@@ -1,4 +1,4 @@
-import socket, sys, argparse, os, threading
+import socket, sys, argparse, os, threading, filelock
 from Crypto.Cipher import AES
 from Crypto.Hash import SHA256
 
@@ -19,7 +19,7 @@ class SocketConnection() #only handles data coming in on its specified connectio
         
     
     #Below is all of our functions concerning sending data through our socket
-    def sendData(self, data): #The backbone of our socket connections ability to send data
+    def sendData(self, data, size= None): #The backbone of our socket connections ability to send data
         if size is None:
             size = str(sys.getsize(data)).zfill(1024) #padds the gile size until it is a 1024 bit chunk, as that is what the recieving end expects
         try:
@@ -29,7 +29,7 @@ class SocketConnection() #only handles data coming in on its specified connectio
                 data = encryptData(data)
                 self.socket.send(data.encode('utf-8')) #now the data can be sent as one full size as the other end knows what size to expect
             else:
-                self.socket.send((str(1).zfill(1024)).encode('utf-8')) #
+                self.socket.send((str(1).zfill(1024))) #
                 data = self.encryptData(data)
                 self.socket.send(data)
             return True
@@ -39,27 +39,20 @@ class SocketConnection() #only handles data coming in on its specified connectio
         
     def sendFile(self, filePath):
             
-        if not 'C:' in path:
-            path = os.path.join(path, os.getcwd())
-
-        
-        with open(path, 'rb') as file:
-
-            if self.server is not None:
-                self.markFileAsOpen(path)
+        with FileLock('filePath'):        
+            with open(path, 'rb') as file:
+                data = file.read()
+                status = self.sendData(data, True)
                 
-            data = file.read()
-            status = self.sendData(data, True)
-            
-            file.close()
-            self.markFileAsClosed(path)
-            return status
+                return status
     
     def sendFiles(self, fileNames):
         statuses = []
         for name in fileNames:
             statuses.append(self.sendFile(name))
-            
+
+        return statuses
+        
     def sendDir(self, directory, clearance = 1, topLevel = True):
         if topLevel:
             clearence = self.recieveData()
@@ -131,12 +124,16 @@ class SocketConnection() #only handles data coming in on its specified connectio
     
         return data
 
-    def recieveFile(self.fileName):
-        return self.recieveData()
+    def recieveFile(self, fileName):
+        with FileLock(fileName): 
+            return self.recieveData(fileName)
     
     def recieveFiles(self, fileNames):
+        statuses = []
         for file in fileNames:
-            self.recieveData(file)
+            statuses.append(self.recieveFile(file))
+
+        return statuses
         
     def recieveDir(self, path):
         if not os.path.exists(path) or not os.path.isdir(path):
@@ -168,8 +165,8 @@ class SocketConnection() #only handles data coming in on its specified connectio
         return self.encryptor.decrypt(data)
 
     #File compression algorithms for sending files, still under construction
-    def huffminEncoding(self, file):
-        pass
+    #def huffminEncoding(self, file):
+    
 
     #Managing or changing the active socket, these functions excoet for closing the connection aren't used with the additonal server code
     def closeSocket(self):

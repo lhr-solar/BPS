@@ -1,4 +1,4 @@
-import socket, sys, argparse, os, threading
+import socket, sys, argparse, os, threading, filelock
 from Crypto.Cipher import AES
 from Crypto.Hash import SHA256
 
@@ -39,21 +39,20 @@ class SocketConnection() #only handles data coming in on its specified connectio
         
     def sendFile(self, filePath):
             
-        if not 'C:' in path:
-            path = os.path.join(path, os.getcwd())
-
-        
-        with open(path, 'rb') as file:
-            data = file.read()
-            status = self.sendData(data, True)
-            
-            return status
+        with FileLock('filePath'):        
+            with open(path, 'rb') as file:
+                data = file.read()
+                status = self.sendData(data, True)
+                
+                return status
     
     def sendFiles(self, fileNames):
         statuses = []
         for name in fileNames:
             statuses.append(self.sendFile(name))
-            
+
+        return statuses
+        
     def sendDir(self, directory, clearance = 1, topLevel = True):
         if topLevel:
             clearence = self.recieveData()
@@ -125,12 +124,16 @@ class SocketConnection() #only handles data coming in on its specified connectio
     
         return data
 
-    def recieveFile(self.fileName):
-        return self.recieveData()
+    def recieveFile(self, fileName):
+        with FileLock(fileName): 
+            return self.recieveData(fileName)
     
     def recieveFiles(self, fileNames):
+        statuses = []
         for file in fileNames:
-            self.recieveData(file)
+            statuses.append(self.recieveFile(file))
+
+        return statuses
         
     def recieveDir(self, path):
         if not os.path.exists(path) or not os.path.isdir(path):
