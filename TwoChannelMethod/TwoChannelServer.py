@@ -1,10 +1,10 @@
 import socket, threading, argparse
 #####Custom Libs#####
-from ClientHandler import ClientHandler #what clients are passed off too
+from TwoChannelConnection import TwoChannelConnection
 from ServerDatabase import Database
 
-class Server(threading.Thread): #inherits from threading so that you can run multiple servers on the same computer
-    
+class TwoChannelServer(threading.Thread):
+
     def __init__(self, host = "127.0.0.1", port= 5000, backlogs= 100, banFile= None):
         self.host = host #IP to run on
         self.port = port #Port to run on, make sure this is forwarded on your local network router
@@ -18,6 +18,7 @@ class Server(threading.Thread): #inherits from threading so that you can run mul
         
         self.openServerCon()
         self.currentConnections = []
+        self.pendingConnections = []
         
         self.inputMonitor = threading.Thread(target= lambda: monitorUserInput()) #seperate thread for the server admins input from the console
         self.userCommand = ""
@@ -26,7 +27,7 @@ class Server(threading.Thread): #inherits from threading so that you can run mul
         self.printLock = threading.Lock() #used to prevent competing threads from printing at once
         self.connnectionLock = threading.Lock() #used to prevent multiple threads from messing with the servers status or connections list at once to avoid confusion
 
-        self.con = Database
+        self.con = Database()
         
         super(Server, self).__init__() #calls the constructor for the thread class it inherits from as well
 
@@ -47,21 +48,27 @@ class Server(threading.Thread): #inherits from threading so that you can run mul
                     break
 
             if not banned:
-                newClient = ClientHandler(con, addr, port, self) #here the new client is passed off to a connection handler
-                self.currentConnections.append(newClient)
-                newClient.start()
+                self.pendingConnections.append([con, addr])
+
+            for client in pendingConnections:
+                if client[1][0] == addr[0] && client[1][1] != addr[1]:
+                    cons = [client[0], con]
+                    newClient = TwoChannelConnection(self.host, self.port, cons, self)
+                    newClient.start()
+
+                    self.currentConnections.append(newClient)
         
         print("Closing Server")
         self.serverCon.close()
-
-    def checkPassword(self, password)
-        return self.con.passwordStatus(password)
 
     #####USer Input and displaying functions#####
     def showMessage(msg): #called instead of print to 
         self.printLock.acquire()
         print('\n' + str(msg))
         self.printLock.release()
+
+    def checkPassword(self, password)
+        return self.con.passwordStatus(password)
     
     def monitorUserInput(self):
         while True:
@@ -288,42 +295,14 @@ class Server(threading.Thread): #inherits from threading so that you can run mul
         msg += '-rs\t\tRestarts the server\n'
         msg += '-bci\t\tBans a specified IP\n' 
         msg += '-bc\t\tBans a specified client from the current connection list\n'
-        msg += "-ubc\t\tUnbans a specified IP"
+        msg += "-ubc\t\tUnbans a specified IP\n"
         msg += "-p\t\tDisplays the paramters of the server that can be changed by the user\n"
         msg += '-wq\t\tShutsdown the server\n'
         msg += "*****You can change any of the server parameters by typing the paramter name, and an equals sign  with the new value*****\n"
         msg += "*****EX: backlogs = 2500, would change the backlogged connection limit to 2500*****\n"
         self.showMessage(msg)
-
-#####For testing the server#####
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument("-ho", "--host", help= "host the test clients will connect to", type= str)
-    parser.add_argument("-p", "--port", help= "port the clients will connect to", type= int)
-    parser.add_argument("-bl", "--backlogs", help= "the max number of clients on hold until all new clients past the threshold will be rejected", type= int)
-    parser.add_argument('-bf', "--banfile", help= "list of ips to reject", type= str)
     
-    args = parser.parse_args()
 
-    if args.host is not None:
-        host = args.host
-    else:
-        host = "127.0.0.1" 
-        
-    if args.port is not None:
-        port = args.port
-    else:
-        port = 5000
 
-    if args.backlogs is not None:
-        backlogs = args.backlogs
-    else:
-        backlogs = 100
-
-    if args.banfile is not None:
-        banFile = args.banFile
-    else:
-        banFile = None
-
-    server = Server(host, port, backlogs, banFile)
-    server.start()
+if __name__ == '__main__':
+    

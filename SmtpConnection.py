@@ -1,6 +1,6 @@
 import os
 import sys
-import smtplib
+from smtplib import *
 
 from email import encoders
 from email.message import Message
@@ -10,7 +10,7 @@ from email.mime.image import MIMEImage
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
-class smtpConnection(smtplib):
+class smtpConnection(threading.Thread):
 
     def __init__(self, username, password, smtpServer):
         self.username = username
@@ -33,7 +33,10 @@ class smtpConnection(smtplib):
             print("Error occurred while connecting to smtp server ", self.smtpServer, "with error of:", sys.exc_info()[0])
             self.active = False
 
+        self.quit = False
+
         if self.active:
+            self.quit = True
             try:
                 print("Logging in to email account..")
                 self.mail.login(self.username, self.password)
@@ -43,8 +46,12 @@ class smtpConnection(smtplib):
                 print("Print error logging into email account:", sys.exc_info()[0])
                 self.active = False
             
-        self.authorized = ["User", "Admin", "Mod"]
         
+        
+    def run(self):
+        while self.quit = False:
+            pass
+
     def encodeFileBase64(self, file, filesName):
         print("Encoding", filesName + "...")
         attachment = MIMEBase('application', 'octet-stream')
@@ -165,9 +172,6 @@ class smtpConnection(smtplib):
             print("Error sending mail:", sys.exc_info()[0])    
             return False
 
-    def closeConnection(self):
-        self.database.close()
-        self.active = False
         
 if __name__ == "__main__":
     sendMail('coreyohulse@gmail.com', ['cohulse@asu.edu', 'coreyohulse@gmail.com'], 'testing', 'Hope this works!', ['serverDirectory', 'serverFile.txt'])

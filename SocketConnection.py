@@ -12,7 +12,7 @@ class SocketConnection() #only handles data coming in on its specified connectio
         if con:
             self.socket = con #Here is where we make the actual socket connection   
         else:
-            self.connectToHost()
+            self.connectToHost(host, port)
     
         self.quit = False #if this is set true, than the connection will close as soon as it done handling files or anything that stopping in the middle of would be bad 
         self.quitLock = threading.Lock()#to prevent anymore processes from being opened once the quit mode is engage
