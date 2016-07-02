@@ -2,35 +2,37 @@ import socket, sys, argparse, os, threading, filelock
 from Crypto.Cipher import AES
 from Crypto.Hash import SHA256
 
-class SocketConnection() #only handles data coming in on its specified connection
-{
+class SocketConnection(): #only handles data coming in on its specified connection
 
     def __init__(addr, port, con= None):
         self.host = addr #ip address
         self.port = port
 
         if con:
-            self.socket = con #Here is where we make the actual socket connection   
+            self.socket = con #Here is where we make the actual socket connection
+            #self.encryptKey = self.recieveData()
+            #self.IV = self.recieveData()
+            #self.encryptor = AES.new(self.encryptKey, AES.MODE_CBC, self.IV)
         else:
-            self.connectToHost()
+            self.connectToHost(host, port)
     
         self.quit = False #if this is set true, than the connection will close as soon as it done handling files or anything that stopping in the middle of would be bad 
         self.quitLock = threading.Lock()#to prevent anymore processes from being opened once the quit mode is engage
         
     
     #Below is all of our functions concerning sending data through our socket
-    def sendData(self, data, size= None): #The backbone of our socket connections ability to send data
+    def sendData(self, data, size= None): #The backbone of our socket connections ability to send data, all functions concerning sending data go through here
         if size is None:
             size = str(sys.getsize(data)).zfill(1024) #padds the gile size until it is a 1024 bit chunk, as that is what the recieving end expects
         try:
             self.socket.send(str(size).encode('utf-8'))
-            if not binary: #a 0 is ent to confirm the message is not intended to be in binary, a 1 confirms the message is intended to be bianary data
-                self.socket.send((str(0).zfill(1024)).encode('utf-8'))
-                data = encryptData(data)
+            if not binary: #b is sent to confirm the message is not intended to be in binary, a p confirms the message is intended to be bianary data
+                self.socket.send((str('b').zfill(1024)).encode('utf-8'))
+                #data = encryptData(data)
                 self.socket.send(data.encode('utf-8')) #now the data can be sent as one full size as the other end knows what size to expect
             else:
-                self.socket.send((str(1).zfill(1024))) #
-                data = self.encryptData(data)
+                self.socket.send((str(1).zfill(1024)))
+                #data = self.encryptData(data) #encrypts the data
                 self.socket.send(data)
             return True
         except: #this message is sent to notify of an error on the other side
@@ -39,7 +41,7 @@ class SocketConnection() #only handles data coming in on its specified connectio
         
     def sendFile(self, filePath):
             
-        with FileLock('filePath'):        
+        with FileLock(filePath): #prevents the file form being opened up by another thread        
             with open(path, 'rb') as file:
                 data = file.read()
                 status = self.sendData(data, True)
@@ -54,78 +56,82 @@ class SocketConnection() #only handles data coming in on its specified connectio
         return statuses
         
     def sendDir(self, directory, clearance = 1, topLevel = True):
-        if topLevel:
+        if topLevel: #on the first run through we recieve the data on how deep we are going into these directories, each level of clearance is another directory level
             clearence = self.recieveData()
             clearence = int(clearance)
 
         directories = []
-        if 'C:' not in directory:
-            directory = os.path.join(os.getpath(cwd), directory)
-        for file in os.listdir(directory):
-           path = os.path.join(directory, file) 
+        if 'C:' not in directory: #if there is no file path before the directory name we add it in to keep track of where we are
+            directory = os.path.join(os.getpath(cwd), directory) #adds the full path to the name
+        for file in os.listdir(directory): #sorting files from directories to deal with differently
+           path = os.path.join(directory, file)  #adding the path name to the file so we can keep track of where it is
             if os.path.isfile(path):
-                self.sendData("SENDING FILE: " + path)
+                self.sendData("SENDING FILE: " + path) #let the other end know we are sending a file
                 self.sendFile(path)
-            elif os.path.isdir(path) && clearance != 0:
+            elif os.path.isdir(path) && clearance != 0: #if we still have clearance then add the directory to the list of directories we will go through after all the files are done
                 directories.append(path)
 
             else:
                 pass
             
-        if clearence != 0:
+        if clearence != 0: 
             for direc in directories:
                 path = os.path.join(direc, directory)
-                self.socket.send("NEW DIRECTORY: " + direc)
-                self.sendDir(path, clearance - 1, False)
+                self.socket.sendData("NEW DIRECTORY: " + direc) #let the other end know we are in a new directory
+                self.sendDir(path, clearance - 1, False) #take out a level of clearence and run through the new directory
 
-        self.sendData('__DONE__')
+        self.sendData('__DONE__') #lets the other end know we are done
 
     #Below is all of our functions conerning recieving data from our socket
-    def isError(data):
+    def isError(data): #thuis checks if a notification that an error was encountered on the sending side was sent to us
         if "$ERROR$" in data[-6:]:
             return True
         else:
             return False
     
-    def recieveData(self, fileName= None): #The backbone of our socket connection's ability to recieve data
-        size = self.socket.recv(1024).decode('utf-8')
-        binary = self.socket.recv(1024).decode('utf-8')
-        if binary == "1":
-            binary = True
-        else:
-            binary = False
+    def recieveData(self, fileName= None): #The backbone of our socket connection's ability to recieve data, all functions concerning recieving data use this
+        try:
+            size = self.socket.recv(1024).decode('utf-8').strip('0')
+            binary = self.socket.recv(1024).decode('utf-8').strip('0')
 
-        data = self.socket.recv(int(size))
-        data = self.decryptData(data)
-        if isError(size) or (isError(binary) or isError(data)):
-            return False
-        
-        if fileName is not None:
+            if binary == "b": #if true the data being sent is supposed to be in binary, otherwise it is assumed to be encoded text
+                binary = True
+            else:
+                binary = False
+
+            if self.isError(size) or self.isError(binary): #if an error is encountered then abort the process
+                return False
+
+            data = self.socket.recv(int(size))
+            if self.isError(data): #one final error check before doing anything with or writing the data to a file
+                return False
+
+            #data = self.decryptData(data) 
             
-            try:
-                if "C:" not in fileName:
-                    fileName = os.path.join(os.getcwd(), fileName)
+            if fileName is not None:
+                
+                try:
 
-                if int(binary) == 1:
-                    file = open(fileName, 'ab')
-                else:
-                    file = open(fileName, 'a')
-                    data = data.decode('utf-8')
-                if data[-7:] == "$ERROR$":
-                    return 0
-                else:
+                    if binary:
+                        file = open(fileName, 'ab')
+                    else:
+                        file = open(fileName, 'a')
+                        data = data.decode('utf-8')
+
                     file.write(data)
 
-            except:
-                return False
+                except:
+                    return False
+            
+                file.close()
         
-            file.close()
-    `       self.markFileAsClosed(fileName)
-    
-        return data
+            return data
+        
+        except:
+            return False
 
     def recieveFile(self, fileName):
-        with FileLock(fileName): 
+        with FileLock(fileName): #this prevents the file frmo being opened by other connections
             return self.recieveData(fileName)
     
     def recieveFiles(self, fileNames):
@@ -141,28 +147,32 @@ class SocketConnection() #only handles data coming in on its specified connectio
                 os.path.join(os.getcwd(), path)
 
             os.makedirs(path)
+            
         while True:
-            fileName = self.recieveData()
-            if fileName == "__DONE__":
+            fileName = self.recieveData() #recieves the fileName
+            if fileName == "__DONE__" : #checks if the current directory is finished being sent, then below checks if an error was encountered
                 break
             
-            elif fileName[0:12] == "SENDING FILE:":
+            elif not fileName:
+                pass
+            
+            elif fileName[0:12] == "SENDING FILE:": #if a file is being sent, then prepare for that
                 filePath = os.path.join(path, fileName[14:])
                 self.recieveData(filePath)
                 
-            elif fileName[0:14] == "NEW DIRECTORY:":
+            elif fileName[0:14] == "NEW DIRECTORY:": #and if a new directory is being sent, then call this function again for some good ol recursive fun
                 newDirec = fileName[16:]
                 newDirecPath = os.path.join(path, newDirec)
                 self.recieveDir(newDirecPath)
     
 
-    #Encryption functions for all of our data sending
-    def encryptData(self, data):
-        return self.encryptor.encrypt(data)
-
-    #Decryption functions for all of our data receiving
-    def decryptData(self, data):
-        return self.encryptor.decrypt(data)
+##    #Encryption functions for all of our data sending
+##    def encryptData(self, data):
+##        return self.encryptor.encrypt(data)
+##
+##    #Decryption functions for all of our data receiving
+##    def decryptData(self, data):
+##        return self.encryptor.decrypt(data)
 
     #File compression algorithms for sending files, still under construction
     #def huffminEncoding(self, file):
@@ -172,16 +182,16 @@ class SocketConnection() #only handles data coming in on its specified connectio
     def closeSocket(self):
         self.socket.close()
 
-    def connectToHost(self, host, port):
+    def connectToHost(self, host, port): #takes care of some preliminary things when connectin to a new socket
 
         try:
             self.socket.connect(host, port)
-            self.encryptKey = self.recieveData()
-            self.IV = self.recieveData()
-            self.encryptor = AES.new(self.encryptKey, AES.MODE_CBC, self.IV)
-            return True #a return of 1 indicated a connection was successful
+            #self.encryptKey = self.recieveData()
+            #self.IV = self.recieveData()
+            #self.encryptor = AES.new(self.encryptKey, AES.MODE_CBC, self.IV)
+            return True 
         except:
-            return False #a return of zero indicates a connection was not successful
+            return False
       
 
     def changeSocket(self, host, port): #Will ask the user for input if none is given
@@ -189,7 +199,7 @@ class SocketConnection() #only handles data coming in on its specified connectio
         return self.connectToHost(host, port):
       
     
-    def checkQuit(): #if the thread is queued to close, it will 
+    def checkQuit(): #if the thread is queued to close, it will end all processes as soon as it is free and not doing anything unstable
         if self.quit:
             self.quitLock.acquire()
             self.socket.close()
