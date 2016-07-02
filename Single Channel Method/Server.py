@@ -57,12 +57,13 @@ class Server(threading.Thread): #inherits from threading so that you can run mul
     def checkPassword(self, password)
         return self.con.passwordStatus(password)
 
-    #####USer Input and displaying functions#####
+    #####User Input and displaying functions#####
     def showMessage(msg): #called instead of print to 
         self.printLock.acquire()
         print('\n' + str(msg))
         self.printLock.release()
-    
+
+    #Allows the user to enter in commands in the command prompt even while the server is busy accepting and passing off clients
     def monitorUserInput(self):
         while True:
             self.userCommand = str(input(">>"))
@@ -78,7 +79,7 @@ class Server(threading.Thread): #inherits from threading so that you can run mul
 
                 self.showMessage("You must restart the server for the changes to take effect")
                 answer = ''
-                while True:
+                while True: #will restart the server so the change to the server paramter can be put in
                     answer = str(input('Would you like to restart now(Y/N): '))
                     if answer.upper() == "Y" or answer.upper() == "YES":
                         self.restartServer()
@@ -87,7 +88,7 @@ class Server(threading.Thread): #inherits from threading so that you can run mul
                     else:
                         self.showMessage('Command Not Recgonized')
                         
-            elif self.userCommand[:3] == "-cl": 
+            elif self.userCommand[:3] == "-cl": #close a specified connection
                 try:
                     client = int(self.userCommand[4:])
                 except:
@@ -100,7 +101,7 @@ class Server(threading.Thread): #inherits from threading so that you can run mul
                 finally:
                     self.closeConnection(client)
                     
-            elif self.userCommand[:4] == "-clr":
+            elif self.userCommand[:4] == "-clr": #close connections in a specified range
                 try:
                     startRange = self.userCommand[5:6]
                     endRange = self.userCommand[7:8]
@@ -125,7 +126,7 @@ class Server(threading.Thread): #inherits from threading so that you can run mul
                 finally:
                     self.closeConnectionRange(startRange, endRange)
                                                                  
-            elif self.userCommand[:4] == "-cla":
+            elif self.userCommand[:4] == "-cla": #close all connections
                 answer = ""
                 while True:
                     answer = str(input("Are you sure you would like to close all client connections(Y/N): "))
@@ -137,22 +138,22 @@ class Server(threading.Thread): #inherits from threading so that you can run mul
                         self.showMessage("Canceling closing all client proccesses")
                         break;
                                                                  
-            elif self.userCommand[:3] == "-pa":
+            elif self.userCommand[:3] == "-pa": #pause the server
                 self.pauseServer()
                                                                  
-            elif self.userCommand[:3] == "-upa":
+            elif self.userCommand[:3] == "-upa": #unpause the server
                 self.unpauseServer()
                                                                  
-            elif self.userCommand[:3] == "-cls":
+            elif self.userCommand[:3] == "-cls": #closes the server to incoming connections
                 self.closeServerCon()
                                                                  
-            elif self.userCommand[:3] == "-ops":
+            elif self.userCommand[:3] == "-ops": #opens up the server to connections
                 self.openServerCon()
                                                                  
-            elif self.userCommand[:3] == "-rs":
+            elif self.userCommand[:3] == "-rs": #resets the server
                 self.restartServer()
                                                                  
-            elif self.userCommand[:4] == "-bci":
+            elif self.userCommand[:4] == "-bci": # bans a client in the specified connection index
                 try:
                     client = self.userCommand[5:]
                 except:
@@ -165,7 +166,7 @@ class Server(threading.Thread): #inherits from threading so that you can run mul
                 finally:
                     self.banClientIP(client)
 
-            elif self.userCommand[:3] == '-bc':
+            elif self.userCommand[:3] == '-bc': #bans a specified ip
                 try:
                     client = self.userCommand[4:]
                 except:
@@ -181,7 +182,7 @@ class Server(threading.Thread): #inherits from threading so that you can run mul
                 finally:
                     self.banClient(client)
             
-            elif self.userCommand[:4] == "-ubc":
+            elif self.userCommand[:4] == "-ubc": #unban a client
                 try:
                     client = self.userCommand[5:]
                 except:
@@ -189,13 +190,13 @@ class Server(threading.Thread): #inherits from threading so that you can run mul
                 finally:
                     self.unbanClient(client)
                                                                  
-            elif self.userCommand[:3] == "-wq":
+            elif self.userCommand[:3] == "-wq": #ends the server and program
                 self.endServer()
                                                                  
-            elif self.userCommand[:2] == "-h":
+            elif self.userCommand[:2] == "-h": #displays all server commands
                 self.displayHelp()
 
-            elif self.userCommand[:2] == "-p":
+            elif self.userCommand[:2] == "-p": #displays server parameters
                 self.showMessage('Server Backlogs: ' + self.backlogs)
                 self.showMessage('Server Host: ' + self.host)
                 self.showMessage('Server port: ' + self.port)
@@ -204,32 +205,35 @@ class Server(threading.Thread): #inherits from threading so that you can run mul
                 self.showMessage('Command not recgonized')
 
     #####Closing current connections#####                
-    def closeConnection(self, con):
+    def closeConnection(self, con, remove= True): #closes the connection and removes it from the connection list
         con.quit = True
-        self.currentConnections.remove(con)
+        if remove:
+            self.currentConnections.remove(con)
         
     def closeConnectionRange(self, start, last):
         for x in range(start, last + 1):
             self.closeConnection(self.currentConnections[x])
             
     def closeAllConnections(self):
-        if not self.paused():
+        if not self.paused(): #pauses accepting any more incoming connections so that the list size wont change during iteration
             self.pause()
         for con in self.currentConnections:
-            self.closeConnection(con)
-        self.unpause
+            self.closeConnection(con, False) #avoids removing any connections until after the iteration through the list is complete
+        self.currentConnections = []
+        self.unpause()
 
     #####Banning/Unbanning Clients#####
-    def banClient(self, clientNum):
+    #All banned client ips are kept in a text file that the server reads from
+    def banClient(self, clientNum): #bans the ip associated with the connection in the specified number index on the connections list
         clientIp = self.currentConnections[clientNum].addr
-        self.bannedClients.append(clientIp + '\n')
+        self.bannedClients.append(clientIp + '\n') #adds the ip to the list of banned ips and then below that writes it to the file
         self.banFile.write('\n' + clientIp)
 
-    def banClientIP(self, clientIP):
+    def banClientIP(self, clientIP): #bans a client ip by both putting them in the ban list and in the ban file
         self.bannedClients.append(clientIP + '\n')
         self.banFile.write('\n' + clientIP)
         
-    def unbanClient(self, clientIP):
+    def unbanClient(self, clientIP): #to unban a client they must be both removed from the ban list and the ban file
         for client in self.bannedClients:
             if clientIP in client:
                 self.bannedClients.remove(clientIP + '\n')
@@ -242,14 +246,14 @@ class Server(threading.Thread): #inherits from threading so that you can run mul
             self.banFile.write(line)
 
     #####Changing Server Status#####
-    def pause(self):
+    def pause(self): #triggers a loop in the main thread that waits until unpaused
         if not self.pause:
             self.pause = True
         else:
             self.showMessage("Server Already Paused")
             
     def unpause(self):
-        if self.pause:
+        if self.pause: #breaks the loop the main thread can enter when paused
             self.pause = False
         else:
             self.showMessage("Server Already Unpaused")
@@ -257,27 +261,27 @@ class Server(threading.Thread): #inherits from threading so that you can run mul
     def paused(self):
         return self.pause
         
-    def closeServerCon(self):
+    def closeServerCon(self): #temporarily shutsdown the server until told to open
         self.closeAllConnections()
         self.serverCon.close()
         
-    def openServerCon(self):
+    def openServerCon(self): #reopens the server
         self.serverCon = socket.socket()
         self.serverCon = socket.bind((self.host, self.port))
         self.serverCon.listen(self.backlogs)
 
-    def restartServer(self):
+    def restartServer(self): #restarts teh server, used to update changed parameters
         self.showMessage("Restarting Server")
         self.closeServerCon()
         self.openServerCon()
 
-    def endServer(self):
+    def endServer(self): #shutdowns the server and the program
         self.closeAllConnections()
         self.serverCon.close()
         self.updateBanfile()
         sys.exit(0)
 
-    def displayHelp(self):
+    def displayHelp(self): #used to list off all server commands
         msg += '-cl\t\tCloses a specified client connection\n'
         msg += '-clr\t\tCloses a specified range of clients\n'
         msg += '-cla\t\tCloses all connections\n'
@@ -297,6 +301,7 @@ class Server(threading.Thread): #inherits from threading so that you can run mul
 
 #####For testing the server#####
 if __name__ == "__main__":
+    #All command line arguments are optional and will revert to default values if not entered
     parser = argparse.ArgumentParser()
     parser.add_argument("-ho", "--host", help= "host the test clients will connect to", type= str)
     parser.add_argument("-p", "--port", help= "port the clients will connect to", type= int)
@@ -325,5 +330,7 @@ if __name__ == "__main__":
     else:
         banFile = None
 
+    #starts the server based off of command line arguments or default values if none were entered, and gets it running
     server = Server(host, port, backlogs, banFile)
     server.start()
+    
