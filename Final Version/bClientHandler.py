@@ -2,6 +2,7 @@ import threading
 import subprocess
 import os
 import sys
+import hashlib
 
 class clientHandler(threading.Thread):
 
@@ -14,8 +15,16 @@ class clientHandler(threading.Thread):
         self.results = ''
         super(clientHandler, self).__init__()
 
-    def run(self):
+    def run(self): 
         try:
+            print(-1)
+            if self.server.passwords != None:
+                message = self.recvData()
+                if hashlib.md5(self.server.salt + message.encode('utf-8')).hexdigest() + ':h' in self.server.passwords:
+                    self.sendData('PASSWORD ACCEPTED')
+                else:
+                    raise Exception('PASSWORD NOT ACCEPTED')
+            
             message = ''
             while message != 'wq' and self.quit != True:
                 message = self.recvData()
@@ -25,11 +34,17 @@ class clientHandler(threading.Thread):
 
                 elif message[:3] == "-DF":
                     fileName = message[4:]
-                    self.sendFile(fileName)
+                    if fileName == 'passwords.txt':
+                        self.results = 'YOU DO NOT HAVE ACCESS TO THAT FILE'
+                    else:
+                        self.sendFile(fileName)
                     
                 elif message[:3] == "-UF":
                     fileName = message[4:]
-                    self.recvFile(fileName)
+                    if fileName == 'passwords.txt':
+                        self.results = 'YOU DO NOT HAVE ACCESS TO THAT FILE'
+                    else:
+                        self.recvFile(fileName)
 
                 elif message[:2] == "cd":
                     directory = message[3:]
@@ -40,14 +55,22 @@ class clientHandler(threading.Thread):
                         self.results = "Error in changing directory, directory may not exist"
                         
                 else:
-                    cmd = subprocess.Popen(message, shell= True, stdout= subprocess.PIPE, stderr= subprocess.PIPE)
-                    self.results = (cmd.stdout.read() + cmd.stderr.read()).decode('utf-8')
-                
+                    if 'passwords.txt' in message:
+                        self.results = 'YOU DO NOT HAVE ACCES TO THAT FILE'
+                    elif 'rmdir' in message.lower():
+                        self.results = 'COMMAND NOT ALLOWED'
+                    else:
+                        cmd = subprocess.Popen(message, shell= True, stdout= subprocess.PIPE, stderr= subprocess.PIPE)
+                        self.results = (cmd.stdout.read() + cmd.stderr.read()).decode('utf-8')
+                        self.results = self.results.replace('passwords.txt', 'new Text Document.txt')
+                        
                 self.sendData(self.results)
 
-        except: 
-            pass
-        
+        except Exception as e:
+            try:
+                self.sendData(str(e) + '\nEnding Connection due to Errors')
+            except:
+                pass
         finally:
             for x in self.server.currentCons:
                 if x[1] == self.IP:

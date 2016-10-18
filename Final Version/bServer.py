@@ -2,6 +2,8 @@ import socket
 from bClientHandler import clientHandler
 import argparse
 import threading
+import os
+import hashlib
 
 class Server(threading.Thread):
 
@@ -17,9 +19,30 @@ class Server(threading.Thread):
 
         self.sock.listen(backlogs)
         self.currentCons = []
-        self.fileLocks = []
+        self.fileLocks = [['passwords.txt', threading.Lock()]]
+        lock = self.fileLocks[0][1]
+        lock.acquire()
         self.clientLock = threading.Lock()
-        
+
+        self.salt = 'scooter'.encode('utf-8')
+        if os.path.isfile('passwords.txt'):
+            with open('passwords.txt', 'r') as file:
+                self.passwords = [x.strip('\n') for x in file.readlines()]
+                tempList = []
+                for x in self.passwords:
+                    if x.endswith(':h'):
+                        tempList.append(x)
+                    else:
+                        tempList.append(hashlib.md5(self.salt + x.encode('utf-8')).hexdigest() + ':h')
+                self.passwords = tempList
+
+            with open('passwords.txt', 'w') as file:
+                for x in self.passwords:
+                    file.write(x + '\n')
+                        
+        else:
+            self.passwords = None
+            
         super(Server, self).__init__()
 
     def run(self):
