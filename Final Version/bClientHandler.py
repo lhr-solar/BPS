@@ -72,7 +72,7 @@ class clientHandler(threading.Thread):
                 chunk = self.con.recv(1024)
                 
                 if sys.getsizeof(chunk) < 1024:
-                    if chunk == '$$ERROR$$'.encode('utf-8'):
+                    if '$$ERROR$$'.encode('utf-8') in chunk:
                         error = True
                         break
                     else:
@@ -87,7 +87,7 @@ class clientHandler(threading.Thread):
             else:
                 file.close()
                 os.remove(fileName)
-                self.results = 'ERROR DURING UPLOADING'
+                self.results = chunk.decode('utf-8').replace('$$ERROR$$', '')
             lock.release()
             
     def sendData(self, data):
@@ -117,11 +117,11 @@ class clientHandler(threading.Thread):
             self.results = "FILE DOWNLOADED"
             lock.release()
             return
-        except:
+        except Exception as e:
             self.con.recv(22)
             lock.release()
             self.con.send("$$ERROR$$".encode('utf-8'))
-            self.results = "ERROR ENCOUNTERED: check that the file name was spelled correctly"
+            self.results = str(e)
 
     def lockFile(self, fileName):
         noFile = True
