@@ -19,10 +19,9 @@ class clientHandler(threading.Thread):
             message = ''
             while message != 'wq' and self.quit != True:
                 message = self.recvData()
-
                 if message == "wq":
                     self.quit = True
-                    continue
+                    self.results == 'TERMINATING CONNECTION'
 
                 elif message[:3] == "-DF":
                     fileName = message[4:]
@@ -43,10 +42,8 @@ class clientHandler(threading.Thread):
                 else:
                     cmd = subprocess.Popen(message, shell= True, stdout= subprocess.PIPE, stderr= subprocess.PIPE)
                     self.results = (cmd.stdout.read() + cmd.stderr.read()).decode('utf-8')
-
-
+                
                 self.sendData(self.results)
-                print(self.results)
 
         except: 
             pass
@@ -71,14 +68,11 @@ class clientHandler(threading.Thread):
             data = "".encode('utf-8')
             error = False
             while True:
+                self.con.send('ready'.encode('utf-8'))
                 chunk = self.con.recv(1024)
                 
                 if sys.getsizeof(chunk) < 1024:
-                    if "$$ERROR$$" == chunk.decode('utf-8'):
-                        self.results = "ERROR ENCOUNTERED: check that the given file exist"
-                        file.close()
-                        os.remove(fileName)
-                        lock.release()
+                    if chunk == '$$ERROR$$'.encode('utf-8'):
                         error = True
                         break
                     else:
@@ -86,13 +80,16 @@ class clientHandler(threading.Thread):
                         break
                 else:
                     data += chunk
-
+            
             if not error:
-                lock.release()
                 self.results = "FILE UPLOADED"
                 file.write(data)
-                    
-                    
+            else:
+                file.close()
+                os.remove(fileName)
+                self.results = 'ERROR DURING UPLOADING'
+            lock.release()
+            
     def sendData(self, data):
         try:
             data = data.encode('utf-8')
@@ -103,7 +100,7 @@ class clientHandler(threading.Thread):
             self.con.send(data)
             return True
         except:
-            print('Error: ', str(sys.exc_info()[0]))
+            raise Exception('Error: ' + str(sys.exc_info()[0]))
             return False
 
     def sendFile(self, fileName):
@@ -112,21 +109,19 @@ class clientHandler(threading.Thread):
             with open(fileName, 'rb') as file:
                 while True:
                     chunk = file.read(1024)
-
+                    self.con.recv(22)
+                    self.con.send(chunk)
                     if sys.getsizeof(chunk) < 1024:
-                        self.con.send(chunk)
-                        self.con.recv(19) 
                         break
-                    else:
-                        self.con.send(chunk)
-                self.results = "FILE DOWNLOADED"
+                        
+            self.results = "FILE DOWNLOADED"
             lock.release()
             return
         except:
+            self.con.recv(22)
             lock.release()
             self.con.send("$$ERROR$$".encode('utf-8'))
-            self.con.recv(19)
-            self.results = "ERROR ENCOUNTERED: check that the given file exist"
+            self.results = "ERROR ENCOUNTERED: check that the file name was spelled correctly"
 
     def lockFile(self, fileName):
         noFile = True
