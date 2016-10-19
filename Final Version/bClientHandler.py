@@ -1,8 +1,4 @@
-import threading
-import subprocess
-import os
-import sys
-import hashlib
+import threading, subprocess, os, sys, hashlib
 
 class clientHandler(threading.Thread):
 
@@ -114,6 +110,8 @@ class clientHandler(threading.Thread):
             
     def sendData(self, data):
         try:
+            if data == None or len(data) == 0:
+                data = 'NONE'
             data = data.encode('utf-8')
             dataSize = str(sys.getsizeof(data))
             while sys.getsizeof(dataSize) < 1032:

@@ -1,7 +1,4 @@
-import socket
-import base64
-import sys
-import os
+import socket, sys, os
 
 def recvFile(fileName, con):
         data = ''.encode('utf-8')
@@ -53,11 +50,12 @@ sock.connect(('127.0.01', 5000))
 print('Connected to server')
 
 password = str(input('PASSWORD(put in nothing if no password): '))
-sock.send(password.encode('utf-8'))
-results = recvData()
-print(results)
-if 'NOT' in results:
-        sys.exit()
+if len(password) > 0:
+        sock.send(password.encode('utf-8'))
+        results = recvData()
+        print(results)
+        if 'NOT' in results:
+                sys.exit()
         
 
 message = ''

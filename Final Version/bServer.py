@@ -1,9 +1,5 @@
-import socket
+import socket, argparse, threading, os, hashlib
 from bClientHandler import clientHandler
-import argparse
-import threading
-import os
-import hashlib
 
 class Server(threading.Thread):
 
