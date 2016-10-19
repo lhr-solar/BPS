@@ -40,7 +40,11 @@ def sendFile(fileName, con):
         except Exception as e:
                 con.recv(22)
                 con.send(('$$ERROR$$' + str(e)).encode('utf-8'))
-                
+
+def recvData():
+        results = sock.recv(1024)
+        return sock.recv(int(results)).decode('utf-8')
+
 sock = socket.socket()
 
 print('Connecting to server..')
@@ -48,9 +52,9 @@ sock.connect(('127.0.01', 5000))
 
 print('Connected to server')
 
-sock.send('corbosiny247'.encode('utf-8'))
-results = sock.recv(1024)
-results = sock.recv(int(results)).decode('utf-8')
+password = str(input('PASSWORD(put in nothing if no password): '))
+sock.send(password.encode('utf-8'))
+results = recvData()
 print(results)
 if 'NOT' in results:
         sys.exit()
@@ -70,8 +74,7 @@ while message != 'wq':
         if fileName != 'passwords.txt':
                 sendFile(fileName, sock)
 
-    results = sock.recv(1024)
-    results = sock.recv(int(results)).decode('utf-8')
+    results = recvData()
     print(results)
 
 print('Connection closed')

@@ -17,7 +17,6 @@ class clientHandler(threading.Thread):
 
     def run(self): 
         try:
-            print(-1)
             if self.server.passwords != None:
                 message = self.recvData()
                 if hashlib.md5(self.server.salt + message.encode('utf-8')).hexdigest() + ':h' in self.server.passwords:
