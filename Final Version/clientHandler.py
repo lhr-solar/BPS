@@ -117,7 +117,7 @@ class ClientHandler(threading.Thread):
             
     def sendData(self, data):
         try:
-            if data == None or len(data) == 0:  #client expects data, so we send him at least something if we dont have any so it doesnt cause him an error
+            if data == None or len(data) == 0 or sys.getsizeof(data) == 0:  #client expects data, so we send him at least something if we dont have any so it doesnt cause him an error
                 data = 'NONE'
             data = data.encode('utf-8')
             dataSize = str(sys.getsizeof(data))
