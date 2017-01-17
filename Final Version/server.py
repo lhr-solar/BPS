@@ -1,9 +1,9 @@
-import socket, argparse, threading, os, hashlib
+import socket, argparse, threading, os, hashlib, time
 from clientHandler import ClientHandler
 
 class Server(threading.Thread):
 
-    def __init__(self, IP= '127.0.0.1', port= 5000, backlogs= 100, updates= False):         #only needs IP, port, and number of incoming connections that are allowed to be backloged before we start rejecting people
+    def __init__(self, IP= '127.0.0.1', port= 5000, backlogs= 100, update= False):         #only needs IP, port, and number of incoming connections that are allowed to be backloged before we start rejecting people
         self.IP = IP
         self.port = port
 
@@ -15,12 +15,16 @@ class Server(threading.Thread):
 
         self.sock.listen(backlogs)                                                                  #start up the server and set the limit on backloged connections
         self.currentCons = []                                                                       #current connections to the server, 2D stored like [IP, connectionObject]
-        self.fileLocks = [['passwords.txt', threading.Lock()]]                                      #sets up a list of currently used files to avoid different clients from accessing it at the same time
+        self.fileLocks = [['passwords.txt', threading.Lock()], ['datalog.txt', threading.Lock()]]                                      #sets up a list of currently used files to avoid different clients from accessing it at the same time
         lock = self.fileLocks[0][1]                                                                 #setting up a lock on the passwords file to avoid anyone accessing it
         lock.acquire()
+        lock2 = self.fileLocks[1][1]
+        lock2.acquire()
         self.clientLock = threading.Lock()                                                          #this lock is for when threads are trying to remove themselves from the client list
 
-        self.updates = updates #determines whether a log of server flow is kept
+        self.update = update #determines whether a log of server flow is kept
+        if self.update:
+            self.updates("\n____________________", "SERVER START UP", "________________________\n")
         self.salt = 'scooter'.encode('utf-8')                                                       #server salt, for when passwords are being hashed and we add this in to defend against bruteforcers
         if os.path.isfile('passwords.txt'):                                                         #if there is a passwords file in the same directory, we engage passwords mode
             with open('passwords.txt', 'r') as file:
@@ -36,7 +40,7 @@ class Server(threading.Thread):
             with open('passwords.txt', 'w') as file:        #rewrite the newly hashed passwords to the file
                 for x in self.passwords:
                     file.write(x + '\n')
-                        
+                   
         else:
             self.passwords = None
             
@@ -47,7 +51,7 @@ class Server(threading.Thread):
             con, addr = self.sock.accept()
             print('Connection made at IP: ', str(addr[0]))
             print('Passing off client..')
-            client = clientHandler(con, addr[0], self, self.update)      #creating the client handler thread, needs the connection object and IP the client is from
+            client = ClientHandler(con, addr[0], self, self.update)      #creating the client handler thread, needs the connection object and IP the client is from
             client.start()
             self.currentCons.append([client, addr[0]])      #adds in the connection to the current connections list
             self.displayClients()
@@ -55,7 +59,9 @@ class Server(threading.Thread):
         print('Closing server and connections..')
         self.sock.close()
         self.deleteAllClients()
-    
+        if self.update:
+            self.updates("_________, SERVER SHUT DOWN", "______")
+            
     def updates(self, ip, command, filename):                #just updates a text file with the client, action, and date to keep track of the flow of things
         if os.path.isfile('datalog.txt'):
             with open('datalog.txt', 'a') as file:
@@ -86,7 +92,7 @@ if __name__ == "__main__":  #just test code
     parser.add_argument('-ho', '--host', help= 'The host IP the server will bind to', type= str)
     parser.add_argument('-po', '--port', help= 'The host port the server will bind to', type= int)
     parser.add_argument('-bl', '--backlogs', help= 'The number of backloged connections allowed until rejecting further traffic', type= int)
-
+    parser.add_argument('-up', '--update', help= 'If set to true then the server will keep a log of all data flow', type = bool)
     args = parser.parse_args()
 
     if(args.host == None):  #setting some default values if nothing was entered into the optional parameters
@@ -95,8 +101,9 @@ if __name__ == "__main__":  #just test code
         args.port = 5000
     if(args.backlogs == None):
         args.backlogs = 100
-        
-    s = Server(args.host, args.port, args.backlogs)
+    if (args.update == None):
+        args.update = True
+    s = Server(args.host, args.port, args.backlogs, args.update)
     s.start()
 
         

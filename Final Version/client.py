@@ -1,4 +1,4 @@
-import socket, sys, os, argparse
+import socket, sys, os, argparse, subprocess
 
 class Client():    #it is possilbe to make a version that is threaded so it can implement with other programs without stopping them
 
@@ -56,23 +56,40 @@ class Client():    #it is possilbe to make a version that is threaded so it can 
 
     def recvData(self):                                             #used to avoid writing the decode line when just receiving strings
             results = self.con.recv(1024)
-            return self.con.recv(int(results)).decode('utf-8')
-
+            try:
+                return self.con.recv(int(results)).decode('utf-8')
+            except:
+                return None
 
     def sendCommand(self, message):                     #sends a command over and triggers its own response to whichever command it is
-        self.con.send(message.encode('utf-8'))
-        if message[:3] == "-DF":    #download file from server
-            fileName = message[4:]
-            if fileName != 'passwords.txt':
-                self.recvFile(fileName)
+        if message[0:3] == "lc:":
+            command = message[3:]
+            if command[0:2] == "cd":
+                directory = command[3:]
+                try:
+                    os.chdir(directory)
+                    self.results = str(os.getcwd())
+                except:
+                    self.results = "Error in changing directory, directory may not exist"
+            else:
+                cmd = subprocess.Popen(command, shell= True, stdout= subprocess.PIPE, stderr= subprocess.PIPE)
+                self.results = (cmd.stdout.read() + cmd.stderr.read()).decode('utf-8')
+                
+        else:
+            self.con.send(message.encode('utf-8'))
+            if message[:3] == "-DF":    #download file from server
+                fileName = message[4:]
+                if "passwords.txt" not in fileName and "datalog.txt" not in fileName:
+                    self.recvFile(fileName)
 
-        elif message[:3] == "-UF":  #upload file to server
-            fileName = message[4:]
-            if fileName != 'passwords.txt':
-                self.sendFile(fileName)
-
-        self.results = self.recvData() #server will send back the results of the command
-        
+            elif message[:3] == "-UF":  #upload file to server
+                fileName = message[4:]
+                if "passwords.txt" not in fileName and "datalog.txt" not in fileName:
+                    self.sendFile(fileName)
+            
+            self.results = self.recvData() #server will send back the results of the command
+            if "Ending Connection due to Errors" == self.results:
+                raise Exception("Ending Connection due to Errors")
         
 if __name__ == '__main__': #below is mostly test code
     parser = argparse.ArgumentParser()      #adding in an optional command line parser, allows you to start the program from the command line
@@ -89,8 +106,7 @@ if __name__ == '__main__': #below is mostly test code
 
     client = Client(args.ip, args.port, args.password)
     message = ''
-    while message != 'wq':      #starts up the client and waits for commands
+    while message != "wq":      #starts up the client and waits for commands
         message = str(input('>>'))
         client.sendCommand(message)
         print(client.results)
-        

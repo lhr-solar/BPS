@@ -10,9 +10,11 @@ class ClientHandler(threading.Thread):
 
         self.update = update   #determines whether the handler will update the server log
         self.results = ''
-        super(clientHandler, self).__init__()
+        super(ClientHandler, self).__init__()
 
     def run(self):             #waits for client commands
+        if self.update == True:
+            self.server.updates(self.IP, "CONNECTED" , '___')
         try:
             if self.server.passwords != None:                   #if the server isnt running passwords than it doesn't expect one from the client
                 message = self.recvData()
@@ -26,18 +28,18 @@ class ClientHandler(threading.Thread):
                 message = self.recvData()
                 if message == "wq":
                     self.quit = True
-                    self.results == 'TERMINATING CONNECTION'
+                    self.results = 'TERMINATING CONNECTION'
                     
                 elif message[:3] == "-DF":      #sends file to client
                     fileName = message[4:]
-                    if fileName == 'passwords.txt':
+                    if 'passwords.txt' in fileName or "datalog.txt" in fileName:
                         self.results = 'YOU DO NOT HAVE ACCESS TO THAT FILE'
                     else:
                         self.sendFile(fileName)
                     
                 elif message[:3] == "-UF":          #received file from client
                     fileName = message[4:]
-                    if fileName == 'passwords.txt':
+                    if 'passwords.txt' in fileName or "datalog.txt" in fileName:
                         self.results = 'YOU DO NOT HAVE ACCESS TO THAT FILE'
                     else:
                         self.recvFile(fileName)
@@ -47,12 +49,13 @@ class ClientHandler(threading.Thread):
                     try:
                         os.chdir(directory)
                         self.results = str(os.getcwd())
+                        self.server.updates(self.IP, "cd" , directory)
                     except:
                         self.results = "Error in changing directory, directory may not exist"
                         
                 else:           #sends command to command line, unless it has passwords.txt in it or rmdir, no touching!!
-                    if 'passwords.txt' in message:
-                        self.results = 'YOU DO NOT HAVE ACCES TO THAT FILE'
+                    if 'passwords.txt' in message or "datalog.txt" in message:
+                        self.results = 'YOU DO NOT HAVE ACCESS TO THAT FILE'
                     elif 'rmdir' in message.lower():
                         self.results = 'COMMAND NOT ALLOWED'
                     else: #pipes command to the command line and returns the results
@@ -61,9 +64,10 @@ class ClientHandler(threading.Thread):
                         self.results = self.results.replace('passwords.txt', 'new Text Document.txt')
                         if self.update:
                             self.server.updates(self.IP, message , '___') #update server log
-                        
-                self.sendData(self.results)
 
+                self.sendData(self.results)
+                
+                
         except Exception as e:  #if an error with the connection the handler shuts down
             try:
                 self.sendData(str(e) + '\nEnding Connection due to Errors')
@@ -73,6 +77,8 @@ class ClientHandler(threading.Thread):
             for x in self.server.currentCons:       #it always removes itself from the connections list
                 if x[1] == self.IP:
                     self.server.currentCons.pop(self.server.currentCons.index(x))
+                    if self.update == True:
+                        self.server.updates(self.IP, "DISCONNECTED" , '___')
                     break
                 
     def recvData(self):                            #recieves byte data and turns it into strings
@@ -116,6 +122,8 @@ class ClientHandler(threading.Thread):
             lock.release()
             
     def sendData(self, data):
+        if data == "None" or sys.getsizeof(data) == 0:
+            data = "None"
         try:
             if data == None or len(data) == 0 or sys.getsizeof(data) == 0:  #client expects data, so we send him at least something if we dont have any so it doesnt cause him an error
                 data = 'NONE'
@@ -144,7 +152,7 @@ class ClientHandler(threading.Thread):
             self.results = "FILE DOWNLOADED"
             lock.release()
             if self.update:
-                self.server.updates(self.IP, message , fileName)    #updates server log
+                self.server.updates(self.IP, '-UF' , fileName)    #updates server log
             return
         
         except Exception as e:
