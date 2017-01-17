@@ -5,6 +5,8 @@ import threading
 import time
 import os
 
+###this server is identical to the normal one except it keeps a text file log of all activity by default <-----
+###for documentation check out the bServer.py file for full documentation
 class Server(threading.Thread):
 
     def __init__(self, IP= '127.0.0.1', port= 5000, backlogs= 100):
@@ -49,7 +51,7 @@ class Server(threading.Thread):
         self.currentCons.pop(index - 1)
         self.clientLock.release()
 
-    def updates(self, ip, command, filename):
+    def updates(self, ip, command, filename):       #just updates a text file with the client, action, and date to keep track of the flow of things
         if os.path.isfile('datalog.txt'):
             with open('datalog.txt', 'a') as file:
                 file.write(ip + ',' + command + ',' + filename + ',' + time.strftime('%d/%m/%Y %H:%M:%S') + '\n')
