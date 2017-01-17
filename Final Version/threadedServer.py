@@ -1,5 +1,8 @@
 import socket, clientHandler, argparse
 
+
+###just a test server without the added passwords or locking of the full server, <-----------
+###for documentation check out the real server, its almost identical <----------
 class Server():
 
     def __init__(self, IP= '127.0.0.1', port= 5000, backlogs= 100):
