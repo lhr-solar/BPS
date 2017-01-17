@@ -1,6 +1,6 @@
 import threading, subprocess, os, sys, hashlib
 
-class clientHandler(threading.Thread):
+class ClientHandler(threading.Thread):
 
     def __init__(self, con, IP, server, update = False):                #takes in client connection, IP address of client, server, and option paramter on whether it updates a data log for the server        
         self.con = con
