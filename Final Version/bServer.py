@@ -3,7 +3,7 @@ from bClientHandler import clientHandler
 
 class Server(threading.Thread):
 
-    def __init__(self, IP= '127.0.0.1', port= 5000, backlogs= 100):         #only needs IP, port, and number of incoming connections that are allowed to be backloged before we start rejecting people
+    def __init__(self, IP= '127.0.0.1', port= 5000, backlogs= 100, updates= False):         #only needs IP, port, and number of incoming connections that are allowed to be backloged before we start rejecting people
         self.IP = IP
         self.port = port
 
@@ -13,26 +13,27 @@ class Server(threading.Thread):
         self.sock.bind((IP, port))          #setting up the server
         print('Server started, listening for clients..')
 
-        self.sock.listen(backlogs)      #start up the server and set the limit on backloged connections
-        self.currentCons = []           #current connections to the server, 2D stored like [IP, connectionObject]
-        self.fileLocks = [['passwords.txt', threading.Lock()]] #sets up a list of currently used files to avoid different clients from accessing it at the same time
-        lock = self.fileLocks[0][1] #setting up a lock on the passwords file to avoid anyone accessing it
+        self.sock.listen(backlogs)                                                                  #start up the server and set the limit on backloged connections
+        self.currentCons = []                                                                       #current connections to the server, 2D stored like [IP, connectionObject]
+        self.fileLocks = [['passwords.txt', threading.Lock()]]                                      #sets up a list of currently used files to avoid different clients from accessing it at the same time
+        lock = self.fileLocks[0][1]                                                                 #setting up a lock on the passwords file to avoid anyone accessing it
         lock.acquire()
-        self.clientLock = threading.Lock()  #this lock is for when threads are trying to remove themselves from the client list
+        self.clientLock = threading.Lock()                                                          #this lock is for when threads are trying to remove themselves from the client list
 
-        self.salt = 'scooter'.encode('utf-8')   #server salt, for when passwords are being hashed and we add this in to defend against bruteforcers
-        if os.path.isfile('passwords.txt'):     #if there is a passwords file in the same directory, we engage passwords mode
+        self.updates = updates #determines whether a log of server flow is kept
+        self.salt = 'scooter'.encode('utf-8')                                                       #server salt, for when passwords are being hashed and we add this in to defend against bruteforcers
+        if os.path.isfile('passwords.txt'):                                                         #if there is a passwords file in the same directory, we engage passwords mode
             with open('passwords.txt', 'r') as file:
-                self.passwords = [x.strip('\n') for x in file.readlines()]      #to add passwords to the server just put them in the file as plain text and they will be hashed
+                self.passwords = [x.strip('\n') for x in file.readlines()]                          #to add passwords to the server just put them in the file as plain text and they will be hashed
                 tempList = []
                 for x in self.passwords:
-                    if x.endswith(':h'):    #:h signifies its already been hashed, otherwise its plain text so we hash it
+                    if x.endswith(':h'):                                                            #:h signifies its already been hashed, otherwise its plain text so we hash it
                         tempList.append(x)
                     else:
                         tempList.append(hashlib.md5(self.salt + x.encode('utf-8')).hexdigest() + ':h') #hashing
                 self.passwords = tempList
 
-            with open('passwords.txt', 'w') as file: #rewrite the newly hashed passwords to the file
+            with open('passwords.txt', 'w') as file:        #rewrite the newly hashed passwords to the file
                 for x in self.passwords:
                     file.write(x + '\n')
                         
@@ -42,31 +43,40 @@ class Server(threading.Thread):
         super(Server, self).__init__()
 
     def run(self):
-        while True:        #the servers main job is to just sit and accept clients, then pass them off to a handler thread
+        while True:                                          #the servers main job is to just sit and accept clients, then pass them off to a handler thread
             con, addr = self.sock.accept()
             print('Connection made at IP: ', str(addr[0]))
             print('Passing off client..')
-            client = clientHandler(con, addr[0], self)  #creating the client handler thread, needs the connection object and IP the client is from
+            client = clientHandler(con, addr[0], self, self.update)      #creating the client handler thread, needs the connection object and IP the client is from
             client.start()
-            self.currentCons.append([client, addr[0]])  #adds in the connection to the current connections list
+            self.currentCons.append([client, addr[0]])      #adds in the connection to the current connections list
             self.displayClients()
             
         print('Closing server and connections..')
         self.sock.close()
         self.deleteAllClients()
-            
-    def displayClients(self):   #printing out all the current connections
+    
+    def updates(self, ip, command, filename):                #just updates a text file with the client, action, and date to keep track of the flow of things
+        if os.path.isfile('datalog.txt'):
+            with open('datalog.txt', 'a') as file:
+                file.write(ip + ',' + command + ',' + filename + ',' + time.strftime('%d/%m/%Y %H:%M:%S') + '\n')
+        else:
+            with open('datalog.txt', 'w') as file:
+                file.write('IP ADDRESS, COMMAND, FILENAME, DATE/TIME\n')
+                file.write(ip + ',' + command + ',' + filename + ',' + time.strftime('%d/%m/%Y %H:%M:%S') + '\n')   
+    
+    def displayClients(self):                                               #printing out all the current connections
         for num in range(len(self.currentCons)):
             print(str(num + 1) + ". " + self.currentCons[num][1])
 
-    def deleteClient(self, index):  #boots a specific client off the server, starts counting from 1 <--
+    def deleteClient(self, index):                                          #boots a specific client off the server, starts counting from 1 <--
         self.clientLock.acquire()
         client = self.currentCons[index - 1][0]
         client.quit()
         self.currentCons.pop(index - 1)
         self.clientLock.release()
         
-    def deleteAllClients(self):     #boot all clients off the server
+    def deleteAllClients(self):                                             #boot all clients off the server
         for x in range(len(self.currentCons)):
             self.deleteClient(x+1)
     
