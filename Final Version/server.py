@@ -1,5 +1,5 @@
 import socket, argparse, threading, os, hashlib
-from bClientHandler import clientHandler
+from clientHandler import ClientHandler
 
 class Server(threading.Thread):
 
