@@ -55,11 +55,9 @@ class Client():    #it is possilbe to make a version that is threaded so it can 
                     self.con.send(('$$ERROR$$' + str(e)).encode('utf-8'))
 
     def recvData(self):                                             #used to avoid writing the decode line when just receiving strings
-            results = self.con.recv(1024)
-            try:
-                return self.con.recv(int(results)).decode('utf-8')
-            except:
-                return None
+        results = self.con.recv(55)
+        self.con.send('ready'.encode('utf-8'))
+        return self.con.recv(int(results)).decode('utf-8')
 
     def sendCommand(self, message):                     #sends a command over and triggers its own response to whichever command it is
         if message[0:3] == "lc:":

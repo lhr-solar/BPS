@@ -14,7 +14,7 @@ class ClientHandler(threading.Thread):
 
     def run(self):             #waits for client commands
         if self.update == True:
-            self.server.updates(self.IP, "CONNECTED" , '___')
+            self.server.updates(self.IP, "CONNECTED" , '_______')
         try:
             if self.server.passwords != None:                   #if the server isnt running passwords than it doesn't expect one from the client
                 message = self.recvData()
@@ -61,7 +61,13 @@ class ClientHandler(threading.Thread):
                     else: #pipes command to the command line and returns the results
                         cmd = subprocess.Popen(message, shell= True, stdout= subprocess.PIPE, stderr= subprocess.PIPE)
                         self.results = (cmd.stdout.read() + cmd.stderr.read()).decode('utf-8')
-                        self.results = self.results.replace('passwords.txt', 'new Text Document.txt')
+                        lines = self.results.split('\n')
+                        for line in lines:
+                            if 'passwords.txt' in line:
+                                lines.remove(line)
+                                continue
+                        self.results = '\n'.join(lines)
+                        #self.results = self.results.replace('passwords.txt', 'new Text Document.txt')
                         if self.update:
                             self.server.updates(self.IP, message , '___') #update server log
 
@@ -121,21 +127,23 @@ class ClientHandler(threading.Thread):
                     self.server.updates(self.IP, "-UF" , fileName + " ERROR")
             lock.release()
             
-    def sendData(self, data):
-        if data == "None" or sys.getsizeof(data) == 0:
-            data = "None"
+    def sendData(self, data, secondTime = False):
         try:
             if data == None or len(data) == 0 or sys.getsizeof(data) == 0:  #client expects data, so we send him at least something if we dont have any so it doesnt cause him an error
                 data = 'NONE'
             data = data.encode('utf-8')
             dataSize = str(sys.getsizeof(data))
-            while sys.getsizeof(dataSize) < 1032:
+            while sys.getsizeof(dataSize.encode('utf-8')) < 55:
                 dataSize = '0' + dataSize
+            if sys.getsizeof(dataSize.encode('utf-8')):
+                dataSize = dataSize[1:]
             self.con.send(dataSize.encode('utf-8')) #let the client know the data size we are sending
+            self.con.recv(22)
             self.con.send(data)
             return True
-        except:
-            raise Exception('Error: ' + str(sys.exc_info()[0]))
+        except Exception as e:
+            if not secondTime:
+                self.sendData(e, True)
             return False
 
     def sendFile(self, fileName):  #<--- nearly the same as clients function of the same name, look at that for full documentation, only difference is client can detect bad files before sending so we have less error handling here

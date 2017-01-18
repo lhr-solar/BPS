@@ -6,7 +6,6 @@ class Server(threading.Thread):
     def __init__(self, IP= '127.0.0.1', port= 5000, backlogs= 100, update= False):         #only needs IP, port, and number of incoming connections that are allowed to be backloged before we start rejecting people
         self.IP = IP
         self.port = port
-
         
         self.sock = socket.socket()     
 
