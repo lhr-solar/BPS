@@ -1,4 +1,4 @@
-import threading, subprocess, os, sys, hashlib
+import threading, subprocess, os, sys, hashlib, ntpath
 
 class ClientHandler(threading.Thread):
 
@@ -96,6 +96,7 @@ class ClientHandler(threading.Thread):
         return message
 
     def recvFile(self, fileName):                   ##<-- exactly the same as clients function, view that for full documentation
+        fileName = ntpath.basename(fileName)
         lock = self.lockFile(fileName)
         with open(fileName, 'wb') as file:
             data = "".encode('utf-8')

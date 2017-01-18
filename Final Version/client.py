@@ -1,4 +1,4 @@
-import socket, sys, os, argparse, subprocess
+import socket, sys, os, argparse, subprocess, ntpath
 
 class Client():    #it is possilbe to make a version that is threaded so it can implement with other programs without stopping them
 
@@ -20,6 +20,7 @@ class Client():    #it is possilbe to make a version that is threaded so it can 
         data = ''.encode('utf-8')                #setting up a string of bits
         error = False                            #flag for if anything went wrong server side
 
+        fileName = ntpath.basename(fileName)
         with open(fileName, 'wb') as file:
                 while True:
                         self.con.send('ready'.encode('utf-8'))  #used to make sure both ends are in synch
