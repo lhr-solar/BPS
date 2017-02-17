@@ -3,6 +3,7 @@ import math
 import matplotlib.pyplot as plt
 import random
 
+#PRINT STATEMENTS LEFT IN FOR THOSE LEARNING KALMAN FILTERS, TAKE OUT WHEN ACTUALLY USING
 #requires Matrix library, in the linear algebra repository on my github!
 class KalmanFilter():
 
