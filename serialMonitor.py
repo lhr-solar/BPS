@@ -1,17 +1,11 @@
 import serial
-import threading
 
-class SerialMonitor(threading.Thread):
+class SerialMonitor():
 
     def __init__(self, comPort, baudRate = 9600):
         self.comPort = comPort
         self.baudRate = baudRate
         self.serialConnection = serial.Serial(comPort, baudRate)
-        super(SerialMonitor, self).__init__()
-
-    def run(self):
-        while True:
-            self.displaySerialMonitor()
 
     def displaySerialMonitor(self):
         serialMonitorData = self.getLineFromComPort()
@@ -24,7 +18,6 @@ class SerialMonitor(threading.Thread):
     def getFloatFromComPort(self):
         serialData = self.getLineFromComPort()
         return float(serialData)
-
 
     def getLineFromComPort(self):
         line = ''
@@ -57,7 +50,5 @@ class SerialMonitor(threading.Thread):
 if __name__ == "__main__":
     comPort = "COM20"
     newMonitor = SerialMonitor(comPort)
-    newMonitor.start()
     while True:
-        userInput = str(input(">>"))
-        newMonitor.sendStringToComPort(userInput)
+        newMonitor.displaySerialMonitor()
