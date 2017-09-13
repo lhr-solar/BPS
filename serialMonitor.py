@@ -7,13 +7,27 @@ class SerialMonitor():
         self.baudRate = baudRate
         self.serialConnection = serial.Serial(comPort, baudRate)
 
-    def readComPort():
-        serialMonitorData = self.serialConnection.read()
-        print(serialMonitorData)
+    def displaySerialMonitor(self):
+        serialMonitorData = self.getLineFromComPort()
+        print(serialMonitorData, end= '')
 
+    def getLineFromComPort(self):
+        line = ''
+        lastCharReceived = ''
+        while '\n' not in lastCharReceived:
+            lastCharReceived = self.getCharFromComPort()
+            line += lastCharReceived
+
+        return line
+
+    def getCharFromComPort(self):
+        return self.getByteFromComPort().decode('utf-8')
+
+    def getByteFromComPort(self):
+        return self.serialConnection.read()
 
 if __name__ == "__main__":
-    comPort = 7
+    comPort = "COM20"
     newMonitor = SerialMonitor(comPort)
     while True:
-        newMonitor.readComPort()
+        newMonitor.displaySerialMonitor()
