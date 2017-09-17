@@ -8,9 +8,10 @@ class SerialMonitor():
         self.serialConnection = serial.Serial(comPort, baudRate)
 
     def displaySerialMonitor(self):
-        serialMonitorData = self.getLineFromComPort()
-        print(serialMonitorData, end= '')
-            
+        if self.dataIsAvailable:
+            serialMonitorData = self.getLineFromComPort()
+            print(serialMonitorData, end= '')
+        
     def getIntFromComPort(self):
         serialData = self.getLineFromComPort()
         return int(serialData)
@@ -34,7 +35,9 @@ class SerialMonitor():
     def getByteFromComPort(self):
         return self.serialConnection.read()
 
-
+    def dataIsAvailable():
+        if self.serialConnection.in_waiting > 0:
+            return True
 
     def sendNumToComPort(self, numToSend):
         numAsString = str(numToSend)
@@ -48,7 +51,9 @@ class SerialMonitor():
 
 
 if __name__ == "__main__":
-    comPort = "COM20"
+    comPort = "COM21"
     newMonitor = SerialMonitor(comPort)
     while True:
+        userInput = input(">>")
+        newMonitor.sendStringToComPort(userInput)
         newMonitor.displaySerialMonitor()
