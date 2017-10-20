@@ -30,8 +30,11 @@ class SerialMonitor():
         return line
 
     def getCharFromComPort(self):
-        return self.getByteFromComPort().decode('utf-8')
-
+        try:
+            return self.getByteFromComPort().decode("utf-8")
+        except:
+            return ""
+        
     def getByteFromComPort(self):
         return self.serialConnection.read()
 
@@ -51,7 +54,7 @@ class SerialMonitor():
 
 
 if __name__ == "__main__":
-    comPort = "COM21"
+    comPort = "/dev/ttyACM0"
     newMonitor = SerialMonitor(comPort)
     while True:
         userInput = input(">>")
