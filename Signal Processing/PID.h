@@ -1,3 +1,7 @@
+#ifndef PID_H
+#define PID_H
+
+
 #include "mbed.h"
 
 class PID {
@@ -5,23 +9,31 @@ class PID {
     
     
     public:
-        PID(int[] constants);
-        float generatePIDOutput(float error);
-        void setDesiredState(float newDesState);
+        PID(float newConstants[], int newLimits[]);
+        float generatePIDOutput(float currentState);
+        void setDesiredState(float newDesiredState);
         
     private:
-        float generateP(float error);
-        float generateI(float error);
-        float generateD(float error);
-        float generateError(float currentState);
+        float *generatePIDterms(float error);
+        float *governPIDterms(float PIDterms[]);
+        float generateProportional(float error);
+        float generateIntegral(float error);
+        float generateDerivative(float error);
+        float calculateError(float currentState);
+        
+        float *constants;
+        int *limits;
+        float *PIDterms;
+        
         float desiredState;
-        Timer t;
-        bool reset = false;
+        bool reset;
         float integral;
         float lastError;
-        float timeOfLastMeasurement;
+        
+        Timer timer;
+        float timeOfLastMeasurment;
         
     
-}
+};
 
 #endif
