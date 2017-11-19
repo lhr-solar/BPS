@@ -1,6 +1,3 @@
-#ifndef MBED_CAN_LIB_H
-#define MBED_CAN_LIB_H
-
 #include "mbed.h"
 
 class PID {
