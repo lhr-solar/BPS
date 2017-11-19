@@ -35,13 +35,13 @@ float *PID::governPIDterms(float PIDterms[])
 {
     for(int i = 0; i < 3; i++)
     {
-        if(PIDterms[i] < limits[i])
+        if(abs(PIDterms[i]) < limits[i])
         {
             continue;
         }
         else
         {
-            PIDterms[i] = (float)limits[i];
+            PIDterms[i] = (float)limits[i] * (abs(PIDterms[i]) / PIDterms[i]);
         }
     }
     return PIDterms;
