@@ -1,6 +1,8 @@
 #! /usr/bin/python
 
 import wx #, wx.lib.scrolledpanel
+import sys
+import serial, serial.tools.list_ports
 
 ID_FILE       = wx.NewId()
 ID_ABOUT      = wx.NewId()
@@ -15,32 +17,58 @@ class _MainPanel(wx.Panel):
 		wx.Panel.__init__(self,parent=parent, id=wx.ID_ANY)
 
 		panelSizer = wx.BoxSizer(wx.VERTICAL)
-		push1Sizer = wx.BoxSizer(wx.HORIZONTAL)
-		push2Sizer = wx.BoxSizer(wx.HORIZONTAL)
+		targetSizer = wx.BoxSizer(wx.HORIZONTAL)
+		consoleSizer = wx.BoxSizer(wx.VERTICAL)
 
-		self.words = wx.StaticText(self, -1, "Hi. I am words.")
-		self.push1button = wx.Button(self, label="Press me!")
-		self.Bind(wx.EVT_BUTTON, self.push1, self.push1button)
-		self.push1ctrl = wx.TextCtrl(self)
-		self.push2button= wx.Button(self, label="Press me!")
-		self.Bind(wx.EVT_BUTTON, self.push2, self.push2button)
-		self.push2ctrl = wx.TextCtrl(self)
+		self.serialConnection = None
 
-		push1Sizer.Add(self.push1button)
-		push1Sizer.Add(self.push1ctrl, 0, wx.EXPAND)
-		push2Sizer.Add(self.push2button)
-		push2Sizer.Add(self.push2ctrl, 0, wx.EXPAND)
+		self.tenHztimer = wx.Timer(self,100)
+		self.Bind(wx.EVT_TIMER,self.tenHz_SIM_Cyclic_Routine,self.tenHztimer)
+		#  timer interval is 100  milliseconds
+		self.tenHztimer.Start(100)
 
-		panelSizer.Add(self.words)
-		panelSizer.Add(push1Sizer, 0, wx.EXPAND)
-		panelSizer.Add(push2Sizer, 0, wx.EXPAND)
+		self.font1 = wx.Font(10, wx.MODERN, wx.NORMAL, wx.NORMAL, False, u'Courier New')
+
+		comChoices = []
+		for thing in serial.tools.list_ports.comports():
+			comChoices.append(thing.device)
+		sys.stdout.write(''.join(comChoices))
+		self.comBx = wx.ComboBox(self, choices=comChoices, value=comChoices[0], size=(150, 30))
+		self.comBx.SetFont(self.font1)
+		targetSizer.Add(self.comBx, 0, wx.ALL, 5)
+		self.openCOMButton = wx.Button(self, label="Open COM", size=(100,30))
+		self.Bind(wx.EVT_BUTTON, self.openCOM, self.openCOMButton)
+		targetSizer.Add(self.openCOMButton, 0, wx.ALL, 5)
+
+		consoleLabel = wx.StaticText(self, -1, "Console Output")
+		consoleSizer.Add(consoleLabel, 0, wx.ALL, 2)
+		self.consoleout = wx.TextCtrl(self, size=(500,100), style=wx.TE_MULTILINE | wx.TE_READONLY )
+		self.consoleout.SetFont(self.font1)
+		consoleSizer.Add(self.consoleout, 1, wx.ALL|wx.EXPAND, 2)
+
+		panelSizer.Add(targetSizer, 0, wx.ALL|wx.EXPAND,5)
+		panelSizer.Add(consoleSizer, 1, wx.ALL|wx.EXPAND,5)
 
 		self.SetSizer(panelSizer)
 
-	def push1(self, parent):
-		self.push1ctrl.SetValue("Pushed!")
-	def push2(self, parent):
-		self.push2ctrl.SetValue("Pushed!")
+	def openCOM(self,event):
+		self.serialConnection = serial.Serial(self.comBx.GetValue(), 9600)
+
+	''' tenHz_SIM_Cyclic_Routine:
+        So why do each of the tab panels have this tenHz Cyclic Routine?
+        Because of a wxPython thing. Only the main thread, the gui thread, may change display. Trying to write to the
+        gui console or something like that using any other thread may cause a seg fault. At the very least, you'd get 
+        the error "Gtk-CRITICAL **: gtk_text_layout_real_invalidate: assertion 'layout->wrap_loop_count == 0'". What 
+        this error is saying is that wxPython is pissed because some of the gui stuff was modified without it knowing 
+        about it. 
+        Solution: have the main thread go off into this periodic routine (I chose 10Hz) to periodically push the updates
+        that any of the threads want to make to the gui display. So what you do is have the side thread go push the info
+        off into a queue, and then this tenHz cyclic routine will pull that and write to the gui. Emily '''
+	def tenHz_SIM_Cyclic_Routine(self, event):
+		if self.serialConnection:
+			line = self.serialConnection.read(self.serialConnection.in_waiting)
+			line = line.decode("utf-8")
+			self.consoleout.AppendText(line)
 
 ####################################################################################################
 #      Main frame of window
@@ -53,6 +81,8 @@ class UTSVTMainFrame(wx.Frame):
 		#self.panel = wx.lib.scrolledpanel.ScrolledPanel(parent=self, id=-1)
 		#self.panel.SetupScrolling()
 		self.panel = _MainPanel(self, parent)
+
+		self.Bind(wx.EVT_CLOSE, self.closeWindow)
 
 ####################################################################################################
 #       status bar at the bottom
