@@ -8,8 +8,8 @@ class Contactor{
     Contactor(PinName out, PinName in);
     void openContactor();
     void closeContactor();
-    int checkFlag();        // returns status of flag
-    int checkSignal();      // returns status of signal
+    int getFlagState();		// returns status of flag
+    int getSignalState();  	// returns status of signal
     
     private:
     DigitalOut signal;

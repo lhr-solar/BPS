@@ -24,19 +24,19 @@ void Contactor::closeContactor(){
 }
 
 //******************************************************************************
-// checkFlag
+// getFlagState
 // checks the flag if the contactor is operating correctly
 // Input: None
 // Output: returns 1 if functioning correctly, 0 if not
-int Contactor::checkFlag(){
+int Contactor::getFlagState(){
     return flag;
 }
 
 //******************************************************************************
-// checkSignal
+// getSignalState
 // checks if the contactor is on or off
 // Input: None
 // Output: returns 1 if closed, 0 if open
-int Contactor::checkSignal(){
+int Contactor::getSignalState(){
     return signal;
 }
