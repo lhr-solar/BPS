@@ -5,14 +5,14 @@ int main2(){
     Contactor batteryContactor(PC_5, PC_6);
     DigitalOut testLed(LED1);
     batteryContactor.closeContactor();
-    if(batteryContactor.checkSignal()){
+    if(batteryContactor.getSignalState()){
         testLed = 1;
     }
     wait(2);
     testLed = 0;
     wait(2);
     batteryContactor.openContactor();
-    if(!batteryContactor.checkSignal()){
+    if(!batteryContactor.getSignalState()){
         testLed = 1;
     }
     while(1){};
