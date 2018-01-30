@@ -17,15 +17,13 @@ CAN_Interrupt_Handler::CAN_Interrupt_Handler(PinName rx, PinName tx, int frequen
 // interruptRoutine
 // The following function is called whenever the CAN bus receives a new message
 void CAN_Interrupt_Handler::interruptRoutine(){
-    if(mailBoxPutIndex != mailBoxGetIndex - 1){
+    if(mailBoxPutIndex % CAN_STACK_SIZE + 1 != mailBoxGetIndex){
         CANMessage newCanMsg;       // declare empty message
         canBus.read(newCanMsg);     // place newly received CAN message into newCanMsg
         messageMailBox[mailBoxPutIndex++] = newCanMsg;
         
         // mailBoxPutIndex will return to 0 if index exceeds size of stack
-        if(mailBoxPutIndex >= CAN_STACK_SIZE){
-            mailBoxPutIndex = 0;
-        }
+        mailBoxPutIndex %= CAN_STACK_SIZE;
         
         // DEBUG
         heartbeat = !heartbeat;
@@ -45,9 +43,7 @@ bool CAN_Interrupt_Handler::getNextMessage(CANMessage &canMsg){
         canMsg = messageMailBox[mailBoxGetIndex++];
         
         // mailBoxGetIndex will return to 0 if index exceeds size of stack
-        if(mailBoxGetIndex >= CAN_STACK_SIZE){
-            mailBoxGetIndex = 0;
-        }
+        mailBoxGetIndex %= CAN_STACK_SIZE;
         
         return true;
     }else{
