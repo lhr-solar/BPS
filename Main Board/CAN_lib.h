@@ -8,17 +8,22 @@
 class CAN_Interrupt_Handler{
     
     public:
-    CAN_Interrupt_Handler(PinName rx, PinName tx, int frequency= 100000);
+    CAN_Interrupt_Handler(PinName rx, PinName tx, int id, int priority, int frequency= 100000);
     bool getNextMessage(CANMessage &canMsg);
     bool isMailBoxEmpty();
+    void setPriority(int priority);
     
     private:
     void interruptRoutine();
+    void findCANnumber(PinName rx, PinName tx);
     
     CAN canBus;
-    CANMessage messageMailBox[CAN_STACK_SIZE + 1];    // FIFO stack of CAN messages
+    CANMessage messageMailBox[CAN_STACK_SIZE + 1];  // FIFO stack of CAN messages
     int mailBoxGetIndex;
     int mailBoxPutIndex;
+    int canID;          // Id of can bus
+    int canNumber;      // holds canbus number 
+    int priority;       // Priority of receiver interrupt
     
     // DEBUG useful?
     //DigitalOut overFlowError;   // Heartbeat, led light up if overflow error of stack
