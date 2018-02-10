@@ -1,18 +1,20 @@
 #include "CAN_lib.h"
 
+// For Debugging
 DigitalOut led1(LED1);
-DigitalOut led2(LED2);     // For Debugging
+DigitalOut led2(LED2);
+DigitalOut led3(LED3);
 Serial pcConnection(SERIAL_TX, SERIAL_RX);
 
 //******************************************************************************
 // CAN_Interrupt_Handler constructor
-CAN_Interrupt_Handler::CAN_Interrupt_Handler(PinName rx, PinName tx, int priority, int frequency) : canBus(rx, tx){
+CAN_Interrupt_Handler::CAN_Interrupt_Handler(PinName rx, PinName tx, int priority, int mode, int frequency, int filterId) : canBus(rx, tx){
     canBus.frequency(frequency);
-    canBus.attach(callback(this, &CAN_Interrupt_Handler::interruptRoutine), CAN::RxIrq);    // Initialize interrupt for whenever CAN receives message
+    setMode(mode, filterId);    // attaches Handler depending on mode
     
     // Set priority for interrupts
-    findCANnumber(rx, tx);          // Deterine which CAN bus on F429ZI is being used to get interrupt number
-    setPriority(this->priority);
+    findCANnumber(rx, tx);      // Deterine which CAN bus on F429ZI is being used to get interrupt number
+    setPriority(priority);
         
     // Indexes for FIFO
     mailBoxGetIndex = 0;
@@ -22,12 +24,12 @@ CAN_Interrupt_Handler::CAN_Interrupt_Handler(PinName rx, PinName tx, int priorit
     //pcConnection.baud(9600);
     //pcConnection.format(8, Serial::None, 1);
     
-    led2 = !led2;
+    led1 = !led1;
 }
 
 //******************************************************************************
-// interruptRoutine
-// The following function is called whenever the CAN bus receives a new message
+// accept_Handler
+// Interrupts for all messages that is received
 void CAN_Interrupt_Handler::interruptRoutine(){    
     if(mailBoxPutIndex % CAN_STACK_SIZE + 1 != mailBoxGetIndex){
         CANMessage newCanMsg;       // declare empty message
@@ -38,10 +40,10 @@ void CAN_Interrupt_Handler::interruptRoutine(){
         mailBoxPutIndex %= CAN_STACK_SIZE;
         
         // DEBUG
-        if(led1 == 1){
-            led1 = 0;
+        if(led2 == 1){
+            led2 = 0;
         }else{
-            led1 = 1;
+            led2 = 1;
         }
         //Serial.printf("Yes");
         
@@ -104,7 +106,7 @@ void CAN_Interrupt_Handler::findCANnumber(PinName rx, PinName tx){
 // Input: 8-bit priority number
 // Output: None
 void CAN_Interrupt_Handler::setPriority(int priority){
-    priority = this->priority;
+    this->priority = priority;
     switch(canNumber){
         case 1:
             NVIC_SetPriority(CAN1_RX0_IRQn, priority);
@@ -114,5 +116,31 @@ void CAN_Interrupt_Handler::setPriority(int priority){
             break;
         //default:
         //Not correct bus. Add more later
+    }
+}
+
+//******************************************************************************
+// setMode
+// Changes modes of CAN ports to the following:
+//      0 : Ignore all messages
+//      1 : Accept all messages
+//      2 : Filter through messages
+// The function wil attach the appropriate interrupt handler accodrding to the mode
+void CAN_Interrupt_Handler::setMode(int mode, int filterId){
+    this->mode = mode;
+    id = filterId;
+    switch(this->mode){       
+        case 1:     // Change interrupt for whenever CAN receives message
+            canBus.reset();
+            canBus.attach(callback(this, &CAN_Interrupt_Handler::interruptRoutine), CAN::RxIrq);
+            break;
+        case 2:     // Change interrupt to filter CAN
+            canBus.filter(id, ~0x7F);
+            canBus.attach(callback(this, &CAN_Interrupt_Handler::interruptRoutine), CAN::RxIrq);
+            break;
+        default:    // mode = 0 or invalid mode number
+            canBus.reset();
+            canBus.attach(0);
+            break; 
     }
 }
