@@ -6,23 +6,21 @@ Serial pcConnection(SERIAL_TX, SERIAL_RX);
 
 //******************************************************************************
 // CAN_Interrupt_Handler constructor
-CAN_Interrupt_Handler::CAN_Interrupt_Handler(PinName rx, PinName tx, int id, int priority, int frequency) : canBus(rx, tx){
+CAN_Interrupt_Handler::CAN_Interrupt_Handler(PinName rx, PinName tx, int priority, int frequency) : canBus(rx, tx){
     canBus.frequency(frequency);
     canBus.attach(callback(this, &CAN_Interrupt_Handler::interruptRoutine), CAN::RxIrq);    // Initialize interrupt for whenever CAN receives message
     
     // Set priority for interrupts
     findCANnumber(rx, tx);          // Deterine which CAN bus on F429ZI is being used to get interrupt number
-    //setPriority(this->priority);
+    setPriority(this->priority);
         
     // Indexes for FIFO
     mailBoxGetIndex = 0;
     mailBoxPutIndex = 0;
     
-    canID = id;     // CAN id
-    
     // DEBUG
-    pcConnection.baud(9600);
-    pcConnection.format(8, Serial::None, 1);
+    //pcConnection.baud(9600);
+    //pcConnection.format(8, Serial::None, 1);
     
     led2 = !led2;
 }
@@ -30,9 +28,7 @@ CAN_Interrupt_Handler::CAN_Interrupt_Handler(PinName rx, PinName tx, int id, int
 //******************************************************************************
 // interruptRoutine
 // The following function is called whenever the CAN bus receives a new message
-void CAN_Interrupt_Handler::interruptRoutine(){
-    led1 = !led1;     // DEBUG
-    
+void CAN_Interrupt_Handler::interruptRoutine(){    
     if(mailBoxPutIndex % CAN_STACK_SIZE + 1 != mailBoxGetIndex){
         CANMessage newCanMsg;       // declare empty message
         canBus.read(newCanMsg);     // place newly received CAN message into newCanMsg
@@ -42,10 +38,16 @@ void CAN_Interrupt_Handler::interruptRoutine(){
         mailBoxPutIndex %= CAN_STACK_SIZE;
         
         // DEBUG
-        pcConnection.printf("Yes\n");
+        if(led1 == 1){
+            led1 = 0;
+        }else{
+            led1 = 1;
+        }
+        //Serial.printf("Yes");
+        
     }else{
-        // DEBUG FUNCTION
-        pcConnection.printf("No\n");
+        // DEBUG
+        // Serial.printf("No");
     }
 }
 
