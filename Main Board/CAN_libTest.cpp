@@ -2,11 +2,13 @@
 #include "CAN.h"
 #include "CAN_lib.h"
 
-DigitalOut led4(LED4);
+DigitalOut led3(LED3);
+//DigitalOut led2(PC_8);
+//DigitalOut led1(LED1);
 
-//Serial pcConnection(SERIAL_TX, SERIAL_RX);
+Serial pcConnection(SERIAL_TX, SERIAL_RX);
 
-CAN_Interrupt_Handler can1(PD_0, PD_1, 3, 100000);     // Address 0x21, priority 3
+CAN_Interrupt_Handler can1(PD_0, PD_1, 3);     // Address 0x21, priority 3
 //CAN_Interrupt_Handler can2(PA_11, PA_12, 100000);
 //CAN canBus(PD_0, PD_1);   // for F429ZI
 CANMessage canMailBox;
@@ -21,10 +23,6 @@ int CANaddress = 1337;
 void sendTestMessage(); 
 void setup();
 void canInterupptRoutine();
-
-void ledBlink(){
-    led4 != led4;
-}
 /*
 // for transmitter
 void sendTestMessage()
@@ -37,26 +35,95 @@ void sendTestMessage()
     //messageSignalLED = 0;   
 }*/
 
+//******************************************************************************
+// TEST
+//******************************************************************************
 void setup()
 {
-    //canBus.frequency(100000);
-    //canBus.attach(&ledBlink, CAN::RxIrq);
-    //pcConnection.baud(9600);
-    //pcConnection.format(8, Serial::None, 1);
+    pcConnection.baud(9600);
+    pcConnection.format(8, Serial::None, 1);
     //sendButton.rise(&sendTestMessage);
     //testCANbus.frequency(100000);
     //canBus.frequency(100000);
     //anBus.attach(&canInterupptRoutine, CAN::RxIrq);
 }
 
-int main() 
-{
-    //setup();    
-    while(1) 
-    {
-        ;
+//------------------------------------------------------------------------------
+// Filtering Test Code (Change to main to test)
+int main(){
+    setup();
+    //can1.setMode(0);
+    //can1.setMode(1);
+    can1.setMode(2, 0x5);
+    while(1){
+        if(!can1.isMailBoxEmpty()){
+            can1.getNextMessage(receiverMailBox);
+            pcConnection.printf("%s\n\r", receiverMailBox.data);
+            led3 = !led3;
+        }
     }
 }
+
+//------------------------------------------------------------------------------
+// Priority Test Code (Change to main to test)
+/*
+//Ticker tick;    // Uncomment this line if testing
+//InterruptIn in(BUTTON1);
+void long_event(){
+    //led3 = !led3;
+    led3 = !led3;
+    wait_ms(950);
+    led3 = !led3;
+}
+
+void short_event(){
+    led2 = !led2;
+    //wait(.5);
+}
+
+int mainPriorityTest(){
+    setup();
+    can1.setPriority(0);
+    tick.attach(&long_event, 1);
+    //in.rise(&long_event);
+    NVIC_SetPriority(TIM3_IRQn, 4);
+    while(1){
+        if(!can1.isMailBoxEmpty()){
+            can1.getNextMessage(receiverMailBox);
+            //pcConnection.printf("%s\n\r", receiverMailBox.data);
+            led2 = !led2;
+        }
+    }    
+    return 0;
+}
+*/
+/*
+//------------------------------------------------------------------------------
+// FIFO Test Code (Change to main to test)
+int mainFIFOTest(){
+    setup();
+    //wait(20);
+    while(1){
+        //led3 = 1;
+        led2 = 1;
+        if(can1.isMailBoxFull()){
+            break;
+        }
+        
+        //pcConnection.printf("Working");
+    }
+    led2 = 0;
+    while(!can1.isMailBoxEmpty()){
+        led3 = 1;
+        can1.getNextMessage(receiverMailBox);
+        pcConnection.printf("%s\n\r", receiverMailBox.data);
+        //led3 = !led3;
+    }
+    return 0;
+}
+*/
+//******************************************************************************
+//******************************************************************************
 
 /*
 void canInterupptRoutine()

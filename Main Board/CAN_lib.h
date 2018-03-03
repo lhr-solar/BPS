@@ -3,7 +3,7 @@
 
 #include "mbed.h"
 
-#define CAN_STACK_SIZE 250
+#define CAN_STACK_SIZE 5
 
 class CAN_Interrupt_Handler{
     
@@ -11,8 +11,9 @@ class CAN_Interrupt_Handler{
     CAN_Interrupt_Handler(PinName rx, PinName tx, int priority, int frequency= 100000, int mode= 1, int filterId= 0x600);
     bool getNextMessage(CANMessage &canMsg);
     bool isMailBoxEmpty();
+    bool isMailBoxFull();
     void setPriority(int priority);
-    void setMode(int mode, int filterId= 0x600);
+    void setMode(int mode, int filterId= 0x6);
     
     private:
     void interruptRoutine();
@@ -30,9 +31,6 @@ class CAN_Interrupt_Handler{
     //  0 : Ignore all messages
     //  1 : Accept all messages
     //  2 : Filter through messages
-    
-    // DEBUG useful?
-    //DigitalOut overFlowError;   // Heartbeat, led light up if overflow error of stack
 };
 
 
