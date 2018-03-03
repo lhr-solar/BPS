@@ -3,12 +3,11 @@
 // For Debugging
 DigitalOut led1(LED1);
 DigitalOut led2(LED2);
-DigitalOut led3(LED3);
-Serial pcConnection(SERIAL_TX, SERIAL_RX);
+//Serial serial(SERIAL_TX, SERIAL_RX);
 
 //******************************************************************************
 // CAN_Interrupt_Handler constructor
-CAN_Interrupt_Handler::CAN_Interrupt_Handler(PinName rx, PinName tx, int priority, int mode, int frequency, int filterId) : canBus(rx, tx){
+CAN_Interrupt_Handler::CAN_Interrupt_Handler(PinName rx, PinName tx, int priority, int frequency, int mode, int filterId) : canBus(rx, tx){
     canBus.frequency(frequency);
     setMode(mode, filterId);    // attaches Handler depending on mode
     
@@ -21,35 +20,40 @@ CAN_Interrupt_Handler::CAN_Interrupt_Handler(PinName rx, PinName tx, int priorit
     mailBoxPutIndex = 0;
     
     // DEBUG
-    //pcConnection.baud(9600);
-    //pcConnection.format(8, Serial::None, 1);
+    //sserial.baud(9600);
+    //serial.format(8, Serial::None, 1);
     
-    led1 = !led1;
+    //led1 = 1;
 }
 
 //******************************************************************************
-// accept_Handler
+// interruptRoutine
 // Interrupts for all messages that is received
 void CAN_Interrupt_Handler::interruptRoutine(){    
-    if(mailBoxPutIndex % CAN_STACK_SIZE + 1 != mailBoxGetIndex){
+    if(!isMailBoxFull()){
         CANMessage newCanMsg;       // declare empty message
         canBus.read(newCanMsg);     // place newly received CAN message into newCanMsg
-        messageMailBox[mailBoxPutIndex++] = newCanMsg;
+        messageMailBox[mailBoxPutIndex] = newCanMsg;
         
         // mailBoxPutIndex will return to 0 if index exceeds size of stack
-        mailBoxPutIndex %= CAN_STACK_SIZE;
+        mailBoxPutIndex = (mailBoxPutIndex + 1) % CAN_STACK_SIZE;
         
+        // DEBUG
+        if(led1 == 1){
+            led1 = 0;
+        }else{
+            led1 = 1;
+        }
+        //serial.printf("Yes");
+        
+    }else{
         // DEBUG
         if(led2 == 1){
             led2 = 0;
         }else{
             led2 = 1;
         }
-        //Serial.printf("Yes");
-        
-    }else{
-        // DEBUG
-        // Serial.printf("No");
+        //serial.printf("No");
     }
 }
 
@@ -61,10 +65,10 @@ void CAN_Interrupt_Handler::interruptRoutine(){
 // Output: true if message is returned, false if not
 bool CAN_Interrupt_Handler::getNextMessage(CANMessage &canMsg){
     if(!isMailBoxEmpty()){
-        canMsg = messageMailBox[mailBoxGetIndex++];
+        canMsg = messageMailBox[mailBoxGetIndex];
         
         // mailBoxGetIndex will return to 0 if index exceeds size of stack
-        mailBoxGetIndex %= CAN_STACK_SIZE;
+        mailBoxGetIndex = (mailBoxGetIndex + 1) % CAN_STACK_SIZE;
         
         return true;
     }else{
@@ -79,6 +83,19 @@ bool CAN_Interrupt_Handler::getNextMessage(CANMessage &canMsg){
 // Output: true for empty mailbox, false if mailbox have messages
 bool CAN_Interrupt_Handler::isMailBoxEmpty(){
     if(mailBoxPutIndex == mailBoxGetIndex){
+        return true;
+    }else{
+        return false;
+    }
+}
+
+//******************************************************************************
+// isMailBoxFull
+// The following function returns if true if the mailbox is full, false if not
+// Input: None
+// Output: true for full mailbox, false if mailbox still has room
+bool CAN_Interrupt_Handler::isMailBoxFull(){
+    if((((mailBoxPutIndex + 1) % CAN_STACK_SIZE)) == mailBoxGetIndex){
         return true;
     }else{
         return false;
@@ -127,6 +144,7 @@ void CAN_Interrupt_Handler::setPriority(int priority){
 //      2 : Filter through messages
 // The function wil attach the appropriate interrupt handler accodrding to the mode
 void CAN_Interrupt_Handler::setMode(int mode, int filterId){
+    //led2 = 1;
     this->mode = mode;
     id = filterId;
     switch(this->mode){       
@@ -135,7 +153,7 @@ void CAN_Interrupt_Handler::setMode(int mode, int filterId){
             canBus.attach(callback(this, &CAN_Interrupt_Handler::interruptRoutine), CAN::RxIrq);
             break;
         case 2:     // Change interrupt to filter CAN
-            canBus.filter(id, ~0x7F);
+            canBus.filter(id, 0xE, CANStandard);    // id to filter, 0xE is MASK, CANStandard for 11-bit
             canBus.attach(callback(this, &CAN_Interrupt_Handler::interruptRoutine), CAN::RxIrq);
             break;
         default:    // mode = 0 or invalid mode number
