@@ -14,6 +14,7 @@ class CAN_Interrupt_Handler{
     bool isMailBoxFull();
     void setPriority(int priority);
     void setMode(int mode, int filterId= 0x6);
+    void sendMessage(CANMessage canMsg);
     
     private:
     void interruptRoutine();

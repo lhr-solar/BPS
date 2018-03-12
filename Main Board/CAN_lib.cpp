@@ -162,3 +162,12 @@ void CAN_Interrupt_Handler::setMode(int mode, int filterId){
             break; 
     }
 }
+
+//******************************************************************************
+// sendMessage
+// sends a message through CAN
+// Input: CANMessage msg
+// Output: None
+void CAN_Interrupt_Handler::sendMessage(CANMessage canMsg){
+    canBus.write(canMsg);
+}
