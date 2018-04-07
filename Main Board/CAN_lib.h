@@ -12,8 +12,12 @@ class CAN_Interrupt_Handler{
     bool getNextMessage(CANMessage &canMsg);
     bool isMailBoxEmpty();
     bool isMailBoxFull();
-    void setPriority(int priority);
+    void setPriority(int priority);     // Skeptical if this works
     void setMode(int mode, int filterId= 0x6);
+        // Possible mode values
+        //  0 : Ignore all messages
+        //  1 : Accept all messages
+        //  2 : Filter through messages (add filterId in input paramter)
     void sendMessage(CANMessage canMsg);
     
     private:
