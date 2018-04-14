@@ -1,46 +1,60 @@
 #include "SerialLib.h"
 #include <string>
 
-DigitalOut debugLed(LED1);
+DigitalOut led1(LED1);
+DigitalOut led2(LED2);
 
-SerialInterruptHandler::SerialInterruptHandler(PinName tx, PinName rx) : serialCon(tx, rx)
+SerialInterruptHandler::SerialInterruptHandler(PinName tx, PinName rx) : serialConn(tx, rx)
 {
     mailBoxGetIndex = 0;
     mailBoxPutIndex = 0;
-    serialCon.baud(9600);
-    serialCon.format(8, Serial::None, 1);
-    serialCon.attach(callback(this, &SerialInterruptHandler::interruptRoutine), Serial::RxIrq);
+    serialConn.baud(9600);
+    serialConn.format(8, Serial::None, 1);
+    serialConn.attach(callback(this, &SerialInterruptHandler::interruptRoutine), Serial::RxIrq);
+    endMessageFlag = false;
 }
 
 void SerialInterruptHandler::interruptRoutine()
 {
-    debugLed = 1;
+    led2 = 0;
     if(!isMailBoxFull())
     {
-        char newMessage[50] = "";
-        char nextChar = 'a';
-        for(int i = 0; nextChar != '\n' && i < 50; i++)    
+        string newMessage = ""; 
+        serialConn.scanf("%s", newMessage.c_str());
+//        serialConn.fgets(newMessage, 50);
+        /*
+        while(nextChar != '\n')
         {
+                    led1 = 1;
                     nextChar = serialCon.getc();
+                    //serialCon.printf("%c\n\r", nextChar);
+                    
+                    if (nextChar == '\r' && endMessageFlag){
+                        break;
+                    }
+                    
                     if (nextChar != '\n') 
                     {
                         newMessage[i] = nextChar;
                     }else
                     {
-                        break;
+                        endMessageFlag = true;
                     }
-        }
+                    i++;
+                    //serialCon.printf("%s\n", newMessage);
+        }*/
+        led2 = 1;
         mailBox[mailBoxPutIndex] = newMessage;
         mailBoxPutIndex = (mailBoxPutIndex + 1) % MAIL_BOX_SIZE;   
         lastMessage = newMessage;
     }
-    debugLed = 0;
+    led1 = 0;
 }
 
 
-char *SerialInterruptHandler::getNextMessage()
+string SerialInterruptHandler::getNextMessage()
 {
-    char *newMessage = lastMessage;
+    string newMessage = lastMessage;
     
     if(!isMailBoxEmpty())
     {
@@ -63,9 +77,9 @@ bool SerialInterruptHandler::isMailBoxFull()
 }
 
 
-void SerialInterruptHandler::sendMessage(char *message)
+void SerialInterruptHandler::sendMessage(string message)
 {
-    serialCon.printf("%s\n", message);
+    serialConn.printf("%s\n", message.c_str());
 }
 
 void SerialInterruptHandler::setMode(int mode)
