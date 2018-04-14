@@ -5,14 +5,14 @@
 #include "mbed.h"
 #include<string>
 
-#define MAIL_BOX_SIZE 5
+#define MAIL_BOX_SIZE 50
 class SerialInterruptHandler
 {
     
     public:
         SerialInterruptHandler(PinName tx, PinName rx);
-        void sendMessage(char *message);
-        char *getNextMessage();
+        void sendMessage(string message);
+        string getNextMessage();
         bool isMailBoxEmpty();
         bool isMailBoxFull();
         
@@ -21,12 +21,15 @@ class SerialInterruptHandler
     private:
         void interruptRoutine();
         
-        char *mailBox[MAIL_BOX_SIZE + 1];
+        string mailBox[MAIL_BOX_SIZE + 1];
+        
+//        char *mailBox[MAIL_BOX_SIZE + 1];
         int mailBoxGetIndex;
         int mailBoxPutIndex;
+        bool endMessageFlag;
         int mode; 
-        char *lastMessage;
-        Serial serialCon;
+        string lastMessage;
+        Serial serialConn;
         //  0 : Ignore all messages
         //  1 : Accept all messages
 
