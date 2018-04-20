@@ -3,9 +3,9 @@
   (general
     (links 71)
     (no_connects 0)
-    (area 148.689287 47.465 219.280001 104.077381)
+    (area 148.689287 46.83 219.280001 104.077381)
     (thickness 1.6)
-    (drawings 57)
+    (drawings 58)
     (tracks 156)
     (zones 0)
     (modules 39)
@@ -1459,6 +1459,9 @@
       (net 3 +9V))
   )
 
+  (gr_text "Preview Printing Instructions:\n* Use \"Approx. Scale 1\" for accurate sizing\n* For general fit, use F.Silk, F.Mask, and F.CrtYd\n* For electrical connections, use F.Cu and B.Cu" (at 158.115 110.49) (layer Cmts.User)
+    (effects (font (size 2.54 2.54) (thickness 0.3)) (justify left))
+  )
   (dimension 51.435 (width 0.3) (layer Dwgs.User)
     (gr_text "2.0250 in" (at 154.225 76.5175 90) (layer Dwgs.User)
       (effects (font (size 1.5 1.5) (thickness 0.3)))
