@@ -38,7 +38,7 @@ EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
 Sheet 1 1
-Title "CAN Snooper"
+Title "Nucleo-CAN Interface"
 Date "2018-04-16"
 Rev "3"
 Comp "University of Texas Solar Vehicle Team"

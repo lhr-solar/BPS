@@ -14,7 +14,7 @@
 
   (page USLetter)
   (title_block
-    (title "CAN Snooper")
+    (title "Nucleo-CAN Interface")
     (date 2018-04-16)
     (rev 2)
     (company "University of Texas Solar Vehicles Team")
