@@ -58,5 +58,5 @@ if __name__ == "__main__":
     newMonitor = SerialMonitor(comPort)
     while True:
         userInput = input(">>")
-        newMonitor.sendStringToComPort(userInput)
+        newMonitor.sendStringToComPort(userInput + "\n")
         newMonitor.displaySerialMonitor()
