@@ -1,12 +1,26 @@
-#include "CAN_lib.h"
+// CANlib.h
+/**
+ * Driver for CAN bus. Interrupts whenever a new message has been received
+ * @authors Sijin Woo, Corey Hulse
+ * @lastRevised 9/4/2018
+ */
+
+#include "CANlib.h"
 
 // For Debugging
 DigitalOut led1(LED1);
 DigitalOut led2(LED2);
 //Serial serial(SERIAL_TX, SERIAL_RX);
 
-//******************************************************************************
-// CAN_Interrupt_Handler constructor
+/** Constructor
+ * Initializes CAN bus pins and receiver interrupt
+ * @param rx pin
+ * @param tx pin
+ * @param priority of the interrupt
+ * @param frequency of the CAN bus lines
+ * @param mode for filtering (0 : ignore all msgs, 1 : accept all msgs, 2 : filter messages)
+ * @param filterId when filter mode (2) is enabled. Only records messages that matches filterId
+ */
 CAN_Interrupt_Handler::CAN_Interrupt_Handler(PinName rx, PinName tx, int priority, int frequency, int mode, int filterId) : canBus(rx, tx){
     canBus.frequency(frequency);
     setMode(mode, filterId);    // attaches Handler depending on mode
@@ -26,9 +40,9 @@ CAN_Interrupt_Handler::CAN_Interrupt_Handler(PinName rx, PinName tx, int priorit
     //led1 = 1;
 }
 
-//******************************************************************************
-// interruptRoutine
-// Interrupts for all messages that is received
+/** interruptyRoutine
+ * ISR that is called whenever a new message arrives on the CANB bus
+ */
 void CAN_Interrupt_Handler::interruptRoutine(){    
     if(!isMailBoxFull()){
         CANMessage newCanMsg;       // declare empty message
@@ -57,12 +71,10 @@ void CAN_Interrupt_Handler::interruptRoutine(){
     }
 }
 
-//******************************************************************************
-// getNextMessage
-// The following function returns a true if there is an available message to be retrieved,
-//    false if no messages available
-// Input: reference parameter for CANMessage to be stored
-// Output: true if message is returned, false if not
+/** getNextMessage
+ * Gets a message from the CAN FIFO
+ * @param CANMessage object
+ */
 bool CAN_Interrupt_Handler::getNextMessage(CANMessage &canMsg){
     if(!isMailBoxEmpty()){
         canMsg = messageMailBox[mailBoxGetIndex];
@@ -76,12 +88,11 @@ bool CAN_Interrupt_Handler::getNextMessage(CANMessage &canMsg){
     }
 }
 
-//******************************************************************************
-// isMailBoxEmpty
-// The following function returns if true if the mailbox is empty, false if not
-// Input: None
-// Output: true for empty mailbox, false if mailbox have messages
-bool CAN_Interrupt_Handler::isMailBoxEmpty(){
+/** isFIFOEmpty
+ * Checks if FIFO is empty
+ * @return True if empty, False if not-empty
+ */
+bool CAN_Interrupt_Handler::isFIFOEmpty(){
     if(mailBoxPutIndex == mailBoxGetIndex){
         return true;
     }else{
@@ -89,12 +100,11 @@ bool CAN_Interrupt_Handler::isMailBoxEmpty(){
     }
 }
 
-//******************************************************************************
-// isMailBoxFull
-// The following function returns if true if the mailbox is full, false if not
-// Input: None
-// Output: true for full mailbox, false if mailbox still has room
-bool CAN_Interrupt_Handler::isMailBoxFull(){
+/** isFIFOFull
+ * Checks if FIFO is empty
+ * @return True if full, False if still room left
+ */
+bool CAN_Interrupt_Handler::isFIFOFull(){
     if((((mailBoxPutIndex + 1) % CAN_STACK_SIZE)) == mailBoxGetIndex){
         return true;
     }else{
@@ -102,11 +112,11 @@ bool CAN_Interrupt_Handler::isMailBoxFull(){
     }
 }
 
-//******************************************************************************
-// findCANnumber
-// The following function finds which canbus is used from the pins
-// Input: PinName of rx and tx
-// Output: None
+/** findCANnumber
+ * Not necessary but it checks which CAN module the pins are using
+ * @param rx pin
+ * @param tx pin
+ */
 void CAN_Interrupt_Handler::findCANnumber(PinName rx, PinName tx){
     if((rx == PD_0 && tx == PD_1) || (rx == PB_8 && tx == PB_9)){
         canNumber = 1;
@@ -117,11 +127,10 @@ void CAN_Interrupt_Handler::findCANnumber(PinName rx, PinName tx){
     }
 }
 
-//******************************************************************************
-// setPriority
-// The followinng function sets the priority of CAN interrupt
-// Input: 8-bit priority number
-// Output: None
+/** setPriority
+ * Sets the priority of the CAN receiver interrupt
+ * @param priority number (0-255), 0 with highest priority
+ */
 void CAN_Interrupt_Handler::setPriority(int priority){
     this->priority = priority;
     switch(canNumber){
@@ -136,13 +145,10 @@ void CAN_Interrupt_Handler::setPriority(int priority){
     }
 }
 
-//******************************************************************************
-// setMode
-// Changes modes of CAN ports to the following:
-//      0 : Ignore all messages
-//      1 : Accept all messages
-//      2 : Filter through messages
-// The function wil attach the appropriate interrupt handler accodrding to the mode
+/** setMode
+ * Sets mode if receiver interrupt should ignore, accept, filter messages
+ * @param mode for filtering (0 : ignore all msgs, 1 : accept all msgs, 2 : filter messages)
+ */
 void CAN_Interrupt_Handler::setMode(int mode, int filterId){
     //led2 = 1;
     this->mode = mode;
@@ -163,11 +169,10 @@ void CAN_Interrupt_Handler::setMode(int mode, int filterId){
     }
 }
 
-//******************************************************************************
-// sendMessage
-// sends a message through CAN
-// Input: CANMessage msg
-// Output: None
+/** sendMessage
+ * Sends message through CAN bus
+ * @param CANMessage object
+ */
 void CAN_Interrupt_Handler::sendMessage(CANMessage canMsg){
     canBus.write(canMsg);
 }
