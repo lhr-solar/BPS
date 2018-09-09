@@ -25,7 +25,7 @@ Current::Current(){
  * @param max current the battery can handler before danger
  */
 Current::Current(int ceiling){
-
+	setLimits(ceiling);
 }
 
 /** Destructor
@@ -39,8 +39,8 @@ Current::~Current(){
  * Sets the max current limit the cells can reach before danger
  * @param max current limit
  */
-void Current:setLimits(int ceiling){
-
+void Current::setLimits(int ceiling){
+	maxCurrentLimit = ceiling;
 }
 
 /** updateMeasurements
@@ -58,7 +58,7 @@ uint8_t Current::updateMeasurements(int highPrecision, int lowPrecision){
  * @return 1 if pack is safe, 0 if in danger
  */
 uint8_t Current::isSafe(void){
-
+	return highPrecision < maxCurrentLimit && lowPrecision < maxCurrentLimit;
 }
 
 /** highPrecisionCurrent
@@ -66,7 +66,7 @@ uint8_t Current::isSafe(void){
  * @return Amperes value
  */
 int Current::highPrecisionAmperes(void){
-
+	return highPrecision;
 }
 
 /** lowPrecisionCurrent
@@ -74,5 +74,5 @@ int Current::highPrecisionAmperes(void){
  * @return Amperes value
  */
 int Current::lowPrecisionAmperes(void){
-
+	return lowPrecision;
 }
