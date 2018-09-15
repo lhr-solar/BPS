@@ -11,6 +11,8 @@
 #ifndef __TEMPERATURE_H__
 #define __TEMPERATURE_H__
 
+#define NUM_MODULES 31
+
 /** Temperature
  * This class holds functions related to the temperature of BeVolt's
  * battery pack.
@@ -45,7 +47,7 @@ public:
 	 * @param pointer to new temperature measurements
 	 * @return 1 if successfully stored, 0 if failed
 	 */
-	uint8_t updateMeasurements(int *modules);
+	uint8_t updateMeasurements();
 
 	/** isSafe
 	 * Checks if all modules are safe

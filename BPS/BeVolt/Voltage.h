@@ -11,6 +11,8 @@
 
 enum VoltageStatus {OverVoltage, UnderVoltage};
 
+#define NUM_MODULES 31
+
 /** Voltage
  * This class holds functions related to the voltage of BeVolt's
  * battery pack.
@@ -47,7 +49,7 @@ public:
 	 * @param pointer to new voltage measurements
 	 * @return 1 if successfully stored, 0 if failed
 	 */
-	uint8_t updateMeasurements(int *modules);
+	uint8_t updateMeasurements();
 
 	/** isSafe
 	 * Checks if all modules are safe
@@ -75,9 +77,9 @@ public:
 	int totalPackVoltage(void);
 
 private:
-	int *modules;			// list of voltages of all modules
-	int maxVoltageLimit;	// maximum voltage limit the battery can reach before danger
-	int minVoltageLimit;	// minimum voltage limit the battery can reach before danger
+	uint16_t *modules;			// list of voltages of all modules
+	uint16_t maxVoltageLimit;	// maximum voltage limit the battery can reach before danger
+	uint16_t minVoltageLimit;	// minimum voltage limit the battery can reach before danger
 };
 
 #endif
