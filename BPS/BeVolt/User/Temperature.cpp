@@ -8,7 +8,6 @@
 
 // NOTE: All units are in Celsius
 
-#include <stdint.h>
 #include "Temperature.h"
 #include "LTC2983.h"
 #include "Definition.h"

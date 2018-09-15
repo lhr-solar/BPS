@@ -6,7 +6,6 @@
  * @lastRevised 9/3/2018
  */
 
-#include <stdint.h>
 #include "Voltage.h"
 #include "LTC6813.h"
 #include "Definition.h"

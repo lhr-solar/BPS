@@ -10,7 +10,6 @@
 
 // TODO: Think of better naming convention of current
 
-#include <stdint.h>
 #include "Current.h"
 
 /** Constructor

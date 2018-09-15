@@ -11,6 +11,8 @@
 #ifndef __EEPROM_H__
 #define __EEPROM_H__
 
+#include <stdint.h>
+
 /** EEPROM_Init
  * Initializes I2C to communicate with EEPROM (M24128)
  */
