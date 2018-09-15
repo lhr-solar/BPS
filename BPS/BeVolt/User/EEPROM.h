@@ -18,12 +18,12 @@
  */
 void EEPROM_Init(void);
 
-/** EEPROM_Save
+/** EEPROM_Write
  * Saves data to the EEPROM at the specified address
  * @param unsigned 16-bit address
  * @param unsigned 8-bit address
  */
-void EEPROM_Save(uint16_t address, uint8_t data);
+void EEPROM_Write(uint16_t address, uint8_t data);
 
 /** EEPROM_ReadMultipleBytes
  * Gets multiple bytes of data sequentially from EEPROM beginning at specified address
