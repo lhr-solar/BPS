@@ -471,6 +471,11 @@
               <FileType>5</FileType>
               <FilePath>.\User\WDTimer.h</FilePath>
             </File>
+            <File>
+              <FileName>Definition.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\User\Definition.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -485,6 +490,16 @@
               <FileName>stm32f4xx_rcc.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_rcc.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f4xx_i2c.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_i2c.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f4xx_gpio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_gpio.c</FilePath>
             </File>
           </Files>
         </Group>
