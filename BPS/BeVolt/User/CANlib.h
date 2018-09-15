@@ -8,8 +8,6 @@
 #ifndef __CANLIB_H
 #define __CANLIB_H
 
-#include "mbed.h"
-
 #define CAN_STACK_SIZE 5
 
 /** CAN_Interrupt_Handler

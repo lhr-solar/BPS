@@ -2,7 +2,7 @@
 /**
  * Temperature class that holds all Temperature related information of BeVolt's
  * battery pack.
- * @authors Sijin Woo
+ * @authors Sijin Woo, Chase Block
  * @lastRevised 9/3/2018
  */
 
@@ -11,7 +11,7 @@
 #ifndef __TEMPERATURE_H__
 #define __TEMPERATURE_H__
 
-#define NUM_MODULES 31
+#include <stdint.h>
 
 /** Temperature
  * This class holds functions related to the temperature of BeVolt's
@@ -29,7 +29,7 @@ public:
 	 * Creates Temperature instance with NULL pointer to temperature list
 	 * @param max temperature limit of the lithium ion cells
 	 */
-	Temperature(int ceiling);
+	Temperature(uint16_t ceiling);
 
 	/** Destructor
 	 * Destroys Temperature instance
@@ -59,24 +59,24 @@ public:
 	 * Finds all modules that in danger and stores them into a list
 	 * @return pointer to index of modules that are in danger
 	 */
-	int *modulesInDanger(void);
+	uint16_t *modulesInDanger(void);
 
 	/** moduleTemperature
 	 * Gets the temperature of a certain module in the battery pack
 	 * @param index of module
 	 * @return temperature of module at specified index
 	 */
-	int moduleTemperature(int moduleIdx);
+	uint16_t moduleTemperature(int moduleIdx);
 
 	/** totalPackAvgTemperature
 	 * Gets the average temperature of the whole battery pack
 	 * @return average temperature of battery pack
 	 */
-	int totalPackAvgTemperature(void);
+	uint16_t totalPackAvgTemperature(void);
 
 private:
-	int *modules;				// list of voltages of all modules
-	int maxTemperatureLimit;	// Max temperature the battery can reach before danger
+	uint16_t *modules;				// list of voltages of all modules
+	uint16_t maxTemperatureLimit;	// Max temperature the battery can reach before danger
 
 };
 

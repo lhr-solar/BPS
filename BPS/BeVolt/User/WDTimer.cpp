@@ -2,7 +2,7 @@
 /**
  * Driver for the watch dog timer. Whenever the Watch Dog Timer reaches 0,
  * all contactors will be opened (the battery pack will be disconnected from the car).
- * @authors Sijin Woo
+ * @authors Sijin Woo, Chase Block
  * @lastRevised 9/4/2018
  */
 

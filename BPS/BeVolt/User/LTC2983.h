@@ -12,6 +12,8 @@
 #ifndef __LTC2983_H__
 #define __LTC2983_H__
 
+#include <stdint.h>
+
 /** LTC2983_Init
  * Initializes SPI to communicate with the temperature slave boards (LTC2983 chip)
  * Initializes and configures LTC2983 chip 

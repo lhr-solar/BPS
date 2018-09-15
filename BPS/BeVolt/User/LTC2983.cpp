@@ -10,4 +10,3 @@
  */
 
 #include <stdint.h>
-#include "mbed.h"

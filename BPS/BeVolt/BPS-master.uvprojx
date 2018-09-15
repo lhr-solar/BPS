@@ -387,16 +387,6 @@
               <FilePath>.\User\main.cpp</FilePath>
             </File>
             <File>
-              <FileName>CANlib.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>.\User\CANlib.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>Contactor.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>.\User\Contactor.cpp</FilePath>
-            </File>
-            <File>
               <FileName>Current.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>.\User\Current.cpp</FilePath>

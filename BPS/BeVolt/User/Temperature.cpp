@@ -2,7 +2,7 @@
 /**
  * Temperature class that holds all temperature related information of BeVolt's
  * battery pack.
- * @authors Sijin Woo
+ * @authors Sijin Woo, Chase Block
  * @lastRevised 9/3/2018
  */
 
@@ -11,6 +11,7 @@
 #include <stdint.h>
 #include "Temperature.h"
 #include "LTC2983.h"
+#include "Definition.h"
 
 /** Constructor
  * Creates Temperature instance with NULL pointer to temperature list
@@ -24,17 +25,8 @@ Temperature::Temperature(){
  * Creates Temperature instance with NULL pointer to temperature list
  * @param max temperature limit of the lithium ion cells
  */
-Temperature::Temperature(int ceiling){
+Temperature::Temperature(uint16_t ceiling){
 	setLimits(ceiling);
-}
-
-/** Constructor
- * Creates Temperature instance with NULL pointer to temperature list
- * @param max temperature limit of the lithium ion cells
- */
-Temperature::Temperature(int ceiling, int *modules){
-	setLimits(ceiling);
-	updateMeasurements(modules);
 }
 
 /** Destructor
@@ -85,8 +77,8 @@ uint8_t Temperature::isSafe(void){
  * Finds all modules that in danger and stores them into a list
  * @return pointer to index of modules that are in danger
  */
-int *Temperature::modulesInDanger(void){
-	int checks[NUM_MODULES];
+uint16_t *Temperature::modulesInDanger(void){
+	uint8_t checks[NUM_MODULES];
 	for(int i = 0; i < NUM_MODULES; ++i){
 		if(moduleTemperature(i) > maxTemperatureLimit){
 			checks[i] = 1;	// 1 shows that the unit is in danger
@@ -95,12 +87,7 @@ int *Temperature::modulesInDanger(void){
 		}
 	}
 
-	int sum = 0;
-	for(int i = 0; i < NUM_MODULES; ++i){
-		sum += checks[i];
-	}
-
-	int endangeredModules[sum];
+	uint16_t endangeredModules[NUM_MODULES];
 	int j = 0;
 	for(int i = 0; i < NUM_MODULES; ++i){
 		if(checks[i]){
@@ -117,7 +104,7 @@ int *Temperature::modulesInDanger(void){
  * @param index of module
  * @return temperature of module at specified index
  */
-int Voltage::moduleTemperature(int moduleIdx){
+uint16_t Temperature::moduleTemperature(int moduleIdx){
 	return modules[moduleIdx];
 }
 
@@ -125,7 +112,7 @@ int Voltage::moduleTemperature(int moduleIdx){
  * Gets the average temperature of the whole battery pack
  * @return average temperature of battery pack
  */
-int Voltage::totalPackAvgTemperature(void){
+uint16_t Temperature::totalPackAvgTemperature(void){
 	int sum = 0;
 	for(int i = 0; i < sizeof(modules)/sizeof(uint16_t); ++i){
 		sum += moduleTemperature(i);

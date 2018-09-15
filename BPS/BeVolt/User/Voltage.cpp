@@ -2,13 +2,14 @@
 /**
  * Voltage class that holds all voltage related information of BeVolt's
  * battery pack.
- * @authors Sijin Woo
+ * @authors Sijin Woo, Chase Block
  * @lastRevised 9/3/2018
  */
 
 #include <stdint.h>
 #include "Voltage.h"
 #include "LTC6813.h"
+#include "Definition.h"
 
 /** Constructor
  * Creates Voltage instance with NULL pointer to voltage list
@@ -91,7 +92,7 @@ uint16_t *Voltage::modulesInDanger(void){
 		sum += checks[i];
 	}
 
-	int endangeredModules[sum];
+	uint16_t endangeredModules[31];
 	int j = 0;
 	for(int i = 0; i < NUM_MODULES; ++i){
 		if(checks[i]){
@@ -108,7 +109,7 @@ uint16_t *Voltage::modulesInDanger(void){
  * @param index of module
  * @return voltage of module at specified index
  */
-int Voltage::moduleVoltage(int moduleIdx){
+uint16_t Voltage::moduleVoltage(int moduleIdx){
 	return modules[moduleIdx];
 }
 
@@ -116,7 +117,7 @@ int Voltage::moduleVoltage(int moduleIdx){
  * Gets the total voltage of the battery pack
  * @return voltage of whole battery pack
  */
-int Voltage::totalPackVoltage(void){
+uint16_t Voltage::totalPackVoltage(void){
 	int sum = 0;
 	for(int i = 0; i < sizeof(modules)/sizeof(uint16_t); ++i){
 		sum += modules[i];

@@ -1,2 +1,2 @@
 .\objects\wdtimer.o: User\WDTimer.cpp
-.\objects\wdtimer.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
+.\objects\wdtimer.o: D:\Program Files\Keil\ARM\ARMCC\Bin\..\include\stdint.h

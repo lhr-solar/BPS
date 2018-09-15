@@ -2,7 +2,7 @@
 /**
  * Current class that holds all Current (Amps) related information of BeVolt's
  * battery pack.
- * @authors Sijin Woo
+ * @authors Sijin Woo, Chase Block
  * @lastRevised 9/3/2018
  */
 
@@ -24,7 +24,7 @@ Current::Current(){
  * Creates Current (Amps) instance
  * @param max current the battery can handler before danger
  */
-Current::Current(int ceiling){
+Current::Current(uint16_t ceiling){
 	setLimits(ceiling);
 }
 
@@ -39,7 +39,7 @@ Current::~Current(){
  * Sets the max current limit the cells can reach before danger
  * @param max current limit
  */
-void Current::setLimits(int ceiling){
+void Current::setLimits(uint16_t ceiling){
 	maxCurrentLimit = ceiling;
 }
 
@@ -49,7 +49,7 @@ void Current::setLimits(int ceiling){
  * @param Amps of low precision hall efect sensor
  * @return 1 if successfully stored, 0 if failed
  */
-uint8_t Current::updateMeasurements(int highPrecision, int lowPrecision){
+uint8_t Current::updateMeasurements(){
 
 }
 
@@ -65,7 +65,7 @@ uint8_t Current::isSafe(void){
  * Gets the Ampere measurement the high precision hall effect sensor recorded
  * @return Amperes value
  */
-int Current::highPrecisionAmperes(void){
+uint16_t Current::highPrecisionAmperes(void){
 	return highPrecision;
 }
 
@@ -73,6 +73,6 @@ int Current::highPrecisionAmperes(void){
  * Gets the Ampere measurement the low precision hall effect sensor recorded
  * @return Amperes value
  */
-int Current::lowPrecisionAmperes(void){
+uint16_t Current::lowPrecisionAmperes(void){
 	return lowPrecision;
 }

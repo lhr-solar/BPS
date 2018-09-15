@@ -11,6 +11,8 @@
 #ifndef __LTC6813_H__
 #define __LTC6813_H__
 
+#include <stdint.h>
+
 /** LTC6813_Init
  * Initializes SPI for LTC6820 to convert to isoSPI
  * Initializes and configures LTC6813

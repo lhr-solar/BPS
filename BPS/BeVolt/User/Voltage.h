@@ -2,16 +2,16 @@
 /**
  * Voltage class that holds all voltage related information of BeVolt's
  * battery pack.
- * @authors Sijin Woo
+ * @authors Sijin Woo, Chase Block
  * @lastRevised 9/3/2018
  */
 
 #ifndef __VOLTAGE_H__
 #define __VOLTAGE_H__
 
-enum VoltageStatus {OverVoltage, UnderVoltage};
+#include <stdint.h>
 
-#define NUM_MODULES 31
+enum VoltageStatus {OverVoltage, UnderVoltage};
 
 /** Voltage
  * This class holds functions related to the voltage of BeVolt's
@@ -30,7 +30,7 @@ public:
 	 * @param max voltage limit of the lithium ion cells
 	 * @param min voltage limit of the lithium ion cells
 	 */
-	Voltage(int ceiling, int floor);
+	Voltage(uint16_t ceiling, uint16_t floor);
 
 	/** Destructor
 	 * Destroys Voltage instance
@@ -42,7 +42,7 @@ public:
 	 * @param max voltage limit
 	 * @param min voltage limit
 	 */
-	void setLimits(int ceiling, int floor);
+	void setLimits(uint16_t ceiling, uint16_t floor);
 
 	/** updateMeasurements
 	 * Stores and updates the new measurements received
@@ -61,20 +61,20 @@ public:
 	 * Finds all modules that in danger and stores them into a list
 	 * @return pointer to index of modules that are in danger
 	 */
-	int *modulesInDanger(void);
+	uint16_t *modulesInDanger(void);
 
 	/** moduleVoltage
 	 * Gets the voltage of a certain module in the battery pack
 	 * @param index of module
 	 * @return voltage of module at specified index
 	 */
-	int moduleVoltage(int moduleIdx);
+	uint16_t moduleVoltage(int moduleIdx);
 
 	/** totalPackVoltage
 	 * Gets the total voltage of the battery pack
 	 * @return voltage of whole battery pack
 	 */
-	int totalPackVoltage(void);
+	uint16_t totalPackVoltage(void);
 
 private:
 	uint16_t *modules;			// list of voltages of all modules

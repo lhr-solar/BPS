@@ -2,7 +2,7 @@
 /**
  * Current class that holds all Current (Amps) related information of BeVolt's
  * battery pack.
- * @authors Sijin Woo
+ * @authors Sijin Woo, Chase Block
  * @lastRevised 9/3/2018
  */
 
@@ -10,6 +10,8 @@
 
 #ifndef __CURRENT_H__
 #define __CURRENT_H__
+
+#include <stdint.h>
 
 /** Current (Amps)
  * This class holds functions related to the temperature of BeVolt's
@@ -27,7 +29,7 @@ public:
 	 * Creates Current (Amps) instance
 	 * @param max current the battery can handler before danger
 	 */
-	Current(int ceiling);
+	Current(uint16_t ceiling);
 
 	/** Destructor
 	 * Destroys Current (Amps) instance
@@ -38,7 +40,7 @@ public:
 	 * Sets the max current (Amps) limit the cells can reach before danger
 	 * @param max current limit
 	 */
-	void setLimits(int ceiling);
+	void setLimits(uint16_t ceiling);
 
 	/** updateMeasurements
 	 * Stores and updates the new measurements received
@@ -46,7 +48,7 @@ public:
 	 * @param Amps of low precision hall efect sensor
 	 * @return 1 if successfully stored, 0 if failed
 	 */
-	uint8_t updateMeasurements(int highPrecision, int lowPrecision);
+	uint8_t updateMeasurements();
 
 	/** isSafe
 	 * Checks if pack does not have a short circuit
@@ -58,18 +60,18 @@ public:
 	 * Gets the Ampere measurement the high precision hall effect sensor recorded
 	 * @return Amperes value
 	 */
-	int highPrecisionAmperes(void);
+	uint16_t highPrecisionAmperes(void);
 
 	/** lowPrecisionCurrent
 	 * Gets the Ampere measurement the low precision hall effect sensor recorded
 	 * @return Amperes value
 	 */
-	int lowPrecisionAmperes(void);
+	uint16_t lowPrecisionAmperes(void);
 
 private:
-	int highPrecision;		// Amp measurement of hall effect sensor of high precision
-	int lowPrecision;		// Amp measurement of hall effect sensor of high precision
-	int maxCurrentLimit;	// Max current (amps) limit the battery can handle before danger
+	uint16_t highPrecision;		// Amp measurement of hall effect sensor of high precision
+	uint16_t lowPrecision;		// Amp measurement of hall effect sensor of high precision
+	uint16_t maxCurrentLimit;	// Max current (amps) limit the battery can handle before danger
 };
 
 #endif
