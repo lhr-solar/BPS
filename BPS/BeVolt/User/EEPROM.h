@@ -4,7 +4,7 @@
  * in the regulations, all safety critical data is stored in here. This includes'
  * over voltage, under voltage, max current, max temperature.
  * The EEPROM is 128Kbits (16k x 8 bits) and uses I2C
- * @authors Sijin Woo
+ * @authors Sijin Woo, Chase Block
  * @lastRevised 9/4/2018
  */
 
@@ -12,6 +12,8 @@
 #define __EEPROM_H__
 
 #include <stdint.h>
+
+#define EEPROM_ADDRESS 0x10
 
 /** EEPROM_Init
  * Initializes I2C to communicate with EEPROM (M24128)

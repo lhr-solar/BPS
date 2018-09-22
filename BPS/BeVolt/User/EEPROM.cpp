@@ -3,7 +3,7 @@
  * Driver for EEPROM. Required by the American Solar Challanged in the regulations,
  * all safety critical data is stored in here. This includes over voltage, under
  * voltage, max current, max temperature.
- * @authors Sijin Woo
+ * @authors Sijin Woo, Chase Block
  * @lastRevised 9/4/2018
  */
 
@@ -55,7 +55,12 @@ void EEPROM_Init(void){
  * @param unsigned 8-bit address
  */
 void EEPROM_Write(uint16_t address, uint8_t data){
-	
+//	I2C_Send7bitAddress(I2C3, EEPROM_ADDRESS, I2C_Direction_Transmitter);	// Address the EEPROM
+	I2C_SendData(I2C3, EEPROM_ADDRESS << 1);	// This sends the address plus a write bit (0x0)
+			// I don't know if these two lines do the same thing or not.
+	I2C_SendData(I2C3, address >> 8);					// Send the first byte for the address
+	I2C_SendData(I2C3, address & 0xFF);				// Send the second byte for the address
+	I2C_SendData(I2C3, data);									// Send the byte of data
 }
 
 /** EEPROM_ReadMultipleBytes
@@ -65,7 +70,12 @@ void EEPROM_Write(uint16_t address, uint8_t data){
  * @return unsigned 8-bit list of data
  */
 uint8_t *EEPROM_ReadMultipleBytes(uint16_t address, uint32_t bytes){
+	uint8_t *data = new uint8_t [bytes];
+	for(int i = 0; i < bytes; ++i){
+		data[i] = EEPROM_ReadSingleByte(address + i);
+	}
 	
+	return data;
 }
 
 /** EEPROM_ReadSingleByte
@@ -74,5 +84,5 @@ uint8_t *EEPROM_ReadMultipleBytes(uint16_t address, uint32_t bytes){
  * @return unsigned 8-bit data
  */
 uint8_t EEPROM_ReadSingleByte(uint16_t address){
-	
+	return I2C_ReceiveData(I2C3);
 }

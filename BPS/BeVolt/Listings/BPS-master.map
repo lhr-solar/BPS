@@ -4,6 +4,7 @@ Component: ARM Compiler 5.06 update 6 (build 750) Tool: armlink [4d35ed]
 
 Section Cross References
 
+    main.o(i._Z10initializev) refers to eeprom.o(i._Z11EEPROM_Initv) for EEPROM_Init()
     main.o(i._Z10initializev) refers to wdtimer.o(i._Z12WDTimer_Initv) for WDTimer_Init()
     main.o(i.__sti___8_main_cpp_31c4e013) refers to voltage.o(i._ZN7VoltageC1Ev) for Voltage::Voltage()
     main.o(i.__sti___8_main_cpp_31c4e013) refers to aeabi_atexit.o(.text) for __aeabi_atexit
@@ -35,12 +36,31 @@ Section Cross References
     current.o(.ARM.exidx) refers to current.o(i._ZN7Current6isSafeEv) for i._ZN7Current6isSafeEv
     current.o(.ARM.exidx) refers to current.o(i._ZN7Current20highPrecisionAmperesEv) for i._ZN7Current20highPrecisionAmperesEv
     current.o(.ARM.exidx) refers to current.o(i._ZN7Current19lowPrecisionAmperesEv) for i._ZN7Current19lowPrecisionAmperesEv
+    eeprom.o(i._Z11EEPROM_Initv) refers to stm32f4xx_rcc.o(i.RCC_AHB1PeriphClockCmd) for RCC_AHB1PeriphClockCmd
+    eeprom.o(i._Z11EEPROM_Initv) refers to stm32f4xx_rcc.o(i.RCC_APB1PeriphClockCmd) for RCC_APB1PeriphClockCmd
+    eeprom.o(i._Z11EEPROM_Initv) refers to stm32f4xx_gpio.o(i.GPIO_Init) for GPIO_Init
+    eeprom.o(i._Z11EEPROM_Initv) refers to stm32f4xx_gpio.o(i.GPIO_PinAFConfig) for GPIO_PinAFConfig
+    eeprom.o(i._Z11EEPROM_Initv) refers to stm32f4xx_i2c.o(i.I2C_Init) for I2C_Init
+    eeprom.o(i._Z11EEPROM_Initv) refers to stm32f4xx_i2c.o(i.I2C_Cmd) for I2C_Cmd
+    eeprom.o(i._Z12EEPROM_Writeth) refers to stm32f4xx_i2c.o(i.I2C_SendData) for I2C_SendData
+    eeprom.o(i._Z21EEPROM_ReadSingleBytet) refers to stm32f4xx_i2c.o(i.I2C_ReceiveData) for I2C_ReceiveData
+    eeprom.o(i._Z24EEPROM_ReadMultipleBytestj) refers to array_new.o(i._Znaj) for operator new[] (unsigned)
+    eeprom.o(i._Z24EEPROM_ReadMultipleBytestj) refers to eeprom.o(i._Z21EEPROM_ReadSingleBytet) for EEPROM_ReadSingleByte(unsigned short)
+    eeprom.o(.ARM.exidx) refers to eeprom.o(i._Z11EEPROM_Initv) for i._Z11EEPROM_Initv
+    eeprom.o(.ARM.exidx) refers to eeprom.o(i._Z12EEPROM_Writeth) for i._Z12EEPROM_Writeth
+    eeprom.o(.ARM.exidx) refers to eeprom.o(i._Z21EEPROM_ReadSingleBytet) for i._Z21EEPROM_ReadSingleBytet
+    eeprom.o(.ARM.exidx) refers to eeprom.o(i._Z24EEPROM_ReadMultipleBytestj) for i._Z24EEPROM_ReadMultipleBytestj
+    ltc2983.o(.ARM.exidx) refers to ltc2983.o(i._Z12LTC2983_Initv) for i._Z12LTC2983_Initv
+    ltc2983.o(.ARM.exidx) refers to ltc2983.o(i._Z15LTC2983_SendCmdPt) for i._Z15LTC2983_SendCmdPt
+    ltc2983.o(.ARM.exidx) refers to ltc2983.o(i._Z15LTC2983_Measurev) for i._Z15LTC2983_Measurev
     ltc6813.o(i._Z5pec15Pci) refers to ltc6813.o(.bss) for pec15Table
     ltc6813.o(i._ZN33_INTERNAL_11_LTC6813_cpp_73e134cf16init_PEC15_TableEv) refers to ltc6813.o(.data) for CRC15_POLY
     ltc6813.o(i._ZN33_INTERNAL_11_LTC6813_cpp_73e134cf16init_PEC15_TableEv) refers to ltc6813.o(.bss) for pec15Table
     ltc6813.o(.ARM.exidx) refers to ltc6813.o(i._ZN33_INTERNAL_11_LTC6813_cpp_73e134cf16init_PEC15_TableEv) for i._ZN33_INTERNAL_11_LTC6813_cpp_73e134cf16init_PEC15_TableEv
     ltc6813.o(.ARM.exidx) refers to ltc6813.o(i._Z5pec15Pci) for i._Z5pec15Pci
     temperature.o(i._ZN11Temperature15modulesInDangerEv) refers to temperature.o(i._ZN11Temperature17moduleTemperatureEi) for Temperature::moduleTemperature(int)
+    temperature.o(i._ZN11Temperature15modulesInDangerEv) refers to array_new.o(i._Znaj) for operator new[] (unsigned)
+    temperature.o(i._ZN11Temperature18updateMeasurementsEv) refers to ltc2983.o(i._Z15LTC2983_Measurev) for LTC2983_Measure()
     temperature.o(i._ZN11Temperature23totalPackAvgTemperatureEv) refers to temperature.o(i._ZN11Temperature17moduleTemperatureEi) for Temperature::moduleTemperature(int)
     temperature.o(i._ZN11Temperature6isSafeEv) refers to temperature.o(i._ZN11Temperature17moduleTemperatureEi) for Temperature::moduleTemperature(int)
     temperature.o(i._ZN11TemperatureC1Et) refers to temperature.o(i._ZN11Temperature9setLimitsEi) for Temperature::setLimits(int)
@@ -54,6 +74,7 @@ Section Cross References
     temperature.o(.ARM.exidx) refers to temperature.o(i._ZN11Temperature15modulesInDangerEv) for i._ZN11Temperature15modulesInDangerEv
     temperature.o(.ARM.exidx) refers to temperature.o(i._ZN11Temperature23totalPackAvgTemperatureEv) for i._ZN11Temperature23totalPackAvgTemperatureEv
     voltage.o(i._ZN7Voltage15modulesInDangerEv) refers to voltage.o(i._ZN7Voltage13moduleVoltageEi) for Voltage::moduleVoltage(int)
+    voltage.o(i._ZN7Voltage15modulesInDangerEv) refers to array_new.o(i._Znaj) for operator new[] (unsigned)
     voltage.o(i._ZN7Voltage6isSafeEv) refers to voltage.o(i._ZN7Voltage13moduleVoltageEi) for Voltage::moduleVoltage(int)
     voltage.o(i._ZN7VoltageC1Ett) refers to voltage.o(i._ZN7Voltage9setLimitsEtt) for Voltage::setLimits(unsigned short, unsigned short)
     voltage.o(.ARM.exidx) refers to voltage.o(i._ZN7VoltageC1Ev) for i._ZN7VoltageC1Ev
@@ -125,6 +146,85 @@ Section Cross References
     stm32f4xx_rcc.o(.ARM.exidx) refers to stm32f4xx_rcc.o(i.RCC_ClearFlag) for i.RCC_ClearFlag
     stm32f4xx_rcc.o(.ARM.exidx) refers to stm32f4xx_rcc.o(i.RCC_GetITStatus) for i.RCC_GetITStatus
     stm32f4xx_rcc.o(.ARM.exidx) refers to stm32f4xx_rcc.o(i.RCC_ClearITPendingBit) for i.RCC_ClearITPendingBit
+    stm32f4xx_i2c.o(i.I2C_DeInit) refers to stm32f4xx_rcc.o(i.RCC_APB1PeriphResetCmd) for RCC_APB1PeriphResetCmd
+    stm32f4xx_i2c.o(i.I2C_Init) refers to stm32f4xx_rcc.o(i.RCC_GetClocksFreq) for RCC_GetClocksFreq
+    stm32f4xx_i2c.o(.ARM.exidx) refers to stm32f4xx_i2c.o(i.I2C_DeInit) for i.I2C_DeInit
+    stm32f4xx_i2c.o(.ARM.exidx) refers to stm32f4xx_i2c.o(i.I2C_Init) for i.I2C_Init
+    stm32f4xx_i2c.o(.ARM.exidx) refers to stm32f4xx_i2c.o(i.I2C_StructInit) for i.I2C_StructInit
+    stm32f4xx_i2c.o(.ARM.exidx) refers to stm32f4xx_i2c.o(i.I2C_Cmd) for i.I2C_Cmd
+    stm32f4xx_i2c.o(.ARM.exidx) refers to stm32f4xx_i2c.o(i.I2C_AnalogFilterCmd) for i.I2C_AnalogFilterCmd
+    stm32f4xx_i2c.o(.ARM.exidx) refers to stm32f4xx_i2c.o(i.I2C_DigitalFilterConfig) for i.I2C_DigitalFilterConfig
+    stm32f4xx_i2c.o(.ARM.exidx) refers to stm32f4xx_i2c.o(i.I2C_GenerateSTART) for i.I2C_GenerateSTART
+    stm32f4xx_i2c.o(.ARM.exidx) refers to stm32f4xx_i2c.o(i.I2C_GenerateSTOP) for i.I2C_GenerateSTOP
+    stm32f4xx_i2c.o(.ARM.exidx) refers to stm32f4xx_i2c.o(i.I2C_Send7bitAddress) for i.I2C_Send7bitAddress
+    stm32f4xx_i2c.o(.ARM.exidx) refers to stm32f4xx_i2c.o(i.I2C_AcknowledgeConfig) for i.I2C_AcknowledgeConfig
+    stm32f4xx_i2c.o(.ARM.exidx) refers to stm32f4xx_i2c.o(i.I2C_OwnAddress2Config) for i.I2C_OwnAddress2Config
+    stm32f4xx_i2c.o(.ARM.exidx) refers to stm32f4xx_i2c.o(i.I2C_DualAddressCmd) for i.I2C_DualAddressCmd
+    stm32f4xx_i2c.o(.ARM.exidx) refers to stm32f4xx_i2c.o(i.I2C_GeneralCallCmd) for i.I2C_GeneralCallCmd
+    stm32f4xx_i2c.o(.ARM.exidx) refers to stm32f4xx_i2c.o(i.I2C_SoftwareResetCmd) for i.I2C_SoftwareResetCmd
+    stm32f4xx_i2c.o(.ARM.exidx) refers to stm32f4xx_i2c.o(i.I2C_StretchClockCmd) for i.I2C_StretchClockCmd
+    stm32f4xx_i2c.o(.ARM.exidx) refers to stm32f4xx_i2c.o(i.I2C_FastModeDutyCycleConfig) for i.I2C_FastModeDutyCycleConfig
+    stm32f4xx_i2c.o(.ARM.exidx) refers to stm32f4xx_i2c.o(i.I2C_NACKPositionConfig) for i.I2C_NACKPositionConfig
+    stm32f4xx_i2c.o(.ARM.exidx) refers to stm32f4xx_i2c.o(i.I2C_SMBusAlertConfig) for i.I2C_SMBusAlertConfig
+    stm32f4xx_i2c.o(.ARM.exidx) refers to stm32f4xx_i2c.o(i.I2C_ARPCmd) for i.I2C_ARPCmd
+    stm32f4xx_i2c.o(.ARM.exidx) refers to stm32f4xx_i2c.o(i.I2C_SendData) for i.I2C_SendData
+    stm32f4xx_i2c.o(.ARM.exidx) refers to stm32f4xx_i2c.o(i.I2C_ReceiveData) for i.I2C_ReceiveData
+    stm32f4xx_i2c.o(.ARM.exidx) refers to stm32f4xx_i2c.o(i.I2C_TransmitPEC) for i.I2C_TransmitPEC
+    stm32f4xx_i2c.o(.ARM.exidx) refers to stm32f4xx_i2c.o(i.I2C_PECPositionConfig) for i.I2C_PECPositionConfig
+    stm32f4xx_i2c.o(.ARM.exidx) refers to stm32f4xx_i2c.o(i.I2C_CalculatePEC) for i.I2C_CalculatePEC
+    stm32f4xx_i2c.o(.ARM.exidx) refers to stm32f4xx_i2c.o(i.I2C_GetPEC) for i.I2C_GetPEC
+    stm32f4xx_i2c.o(.ARM.exidx) refers to stm32f4xx_i2c.o(i.I2C_DMACmd) for i.I2C_DMACmd
+    stm32f4xx_i2c.o(.ARM.exidx) refers to stm32f4xx_i2c.o(i.I2C_DMALastTransferCmd) for i.I2C_DMALastTransferCmd
+    stm32f4xx_i2c.o(.ARM.exidx) refers to stm32f4xx_i2c.o(i.I2C_ReadRegister) for i.I2C_ReadRegister
+    stm32f4xx_i2c.o(.ARM.exidx) refers to stm32f4xx_i2c.o(i.I2C_ITConfig) for i.I2C_ITConfig
+    stm32f4xx_i2c.o(.ARM.exidx) refers to stm32f4xx_i2c.o(i.I2C_CheckEvent) for i.I2C_CheckEvent
+    stm32f4xx_i2c.o(.ARM.exidx) refers to stm32f4xx_i2c.o(i.I2C_GetLastEvent) for i.I2C_GetLastEvent
+    stm32f4xx_i2c.o(.ARM.exidx) refers to stm32f4xx_i2c.o(i.I2C_GetFlagStatus) for i.I2C_GetFlagStatus
+    stm32f4xx_i2c.o(.ARM.exidx) refers to stm32f4xx_i2c.o(i.I2C_ClearFlag) for i.I2C_ClearFlag
+    stm32f4xx_i2c.o(.ARM.exidx) refers to stm32f4xx_i2c.o(i.I2C_GetITStatus) for i.I2C_GetITStatus
+    stm32f4xx_i2c.o(.ARM.exidx) refers to stm32f4xx_i2c.o(i.I2C_ClearITPendingBit) for i.I2C_ClearITPendingBit
+    stm32f4xx_gpio.o(i.GPIO_DeInit) refers to stm32f4xx_rcc.o(i.RCC_AHB1PeriphResetCmd) for RCC_AHB1PeriphResetCmd
+    stm32f4xx_gpio.o(.ARM.exidx) refers to stm32f4xx_gpio.o(i.GPIO_DeInit) for i.GPIO_DeInit
+    stm32f4xx_gpio.o(.ARM.exidx) refers to stm32f4xx_gpio.o(i.GPIO_Init) for i.GPIO_Init
+    stm32f4xx_gpio.o(.ARM.exidx) refers to stm32f4xx_gpio.o(i.GPIO_StructInit) for i.GPIO_StructInit
+    stm32f4xx_gpio.o(.ARM.exidx) refers to stm32f4xx_gpio.o(i.GPIO_PinLockConfig) for i.GPIO_PinLockConfig
+    stm32f4xx_gpio.o(.ARM.exidx) refers to stm32f4xx_gpio.o(i.GPIO_ReadInputDataBit) for i.GPIO_ReadInputDataBit
+    stm32f4xx_gpio.o(.ARM.exidx) refers to stm32f4xx_gpio.o(i.GPIO_ReadInputData) for i.GPIO_ReadInputData
+    stm32f4xx_gpio.o(.ARM.exidx) refers to stm32f4xx_gpio.o(i.GPIO_ReadOutputDataBit) for i.GPIO_ReadOutputDataBit
+    stm32f4xx_gpio.o(.ARM.exidx) refers to stm32f4xx_gpio.o(i.GPIO_ReadOutputData) for i.GPIO_ReadOutputData
+    stm32f4xx_gpio.o(.ARM.exidx) refers to stm32f4xx_gpio.o(i.GPIO_SetBits) for i.GPIO_SetBits
+    stm32f4xx_gpio.o(.ARM.exidx) refers to stm32f4xx_gpio.o(i.GPIO_ResetBits) for i.GPIO_ResetBits
+    stm32f4xx_gpio.o(.ARM.exidx) refers to stm32f4xx_gpio.o(i.GPIO_WriteBit) for i.GPIO_WriteBit
+    stm32f4xx_gpio.o(.ARM.exidx) refers to stm32f4xx_gpio.o(i.GPIO_Write) for i.GPIO_Write
+    stm32f4xx_gpio.o(.ARM.exidx) refers to stm32f4xx_gpio.o(i.GPIO_ToggleBits) for i.GPIO_ToggleBits
+    stm32f4xx_gpio.o(.ARM.exidx) refers to stm32f4xx_gpio.o(i.GPIO_PinAFConfig) for i.GPIO_PinAFConfig
+    stm32f4xx_spi.o(i.SPI_I2S_DeInit) refers to stm32f4xx_rcc.o(i.RCC_APB2PeriphResetCmd) for RCC_APB2PeriphResetCmd
+    stm32f4xx_spi.o(i.SPI_I2S_DeInit) refers to stm32f4xx_rcc.o(i.RCC_APB1PeriphResetCmd) for RCC_APB1PeriphResetCmd
+    stm32f4xx_spi.o(.ARM.exidx) refers to stm32f4xx_spi.o(i.SPI_I2S_DeInit) for i.SPI_I2S_DeInit
+    stm32f4xx_spi.o(.ARM.exidx) refers to stm32f4xx_spi.o(i.SPI_Init) for i.SPI_Init
+    stm32f4xx_spi.o(.ARM.exidx) refers to stm32f4xx_spi.o(i.I2S_Init) for i.I2S_Init
+    stm32f4xx_spi.o(.ARM.exidx) refers to stm32f4xx_spi.o(i.SPI_StructInit) for i.SPI_StructInit
+    stm32f4xx_spi.o(.ARM.exidx) refers to stm32f4xx_spi.o(i.I2S_StructInit) for i.I2S_StructInit
+    stm32f4xx_spi.o(.ARM.exidx) refers to stm32f4xx_spi.o(i.SPI_Cmd) for i.SPI_Cmd
+    stm32f4xx_spi.o(.ARM.exidx) refers to stm32f4xx_spi.o(i.I2S_Cmd) for i.I2S_Cmd
+    stm32f4xx_spi.o(.ARM.exidx) refers to stm32f4xx_spi.o(i.SPI_DataSizeConfig) for i.SPI_DataSizeConfig
+    stm32f4xx_spi.o(.ARM.exidx) refers to stm32f4xx_spi.o(i.SPI_BiDirectionalLineConfig) for i.SPI_BiDirectionalLineConfig
+    stm32f4xx_spi.o(.ARM.exidx) refers to stm32f4xx_spi.o(i.SPI_NSSInternalSoftwareConfig) for i.SPI_NSSInternalSoftwareConfig
+    stm32f4xx_spi.o(.ARM.exidx) refers to stm32f4xx_spi.o(i.SPI_SSOutputCmd) for i.SPI_SSOutputCmd
+    stm32f4xx_spi.o(.ARM.exidx) refers to stm32f4xx_spi.o(i.SPI_TIModeCmd) for i.SPI_TIModeCmd
+    stm32f4xx_spi.o(.ARM.exidx) refers to stm32f4xx_spi.o(i.I2S_FullDuplexConfig) for i.I2S_FullDuplexConfig
+    stm32f4xx_spi.o(.ARM.exidx) refers to stm32f4xx_spi.o(i.SPI_I2S_ReceiveData) for i.SPI_I2S_ReceiveData
+    stm32f4xx_spi.o(.ARM.exidx) refers to stm32f4xx_spi.o(i.SPI_I2S_SendData) for i.SPI_I2S_SendData
+    stm32f4xx_spi.o(.ARM.exidx) refers to stm32f4xx_spi.o(i.SPI_CalculateCRC) for i.SPI_CalculateCRC
+    stm32f4xx_spi.o(.ARM.exidx) refers to stm32f4xx_spi.o(i.SPI_TransmitCRC) for i.SPI_TransmitCRC
+    stm32f4xx_spi.o(.ARM.exidx) refers to stm32f4xx_spi.o(i.SPI_GetCRC) for i.SPI_GetCRC
+    stm32f4xx_spi.o(.ARM.exidx) refers to stm32f4xx_spi.o(i.SPI_GetCRCPolynomial) for i.SPI_GetCRCPolynomial
+    stm32f4xx_spi.o(.ARM.exidx) refers to stm32f4xx_spi.o(i.SPI_I2S_DMACmd) for i.SPI_I2S_DMACmd
+    stm32f4xx_spi.o(.ARM.exidx) refers to stm32f4xx_spi.o(i.SPI_I2S_ITConfig) for i.SPI_I2S_ITConfig
+    stm32f4xx_spi.o(.ARM.exidx) refers to stm32f4xx_spi.o(i.SPI_I2S_GetFlagStatus) for i.SPI_I2S_GetFlagStatus
+    stm32f4xx_spi.o(.ARM.exidx) refers to stm32f4xx_spi.o(i.SPI_I2S_ClearFlag) for i.SPI_I2S_ClearFlag
+    stm32f4xx_spi.o(.ARM.exidx) refers to stm32f4xx_spi.o(i.SPI_I2S_GetITStatus) for i.SPI_I2S_GetITStatus
+    stm32f4xx_spi.o(.ARM.exidx) refers to stm32f4xx_spi.o(i.SPI_I2S_ClearITPendingBit) for i.SPI_I2S_ClearITPendingBit
     startup_stm32f411xe.o(STACK) refers (Special) to heapauxi.o(.text) for __use_two_region_memory
     startup_stm32f411xe.o(HEAP) refers (Special) to heapauxi.o(.text) for __use_two_region_memory
     startup_stm32f411xe.o(RESET) refers (Special) to heapauxi.o(.text) for __use_two_region_memory
@@ -154,6 +254,12 @@ Section Cross References
     init_aeabi.o(.text) refers (Special) to libinit2.o(.ARM.Collect$$libinit$$00000031) for __rt_lib_init_cpp_2
     init_aeabi.o(.ARM.exidx) refers (Special) to libinit2.o(.ARM.Collect$$libinit$$00000031) for __rt_lib_init_cpp_2
     init_aeabi.o(.ARM.exidx) refers to init_aeabi.o(.text) for .text
+    array_new.o(i._Znaj) refers to new.o(i._Znwj) for operator new(unsigned)
+    array_new.o(.ARM.exidx) refers to array_new.o(i._Znaj) for i._Znaj
+    array_new.o(.ARM.exidx) refers to unwind_pr0.o(.text) for __aeabi_unwind_cpp_pr0
+    array_new.o(.ARM.exidx) refers to array_new.o(.ARM.extab) for .extab._Znaj
+    array_new.o(.ARM.extab) refers to arm_callunex_noexceptions.o(.text) for __cxa_call_unexpected
+    array_new.o(.ARM.extab) refers to bad_alloc_dtor.o(.constdata__ZTISt9bad_alloc) for typeinfo for std::bad_alloc
     __rtentry.o(.ARM.Collect$$rtentry$$00000000) refers (Special) to __rtentry2.o(.ARM.Collect$$rtentry$$0000000A) for __rt_entry_li
     __rtentry.o(.ARM.Collect$$rtentry$$00000000) refers (Special) to __rtentry2.o(.ARM.Collect$$rtentry$$0000000D) for __rt_entry_main
     __rtentry.o(.ARM.Collect$$rtentry$$00000000) refers (Special) to __rtentry2.o(.ARM.Collect$$rtentry$$0000000C) for __rt_entry_postli_1
@@ -238,6 +344,21 @@ Section Cross References
     libinit2.o(.ARM.Collect$$libinit$$00000026) refers to argv_veneer.o(.emb_text) for __ARM_argv_veneer
     libinit2.o(.ARM.Collect$$libinit$$00000027) refers to argv_veneer.o(.emb_text) for __ARM_argv_veneer
     libinit2.o(.ARM.Collect$$libinit$$00000031) refers (Weak) to init_aeabi.o(.text) for __cpp_initialize__aeabi_
+    new.o(i._Znwj) refers to rt_new_handler_addr_intlibspace.o(.text) for __rt_new_handler_addr
+    new.o(i._Znwj) refers to h1_alloc.o(.text) for malloc
+    new.o(i._Znwj) refers to arm_newhandler_noexceptions.o(.text) for __default_new_handler()
+    new.o(.ARM.exidx) refers to new.o(i._Znwj) for i._Znwj
+    new.o(.ARM.exidx) refers to unwind_pr0.o(.text) for __aeabi_unwind_cpp_pr0
+    new.o(.ARM.exidx) refers to new.o(.ARM.extab) for .extab._Znwj
+    new.o(.ARM.extab) refers to arm_callunex_noexceptions.o(.text) for __cxa_call_unexpected
+    new.o(.ARM.extab) refers to bad_alloc_dtor.o(.constdata__ZTISt9bad_alloc) for typeinfo for std::bad_alloc
+    arm_callunex_noexceptions.o(.ARM.exidx) refers to arm_callunex_noexceptions.o(.text) for .text
+    bad_alloc_dtor.o(i._ZNSt9bad_allocD0Ev) refers to bad_alloc_dtor.o(i._ZNSt9bad_allocD1Ev) for std::bad_alloc::~bad_alloc()
+    bad_alloc_dtor.o(i._ZNSt9bad_allocD0Ev) refers to delete.o(i._ZdlPv) for operator delete (void*)
+    bad_alloc_dtor.o(.ARM.exidx) refers to bad_alloc_dtor.o(i._ZNSt9bad_allocD1Ev) for i._ZNSt9bad_allocD1Ev
+    bad_alloc_dtor.o(.ARM.exidx) refers to bad_alloc_dtor.o(i._ZNSt9bad_allocD0Ev) for i._ZNSt9bad_allocD0Ev
+    unwind_pr0.o(.text) refers to unwind_prcommon.o(.text) for __ARM_unwind_cpp_prcommon
+    unwind_pr0.o(.ARM.exidx) refers to unwind_pr0.o(.text) for .text
     libspace.o(.text) refers to libspace.o(.bss) for __libspace_start
     __rtentry2.o(.ARM.Collect$$rtentry$$00000008) refers to boardinit2.o(.text) for _platform_post_stackheap_init
     __rtentry2.o(.ARM.Collect$$rtentry$$0000000A) refers to libinit.o(.ARM.Collect$$libinit$$00000000) for __rt_lib_init
@@ -253,6 +374,8 @@ Section Cross References
     __rtentry4.o(.ARM.exidx) refers to __rtentry4.o(.ARM.Collect$$rtentry$$00000004) for .ARM.Collect$$rtentry$$00000004
     rt_heap_descriptor.o(.text) refers to rt_heap_descriptor.o(.bss) for __rt_heap_descriptor_data
     rt_heap_descriptor_intlibspace.o(.text) refers to libspace.o(.bss) for __libspace_start
+    rt_new_handler_addr.o(.text) refers to rt_new_handler_addr.o(.bss) for __rt_new_handler_addr_data
+    rt_new_handler_addr_intlibspace.o(.text) refers to libspace.o(.bss) for __libspace_start
     init_alloc.o(.text) refers (Special) to hguard.o(.text) for __heap$guard
     init_alloc.o(.text) refers (Special) to libinit2.o(.ARM.Collect$$libinit$$00000005) for __rt_lib_init_heap_2
     init_alloc.o(.text) refers (Special) to maybetermalloc1.o(.emb_text) for _maybe_terminate_alloc
@@ -273,6 +396,52 @@ Section Cross References
     argv_veneer.o(.emb_text) refers to no_argv.o(.text) for __ARM_get_argv
     libshutdown2.o(.ARM.Collect$$libshutdown$$00000001) refers (Weak) to cxa_finalize.o(.text) for __cxa_finalize
     libshutdown2.o(.ARM.Collect$$libshutdown$$0000000D) refers (Weak) to term_alloc.o(.text) for _terminate_alloc
+    delete.o(i._ZdlPv) refers to h1_free.o(.text) for free
+    delete.o(.ARM.exidx) refers to delete.o(i._ZdlPv) for i._ZdlPv
+    arm_newhandler_noexceptions.o(.text) refers to arm_exceptions_terminate.o(.text) for std::terminate()
+    arm_newhandler_noexceptions.o(.ARM.exidx) refers to arm_newhandler_noexceptions.o(.text) for .text
+    bad_alloc_what.o(.ARM.exidx) refers to bad_alloc_what.o(i._ZNKSt9bad_alloc4whatEv) for i._ZNKSt9bad_alloc4whatEv
+    exception_dtor.o(i._ZNSt9exceptionD0Ev) refers to delete.o(i._ZdlPv) for operator delete (void*)
+    exception_dtor.o(.ARM.exidx) refers to exception_dtor.o(i._ZNSt9exceptionD1Ev) for i._ZNSt9exceptionD1Ev
+    exception_dtor.o(.ARM.exidx) refers to exception_dtor.o(i._ZNSt9exceptionD0Ev) for i._ZNSt9exceptionD0Ev
+    lib_rtti_impl.o(i._ZN10__cxxabiv116__enum_type_infoD0Ev) refers to lib_rtti_impl.o(i._ZN10__cxxabiv116__enum_type_infoD1Ev) for __cxxabiv1::__enum_type_info::~__enum_type_info()
+    lib_rtti_impl.o(i._ZN10__cxxabiv117__array_type_infoD0Ev) refers to lib_rtti_impl.o(i._ZN10__cxxabiv117__array_type_infoD1Ev) for __cxxabiv1::__array_type_info::~__array_type_info()
+    lib_rtti_impl.o(i._ZN10__cxxabiv117__class_type_infoD0Ev) refers to lib_rtti_impl.o(i._ZN10__cxxabiv117__class_type_infoD1Ev) for __cxxabiv1::__class_type_info::~__class_type_info()
+    lib_rtti_impl.o(i._ZN10__cxxabiv117__pbase_type_infoD0Ev) refers to lib_rtti_impl.o(i._ZN10__cxxabiv117__pbase_type_infoD1Ev) for __cxxabiv1::__pbase_type_info::~__pbase_type_info()
+    lib_rtti_impl.o(i._ZN10__cxxabiv119__pointer_type_infoD0Ev) refers to lib_rtti_impl.o(i._ZN10__cxxabiv119__pointer_type_infoD1Ev) for __cxxabiv1::__pointer_type_info::~__pointer_type_info()
+    lib_rtti_impl.o(i._ZN10__cxxabiv119__pointer_type_infoD1Ev) refers to lib_rtti_impl.o(i._ZN10__cxxabiv117__pbase_type_infoD1Ev) for __cxxabiv1::__pbase_type_info::~__pbase_type_info()
+    lib_rtti_impl.o(i._ZN10__cxxabiv120__function_type_infoD0Ev) refers to lib_rtti_impl.o(i._ZN10__cxxabiv120__function_type_infoD1Ev) for __cxxabiv1::__function_type_info::~__function_type_info()
+    lib_rtti_impl.o(i._ZN10__cxxabiv120__si_class_type_infoD0Ev) refers to lib_rtti_impl.o(i._ZN10__cxxabiv120__si_class_type_infoD1Ev) for __cxxabiv1::__si_class_type_info::~__si_class_type_info()
+    lib_rtti_impl.o(i._ZN10__cxxabiv120__si_class_type_infoD1Ev) refers to lib_rtti_impl.o(i._ZN10__cxxabiv117__class_type_infoD1Ev) for __cxxabiv1::__class_type_info::~__class_type_info()
+    lib_rtti_impl.o(i._ZN10__cxxabiv121__vmi_class_type_infoD0Ev) refers to lib_rtti_impl.o(i._ZN10__cxxabiv121__vmi_class_type_infoD1Ev) for __cxxabiv1::__vmi_class_type_info::~__vmi_class_type_info()
+    lib_rtti_impl.o(i._ZN10__cxxabiv121__vmi_class_type_infoD1Ev) refers to lib_rtti_impl.o(i._ZN10__cxxabiv117__class_type_infoD1Ev) for __cxxabiv1::__class_type_info::~__class_type_info()
+    lib_rtti_impl.o(i._ZN10__cxxabiv123__fundamental_type_infoD0Ev) refers to lib_rtti_impl.o(i._ZN10__cxxabiv123__fundamental_type_infoD1Ev) for __cxxabiv1::__fundamental_type_info::~__fundamental_type_info()
+    lib_rtti_impl.o(i._ZN10__cxxabiv129__pointer_to_member_type_infoD0Ev) refers to lib_rtti_impl.o(i._ZN10__cxxabiv129__pointer_to_member_type_infoD1Ev) for __cxxabiv1::__pointer_to_member_type_info::~__pointer_to_member_type_info()
+    lib_rtti_impl.o(i._ZN10__cxxabiv129__pointer_to_member_type_infoD1Ev) refers to lib_rtti_impl.o(i._ZN10__cxxabiv117__pbase_type_infoD1Ev) for __cxxabiv1::__pbase_type_info::~__pbase_type_info()
+    lib_rtti_impl.o(.ARM.exidx) refers to lib_rtti_impl.o(i._ZN10__cxxabiv123__fundamental_type_infoD1Ev) for i._ZN10__cxxabiv123__fundamental_type_infoD1Ev
+    lib_rtti_impl.o(.ARM.exidx) refers to lib_rtti_impl.o(i._ZN10__cxxabiv123__fundamental_type_infoD0Ev) for i._ZN10__cxxabiv123__fundamental_type_infoD0Ev
+    lib_rtti_impl.o(.ARM.exidx) refers to lib_rtti_impl.o(i._ZN10__cxxabiv117__array_type_infoD1Ev) for i._ZN10__cxxabiv117__array_type_infoD1Ev
+    lib_rtti_impl.o(.ARM.exidx) refers to lib_rtti_impl.o(i._ZN10__cxxabiv117__array_type_infoD0Ev) for i._ZN10__cxxabiv117__array_type_infoD0Ev
+    lib_rtti_impl.o(.ARM.exidx) refers to lib_rtti_impl.o(i._ZN10__cxxabiv120__function_type_infoD1Ev) for i._ZN10__cxxabiv120__function_type_infoD1Ev
+    lib_rtti_impl.o(.ARM.exidx) refers to lib_rtti_impl.o(i._ZN10__cxxabiv120__function_type_infoD0Ev) for i._ZN10__cxxabiv120__function_type_infoD0Ev
+    lib_rtti_impl.o(.ARM.exidx) refers to lib_rtti_impl.o(i._ZN10__cxxabiv116__enum_type_infoD1Ev) for i._ZN10__cxxabiv116__enum_type_infoD1Ev
+    lib_rtti_impl.o(.ARM.exidx) refers to lib_rtti_impl.o(i._ZN10__cxxabiv116__enum_type_infoD0Ev) for i._ZN10__cxxabiv116__enum_type_infoD0Ev
+    lib_rtti_impl.o(.ARM.exidx) refers to lib_rtti_impl.o(i._ZN10__cxxabiv117__class_type_infoD1Ev) for i._ZN10__cxxabiv117__class_type_infoD1Ev
+    lib_rtti_impl.o(.ARM.exidx) refers to lib_rtti_impl.o(i._ZN10__cxxabiv117__class_type_infoD0Ev) for i._ZN10__cxxabiv117__class_type_infoD0Ev
+    lib_rtti_impl.o(.ARM.exidx) refers to lib_rtti_impl.o(i._ZN10__cxxabiv120__si_class_type_infoD1Ev) for i._ZN10__cxxabiv120__si_class_type_infoD1Ev
+    lib_rtti_impl.o(.ARM.exidx) refers to lib_rtti_impl.o(i._ZN10__cxxabiv120__si_class_type_infoD0Ev) for i._ZN10__cxxabiv120__si_class_type_infoD0Ev
+    lib_rtti_impl.o(.ARM.exidx) refers to lib_rtti_impl.o(i._ZN10__cxxabiv121__vmi_class_type_infoD1Ev) for i._ZN10__cxxabiv121__vmi_class_type_infoD1Ev
+    lib_rtti_impl.o(.ARM.exidx) refers to lib_rtti_impl.o(i._ZN10__cxxabiv121__vmi_class_type_infoD0Ev) for i._ZN10__cxxabiv121__vmi_class_type_infoD0Ev
+    lib_rtti_impl.o(.ARM.exidx) refers to lib_rtti_impl.o(i._ZN10__cxxabiv117__pbase_type_infoD1Ev) for i._ZN10__cxxabiv117__pbase_type_infoD1Ev
+    lib_rtti_impl.o(.ARM.exidx) refers to lib_rtti_impl.o(i._ZN10__cxxabiv117__pbase_type_infoD0Ev) for i._ZN10__cxxabiv117__pbase_type_infoD0Ev
+    lib_rtti_impl.o(.ARM.exidx) refers to lib_rtti_impl.o(i._ZN10__cxxabiv119__pointer_type_infoD1Ev) for i._ZN10__cxxabiv119__pointer_type_infoD1Ev
+    lib_rtti_impl.o(.ARM.exidx) refers to lib_rtti_impl.o(i._ZN10__cxxabiv119__pointer_type_infoD0Ev) for i._ZN10__cxxabiv119__pointer_type_infoD0Ev
+    lib_rtti_impl.o(.ARM.exidx) refers to lib_rtti_impl.o(i._ZN10__cxxabiv129__pointer_to_member_type_infoD1Ev) for i._ZN10__cxxabiv129__pointer_to_member_type_infoD1Ev
+    lib_rtti_impl.o(.ARM.exidx) refers to lib_rtti_impl.o(i._ZN10__cxxabiv129__pointer_to_member_type_infoD0Ev) for i._ZN10__cxxabiv129__pointer_to_member_type_infoD0Ev
+    unwind_prcommon.o(.text) refers to unwinder.o(.text) for _Unwind_VRS_Get
+    unwind_prcommon.o(.text) refers to unwind_activity.o(.emb_text) for _Unwind_Activity
+    unwind_prcommon.o(.text) refers (Weak) to arm_callunex_noexceptions.o(.text) for __cxa_call_unexpected
+    unwind_prcommon.o(.ARM.exidx) refers to unwind_prcommon.o(.text) for .text
     sys_command.o(.text) refers (Special) to use_no_semi.o(.text) for __I$use$semihosting
     sys_command.o(.text) refers (Special) to indicate_semi.o(.text) for __semihosting_library_function
     sys_stackheap_outer.o(.text) refers to libspace.o(.text) for __user_perproc_libspace
@@ -309,6 +478,26 @@ Section Cross References
     libinit.o(.ARM.Collect$$libinit$$00000000) refers (Special) to libinit2.o(.ARM.Collect$$libinit$$0000001D) for __rt_lib_init_signal_1
     libinit.o(.ARM.Collect$$libinit$$00000000) refers (Special) to libinit2.o(.ARM.Collect$$libinit$$00000025) for __rt_lib_init_stdio_1
     libinit.o(.ARM.Collect$$libinit$$00000000) refers (Special) to libinit2.o(.ARM.Collect$$libinit$$0000000C) for __rt_lib_init_user_alloc_1
+    exception_what.o(.ARM.exidx) refers to exception_what.o(i._ZNKSt9exception4whatEv) for i._ZNKSt9exception4whatEv
+    type_info_dtor.o(.ARM.exidx) refers to type_info_dtor.o(i._ZNSt9type_infoD1Ev) for i._ZNSt9type_infoD1Ev
+    type_info_dtor.o(.ARM.exidx) refers to type_info_dtor.o(i._ZNSt9type_infoD0Ev) for i._ZNSt9type_infoD0Ev
+    arm_exceptions_terminate.o(.text) refers to arm_exceptions_globs.o(.text) for __cxa_get_globals
+    arm_exceptions_terminate.o(.text) refers to abort.o(.text) for abort
+    arm_exceptions_terminate.o(.ARM.exidx) refers to arm_exceptions_terminate.o(.text) for .text
+    arm_exceptions_callterm.o(.text) refers to arm_exceptions_globs.o(.text) for __cxa_get_globals
+    arm_exceptions_callterm.o(.text) refers to arm_exceptions_support.o(.text) for __ARM::is_foreign_exception(_Unwind_Control_Block*)
+    arm_exceptions_callterm.o(.text) refers to arm_exceptions_terminate.o(.text) for std::terminate()
+    arm_exceptions_callterm.o(.ARM.exidx) refers to arm_exceptions_callterm.o(.text) for .text
+    unwinder.o(.emb_text) refers to unwinder.o(.text) for __ARM_Unwind_RaiseException
+    unwinder.o(.text) refers to bsearchnoex.o(.text) for bsearch
+    unwinder.o(.text) refers to unwind_activity.o(.emb_text) for _Unwind_Activity
+    unwinder.o(.text) refers to abort.o(.text) for abort
+    unwinder.o(.text) refers to unwinder.o(.emb_text) for __ARM_Unwind_VRS_corerestore
+    unwinder.o(.text) refers to h1_alloc.o(.text) for malloc
+    unwinder.o(.text) refers to rt_memcpy_w.o(.text) for __aeabi_memcpy4
+    unwinder.o(.text) refers to h1_free.o(.text) for free
+    unwinder.o(.text) refers (Weak) to unwind_pr0.o(.text) for __aeabi_unwind_cpp_pr0
+    unwinder.o(.ARM.exidx) refers to unwinder.o(.text) for .text
     rtexit.o(.ARM.Collect$$rtexit$$00000000) refers (Special) to rtexit2.o(.ARM.Collect$$rtexit$$00000004) for __rt_exit_exit
     rtexit.o(.ARM.Collect$$rtexit$$00000000) refers (Special) to rtexit2.o(.ARM.Collect$$rtexit$$00000003) for __rt_exit_ls
     rtexit.o(.ARM.Collect$$rtexit$$00000000) refers (Special) to rtexit2.o(.ARM.Collect$$rtexit$$00000002) for __rt_exit_prels_1
@@ -321,8 +510,19 @@ Section Cross References
     term_alloc.o(.text) refers (Special) to libshutdown2.o(.ARM.Collect$$libshutdown$$0000000E) for __rt_lib_shutdown_heap_2
     term_alloc.o(.text) refers to rt_heap_descriptor_intlibspace.o(.text) for __rt_heap_descriptor
     term_alloc.o(.text) refers to h1_final.o(.text) for __Heap_Finalize
+    abort.o(.text) refers to defsig_abrt_outer.o(.text) for __rt_SIGABRT
+    abort.o(.text) refers (Weak) to libshutdown.o(.ARM.Collect$$libshutdown$$00000000) for __rt_lib_shutdown
+    abort.o(.text) refers to sys_exit.o(.text) for _sys_exit
     defsig_exit.o(.text) refers to sys_exit.o(.text) for _sys_exit
     defsig_rtmem_inner.o(.text) refers to defsig_general.o(.text) for __default_signal_display
+    arm_begincatch_noexceptions.o(.ARM.exidx) refers to arm_begincatch_noexceptions.o(.text) for .text
+    arm_exceptions_support.o(.text) refers to arm_exceptions_support.o(.constdata) for .constdata
+    arm_exceptions_support.o(.ARM.exidx) refers to arm_exceptions_support.o(.text) for .text
+    arm_exceptions_globs.o(.text) refers to abort.o(.text) for abort
+    arm_exceptions_globs.o(.text) refers to rt_eh_globals_addr_intlibspace.o(.text) for __rt_eh_globals_addr
+    arm_exceptions_globs.o(.text) refers to h1_alloc.o(.text) for malloc
+    arm_exceptions_globs.o(.text) refers to arm_exceptions_mem.o(.text) for __ARM_exceptions_buffer_init
+    arm_exceptions_globs.o(.ARM.exidx) refers to arm_exceptions_globs.o(.text) for .text
     sys_exit.o(.text) refers (Special) to use_no_semi.o(.text) for __I$use$semihosting
     sys_exit.o(.text) refers (Special) to indicate_semi.o(.text) for __semihosting_library_function
     rtexit2.o(.ARM.Collect$$rtexit$$00000003) refers to libshutdown.o(.ARM.Collect$$libshutdown$$00000000) for __rt_lib_shutdown
@@ -330,10 +530,19 @@ Section Cross References
     rtexit2.o(.ARM.exidx) refers to rtexit2.o(.ARM.Collect$$rtexit$$00000001) for .ARM.Collect$$rtexit$$00000001
     rtexit2.o(.ARM.exidx) refers to rtexit2.o(.ARM.Collect$$rtexit$$00000003) for .ARM.Collect$$rtexit$$00000003
     rtexit2.o(.ARM.exidx) refers to rtexit2.o(.ARM.Collect$$rtexit$$00000004) for .ARM.Collect$$rtexit$$00000004
+    rt_eh_globals_addr.o(.text) refers to rt_eh_globals_addr.o(.bss) for __rt_eh_globals_addr_data
+    rt_eh_globals_addr_intlibspace.o(.text) refers to libspace.o(.bss) for __libspace_start
     __raise.o(.text) refers to defsig.o(CL$$defsig) for __default_signal_handler
     defsig_general.o(.text) refers to sys_wrch.o(.text) for _ttywrch
+    defsig_abrt_outer.o(.text) refers to defsig_abrt_inner.o(.text) for __rt_SIGABRT_inner
+    defsig_abrt_outer.o(.text) refers to defsig_exit.o(.text) for __sig_exit
+    defsig_abrt_formal.o(.text) refers to rt_raise.o(.text) for __rt_raise
+    arm_exceptions_mem.o(.text) refers to h1_alloc.o(.text) for malloc
+    arm_exceptions_mem.o(.ARM.exidx) refers to arm_exceptions_mem.o(.text) for .text
     sys_wrch.o(.text) refers (Special) to use_no_semi.o(.text) for __I$use$semihosting
     sys_wrch.o(.text) refers (Special) to indicate_semi.o(.text) for __semihosting_library_function
+    defsig_abrt_inner.o(.text) refers to defsig_general.o(.text) for __default_signal_display
+    defsig.o(CL$$defsig) refers to defsig_abrt_inner.o(.text) for __rt_SIGABRT_inner
     defsig.o(CL$$defsig) refers to defsig_rtmem_inner.o(.text) for __rt_SIGRTMEM_inner
     libshutdown.o(.ARM.Collect$$libshutdown$$00000000) refers (Special) to libshutdown2.o(.ARM.Collect$$libshutdown$$00000002) for __rt_lib_shutdown_cpp_1
     libshutdown.o(.ARM.Collect$$libshutdown$$00000000) refers (Special) to libshutdown2.o(.ARM.Collect$$libshutdown$$00000007) for __rt_lib_shutdown_fp_trap_1
@@ -342,7 +551,6 @@ Section Cross References
     libshutdown.o(.ARM.Collect$$libshutdown$$00000000) refers (Special) to libshutdown2.o(.ARM.Collect$$libshutdown$$0000000A) for __rt_lib_shutdown_signal_1
     libshutdown.o(.ARM.Collect$$libshutdown$$00000000) refers (Special) to libshutdown2.o(.ARM.Collect$$libshutdown$$00000004) for __rt_lib_shutdown_stdio_1
     libshutdown.o(.ARM.Collect$$libshutdown$$00000000) refers (Special) to libshutdown2.o(.ARM.Collect$$libshutdown$$0000000C) for __rt_lib_shutdown_user_alloc_1
-    defsig_abrt_inner.o(.text) refers to defsig_general.o(.text) for __default_signal_display
     defsig_fpe_inner.o(.text) refers to defsig_general.o(.text) for __default_signal_display
     defsig_rtred_inner.o(.text) refers to defsig_general.o(.text) for __default_signal_display
     defsig_stak_inner.o(.text) refers to defsig_general.o(.text) for __default_signal_display
@@ -350,6 +558,87 @@ Section Cross References
     defsig_cppl_inner.o(.text) refers to defsig_general.o(.text) for __default_signal_display
     defsig_segv_inner.o(.text) refers to defsig_general.o(.text) for __default_signal_display
     defsig_other.o(.text) refers to defsig_general.o(.text) for __default_signal_display
+    bad_alloc_dtor.o(.constdata__ZTVSt9bad_alloc) refers to bad_alloc_dtor.o(.constdata__ZTISt9bad_alloc) for typeinfo for std::bad_alloc
+    bad_alloc_dtor.o(.constdata__ZTVSt9bad_alloc) refers to bad_alloc_dtor.o(i._ZNSt9bad_allocD1Ev) for std::bad_alloc::~bad_alloc()
+    bad_alloc_dtor.o(.constdata__ZTVSt9bad_alloc) refers to bad_alloc_dtor.o(i._ZNSt9bad_allocD0Ev) for std::bad_alloc::~bad_alloc__deallocating()
+    bad_alloc_dtor.o(.constdata__ZTVSt9bad_alloc) refers to bad_alloc_what.o(i._ZNKSt9bad_alloc4whatEv) for std::bad_alloc::what() const
+    bad_alloc_dtor.o(.constdata__ZTISt9bad_alloc) refers to lib_rtti_impl.o(.constdata__ZTVN10__cxxabiv120__si_class_type_infoE) for vtable for __cxxabiv1::__si_class_type_info
+    bad_alloc_dtor.o(.constdata__ZTISt9bad_alloc) refers to bad_alloc_dtor.o(.constdata__ZTSSt9bad_alloc) for typeinfo name for std::bad_alloc
+    bad_alloc_dtor.o(.constdata__ZTISt9bad_alloc) refers to exception_dtor.o(.constdata__ZTISt9exception) for typeinfo for std::exception
+    exception_dtor.o(.constdata__ZTVSt9exception) refers to exception_dtor.o(.constdata__ZTISt9exception) for typeinfo for std::exception
+    exception_dtor.o(.constdata__ZTVSt9exception) refers to exception_dtor.o(i._ZNSt9exceptionD1Ev) for std::exception::~exception()
+    exception_dtor.o(.constdata__ZTVSt9exception) refers to exception_dtor.o(i._ZNSt9exceptionD0Ev) for std::exception::~exception__deallocating()
+    exception_dtor.o(.constdata__ZTVSt9exception) refers to exception_what.o(i._ZNKSt9exception4whatEv) for std::exception::what() const
+    exception_dtor.o(.constdata__ZTISt9exception) refers to lib_rtti_impl.o(.constdata__ZTVN10__cxxabiv117__class_type_infoE) for vtable for __cxxabiv1::__class_type_info
+    exception_dtor.o(.constdata__ZTISt9exception) refers to exception_dtor.o(.constdata__ZTSSt9exception) for typeinfo name for std::exception
+    lib_rtti_impl.o(.constdata__ZTVN10__cxxabiv123__fundamental_type_infoE) refers to lib_rtti_impl.o(.constdata__ZTIN10__cxxabiv123__fundamental_type_infoE) for typeinfo for __cxxabiv1::__fundamental_type_info
+    lib_rtti_impl.o(.constdata__ZTVN10__cxxabiv123__fundamental_type_infoE) refers to lib_rtti_impl.o(i._ZN10__cxxabiv123__fundamental_type_infoD1Ev) for __cxxabiv1::__fundamental_type_info::~__fundamental_type_info()
+    lib_rtti_impl.o(.constdata__ZTVN10__cxxabiv123__fundamental_type_infoE) refers to lib_rtti_impl.o(i._ZN10__cxxabiv123__fundamental_type_infoD0Ev) for __cxxabiv1::__fundamental_type_info::~__fundamental_type_info__deallocating()
+    lib_rtti_impl.o(.constdata__ZTVN10__cxxabiv117__array_type_infoE) refers to lib_rtti_impl.o(.constdata__ZTIN10__cxxabiv117__array_type_infoE) for typeinfo for __cxxabiv1::__array_type_info
+    lib_rtti_impl.o(.constdata__ZTVN10__cxxabiv117__array_type_infoE) refers to lib_rtti_impl.o(i._ZN10__cxxabiv117__array_type_infoD1Ev) for __cxxabiv1::__array_type_info::~__array_type_info()
+    lib_rtti_impl.o(.constdata__ZTVN10__cxxabiv117__array_type_infoE) refers to lib_rtti_impl.o(i._ZN10__cxxabiv117__array_type_infoD0Ev) for __cxxabiv1::__array_type_info::~__array_type_info__deallocating()
+    lib_rtti_impl.o(.constdata__ZTVN10__cxxabiv120__function_type_infoE) refers to lib_rtti_impl.o(.constdata__ZTIN10__cxxabiv120__function_type_infoE) for typeinfo for __cxxabiv1::__function_type_info
+    lib_rtti_impl.o(.constdata__ZTVN10__cxxabiv120__function_type_infoE) refers to lib_rtti_impl.o(i._ZN10__cxxabiv120__function_type_infoD1Ev) for __cxxabiv1::__function_type_info::~__function_type_info()
+    lib_rtti_impl.o(.constdata__ZTVN10__cxxabiv120__function_type_infoE) refers to lib_rtti_impl.o(i._ZN10__cxxabiv120__function_type_infoD0Ev) for __cxxabiv1::__function_type_info::~__function_type_info__deallocating()
+    lib_rtti_impl.o(.constdata__ZTVN10__cxxabiv116__enum_type_infoE) refers to lib_rtti_impl.o(.constdata__ZTIN10__cxxabiv116__enum_type_infoE) for typeinfo for __cxxabiv1::__enum_type_info
+    lib_rtti_impl.o(.constdata__ZTVN10__cxxabiv116__enum_type_infoE) refers to lib_rtti_impl.o(i._ZN10__cxxabiv116__enum_type_infoD1Ev) for __cxxabiv1::__enum_type_info::~__enum_type_info()
+    lib_rtti_impl.o(.constdata__ZTVN10__cxxabiv116__enum_type_infoE) refers to lib_rtti_impl.o(i._ZN10__cxxabiv116__enum_type_infoD0Ev) for __cxxabiv1::__enum_type_info::~__enum_type_info__deallocating()
+    lib_rtti_impl.o(.constdata__ZTVN10__cxxabiv117__class_type_infoE) refers to lib_rtti_impl.o(.constdata__ZTIN10__cxxabiv117__class_type_infoE) for typeinfo for __cxxabiv1::__class_type_info
+    lib_rtti_impl.o(.constdata__ZTVN10__cxxabiv117__class_type_infoE) refers to lib_rtti_impl.o(i._ZN10__cxxabiv117__class_type_infoD1Ev) for __cxxabiv1::__class_type_info::~__class_type_info()
+    lib_rtti_impl.o(.constdata__ZTVN10__cxxabiv117__class_type_infoE) refers to lib_rtti_impl.o(i._ZN10__cxxabiv117__class_type_infoD0Ev) for __cxxabiv1::__class_type_info::~__class_type_info__deallocating()
+    lib_rtti_impl.o(.constdata__ZTVN10__cxxabiv120__si_class_type_infoE) refers to lib_rtti_impl.o(.constdata__ZTIN10__cxxabiv120__si_class_type_infoE) for typeinfo for __cxxabiv1::__si_class_type_info
+    lib_rtti_impl.o(.constdata__ZTVN10__cxxabiv120__si_class_type_infoE) refers to lib_rtti_impl.o(i._ZN10__cxxabiv120__si_class_type_infoD1Ev) for __cxxabiv1::__si_class_type_info::~__si_class_type_info()
+    lib_rtti_impl.o(.constdata__ZTVN10__cxxabiv120__si_class_type_infoE) refers to lib_rtti_impl.o(i._ZN10__cxxabiv120__si_class_type_infoD0Ev) for __cxxabiv1::__si_class_type_info::~__si_class_type_info__deallocating()
+    lib_rtti_impl.o(.constdata__ZTVN10__cxxabiv121__vmi_class_type_infoE) refers to lib_rtti_impl.o(.constdata__ZTIN10__cxxabiv121__vmi_class_type_infoE) for typeinfo for __cxxabiv1::__vmi_class_type_info
+    lib_rtti_impl.o(.constdata__ZTVN10__cxxabiv121__vmi_class_type_infoE) refers to lib_rtti_impl.o(i._ZN10__cxxabiv121__vmi_class_type_infoD1Ev) for __cxxabiv1::__vmi_class_type_info::~__vmi_class_type_info()
+    lib_rtti_impl.o(.constdata__ZTVN10__cxxabiv121__vmi_class_type_infoE) refers to lib_rtti_impl.o(i._ZN10__cxxabiv121__vmi_class_type_infoD0Ev) for __cxxabiv1::__vmi_class_type_info::~__vmi_class_type_info__deallocating()
+    lib_rtti_impl.o(.constdata__ZTVN10__cxxabiv117__pbase_type_infoE) refers to lib_rtti_impl.o(.constdata__ZTIN10__cxxabiv117__pbase_type_infoE) for typeinfo for __cxxabiv1::__pbase_type_info
+    lib_rtti_impl.o(.constdata__ZTVN10__cxxabiv117__pbase_type_infoE) refers to lib_rtti_impl.o(i._ZN10__cxxabiv117__pbase_type_infoD1Ev) for __cxxabiv1::__pbase_type_info::~__pbase_type_info()
+    lib_rtti_impl.o(.constdata__ZTVN10__cxxabiv117__pbase_type_infoE) refers to lib_rtti_impl.o(i._ZN10__cxxabiv117__pbase_type_infoD0Ev) for __cxxabiv1::__pbase_type_info::~__pbase_type_info__deallocating()
+    lib_rtti_impl.o(.constdata__ZTVN10__cxxabiv119__pointer_type_infoE) refers to lib_rtti_impl.o(.constdata__ZTIN10__cxxabiv119__pointer_type_infoE) for typeinfo for __cxxabiv1::__pointer_type_info
+    lib_rtti_impl.o(.constdata__ZTVN10__cxxabiv119__pointer_type_infoE) refers to lib_rtti_impl.o(i._ZN10__cxxabiv119__pointer_type_infoD1Ev) for __cxxabiv1::__pointer_type_info::~__pointer_type_info()
+    lib_rtti_impl.o(.constdata__ZTVN10__cxxabiv119__pointer_type_infoE) refers to lib_rtti_impl.o(i._ZN10__cxxabiv119__pointer_type_infoD0Ev) for __cxxabiv1::__pointer_type_info::~__pointer_type_info__deallocating()
+    lib_rtti_impl.o(.constdata__ZTVN10__cxxabiv129__pointer_to_member_type_infoE) refers to lib_rtti_impl.o(.constdata__ZTIN10__cxxabiv129__pointer_to_member_type_infoE) for typeinfo for __cxxabiv1::__pointer_to_member_type_info
+    lib_rtti_impl.o(.constdata__ZTVN10__cxxabiv129__pointer_to_member_type_infoE) refers to lib_rtti_impl.o(i._ZN10__cxxabiv129__pointer_to_member_type_infoD1Ev) for __cxxabiv1::__pointer_to_member_type_info::~__pointer_to_member_type_info()
+    lib_rtti_impl.o(.constdata__ZTVN10__cxxabiv129__pointer_to_member_type_infoE) refers to lib_rtti_impl.o(i._ZN10__cxxabiv129__pointer_to_member_type_infoD0Ev) for __cxxabiv1::__pointer_to_member_type_info::~__pointer_to_member_type_info__deallocating()
+    lib_rtti_impl.o(.ARM.exidx) refers to lib_rtti_impl.o(i._ZNSt9type_infodlEPv) for i._ZNSt9type_infodlEPv
+    lib_rtti_impl.o(.constdata__ZTIN10__cxxabiv123__fundamental_type_infoE) refers to lib_rtti_impl.o(.constdata__ZTVN10__cxxabiv120__si_class_type_infoE) for vtable for __cxxabiv1::__si_class_type_info
+    lib_rtti_impl.o(.constdata__ZTIN10__cxxabiv123__fundamental_type_infoE) refers to lib_rtti_impl.o(.constdata__ZTSN10__cxxabiv123__fundamental_type_infoE) for typeinfo name for __cxxabiv1::__fundamental_type_info
+    lib_rtti_impl.o(.constdata__ZTIN10__cxxabiv123__fundamental_type_infoE) refers to type_info_dtor.o(.constdata__ZTISt9type_info) for typeinfo for std::type_info
+    lib_rtti_impl.o(.constdata__ZTIN10__cxxabiv117__array_type_infoE) refers to lib_rtti_impl.o(.constdata__ZTVN10__cxxabiv120__si_class_type_infoE) for vtable for __cxxabiv1::__si_class_type_info
+    lib_rtti_impl.o(.constdata__ZTIN10__cxxabiv117__array_type_infoE) refers to lib_rtti_impl.o(.constdata__ZTSN10__cxxabiv117__array_type_infoE) for typeinfo name for __cxxabiv1::__array_type_info
+    lib_rtti_impl.o(.constdata__ZTIN10__cxxabiv117__array_type_infoE) refers to type_info_dtor.o(.constdata__ZTISt9type_info) for typeinfo for std::type_info
+    lib_rtti_impl.o(.constdata__ZTIN10__cxxabiv120__function_type_infoE) refers to lib_rtti_impl.o(.constdata__ZTVN10__cxxabiv120__si_class_type_infoE) for vtable for __cxxabiv1::__si_class_type_info
+    lib_rtti_impl.o(.constdata__ZTIN10__cxxabiv120__function_type_infoE) refers to lib_rtti_impl.o(.constdata__ZTSN10__cxxabiv120__function_type_infoE) for typeinfo name for __cxxabiv1::__function_type_info
+    lib_rtti_impl.o(.constdata__ZTIN10__cxxabiv120__function_type_infoE) refers to type_info_dtor.o(.constdata__ZTISt9type_info) for typeinfo for std::type_info
+    lib_rtti_impl.o(.constdata__ZTIN10__cxxabiv116__enum_type_infoE) refers to lib_rtti_impl.o(.constdata__ZTVN10__cxxabiv120__si_class_type_infoE) for vtable for __cxxabiv1::__si_class_type_info
+    lib_rtti_impl.o(.constdata__ZTIN10__cxxabiv116__enum_type_infoE) refers to lib_rtti_impl.o(.constdata__ZTSN10__cxxabiv116__enum_type_infoE) for typeinfo name for __cxxabiv1::__enum_type_info
+    lib_rtti_impl.o(.constdata__ZTIN10__cxxabiv116__enum_type_infoE) refers to type_info_dtor.o(.constdata__ZTISt9type_info) for typeinfo for std::type_info
+    lib_rtti_impl.o(.constdata__ZTIN10__cxxabiv117__class_type_infoE) refers to lib_rtti_impl.o(.constdata__ZTVN10__cxxabiv120__si_class_type_infoE) for vtable for __cxxabiv1::__si_class_type_info
+    lib_rtti_impl.o(.constdata__ZTIN10__cxxabiv117__class_type_infoE) refers to lib_rtti_impl.o(.constdata__ZTSN10__cxxabiv117__class_type_infoE) for typeinfo name for __cxxabiv1::__class_type_info
+    lib_rtti_impl.o(.constdata__ZTIN10__cxxabiv117__class_type_infoE) refers to type_info_dtor.o(.constdata__ZTISt9type_info) for typeinfo for std::type_info
+    lib_rtti_impl.o(.constdata__ZTIN10__cxxabiv120__si_class_type_infoE) refers to lib_rtti_impl.o(.constdata__ZTVN10__cxxabiv120__si_class_type_infoE) for vtable for __cxxabiv1::__si_class_type_info
+    lib_rtti_impl.o(.constdata__ZTIN10__cxxabiv120__si_class_type_infoE) refers to lib_rtti_impl.o(.constdata__ZTSN10__cxxabiv120__si_class_type_infoE) for typeinfo name for __cxxabiv1::__si_class_type_info
+    lib_rtti_impl.o(.constdata__ZTIN10__cxxabiv120__si_class_type_infoE) refers to lib_rtti_impl.o(.constdata__ZTIN10__cxxabiv117__class_type_infoE) for typeinfo for __cxxabiv1::__class_type_info
+    lib_rtti_impl.o(.constdata__ZTIN10__cxxabiv121__vmi_class_type_infoE) refers to lib_rtti_impl.o(.constdata__ZTVN10__cxxabiv120__si_class_type_infoE) for vtable for __cxxabiv1::__si_class_type_info
+    lib_rtti_impl.o(.constdata__ZTIN10__cxxabiv121__vmi_class_type_infoE) refers to lib_rtti_impl.o(.constdata__ZTSN10__cxxabiv121__vmi_class_type_infoE) for typeinfo name for __cxxabiv1::__vmi_class_type_info
+    lib_rtti_impl.o(.constdata__ZTIN10__cxxabiv121__vmi_class_type_infoE) refers to lib_rtti_impl.o(.constdata__ZTIN10__cxxabiv117__class_type_infoE) for typeinfo for __cxxabiv1::__class_type_info
+    lib_rtti_impl.o(.constdata__ZTIN10__cxxabiv117__pbase_type_infoE) refers to lib_rtti_impl.o(.constdata__ZTVN10__cxxabiv120__si_class_type_infoE) for vtable for __cxxabiv1::__si_class_type_info
+    lib_rtti_impl.o(.constdata__ZTIN10__cxxabiv117__pbase_type_infoE) refers to lib_rtti_impl.o(.constdata__ZTSN10__cxxabiv117__pbase_type_infoE) for typeinfo name for __cxxabiv1::__pbase_type_info
+    lib_rtti_impl.o(.constdata__ZTIN10__cxxabiv117__pbase_type_infoE) refers to type_info_dtor.o(.constdata__ZTISt9type_info) for typeinfo for std::type_info
+    lib_rtti_impl.o(.constdata__ZTIN10__cxxabiv119__pointer_type_infoE) refers to lib_rtti_impl.o(.constdata__ZTVN10__cxxabiv120__si_class_type_infoE) for vtable for __cxxabiv1::__si_class_type_info
+    lib_rtti_impl.o(.constdata__ZTIN10__cxxabiv119__pointer_type_infoE) refers to lib_rtti_impl.o(.constdata__ZTSN10__cxxabiv119__pointer_type_infoE) for typeinfo name for __cxxabiv1::__pointer_type_info
+    lib_rtti_impl.o(.constdata__ZTIN10__cxxabiv119__pointer_type_infoE) refers to lib_rtti_impl.o(.constdata__ZTIN10__cxxabiv117__pbase_type_infoE) for typeinfo for __cxxabiv1::__pbase_type_info
+    lib_rtti_impl.o(.constdata__ZTIN10__cxxabiv129__pointer_to_member_type_infoE) refers to lib_rtti_impl.o(.constdata__ZTVN10__cxxabiv120__si_class_type_infoE) for vtable for __cxxabiv1::__si_class_type_info
+    lib_rtti_impl.o(.constdata__ZTIN10__cxxabiv129__pointer_to_member_type_infoE) refers to lib_rtti_impl.o(.constdata__ZTSN10__cxxabiv129__pointer_to_member_type_infoE) for typeinfo name for __cxxabiv1::__pointer_to_member_type_info
+    lib_rtti_impl.o(.constdata__ZTIN10__cxxabiv129__pointer_to_member_type_infoE) refers to lib_rtti_impl.o(.constdata__ZTIN10__cxxabiv117__pbase_type_infoE) for typeinfo for __cxxabiv1::__pbase_type_info
+    lib_rtti_impl.o(i.__ARM_common_noexcept_landing) refers to arm_exceptions_callterm.o(.text) for __cxa_call_terminate
+    lib_rtti_impl.o(.ARM.exidx) refers to lib_rtti_impl.o(i.__ARM_common_noexcept_landing) for i.__ARM_common_noexcept_landing
+    type_info_dtor.o(.constdata__ZTVSt9type_info) refers to type_info_dtor.o(.constdata__ZTISt9type_info) for typeinfo for std::type_info
+    type_info_dtor.o(.constdata__ZTVSt9type_info) refers to type_info_dtor.o(i._ZNSt9type_infoD1Ev) for std::type_info::~type_info()
+    type_info_dtor.o(.constdata__ZTVSt9type_info) refers to type_info_dtor.o(i._ZNSt9type_infoD0Ev) for std::type_info::~type_info__deallocating()
+    type_info_dtor.o(.constdata__ZTISt9type_info) refers to lib_rtti_impl.o(.constdata__ZTVN10__cxxabiv117__class_type_infoE) for vtable for __cxxabiv1::__class_type_info
+    type_info_dtor.o(.constdata__ZTISt9type_info) refers to type_info_dtor.o(.constdata__ZTSSt9type_info) for typeinfo name for std::type_info
 
 
 ==============================================================================
@@ -374,13 +663,31 @@ Removing Unused input sections from the image.
     Removing current.o(.ARM.exidx), (8 bytes).
     Removing current.o(.ARM.exidx), (8 bytes).
     Removing current.o(.ARM.exidx), (8 bytes).
+    Removing eeprom.o(.rev16_text), (4 bytes).
+    Removing eeprom.o(.revsh_text), (4 bytes).
+    Removing eeprom.o(.rrx_text), (6 bytes).
+    Removing eeprom.o(i._Z12EEPROM_Writeth), (36 bytes).
+    Removing eeprom.o(i._Z21EEPROM_ReadSingleBytet), (16 bytes).
+    Removing eeprom.o(i._Z24EEPROM_ReadMultipleBytestj), (42 bytes).
+    Removing eeprom.o(.ARM.exidx), (8 bytes).
+    Removing eeprom.o(.ARM.exidx), (8 bytes).
+    Removing eeprom.o(.ARM.exidx), (8 bytes).
+    Removing eeprom.o(.ARM.exidx), (8 bytes).
+    Removing ltc2983.o(.rev16_text), (4 bytes).
+    Removing ltc2983.o(.revsh_text), (4 bytes).
+    Removing ltc2983.o(.rrx_text), (6 bytes).
+    Removing ltc2983.o(i._Z12LTC2983_Initv), (2 bytes).
+    Removing ltc2983.o(i._Z15LTC2983_SendCmdPt), (2 bytes).
+    Removing ltc2983.o(.ARM.exidx), (8 bytes).
+    Removing ltc2983.o(.ARM.exidx), (8 bytes).
+    Removing ltc2983.o(.ARM.exidx), (8 bytes).
     Removing ltc6813.o(i._Z5pec15Pci), (52 bytes).
     Removing ltc6813.o(i._ZN33_INTERNAL_11_LTC6813_cpp_73e134cf16init_PEC15_TableEv), (80 bytes).
     Removing ltc6813.o(.ARM.exidx), (8 bytes).
     Removing ltc6813.o(.ARM.exidx), (8 bytes).
     Removing ltc6813.o(.bss), (512 bytes).
     Removing ltc6813.o(.data), (2 bytes).
-    Removing temperature.o(i._ZN11Temperature15modulesInDangerEv), (76 bytes).
+    Removing temperature.o(i._ZN11Temperature15modulesInDangerEv), (100 bytes).
     Removing temperature.o(i._ZN11Temperature23totalPackAvgTemperatureEv), (32 bytes).
     Removing temperature.o(i._ZN11Temperature9setLimitsEi), (4 bytes).
     Removing temperature.o(i._ZN11TemperatureC1Et), (18 bytes).
@@ -393,7 +700,7 @@ Removing Unused input sections from the image.
     Removing temperature.o(.ARM.exidx), (8 bytes).
     Removing temperature.o(.ARM.exidx), (8 bytes).
     Removing temperature.o(.ARM.exidx), (8 bytes).
-    Removing voltage.o(i._ZN7Voltage15modulesInDangerEv), (116 bytes).
+    Removing voltage.o(i._ZN7Voltage15modulesInDangerEv), (114 bytes).
     Removing voltage.o(i._ZN7Voltage16totalPackVoltageEv), (26 bytes).
     Removing voltage.o(i._ZN7Voltage9setLimitsEtt), (6 bytes).
     Removing voltage.o(i._ZN7VoltageC1Ett), (22 bytes).
@@ -431,13 +738,11 @@ Removing Unused input sections from the image.
     Removing stm32f4xx_rcc.o(.rev16_text), (4 bytes).
     Removing stm32f4xx_rcc.o(.revsh_text), (4 bytes).
     Removing stm32f4xx_rcc.o(.rrx_text), (6 bytes).
-    Removing stm32f4xx_rcc.o(i.RCC_AHB1PeriphClockCmd), (32 bytes).
     Removing stm32f4xx_rcc.o(i.RCC_AHB1PeriphClockLPModeCmd), (32 bytes).
     Removing stm32f4xx_rcc.o(i.RCC_AHB1PeriphResetCmd), (32 bytes).
     Removing stm32f4xx_rcc.o(i.RCC_AHB2PeriphClockCmd), (32 bytes).
     Removing stm32f4xx_rcc.o(i.RCC_AHB2PeriphClockLPModeCmd), (32 bytes).
     Removing stm32f4xx_rcc.o(i.RCC_AHB2PeriphResetCmd), (32 bytes).
-    Removing stm32f4xx_rcc.o(i.RCC_APB1PeriphClockCmd), (32 bytes).
     Removing stm32f4xx_rcc.o(i.RCC_APB1PeriphClockLPModeCmd), (32 bytes).
     Removing stm32f4xx_rcc.o(i.RCC_APB1PeriphResetCmd), (32 bytes).
     Removing stm32f4xx_rcc.o(i.RCC_APB2PeriphClockCmd), (32 bytes).
@@ -449,7 +754,6 @@ Removing Unused input sections from the image.
     Removing stm32f4xx_rcc.o(i.RCC_ClearITPendingBit), (12 bytes).
     Removing stm32f4xx_rcc.o(i.RCC_ClockSecuritySystemCmd), (12 bytes).
     Removing stm32f4xx_rcc.o(i.RCC_DeInit), (92 bytes).
-    Removing stm32f4xx_rcc.o(i.RCC_GetClocksFreq), (232 bytes).
     Removing stm32f4xx_rcc.o(i.RCC_GetFlagStatus), (64 bytes).
     Removing stm32f4xx_rcc.o(i.RCC_GetITStatus), (24 bytes).
     Removing stm32f4xx_rcc.o(i.RCC_GetSYSCLKSource), (16 bytes).
@@ -527,7 +831,159 @@ Removing Unused input sections from the image.
     Removing stm32f4xx_rcc.o(.ARM.exidx), (8 bytes).
     Removing stm32f4xx_rcc.o(.ARM.exidx), (8 bytes).
     Removing stm32f4xx_rcc.o(.ARM.exidx), (8 bytes).
-    Removing stm32f4xx_rcc.o(.data), (16 bytes).
+    Removing stm32f4xx_i2c.o(.rev16_text), (4 bytes).
+    Removing stm32f4xx_i2c.o(.revsh_text), (4 bytes).
+    Removing stm32f4xx_i2c.o(.rrx_text), (6 bytes).
+    Removing stm32f4xx_i2c.o(i.I2C_ARPCmd), (24 bytes).
+    Removing stm32f4xx_i2c.o(i.I2C_AcknowledgeConfig), (24 bytes).
+    Removing stm32f4xx_i2c.o(i.I2C_AnalogFilterCmd), (24 bytes).
+    Removing stm32f4xx_i2c.o(i.I2C_CalculatePEC), (24 bytes).
+    Removing stm32f4xx_i2c.o(i.I2C_CheckEvent), (42 bytes).
+    Removing stm32f4xx_i2c.o(i.I2C_ClearFlag), (12 bytes).
+    Removing stm32f4xx_i2c.o(i.I2C_ClearITPendingBit), (12 bytes).
+    Removing stm32f4xx_i2c.o(i.I2C_DMACmd), (24 bytes).
+    Removing stm32f4xx_i2c.o(i.I2C_DMALastTransferCmd), (24 bytes).
+    Removing stm32f4xx_i2c.o(i.I2C_DeInit), (96 bytes).
+    Removing stm32f4xx_i2c.o(i.I2C_DigitalFilterConfig), (22 bytes).
+    Removing stm32f4xx_i2c.o(i.I2C_DualAddressCmd), (24 bytes).
+    Removing stm32f4xx_i2c.o(i.I2C_FastModeDutyCycleConfig), (28 bytes).
+    Removing stm32f4xx_i2c.o(i.I2C_GeneralCallCmd), (24 bytes).
+    Removing stm32f4xx_i2c.o(i.I2C_GenerateSTART), (24 bytes).
+    Removing stm32f4xx_i2c.o(i.I2C_GenerateSTOP), (24 bytes).
+    Removing stm32f4xx_i2c.o(i.I2C_GetFlagStatus), (58 bytes).
+    Removing stm32f4xx_i2c.o(i.I2C_GetITStatus), (38 bytes).
+    Removing stm32f4xx_i2c.o(i.I2C_GetLastEvent), (26 bytes).
+    Removing stm32f4xx_i2c.o(i.I2C_GetPEC), (8 bytes).
+    Removing stm32f4xx_i2c.o(i.I2C_ITConfig), (18 bytes).
+    Removing stm32f4xx_i2c.o(i.I2C_NACKPositionConfig), (28 bytes).
+    Removing stm32f4xx_i2c.o(i.I2C_OwnAddress2Config), (22 bytes).
+    Removing stm32f4xx_i2c.o(i.I2C_PECPositionConfig), (28 bytes).
+    Removing stm32f4xx_i2c.o(i.I2C_ReadRegister), (22 bytes).
+    Removing stm32f4xx_i2c.o(i.I2C_ReceiveData), (8 bytes).
+    Removing stm32f4xx_i2c.o(i.I2C_SMBusAlertConfig), (28 bytes).
+    Removing stm32f4xx_i2c.o(i.I2C_Send7bitAddress), (16 bytes).
+    Removing stm32f4xx_i2c.o(i.I2C_SendData), (4 bytes).
+    Removing stm32f4xx_i2c.o(i.I2C_SoftwareResetCmd), (22 bytes).
+    Removing stm32f4xx_i2c.o(i.I2C_StretchClockCmd), (24 bytes).
+    Removing stm32f4xx_i2c.o(i.I2C_StructInit), (30 bytes).
+    Removing stm32f4xx_i2c.o(i.I2C_TransmitPEC), (24 bytes).
+    Removing stm32f4xx_i2c.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_i2c.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_i2c.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_i2c.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_i2c.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_i2c.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_i2c.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_i2c.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_i2c.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_i2c.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_i2c.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_i2c.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_i2c.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_i2c.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_i2c.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_i2c.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_i2c.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_i2c.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_i2c.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_i2c.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_i2c.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_i2c.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_i2c.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_i2c.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_i2c.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_i2c.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_i2c.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_i2c.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_i2c.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_i2c.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_i2c.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_i2c.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_i2c.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_i2c.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_i2c.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_gpio.o(.rev16_text), (4 bytes).
+    Removing stm32f4xx_gpio.o(.revsh_text), (4 bytes).
+    Removing stm32f4xx_gpio.o(.rrx_text), (6 bytes).
+    Removing stm32f4xx_gpio.o(i.GPIO_DeInit), (312 bytes).
+    Removing stm32f4xx_gpio.o(i.GPIO_PinLockConfig), (34 bytes).
+    Removing stm32f4xx_gpio.o(i.GPIO_ReadInputData), (8 bytes).
+    Removing stm32f4xx_gpio.o(i.GPIO_ReadInputDataBit), (18 bytes).
+    Removing stm32f4xx_gpio.o(i.GPIO_ReadOutputData), (8 bytes).
+    Removing stm32f4xx_gpio.o(i.GPIO_ReadOutputDataBit), (18 bytes).
+    Removing stm32f4xx_gpio.o(i.GPIO_ResetBits), (4 bytes).
+    Removing stm32f4xx_gpio.o(i.GPIO_SetBits), (4 bytes).
+    Removing stm32f4xx_gpio.o(i.GPIO_StructInit), (18 bytes).
+    Removing stm32f4xx_gpio.o(i.GPIO_ToggleBits), (8 bytes).
+    Removing stm32f4xx_gpio.o(i.GPIO_Write), (4 bytes).
+    Removing stm32f4xx_gpio.o(i.GPIO_WriteBit), (10 bytes).
+    Removing stm32f4xx_gpio.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_gpio.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_gpio.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_gpio.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_gpio.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_gpio.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_gpio.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_gpio.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_gpio.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_gpio.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_gpio.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_gpio.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_gpio.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_gpio.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_spi.o(.rev16_text), (4 bytes).
+    Removing stm32f4xx_spi.o(.revsh_text), (4 bytes).
+    Removing stm32f4xx_spi.o(.rrx_text), (6 bytes).
+    Removing stm32f4xx_spi.o(i.I2S_Cmd), (24 bytes).
+    Removing stm32f4xx_spi.o(i.I2S_FullDuplexConfig), (80 bytes).
+    Removing stm32f4xx_spi.o(i.I2S_Init), (408 bytes).
+    Removing stm32f4xx_spi.o(i.I2S_StructInit), (20 bytes).
+    Removing stm32f4xx_spi.o(i.SPI_BiDirectionalLineConfig), (28 bytes).
+    Removing stm32f4xx_spi.o(i.SPI_CalculateCRC), (24 bytes).
+    Removing stm32f4xx_spi.o(i.SPI_Cmd), (24 bytes).
+    Removing stm32f4xx_spi.o(i.SPI_DataSizeConfig), (18 bytes).
+    Removing stm32f4xx_spi.o(i.SPI_GetCRC), (16 bytes).
+    Removing stm32f4xx_spi.o(i.SPI_GetCRCPolynomial), (6 bytes).
+    Removing stm32f4xx_spi.o(i.SPI_I2S_ClearFlag), (6 bytes).
+    Removing stm32f4xx_spi.o(i.SPI_I2S_ClearITPendingBit), (20 bytes).
+    Removing stm32f4xx_spi.o(i.SPI_I2S_DMACmd), (18 bytes).
+    Removing stm32f4xx_spi.o(i.SPI_I2S_DeInit), (176 bytes).
+    Removing stm32f4xx_spi.o(i.SPI_I2S_GetFlagStatus), (18 bytes).
+    Removing stm32f4xx_spi.o(i.SPI_I2S_GetITStatus), (52 bytes).
+    Removing stm32f4xx_spi.o(i.SPI_I2S_ITConfig), (32 bytes).
+    Removing stm32f4xx_spi.o(i.SPI_I2S_ReceiveData), (6 bytes).
+    Removing stm32f4xx_spi.o(i.SPI_I2S_SendData), (4 bytes).
+    Removing stm32f4xx_spi.o(i.SPI_Init), (60 bytes).
+    Removing stm32f4xx_spi.o(i.SPI_NSSInternalSoftwareConfig), (30 bytes).
+    Removing stm32f4xx_spi.o(i.SPI_SSOutputCmd), (24 bytes).
+    Removing stm32f4xx_spi.o(i.SPI_StructInit), (24 bytes).
+    Removing stm32f4xx_spi.o(i.SPI_TIModeCmd), (24 bytes).
+    Removing stm32f4xx_spi.o(i.SPI_TransmitCRC), (10 bytes).
+    Removing stm32f4xx_spi.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_spi.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_spi.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_spi.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_spi.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_spi.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_spi.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_spi.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_spi.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_spi.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_spi.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_spi.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_spi.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_spi.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_spi.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_spi.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_spi.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_spi.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_spi.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_spi.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_spi.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_spi.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_spi.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_spi.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_spi.o(.ARM.exidx), (8 bytes).
     Removing system_stm32f4xx.o(.rev16_text), (4 bytes).
     Removing system_stm32f4xx.o(.revsh_text), (4 bytes).
     Removing system_stm32f4xx.o(.rrx_text), (6 bytes).
@@ -537,4 +993,4 @@ Removing Unused input sections from the image.
     Removing system_stm32f4xx.o(.constdata), (16 bytes).
     Removing system_stm32f4xx.o(.data), (4 bytes).
 
-180 unused section(s) (total 3776 bytes) removed from the image.
+347 unused section(s) (total 6756 bytes) removed from the image.

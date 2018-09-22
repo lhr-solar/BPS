@@ -86,9 +86,14 @@ uint16_t *Temperature::modulesInDanger(void){
 		}
 	}
 
-	uint16_t endangeredModules[NUM_MODULES];
-	int j = 0;
+	int sum = 0;
 	for(int i = 0; i < NUM_MODULES; ++i){
+		sum += checks[i];
+	}
+	
+	uint16_t * endangeredModules = new uint16_t [sum];
+	int j = 0;
+	for(int i = 0; i < sum; ++i){
 		if(checks[i]){
 			endangeredModules[j] = i;
 			++j;

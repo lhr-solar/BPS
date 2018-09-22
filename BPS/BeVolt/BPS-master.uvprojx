@@ -427,16 +427,6 @@
           <GroupName>Inc</GroupName>
           <Files>
             <File>
-              <FileName>CANlib.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\User\CANlib.h</FilePath>
-            </File>
-            <File>
-              <FileName>Contactor.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\User\Contactor.h</FilePath>
-            </File>
-            <File>
               <FileName>Current.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\User\Current.h</FilePath>
@@ -467,14 +457,14 @@
               <FilePath>.\User\Voltage.h</FilePath>
             </File>
             <File>
-              <FileName>WDTimer.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\User\WDTimer.h</FilePath>
-            </File>
-            <File>
               <FileName>Definition.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\User\Definition.h</FilePath>
+            </File>
+            <File>
+              <FileName>WDTimer.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\User\WDTimer.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -500,6 +490,11 @@
               <FileName>stm32f4xx_gpio.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_gpio.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f4xx_spi.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_spi.c</FilePath>
             </File>
           </Files>
         </Group>

@@ -91,9 +91,9 @@ uint16_t *Voltage::modulesInDanger(void){
 		sum += checks[i];
 	}
 
-	uint16_t endangeredModules[31];
+	uint16_t * endangeredModules = new uint16_t[sum];
 	int j = 0;
-	for(int i = 0; i < NUM_MODULES; ++i){
+	for(int i = 0; i < sum; ++i){
 		if(checks[i]){
 			endangeredModules[j] = i;
 			++j;
