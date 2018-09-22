@@ -8,7 +8,7 @@
 #include "Voltage.h"
 #include "Current.h"
 #include "Temperature.h"
-#include "Contactor.h"
+//#include "Contactor.h"
 #include "EEPROM.h"
 //#include "CANlib.h"
 #include "WDTimer.h"

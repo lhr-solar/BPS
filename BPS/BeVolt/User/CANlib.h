@@ -5,8 +5,8 @@
  * @lastRevised 9/4/2018
  */
 
-#ifndef __CANLIB_H
-#define __CANLIB_H
+#ifndef __CANLIB_H__
+#define __CANLIB_H__
 
 #define CAN_STACK_SIZE 5
 
