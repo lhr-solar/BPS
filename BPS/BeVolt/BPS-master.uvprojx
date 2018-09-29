@@ -382,44 +382,44 @@
           <GroupName>Src</GroupName>
           <Files>
             <File>
-              <FileName>main.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>.\User\main.cpp</FilePath>
+              <FileName>Current.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\User\Current.c</FilePath>
             </File>
             <File>
-              <FileName>Current.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>.\User\Current.cpp</FilePath>
+              <FileName>EEPROM.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\User\EEPROM.c</FilePath>
             </File>
             <File>
-              <FileName>EEPROM.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>.\User\EEPROM.cpp</FilePath>
+              <FileName>LTC2983.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\User\LTC2983.c</FilePath>
             </File>
             <File>
-              <FileName>LTC2983.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>.\User\LTC2983.cpp</FilePath>
+              <FileName>LTC6811.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\User\LTC6811.c</FilePath>
             </File>
             <File>
-              <FileName>LTC6813.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>.\User\LTC6813.cpp</FilePath>
+              <FileName>main.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\User\main.c</FilePath>
             </File>
             <File>
-              <FileName>Temperature.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>.\User\Temperature.cpp</FilePath>
+              <FileName>Temperature.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\User\Temperature.c</FilePath>
             </File>
             <File>
-              <FileName>Voltage.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>.\User\Voltage.cpp</FilePath>
+              <FileName>Voltage.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\User\Voltage.c</FilePath>
             </File>
             <File>
-              <FileName>WDTimer.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>.\User\WDTimer.cpp</FilePath>
+              <FileName>WDTimer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\User\WDTimer.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -442,11 +442,6 @@
               <FilePath>.\User\LTC2983.h</FilePath>
             </File>
             <File>
-              <FileName>LTC6813.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\User\LTC6813.h</FilePath>
-            </File>
-            <File>
               <FileName>Temperature.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\User\Temperature.h</FilePath>
@@ -465,6 +460,11 @@
               <FileName>WDTimer.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\User\WDTimer.h</FilePath>
+            </File>
+            <File>
+              <FileName>LTC6811.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\User\LTC6811.h</FilePath>
             </File>
           </Files>
         </Group>
