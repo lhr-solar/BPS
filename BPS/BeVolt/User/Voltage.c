@@ -1,4 +1,4 @@
-// Voltage.cpp
+// Voltage.c
 /**
  * Voltage class that holds all voltage related information of BeVolt's
  * battery pack.

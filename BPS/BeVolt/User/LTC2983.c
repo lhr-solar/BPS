@@ -1,4 +1,4 @@
-// LTC2983.cpp
+// LTC2983.c
 /**
  * Driver for LTC2983 chip related functions. The IC uses SPI to communicate to
  * to MCU. IsoSPI is not required since temperature sensors are galvanically isolated.
@@ -33,6 +33,10 @@ void LTC2983_Init(void){
 	GPIO_PinAFConfig(GPIOB, GPIO_PinSource3, GPIO_AF_SPI3);
 	GPIO_PinAFConfig(GPIOB, GPIO_PinSource4, GPIO_AF_SPI3);
 	GPIO_PinAFConfig(GPIOB, GPIO_PinSource5, GPIO_AF_SPI3);
+	
+	GPIO_InitStruct.GPIO_Pin = GPIO_Pin_6;
+	GPIO_InitStruct.GPIO_Mode = GPIO_Mode_OUT;
+	GPIO_Init(GPIOB, &GPIO_InitStruct);
 	
 	SPI_InitStruct.SPI_FirstBit = SPI_FirstBit_MSB;
 	SPI_InitStruct.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_2;

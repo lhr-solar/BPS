@@ -1,4 +1,4 @@
-// Temperature.cpp
+// Temperature.c
 /**
  * Temperature class that holds all temperature related information of BeVolt's
  * battery pack.
