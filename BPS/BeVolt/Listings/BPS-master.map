@@ -50,6 +50,12 @@ Section Cross References
     eeprom.o(.ARM.exidx) refers to eeprom.o(i._Z12EEPROM_Writeth) for i._Z12EEPROM_Writeth
     eeprom.o(.ARM.exidx) refers to eeprom.o(i._Z21EEPROM_ReadSingleBytet) for i._Z21EEPROM_ReadSingleBytet
     eeprom.o(.ARM.exidx) refers to eeprom.o(i._Z24EEPROM_ReadMultipleBytestj) for i._Z24EEPROM_ReadMultipleBytestj
+    ltc2983.o(i._Z12LTC2983_Initv) refers to stm32f4xx_rcc.o(i.RCC_AHB1PeriphClockCmd) for RCC_AHB1PeriphClockCmd
+    ltc2983.o(i._Z12LTC2983_Initv) refers to stm32f4xx_rcc.o(i.RCC_APB1PeriphClockCmd) for RCC_APB1PeriphClockCmd
+    ltc2983.o(i._Z12LTC2983_Initv) refers to stm32f4xx_gpio.o(i.GPIO_Init) for GPIO_Init
+    ltc2983.o(i._Z12LTC2983_Initv) refers to stm32f4xx_gpio.o(i.GPIO_PinAFConfig) for GPIO_PinAFConfig
+    ltc2983.o(i._Z12LTC2983_Initv) refers to stm32f4xx_spi.o(i.SPI_Init) for SPI_Init
+    ltc2983.o(i._Z12LTC2983_Initv) refers to stm32f4xx_spi.o(i.SPI_Cmd) for SPI_Cmd
     ltc2983.o(.ARM.exidx) refers to ltc2983.o(i._Z12LTC2983_Initv) for i._Z12LTC2983_Initv
     ltc2983.o(.ARM.exidx) refers to ltc2983.o(i._Z15LTC2983_SendCmdPt) for i._Z15LTC2983_SendCmdPt
     ltc2983.o(.ARM.exidx) refers to ltc2983.o(i._Z15LTC2983_Measurev) for i._Z15LTC2983_Measurev
@@ -666,7 +672,7 @@ Removing Unused input sections from the image.
     Removing eeprom.o(.rev16_text), (4 bytes).
     Removing eeprom.o(.revsh_text), (4 bytes).
     Removing eeprom.o(.rrx_text), (6 bytes).
-    Removing eeprom.o(i._Z12EEPROM_Writeth), (36 bytes).
+    Removing eeprom.o(i._Z12EEPROM_Writeth), (44 bytes).
     Removing eeprom.o(i._Z21EEPROM_ReadSingleBytet), (16 bytes).
     Removing eeprom.o(i._Z24EEPROM_ReadMultipleBytestj), (42 bytes).
     Removing eeprom.o(.ARM.exidx), (8 bytes).
@@ -676,7 +682,7 @@ Removing Unused input sections from the image.
     Removing ltc2983.o(.rev16_text), (4 bytes).
     Removing ltc2983.o(.revsh_text), (4 bytes).
     Removing ltc2983.o(.rrx_text), (6 bytes).
-    Removing ltc2983.o(i._Z12LTC2983_Initv), (2 bytes).
+    Removing ltc2983.o(i._Z12LTC2983_Initv), (172 bytes).
     Removing ltc2983.o(i._Z15LTC2983_SendCmdPt), (2 bytes).
     Removing ltc2983.o(.ARM.exidx), (8 bytes).
     Removing ltc2983.o(.ARM.exidx), (8 bytes).
@@ -993,4 +999,4 @@ Removing Unused input sections from the image.
     Removing system_stm32f4xx.o(.constdata), (16 bytes).
     Removing system_stm32f4xx.o(.data), (4 bytes).
 
-347 unused section(s) (total 6756 bytes) removed from the image.
+347 unused section(s) (total 6934 bytes) removed from the image.
