@@ -12,34 +12,23 @@
 
 #include "Current.h"
 
-/** Constructor
- * Creates Current (Amps) instance
- */
-Current::Current(){
-	
-}
+uint16_t HighPrecisionCurrent;		// Amp measurement of hall effect sensor of high precision
+uint16_t LowPrecisionCurrent;		// Amp measurement of hall effect sensor of high precision
+uint16_t MaxCurrentLimit;	// Max current (amps) limit the battery can handle before danger
 
 /** Constructor
  * Creates Current (Amps) instance
- * @param max current the battery can handler before danger
  */
-Current::Current(uint16_t ceiling){
-	setLimits(ceiling);
-}
-
-/** Destructor
- * Destroys Current(Amps) instance
- */
-Current::~Current(){
-
+void Current_Init(uint16_t ceiling){
+	Current_SetLimits(ceiling);
 }
 
 /** setLimits
  * Sets the max current limit the cells can reach before danger
  * @param max current limit
  */
-void Current::setLimits(uint16_t ceiling){
-	maxCurrentLimit = ceiling;
+void Current_SetLimits(uint16_t ceiling){
+	MaxCurrentLimit = ceiling;
 }
 
 /** updateMeasurements
@@ -48,7 +37,7 @@ void Current::setLimits(uint16_t ceiling){
  * @param Amps of low precision hall efect sensor
  * @return 1 if successfully stored, 0 if failed
  */
-uint8_t Current::updateMeasurements(){
+uint8_t Current_UpdateMeasurements(){
 
 }
 
@@ -56,22 +45,22 @@ uint8_t Current::updateMeasurements(){
  * Checks if pack does not have a short circuit
  * @return 1 if pack is safe, 0 if in danger
  */
-uint8_t Current::isSafe(void){
-	return highPrecision < maxCurrentLimit && lowPrecision < maxCurrentLimit;
+uint8_t Current_IsSafe(void){
+	return HighPrecisionCurrent < MaxCurrentLimit && LowPrecisionCurrent < MaxCurrentLimit;
 }
 
 /** highPrecisionCurrent
  * Gets the Ampere measurement the high precision hall effect sensor recorded
  * @return Amperes value
  */
-uint16_t Current::highPrecisionAmperes(void){
-	return highPrecision;
+uint16_t Current_HighPrecisionAmperes(void){
+	return HighPrecisionCurrent;
 }
 
 /** lowPrecisionCurrent
  * Gets the Ampere measurement the low precision hall effect sensor recorded
  * @return Amperes value
  */
-uint16_t Current::lowPrecisionAmperes(void){
-	return lowPrecision;
+uint16_t Current_LowPrecisionAmperes(void){
+	return LowPrecisionCurrent;
 }

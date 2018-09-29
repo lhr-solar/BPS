@@ -16,8 +16,11 @@ uint16_t pec15 (char *data, int len);
 
 // Public Definitions
 
-
-
+// TODO: implement
+uint16_t *LTC6811_Measure(void){
+	uint16_t x[1] = {0};
+	return x;
+}
 
 /************************************
 Copyright 2012 Analog Devices, Inc. (ADI)

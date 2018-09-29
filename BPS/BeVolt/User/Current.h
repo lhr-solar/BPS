@@ -1,6 +1,6 @@
 // Current.h
 /**
- * Current class that holds all Current (Amps) related information of BeVolt's
+ * Current file that holds all Current (Amps) related information of BeVolt's
  * battery pack.
  * @authors Sijin Woo, Chase Block
  * @lastRevised 9/3/2018
@@ -12,66 +12,39 @@
 #define __CURRENT_H__
 
 #include <stdint.h>
-
-/** Current (Amps)
- * This class holds functions related to the temperature of BeVolt's
- * battery pack.
+ 
+void Current_Init(uint16_t ceiling);
+ 
+/** setLimits
+ * Sets the max current (Amps) limit the cells can reach before danger
+ * @param max current limit
  */
-class Current{
-public:
+void Current_SetLimits(uint16_t ceiling);
 
-	/** Constructor
-	 * Creates Current (Amps) instance
-	 */
-	Current();
+/** updateMeasurements
+ * Stores and updates the new measurements received
+ * @param Amps of high precision hall effect sensor
+ * @param Amps of low precision hall efect sensor
+ * @return 1 if successfully stored, 0 if failed
+ */
+uint8_t Current_UpdateMeasurements();
 
-	/** Constructor
-	 * Creates Current (Amps) instance
-	 * @param max current the battery can handler before danger
-	 */
-	Current(uint16_t ceiling);
+/** isSafe
+ * Checks if pack does not have a short circuit
+ * @return 1 if pack is safe, 0 if in danger
+ */
+uint8_t Current_IsSafe(void);
 
-	/** Destructor
-	 * Destroys Current (Amps) instance
-	 */
-	~Current();
+/** highPrecisionCurrent
+ * Gets the Ampere measurement the high precision hall effect sensor recorded
+ * @return Amperes value
+ */
+uint16_t Current_HighPrecisionAmperes(void);
 
-	/** setLimits
-	 * Sets the max current (Amps) limit the cells can reach before danger
-	 * @param max current limit
-	 */
-	void setLimits(uint16_t ceiling);
-
-	/** updateMeasurements
-	 * Stores and updates the new measurements received
-	 * @param Amps of high precision hall effect sensor
-	 * @param Amps of low precision hall efect sensor
-	 * @return 1 if successfully stored, 0 if failed
-	 */
-	uint8_t updateMeasurements();
-
-	/** isSafe
-	 * Checks if pack does not have a short circuit
-	 * @return 1 if pack is safe, 0 if in danger
-	 */
-	uint8_t isSafe(void);
-
-	/** highPrecisionCurrent
-	 * Gets the Ampere measurement the high precision hall effect sensor recorded
-	 * @return Amperes value
-	 */
-	uint16_t highPrecisionAmperes(void);
-
-	/** lowPrecisionCurrent
-	 * Gets the Ampere measurement the low precision hall effect sensor recorded
-	 * @return Amperes value
-	 */
-	uint16_t lowPrecisionAmperes(void);
-
-private:
-	uint16_t highPrecision;		// Amp measurement of hall effect sensor of high precision
-	uint16_t lowPrecision;		// Amp measurement of hall effect sensor of high precision
-	uint16_t maxCurrentLimit;	// Max current (amps) limit the battery can handle before danger
-};
+/** lowPrecisionCurrent
+ * Gets the Ampere measurement the low precision hall effect sensor recorded
+ * @return Amperes value
+ */
+uint16_t Current_LowPrecisionAmperes(void);
 
 #endif

@@ -14,21 +14,16 @@
 #include "WDTimer.h"
 #include "stm32f4xx.h"
 
-// Global Variables
-Voltage VoltSlave;
-Current AmpSlave;
-Temperature CelsiusSlave;
-
 void initialize();
 
 
 int main(){
 	initialize();
 	while(1){
-		if(VoltSlave.isSafe() && AmpSlave.isSafe() && CelsiusSlave.isSafe()){
-			VoltSlave.updateMeasurements();
-			AmpSlave.updateMeasurements();
-			CelsiusSlave.updateMeasurements();
+		if(Voltage_IsSafe() && Current_IsSafe() && Temperature_IsSafe()){
+			Voltage_UpdateMeasurements();
+			Current_UpdateMeasurements();
+			Temperature_UpdateMeasurements();
 		}
 	}
 }
