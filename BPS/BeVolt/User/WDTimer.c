@@ -12,7 +12,7 @@
  * Initializes the Watch Dog Timer. Does not start the timer
  */
 void WDTimer_Init(void){
-
+	// TODO: Initialize timer
 }
 
 /** WDTimer_Start
@@ -26,7 +26,7 @@ void WDTimer_Start(void){
  * Resets the Watch Dog Timer. Does not stop the counter.
  */
 void WDTimer_Reset(void){
-
+	
 }
 
 /** WDTimer_Stop
