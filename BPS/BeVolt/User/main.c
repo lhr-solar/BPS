@@ -19,12 +19,15 @@ void initialize();
 
 int main(){
 	initialize();
+	WDTimer_Start();
 	while(1){
 		if(Voltage_IsSafe() && Current_IsSafe() && Temperature_IsSafe()){
 			Voltage_UpdateMeasurements();
 			Current_UpdateMeasurements();
 			Temperature_UpdateMeasurements();
 		}
+		
+		WDTimer_Reset();
 	}
 }
 

@@ -1,9 +1,9 @@
-// LTC6813.cpp
+// LTC6811.cpp
 /**
  * Driver for LTC6813 chip related functions. The IC uses the robust Isolated
  * SPI (isoSPI) to interface with the STM32F4. The LTC6820 is required to convert
  * regular SPI to isoSPI.
- * MCU --SPI--> LTC6820 --isoSPI--> LTC6813
+ * MCU --SPI--> LTC6820 --isoSPI--> LTC6811
  * @authors Sijin Woo, Chase Block
  * @lastRevised 9/3/2018
  */
@@ -22,7 +22,7 @@ uint16_t *LTC6811_Measure(void){
 	return x;
 }
 
-/************************************
+/*********************************************************************************************************
 Copyright 2012 Analog Devices, Inc. (ADI)
 Permission to freely use, copy, modify, and distribute this software for any purpose with or
 without fee is hereby granted, provided that the above copyright notice and this permission
@@ -31,7 +31,7 @@ ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL ADI BE 
 SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM ANY USE
 OF SAME, INCLUDING ANY LOSS OF USE OR DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
 OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-***************************************/
+*********************************************************************************************************/
 int16_t pec15Table[256];
 int16_t CRC15_POLY = 0x4599;
 void init_PEC15_Table(){
