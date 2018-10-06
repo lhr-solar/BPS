@@ -6,8 +6,8 @@
  * @lastRevised 9/3/2018
  */
 
-#ifndef __VOLTAGE_H__
-#define __VOLTAGE_H__
+#ifndef VOLTAGE_H__
+#define VOLTAGE_H__
 
 #include <stdint.h>
 

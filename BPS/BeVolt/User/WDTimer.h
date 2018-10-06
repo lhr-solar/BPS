@@ -6,8 +6,8 @@
  * @lastRevised 9/4/2018
  */
 
-#ifndef __WDTIMER_H__
-#define __WDTIMER_H__
+#ifndef WDTIMER_H__
+#define WDTIMER_H__
 
 #include <stdint.h>
 

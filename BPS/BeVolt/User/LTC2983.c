@@ -1,4 +1,4 @@
-// LTC2983.cpp
+// LTC2983.c
 /**
  * Driver for LTC2983 chip related functions. The IC uses SPI to communicate to
  * to MCU. IsoSPI is not required since temperature sensors are galvanically isolated.
@@ -13,7 +13,7 @@
 #include "stm32f4xx.h"
 
 /** LTC2983_Init
- * Initializes SPI to communicate with the temperature slave boards (LTC2983 chip)
+ * Initializes SPI pins
  * Initializes and configures LTC2983 chip 
  */
 void LTC2983_Init(void){

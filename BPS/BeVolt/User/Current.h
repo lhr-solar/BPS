@@ -8,8 +8,8 @@
 
 // NOTE: Current does not mean current as in time. It is the flow of charge through a wire
 
-#ifndef __CURRENT_H__
-#define __CURRENT_H__
+#ifndef CURRENT_H__
+#define CURRENT_H__
 
 #include <stdint.h>
  

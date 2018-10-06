@@ -8,8 +8,8 @@
  * @lastRevised 9/3/2018
  */
 
-#ifndef __LTC6813_H__
-#define __LTC6813_H__
+#ifndef LTC6811_H__
+#define LTC6811_H__
 
 #include <stdint.h>
 

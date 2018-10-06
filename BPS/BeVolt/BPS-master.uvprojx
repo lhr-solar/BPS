@@ -14,16 +14,16 @@
       <uAC6>0</uAC6>
       <TargetOption>
         <TargetCommonOption>
-          <Device>STM32F411RETx</Device>
+          <Device>STM32F413RHTx</Device>
           <Vendor>STMicroelectronics</Vendor>
           <PackID>Keil.STM32F4xx_DFP.2.13.0</PackID>
           <PackURL>http://www.keil.com/pack</PackURL>
-          <Cpu>IRAM(0x20000000,0x00020000) IROM(0x08000000,0x00080000) CPUTYPE("Cortex-M4") FPU2 CLOCK(12000000) ELITTLE</Cpu>
+          <Cpu>IRAM(0x20000000,0x00050000) IROM(0x08000000,0x00180000) CPUTYPE("Cortex-M4") FPU2 CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile></StartupFile>
-          <FlashDriverDll>UL2CM3(-S0 -C0 -P0 -FD20000000 -FC1000 -FN1 -FF0STM32F4xx_512 -FS08000000 -FL080000 -FP0($$Device:STM32F411RETx$CMSIS\Flash\STM32F4xx_512.FLM))</FlashDriverDll>
+          <FlashDriverDll>UL2CM3(-S0 -C0 -P0 -FD20000000 -FC1000 -FN1 -FF0STM32F4xx_1536 -FS08000000 -FL0180000 -FP0($$Device:STM32F413RHTx$CMSIS\Flash\STM32F4xx_1536.FLM))</FlashDriverDll>
           <DeviceId>0</DeviceId>
-          <RegisterFile>$$Device:STM32F411RETx$Drivers\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h</RegisterFile>
+          <RegisterFile>$$Device:STM32F413RHTx$Drivers\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h</RegisterFile>
           <MemoryEnv></MemoryEnv>
           <Cmp></Cmp>
           <Asm></Asm>
@@ -33,7 +33,7 @@
           <SLE66CMisc></SLE66CMisc>
           <SLE66AMisc></SLE66AMisc>
           <SLE66LinkerMisc></SLE66LinkerMisc>
-          <SFDFile>$$Device:STM32F411RETx$CMSIS\SVD\STM32F411xx.svd</SFDFile>
+          <SFDFile>$$Device:STM32F413RHTx$CMSIS\SVD\STM32F413.svd</SFDFile>
           <bCustSvd>0</bCustSvd>
           <UseEnv>0</UseEnv>
           <BinPath></BinPath>
@@ -244,12 +244,12 @@
               <IRAM>
                 <Type>0</Type>
                 <StartAddress>0x20000000</StartAddress>
-                <Size>0x20000</Size>
+                <Size>0x50000</Size>
               </IRAM>
               <IROM>
                 <Type>1</Type>
                 <StartAddress>0x8000000</StartAddress>
-                <Size>0x80000</Size>
+                <Size>0x180000</Size>
               </IROM>
               <XRAM>
                 <Type>0</Type>
@@ -274,7 +274,7 @@
               <OCR_RVCT4>
                 <Type>1</Type>
                 <StartAddress>0x8000000</StartAddress>
-                <Size>0x80000</Size>
+                <Size>0x180000</Size>
               </OCR_RVCT4>
               <OCR_RVCT5>
                 <Type>1</Type>
@@ -299,7 +299,7 @@
               <OCR_RVCT9>
                 <Type>0</Type>
                 <StartAddress>0x20000000</StartAddress>
-                <Size>0x20000</Size>
+                <Size>0x50000</Size>
               </OCR_RVCT9>
               <OCR_RVCT10>
                 <Type>0</Type>
@@ -382,34 +382,14 @@
           <GroupName>Src</GroupName>
           <Files>
             <File>
-              <FileName>Current.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\User\Current.c</FilePath>
-            </File>
-            <File>
-              <FileName>EEPROM.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\User\EEPROM.c</FilePath>
-            </File>
-            <File>
-              <FileName>LTC2983.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\User\LTC2983.c</FilePath>
-            </File>
-            <File>
-              <FileName>LTC6811.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\User\LTC6811.c</FilePath>
-            </File>
-            <File>
               <FileName>main.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\User\main.c</FilePath>
             </File>
             <File>
-              <FileName>Temperature.c</FileName>
+              <FileName>Current.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\User\Temperature.c</FilePath>
+              <FilePath>.\User\Current.c</FilePath>
             </File>
             <File>
               <FileName>Voltage.c</FileName>
@@ -417,9 +397,49 @@
               <FilePath>.\User\Voltage.c</FilePath>
             </File>
             <File>
+              <FileName>Temperature.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\User\Temperature.c</FilePath>
+            </File>
+            <File>
+              <FileName>LTC6811.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\User\LTC6811.c</FilePath>
+            </File>
+            <File>
+              <FileName>LTC2983.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\User\LTC2983.c</FilePath>
+            </File>
+            <File>
+              <FileName>Display.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\User\Display.c</FilePath>
+            </File>
+            <File>
+              <FileName>EEPROM.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\User\EEPROM.c</FilePath>
+            </File>
+            <File>
               <FileName>WDTimer.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\User\WDTimer.c</FilePath>
+            </File>
+            <File>
+              <FileName>SPI.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\User\SPI.c</FilePath>
+            </File>
+            <File>
+              <FileName>UART.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\User\UART.c</FilePath>
+            </File>
+            <File>
+              <FileName>FIFO.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\User\FIFO.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -427,24 +447,14 @@
           <GroupName>Inc</GroupName>
           <Files>
             <File>
+              <FileName>Definition.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\User\Definition.h</FilePath>
+            </File>
+            <File>
               <FileName>Current.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\User\Current.h</FilePath>
-            </File>
-            <File>
-              <FileName>EEPROM.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\User\EEPROM.h</FilePath>
-            </File>
-            <File>
-              <FileName>LTC2983.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\User\LTC2983.h</FilePath>
-            </File>
-            <File>
-              <FileName>Temperature.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\User\Temperature.h</FilePath>
             </File>
             <File>
               <FileName>Voltage.h</FileName>
@@ -452,9 +462,29 @@
               <FilePath>.\User\Voltage.h</FilePath>
             </File>
             <File>
-              <FileName>Definition.h</FileName>
+              <FileName>Temperature.h</FileName>
               <FileType>5</FileType>
-              <FilePath>.\User\Definition.h</FilePath>
+              <FilePath>.\User\Temperature.h</FilePath>
+            </File>
+            <File>
+              <FileName>LTC6811.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\User\LTC6811.h</FilePath>
+            </File>
+            <File>
+              <FileName>LTC2983.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\User\LTC2983.h</FilePath>
+            </File>
+            <File>
+              <FileName>Display.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\User\Display.h</FilePath>
+            </File>
+            <File>
+              <FileName>EEPROM.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\User\EEPROM.h</FilePath>
             </File>
             <File>
               <FileName>WDTimer.h</FileName>
@@ -462,9 +492,19 @@
               <FilePath>.\User\WDTimer.h</FilePath>
             </File>
             <File>
-              <FileName>LTC6811.h</FileName>
+              <FileName>SPI.h</FileName>
               <FileType>5</FileType>
-              <FilePath>.\User\LTC6811.h</FilePath>
+              <FilePath>.\User\SPI.h</FilePath>
+            </File>
+            <File>
+              <FileName>UART.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\User\UART.h</FilePath>
+            </File>
+            <File>
+              <FileName>FIFO.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\User\FIFO.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -501,6 +541,11 @@
               <FileType>1</FileType>
               <FilePath>.\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_tim.c</FilePath>
             </File>
+            <File>
+              <FileName>stm32f4xx_usart.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_usart.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -531,7 +576,19 @@
     </components>
     <files>
       <file attr="config" category="source" condition="STM32F411xE_ARMCC" name="Drivers\CMSIS\Device\ST\STM32F4xx\Source\Templates\arm\startup_stm32f411xe.s" version="2.6.2">
-        <instance index="0">RTE\Device\STM32F411RETx\startup_stm32f411xe.s</instance>
+        <instance index="0" removed="1">RTE\Device\STM32F411RETx\startup_stm32f411xe.s</instance>
+        <component Cclass="Device" Cgroup="Startup" Cvendor="Keil" Cversion="2.6.2" condition="STM32F4 CMSIS"/>
+        <package name="STM32F4xx_DFP" schemaVersion="1.3" url="http://www.keil.com/pack" vendor="Keil" version="2.13.0"/>
+        <targetInfos/>
+      </file>
+      <file attr="config" category="source" name="Drivers\CMSIS\Device\ST\STM32F4xx\Source\Templates\system_stm32f4xx.c" version="2.6.2">
+        <instance index="0" removed="1">RTE\Device\STM32F411RETx\system_stm32f4xx.c</instance>
+        <component Cclass="Device" Cgroup="Startup" Cvendor="Keil" Cversion="2.6.2" condition="STM32F4 CMSIS"/>
+        <package name="STM32F4xx_DFP" schemaVersion="1.3" url="http://www.keil.com/pack" vendor="Keil" version="2.13.0"/>
+        <targetInfos/>
+      </file>
+      <file attr="config" category="source" condition="STM32F413xx_ARMCC" name="Drivers\CMSIS\Device\ST\STM32F4xx\Source\Templates\arm\startup_stm32f413xx.s" version="2.6.2">
+        <instance index="0">RTE\Device\STM32F413RHTx\startup_stm32f413xx.s</instance>
         <component Cclass="Device" Cgroup="Startup" Cvendor="Keil" Cversion="2.6.2" condition="STM32F4 CMSIS"/>
         <package name="STM32F4xx_DFP" schemaVersion="1.3" url="http://www.keil.com/pack" vendor="Keil" version="2.13.0"/>
         <targetInfos>
@@ -539,7 +596,7 @@
         </targetInfos>
       </file>
       <file attr="config" category="source" name="Drivers\CMSIS\Device\ST\STM32F4xx\Source\Templates\system_stm32f4xx.c" version="2.6.2">
-        <instance index="0">RTE\Device\STM32F411RETx\system_stm32f4xx.c</instance>
+        <instance index="0">RTE\Device\STM32F413RHTx\system_stm32f4xx.c</instance>
         <component Cclass="Device" Cgroup="Startup" Cvendor="Keil" Cversion="2.6.2" condition="STM32F4 CMSIS"/>
         <package name="STM32F4xx_DFP" schemaVersion="1.3" url="http://www.keil.com/pack" vendor="Keil" version="2.13.0"/>
         <targetInfos>

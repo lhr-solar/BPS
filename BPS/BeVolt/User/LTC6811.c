@@ -1,4 +1,4 @@
-// LTC6811.cpp
+// LTC6811.c
 /**
  * Driver for LTC6813 chip related functions. The IC uses the robust Isolated
  * SPI (isoSPI) to interface with the STM32F4. The LTC6820 is required to convert
@@ -9,17 +9,42 @@
  */
 
 #include <stdint.h>
+#include "stm32f4xx.h"
+#include "Definition.h"
+#include "SPI.h"
+
+// Global variables
+uint16_t static modules[NUM_MODULES];		// Holds voltage values of modules
 
 // Private Functions
 static void init_PEC15_Table();
 uint16_t pec15 (char *data, int len);
 
 // Public Definitions
+/** LTC6811_Init
+ * Initializes SPI for LTC6820 to convert to isoSPI
+ * Initializes and configures LTC6811
+ */
+void LTC6811_Init(void){
+	SPI1_Init();
+	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
+	GPIOA->MODER
+}
 
-// TODO: implement
+/** LTC6811_SendCmd
+ * Sends command data to LTC6811
+ * @param unsigned int 16-bit data
+ */
+uint16_t *LTC6811_SendCmd(uint16_t *data){
+	
+}
+
+/** LTC6811_Measure
+ * Sends command to LTC6811 to gather and save all ADC values
+ * @return unsigned int 16-bit measurements from all ADC's
+ */
 uint16_t *LTC6811_Measure(void){
-	uint16_t x[1] = {0};
-	return x;
+	
 }
 
 /*********************************************************************************************************

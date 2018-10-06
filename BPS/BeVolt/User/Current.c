@@ -1,6 +1,6 @@
-// Current.cpp
+// Current.c
 /**
- * Current class that holds all Current (Amps) related information of BeVolt's
+ * Current wrapper that holds all Current (Amps) related information of BeVolt's
  * battery pack.
  * @authors Sijin Woo, Chase Block
  * @lastRevised 9/3/2018
