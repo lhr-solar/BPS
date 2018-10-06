@@ -8,8 +8,8 @@
 
 // NOTE: All units are in Celsius
 
-#ifndef __TEMPERATURE_H__
-#define __TEMPERATURE_H__
+#ifndef TEMPERATURE_H__
+#define TEMPERATURE_H__
 
 #include <stdint.h>
 

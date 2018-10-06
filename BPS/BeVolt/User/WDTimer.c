@@ -1,4 +1,4 @@
-// WDTimer.cpp
+// WDTimer.c
 /**
  * Driver for the watch dog timer. Whenever the Watch Dog Timer reaches 0,
  * all contactors will be opened (the battery pack will be disconnected from the car).
@@ -12,7 +12,7 @@
  * Initializes the Watch Dog Timer. Does not start the timer
  */
 void WDTimer_Init(void){
-
+	// TODO: Initialize timer
 }
 
 /** WDTimer_Start
@@ -26,7 +26,7 @@ void WDTimer_Start(void){
  * Resets the Watch Dog Timer. Does not stop the counter.
  */
 void WDTimer_Reset(void){
-
+	
 }
 
 /** WDTimer_Stop
@@ -41,4 +41,5 @@ void WDTimer_Stop(void){
  */
 uint8_t WDTimer_FaultDetection(){
 	
+	return 1;
 }

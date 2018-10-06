@@ -8,8 +8,8 @@
  * @lastRevised 9/4/2018
  */
 
-#ifndef __EEPROM_H__
-#define __EEPROM_H__
+#ifndef EEPROM_H__
+#define EEPROM_H__
 
 #include <stdint.h>
 

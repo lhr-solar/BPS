@@ -1,7 +1,7 @@
 /** main.c
  * Program for UTSVT BeVolt's Battery Protection System
  * @authors Sijin Woo, Chase Block
- * @lastRevised 9/4/2018
+ * @lastRevised 10/2/2018
  */
 
 #include <stdint.h>
@@ -16,15 +16,17 @@
 
 void initialize();
 
-
-int main(){
+int Mainmain(){
 	initialize();
+	WDTimer_Start();
 	while(1){
 		if(Voltage_IsSafe() && Current_IsSafe() && Temperature_IsSafe()){
 			Voltage_UpdateMeasurements();
 			Current_UpdateMeasurements();
 			Temperature_UpdateMeasurements();
 		}
+		
+		WDTimer_Reset();
 	}
 }
 
@@ -35,4 +37,30 @@ void initialize(void){
 	//VoltSlave.setLimits();
 	//AmpSlave.setLimits();
 	//CelsiusSlave.setLimits();
+}
+
+
+
+
+// LTC6811 Test
+#include "SPI.h"
+#include "LTC6811.h"
+#include "UART.h"
+#include <string.h>
+int LTCmain(){
+	LTC6811_Init();
+	UART3_Init(9600);
+	while(1){
+		
+	}
+}
+
+// UART Test
+int UARTTestmain(){
+	char str[] = "Hello there.";
+	UART3_Init(9600);
+	while(1){
+		UART3_Write(str, strlen(str));
+		for(uint32_t i = 0; i < 100000; i++);
+	}
 }

@@ -1,6 +1,6 @@
 // Voltage.c
 /**
- * Voltage class that holds all voltage related information of BeVolt's
+ * Voltage wrapper that holds all voltage related information of BeVolt's
  * battery pack.
  * @authors Sijin Woo, Chase Block
  * @lastRevised 9/3/2018

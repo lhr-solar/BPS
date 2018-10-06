@@ -3,15 +3,19 @@
  * Driver for LTC6811 chip related functions. The IC uses the robust Isolated
  * SPI (isoSPI) to interface with the STM32F4. The LTC6820 is required to convert
  * regular SPI to isoSPI.
- * MCU --SPI--> LTC6820 --isoSPI--> LTC6813
+ * MCU --SPI--> LTC6820 --isoSPI--> LTC6811
  * @authors Sijin Woo, Chase Block
  * @lastRevised 9/3/2018
  */
 
 #include <stdint.h>
-#include "LTC6811.h"
-#include "stm32f4xx.h"
 #include <string.h>
+#include "stm32f4xx.h"
+#include "Definition.h"
+#include "SPI.h"
+
+// Global variables
+uint16_t static modules[NUM_MODULES];		// Holds voltage values of modules
 
 #define SEND_BUFFER_SIZE 31
 
@@ -48,46 +52,14 @@ static void init_PEC15_Table();
 uint16_t pec15 (char *data, int len);
 
 // Public Definitions
-
-// TODO: implement
 /** LTC6811_Init
  * Initializes SPI for LTC6820 to convert to isoSPI
  * Initializes and configures LTC6811
  */
 void LTC6811_Init(void){
-	GPIO_InitTypeDef GPIO_InitStruct;
-	SPI_InitTypeDef SPI_InitStruct;
-	
-	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);	// 1) Initialize GPIO port A clock
-	RCC_APB1PeriphClockCmd(RCC_APB1Periph_SPI3, ENABLE);
-	
-	GPIO_InitStruct.GPIO_Pin = GPIO_Pin_5 | GPIO_Pin_6 | GPIO_Pin_7;		// 2) Initialize which pins to use
-	GPIO_InitStruct.GPIO_Mode = GPIO_Mode_AF;							// 3) Set PA8 and PA9 as alternate function
-	GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_UP;							// 4) Set the resistor to pull-up
-	GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;				// 5) Initialize the speed of communication as 25 MHz
-	GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;						// 6) Set to open drain
-	GPIO_Init(GPIOA, &GPIO_InitStruct);
-	
-	GPIO_PinAFConfig(GPIOA, GPIO_PinSource5, GPIO_AF_SPI1);
-	GPIO_PinAFConfig(GPIOA, GPIO_PinSource6, GPIO_AF_SPI1);
-	GPIO_PinAFConfig(GPIOA, GPIO_PinSource7, GPIO_AF_SPI1);
-	
-	GPIO_InitStruct.GPIO_Pin = GPIO_Pin_8;
-	GPIO_InitStruct.GPIO_Mode = GPIO_Mode_OUT;
-	GPIO_Init(GPIOA, &GPIO_InitStruct);
-	
-	SPI_InitStruct.SPI_FirstBit = SPI_FirstBit_MSB;
-	SPI_InitStruct.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_2;
-	SPI_InitStruct.SPI_NSS = SPI_NSS_Soft;
-	SPI_InitStruct.SPI_CPHA = SPI_CPHA_1Edge;
-	SPI_InitStruct.SPI_CPOL = SPI_CPOL_Low;
-	SPI_InitStruct.SPI_CRCPolynomial = 0x1;
-	SPI_InitStruct.SPI_DataSize = SPI_DataSize_8b;
-	SPI_InitStruct.SPI_Direction = SPI_Direction_Rx | SPI_Direction_Tx;
-	SPI_InitStruct.SPI_Mode = SPI_Mode_Master;
-	
-	SPI_Init(SPI1, &SPI_InitStruct);
-	SPI_Cmd(SPI1, ENABLE);
+	SPI1_Init();
+	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
+	GPIOA->MODER
 }
 
 /** LTC6811_SendCmd
@@ -115,7 +87,7 @@ uint16_t *LTC6811_Measure(void){
 	
 }
 
-/************************************
+/*********************************************************************************************************
 Copyright 2012 Analog Devices, Inc. (ADI)
 Permission to freely use, copy, modify, and distribute this software for any purpose with or
 without fee is hereby granted, provided that the above copyright notice and this permission
@@ -124,7 +96,7 @@ ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL ADI BE 
 SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM ANY USE
 OF SAME, INCLUDING ANY LOSS OF USE OR DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
 OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-***************************************/
+*********************************************************************************************************/
 int16_t pec15Table[256];
 int16_t CRC15_POLY = 0x4599;
 void init_PEC15_Table(){
