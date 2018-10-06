@@ -1,6 +1,6 @@
 // LTC6811.c
 /**
- * Driver for LTC6813 chip related functions. The IC uses the robust Isolated
+ * Driver for LTC6811 chip related functions. The IC uses the robust Isolated
  * SPI (isoSPI) to interface with the STM32F4. The LTC6820 is required to convert
  * regular SPI to isoSPI.
  * MCU --SPI--> LTC6820 --isoSPI--> LTC6811
@@ -9,12 +9,43 @@
  */
 
 #include <stdint.h>
+#include <string.h>
 #include "stm32f4xx.h"
 #include "Definition.h"
 #include "SPI.h"
 
 // Global variables
 uint16_t static modules[NUM_MODULES];		// Holds voltage values of modules
+
+#define SEND_BUFFER_SIZE 31
+
+#define ADC_MODE_NORMAL 0x080 // ADC Mode Normal
+#define ADC_STD 0x260 // Basic required bits for ADC init
+#define DCP_YES 0x10 // Discharge permitted
+#define ADCV (ADC_MODE_NORMAL | ADC_STD)
+
+#define ADCVSC_STD 0x4C7
+#define ADCVSC (ADCVSC_STD | ADC_MODE_NORMAL)
+
+#define WRCFGA 0x001 // Write configuration register group A
+#define WRCFGB 0x024 
+#define RDCFGA 0x002 // Read configuration register group A
+#define RDCFGB 0x026 
+#define RDCVA  0x004 // Read cell voltage register group A
+#define RDCVB  0x006 // etc.
+#define RDCVC  0x008
+#define RDCVD  0x00A
+#define RDCVE  0x009
+#define RDCVF  0x00B
+#define RDAUXA 0x00C // Read auxilliary register group A
+#define RDAUXB 0x00E // etc.
+#define RDAUXC 0x00D
+#define RDAUXD 0x00F
+#define RDSTATA 0x010 // Read status register group A
+#define RDSTATB 0x012 // Read status register group B
+
+// Global variables
+uint16_t *RecievedData;
 
 // Private Functions
 static void init_PEC15_Table();
@@ -36,9 +67,18 @@ void LTC6811_Init(void){
  * @param unsigned int 16-bit data
  */
 uint16_t *LTC6811_SendCmd(uint16_t *data){
-	
+	while(data != NULL){
+		//Send
+		while((SPI1->SR & 0x080) != 0);
+		SPI1->DR = *data;
+		data++;
+		//Recieve
+		while((SPI1->SR & 0x01) != 0){
+			
+		}
+	}
 }
-
+	
 /** LTC6811_Measure
  * Sends command to LTC6811 to gather and save all ADC values
  * @return unsigned int 16-bit measurements from all ADC's
