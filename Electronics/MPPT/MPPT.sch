@@ -33,6 +33,8 @@ LIBS:contrib
 LIBS:valves
 LIBS:utsvt-power-regulators
 LIBS:utsvt-microcontrollers
+LIBS:utsvt-connectors
+LIBS:utsvt-chips
 LIBS:MPPT-cache
 EELAYER 25 0
 EELAYER END
@@ -886,4 +888,101 @@ Wire Notes Line
 	10400 3000 10400 650 
 Wire Notes Line
 	10400 650  7750 650 
+Wire Wire Line
+	6300 4900 7100 4900
+$Comp
+L UCC27321 U?
+U 1 1 5BBC0485
+P 7600 4950
+F 0 "U?" H 7600 4700 60  0000 C CNN
+F 1 "UCC27321" H 7600 5200 60  0000 C CNN
+F 2 "" H 7600 4950 60  0001 C CNN
+F 3 "" H 7600 4950 60  0001 C CNN
+	1    7600 4950
+	1    0    0    -1  
+$EndComp
+$Comp
+L R R?
+U 1 1 5BBC08B0
+P 8450 4900
+F 0 "R?" V 8530 4900 50  0000 C CNN
+F 1 "1R5" V 8450 4900 50  0000 C CNN
+F 2 "" V 8380 4900 50  0001 C CNN
+F 3 "" H 8450 4900 50  0001 C CNN
+	1    8450 4900
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	8100 4900 8300 4900
+Wire Wire Line
+	8100 5000 8200 5000
+Wire Wire Line
+	8200 5000 8200 4900
+Connection ~ 8200 4900
+Wire Wire Line
+	8600 4900 8700 4900
+Text Label 8700 4900 0    60   ~ 12
+Drive_PWM
+$Comp
+L +12P #PWR?
+U 1 1 5BBC0ED7
+P 8150 4750
+F 0 "#PWR?" H 8150 4600 50  0001 C CNN
+F 1 "+12P" H 8150 4890 50  0000 C CNN
+F 2 "" H 8150 4750 50  0001 C CNN
+F 3 "" H 8150 4750 50  0001 C CNN
+	1    8150 4750
+	1    0    0    -1  
+$EndComp
+$Comp
+L GNDPWR #PWR?
+U 1 1 5BBC0FAD
+P 8150 5150
+F 0 "#PWR?" H 8150 4950 50  0001 C CNN
+F 1 "GNDPWR" H 8150 5020 50  0000 C CNN
+F 2 "" H 8150 5100 50  0001 C CNN
+F 3 "" H 8150 5100 50  0001 C CNN
+	1    8150 5150
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	8100 5100 8150 5100
+Wire Wire Line
+	8150 5100 8150 5150
+Wire Wire Line
+	8100 4800 8150 4800
+Wire Wire Line
+	8150 4800 8150 4750
+$Comp
+L +12P #PWR?
+U 1 1 5BBC1539
+P 7050 4750
+F 0 "#PWR?" H 7050 4600 50  0001 C CNN
+F 1 "+12P" H 7050 4890 50  0000 C CNN
+F 2 "" H 7050 4750 50  0001 C CNN
+F 3 "" H 7050 4750 50  0001 C CNN
+	1    7050 4750
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	7050 4750 7050 4800
+Wire Wire Line
+	7050 4800 7100 4800
+$Comp
+L GNDPWR #PWR?
+U 1 1 5BBC165F
+P 7050 5150
+F 0 "#PWR?" H 7050 4950 50  0001 C CNN
+F 1 "GNDPWR" H 7050 5020 50  0000 C CNN
+F 2 "" H 7050 5100 50  0001 C CNN
+F 3 "" H 7050 5100 50  0001 C CNN
+	1    7050 5150
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	7050 5150 7050 5100
+Wire Wire Line
+	7050 5100 7100 5100
+Text Notes 6950 4450 0    60   ~ 12
+TODO: Add isolation here.\nEither a new chip or an isolating\nchip on the Nucleo side.
 $EndSCHEMATC

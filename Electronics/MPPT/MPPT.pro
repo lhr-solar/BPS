@@ -1,4 +1,4 @@
-update=10/8/2018 5:32:52 PM
+update=10/8/2018 6:26:25 PM
 version=1
 last_client=kicad
 [pcbnew]
@@ -64,3 +64,4 @@ LibName32=valves
 LibName33=utsvt-power-regulators
 LibName34=utsvt-microcontrollers
 LibName35=utsvt-connectors
+LibName36=utsvt-chips
