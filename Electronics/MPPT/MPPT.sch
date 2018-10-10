@@ -52,14 +52,14 @@ Comment4 ""
 $EndDescr
 Text Notes 3250 850  0    120  ~ 24
 DC/DC Converter
-Text Notes 1550 5350 0    120  ~ 24
+Text Notes 1550 4800 0    120  ~ 24
 Current Sensors
-Text Notes 1450 3200 0    120  ~ 24
+Text Notes 1450 3050 0    120  ~ 24
 Voltage Sensors
 Text Notes 8300 850  0    120  ~ 24
 Power Regulation
-Text Notes 5500 3550 0    120  ~ 24
-Nucleo
+Text Notes 4800 3550 0    120  ~ 24
+Nucleo Connections
 $Comp
 L L_Core_Ferrite L1
 U 1 1 5BB283A5
@@ -106,17 +106,6 @@ F 3 "" H 3300 2200 50  0001 C CNN
 	1    3300 2200
 	1    0    0    -1  
 $EndComp
-$Comp
-L GNDPWR #PWR01
-U 1 1 5BB28553
-P 1300 2500
-F 0 "#PWR01" H 1300 2300 50  0001 C CNN
-F 1 "GNDPWR" H 1300 2370 50  0000 C CNN
-F 2 "" H 1300 2450 50  0001 C CNN
-F 3 "" H 1300 2450 50  0001 C CNN
-	1    1300 2500
-	1    0    0    -1  
-$EndComp
 Wire Wire Line
 	3600 1300 5000 1300
 Wire Wire Line
@@ -125,8 +114,6 @@ Connection ~ 3700 1300
 Wire Wire Line
 	3700 2450 3700 2150
 Connection ~ 3700 2450
-Text Label 2000 1300 0    60   ~ 12
-DC_In+
 $Comp
 L CP1 C1
 U 1 1 5BB285EF
@@ -139,7 +126,7 @@ F 3 "" H 2550 1800 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
-	2000 1300 3300 1300
+	1250 1300 3300 1300
 Wire Wire Line
 	2550 1300 2550 1650
 Connection ~ 2550 1300
@@ -156,22 +143,18 @@ F 3 "" H 1050 1400 50  0001 C CNN
 	1    1050 1400
 	-1   0    0    1   
 $EndComp
-Text Label 1550 1300 2    60   ~ 12
-Array+
-Wire Wire Line
-	1250 1300 1550 1300
-Text Notes 1600 1450 0    60   Italic 0
-Input\nCurrent\nSensor
+Text Notes 1600 2600 0    60   Italic 0
+Array\nCurrent\nSensor
 Wire Notes Line
-	1550 1150 2000 1150
+	1550 2300 2000 2300
 Wire Notes Line
-	2000 1150 2000 1500
+	2000 2300 2000 2650
 Wire Notes Line
-	2000 1500 1550 1500
+	2000 2650 1550 2650
 Wire Notes Line
-	1550 1500 1550 1150
+	1550 2650 1550 2300
 Text Notes 2000 2000 0    60   Italic 0
-Input\nVoltage\nSensor
+Array\nVoltage\nSensor
 Wire Wire Line
 	3200 1650 3800 1650
 Connection ~ 3300 1650
@@ -263,7 +246,7 @@ Wire Wire Line
 	4900 1000 4900 1300
 Connection ~ 4900 1300
 Wire Wire Line
-	5300 1300 6100 1300
+	5300 1300 6500 1300
 Wire Wire Line
 	5400 1000 5400 1650
 Wire Wire Line
@@ -272,8 +255,6 @@ Wire Notes Line
 	2150 1700 2150 1300
 Wire Notes Line
 	2150 2050 2150 2450
-Wire Wire Line
-	1300 2450 7150 2450
 $Comp
 L CP1 C2
 U 1 1 5BB29C25
@@ -288,43 +269,39 @@ $EndComp
 Connection ~ 5400 1300
 Wire Wire Line
 	5400 2450 5400 1950
-Text Label 6100 1300 2    60   ~ 12
-DC_Out+
-Text Notes 6150 1450 0    60   Italic 0
-Output\nCurrent\nSensor
+Text Notes 6150 2600 0    60   Italic 0
+Battery\nCurrent\nSensor
 Wire Notes Line
-	6100 1150 6100 1500
+	6100 2300 6100 2650
 Wire Notes Line
-	6100 1150 6550 1150
+	6100 2300 6550 2300
 Wire Notes Line
-	6550 1150 6550 1500
+	6550 2300 6550 2650
 Wire Notes Line
-	6550 1500 6100 1500
+	6550 2650 6100 2650
 $Comp
 L Conn_01x02 J2
 U 1 1 5BB2AA41
-P 7400 1400
-F 0 "J2" H 7400 1500 50  0000 C CNN
-F 1 "Battery" H 7350 1200 50  0000 L CNN
-F 2 "" H 7400 1400 50  0001 C CNN
-F 3 "" H 7400 1400 50  0001 C CNN
-	1    7400 1400
+P 7150 1400
+F 0 "J2" H 7150 1500 50  0000 C CNN
+F 1 "Battery" H 7100 1200 50  0000 L CNN
+F 2 "" H 7150 1400 50  0001 C CNN
+F 3 "" H 7150 1400 50  0001 C CNN
+	1    7150 1400
 	1    0    0    1   
 $EndComp
-Text Label 6550 1300 0    60   ~ 12
-Batt+
 Wire Wire Line
 	1250 1400 1300 1400
 Wire Wire Line
-	1300 1400 1300 2500
+	1300 1400 1300 2450
 Connection ~ 2550 2450
 Wire Wire Line
-	7150 1400 7150 2500
+	6900 1400 6900 2450
 Wire Wire Line
-	7150 1400 7200 1400
+	6900 1400 6950 1400
 Connection ~ 5400 2450
 Text Notes 5800 2000 0    60   Italic 0
-Output\nVoltage\nSensor
+Battery\nVoltage\nSensor
 Wire Notes Line
 	5750 1700 5750 2050
 Wire Notes Line
@@ -337,184 +314,176 @@ Wire Notes Line
 	5950 1700 5950 1300
 Wire Notes Line
 	5950 2050 5950 2450
-Text Notes 850  3350 0    60   ~ 12
-Input Voltage
 $Comp
 L R R?
 U 1 1 5BB2BAFB
-P 1400 3750
-F 0 "R?" V 1480 3750 50  0000 C CNN
-F 1 "100k" V 1400 3750 50  0000 C CNN
-F 2 "" V 1330 3750 50  0001 C CNN
-F 3 "" H 1400 3750 50  0001 C CNN
-	1    1400 3750
+P 1400 3450
+F 0 "R?" V 1480 3450 50  0000 C CNN
+F 1 "100k" V 1400 3450 50  0000 C CNN
+F 2 "" V 1330 3450 50  0001 C CNN
+F 3 "" H 1400 3450 50  0001 C CNN
+	1    1400 3450
 	1    0    0    -1  
 $EndComp
 $Comp
 L R R?
 U 1 1 5BB2BB53
-P 1400 4200
-F 0 "R?" V 1480 4200 50  0000 C CNN
-F 1 "2k" V 1400 4200 50  0000 C CNN
-F 2 "" V 1330 4200 50  0001 C CNN
-F 3 "" H 1400 4200 50  0001 C CNN
-	1    1400 4200
+P 1400 3900
+F 0 "R?" V 1480 3900 50  0000 C CNN
+F 1 "2k" V 1400 3900 50  0000 C CNN
+F 2 "" V 1330 3900 50  0001 C CNN
+F 3 "" H 1400 3900 50  0001 C CNN
+	1    1400 3900
 	1    0    0    -1  
 $EndComp
 $Comp
 L D_ALT D?
 U 1 1 5BB2BC26
-P 1150 4200
-F 0 "D?" H 1150 4300 50  0000 C CNN
-F 1 "Diode" H 1150 4100 50  0000 C CNN
-F 2 "" H 1150 4200 50  0001 C CNN
-F 3 "" H 1150 4200 50  0001 C CNN
-	1    1150 4200
+P 1150 3900
+F 0 "D?" H 1150 4000 50  0000 C CNN
+F 1 "Diode" H 1150 3800 50  0000 C CNN
+F 2 "" H 1150 3900 50  0001 C CNN
+F 3 "" H 1150 3900 50  0001 C CNN
+	1    1150 3900
 	0    1    1    0   
 $EndComp
 $Comp
 L D_Zener_ALT D?
 U 1 1 5BB2BC8A
-P 850 4200
-F 0 "D?" H 850 4300 50  0000 C CNN
-F 1 "Zener" H 850 4100 50  0000 C CNN
-F 2 "" H 850 4200 50  0001 C CNN
-F 3 "" H 850 4200 50  0001 C CNN
-	1    850  4200
+P 850 3900
+F 0 "D?" H 850 4000 50  0000 C CNN
+F 1 "Zener" H 850 3800 50  0000 C CNN
+F 2 "" H 850 3900 50  0001 C CNN
+F 3 "" H 850 3900 50  0001 C CNN
+	1    850  3900
 	0    1    1    0   
 $EndComp
 Wire Wire Line
-	850  4050 850  3950
+	850  3750 850  3650
 Wire Wire Line
-	850  3950 1500 3950
+	850  3650 1500 3650
 Wire Wire Line
-	1400 3900 1400 4050
-Connection ~ 1400 3950
+	1400 3600 1400 3750
+Connection ~ 1400 3650
 Wire Wire Line
-	1150 4050 1150 3950
-Connection ~ 1150 3950
+	1150 3750 1150 3650
+Connection ~ 1150 3650
 Wire Wire Line
-	850  4350 850  4450
+	850  4050 850  4150
 Wire Wire Line
-	850  4450 1400 4450
+	850  4150 1400 4150
 Wire Wire Line
-	1150 4450 1150 4350
+	1150 4150 1150 4050
 Wire Wire Line
-	1400 4350 1400 4550
-Connection ~ 1150 4450
+	1400 4050 1400 4250
+Connection ~ 1150 4150
 $Comp
 L GNDPWR #PWR02
 U 1 1 5BB2BED0
-P 1400 4550
-F 0 "#PWR02" H 1400 4350 50  0001 C CNN
-F 1 "GNDPWR" H 1400 4420 50  0000 C CNN
-F 2 "" H 1400 4500 50  0001 C CNN
-F 3 "" H 1400 4500 50  0001 C CNN
-	1    1400 4550
+P 1400 4250
+F 0 "#PWR02" H 1400 4050 50  0001 C CNN
+F 1 "GNDPWR" H 1400 4120 50  0000 C CNN
+F 2 "" H 1400 4200 50  0001 C CNN
+F 3 "" H 1400 4200 50  0001 C CNN
+	1    1400 4250
 	1    0    0    -1  
 $EndComp
-Connection ~ 1400 4450
-Text Label 1300 3550 2    60   ~ 0
-DC_In+
+Connection ~ 1400 4150
 Wire Wire Line
-	1300 3550 1400 3550
+	1300 3250 1400 3250
 Wire Wire Line
-	1400 3550 1400 3600
-Text Notes 2400 3350 0    60   ~ 12
-Output Voltage
+	1400 3250 1400 3300
 $Comp
 L R R?
 U 1 1 5BB2C1F1
-P 2950 3750
-F 0 "R?" V 3030 3750 50  0000 C CNN
-F 1 "100k" V 2950 3750 50  0000 C CNN
-F 2 "" V 2880 3750 50  0001 C CNN
-F 3 "" H 2950 3750 50  0001 C CNN
-	1    2950 3750
+P 2900 3450
+F 0 "R?" V 2980 3450 50  0000 C CNN
+F 1 "100k" V 2900 3450 50  0000 C CNN
+F 2 "" V 2830 3450 50  0001 C CNN
+F 3 "" H 2900 3450 50  0001 C CNN
+	1    2900 3450
 	1    0    0    -1  
 $EndComp
 $Comp
 L R R?
 U 1 1 5BB2C1F7
-P 2950 4200
-F 0 "R?" V 3030 4200 50  0000 C CNN
-F 1 "2k" V 2950 4200 50  0000 C CNN
-F 2 "" V 2880 4200 50  0001 C CNN
-F 3 "" H 2950 4200 50  0001 C CNN
-	1    2950 4200
+P 2900 3900
+F 0 "R?" V 2980 3900 50  0000 C CNN
+F 1 "2k" V 2900 3900 50  0000 C CNN
+F 2 "" V 2830 3900 50  0001 C CNN
+F 3 "" H 2900 3900 50  0001 C CNN
+	1    2900 3900
 	1    0    0    -1  
 $EndComp
 $Comp
 L D_ALT D?
 U 1 1 5BB2C1FD
-P 2700 4200
-F 0 "D?" H 2700 4300 50  0000 C CNN
-F 1 "Diode" H 2700 4100 50  0000 C CNN
-F 2 "" H 2700 4200 50  0001 C CNN
-F 3 "" H 2700 4200 50  0001 C CNN
-	1    2700 4200
+P 2650 3900
+F 0 "D?" H 2650 4000 50  0000 C CNN
+F 1 "Diode" H 2650 3800 50  0000 C CNN
+F 2 "" H 2650 3900 50  0001 C CNN
+F 3 "" H 2650 3900 50  0001 C CNN
+	1    2650 3900
 	0    1    1    0   
 $EndComp
 $Comp
 L D_Zener_ALT D?
 U 1 1 5BB2C203
-P 2400 4200
-F 0 "D?" H 2400 4300 50  0000 C CNN
-F 1 "Zener" H 2400 4100 50  0000 C CNN
-F 2 "" H 2400 4200 50  0001 C CNN
-F 3 "" H 2400 4200 50  0001 C CNN
-	1    2400 4200
+P 2350 3900
+F 0 "D?" H 2350 4000 50  0000 C CNN
+F 1 "Zener" H 2350 3800 50  0000 C CNN
+F 2 "" H 2350 3900 50  0001 C CNN
+F 3 "" H 2350 3900 50  0001 C CNN
+	1    2350 3900
 	0    1    1    0   
 $EndComp
 Wire Wire Line
-	2400 4050 2400 3950
+	2350 3750 2350 3650
 Wire Wire Line
-	2400 3950 3050 3950
+	2350 3650 3000 3650
 Wire Wire Line
-	2950 3900 2950 4050
-Connection ~ 2950 3950
+	2900 3600 2900 3750
+Connection ~ 2900 3650
 Wire Wire Line
-	2700 4050 2700 3950
-Connection ~ 2700 3950
+	2650 3750 2650 3650
+Connection ~ 2650 3650
 Wire Wire Line
-	2400 4350 2400 4450
+	2350 4050 2350 4150
 Wire Wire Line
-	2400 4450 2950 4450
+	2350 4150 2900 4150
 Wire Wire Line
-	2700 4450 2700 4350
+	2650 4150 2650 4050
 Wire Wire Line
-	2950 4350 2950 4550
-Connection ~ 2700 4450
+	2900 4050 2900 4250
+Connection ~ 2650 4150
 $Comp
 L GNDPWR #PWR03
 U 1 1 5BB2C218
-P 2950 4550
-F 0 "#PWR03" H 2950 4350 50  0001 C CNN
-F 1 "GNDPWR" H 2950 4420 50  0000 C CNN
-F 2 "" H 2950 4500 50  0001 C CNN
-F 3 "" H 2950 4500 50  0001 C CNN
-	1    2950 4550
+P 2900 4250
+F 0 "#PWR03" H 2900 4050 50  0001 C CNN
+F 1 "GNDPWR" H 2900 4120 50  0000 C CNN
+F 2 "" H 2900 4200 50  0001 C CNN
+F 3 "" H 2900 4200 50  0001 C CNN
+	1    2900 4250
 	1    0    0    -1  
 $EndComp
-Connection ~ 2950 4450
-Text Label 2850 3550 2    60   ~ 0
-DC_Out+
+Connection ~ 2900 4150
 Wire Wire Line
-	2850 3550 2950 3550
+	2800 3250 2900 3250
 Wire Wire Line
-	2950 3550 2950 3600
-Text Label 1500 3950 0    60   ~ 0
-Input_Voltage
-Text Label 3050 3950 0    60   ~ 0
-Output_Voltage
+	2900 3250 2900 3300
+Text Label 1500 3650 0    60   ~ 12
+Array_Voltage
+Text Label 3000 3650 0    60   ~ 12
+Battery_Voltage
 Wire Notes Line
-	650  4800 3800 4800
+	650  4500 3800 4500
 Wire Notes Line
-	3800 4800 3800 3000
+	3800 4500 3800 2850
 Wire Notes Line
-	3800 3000 650  3000
+	3800 2850 650  2850
 Wire Notes Line
-	650  3000 650  4800
+	650  2850 650  4500
 $Comp
 L Conn_01x02 J3
 U 1 1 5BB2D117
@@ -559,26 +528,13 @@ Wire Wire Line
 Wire Notes Line
 	650  650  650  2750
 Wire Notes Line
-	650  2750 7650 2750
+	650  2750 7450 2750
 Wire Notes Line
-	7650 2750 7650 650 
+	7450 2750 7450 650 
 Wire Notes Line
-	7650 650  650  650 
+	7450 650  650  650 
 Wire Wire Line
-	4100 1850 4100 2450
-Connection ~ 1300 2450
-$Comp
-L GNDPWR #PWR06
-U 1 1 5BB2DB28
-P 7150 2500
-F 0 "#PWR06" H 7150 2300 50  0001 C CNN
-F 1 "GNDPWR" H 7150 2370 50  0000 C CNN
-F 2 "" H 7150 2450 50  0001 C CNN
-F 3 "" H 7150 2450 50  0001 C CNN
-	1    7150 2500
-	1    0    0    -1  
-$EndComp
-Connection ~ 7150 2450
+	4100 2450 4100 1850
 $Comp
 L GNDPWR #PWR07
 U 1 1 5BB2E517
@@ -591,7 +547,7 @@ F 3 "" H 3900 2450 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
-	3900 2500 3900 2450
+	3900 2450 3900 2500
 Connection ~ 3900 2450
 $Comp
 L D_ALT D1
@@ -602,7 +558,7 @@ F 1 "Diode" H 4850 1600 50  0000 C CNN
 F 2 "" H 4850 1700 50  0001 C CNN
 F 3 "" H 4850 1700 50  0001 C CNN
 	1    4850 1700
-	0    1    1    0   
+	0    -1   -1   0   
 $EndComp
 Wire Wire Line
 	4850 1900 4850 1850
@@ -635,91 +591,87 @@ Connection ~ 4700 1500
 $Comp
 L Fuse F1
 U 1 1 5BB2FF01
-P 7000 1300
-F 0 "F1" V 7080 1300 50  0000 C CNN
-F 1 "Fuse" V 6925 1300 50  0000 C CNN
-F 2 "" V 6930 1300 50  0001 C CNN
-F 3 "" H 7000 1300 50  0001 C CNN
-	1    7000 1300
+P 6650 1300
+F 0 "F1" V 6730 1300 50  0000 C CNN
+F 1 "Fuse" V 6575 1300 50  0000 C CNN
+F 2 "" V 6580 1300 50  0001 C CNN
+F 3 "" H 6650 1300 50  0001 C CNN
+	1    6650 1300
 	0    1    1    0   
 $EndComp
 Wire Wire Line
-	6850 1300 6550 1300
-Wire Wire Line
-	7150 1300 7200 1300
-Text Notes 1250 950  0    60   ~ 0
-Note: Current sensors may be\non ground line, not high line
+	6800 1300 6950 1300
 $Comp
 L Nucleo_L432KC U?
 U 1 1 5BBBD3B0
-P 5800 4600
-F 0 "U?" H 5800 3750 60  0000 C CNN
-F 1 "Nucleo_L432KC" H 5800 5450 60  0000 C CNN
-F 2 "" H 5800 4300 60  0001 C CNN
-F 3 "" H 5800 4300 60  0001 C CNN
-	1    5800 4600
+P 5400 4600
+F 0 "U?" H 5400 3750 60  0000 C CNN
+F 1 "Nucleo_L432KC" H 5400 5450 60  0000 C CNN
+F 2 "" H 5400 4300 60  0001 C CNN
+F 3 "" H 5400 4300 60  0001 C CNN
+	1    5400 4600
 	1    0    0    -1  
 $EndComp
 $Comp
 L +9V #PWR08
 U 1 1 5BBBD4CE
-P 6350 3850
-F 0 "#PWR08" H 6350 3700 50  0001 C CNN
-F 1 "+9V" H 6350 3990 50  0000 C CNN
-F 2 "" H 6350 3850 50  0001 C CNN
-F 3 "" H 6350 3850 50  0001 C CNN
-	1    6350 3850
+P 5950 3850
+F 0 "#PWR08" H 5950 3700 50  0001 C CNN
+F 1 "+9V" H 5950 3990 50  0000 C CNN
+F 2 "" H 5950 3850 50  0001 C CNN
+F 3 "" H 5950 3850 50  0001 C CNN
+	1    5950 3850
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
-	6300 3900 6350 3900
+	5900 3900 5950 3900
 Wire Wire Line
-	6350 3900 6350 3850
+	5950 3900 5950 3850
 $Comp
 L +5V #PWR09
 U 1 1 5BBBD677
-P 6550 3850
-F 0 "#PWR09" H 6550 3700 50  0001 C CNN
-F 1 "+5V" H 6550 3990 50  0000 C CNN
-F 2 "" H 6550 3850 50  0001 C CNN
-F 3 "" H 6550 3850 50  0001 C CNN
-	1    6550 3850
+P 6150 3850
+F 0 "#PWR09" H 6150 3700 50  0001 C CNN
+F 1 "+5V" H 6150 3990 50  0000 C CNN
+F 2 "" H 6150 3850 50  0001 C CNN
+F 3 "" H 6150 3850 50  0001 C CNN
+	1    6150 3850
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
-	6550 3850 6550 4200
+	6150 3850 6150 4200
 Wire Wire Line
-	6550 4200 6300 4200
+	6150 4200 5900 4200
 $Comp
 L GND #PWR010
 U 1 1 5BBBD81B
-P 6450 5450
-F 0 "#PWR010" H 6450 5200 50  0001 C CNN
-F 1 "GND" H 6450 5300 50  0000 C CNN
-F 2 "" H 6450 5450 50  0001 C CNN
-F 3 "" H 6450 5450 50  0001 C CNN
-	1    6450 5450
+P 6000 5450
+F 0 "#PWR010" H 6000 5200 50  0001 C CNN
+F 1 "GND" H 6000 5300 50  0000 C CNN
+F 2 "" H 6000 5450 50  0001 C CNN
+F 3 "" H 6000 5450 50  0001 C CNN
+	1    6000 5450
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
-	6450 5450 6450 4000
+	6000 5450 6000 4000
 Wire Wire Line
-	6450 4000 6300 4000
+	6000 4000 5900 4000
 $Comp
 L GND #PWR011
 U 1 1 5BBBD95B
-P 5200 5450
-F 0 "#PWR011" H 5200 5200 50  0001 C CNN
-F 1 "GND" H 5200 5300 50  0000 C CNN
-F 2 "" H 5200 5450 50  0001 C CNN
-F 3 "" H 5200 5450 50  0001 C CNN
-	1    5200 5450
+P 4800 5450
+F 0 "#PWR011" H 4800 5200 50  0001 C CNN
+F 1 "GND" H 4800 5300 50  0000 C CNN
+F 2 "" H 4800 5450 50  0001 C CNN
+F 3 "" H 4800 5450 50  0001 C CNN
+	1    4800 5450
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
-	5200 5450 5200 4200
+	4800 5450 4800 4200
 Wire Wire Line
-	5200 4200 5300 4200
+	4800 4200 4900 4200
 $Comp
 L PDS1-S12-S9-M U?
 U 1 1 5BBBDF77
@@ -811,7 +763,7 @@ Wire Notes Line
 Text Notes 10250 1650 1    60   ~ 0
 Nucleo Power
 Text Notes 7800 2950 0    60   ~ 0
-Isolated Power Regions:\n* High Power\n   - Arr+\n   - Batt+\n   - +12P\n   - GNDPWR\n* Low Car Power\n   - +12V\n   - GNDREF\n* Nucleo/Computer Power\n   - +9V\n   - +5V\n   - GND
+Isolated Power Regions:\n* High Power\n   - +/-Arr\n   - +/-Batt\n   - +12P\n   - GNDPWR\n* Low Car Power\n   - +12V\n   - GNDREF\n* Nucleo/Computer Power\n   - +9V\n   - +5V\n   - GND
 $Comp
 L PDM2-S12-S12-S U?
 U 1 1 5BBBED09
@@ -889,7 +841,7 @@ Wire Notes Line
 Wire Notes Line
 	10400 650  7750 650 
 Wire Wire Line
-	6300 4900 7100 4900
+	5900 4900 7100 4900
 $Comp
 L UCC27321 U?
 U 1 1 5BBC0485
@@ -983,6 +935,288 @@ Wire Wire Line
 	7050 5150 7050 5100
 Wire Wire Line
 	7050 5100 7100 5100
-Text Notes 6950 4450 0    60   ~ 12
+Text Notes 6950 4450 0    80   ~ 16
 TODO: Add isolation here.\nEither a new chip or an isolating\nchip on the Nucleo side.
+Wire Wire Line
+	2550 2450 5400 2450
+Wire Wire Line
+	1300 2450 1550 2450
+Wire Notes Line
+	2000 2450 2550 2450
+Text Label 1550 2450 2    60   ~ 12
+-Arr
+Text Notes 2000 2550 0    60   ~ 12
+GNDPWR
+Wire Notes Line
+	5400 2450 6100 2450
+Wire Wire Line
+	6900 2450 6550 2450
+Text Label 6550 2450 0    60   ~ 12
+-Batt
+Text Notes 6100 2550 2    60   ~ 12
+GNDPWR
+$Comp
+L INA213 U?
+U 1 1 5BBD5537
+P 2100 5650
+F 0 "U?" H 2150 5400 60  0000 L CNN
+F 1 "INA213" H 2150 5900 60  0000 L CNN
+F 2 "" H 2100 5650 60  0001 C CNN
+F 3 "" H 2100 5650 60  0001 C CNN
+	1    2100 5650
+	1    0    0    -1  
+$EndComp
+$Comp
+L +12P #PWR?
+U 1 1 5BBD56F4
+P 2100 5150
+F 0 "#PWR?" H 2100 5000 50  0001 C CNN
+F 1 "+12P" H 2100 5290 50  0000 C CNN
+F 2 "" H 2100 5150 50  0001 C CNN
+F 3 "" H 2100 5150 50  0001 C CNN
+	1    2100 5150
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	2100 5150 2100 5250
+$Comp
+L GNDPWR #PWR?
+U 1 1 5BBD5959
+P 2100 6150
+F 0 "#PWR?" H 2100 5950 50  0001 C CNN
+F 1 "GNDPWR" H 2100 6020 50  0000 C CNN
+F 2 "" H 2100 6100 50  0001 C CNN
+F 3 "" H 2100 6100 50  0001 C CNN
+	1    2100 6150
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	2100 6050 2100 6150
+$Comp
+L R_Small R?
+U 1 1 5BBD5B22
+P 1250 5600
+F 0 "R?" H 1280 5620 50  0000 L CNN
+F 1 "10m" H 1280 5560 50  0000 L CNN
+F 2 "" H 1250 5600 50  0001 C CNN
+F 3 "" H 1250 5600 50  0001 C CNN
+	1    1250 5600
+	1    0    0    -1  
+$EndComp
+$Comp
+L GNDPWR #PWR?
+U 1 1 5BBD5CC8
+P 1250 5400
+F 0 "#PWR?" H 1250 5200 50  0001 C CNN
+F 1 "GNDPWR" H 1250 5270 50  0000 C CNN
+F 2 "" H 1250 5350 50  0001 C CNN
+F 3 "" H 1250 5350 50  0001 C CNN
+	1    1250 5400
+	-1   0    0    1   
+$EndComp
+Wire Wire Line
+	1250 5400 1250 5500
+Wire Wire Line
+	1650 5750 1650 6100
+Wire Wire Line
+	1650 6100 2650 6100
+Connection ~ 2100 6100
+$Comp
+L C_Small C?
+U 1 1 5BBD6119
+P 2650 5900
+F 0 "C?" H 2660 5970 50  0000 L CNN
+F 1 "0.1uF" H 2660 5820 50  0000 L CNN
+F 2 "" H 2650 5900 50  0001 C CNN
+F 3 "" H 2650 5900 50  0001 C CNN
+	1    2650 5900
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	2650 5800 2650 5200
+Wire Wire Line
+	2650 5200 2100 5200
+Connection ~ 2100 5200
+Wire Wire Line
+	2650 6100 2650 6000
+Wire Wire Line
+	1250 5450 1550 5450
+Wire Wire Line
+	1550 5450 1550 5550
+Wire Wire Line
+	1550 5550 1650 5550
+Connection ~ 1250 5450
+Wire Wire Line
+	1250 5700 1250 5900
+Wire Wire Line
+	1250 5750 1550 5750
+Wire Wire Line
+	1550 5750 1550 5650
+Wire Wire Line
+	1550 5650 1650 5650
+Text Label 1350 5900 0    60   ~ 12
+-Arr
+Connection ~ 1250 5750
+Text Label 2750 5650 0    60   ~ 12
+Array_Current
+Wire Wire Line
+	2550 5650 2750 5650
+Text Notes 1050 5200 0    60   ~ 0
+This looks weird,\nbut it is correct.\nCurrent flows\ninto array's -.
+$Comp
+L INA213 U?
+U 1 1 5BBD7DF1
+P 2100 7150
+F 0 "U?" H 2150 6900 60  0000 L CNN
+F 1 "INA213" H 2150 7400 60  0000 L CNN
+F 2 "" H 2100 7150 60  0001 C CNN
+F 3 "" H 2100 7150 60  0001 C CNN
+	1    2100 7150
+	1    0    0    -1  
+$EndComp
+$Comp
+L +12P #PWR?
+U 1 1 5BBD7DF7
+P 2100 6650
+F 0 "#PWR?" H 2100 6500 50  0001 C CNN
+F 1 "+12P" H 2100 6790 50  0000 C CNN
+F 2 "" H 2100 6650 50  0001 C CNN
+F 3 "" H 2100 6650 50  0001 C CNN
+	1    2100 6650
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	2100 6650 2100 6750
+$Comp
+L GNDPWR #PWR?
+U 1 1 5BBD7DFF
+P 2100 7650
+F 0 "#PWR?" H 2100 7450 50  0001 C CNN
+F 1 "GNDPWR" H 2100 7520 50  0000 C CNN
+F 2 "" H 2100 7600 50  0001 C CNN
+F 3 "" H 2100 7600 50  0001 C CNN
+	1    2100 7650
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	2100 7550 2100 7650
+$Comp
+L R_Small R?
+U 1 1 5BBD7E07
+P 1250 7100
+F 0 "R?" H 1280 7120 50  0000 L CNN
+F 1 "10m" H 1280 7060 50  0000 L CNN
+F 2 "" H 1250 7100 50  0001 C CNN
+F 3 "" H 1250 7100 50  0001 C CNN
+	1    1250 7100
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	1250 6800 1250 7000
+Wire Wire Line
+	1650 7250 1650 7600
+Wire Wire Line
+	1650 7600 2650 7600
+Connection ~ 2100 7600
+$Comp
+L C_Small C?
+U 1 1 5BBD7E19
+P 2650 7400
+F 0 "C?" H 2660 7470 50  0000 L CNN
+F 1 "0.1uF" H 2660 7320 50  0000 L CNN
+F 2 "" H 2650 7400 50  0001 C CNN
+F 3 "" H 2650 7400 50  0001 C CNN
+	1    2650 7400
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	2650 7300 2650 6700
+Wire Wire Line
+	2650 6700 2100 6700
+Connection ~ 2100 6700
+Wire Wire Line
+	2650 7600 2650 7500
+Wire Wire Line
+	1250 6950 1550 6950
+Wire Wire Line
+	1550 6950 1550 7050
+Wire Wire Line
+	1550 7050 1650 7050
+Connection ~ 1250 6950
+Wire Wire Line
+	1250 7200 1250 7300
+Wire Wire Line
+	1250 7250 1550 7250
+Wire Wire Line
+	1550 7250 1550 7150
+Wire Wire Line
+	1550 7150 1650 7150
+Text Label 1350 6800 0    60   ~ 12
+-Batt
+Connection ~ 1250 7250
+Text Label 2750 7150 0    60   ~ 12
+Battery_Current
+Wire Wire Line
+	2550 7150 2750 7150
+$Comp
+L GNDPWR #PWR?
+U 1 1 5BBD81EA
+P 1250 7300
+F 0 "#PWR?" H 1250 7100 50  0001 C CNN
+F 1 "GNDPWR" H 1250 7170 50  0000 C CNN
+F 2 "" H 1250 7250 50  0001 C CNN
+F 3 "" H 1250 7250 50  0001 C CNN
+	1    1250 7300
+	1    0    0    -1  
+$EndComp
+Wire Notes Line
+	950  4600 3550 4600
+Wire Notes Line
+	3550 4600 3550 7850
+Wire Notes Line
+	3550 7850 950  7850
+Wire Notes Line
+	950  7850 950  4600
+Text Label 6100 4800 0    60   ~ 12
+Battery_Current
+Text Label 6100 4700 0    60   ~ 12
+Array_Current
+Text Label 6100 4600 0    60   ~ 12
+Battery_Voltage
+Text Label 6100 4500 0    60   ~ 12
+Array_Voltage
+Wire Wire Line
+	5900 4500 6100 4500
+Wire Wire Line
+	6100 4600 5900 4600
+Wire Wire Line
+	5900 4700 6100 4700
+Wire Wire Line
+	6100 4800 5900 4800
+Text Notes 1050 6550 0    60   ~ 0
+This looks weird,\nbut it is correct.\nCurrent flows out\nof battery's -.
+Text Notes 3050 3100 0    60   ~ 0
+Basic voltage\ndividers
+Text Notes 3000 5150 0    60   ~ 0
+Low-side\ncurrent\nsense
+Text Notes 6150 5750 0    80   ~ 16
+TODO: Add isolation to\nall of these inputs
+Wire Notes Line
+	6350 5450 6350 5000
+Text Label 2150 1300 2    60   ~ 12
++Arr
+Text Label 1300 3250 2    60   ~ 12
++Arr
+Wire Wire Line
+	1250 5900 1350 5900
+Wire Wire Line
+	1350 6800 1250 6800
+Text Label 5950 1300 0    60   ~ 12
++Batt
+Text Label 2800 3250 2    60   ~ 12
++Batt
+Wire Notes Line
+	6350 5000 6300 5050
+Wire Notes Line
+	6350 5000 6400 5050
 $EndSCHEMATC
