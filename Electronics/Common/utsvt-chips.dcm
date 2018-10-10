@@ -1,5 +1,9 @@
 EESchema-DOCLIB  Version 2.0
 #
+$CMP INA213
+D 50V/V Current-Sense Amplifier
+$ENDCMP
+#
 $CMP UCC27321
 D FET Driver
 $ENDCMP
