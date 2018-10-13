@@ -4,7 +4,7 @@
  * to MCU.
  *
  * @authors Chase Block
- * @lastRevised 9/3/2018
+ * @lastRevised 10/13/2018
  */
 
 #ifndef __I3G4250D_H__

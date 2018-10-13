@@ -4,13 +4,13 @@
  * to MCU.
  *
  * @authors Chase Block
- * @lastRevised 9/3/2018
+ * @lastRevised 10/13/2018
  */
 
 #include "I3G4250D.h"
 
 /** I3G4250D_Init
- * Initializes SPI to communicate with the temperature slave boards (I3G4250D chip)
+ * Initializes SPI to communicate with the gyro slave board (I3G4250D chip)
  * Initializes and configures I3G4250D chip 
  */
 void I3G4250D_Init(void){
@@ -54,11 +54,20 @@ void I3G4250D_Init(void){
  * @param unsigned int 16-bit data
  */
 void I3G4250D_SendCmd(uint16_t *data){
-
+	while(data != NULL){
+		//Send
+		while((SPI1->SR & 0x80) != 0);
+		SPI1->DR = *data;
+		data++;
+		//Recieve
+		while((SPI1-SR & 0x01) != 0){
+			//TODO fill out
+		}
+	}
 }
 
 /** I3G4250D_Measure
- * Sends command to I3G4250D to gather and save all ADC values
+ * Sends command to I3G4250D to gather and save the current heading
  * @return unsigned int 16-bit measurements from all ADCs
  */
 uint16_t *I3G4250D_Measure(void){
