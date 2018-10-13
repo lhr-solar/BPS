@@ -95,6 +95,20 @@ X V_ISO_Out 19 700 450 200 L 50 50 1 1 w
 ENDDRAW
 ENDDEF
 #
+# BatteryConnector
+#
+DEF BatteryConnector J 0 40 Y Y 1 F N
+F0 "J" 0 -200 60 H V C CNN
+F1 "BatteryConnector" 0 200 60 H V C CNN
+F2 "" 0 0 60 H I C CNN
+F3 "" 0 0 60 H I C CNN
+DRAW
+S 100 150 -100 -150 0 1 0 f
+X + 1 300 100 200 L 50 50 1 1 P
+X - 2 300 -100 200 L 50 50 1 1 P
+ENDDRAW
+ENDDEF
+#
 # CANConnector
 #
 DEF CANConnector J 0 40 Y Y 1 F N
@@ -103,7 +117,7 @@ F1 "CANConnector" 0 250 60 H V C CNN
 F2 "" 150 300 60 H I C CNN
 F3 "" 150 300 60 H I C CNN
 DRAW
-S 150 200 -150 -200 0 1 0 N
+S 150 200 -150 -200 0 1 0 f
 X 5V 1 350 150 200 L 50 50 1 1 W
 X GND 2 350 50 200 L 50 50 1 1 W
 X CAN_H 3 350 -50 200 L 50 50 1 1 B
@@ -149,27 +163,18 @@ X ~ 2 0 -100 80 U 50 50 1 1 P
 ENDDRAW
 ENDDEF
 #
-# Conn_01x02
+# CarPowerConnector
 #
-DEF Conn_01x02 J 0 40 Y N 1 F N
-F0 "J" 0 100 50 H V C CNN
-F1 "Conn_01x02" 0 -200 50 H V C CNN
-F2 "" 0 0 50 H I C CNN
-F3 "" 0 0 50 H I C CNN
-$FPLIST
- Connector*:*_??x*mm*
- Connector*:*1x??x*mm*
- Pin?Header?Straight?1X*
- Pin?Header?Angled?1X*
- Socket?Strip?Straight?1X*
- Socket?Strip?Angled?1X*
-$ENDFPLIST
+DEF CarPowerConnector J 0 40 Y Y 1 F N
+F0 "J" 0 -200 60 H V C CNN
+F1 "CarPowerConnector" 0 200 60 H V C CNN
+F2 "" 0 0 60 H I C CNN
+F3 "" 0 0 60 H I C CNN
 DRAW
-S -50 -95 0 -105 1 1 6 N
-S -50 5 0 -5 1 1 6 N
-S -50 50 50 -150 1 1 10 f
-X Pin_1 1 -200 0 150 R 50 50 1 1 P
-X Pin_2 2 -200 -100 150 R 50 50 1 1 P
+S 100 150 -150 -150 0 1 0 f
+X +12V 1 300 100 200 L 50 50 1 1 w
+X +5V 2 300 0 200 L 50 50 1 1 w
+X GND 3 300 -100 200 L 50 50 1 1 w
 ENDDRAW
 ENDDEF
 #
@@ -568,6 +573,21 @@ P 2 0 1 0 0 50 0 120 N
 P 2 0 1 0 100 50 -100 50 N
 X 1 1 -200 0 100 R 50 50 0 1 P
 X 2 2 200 0 100 L 50 50 0 1 P
+ENDDRAW
+ENDDEF
+#
+# SolarArrayConnector
+#
+DEF SolarArrayConnector J 0 40 Y Y 1 F N
+F0 "J" 0 -200 60 H V C CNN
+F1 "SolarArrayConnector" 0 200 60 H V C CNN
+F2 "" 0 0 60 H I C CNN
+F3 "" 0 0 60 H I C CNN
+DRAW
+S 100 150 -100 -150 0 1 0 f
+X + 1 300 100 200 L 50 50 1 1 P
+X nc 2 300 0 200 L 50 50 1 1 N
+X - 3 300 -100 200 L 50 50 1 1 P
 ENDDRAW
 ENDDEF
 #
