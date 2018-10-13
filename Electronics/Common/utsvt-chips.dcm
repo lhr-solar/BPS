@@ -4,11 +4,11 @@ $CMP ADM3055E
 D Isolating CAN Transceiver with Integrated Power Regulator
 $ENDCMP
 #
-$CMP INA213
+$CMP INA21x
 D 50V/V Current-Sense Amplifier
 $ENDCMP
 #
-$CMP UCC27321
+$CMP UCC37321
 D FET Driver
 $ENDCMP
 #
