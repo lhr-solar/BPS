@@ -446,6 +446,11 @@
               <FileType>1</FileType>
               <FilePath>.\User\FXAS21002CQR1.c</FilePath>
             </File>
+            <File>
+              <FileName>Terminal.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\User\Terminal.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
