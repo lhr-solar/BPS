@@ -57,9 +57,9 @@ uint16_t pec15 (char *data, int len);
  * Initializes and configures LTC6811
  */
 void LTC6811_Init(void){
-	SPI1_Init();
+	SPI_Init8();
 	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
-	GPIOA->MODER
+//	GPIOA->MODER
 }
 
 /** LTC6811_SendCmd
