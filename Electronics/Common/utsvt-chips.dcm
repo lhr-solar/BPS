@@ -4,6 +4,10 @@ $CMP ADM3055E
 D Isolating CAN Transceiver with Integrated Power Regulator
 $ENDCMP
 #
+$CMP CDSOT23-T24CAN
+D CAN Bus Protector
+$ENDCMP
+#
 $CMP INA21x
 D 50V/V Current-Sense Amplifier
 $ENDCMP
