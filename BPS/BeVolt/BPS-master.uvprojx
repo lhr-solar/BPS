@@ -441,6 +441,16 @@
               <FileType>1</FileType>
               <FilePath>.\User\FIFO.c</FilePath>
             </File>
+            <File>
+              <FileName>FXAS21002CQR1.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\User\FXAS21002CQR1.c</FilePath>
+            </File>
+            <File>
+              <FileName>Terminal.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\User\Terminal.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -505,6 +515,11 @@
               <FileName>FIFO.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\User\FIFO.h</FilePath>
+            </File>
+            <File>
+              <FileName>FXAS21002CQR1.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\User\FXAS21002CQR1.h</FilePath>
             </File>
           </Files>
         </Group>

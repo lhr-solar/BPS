@@ -91,4 +91,13 @@ int UARTTestmain(){
 	}
 }
 
-
+// Gyro test
+#include "FXAS21002CQR1.h"
+int gyroTestmain(){
+	FXAS21002CQR1_Init();
+	UART3_Init(9600);
+	while(1){
+		uint16_t *vals = FXAS21002CQR1_Measure();
+		// print or something
+	}
+}

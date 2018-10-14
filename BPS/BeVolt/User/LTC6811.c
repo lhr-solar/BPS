@@ -27,7 +27,7 @@ void adcv(uint8_t MD, uint8_t DCP, uint8_t CH);
  * Initializes and configures LTC6811
  */
 void LTC6811_Init(void){	
-	SPI1_Init();
+	SPI_Init8();
 	init_PEC15_Table();		// Code received from datasheet
 	
 	// Initialize Chip Select/Enable pin (PB6)
