@@ -8,4 +8,8 @@ $CMP PDS1-S12-S9-M
 D 12V-9V DC Power Isolator
 $ENDCMP
 #
+$CMP PQMC3-Dx-Sx-S
+D 3W Isolating Power Regulator (example: 12V->9V)
+$ENDCMP
+#
 #End Doc Library
