@@ -40,7 +40,7 @@ void Temperature_SetLimits(uint16_t ceiling){
 uint8_t Temperature_UpdateMeasurements(){
 	ModuleTemperatures = LTC2983_Measure();
 
-	if(sizeof(ModuleTemperatures)/sizeof(uint16_t) == NUM_MODULES){
+	if(sizeof(ModuleTemperatures)/sizeof(uint16_t) == NUM_BATTERY_MODULES){
 		return 1;
 	}else{
 		return 0;
@@ -66,8 +66,8 @@ uint8_t Temperature_IsSafe(void){
  * @return pointer to index of modules that are in danger
  */
 uint16_t *Temperature_ModulesInDanger(void){
-	uint8_t checks[NUM_MODULES];
-	for(int i = 0; i < NUM_MODULES; ++i){
+	uint8_t checks[NUM_BATTERY_MODULES];
+	for(int i = 0; i < NUM_BATTERY_MODULES; ++i){
 		if(Temperature_ModuleTemperature(i) > MaxTemperatureLimit){
 			checks[i] = 1;	// 1 shows that the unit is in danger
 		}else{
@@ -76,7 +76,7 @@ uint16_t *Temperature_ModulesInDanger(void){
 	}
 
 	int sum = 0;
-	for(int i = 0; i < NUM_MODULES; ++i){
+	for(int i = 0; i < NUM_BATTERY_MODULES; ++i){
 		sum += checks[i];
 	}
 	

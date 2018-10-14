@@ -15,8 +15,8 @@
 #include <stdint.h>
 #include "stm32f4xx.h"
 
-/** SPI1_Init
- * Initializes SPI1 for multiple slaves to use
+/** SPI_Init8
+ * Initializes SPI1 for multiple slaves to use. This SPI line is for 8 bit message formats.
  */
 void SPI_Init8(void){
 	GPIO_InitTypeDef GPIO_InitStruct;
@@ -49,6 +49,9 @@ void SPI_Init8(void){
 	SPI_Cmd(SPI1, ENABLE);
 }
 
+/** SPI_Init16
+ * Initialize SPI2. This SPI line is for 16 bit message formats.
+ */
 void SPI_Init16(void){
 	GPIO_InitTypeDef GPIO_InitStruct;
 	SPI_InitTypeDef SPI_InitStruct;
@@ -127,13 +130,6 @@ void SPI_WriteRead8(uint8_t *txBuf, uint32_t txSize, uint8_t *rxBuf, uint32_t rx
 			rxIdx++;
 		}
 	}
-	
-	for(; rxIdx < rxSize; ++rxIdx){
-		while((SPI1->SR&SPI_SR_RXNE) != SPI_SR_RXNE);
-		rxBuf[rxIdx] = SPI1->DR;
-		rxIdx++;
-	}
-	
 	while((SPI1->SR&SPI_SR_BSY) == SPI_SR_BSY);	// Have to wait until transmission is done
 }
 
