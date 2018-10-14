@@ -42,8 +42,8 @@ $Descr USLetter 11000 8500
 encoding utf-8
 Sheet 1 1
 Title "UT SVT MPPT 2018"
-Date "2018-10-10"
-Rev "Rev1"
+Date "2018-10-14"
+Rev "Rev2"
 Comp "UT Solar Vehicle Team"
 Comment1 ""
 Comment2 ""
