@@ -11,9 +11,9 @@
 #include "Definition.h"
 #include <stdlib.h>
 
-uint16_t *modules;			// list of voltages of all modules
-uint16_t maxVoltageLimit;	// maximum voltage limit the battery can reach before danger
-uint16_t minVoltageLimit;	// minimum voltage limit the battery can reach before danger
+uint16_t static Modules[NUM_BATTERY_MODULES];		// Holds voltage values of modules
+uint16_t static MaxVoltageLimit;	// maximum voltage limit the battery can reach before danger
+uint16_t static MinVoltageLimit;	// minimum voltage limit the battery can reach before danger
 
 /** Constructor
  * Creates Voltage instance with NULL pointer to voltage list
@@ -30,8 +30,8 @@ void Voltage_Init(uint16_t ceiling, uint16_t floor){
  * @param min voltage limit
  */
 void Voltage_SetLimits(uint16_t ceiling, uint16_t floor){
-	maxVoltageLimit = ceiling;
-	minVoltageLimit = floor;
+	MaxVoltageLimit = ceiling;
+	MinVoltageLimit = floor;
 }
 
 /** updateMeasurements
@@ -40,9 +40,9 @@ void Voltage_SetLimits(uint16_t ceiling, uint16_t floor){
  * @return 1 if successfully stored, 0 if failed
  */
 uint8_t Voltage_UpdateMeasurements(){
-	modules = LTC6811_Measure();
+//	Modules = LTC6811_Measure();
 	
-	if(sizeof(modules)/sizeof(uint16_t) == NUM_MODULES){
+	if(sizeof(Modules)/sizeof(uint16_t) == NUM_BATTERY_MODULES){
 		return 1;
 	}else{
 		return 0;
@@ -54,8 +54,8 @@ uint8_t Voltage_UpdateMeasurements(){
  * @return 1 if pack is safe, 0 if in danger
  */
 uint8_t Voltage_IsSafe(void){
-	for(int i = 0; i < sizeof(modules)/sizeof(uint16_t); ++i){
-		if(Voltage_ModuleVoltage(i) > maxVoltageLimit || Voltage_ModuleVoltage(i) < minVoltageLimit){
+	for(int i = 0; i < sizeof(Modules)/sizeof(uint16_t); ++i){
+		if(Voltage_ModuleVoltage(i) > MaxVoltageLimit || Voltage_ModuleVoltage(i) < MinVoltageLimit){
 			return 0;
 		}
 	}
@@ -68,9 +68,9 @@ uint8_t Voltage_IsSafe(void){
  * @return pointer to index of modules that are in danger
  */
 uint16_t *Voltage_ModulesInDanger(void){
-	int checks[NUM_MODULES];
-	for(int i = 0; i < NUM_MODULES; ++i){
-		if(Voltage_ModuleVoltage(i) > maxVoltageLimit || Voltage_ModuleVoltage(i) < minVoltageLimit){
+	int checks[NUM_BATTERY_MODULES];
+	for(int i = 0; i < NUM_BATTERY_MODULES; ++i){
+		if(Voltage_ModuleVoltage(i) > MaxVoltageLimit || Voltage_ModuleVoltage(i) < MinVoltageLimit){
 			checks[i] = 1;	// 1 shows that the unit is in danger
 		}else{
 			checks[i] = 0;	// 0 shows that the unit is not in danger
@@ -78,7 +78,7 @@ uint16_t *Voltage_ModulesInDanger(void){
 	}
 
 	int sum = 0;
-	for(int i = 0; i < NUM_MODULES; ++i){
+	for(int i = 0; i < NUM_BATTERY_MODULES; ++i){
 		sum += checks[i];
 	}
 
@@ -101,7 +101,7 @@ uint16_t *Voltage_ModulesInDanger(void){
  * @return voltage of module at specified index
  */
 uint16_t Voltage_ModuleVoltage(uint16_t moduleIdx){
-	return modules[moduleIdx];
+	return Modules[moduleIdx];
 }
 
 /** totalPackVoltage
@@ -110,8 +110,8 @@ uint16_t Voltage_ModuleVoltage(uint16_t moduleIdx){
  */
 uint16_t Voltage_TotalPackVoltage(void){
 	int sum = 0;
-	for(int i = 0; i < sizeof(modules)/sizeof(uint16_t); ++i){
-		sum += modules[i];
+	for(int i = 0; i < sizeof(Modules)/sizeof(uint16_t); ++i){
+		sum += Modules[i];
 	}
 
 	return sum;

@@ -151,8 +151,8 @@ void UART3_Init(uint32_t baud){
  */
 void UART3_Write(char *txBuf, uint32_t txSize){
 	for(uint32_t i = 0; i < txSize; i++){
-		USART3->DR = txBuf[i] & 0xFF;
 		while((USART3->SR&USART_SR_TC) == 0);	// Wait until transmission is done
+		USART3->DR = txBuf[i] & 0xFF;
 	}
 }
 
