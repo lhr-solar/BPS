@@ -747,13 +747,13 @@ $EndComp
 $Comp
 L TEST TP2
 U 1 1 5BBECCC0
-P 5550 1150
-F 0 "TP2" H 5550 1450 50  0000 C BNN
-F 1 "+BATT" H 5550 1400 50  0000 C CNN
-F 2 "Measurement_Points:Test_Point_Keystone_5005-5009_Compact" H 5550 1150 50  0001 C CNN
-F 3 "" H 5550 1150 50  0001 C CNN
-	1    5550 1150
-	1    0    0    -1  
+P 1100 2350
+F 0 "TP2" H 1100 2650 50  0000 C BNN
+F 1 "-ARR" H 1100 2600 50  0000 C CNN
+F 2 "Measurement_Points:Test_Point_Keystone_5005-5009_Compact" H 1100 2350 50  0001 C CNN
+F 3 "" H 1100 2350 50  0001 C CNN
+	1    1100 2350
+	0    -1   -1   0   
 $EndComp
 $Comp
 L TEST TP1
@@ -1343,11 +1343,11 @@ $EndComp
 Text Label 3550 6250 0    60   ~ 12
 -Arr
 Text Label 3550 5350 0    60   ~ 12
--Arr
++Arr
 Text Label 3900 6250 0    60   ~ 12
 -Batt
 Text Label 3900 5350 0    60   ~ 12
--Batt
++Batt
 $Comp
 L R_Small R15
 U 1 1 5BC34208
@@ -1959,13 +1959,13 @@ Wire Wire Line
 Wire Wire Line
 	2450 2350 5300 2350
 Wire Wire Line
-	1200 2350 1450 2350
+	1100 2350 1450 2350
 Wire Notes Line
 	1900 2350 2450 2350
 Wire Notes Line
 	5300 2350 6000 2350
 Wire Wire Line
-	6800 2350 6450 2350
+	6450 2350 6900 2350
 Wire Wire Line
 	1600 5050 1600 5150
 Wire Wire Line
@@ -2661,4 +2661,28 @@ Wire Wire Line
 Connection ~ 8300 4100
 Text Notes 8350 1550 0    40   Italic 0
 pi filter\noptional
+Connection ~ 1200 2350
+$Comp
+L TEST TP23
+U 1 1 5BCA523D
+P 5550 1150
+F 0 "TP23" H 5550 1450 50  0000 C BNN
+F 1 "+BATT" H 5550 1400 50  0000 C CNN
+F 2 "Measurement_Points:Test_Point_Keystone_5005-5009_Compact" H 5550 1150 50  0001 C CNN
+F 3 "" H 5550 1150 50  0001 C CNN
+	1    5550 1150
+	1    0    0    -1  
+$EndComp
+$Comp
+L TEST TP24
+U 1 1 5BCA5488
+P 6900 2350
+F 0 "TP24" H 6900 2650 50  0000 C BNN
+F 1 "-BATT" H 6900 2600 50  0000 C CNN
+F 2 "Measurement_Points:Test_Point_Keystone_5005-5009_Compact" H 6900 2350 50  0001 C CNN
+F 3 "" H 6900 2350 50  0001 C CNN
+	1    6900 2350
+	0    1    1    0   
+$EndComp
+Connection ~ 6800 2350
 $EndSCHEMATC
