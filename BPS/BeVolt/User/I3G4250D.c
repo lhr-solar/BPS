@@ -1,40 +1,37 @@
-// LTC2983.c
+// I3G4250D.c
 /**
- * Driver for LTC2983 chip related functions. The IC uses SPI to communicate to
- * to MCU. IsoSPI is not required since temperature sensors are galvanically isolated.
- * regular SPI to isoSPI.
- * If using SPI: MCU --SPI--> LTC2983
- * If using isoSPI: MCU --SPI--> LTC6820 --isoSPI--> LTC2983
- * @authors Sijin Woo, Chase Block
+ * Driver for I3G4250D chip related functions. The IC uses SPI to communicate to
+ * to MCU.
+ *
+ * @authors Chase Block
  * @lastRevised 9/3/2018
  */
 
-#include <stdint.h>
-#include "stm32f4xx.h"
+#include "I3G4250D.h"
 
-/** LTC2983_Init
- * Initializes SPI pins
- * Initializes and configures LTC2983 chip 
+/** I3G4250D_Init
+ * Initializes SPI to communicate with the temperature slave boards (I3G4250D chip)
+ * Initializes and configures I3G4250D chip 
  */
-void LTC2983_Init(void){
+void I3G4250D_Init(void){
 	GPIO_InitTypeDef GPIO_InitStruct;
 	SPI_InitTypeDef SPI_InitStruct;
 	
 	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);	// 1) Initialize GPIO port A clock
-	RCC_APB1PeriphClockCmd(RCC_APB1Periph_SPI3, ENABLE);
+	RCC_APB1PeriphClockCmd(RCC_APB1Periph_SPI2, ENABLE);
 	
-	GPIO_InitStruct.GPIO_Pin = GPIO_Pin_3 | GPIO_Pin_4 | GPIO_Pin_5;		// 2) Initialize which pins to use
+	GPIO_InitStruct.GPIO_Pin = CLOCK_PIN | MOSI_PIN | MISO_PIN;		// 2) Initialize which pins to use
 	GPIO_InitStruct.GPIO_Mode = GPIO_Mode_AF;							// 3) Set PA8 and PA9 as alternate function
 	GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_UP;							// 4) Set the resistor to pull-up
 	GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;				// 5) Initialize the speed of communication as 25 MHz
 	GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;						// 6) Set to open drain
 	GPIO_Init(GPIOB, &GPIO_InitStruct);
 	
-	GPIO_PinAFConfig(GPIOB, GPIO_PinSource3, GPIO_AF_SPI3);
-	GPIO_PinAFConfig(GPIOB, GPIO_PinSource4, GPIO_AF_SPI3);
-	GPIO_PinAFConfig(GPIOB, GPIO_PinSource5, GPIO_AF_SPI3);
+	GPIO_PinAFConfig(GPIOB, CLOCK_PIN_SRC, GPIO_AF_SPI2);
+	GPIO_PinAFConfig(GPIOB, MOSI_PIN_SRC, GPIO_AF_SPI2);
+	GPIO_PinAFConfig(GPIOB, MISO_PIN_SRC, GPIO_AF_SPI2);
 	
-	GPIO_InitStruct.GPIO_Pin = GPIO_Pin_6;
+	GPIO_InitStruct.GPIO_Pin = CHIP_SEL;
 	GPIO_InitStruct.GPIO_Mode = GPIO_Mode_OUT;
 	GPIO_Init(GPIOB, &GPIO_InitStruct);
 	
@@ -48,22 +45,22 @@ void LTC2983_Init(void){
 	SPI_InitStruct.SPI_Direction = SPI_Direction_Rx | SPI_Direction_Tx;
 	SPI_InitStruct.SPI_Mode = SPI_Mode_Master;
 	
-	SPI_Init(SPI3, &SPI_InitStruct);
-	SPI_Cmd(SPI3, ENABLE);
+	SPI_Init(SPI2, &SPI_InitStruct);
+	SPI_Cmd(SPI2, ENABLE);
 }
 
-/** LTC2983_SendCmd
- * Sends command data to LTC2983
+/** I3G4250D_SendCmd
+ * Sends command data to I3G4250D
  * @param unsigned int 16-bit data
  */
-void LTC2983_SendCmd(uint16_t *data){
-	
+void I3G4250D_SendCmd(uint16_t *data){
+
 }
 
-/** LTC2983_Measure
- * Sends command to LTC2983 to gather and save all ADC values
+/** I3G4250D_Measure
+ * Sends command to I3G4250D to gather and save all ADC values
  * @return unsigned int 16-bit measurements from all ADCs
  */
-uint16_t *LTC2983_Measure(void){
-	
+uint16_t *I3G4250D_Measure(void){
+
 }
