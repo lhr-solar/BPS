@@ -714,12 +714,12 @@ $EndComp
 $Comp
 L TEST TP6
 U 1 1 5BBEBBC8
-P 9300 2150
-F 0 "TP6" H 9300 2450 50  0000 C BNN
-F 1 "GNDP" H 9300 2400 50  0000 C CNN
-F 2 "Measurement_Points:Test_Point_Keystone_5005-5009_Compact" H 9300 2150 50  0001 C CNN
-F 3 "" H 9300 2150 50  0001 C CNN
-	1    9300 2150
+P 10050 2150
+F 0 "TP6" H 10050 2450 50  0000 C BNN
+F 1 "GNDP" H 10050 2400 50  0000 C CNN
+F 2 "Measurement_Points:Test_Point_Keystone_5005-5009_Compact" H 10050 2150 50  0001 C CNN
+F 3 "" H 10050 2150 50  0001 C CNN
+	1    10050 2150
 	1    0    0    -1  
 $EndComp
 $Comp
@@ -1508,12 +1508,12 @@ $EndComp
 $Comp
 L TEST TP18
 U 1 1 5BC42C00
-P 10050 2150
-F 0 "TP18" H 10050 2450 50  0000 C BNN
-F 1 "Car GND" H 10050 2400 50  0000 C CNN
-F 2 "Measurement_Points:Test_Point_Keystone_5005-5009_Compact" H 10050 2150 50  0001 C CNN
-F 3 "" H 10050 2150 50  0001 C CNN
-	1    10050 2150
+P 9300 2150
+F 0 "TP18" H 9300 2450 50  0000 C BNN
+F 1 "Car GND" H 9300 2400 50  0000 C CNN
+F 2 "Measurement_Points:Test_Point_Keystone_5005-5009_Compact" H 9300 2150 50  0001 C CNN
+F 3 "" H 9300 2150 50  0001 C CNN
+	1    9300 2150
 	1    0    0    -1  
 $EndComp
 $Comp
@@ -1538,7 +1538,7 @@ F 3 "" H 2950 3800 50  0001 C CNN
 	1    2950 3800
 	1    0    0    -1  
 $EndComp
-Text Notes 3100 3950 0    40   ~ 0
+Text Notes 3100 3950 0    40   Italic 0
 filtering\ncapacitor\noptional
 $Comp
 L R_Small R18
@@ -1562,7 +1562,7 @@ F 3 "" H 2400 5800 50  0001 C CNN
 	1    2400 5800
 	1    0    0    -1  
 $EndComp
-Text Notes 2600 5850 0    40   ~ 0
+Text Notes 2600 5850 0    40   Italic 0
 RC filter\noptional
 $Comp
 L R_Small R19
@@ -1586,7 +1586,7 @@ F 3 "" H 2400 7300 50  0001 C CNN
 	1    2400 7300
 	1    0    0    -1  
 $EndComp
-Text Notes 2600 7350 0    40   ~ 0
+Text Notes 2600 7350 0    40   Italic 0
 RC filter\noptional
 $Comp
 L GNDPWR #PWR035
@@ -2395,10 +2395,10 @@ Wire Wire Line
 Wire Wire Line
 	8700 2950 8550 2950
 Wire Wire Line
-	8550 4000 8550 2950
+	8550 2950 8550 4000
 Connection ~ 8550 4000
 Wire Wire Line
-	8650 4100 8650 3050
+	8650 3050 8650 4100
 Connection ~ 8650 4100
 Wire Wire Line
 	9400 3000 9650 3000
@@ -2560,7 +2560,7 @@ Wire Wire Line
 	3550 7200 3550 7300
 Wire Wire Line
 	3550 7600 3550 7700
-Text Notes 1700 3950 0    40   ~ 0
+Text Notes 1700 3950 0    40   Italic 0
 filtering\ncapacitor\noptional
 $Comp
 L TEST TP20
@@ -2659,4 +2659,6 @@ Wire Wire Line
 Wire Wire Line
 	8300 4200 8400 4200
 Connection ~ 8300 4100
+Text Notes 8350 1550 0    40   Italic 0
+pi filter\noptional
 $EndSCHEMATC
