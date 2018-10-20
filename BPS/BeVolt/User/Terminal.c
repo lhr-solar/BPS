@@ -59,6 +59,53 @@ char * Terminal_currentStatus(){
 	return output;
 }
 
+char * Terminal_voltageStatus(void){
+	
+}
+
+char * Terminal_temperatureStatus(void){
+	
+}
+
+char * Terminal_contactorStatus(void){
+	
+}
+
+char * Terminal_setContactor(char * status){
+	
+}
+
+char * Terminal_generalStatus(void){
+	
+}
+
+/**
+ * @param the axes to read from, where 0 = all, 1 = x, 2 = y, 3 = z
+ */
+char * Terminal_gyroStatus(uint8_t axes){
+	
+}
+
+char * Terminal_watchdogStatus(){
+	
+}
+
+char * Terminal_eepromStatus(){
+	
+}
+
+char * Terminal_canStatus(){
+	
+}
+
+char * Terminal_spiStatus(){
+	
+}
+
+char * Terminal_i2cStatus(){
+	
+}
+
 char ** Terminal_splitOps (char * input){
 	char ** ops;
 	ops[0] = strtok(input, " ");

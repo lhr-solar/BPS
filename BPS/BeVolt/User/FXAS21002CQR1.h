@@ -22,8 +22,6 @@
 #define CTRL_REG2	0x14
 #define CTRL_REG3	0x15
 
-double headings [3]; // x,y,z
-
 /** FXAS21002CQR1_Init
  * Initializes SPI for FXAS21002CQR1
  * Initializes and configures LTC6811

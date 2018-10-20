@@ -12,6 +12,7 @@
 #include "EEPROM.h"
 //#include "CANlib.h"
 #include "WDTimer.h"
+#include "FXAS21002CQR1.h"
 #include "stm32f4xx.h"
 
 void initialize();
@@ -92,7 +93,6 @@ int UARTTestmain(){
 }
 
 // Gyro test
-#include "FXAS21002CQR1.h"
 int gyroTestmain(){
 	FXAS21002CQR1_Init();
 	UART3_Init(9600);
