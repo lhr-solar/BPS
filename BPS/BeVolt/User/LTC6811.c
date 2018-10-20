@@ -62,7 +62,7 @@ void LTC6811_SendCmd(uint16_t txCmd){
 	
 	// Send to LTC6811
 	GPIOB->ODR &= ~GPIO_Pin_6;		// CS low
-	SPI1_Write(cmd, 4);
+	SPI_Write8(cmd, 4);
 	GPIOB->ODR |= GPIO_Pin_6;		// CS high
 }
 
@@ -108,7 +108,7 @@ void LTC6811_Write(uint16_t txCmd, uint8_t *data){
 
 	// Send to LTC6811
 	GPIOB->ODR &= ~GPIO_Pin_6;		// CS low
-	SPI1_Write(cmd, CMD_LEN);
+	SPI_Write8(cmd, CMD_LEN);
 	GPIOB->ODR |= GPIO_Pin_6;		// CS high
 }
 
@@ -137,7 +137,7 @@ int8_t LTC6811_Read(uint16_t txCmd, uint8_t *rxData, uint32_t rxSize){
 
 	// Send to LTC6811
 	GPIOB->ODR &= ~GPIO_Pin_6;		// CS low
-	SPI1_WriteRead(cmd, 4, data, (BYTES_IN_REG * NUM_VOLTAGE_BOARDS));	//Read the configuration data of all ICs on the daisy chain into
+	SPI_WriteRead8(cmd, 4, data, (BYTES_IN_REG * NUM_VOLTAGE_BOARDS));	//Read the configuration data of all ICs on the daisy chain into
 	GPIOB->ODR |= GPIO_Pin_6;		// CS high
 
 	//executes for each LTC681x in the daisy chain and packs the data
@@ -290,7 +290,7 @@ void rdcvReg(uint8_t reg, uint8_t total_ic, uint8_t *data){
   cmd[3] = (uint8_t)(cmdPec);
 
   
-  SPI_WriteRead(cmd,4,data,(8 * NUM_VOLTAGE_BOARDS));
+  SPI_WriteRead8(cmd,4,data,(8 * NUM_VOLTAGE_BOARDS));
   
 }
 

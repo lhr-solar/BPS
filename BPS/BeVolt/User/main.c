@@ -59,7 +59,7 @@ int LTC6811Testmain(){
 int main(){
 	__disable_irq();
 	UART3_Init(9600);
-	SPI1_Init();
+	SPI_Init8();
 	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);	// 1) Initialize GPIO portB clock
 	GPIO_InitTypeDef GPIO_InitStruct;
 	GPIO_InitStruct.GPIO_Pin = GPIO_Pin_6;								// 2) Initialize which pins to use
@@ -74,7 +74,7 @@ int main(){
 	char str[30] = "Testing\n\r";
 	UART3_Write(str, strlen(str));
 	GPIOB->ODR &= ~GPIO_Pin_6;
-	SPI1_Write((uint8_t *)str, strlen(str));
+	SPI_Write8((uint8_t *)str, strlen(str));
 	GPIOB->ODR |= GPIO_Pin_6;
 	while(1){
 		

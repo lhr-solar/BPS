@@ -1,33 +1,39 @@
-
-
 #include <stdint.h>
+#include "Current.h"
+#include "Voltage.h"
+#include "Temperature.h"
 
 char * Terminal_HandleInput(char * input);
 
-char ** splitOps (char * input);
+char ** Terminal_splitOps (char * input);
 
-char * currentStatus(void);
+char * Terminal_currentStatus(void);
 
-char * voltageStatus(void);
+char * Terminal_voltageStatus(void);
 
-char * temperatureStatus(void);
+char * Terminal_temperatureStatus(void);
 
-char * contactorStatus(void);
+char * Terminal_contactorStatus(void);
 
-char * setContactor(uint16_t status);
+char * Terminal_setContactor(char * status);
 
-char * generalStatus(void);
+char * Terminal_generalStatus(void);
 
-char * gyroStatus(uint8_t axes);
+/**
+ * @param the axes to read from, where 0 = all, 1 = x, 2 = y, 3 = z
+ */
+char * Terminal_gyroStatus(uint8_t axes);
 
-char * watchdogStatus();
+char * Terminal_watchdogStatus();
 
-char * eepromStatus();
+char * Terminal_eepromStatus();
 
-char * canStatus();
+char * Terminal_canStatus();
 
-char * spiStatus();
+char * Terminal_spiStatus();
 
-char * i2cStatus();
+char * Terminal_i2cStatus();
 
-char * helpMenu();
+char * Terminal_helpMenu();
+
+char * Terminal_concatInt(char * str, uint16_t n);
