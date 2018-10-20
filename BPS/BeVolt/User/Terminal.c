@@ -48,9 +48,9 @@ char * Terminal_concatInt(char * str, uint16_t n){
 
 char * Terminal_currentStatus(){
 	char * output;
-	output = strcat(
-		Current_IsSafe() ? "The current level is SAFE." : "The cureent level is NOT SAFE.",
-		"The high-precision reading is ");
+//	output = strcat(
+//		Current_IsSafe() ? "The current level is SAFE." : "The cureent level is NOT SAFE.",
+//		"The high-precision reading is ");
 	output = Terminal_concatInt(output, Current_HighPrecisionAmperes());
 	output = strcat(output, " and the low-precision reading is ");
 	output = Terminal_concatInt(output, Current_LowPrecisionAmperes());

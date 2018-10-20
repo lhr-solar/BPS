@@ -12,8 +12,7 @@ Section Cross References
     main.o(i._Z12gyroTestmainv) refers to fxas21002cqr1.o(i._Z18FXAS21002CQR1_Initv) for FXAS21002CQR1_Init()
     main.o(i._Z12gyroTestmainv) refers to uart.o(i._Z10UART3_Initj) for UART3_Init(unsigned)
     main.o(i._Z12gyroTestmainv) refers to fxas21002cqr1.o(i._Z21FXAS21002CQR1_Measurev) for FXAS21002CQR1_Measure()
-    main.o(i._Z7LTCmainv) refers to ltc6811.o(i._Z12LTC6811_Initv) for LTC6811_Init()
-    main.o(i._Z7LTCmainv) refers to uart.o(i._Z10UART3_Initj) for UART3_Init(unsigned)
+    main.o(i._Z15LTC6811Testmainv) refers to uart.o(i._Z10UART3_Initj) for UART3_Init(unsigned)
     main.o(i._Z8Mainmainv) refers to main.o(i._Z10initializev) for initialize()
     main.o(i._Z8Mainmainv) refers to wdtimer.o(i._Z13WDTimer_Startv) for WDTimer_Start()
     main.o(i._Z8Mainmainv) refers to voltage.o(i._Z14Voltage_IsSafev) for Voltage_IsSafe()
@@ -23,9 +22,19 @@ Section Cross References
     main.o(i._Z8Mainmainv) refers to current.o(i._Z26Current_UpdateMeasurementsv) for Current_UpdateMeasurements()
     main.o(i._Z8Mainmainv) refers to temperature.o(i._Z30Temperature_UpdateMeasurementsv) for Temperature_UpdateMeasurements()
     main.o(i._Z8Mainmainv) refers to wdtimer.o(i._Z13WDTimer_Resetv) for WDTimer_Reset()
+    main.o(i.main) refers to uart.o(i._Z10UART3_Initj) for UART3_Init(unsigned)
+    main.o(i.main) refers to spi.o(i._Z9SPI_Init8v) for SPI_Init8()
+    main.o(i.main) refers to stm32f4xx_rcc.o(i.RCC_AHB1PeriphClockCmd) for RCC_AHB1PeriphClockCmd
+    main.o(i.main) refers to stm32f4xx_gpio.o(i.GPIO_Init) for GPIO_Init
+    main.o(i.main) refers to rt_memcpy_w.o(.text) for __aeabi_memcpy4
+    main.o(i.main) refers to strlen.o(.text) for strlen
+    main.o(i.main) refers to uart.o(i._Z11UART3_WritePcj) for UART3_Write(char*, unsigned)
+    main.o(i.main) refers to spi.o(i._Z10SPI_Write8Phj) for SPI_Write8(unsigned char*, unsigned)
+    main.o(i.main) refers to main.o(.constdata) for .constdata
     main.o(.ARM.exidx) refers to main.o(i._Z10initializev) for i._Z10initializev
     main.o(.ARM.exidx) refers to main.o(i._Z8Mainmainv) for i._Z8Mainmainv
-    main.o(.ARM.exidx) refers to main.o(i._Z7LTCmainv) for i._Z7LTCmainv
+    main.o(.ARM.exidx) refers to main.o(i._Z15LTC6811Testmainv) for i._Z15LTC6811Testmainv
+    main.o(.ARM.exidx) refers to main.o(i.main) for i.main
     main.o(.ARM.exidx) refers to main.o(i._Z12UARTTestmainv) for i._Z12UARTTestmainv
     main.o(.ARM.exidx) refers to main.o(i._Z12gyroTestmainv) for i._Z12gyroTestmainv
     current.o(i._Z12Current_Initt) refers to current.o(i._Z17Current_SetLimitst) for Current_SetLimits(unsigned short)
@@ -41,15 +50,13 @@ Section Cross References
     current.o(.ARM.exidx) refers to current.o(i._Z27Current_LowPrecisionAmperesv) for i._Z27Current_LowPrecisionAmperesv
     voltage.o(i._Z12Voltage_Inittt) refers to voltage.o(i._Z17Voltage_SetLimitstt) for Voltage_SetLimits(unsigned short, unsigned short)
     voltage.o(i._Z14Voltage_IsSafev) refers to voltage.o(i._Z21Voltage_ModuleVoltaget) for Voltage_ModuleVoltage(unsigned short)
-    voltage.o(i._Z14Voltage_IsSafev) refers to voltage.o(.data) for maxVoltageLimit
-    voltage.o(i._Z17Voltage_SetLimitstt) refers to voltage.o(.data) for maxVoltageLimit
-    voltage.o(i._Z21Voltage_ModuleVoltaget) refers to voltage.o(.data) for modules
+    voltage.o(i._Z14Voltage_IsSafev) refers to voltage.o(.data) for MaxVoltageLimit
+    voltage.o(i._Z17Voltage_SetLimitstt) refers to voltage.o(.data) for MaxVoltageLimit
+    voltage.o(i._Z21Voltage_ModuleVoltaget) refers to voltage.o(.bss) for Modules
     voltage.o(i._Z23Voltage_ModulesInDangerv) refers to voltage.o(i._Z21Voltage_ModuleVoltaget) for Voltage_ModuleVoltage(unsigned short)
     voltage.o(i._Z23Voltage_ModulesInDangerv) refers to h1_alloc.o(.text) for malloc
-    voltage.o(i._Z23Voltage_ModulesInDangerv) refers to voltage.o(.data) for maxVoltageLimit
-    voltage.o(i._Z24Voltage_TotalPackVoltagev) refers to voltage.o(.data) for modules
-    voltage.o(i._Z26Voltage_UpdateMeasurementsv) refers to ltc6811.o(i._Z15LTC6811_Measurev) for LTC6811_Measure()
-    voltage.o(i._Z26Voltage_UpdateMeasurementsv) refers to voltage.o(.data) for modules
+    voltage.o(i._Z23Voltage_ModulesInDangerv) refers to voltage.o(.data) for MaxVoltageLimit
+    voltage.o(i._Z24Voltage_TotalPackVoltagev) refers to voltage.o(.bss) for Modules
     voltage.o(.ARM.exidx) refers to voltage.o(i._Z17Voltage_SetLimitstt) for i._Z17Voltage_SetLimitstt
     voltage.o(.ARM.exidx) refers to voltage.o(i._Z12Voltage_Inittt) for i._Z12Voltage_Inittt
     voltage.o(.ARM.exidx) refers to voltage.o(i._Z26Voltage_UpdateMeasurementsv) for i._Z26Voltage_UpdateMeasurementsv
@@ -65,7 +72,6 @@ Section Cross References
     temperature.o(i._Z27Temperature_ModulesInDangerv) refers to h1_alloc.o(.text) for malloc
     temperature.o(i._Z27Temperature_ModulesInDangerv) refers to temperature.o(.data) for MaxTemperatureLimit
     temperature.o(i._Z29Temperature_ModuleTemperaturet) refers to temperature.o(.data) for ModuleTemperatures
-    temperature.o(i._Z30Temperature_UpdateMeasurementsv) refers to ltc2983.o(i._Z15LTC2983_Measurev) for LTC2983_Measure()
     temperature.o(i._Z30Temperature_UpdateMeasurementsv) refers to temperature.o(.data) for ModuleTemperatures
     temperature.o(i._Z35Temperature_TotalPackAvgTemperaturev) refers to temperature.o(i._Z29Temperature_ModuleTemperaturet) for Temperature_ModuleTemperature(unsigned short)
     temperature.o(.ARM.exidx) refers to temperature.o(i._Z21Temperature_SetLimitst) for i._Z21Temperature_SetLimitst
@@ -75,25 +81,6 @@ Section Cross References
     temperature.o(.ARM.exidx) refers to temperature.o(i._Z18Temperature_IsSafev) for i._Z18Temperature_IsSafev
     temperature.o(.ARM.exidx) refers to temperature.o(i._Z27Temperature_ModulesInDangerv) for i._Z27Temperature_ModulesInDangerv
     temperature.o(.ARM.exidx) refers to temperature.o(i._Z35Temperature_TotalPackAvgTemperaturev) for i._Z35Temperature_TotalPackAvgTemperaturev
-    ltc6811.o(i._Z12LTC6811_Initv) refers to spi.o(i._Z9SPI_Init8v) for SPI_Init8()
-    ltc6811.o(i._Z12LTC6811_Initv) refers to stm32f4xx_rcc.o(i.RCC_AHB1PeriphClockCmd) for RCC_AHB1PeriphClockCmd
-    ltc6811.o(i._Z5pec15Pci) refers to ltc6811.o(.bss) for pec15Table
-    ltc6811.o(i._ZN30_INTERNAL_9_LTC6811_c_6012758a16init_PEC15_TableEv) refers to ltc6811.o(.data) for CRC15_POLY
-    ltc6811.o(i._ZN30_INTERNAL_9_LTC6811_c_6012758a16init_PEC15_TableEv) refers to ltc6811.o(.bss) for pec15Table
-    ltc6811.o(.ARM.exidx) refers to ltc6811.o(i._Z12LTC6811_Initv) for i._Z12LTC6811_Initv
-    ltc6811.o(.ARM.exidx) refers to ltc6811.o(i._Z15LTC6811_SendCmdPt) for i._Z15LTC6811_SendCmdPt
-    ltc6811.o(.ARM.exidx) refers to ltc6811.o(i._Z15LTC6811_Measurev) for i._Z15LTC6811_Measurev
-    ltc6811.o(.ARM.exidx) refers to ltc6811.o(i._ZN30_INTERNAL_9_LTC6811_c_6012758a16init_PEC15_TableEv) for i._ZN30_INTERNAL_9_LTC6811_c_6012758a16init_PEC15_TableEv
-    ltc6811.o(.ARM.exidx) refers to ltc6811.o(i._Z5pec15Pci) for i._Z5pec15Pci
-    ltc2983.o(i._Z12LTC2983_Initv) refers to stm32f4xx_rcc.o(i.RCC_AHB1PeriphClockCmd) for RCC_AHB1PeriphClockCmd
-    ltc2983.o(i._Z12LTC2983_Initv) refers to stm32f4xx_rcc.o(i.RCC_APB1PeriphClockCmd) for RCC_APB1PeriphClockCmd
-    ltc2983.o(i._Z12LTC2983_Initv) refers to stm32f4xx_gpio.o(i.GPIO_Init) for GPIO_Init
-    ltc2983.o(i._Z12LTC2983_Initv) refers to stm32f4xx_gpio.o(i.GPIO_PinAFConfig) for GPIO_PinAFConfig
-    ltc2983.o(i._Z12LTC2983_Initv) refers to stm32f4xx_spi.o(i.SPI_Init) for SPI_Init
-    ltc2983.o(i._Z12LTC2983_Initv) refers to stm32f4xx_spi.o(i.SPI_Cmd) for SPI_Cmd
-    ltc2983.o(.ARM.exidx) refers to ltc2983.o(i._Z12LTC2983_Initv) for i._Z12LTC2983_Initv
-    ltc2983.o(.ARM.exidx) refers to ltc2983.o(i._Z15LTC2983_SendCmdPt) for i._Z15LTC2983_SendCmdPt
-    ltc2983.o(.ARM.exidx) refers to ltc2983.o(i._Z15LTC2983_Measurev) for i._Z15LTC2983_Measurev
     display.o(.ARM.exidx) refers to display.o(i._Z12Display_Initv) for i._Z12Display_Initv
     display.o(.ARM.exidx) refers to display.o(i._Z14Display_Updatev) for i._Z14Display_Updatev
     eeprom.o(i._Z11EEPROM_Initv) refers to stm32f4xx_rcc.o(i.RCC_AHB1PeriphClockCmd) for RCC_AHB1PeriphClockCmd
@@ -205,9 +192,26 @@ Section Cross References
     fxas21002cqr1.o(.ARM.exidx) refers to fxas21002cqr1.o(i._Z21FXAS21002CQR1_Measurev) for i._Z21FXAS21002CQR1_Measurev
     fxas21002cqr1.o(.ARM.exidx) refers to fxas21002cqr1.o(i._Z28FXAS21002CQR1_CurrentHeadingv) for i._Z28FXAS21002CQR1_CurrentHeadingv
     fxas21002cqr1.o(.ARM.exidx) refers to fxas21002cqr1.o(i._Z9isFlippedv) for i._Z9isFlippedv
-    terminal.o(i._Z20Terminal_HandleInputPc) refers to h1_alloc.o(.text) for malloc
-    terminal.o(i._Z20Terminal_HandleInputPc) refers to h1_free.o(.text) for free
-    terminal.o(i._Z20Terminal_HandleInputPc) refers to strlen.o(.text) for strlen
+    terminal.o(i._Z17Terminal_helpMenuv) refers to terminal.o(.conststring) for .conststring
+    terminal.o(i._Z17Terminal_splitOpsPc) refers to strtok.o(.text) for strtok
+    terminal.o(i._Z18Terminal_concatIntPct) refers to _printf_percent.o(.ARM.Collect$$_printf_percent$$00000000) for _printf_percent
+    terminal.o(i._Z18Terminal_concatIntPct) refers to _printf_d.o(.ARM.Collect$$_printf_percent$$00000009) for _printf_d
+    terminal.o(i._Z18Terminal_concatIntPct) refers to _printf_dec.o(.text) for _printf_int_dec
+    terminal.o(i._Z18Terminal_concatIntPct) refers to noretval__2sprintf.o(.text) for __2sprintf
+    terminal.o(i._Z18Terminal_concatIntPct) refers to strcat.o(.text) for strcat
+    terminal.o(i._Z20Terminal_HandleInputPc) refers to terminal.o(i._Z17Terminal_splitOpsPc) for Terminal_splitOps(char*)
+    terminal.o(i._Z20Terminal_HandleInputPc) refers to strcmpv7m.o(.text) for strcmp
+    terminal.o(i._Z20Terminal_HandleInputPc) refers to terminal.o(i._Z22Terminal_currentStatusv) for Terminal_currentStatus()
+    terminal.o(i._Z20Terminal_HandleInputPc) refers to strcat.o(.text) for strcat
+    terminal.o(i._Z20Terminal_HandleInputPc) refers to terminal.o(i._Z17Terminal_helpMenuv) for Terminal_helpMenu()
+    terminal.o(i._Z22Terminal_currentStatusv) refers to current.o(i._Z28Current_HighPrecisionAmperesv) for Current_HighPrecisionAmperes()
+    terminal.o(i._Z22Terminal_currentStatusv) refers to terminal.o(i._Z18Terminal_concatIntPct) for Terminal_concatInt(char*, unsigned short)
+    terminal.o(i._Z22Terminal_currentStatusv) refers to strcat.o(.text) for strcat
+    terminal.o(i._Z22Terminal_currentStatusv) refers to current.o(i._Z27Current_LowPrecisionAmperesv) for Current_LowPrecisionAmperes()
+    terminal.o(.ARM.exidx) refers to terminal.o(i._Z17Terminal_helpMenuv) for i._Z17Terminal_helpMenuv
+    terminal.o(.ARM.exidx) refers to terminal.o(i._Z18Terminal_concatIntPct) for i._Z18Terminal_concatIntPct
+    terminal.o(.ARM.exidx) refers to terminal.o(i._Z22Terminal_currentStatusv) for i._Z22Terminal_currentStatusv
+    terminal.o(.ARM.exidx) refers to terminal.o(i._Z17Terminal_splitOpsPc) for i._Z17Terminal_splitOpsPc
     terminal.o(.ARM.exidx) refers to terminal.o(i._Z20Terminal_HandleInputPc) for i._Z20Terminal_HandleInputPc
     misc.o(.ARM.exidx) refers to misc.o(i.NVIC_PriorityGroupConfig) for i.NVIC_PriorityGroupConfig
     misc.o(.ARM.exidx) refers to misc.o(i.NVIC_Init) for i.NVIC_Init
@@ -518,17 +522,12 @@ Section Cross References
     malloc.o(.text) refers (Special) to init_alloc.o(.text) for _init_alloc
     malloc.o(.text) refers to rt_heap_descriptor_intlibspace.o(.text) for __rt_heap_descriptor
     malloc.o(.text) refers to heapstubs.o(.text) for __Heap_Alloc
-    free.o(.text) refers (Special) to hguard.o(.text) for __heap$guard
-    free.o(.text) refers to rt_heap_descriptor_intlibspace.o(.text) for __rt_heap_descriptor
-    free.o(.text) refers to heapstubs.o(.text) for __Heap_Free
     h1_alloc.o(.text) refers (Special) to h1_init.o(.text) for __Heap_Initialize
     h1_alloc.o(.text) refers to rt_heap_descriptor_intlibspace.o(.text) for __rt_heap_descriptor
     h1_alloc.o(.text) refers to init_alloc.o(.text) for __Heap_Full
-    h1_free.o(.text) refers to rt_heap_descriptor_intlibspace.o(.text) for __rt_heap_descriptor
     h1_alloc_mt.o(.text) refers (Special) to h1_init.o(.text) for __Heap_Initialize
     h1_alloc_mt.o(.text) refers to init_alloc.o(.text) for __Heap_Full
     h1_alloc_mt.o(.text) refers to rt_heap_descriptor_intlibspace.o(.text) for __rt_heap_descriptor
-    h1_free_mt.o(.text) refers to rt_heap_descriptor_intlibspace.o(.text) for __rt_heap_descriptor
     heap2.o(i._FDIterate) refers to heap2.o(.conststring) for .conststring
     heap2.o(i.___Heap_ProvideMemory$realtime) refers to fdtree.o(i._FDTree_Delete) for _FDTree_Delete
     heap2.o(i.___Heap_ProvideMemory$realtime) refers to fdtree.o(i._FDTree_Insert) for _FDTree_Insert
@@ -580,6 +579,31 @@ Section Cross References
     heap2mt.o(i._realloc$realtime$concurrent) refers to h1_alloc.o(.text) for malloc
     heap2mt.o(i._realloc$realtime$concurrent) refers to fdtree.o(i._FDTree_Delete) for _FDTree_Delete
     heap2mt.o(i._realloc$realtime$concurrent) refers to rt_memcpy_w.o(.text) for __aeabi_memcpy4
+    __2sprintf.o(.text) refers to _printf_char_common.o(.text) for _printf_char_common
+    __2sprintf.o(.text) refers to _sputc.o(.text) for _sputc
+    noretval__2sprintf.o(.text) refers to _printf_char_common.o(.text) for _printf_char_common
+    noretval__2sprintf.o(.text) refers to _sputc.o(.text) for _sputc
+    __printf.o(.text) refers to _printf_percent.o(.ARM.Collect$$_printf_percent$$00000000) for _printf_percent
+    _printf_dec.o(.text) refers to _printf_intcommon.o(.text) for _printf_int_common
+    __printf_flags.o(.text) refers to _printf_percent.o(.ARM.Collect$$_printf_percent$$00000000) for _printf_percent
+    __printf_flags.o(.text) refers to __printf_flags.o(.constdata) for .constdata
+    __printf_ss.o(.text) refers to _printf_percent.o(.ARM.Collect$$_printf_percent$$00000000) for _printf_percent
+    __printf_flags_ss.o(.text) refers to _printf_percent.o(.ARM.Collect$$_printf_percent$$00000000) for _printf_percent
+    __printf_flags_ss.o(.text) refers to __printf_flags_ss.o(.constdata) for .constdata
+    __printf_wp.o(.text) refers to __printf_wp.o(i._is_digit) for _is_digit
+    __printf_wp.o(.text) refers to _printf_percent.o(.ARM.Collect$$_printf_percent$$00000000) for _printf_percent
+    __printf_flags_wp.o(.text) refers to __printf_wp.o(i._is_digit) for _is_digit
+    __printf_flags_wp.o(.text) refers to _printf_percent.o(.ARM.Collect$$_printf_percent$$00000000) for _printf_percent
+    __printf_flags_wp.o(.text) refers to __printf_flags_wp.o(.constdata) for .constdata
+    __printf_ss_wp.o(.text) refers to __printf_wp.o(i._is_digit) for _is_digit
+    __printf_ss_wp.o(.text) refers to _printf_percent.o(.ARM.Collect$$_printf_percent$$00000000) for _printf_percent
+    __printf_flags_ss_wp.o(.text) refers to __printf_wp.o(i._is_digit) for _is_digit
+    __printf_flags_ss_wp.o(.text) refers to _printf_percent.o(.ARM.Collect$$_printf_percent$$00000000) for _printf_percent
+    __printf_flags_ss_wp.o(.text) refers to __printf_flags_ss_wp.o(.constdata) for .constdata
+    _printf_d.o(.ARM.Collect$$_printf_percent$$00000009) refers (Weak) to _printf_dec.o(.text) for _printf_int_dec
+    _printf_percent.o(.ARM.Collect$$_printf_percent$$00000000) refers (Special) to _printf_percent_end.o(.ARM.Collect$$_printf_percent$$00000017) for _printf_percent_end
+    strtok.o(.text) refers to strtok_int.o(.text) for __strtok_internal
+    strtok.o(.text) refers to strtok.o(.data) for .data
     __main.o(!!!main) refers to __rtentry.o(.ARM.Collect$$rtentry$$00000000) for __rt_entry
     daddsub_clz.o(x$fpl$dadd) refers (Special) to usenofp.o(x$fpl$usenofp) for __I$use$fp
     daddsub_clz.o(x$fpl$dadd) refers to daddsub_clz.o(x$fpl$dsub) for _dsub1
@@ -618,7 +642,15 @@ Section Cross References
     init_alloc.o(.text) refers to defsig_rtmem_outer.o(.text) for __rt_SIGRTMEM
     init_alloc.o(.text) refers to rt_heap_descriptor_intlibspace.o(.text) for __rt_heap_descriptor
     init_alloc.o(.text) refers to h1_init.o(.text) for __Heap_Initialize
+    free.o(.text) refers (Special) to hguard.o(.text) for __heap$guard
+    free.o(.text) refers to rt_heap_descriptor_intlibspace.o(.text) for __rt_heap_descriptor
+    free.o(.text) refers to heapstubs.o(.text) for __Heap_Free
+    h1_free.o(.text) refers to rt_heap_descriptor_intlibspace.o(.text) for __rt_heap_descriptor
     h1_init_mt.o(.text) refers to mutex_dummy.o(.text) for _mutex_initialize
+    h1_free_mt.o(.text) refers to rt_heap_descriptor_intlibspace.o(.text) for __rt_heap_descriptor
+    _printf_char_common.o(.text) refers to __printf.o(.text) for __printf
+    strtok_int.o(.text) refers to strspn.o(.text) for strspn
+    strtok_int.o(.text) refers to strcspn.o(.text) for strcspn
     _get_argv.o(.text) refers (Special) to hrguard.o(.text) for __heap_region$guard
     _get_argv.o(.text) refers to h1_alloc.o(.text) for malloc
     _get_argv.o(.text) refers to defsig_rtmem_outer.o(.text) for __rt_SIGRTMEM
@@ -640,6 +672,7 @@ Section Cross References
     __rtentry2.o(.ARM.Collect$$rtentry$$00000008) refers to boardinit2.o(.text) for _platform_post_stackheap_init
     __rtentry2.o(.ARM.Collect$$rtentry$$0000000A) refers to libinit.o(.ARM.Collect$$libinit$$00000000) for __rt_lib_init
     __rtentry2.o(.ARM.Collect$$rtentry$$0000000B) refers to boardinit3.o(.text) for _platform_post_lib_init
+    __rtentry2.o(.ARM.Collect$$rtentry$$0000000D) refers to main.o(i.main) for main
     __rtentry2.o(.ARM.Collect$$rtentry$$0000000D) refers to exit.o(.text) for exit
     __rtentry2.o(.ARM.exidx) refers to __rtentry2.o(.ARM.Collect$$rtentry$$00000001) for .ARM.Collect$$rtentry$$00000001
     __rtentry2.o(.ARM.exidx) refers to __rtentry2.o(.ARM.Collect$$rtentry$$00000008) for .ARM.Collect$$rtentry$$00000008
@@ -655,7 +688,7 @@ Section Cross References
     defsig_rtmem_outer.o(.text) refers to defsig_exit.o(.text) for __sig_exit
     defsig_rtmem_formal.o(.text) refers to rt_raise.o(.text) for __rt_raise
     heapauxa.o(.text) refers to heapauxa.o(.data) for .data
-    argv_veneer.o(.emb_text) refers to _get_argv.o(.text) for __ARM_get_argv
+    argv_veneer.o(.emb_text) refers to no_argv.o(.text) for __ARM_get_argv
     sys_stackheap_outer.o(.text) refers to libspace.o(.text) for __user_perproc_libspace
     sys_stackheap_outer.o(.text) refers to startup_stm32f413xx.o(.text) for __user_initial_stackheap
     rt_raise.o(.text) refers to __raise.o(.text) for __raise
@@ -670,7 +703,7 @@ Section Cross References
     _get_argv_nomalloc.o(.text) refers to defsig_rtmem_outer.o(.text) for __rt_SIGRTMEM
     _get_argv_nomalloc.o(.text) refers to sys_command.o(.text) for _sys_command_string
     libinit.o(.ARM.Collect$$libinit$$00000000) refers (Special) to libinit2.o(.ARM.Collect$$libinit$$0000002E) for __rt_lib_init_alloca_1
-    libinit.o(.ARM.Collect$$libinit$$00000000) refers (Special) to libinit2.o(.ARM.Collect$$libinit$$00000026) for __rt_lib_init_argv_1
+    libinit.o(.ARM.Collect$$libinit$$00000000) refers (Special) to libinit2.o(.ARM.Collect$$libinit$$0000002C) for __rt_lib_init_argv_1
     libinit.o(.ARM.Collect$$libinit$$00000000) refers (Special) to libinit2.o(.ARM.Collect$$libinit$$0000001B) for __rt_lib_init_atexit_1
     libinit.o(.ARM.Collect$$libinit$$00000000) refers (Special) to libinit2.o(.ARM.Collect$$libinit$$00000021) for __rt_lib_init_clock_1
     libinit.o(.ARM.Collect$$libinit$$00000000) refers (Special) to libinit2.o(.ARM.Collect$$libinit$$00000032) for __rt_lib_init_cpp_1

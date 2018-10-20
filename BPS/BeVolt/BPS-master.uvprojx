@@ -402,16 +402,6 @@
               <FilePath>.\User\Temperature.c</FilePath>
             </File>
             <File>
-              <FileName>LTC6811.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\User\LTC6811.c</FilePath>
-            </File>
-            <File>
-              <FileName>LTC2983.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\User\LTC2983.c</FilePath>
-            </File>
-            <File>
               <FileName>Display.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\User\Display.c</FilePath>
@@ -475,16 +465,6 @@
               <FileName>Temperature.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\User\Temperature.h</FilePath>
-            </File>
-            <File>
-              <FileName>LTC6811.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\User\LTC6811.h</FilePath>
-            </File>
-            <File>
-              <FileName>LTC2983.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\User\LTC2983.h</FilePath>
             </File>
             <File>
               <FileName>Display.h</FileName>
