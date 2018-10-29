@@ -379,7 +379,7 @@ U 1 1 5BB2FF01
 P 6550 1200
 F 0 "F1" V 6630 1200 50  0000 C CNN
 F 1 "Fuse" V 6475 1200 50  0000 C CNN
-F 2 "Fuse_Holders_and_Fuses:Fuseholder5x20_horiz_open_inline_Type-I" V 6480 1200 50  0001 C CNN
+F 2 "UTSVT_Passive:LittelFuse_OMNIBLOK_520Series_PCB" V 6480 1200 50  0001 C CNN
 F 3 "" H 6550 1200 50  0001 C CNN
 	1    6550 1200
 	0    1    1    0   
