@@ -15,8 +15,8 @@
   (page USLetter)
   (title_block
     (title "UT SVT MPPT 2018")
-    (date 2018-10-30)
-    (rev Rev1.1)
+    (date 2018-10-31)
+    (rev Rev1.2)
     (company "UT Solar Vehicle Team")
   )
 
@@ -44,7 +44,7 @@
   )
 
   (setup
-    (last_trace_width 4.3)
+    (last_trace_width 0.25)
     (user_trace_width 0.25)
     (user_trace_width 0.5)
     (user_trace_width 1)
