@@ -1,4 +1,5 @@
 (module SOIC-6_1.40x2.15mm_Pitch0.65mm (layer F.Cu) (tedit 5BD9F566)
+  (clearance 0.08)
   (fp_text reference REF** (at -2.3 0 90) (layer F.SilkS)
     (effects (font (size 1.2 1.2) (thickness 0.15)))
   )
