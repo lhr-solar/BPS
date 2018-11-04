@@ -12,7 +12,9 @@
 #include "EEPROM.h"
 //#include "CANlib.h"
 #include "WDTimer.h"
+//#include "Gyro.h"
 #include "stm32f4xx.h"
+
 
 void initialize();
 
@@ -42,24 +44,58 @@ void initialize(void){
 
 
 
+
+//*************************************************************************************
+// The following code is for testing individual pieces of code.
+//*************************************************************************************
+
 // LTC6811 Test
 #include "SPI.h"
 #include "LTC6811.h"
 #include "UART.h"
+#include "Definition.h"
 #include <string.h>
-int LTC6811Testmain(){
-	LTC6811_Init();
+void printCells(cell_asic *mods);
+int main(){
+	// Local var
+	int8_t error = 0;
+	
+	// Initialize LTC
+	__disable_irq();
+	cell_asic battMod[NUM_VOLTAGE_BOARDS];
 	UART3_Init(9600);
+	LTC6811_Init(battMod);
+	wakeup_sleep(NUM_VOLTAGE_BOARDS);
+  LTC6811_adcv(ADC_CONVERSION_MODE, ADC_DCP, CELL_CH_TO_CONVERT);
+	__enable_irq();
 	while(1){
-		
+		UART3_Write("Waiting...\n\r", 12);
+		wakeup_sleep(NUM_VOLTAGE_BOARDS);
+    error = LTC6811_rdcv(0, NUM_VOLTAGE_BOARDS, battMod); // Set to read back all cell voltage registers
+		printCells(battMod);
+		for(uint32_t i = 0; i < 1000000; i++);
 	}
 }
 
+void printCells(cell_asic *mods){
+	for (int current_ic = 0 ; current_ic < NUM_VOLTAGE_BOARDS; current_ic++){
+		for (int i=0; i<mods[0].ic_reg.cell_channels; i++){
+      UART3_Write(" C", 2);
+      Serial.print(i+1,DEC);
+      Serial.print(":");
+      Serial.print(bms_ic[current_ic].cells.c_codes[i]*0.0001,4);
+      Serial.print(",");
+    }
+		Serial.println();
+  }
+  Serial.println();
+}
+
 // SPI Test
-int main(){
+int SPITestmain(){
 	__disable_irq();
 	UART3_Init(9600);
-	SPI1_Init();
+	SPI_Init8();
 	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);	// 1) Initialize GPIO portB clock
 	GPIO_InitTypeDef GPIO_InitStruct;
 	GPIO_InitStruct.GPIO_Pin = GPIO_Pin_6;								// 2) Initialize which pins to use
@@ -74,7 +110,7 @@ int main(){
 	char str[30] = "Testing\n\r";
 	UART3_Write(str, strlen(str));
 	GPIOB->ODR &= ~GPIO_Pin_6;
-	SPI1_Write((uint8_t *)str, strlen(str));
+	SPI_Write8((uint8_t *)str, strlen(str));
 	GPIOB->ODR |= GPIO_Pin_6;
 	while(1){
 		
@@ -92,12 +128,11 @@ int UARTTestmain(){
 }
 
 // Gyro test
-#include "FXAS21002CQR1.h"
 int gyroTestmain(){
-	FXAS21002CQR1_Init();
+	//FXAS21002CQR1_Init();
 	UART3_Init(9600);
 	while(1){
-		uint16_t *vals = FXAS21002CQR1_Measure();
+		//uint16_t *vals = FXAS21002CQR1_Measure();
 		// print or something
 	}
 }

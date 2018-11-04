@@ -5,8 +5,8 @@
  * @lastRevised 10/2/2018
  */
 
-#ifndef SPI_H__
-#define SPI_H__
+#ifndef __SPI_H__
+#define __SPI_H__
 
 #include <stdint.h>
 
@@ -21,6 +21,10 @@
  * 		PB3 : SCK
  *		PB4 : MISO
  *		PB5 : MOSI 
+ * SPI2:
+ *		 : SCK
+ *		 : MISO
+ *		 : MOSI
  */
 
 /** SPI_Init8
@@ -74,5 +78,26 @@ void SPI_Read16(uint16_t *rxBuf, uint32_t rxSize);
  * @param ptr to unsigned 16-bit tx buffer, number of bytes to sen, ptr to unsigned 16-bit rx buffer, number of bytes to rea
  */
 void SPI_WriteRead16(uint16_t *txBuf, uint32_t txSize, uint16_t *rxBuf, uint32_t rxSize);
+
+/** SPI_InitCS
+ * Initializes Port B pin for SPI chip select
+ * Use GPIO_Pin_x (replace x) for easier code readablity.
+ * @param pin number
+ */
+void SPI_InitCS(uint16_t pin);
+
+/** SPI_CSHigh
+ * Sets PortB pin to high.
+ * Use GPIO_Pin_x (replace x) for easier code readablity.
+ * @param pin number of PortB
+ */
+void SPI_CSHigh(uint16_t pin);
+
+/** SPI_CSLow
+ * Resets PortB pin to low.
+ * Use GPIO_Pin_x (replace x) for easier code readablity.
+ * @param pin number if PortB
+ */
+void SPI_CSLow(uint16_t pin);
 
 #endif
