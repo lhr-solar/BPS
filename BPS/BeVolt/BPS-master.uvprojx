@@ -407,6 +407,11 @@
               <FilePath>.\User\LTC6811.c</FilePath>
             </File>
             <File>
+              <FileName>LTC681x.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\User\LTC681x.c</FilePath>
+            </File>
+            <File>
               <FileName>LTC2983.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\User\LTC2983.c</FilePath>
@@ -420,6 +425,11 @@
               <FileName>EEPROM.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\User\EEPROM.c</FilePath>
+            </File>
+            <File>
+              <FileName>Gyro.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\User\Gyro.c</FilePath>
             </File>
             <File>
               <FileName>WDTimer.c</FileName>
@@ -440,11 +450,6 @@
               <FileName>FIFO.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\User\FIFO.c</FilePath>
-            </File>
-            <File>
-              <FileName>FXAS21002CQR1.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\User\FXAS21002CQR1.c</FilePath>
             </File>
             <File>
               <FileName>Terminal.c</FileName>
@@ -482,6 +487,11 @@
               <FilePath>.\User\LTC6811.h</FilePath>
             </File>
             <File>
+              <FileName>LTC681x.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\User\LTC681x.h</FilePath>
+            </File>
+            <File>
               <FileName>LTC2983.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\User\LTC2983.h</FilePath>
@@ -495,6 +505,11 @@
               <FileName>EEPROM.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\User\EEPROM.h</FilePath>
+            </File>
+            <File>
+              <FileName>Gyro.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\User\Gyro.h</FilePath>
             </File>
             <File>
               <FileName>WDTimer.h</FileName>
@@ -515,11 +530,6 @@
               <FileName>FIFO.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\User\FIFO.h</FilePath>
-            </File>
-            <File>
-              <FileName>FXAS21002CQR1.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\User\FXAS21002CQR1.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -562,6 +572,9 @@
               <FilePath>.\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_usart.c</FilePath>
             </File>
           </Files>
+        </Group>
+        <Group>
+          <GroupName>Drivers</GroupName>
         </Group>
         <Group>
           <GroupName>::CMSIS</GroupName>
