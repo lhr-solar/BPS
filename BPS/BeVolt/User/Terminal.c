@@ -1,7 +1,16 @@
 #include <string.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include "Terminal.h"
+
+int _read(int file, char *data, int len){
+	
+}
+
+int _write(int file, char *data, int len){
+	
+}
 
 char * Terminal_HandleInput(char * input){
 	char ** ops = Terminal_splitOps(input);

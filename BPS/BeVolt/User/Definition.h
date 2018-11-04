@@ -6,8 +6,10 @@
  * @lastRevised 10/2/2018
  */
  
+#define NUCLEO		1
+
 #define NUM_BATTERY_MODULES			31
-#define NUM_VOLTAGE_BOARDS				3
+#define NUM_VOLTAGE_BOARDS				1
 #define NUM_TEMPERATURE_BOARDS		3
 
 // PRIORITIES
