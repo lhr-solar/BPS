@@ -78,6 +78,7 @@ int main(){
 }
 
 void printCells(cell_asic *mods){
+	/*
 	for (int current_ic = 0 ; current_ic < NUM_VOLTAGE_BOARDS; current_ic++){
 		for (int i=0; i<mods[0].ic_reg.cell_channels; i++){
       UART3_Write(" C", 2);
@@ -89,6 +90,7 @@ void printCells(cell_asic *mods){
 		Serial.println();
   }
   Serial.println();
+	*/
 }
 
 // SPI Test

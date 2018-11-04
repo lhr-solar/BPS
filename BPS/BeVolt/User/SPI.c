@@ -108,7 +108,6 @@ void SPI_InitCS(uint16_t pin){
  */
 void SPI_Write8(uint8_t *txBuf, uint32_t txSize){
 	//SPI1->DR = 0xCC;
-	uint32_t poll = 0;
 	for(uint32_t i = 0; i < txSize; i++){
 		while((SPI1->SR&SPI_SR_BSY) == SPI_SR_BSY);	// Wait until transmission is done
 		//while((SPI1->SR&SPI_SR_TXE) == SPI_SR_TXE);	// Have to wait until transmission is done
