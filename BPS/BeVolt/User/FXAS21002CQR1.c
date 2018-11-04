@@ -13,6 +13,8 @@
 #include <string.h>
 #include <stdlib.h>
 
+double gyro_headings [3]; // x,y,z
+
 /** FXAS21002CQR1_Init
  * Initializes SPI for FXAS21002CQR1
  * Initializes and configures LTC6811
@@ -72,18 +74,18 @@ uint16_t *FXAS21002CQR1_Measure(void){
  */
 double *FXAS21002CQR1_CurrentHeading(void){
 	int16_t * measurements = (int16_t *) FXAS21002CQR1_Measure();
-	headings[0] += *(measurements++) / 12.5;
-	headings[1] += *(measurements++) / 12.5;
-	headings[2] += *(measurements) / 12.5;
+	gyro_headings[0] += *(measurements++) / 12.5;
+	gyro_headings[1] += *(measurements++) / 12.5;
+	gyro_headings[2] += *(measurements) / 12.5;
 	
-	return headings;
+	return gyro_headings;
 }
 
 /** FXAS21002CQR1_ResetHeadings
  * Resets the heading values
  */
 void FXAS21002CQR1_ResetHeadings(void){
-	headings[0] = headings[1] = headings[2] = 0;
+	gyro_headings[0] = gyro_headings[1] = gyro_headings[2] = 0;
 }
 
 /**

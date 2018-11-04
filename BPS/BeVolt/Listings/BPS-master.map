@@ -12,8 +12,7 @@ Section Cross References
     main.o(i._Z12gyroTestmainv) refers to fxas21002cqr1.o(i._Z18FXAS21002CQR1_Initv) for FXAS21002CQR1_Init()
     main.o(i._Z12gyroTestmainv) refers to uart.o(i._Z10UART3_Initj) for UART3_Init(unsigned)
     main.o(i._Z12gyroTestmainv) refers to fxas21002cqr1.o(i._Z21FXAS21002CQR1_Measurev) for FXAS21002CQR1_Measure()
-    main.o(i._Z7LTCmainv) refers to ltc6811.o(i._Z12LTC6811_Initv) for LTC6811_Init()
-    main.o(i._Z7LTCmainv) refers to uart.o(i._Z10UART3_Initj) for UART3_Init(unsigned)
+    main.o(i._Z15LTC6811Testmainv) refers to uart.o(i._Z10UART3_Initj) for UART3_Init(unsigned)
     main.o(i._Z8Mainmainv) refers to main.o(i._Z10initializev) for initialize()
     main.o(i._Z8Mainmainv) refers to wdtimer.o(i._Z13WDTimer_Startv) for WDTimer_Start()
     main.o(i._Z8Mainmainv) refers to voltage.o(i._Z14Voltage_IsSafev) for Voltage_IsSafe()
@@ -23,9 +22,19 @@ Section Cross References
     main.o(i._Z8Mainmainv) refers to current.o(i._Z26Current_UpdateMeasurementsv) for Current_UpdateMeasurements()
     main.o(i._Z8Mainmainv) refers to temperature.o(i._Z30Temperature_UpdateMeasurementsv) for Temperature_UpdateMeasurements()
     main.o(i._Z8Mainmainv) refers to wdtimer.o(i._Z13WDTimer_Resetv) for WDTimer_Reset()
+    main.o(i.main) refers to uart.o(i._Z10UART3_Initj) for UART3_Init(unsigned)
+    main.o(i.main) refers to spi.o(i._Z9SPI_Init8v) for SPI_Init8()
+    main.o(i.main) refers to stm32f4xx_rcc.o(i.RCC_AHB1PeriphClockCmd) for RCC_AHB1PeriphClockCmd
+    main.o(i.main) refers to stm32f4xx_gpio.o(i.GPIO_Init) for GPIO_Init
+    main.o(i.main) refers to rt_memcpy_w.o(.text) for __aeabi_memcpy4
+    main.o(i.main) refers to strlen.o(.text) for strlen
+    main.o(i.main) refers to uart.o(i._Z11UART3_WritePcj) for UART3_Write(char*, unsigned)
+    main.o(i.main) refers to spi.o(i._Z10SPI_Write8Phj) for SPI_Write8(unsigned char*, unsigned)
+    main.o(i.main) refers to main.o(.constdata) for .constdata
     main.o(.ARM.exidx) refers to main.o(i._Z10initializev) for i._Z10initializev
     main.o(.ARM.exidx) refers to main.o(i._Z8Mainmainv) for i._Z8Mainmainv
-    main.o(.ARM.exidx) refers to main.o(i._Z7LTCmainv) for i._Z7LTCmainv
+    main.o(.ARM.exidx) refers to main.o(i._Z15LTC6811Testmainv) for i._Z15LTC6811Testmainv
+    main.o(.ARM.exidx) refers to main.o(i.main) for i.main
     main.o(.ARM.exidx) refers to main.o(i._Z12UARTTestmainv) for i._Z12UARTTestmainv
     main.o(.ARM.exidx) refers to main.o(i._Z12gyroTestmainv) for i._Z12gyroTestmainv
     current.o(i._Z12Current_Initt) refers to current.o(i._Z17Current_SetLimitst) for Current_SetLimits(unsigned short)
@@ -41,15 +50,13 @@ Section Cross References
     current.o(.ARM.exidx) refers to current.o(i._Z27Current_LowPrecisionAmperesv) for i._Z27Current_LowPrecisionAmperesv
     voltage.o(i._Z12Voltage_Inittt) refers to voltage.o(i._Z17Voltage_SetLimitstt) for Voltage_SetLimits(unsigned short, unsigned short)
     voltage.o(i._Z14Voltage_IsSafev) refers to voltage.o(i._Z21Voltage_ModuleVoltaget) for Voltage_ModuleVoltage(unsigned short)
-    voltage.o(i._Z14Voltage_IsSafev) refers to voltage.o(.data) for maxVoltageLimit
-    voltage.o(i._Z17Voltage_SetLimitstt) refers to voltage.o(.data) for maxVoltageLimit
-    voltage.o(i._Z21Voltage_ModuleVoltaget) refers to voltage.o(.data) for modules
+    voltage.o(i._Z14Voltage_IsSafev) refers to voltage.o(.data) for MaxVoltageLimit
+    voltage.o(i._Z17Voltage_SetLimitstt) refers to voltage.o(.data) for MaxVoltageLimit
+    voltage.o(i._Z21Voltage_ModuleVoltaget) refers to voltage.o(.bss) for Modules
     voltage.o(i._Z23Voltage_ModulesInDangerv) refers to voltage.o(i._Z21Voltage_ModuleVoltaget) for Voltage_ModuleVoltage(unsigned short)
     voltage.o(i._Z23Voltage_ModulesInDangerv) refers to h1_alloc.o(.text) for malloc
-    voltage.o(i._Z23Voltage_ModulesInDangerv) refers to voltage.o(.data) for maxVoltageLimit
-    voltage.o(i._Z24Voltage_TotalPackVoltagev) refers to voltage.o(.data) for modules
-    voltage.o(i._Z26Voltage_UpdateMeasurementsv) refers to ltc6811.o(i._Z15LTC6811_Measurev) for LTC6811_Measure()
-    voltage.o(i._Z26Voltage_UpdateMeasurementsv) refers to voltage.o(.data) for modules
+    voltage.o(i._Z23Voltage_ModulesInDangerv) refers to voltage.o(.data) for MaxVoltageLimit
+    voltage.o(i._Z24Voltage_TotalPackVoltagev) refers to voltage.o(.bss) for Modules
     voltage.o(.ARM.exidx) refers to voltage.o(i._Z17Voltage_SetLimitstt) for i._Z17Voltage_SetLimitstt
     voltage.o(.ARM.exidx) refers to voltage.o(i._Z12Voltage_Inittt) for i._Z12Voltage_Inittt
     voltage.o(.ARM.exidx) refers to voltage.o(i._Z26Voltage_UpdateMeasurementsv) for i._Z26Voltage_UpdateMeasurementsv
@@ -65,7 +72,6 @@ Section Cross References
     temperature.o(i._Z27Temperature_ModulesInDangerv) refers to h1_alloc.o(.text) for malloc
     temperature.o(i._Z27Temperature_ModulesInDangerv) refers to temperature.o(.data) for MaxTemperatureLimit
     temperature.o(i._Z29Temperature_ModuleTemperaturet) refers to temperature.o(.data) for ModuleTemperatures
-    temperature.o(i._Z30Temperature_UpdateMeasurementsv) refers to ltc2983.o(i._Z15LTC2983_Measurev) for LTC2983_Measure()
     temperature.o(i._Z30Temperature_UpdateMeasurementsv) refers to temperature.o(.data) for ModuleTemperatures
     temperature.o(i._Z35Temperature_TotalPackAvgTemperaturev) refers to temperature.o(i._Z29Temperature_ModuleTemperaturet) for Temperature_ModuleTemperature(unsigned short)
     temperature.o(.ARM.exidx) refers to temperature.o(i._Z21Temperature_SetLimitst) for i._Z21Temperature_SetLimitst
@@ -75,25 +81,6 @@ Section Cross References
     temperature.o(.ARM.exidx) refers to temperature.o(i._Z18Temperature_IsSafev) for i._Z18Temperature_IsSafev
     temperature.o(.ARM.exidx) refers to temperature.o(i._Z27Temperature_ModulesInDangerv) for i._Z27Temperature_ModulesInDangerv
     temperature.o(.ARM.exidx) refers to temperature.o(i._Z35Temperature_TotalPackAvgTemperaturev) for i._Z35Temperature_TotalPackAvgTemperaturev
-    ltc6811.o(i._Z12LTC6811_Initv) refers to spi.o(i._Z9SPI_Init8v) for SPI_Init8()
-    ltc6811.o(i._Z12LTC6811_Initv) refers to stm32f4xx_rcc.o(i.RCC_AHB1PeriphClockCmd) for RCC_AHB1PeriphClockCmd
-    ltc6811.o(i._Z5pec15Pci) refers to ltc6811.o(.bss) for pec15Table
-    ltc6811.o(i._ZN30_INTERNAL_9_LTC6811_c_6012758a16init_PEC15_TableEv) refers to ltc6811.o(.data) for CRC15_POLY
-    ltc6811.o(i._ZN30_INTERNAL_9_LTC6811_c_6012758a16init_PEC15_TableEv) refers to ltc6811.o(.bss) for pec15Table
-    ltc6811.o(.ARM.exidx) refers to ltc6811.o(i._Z12LTC6811_Initv) for i._Z12LTC6811_Initv
-    ltc6811.o(.ARM.exidx) refers to ltc6811.o(i._Z15LTC6811_SendCmdPt) for i._Z15LTC6811_SendCmdPt
-    ltc6811.o(.ARM.exidx) refers to ltc6811.o(i._Z15LTC6811_Measurev) for i._Z15LTC6811_Measurev
-    ltc6811.o(.ARM.exidx) refers to ltc6811.o(i._ZN30_INTERNAL_9_LTC6811_c_6012758a16init_PEC15_TableEv) for i._ZN30_INTERNAL_9_LTC6811_c_6012758a16init_PEC15_TableEv
-    ltc6811.o(.ARM.exidx) refers to ltc6811.o(i._Z5pec15Pci) for i._Z5pec15Pci
-    ltc2983.o(i._Z12LTC2983_Initv) refers to stm32f4xx_rcc.o(i.RCC_AHB1PeriphClockCmd) for RCC_AHB1PeriphClockCmd
-    ltc2983.o(i._Z12LTC2983_Initv) refers to stm32f4xx_rcc.o(i.RCC_APB1PeriphClockCmd) for RCC_APB1PeriphClockCmd
-    ltc2983.o(i._Z12LTC2983_Initv) refers to stm32f4xx_gpio.o(i.GPIO_Init) for GPIO_Init
-    ltc2983.o(i._Z12LTC2983_Initv) refers to stm32f4xx_gpio.o(i.GPIO_PinAFConfig) for GPIO_PinAFConfig
-    ltc2983.o(i._Z12LTC2983_Initv) refers to stm32f4xx_spi.o(i.SPI_Init) for SPI_Init
-    ltc2983.o(i._Z12LTC2983_Initv) refers to stm32f4xx_spi.o(i.SPI_Cmd) for SPI_Cmd
-    ltc2983.o(.ARM.exidx) refers to ltc2983.o(i._Z12LTC2983_Initv) for i._Z12LTC2983_Initv
-    ltc2983.o(.ARM.exidx) refers to ltc2983.o(i._Z15LTC2983_SendCmdPt) for i._Z15LTC2983_SendCmdPt
-    ltc2983.o(.ARM.exidx) refers to ltc2983.o(i._Z15LTC2983_Measurev) for i._Z15LTC2983_Measurev
     display.o(.ARM.exidx) refers to display.o(i._Z12Display_Initv) for i._Z12Display_Initv
     display.o(.ARM.exidx) refers to display.o(i._Z14Display_Updatev) for i._Z14Display_Updatev
     eeprom.o(i._Z11EEPROM_Initv) refers to stm32f4xx_rcc.o(i.RCC_AHB1PeriphClockCmd) for RCC_AHB1PeriphClockCmd
@@ -189,14 +176,12 @@ Section Cross References
     fxas21002cqr1.o(i._Z18FXAS21002CQR1_Initv) refers to fxas21002cqr1.o(i._Z27FXAS21002CQR1_ResetHeadingsv) for FXAS21002CQR1_ResetHeadings()
     fxas21002cqr1.o(i._Z21FXAS21002CQR1_Measurev) refers to fxas21002cqr1.o(i._Z21FXAS21002CQR1_SendCmdhhhj) for FXAS21002CQR1_SendCmd(unsigned char, unsigned char, unsigned char, unsigned)
     fxas21002cqr1.o(i._Z21FXAS21002CQR1_SendCmdhhhj) refers to spi.o(i._Z15SPI_WriteRead16PtjS_j) for SPI_WriteRead16(unsigned short*, unsigned, unsigned short*, unsigned)
-    fxas21002cqr1.o(i._Z27FXAS21002CQR1_ResetHeadingsv) refers to main.o(.bss) for headings
-    fxas21002cqr1.o(i._Z27FXAS21002CQR1_ResetHeadingsv) refers to fxas21002cqr1.o(.bss) for headings
+    fxas21002cqr1.o(i._Z27FXAS21002CQR1_ResetHeadingsv) refers to fxas21002cqr1.o(.bss) for gyro_headings
     fxas21002cqr1.o(i._Z28FXAS21002CQR1_CurrentHeadingv) refers to fxas21002cqr1.o(i._Z21FXAS21002CQR1_Measurev) for FXAS21002CQR1_Measure()
     fxas21002cqr1.o(i._Z28FXAS21002CQR1_CurrentHeadingv) refers to dflt_clz.o(x$fpl$dflt) for __aeabi_i2d
     fxas21002cqr1.o(i._Z28FXAS21002CQR1_CurrentHeadingv) refers to ddiv.o(x$fpl$ddiv) for __aeabi_ddiv
     fxas21002cqr1.o(i._Z28FXAS21002CQR1_CurrentHeadingv) refers to daddsub_clz.o(x$fpl$dadd) for __aeabi_dadd
-    fxas21002cqr1.o(i._Z28FXAS21002CQR1_CurrentHeadingv) refers to main.o(.bss) for headings
-    fxas21002cqr1.o(i._Z28FXAS21002CQR1_CurrentHeadingv) refers to fxas21002cqr1.o(.bss) for headings
+    fxas21002cqr1.o(i._Z28FXAS21002CQR1_CurrentHeadingv) refers to fxas21002cqr1.o(.bss) for gyro_headings
     fxas21002cqr1.o(i._Z9isFlippedv) refers to fxas21002cqr1.o(i._Z28FXAS21002CQR1_CurrentHeadingv) for FXAS21002CQR1_CurrentHeading()
     fxas21002cqr1.o(i._Z9isFlippedv) refers to dfix.o(x$fpl$dfix) for __aeabi_d2iz
     fxas21002cqr1.o(.ARM.exidx) refers to fxas21002cqr1.o(i._Z27FXAS21002CQR1_ResetHeadingsv) for i._Z27FXAS21002CQR1_ResetHeadingsv
@@ -205,10 +190,43 @@ Section Cross References
     fxas21002cqr1.o(.ARM.exidx) refers to fxas21002cqr1.o(i._Z21FXAS21002CQR1_Measurev) for i._Z21FXAS21002CQR1_Measurev
     fxas21002cqr1.o(.ARM.exidx) refers to fxas21002cqr1.o(i._Z28FXAS21002CQR1_CurrentHeadingv) for i._Z28FXAS21002CQR1_CurrentHeadingv
     fxas21002cqr1.o(.ARM.exidx) refers to fxas21002cqr1.o(i._Z9isFlippedv) for i._Z9isFlippedv
-    terminal.o(i._Z20Terminal_HandleInputPc) refers to h1_alloc.o(.text) for malloc
-    terminal.o(i._Z20Terminal_HandleInputPc) refers to h1_free.o(.text) for free
-    terminal.o(i._Z20Terminal_HandleInputPc) refers to strlen.o(.text) for strlen
+    terminal.o(i._Z17Terminal_helpMenuv) refers to terminal.o(.conststring) for .conststring
+    terminal.o(i._Z17Terminal_splitOpsPc) refers to strtok.o(.text) for strtok
+    terminal.o(i._Z18Terminal_concatIntPct) refers to _printf_percent.o(.ARM.Collect$$_printf_percent$$00000000) for _printf_percent
+    terminal.o(i._Z18Terminal_concatIntPct) refers to _printf_d.o(.ARM.Collect$$_printf_percent$$00000009) for _printf_d
+    terminal.o(i._Z18Terminal_concatIntPct) refers to _printf_dec.o(.text) for _printf_int_dec
+    terminal.o(i._Z18Terminal_concatIntPct) refers to noretval__2sprintf.o(.text) for __2sprintf
+    terminal.o(i._Z18Terminal_concatIntPct) refers to strcat.o(.text) for strcat
+    terminal.o(i._Z20Terminal_HandleInputPc) refers to terminal.o(i._Z17Terminal_splitOpsPc) for Terminal_splitOps(char*)
+    terminal.o(i._Z20Terminal_HandleInputPc) refers to strcmpv7m.o(.text) for strcmp
+    terminal.o(i._Z20Terminal_HandleInputPc) refers to terminal.o(i._Z22Terminal_currentStatusv) for Terminal_currentStatus()
+    terminal.o(i._Z20Terminal_HandleInputPc) refers to terminal.o(i._Z22Terminal_voltageStatusv) for Terminal_voltageStatus()
+    terminal.o(i._Z20Terminal_HandleInputPc) refers to terminal.o(i._Z26Terminal_temperatureStatusv) for Terminal_temperatureStatus()
+    terminal.o(i._Z20Terminal_HandleInputPc) refers to strcat.o(.text) for strcat
+    terminal.o(i._Z20Terminal_HandleInputPc) refers to terminal.o(i._Z24Terminal_contactorStatusv) for Terminal_contactorStatus()
+    terminal.o(i._Z20Terminal_HandleInputPc) refers to terminal.o(i._Z19Terminal_gyroStatush) for Terminal_gyroStatus(unsigned char)
+    terminal.o(i._Z20Terminal_HandleInputPc) refers to terminal.o(i._Z21Terminal_setContactorPc) for Terminal_setContactor(char*)
+    terminal.o(i._Z20Terminal_HandleInputPc) refers to terminal.o(i._Z17Terminal_helpMenuv) for Terminal_helpMenu()
+    terminal.o(i._Z22Terminal_currentStatusv) refers to current.o(i._Z28Current_HighPrecisionAmperesv) for Current_HighPrecisionAmperes()
+    terminal.o(i._Z22Terminal_currentStatusv) refers to terminal.o(i._Z18Terminal_concatIntPct) for Terminal_concatInt(char*, unsigned short)
+    terminal.o(i._Z22Terminal_currentStatusv) refers to strcat.o(.text) for strcat
+    terminal.o(i._Z22Terminal_currentStatusv) refers to current.o(i._Z27Current_LowPrecisionAmperesv) for Current_LowPrecisionAmperes()
+    terminal.o(.ARM.exidx) refers to terminal.o(i._Z17Terminal_helpMenuv) for i._Z17Terminal_helpMenuv
+    terminal.o(.ARM.exidx) refers to terminal.o(i._Z24Terminal_contactorStatusv) for i._Z24Terminal_contactorStatusv
+    terminal.o(.ARM.exidx) refers to terminal.o(i._Z21Terminal_setContactorPc) for i._Z21Terminal_setContactorPc
+    terminal.o(.ARM.exidx) refers to terminal.o(i._Z19Terminal_gyroStatush) for i._Z19Terminal_gyroStatush
+    terminal.o(.ARM.exidx) refers to terminal.o(i._Z26Terminal_temperatureStatusv) for i._Z26Terminal_temperatureStatusv
+    terminal.o(.ARM.exidx) refers to terminal.o(i._Z22Terminal_voltageStatusv) for i._Z22Terminal_voltageStatusv
+    terminal.o(.ARM.exidx) refers to terminal.o(i._Z18Terminal_concatIntPct) for i._Z18Terminal_concatIntPct
+    terminal.o(.ARM.exidx) refers to terminal.o(i._Z22Terminal_currentStatusv) for i._Z22Terminal_currentStatusv
+    terminal.o(.ARM.exidx) refers to terminal.o(i._Z17Terminal_splitOpsPc) for i._Z17Terminal_splitOpsPc
     terminal.o(.ARM.exidx) refers to terminal.o(i._Z20Terminal_HandleInputPc) for i._Z20Terminal_HandleInputPc
+    terminal.o(.ARM.exidx) refers to terminal.o(i._Z22Terminal_generalStatusv) for i._Z22Terminal_generalStatusv
+    terminal.o(.ARM.exidx) refers to terminal.o(i._Z23Terminal_watchdogStatusv) for i._Z23Terminal_watchdogStatusv
+    terminal.o(.ARM.exidx) refers to terminal.o(i._Z21Terminal_eepromStatusv) for i._Z21Terminal_eepromStatusv
+    terminal.o(.ARM.exidx) refers to terminal.o(i._Z18Terminal_canStatusv) for i._Z18Terminal_canStatusv
+    terminal.o(.ARM.exidx) refers to terminal.o(i._Z18Terminal_spiStatusv) for i._Z18Terminal_spiStatusv
+    terminal.o(.ARM.exidx) refers to terminal.o(i._Z18Terminal_i2cStatusv) for i._Z18Terminal_i2cStatusv
     misc.o(.ARM.exidx) refers to misc.o(i.NVIC_PriorityGroupConfig) for i.NVIC_PriorityGroupConfig
     misc.o(.ARM.exidx) refers to misc.o(i.NVIC_Init) for i.NVIC_Init
     misc.o(.ARM.exidx) refers to misc.o(i.NVIC_SetVectorTable) for i.NVIC_SetVectorTable
@@ -518,17 +536,12 @@ Section Cross References
     malloc.o(.text) refers (Special) to init_alloc.o(.text) for _init_alloc
     malloc.o(.text) refers to rt_heap_descriptor_intlibspace.o(.text) for __rt_heap_descriptor
     malloc.o(.text) refers to heapstubs.o(.text) for __Heap_Alloc
-    free.o(.text) refers (Special) to hguard.o(.text) for __heap$guard
-    free.o(.text) refers to rt_heap_descriptor_intlibspace.o(.text) for __rt_heap_descriptor
-    free.o(.text) refers to heapstubs.o(.text) for __Heap_Free
     h1_alloc.o(.text) refers (Special) to h1_init.o(.text) for __Heap_Initialize
     h1_alloc.o(.text) refers to rt_heap_descriptor_intlibspace.o(.text) for __rt_heap_descriptor
     h1_alloc.o(.text) refers to init_alloc.o(.text) for __Heap_Full
-    h1_free.o(.text) refers to rt_heap_descriptor_intlibspace.o(.text) for __rt_heap_descriptor
     h1_alloc_mt.o(.text) refers (Special) to h1_init.o(.text) for __Heap_Initialize
     h1_alloc_mt.o(.text) refers to init_alloc.o(.text) for __Heap_Full
     h1_alloc_mt.o(.text) refers to rt_heap_descriptor_intlibspace.o(.text) for __rt_heap_descriptor
-    h1_free_mt.o(.text) refers to rt_heap_descriptor_intlibspace.o(.text) for __rt_heap_descriptor
     heap2.o(i._FDIterate) refers to heap2.o(.conststring) for .conststring
     heap2.o(i.___Heap_ProvideMemory$realtime) refers to fdtree.o(i._FDTree_Delete) for _FDTree_Delete
     heap2.o(i.___Heap_ProvideMemory$realtime) refers to fdtree.o(i._FDTree_Insert) for _FDTree_Insert
@@ -580,6 +593,31 @@ Section Cross References
     heap2mt.o(i._realloc$realtime$concurrent) refers to h1_alloc.o(.text) for malloc
     heap2mt.o(i._realloc$realtime$concurrent) refers to fdtree.o(i._FDTree_Delete) for _FDTree_Delete
     heap2mt.o(i._realloc$realtime$concurrent) refers to rt_memcpy_w.o(.text) for __aeabi_memcpy4
+    __2sprintf.o(.text) refers to _printf_char_common.o(.text) for _printf_char_common
+    __2sprintf.o(.text) refers to _sputc.o(.text) for _sputc
+    noretval__2sprintf.o(.text) refers to _printf_char_common.o(.text) for _printf_char_common
+    noretval__2sprintf.o(.text) refers to _sputc.o(.text) for _sputc
+    __printf.o(.text) refers to _printf_percent.o(.ARM.Collect$$_printf_percent$$00000000) for _printf_percent
+    _printf_dec.o(.text) refers to _printf_intcommon.o(.text) for _printf_int_common
+    __printf_flags.o(.text) refers to _printf_percent.o(.ARM.Collect$$_printf_percent$$00000000) for _printf_percent
+    __printf_flags.o(.text) refers to __printf_flags.o(.constdata) for .constdata
+    __printf_ss.o(.text) refers to _printf_percent.o(.ARM.Collect$$_printf_percent$$00000000) for _printf_percent
+    __printf_flags_ss.o(.text) refers to _printf_percent.o(.ARM.Collect$$_printf_percent$$00000000) for _printf_percent
+    __printf_flags_ss.o(.text) refers to __printf_flags_ss.o(.constdata) for .constdata
+    __printf_wp.o(.text) refers to __printf_wp.o(i._is_digit) for _is_digit
+    __printf_wp.o(.text) refers to _printf_percent.o(.ARM.Collect$$_printf_percent$$00000000) for _printf_percent
+    __printf_flags_wp.o(.text) refers to __printf_wp.o(i._is_digit) for _is_digit
+    __printf_flags_wp.o(.text) refers to _printf_percent.o(.ARM.Collect$$_printf_percent$$00000000) for _printf_percent
+    __printf_flags_wp.o(.text) refers to __printf_flags_wp.o(.constdata) for .constdata
+    __printf_ss_wp.o(.text) refers to __printf_wp.o(i._is_digit) for _is_digit
+    __printf_ss_wp.o(.text) refers to _printf_percent.o(.ARM.Collect$$_printf_percent$$00000000) for _printf_percent
+    __printf_flags_ss_wp.o(.text) refers to __printf_wp.o(i._is_digit) for _is_digit
+    __printf_flags_ss_wp.o(.text) refers to _printf_percent.o(.ARM.Collect$$_printf_percent$$00000000) for _printf_percent
+    __printf_flags_ss_wp.o(.text) refers to __printf_flags_ss_wp.o(.constdata) for .constdata
+    _printf_d.o(.ARM.Collect$$_printf_percent$$00000009) refers (Weak) to _printf_dec.o(.text) for _printf_int_dec
+    _printf_percent.o(.ARM.Collect$$_printf_percent$$00000000) refers (Special) to _printf_percent_end.o(.ARM.Collect$$_printf_percent$$00000017) for _printf_percent_end
+    strtok.o(.text) refers to strtok_int.o(.text) for __strtok_internal
+    strtok.o(.text) refers to strtok.o(.data) for .data
     __main.o(!!!main) refers to __rtentry.o(.ARM.Collect$$rtentry$$00000000) for __rt_entry
     daddsub_clz.o(x$fpl$dadd) refers (Special) to usenofp.o(x$fpl$usenofp) for __I$use$fp
     daddsub_clz.o(x$fpl$dadd) refers to daddsub_clz.o(x$fpl$dsub) for _dsub1
@@ -618,7 +656,15 @@ Section Cross References
     init_alloc.o(.text) refers to defsig_rtmem_outer.o(.text) for __rt_SIGRTMEM
     init_alloc.o(.text) refers to rt_heap_descriptor_intlibspace.o(.text) for __rt_heap_descriptor
     init_alloc.o(.text) refers to h1_init.o(.text) for __Heap_Initialize
+    free.o(.text) refers (Special) to hguard.o(.text) for __heap$guard
+    free.o(.text) refers to rt_heap_descriptor_intlibspace.o(.text) for __rt_heap_descriptor
+    free.o(.text) refers to heapstubs.o(.text) for __Heap_Free
+    h1_free.o(.text) refers to rt_heap_descriptor_intlibspace.o(.text) for __rt_heap_descriptor
     h1_init_mt.o(.text) refers to mutex_dummy.o(.text) for _mutex_initialize
+    h1_free_mt.o(.text) refers to rt_heap_descriptor_intlibspace.o(.text) for __rt_heap_descriptor
+    _printf_char_common.o(.text) refers to __printf.o(.text) for __printf
+    strtok_int.o(.text) refers to strspn.o(.text) for strspn
+    strtok_int.o(.text) refers to strcspn.o(.text) for strcspn
     _get_argv.o(.text) refers (Special) to hrguard.o(.text) for __heap_region$guard
     _get_argv.o(.text) refers to h1_alloc.o(.text) for malloc
     _get_argv.o(.text) refers to defsig_rtmem_outer.o(.text) for __rt_SIGRTMEM
@@ -640,6 +686,7 @@ Section Cross References
     __rtentry2.o(.ARM.Collect$$rtentry$$00000008) refers to boardinit2.o(.text) for _platform_post_stackheap_init
     __rtentry2.o(.ARM.Collect$$rtentry$$0000000A) refers to libinit.o(.ARM.Collect$$libinit$$00000000) for __rt_lib_init
     __rtentry2.o(.ARM.Collect$$rtentry$$0000000B) refers to boardinit3.o(.text) for _platform_post_lib_init
+    __rtentry2.o(.ARM.Collect$$rtentry$$0000000D) refers to main.o(i.main) for main
     __rtentry2.o(.ARM.Collect$$rtentry$$0000000D) refers to exit.o(.text) for exit
     __rtentry2.o(.ARM.exidx) refers to __rtentry2.o(.ARM.Collect$$rtentry$$00000001) for .ARM.Collect$$rtentry$$00000001
     __rtentry2.o(.ARM.exidx) refers to __rtentry2.o(.ARM.Collect$$rtentry$$00000008) for .ARM.Collect$$rtentry$$00000008
@@ -655,7 +702,7 @@ Section Cross References
     defsig_rtmem_outer.o(.text) refers to defsig_exit.o(.text) for __sig_exit
     defsig_rtmem_formal.o(.text) refers to rt_raise.o(.text) for __rt_raise
     heapauxa.o(.text) refers to heapauxa.o(.data) for .data
-    argv_veneer.o(.emb_text) refers to _get_argv.o(.text) for __ARM_get_argv
+    argv_veneer.o(.emb_text) refers to no_argv.o(.text) for __ARM_get_argv
     sys_stackheap_outer.o(.text) refers to libspace.o(.text) for __user_perproc_libspace
     sys_stackheap_outer.o(.text) refers to startup_stm32f413xx.o(.text) for __user_initial_stackheap
     rt_raise.o(.text) refers to __raise.o(.text) for __raise
@@ -670,7 +717,7 @@ Section Cross References
     _get_argv_nomalloc.o(.text) refers to defsig_rtmem_outer.o(.text) for __rt_SIGRTMEM
     _get_argv_nomalloc.o(.text) refers to sys_command.o(.text) for _sys_command_string
     libinit.o(.ARM.Collect$$libinit$$00000000) refers (Special) to libinit2.o(.ARM.Collect$$libinit$$0000002E) for __rt_lib_init_alloca_1
-    libinit.o(.ARM.Collect$$libinit$$00000000) refers (Special) to libinit2.o(.ARM.Collect$$libinit$$00000026) for __rt_lib_init_argv_1
+    libinit.o(.ARM.Collect$$libinit$$00000000) refers (Special) to libinit2.o(.ARM.Collect$$libinit$$0000002C) for __rt_lib_init_argv_1
     libinit.o(.ARM.Collect$$libinit$$00000000) refers (Special) to libinit2.o(.ARM.Collect$$libinit$$0000001B) for __rt_lib_init_atexit_1
     libinit.o(.ARM.Collect$$libinit$$00000000) refers (Special) to libinit2.o(.ARM.Collect$$libinit$$00000021) for __rt_lib_init_clock_1
     libinit.o(.ARM.Collect$$libinit$$00000000) refers (Special) to libinit2.o(.ARM.Collect$$libinit$$00000032) for __rt_lib_init_cpp_1
@@ -726,3 +773,740 @@ Section Cross References
     libshutdown.o(.ARM.Collect$$libshutdown$$00000000) refers (Special) to libshutdown2.o(.ARM.Collect$$libshutdown$$00000004) for __rt_lib_shutdown_stdio_1
     libshutdown.o(.ARM.Collect$$libshutdown$$00000000) refers (Special) to libshutdown2.o(.ARM.Collect$$libshutdown$$0000000C) for __rt_lib_shutdown_user_alloc_1
 
+
+==============================================================================
+
+Removing Unused input sections from the image.
+
+    Removing main.o(.rev16_text), (4 bytes).
+    Removing main.o(.revsh_text), (4 bytes).
+    Removing main.o(.rrx_text), (6 bytes).
+    Removing main.o(i._Z10initializev), (12 bytes).
+    Removing main.o(i._Z12UARTTestmainv), (72 bytes).
+    Removing main.o(i._Z12gyroTestmainv), (24 bytes).
+    Removing main.o(i._Z15LTC6811Testmainv), (16 bytes).
+    Removing main.o(i._Z8Mainmainv), (46 bytes).
+    Removing main.o(.ARM.exidx), (8 bytes).
+    Removing main.o(.ARM.exidx), (8 bytes).
+    Removing main.o(.ARM.exidx), (8 bytes).
+    Removing main.o(.ARM.exidx), (8 bytes).
+    Removing main.o(.ARM.exidx), (8 bytes).
+    Removing main.o(.ARM.exidx), (8 bytes).
+    Removing current.o(i._Z12Current_Initt), (12 bytes).
+    Removing current.o(i._Z14Current_IsSafev), (44 bytes).
+    Removing current.o(i._Z17Current_SetLimitst), (12 bytes).
+    Removing current.o(i._Z26Current_UpdateMeasurementsv), (2 bytes).
+    Removing current.o(i._Z27Current_LowPrecisionAmperesv), (12 bytes).
+    Removing current.o(i._Z28Current_HighPrecisionAmperesv), (12 bytes).
+    Removing current.o(.ARM.exidx), (8 bytes).
+    Removing current.o(.ARM.exidx), (8 bytes).
+    Removing current.o(.ARM.exidx), (8 bytes).
+    Removing current.o(.ARM.exidx), (8 bytes).
+    Removing current.o(.ARM.exidx), (8 bytes).
+    Removing current.o(.ARM.exidx), (8 bytes).
+    Removing current.o(.data), (6 bytes).
+    Removing voltage.o(i._Z12Voltage_Inittt), (16 bytes).
+    Removing voltage.o(i._Z14Voltage_IsSafev), (56 bytes).
+    Removing voltage.o(i._Z17Voltage_SetLimitstt), (20 bytes).
+    Removing voltage.o(i._Z21Voltage_ModuleVoltaget), (16 bytes).
+    Removing voltage.o(i._Z23Voltage_ModulesInDangerv), (128 bytes).
+    Removing voltage.o(i._Z24Voltage_TotalPackVoltagev), (28 bytes).
+    Removing voltage.o(i._Z26Voltage_UpdateMeasurementsv), (4 bytes).
+    Removing voltage.o(.ARM.exidx), (8 bytes).
+    Removing voltage.o(.ARM.exidx), (8 bytes).
+    Removing voltage.o(.ARM.exidx), (8 bytes).
+    Removing voltage.o(.ARM.exidx), (8 bytes).
+    Removing voltage.o(.ARM.exidx), (8 bytes).
+    Removing voltage.o(.ARM.exidx), (8 bytes).
+    Removing voltage.o(.ARM.exidx), (8 bytes).
+    Removing voltage.o(.bss), (62 bytes).
+    Removing voltage.o(.data), (4 bytes).
+    Removing temperature.o(i._Z16Temperature_Initt), (12 bytes).
+    Removing temperature.o(i._Z18Temperature_IsSafev), (40 bytes).
+    Removing temperature.o(i._Z21Temperature_SetLimitst), (12 bytes).
+    Removing temperature.o(i._Z27Temperature_ModulesInDangerv), (104 bytes).
+    Removing temperature.o(i._Z29Temperature_ModuleTemperaturet), (16 bytes).
+    Removing temperature.o(i._Z30Temperature_UpdateMeasurementsv), (20 bytes).
+    Removing temperature.o(i._Z35Temperature_TotalPackAvgTemperaturev), (28 bytes).
+    Removing temperature.o(.ARM.exidx), (8 bytes).
+    Removing temperature.o(.ARM.exidx), (8 bytes).
+    Removing temperature.o(.ARM.exidx), (8 bytes).
+    Removing temperature.o(.ARM.exidx), (8 bytes).
+    Removing temperature.o(.ARM.exidx), (8 bytes).
+    Removing temperature.o(.ARM.exidx), (8 bytes).
+    Removing temperature.o(.ARM.exidx), (8 bytes).
+    Removing temperature.o(.data), (6 bytes).
+    Removing display.o(.rev16_text), (4 bytes).
+    Removing display.o(.revsh_text), (4 bytes).
+    Removing display.o(.rrx_text), (6 bytes).
+    Removing display.o(i._Z12Display_Initv), (2 bytes).
+    Removing display.o(i._Z14Display_Updatev), (2 bytes).
+    Removing display.o(.ARM.exidx), (8 bytes).
+    Removing display.o(.ARM.exidx), (8 bytes).
+    Removing eeprom.o(.rev16_text), (4 bytes).
+    Removing eeprom.o(.revsh_text), (4 bytes).
+    Removing eeprom.o(.rrx_text), (6 bytes).
+    Removing eeprom.o(i._Z11EEPROM_Initv), (176 bytes).
+    Removing eeprom.o(i._Z12EEPROM_Writeth), (44 bytes).
+    Removing eeprom.o(i._Z21EEPROM_ReadSingleBytet), (16 bytes).
+    Removing eeprom.o(i._Z24EEPROM_ReadMultipleBytestj), (14 bytes).
+    Removing eeprom.o(.ARM.exidx), (8 bytes).
+    Removing eeprom.o(.ARM.exidx), (8 bytes).
+    Removing eeprom.o(.ARM.exidx), (8 bytes).
+    Removing eeprom.o(.ARM.exidx), (8 bytes).
+    Removing wdtimer.o(i._Z12WDTimer_Initv), (2 bytes).
+    Removing wdtimer.o(i._Z12WDTimer_Stopv), (2 bytes).
+    Removing wdtimer.o(i._Z13WDTimer_Resetv), (2 bytes).
+    Removing wdtimer.o(i._Z13WDTimer_Startv), (2 bytes).
+    Removing wdtimer.o(i._Z22WDTimer_FaultDetectionv), (4 bytes).
+    Removing wdtimer.o(.ARM.exidx), (8 bytes).
+    Removing wdtimer.o(.ARM.exidx), (8 bytes).
+    Removing wdtimer.o(.ARM.exidx), (8 bytes).
+    Removing wdtimer.o(.ARM.exidx), (8 bytes).
+    Removing wdtimer.o(.ARM.exidx), (8 bytes).
+    Removing spi.o(.rev16_text), (4 bytes).
+    Removing spi.o(.revsh_text), (4 bytes).
+    Removing spi.o(.rrx_text), (6 bytes).
+    Removing spi.o(i._Z10SPI_Init16v), (172 bytes).
+    Removing spi.o(i._Z10SPI_Read16Ptj), (68 bytes).
+    Removing spi.o(i._Z11SPI_Write16Ptj), (84 bytes).
+    Removing spi.o(i._Z14SPI_WriteRead8PhjS_j), (84 bytes).
+    Removing spi.o(i._Z15SPI_WriteRead16PtjS_j), (128 bytes).
+    Removing spi.o(i._Z9SPI_Read8Phj), (60 bytes).
+    Removing spi.o(.ARM.exidx), (8 bytes).
+    Removing spi.o(.ARM.exidx), (8 bytes).
+    Removing spi.o(.ARM.exidx), (8 bytes).
+    Removing spi.o(.ARM.exidx), (8 bytes).
+    Removing spi.o(.ARM.exidx), (8 bytes).
+    Removing spi.o(.ARM.exidx), (8 bytes).
+    Removing spi.o(.ARM.exidx), (8 bytes).
+    Removing spi.o(.ARM.exidx), (8 bytes).
+    Removing uart.o(.rev16_text), (4 bytes).
+    Removing uart.o(.revsh_text), (4 bytes).
+    Removing uart.o(.rrx_text), (6 bytes).
+    Removing uart.o(i._Z10UART1_Initj), (188 bytes).
+    Removing uart.o(i._Z10UART1_ReadPcj), (14 bytes).
+    Removing uart.o(i._Z10UART3_ReadPcj), (40 bytes).
+    Removing uart.o(i._Z11UART1_WritePcj), (72 bytes).
+    Removing uart.o(i._Z17USART1_IRQHandlerv), (48 bytes).
+    Removing uart.o(i._Z22copyHardwareToSoftwarev), (44 bytes).
+    Removing uart.o(i._Z22copySoftwareToHardwarev), (60 bytes).
+    Removing uart.o(.ARM.exidx), (8 bytes).
+    Removing uart.o(.ARM.exidx), (8 bytes).
+    Removing uart.o(.ARM.exidx), (8 bytes).
+    Removing uart.o(.ARM.exidx), (8 bytes).
+    Removing uart.o(.ARM.exidx), (8 bytes).
+    Removing uart.o(.ARM.exidx), (8 bytes).
+    Removing uart.o(.ARM.exidx), (8 bytes).
+    Removing uart.o(.ARM.exidx), (8 bytes).
+    Removing uart.o(.ARM.exidx), (8 bytes).
+    Removing uart.o(.data), (8 bytes).
+    Removing fifo.o(i._Z11FIFO_Get_Rxv), (2 bytes).
+    Removing fifo.o(i._Z11FIFO_Get_Txv), (2 bytes).
+    Removing fifo.o(i._Z11FIFO_Put_Rxh), (2 bytes).
+    Removing fifo.o(i._Z11FIFO_Put_Txh), (2 bytes).
+    Removing fifo.o(i._Z14FIFO_IsFull_Rxv), (2 bytes).
+    Removing fifo.o(i._Z14FIFO_IsFull_Txv), (2 bytes).
+    Removing fifo.o(i._Z15FIFO_IsEmpty_Rxv), (2 bytes).
+    Removing fifo.o(i._Z15FIFO_IsEmpty_Txv), (2 bytes).
+    Removing fifo.o(.ARM.exidx), (8 bytes).
+    Removing fifo.o(.ARM.exidx), (8 bytes).
+    Removing fifo.o(.ARM.exidx), (8 bytes).
+    Removing fifo.o(.ARM.exidx), (8 bytes).
+    Removing fifo.o(.ARM.exidx), (8 bytes).
+    Removing fifo.o(.ARM.exidx), (8 bytes).
+    Removing fifo.o(.ARM.exidx), (8 bytes).
+    Removing fifo.o(.ARM.exidx), (8 bytes).
+    Removing fifo.o(.ARM.exidx), (8 bytes).
+    Removing fxas21002cqr1.o(.rev16_text), (4 bytes).
+    Removing fxas21002cqr1.o(.revsh_text), (4 bytes).
+    Removing fxas21002cqr1.o(.rrx_text), (6 bytes).
+    Removing fxas21002cqr1.o(i._Z18FXAS21002CQR1_Initv), (96 bytes).
+    Removing fxas21002cqr1.o(i._Z21FXAS21002CQR1_Measurev), (20 bytes).
+    Removing fxas21002cqr1.o(i._Z21FXAS21002CQR1_SendCmdhhhj), (72 bytes).
+    Removing fxas21002cqr1.o(i._Z27FXAS21002CQR1_ResetHeadingsv), (32 bytes).
+    Removing fxas21002cqr1.o(i._Z28FXAS21002CQR1_CurrentHeadingv), (212 bytes).
+    Removing fxas21002cqr1.o(i._Z9isFlippedv), (84 bytes).
+    Removing fxas21002cqr1.o(.ARM.exidx), (8 bytes).
+    Removing fxas21002cqr1.o(.ARM.exidx), (8 bytes).
+    Removing fxas21002cqr1.o(.ARM.exidx), (8 bytes).
+    Removing fxas21002cqr1.o(.ARM.exidx), (8 bytes).
+    Removing fxas21002cqr1.o(.ARM.exidx), (8 bytes).
+    Removing fxas21002cqr1.o(.ARM.exidx), (8 bytes).
+    Removing fxas21002cqr1.o(.bss), (24 bytes).
+    Removing terminal.o(i._Z17Terminal_helpMenuv), (8 bytes).
+    Removing terminal.o(i._Z17Terminal_splitOpsPc), (32 bytes).
+    Removing terminal.o(i._Z18Terminal_canStatusv), (2 bytes).
+    Removing terminal.o(i._Z18Terminal_concatIntPct), (32 bytes).
+    Removing terminal.o(i._Z18Terminal_i2cStatusv), (2 bytes).
+    Removing terminal.o(i._Z18Terminal_spiStatusv), (2 bytes).
+    Removing terminal.o(i._Z19Terminal_gyroStatush), (4 bytes).
+    Removing terminal.o(i._Z20Terminal_HandleInputPc), (352 bytes).
+    Removing terminal.o(i._Z21Terminal_eepromStatusv), (2 bytes).
+    Removing terminal.o(i._Z21Terminal_setContactorPc), (4 bytes).
+    Removing terminal.o(i._Z22Terminal_currentStatusv), (100 bytes).
+    Removing terminal.o(i._Z22Terminal_generalStatusv), (2 bytes).
+    Removing terminal.o(i._Z22Terminal_voltageStatusv), (2 bytes).
+    Removing terminal.o(i._Z23Terminal_watchdogStatusv), (2 bytes).
+    Removing terminal.o(i._Z24Terminal_contactorStatusv), (2 bytes).
+    Removing terminal.o(i._Z26Terminal_temperatureStatusv), (2 bytes).
+    Removing terminal.o(.ARM.exidx), (8 bytes).
+    Removing terminal.o(.ARM.exidx), (8 bytes).
+    Removing terminal.o(.ARM.exidx), (8 bytes).
+    Removing terminal.o(.ARM.exidx), (8 bytes).
+    Removing terminal.o(.ARM.exidx), (8 bytes).
+    Removing terminal.o(.ARM.exidx), (8 bytes).
+    Removing terminal.o(.ARM.exidx), (8 bytes).
+    Removing terminal.o(.ARM.exidx), (8 bytes).
+    Removing terminal.o(.ARM.exidx), (8 bytes).
+    Removing terminal.o(.ARM.exidx), (8 bytes).
+    Removing terminal.o(.ARM.exidx), (8 bytes).
+    Removing terminal.o(.ARM.exidx), (8 bytes).
+    Removing terminal.o(.ARM.exidx), (8 bytes).
+    Removing terminal.o(.ARM.exidx), (8 bytes).
+    Removing terminal.o(.ARM.exidx), (8 bytes).
+    Removing terminal.o(.ARM.exidx), (8 bytes).
+    Removing terminal.o(.conststring), (739 bytes).
+    Removing misc.o(.rev16_text), (4 bytes).
+    Removing misc.o(.revsh_text), (4 bytes).
+    Removing misc.o(.rrx_text), (6 bytes).
+    Removing misc.o(i.NVIC_Init), (120 bytes).
+    Removing misc.o(i.NVIC_PriorityGroupConfig), (20 bytes).
+    Removing misc.o(i.NVIC_SetVectorTable), (20 bytes).
+    Removing misc.o(i.NVIC_SystemLPConfig), (32 bytes).
+    Removing misc.o(i.SysTick_CLKSourceConfig), (40 bytes).
+    Removing misc.o(.ARM.exidx), (8 bytes).
+    Removing misc.o(.ARM.exidx), (8 bytes).
+    Removing misc.o(.ARM.exidx), (8 bytes).
+    Removing misc.o(.ARM.exidx), (8 bytes).
+    Removing misc.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_rcc.o(.rev16_text), (4 bytes).
+    Removing stm32f4xx_rcc.o(.revsh_text), (4 bytes).
+    Removing stm32f4xx_rcc.o(.rrx_text), (6 bytes).
+    Removing stm32f4xx_rcc.o(i.RCC_48MHzClockSourceConfig), (36 bytes).
+    Removing stm32f4xx_rcc.o(i.RCC_AHB1PeriphClockLPModeCmd), (32 bytes).
+    Removing stm32f4xx_rcc.o(i.RCC_AHB1PeriphResetCmd), (32 bytes).
+    Removing stm32f4xx_rcc.o(i.RCC_AHB2PeriphClockCmd), (32 bytes).
+    Removing stm32f4xx_rcc.o(i.RCC_AHB2PeriphClockLPModeCmd), (32 bytes).
+    Removing stm32f4xx_rcc.o(i.RCC_AHB2PeriphResetCmd), (32 bytes).
+    Removing stm32f4xx_rcc.o(i.RCC_AHB3PeriphClockCmd), (32 bytes).
+    Removing stm32f4xx_rcc.o(i.RCC_AHB3PeriphClockLPModeCmd), (32 bytes).
+    Removing stm32f4xx_rcc.o(i.RCC_AHB3PeriphResetCmd), (32 bytes).
+    Removing stm32f4xx_rcc.o(i.RCC_APB1PeriphClockLPModeCmd), (32 bytes).
+    Removing stm32f4xx_rcc.o(i.RCC_APB1PeriphResetCmd), (32 bytes).
+    Removing stm32f4xx_rcc.o(i.RCC_APB2PeriphClockLPModeCmd), (32 bytes).
+    Removing stm32f4xx_rcc.o(i.RCC_APB2PeriphResetCmd), (32 bytes).
+    Removing stm32f4xx_rcc.o(i.RCC_AdjustHSICalibrationValue), (24 bytes).
+    Removing stm32f4xx_rcc.o(i.RCC_BackupResetCmd), (12 bytes).
+    Removing stm32f4xx_rcc.o(i.RCC_ClearFlag), (20 bytes).
+    Removing stm32f4xx_rcc.o(i.RCC_ClearITPendingBit), (12 bytes).
+    Removing stm32f4xx_rcc.o(i.RCC_ClockSecuritySystemCmd), (12 bytes).
+    Removing stm32f4xx_rcc.o(i.RCC_DFSDM1ACLKConfig), (24 bytes).
+    Removing stm32f4xx_rcc.o(i.RCC_DFSDM2ACLKConfig), (24 bytes).
+    Removing stm32f4xx_rcc.o(i.RCC_DFSDMCLKConfig), (24 bytes).
+    Removing stm32f4xx_rcc.o(i.RCC_DeInit), (96 bytes).
+    Removing stm32f4xx_rcc.o(i.RCC_FMPI2C1ClockSourceConfig), (28 bytes).
+    Removing stm32f4xx_rcc.o(i.RCC_GetFlagStatus), (64 bytes).
+    Removing stm32f4xx_rcc.o(i.RCC_GetITStatus), (24 bytes).
+    Removing stm32f4xx_rcc.o(i.RCC_GetSYSCLKSource), (16 bytes).
+    Removing stm32f4xx_rcc.o(i.RCC_HCLKConfig), (24 bytes).
+    Removing stm32f4xx_rcc.o(i.RCC_HSEConfig), (16 bytes).
+    Removing stm32f4xx_rcc.o(i.RCC_HSICmd), (12 bytes).
+    Removing stm32f4xx_rcc.o(i.RCC_I2SCLKConfig), (52 bytes).
+    Removing stm32f4xx_rcc.o(i.RCC_ITConfig), (32 bytes).
+    Removing stm32f4xx_rcc.o(i.RCC_LPTIM1ClockSourceConfig), (28 bytes).
+    Removing stm32f4xx_rcc.o(i.RCC_LSEConfig), (44 bytes).
+    Removing stm32f4xx_rcc.o(i.RCC_LSEModeConfig), (36 bytes).
+    Removing stm32f4xx_rcc.o(i.RCC_LSICmd), (12 bytes).
+    Removing stm32f4xx_rcc.o(i.RCC_LTDCCLKDivConfig), (24 bytes).
+    Removing stm32f4xx_rcc.o(i.RCC_MCO1Config), (28 bytes).
+    Removing stm32f4xx_rcc.o(i.RCC_MCO2Config), (28 bytes).
+    Removing stm32f4xx_rcc.o(i.RCC_PCLK1Config), (24 bytes).
+    Removing stm32f4xx_rcc.o(i.RCC_PCLK2Config), (24 bytes).
+    Removing stm32f4xx_rcc.o(i.RCC_PLLCmd), (12 bytes).
+    Removing stm32f4xx_rcc.o(i.RCC_PLLConfig), (40 bytes).
+    Removing stm32f4xx_rcc.o(i.RCC_PLLI2SCmd), (12 bytes).
+    Removing stm32f4xx_rcc.o(i.RCC_PLLI2SConfig), (36 bytes).
+    Removing stm32f4xx_rcc.o(i.RCC_PLLSAICmd), (12 bytes).
+    Removing stm32f4xx_rcc.o(i.RCC_RTCCLKCmd), (12 bytes).
+    Removing stm32f4xx_rcc.o(i.RCC_RTCCLKConfig), (60 bytes).
+    Removing stm32f4xx_rcc.o(i.RCC_SAIBlockACLKConfig), (24 bytes).
+    Removing stm32f4xx_rcc.o(i.RCC_SAIBlockBCLKConfig), (24 bytes).
+    Removing stm32f4xx_rcc.o(i.RCC_SAIPLLI2SClkDivConfig), (28 bytes).
+    Removing stm32f4xx_rcc.o(i.RCC_SAIPLLI2SRClkDivConfig), (28 bytes).
+    Removing stm32f4xx_rcc.o(i.RCC_SAIPLLRClkDivConfig), (28 bytes).
+    Removing stm32f4xx_rcc.o(i.RCC_SAIPLLSAIClkDivConfig), (28 bytes).
+    Removing stm32f4xx_rcc.o(i.RCC_SDIOClockSourceConfig), (36 bytes).
+    Removing stm32f4xx_rcc.o(i.RCC_SYSCLKConfig), (24 bytes).
+    Removing stm32f4xx_rcc.o(i.RCC_TIMCLKPresConfig), (12 bytes).
+    Removing stm32f4xx_rcc.o(i.RCC_WaitForHSEStartUp), (56 bytes).
+    Removing stm32f4xx_rcc.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_rcc.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_rcc.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_rcc.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_rcc.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_rcc.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_rcc.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_rcc.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_rcc.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_rcc.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_rcc.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_rcc.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_rcc.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_rcc.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_rcc.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_rcc.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_rcc.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_rcc.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_rcc.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_rcc.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_rcc.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_rcc.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_rcc.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_rcc.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_rcc.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_rcc.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_rcc.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_rcc.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_rcc.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_rcc.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_rcc.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_rcc.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_rcc.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_rcc.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_rcc.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_rcc.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_rcc.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_rcc.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_rcc.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_rcc.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_rcc.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_rcc.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_rcc.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_rcc.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_rcc.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_rcc.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_rcc.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_rcc.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_rcc.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_rcc.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_rcc.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_rcc.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_rcc.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_rcc.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_rcc.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_rcc.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_rcc.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_rcc.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_rcc.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_rcc.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_rcc.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_i2c.o(.rev16_text), (4 bytes).
+    Removing stm32f4xx_i2c.o(.revsh_text), (4 bytes).
+    Removing stm32f4xx_i2c.o(.rrx_text), (6 bytes).
+    Removing stm32f4xx_i2c.o(i.I2C_ARPCmd), (24 bytes).
+    Removing stm32f4xx_i2c.o(i.I2C_AcknowledgeConfig), (24 bytes).
+    Removing stm32f4xx_i2c.o(i.I2C_AnalogFilterCmd), (24 bytes).
+    Removing stm32f4xx_i2c.o(i.I2C_CalculatePEC), (24 bytes).
+    Removing stm32f4xx_i2c.o(i.I2C_CheckEvent), (42 bytes).
+    Removing stm32f4xx_i2c.o(i.I2C_ClearFlag), (12 bytes).
+    Removing stm32f4xx_i2c.o(i.I2C_ClearITPendingBit), (12 bytes).
+    Removing stm32f4xx_i2c.o(i.I2C_Cmd), (24 bytes).
+    Removing stm32f4xx_i2c.o(i.I2C_DMACmd), (24 bytes).
+    Removing stm32f4xx_i2c.o(i.I2C_DMALastTransferCmd), (24 bytes).
+    Removing stm32f4xx_i2c.o(i.I2C_DeInit), (96 bytes).
+    Removing stm32f4xx_i2c.o(i.I2C_DigitalFilterConfig), (22 bytes).
+    Removing stm32f4xx_i2c.o(i.I2C_DualAddressCmd), (24 bytes).
+    Removing stm32f4xx_i2c.o(i.I2C_FastModeDutyCycleConfig), (28 bytes).
+    Removing stm32f4xx_i2c.o(i.I2C_GeneralCallCmd), (24 bytes).
+    Removing stm32f4xx_i2c.o(i.I2C_GenerateSTART), (24 bytes).
+    Removing stm32f4xx_i2c.o(i.I2C_GenerateSTOP), (24 bytes).
+    Removing stm32f4xx_i2c.o(i.I2C_GetFlagStatus), (58 bytes).
+    Removing stm32f4xx_i2c.o(i.I2C_GetITStatus), (38 bytes).
+    Removing stm32f4xx_i2c.o(i.I2C_GetLastEvent), (26 bytes).
+    Removing stm32f4xx_i2c.o(i.I2C_GetPEC), (8 bytes).
+    Removing stm32f4xx_i2c.o(i.I2C_ITConfig), (18 bytes).
+    Removing stm32f4xx_i2c.o(i.I2C_Init), (232 bytes).
+    Removing stm32f4xx_i2c.o(i.I2C_NACKPositionConfig), (28 bytes).
+    Removing stm32f4xx_i2c.o(i.I2C_OwnAddress2Config), (22 bytes).
+    Removing stm32f4xx_i2c.o(i.I2C_PECPositionConfig), (28 bytes).
+    Removing stm32f4xx_i2c.o(i.I2C_ReadRegister), (22 bytes).
+    Removing stm32f4xx_i2c.o(i.I2C_ReceiveData), (8 bytes).
+    Removing stm32f4xx_i2c.o(i.I2C_SMBusAlertConfig), (28 bytes).
+    Removing stm32f4xx_i2c.o(i.I2C_Send7bitAddress), (16 bytes).
+    Removing stm32f4xx_i2c.o(i.I2C_SendData), (4 bytes).
+    Removing stm32f4xx_i2c.o(i.I2C_SoftwareResetCmd), (22 bytes).
+    Removing stm32f4xx_i2c.o(i.I2C_StretchClockCmd), (24 bytes).
+    Removing stm32f4xx_i2c.o(i.I2C_StructInit), (30 bytes).
+    Removing stm32f4xx_i2c.o(i.I2C_TransmitPEC), (24 bytes).
+    Removing stm32f4xx_i2c.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_i2c.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_i2c.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_i2c.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_i2c.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_i2c.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_i2c.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_i2c.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_i2c.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_i2c.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_i2c.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_i2c.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_i2c.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_i2c.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_i2c.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_i2c.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_i2c.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_i2c.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_i2c.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_i2c.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_i2c.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_i2c.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_i2c.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_i2c.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_i2c.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_i2c.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_i2c.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_i2c.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_i2c.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_i2c.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_i2c.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_i2c.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_i2c.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_i2c.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_i2c.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_gpio.o(.rev16_text), (4 bytes).
+    Removing stm32f4xx_gpio.o(.revsh_text), (4 bytes).
+    Removing stm32f4xx_gpio.o(.rrx_text), (6 bytes).
+    Removing stm32f4xx_gpio.o(i.GPIO_DeInit), (312 bytes).
+    Removing stm32f4xx_gpio.o(i.GPIO_PinLockConfig), (34 bytes).
+    Removing stm32f4xx_gpio.o(i.GPIO_ReadInputData), (8 bytes).
+    Removing stm32f4xx_gpio.o(i.GPIO_ReadInputDataBit), (18 bytes).
+    Removing stm32f4xx_gpio.o(i.GPIO_ReadOutputData), (8 bytes).
+    Removing stm32f4xx_gpio.o(i.GPIO_ReadOutputDataBit), (18 bytes).
+    Removing stm32f4xx_gpio.o(i.GPIO_ResetBits), (4 bytes).
+    Removing stm32f4xx_gpio.o(i.GPIO_SetBits), (4 bytes).
+    Removing stm32f4xx_gpio.o(i.GPIO_StructInit), (18 bytes).
+    Removing stm32f4xx_gpio.o(i.GPIO_ToggleBits), (8 bytes).
+    Removing stm32f4xx_gpio.o(i.GPIO_Write), (4 bytes).
+    Removing stm32f4xx_gpio.o(i.GPIO_WriteBit), (10 bytes).
+    Removing stm32f4xx_gpio.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_gpio.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_gpio.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_gpio.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_gpio.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_gpio.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_gpio.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_gpio.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_gpio.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_gpio.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_gpio.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_gpio.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_gpio.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_gpio.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_spi.o(.rev16_text), (4 bytes).
+    Removing stm32f4xx_spi.o(.revsh_text), (4 bytes).
+    Removing stm32f4xx_spi.o(.rrx_text), (6 bytes).
+    Removing stm32f4xx_spi.o(i.I2S_Cmd), (24 bytes).
+    Removing stm32f4xx_spi.o(i.I2S_FullDuplexConfig), (80 bytes).
+    Removing stm32f4xx_spi.o(i.I2S_Init), (436 bytes).
+    Removing stm32f4xx_spi.o(i.I2S_StructInit), (20 bytes).
+    Removing stm32f4xx_spi.o(i.SPI_BiDirectionalLineConfig), (28 bytes).
+    Removing stm32f4xx_spi.o(i.SPI_CalculateCRC), (24 bytes).
+    Removing stm32f4xx_spi.o(i.SPI_DataSizeConfig), (18 bytes).
+    Removing stm32f4xx_spi.o(i.SPI_GetCRC), (16 bytes).
+    Removing stm32f4xx_spi.o(i.SPI_GetCRCPolynomial), (6 bytes).
+    Removing stm32f4xx_spi.o(i.SPI_I2S_ClearFlag), (6 bytes).
+    Removing stm32f4xx_spi.o(i.SPI_I2S_ClearITPendingBit), (20 bytes).
+    Removing stm32f4xx_spi.o(i.SPI_I2S_DMACmd), (18 bytes).
+    Removing stm32f4xx_spi.o(i.SPI_I2S_DeInit), (176 bytes).
+    Removing stm32f4xx_spi.o(i.SPI_I2S_GetFlagStatus), (18 bytes).
+    Removing stm32f4xx_spi.o(i.SPI_I2S_GetITStatus), (52 bytes).
+    Removing stm32f4xx_spi.o(i.SPI_I2S_ITConfig), (32 bytes).
+    Removing stm32f4xx_spi.o(i.SPI_I2S_ReceiveData), (6 bytes).
+    Removing stm32f4xx_spi.o(i.SPI_I2S_SendData), (4 bytes).
+    Removing stm32f4xx_spi.o(i.SPI_NSSInternalSoftwareConfig), (30 bytes).
+    Removing stm32f4xx_spi.o(i.SPI_SSOutputCmd), (24 bytes).
+    Removing stm32f4xx_spi.o(i.SPI_StructInit), (24 bytes).
+    Removing stm32f4xx_spi.o(i.SPI_TIModeCmd), (24 bytes).
+    Removing stm32f4xx_spi.o(i.SPI_TransmitCRC), (10 bytes).
+    Removing stm32f4xx_spi.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_spi.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_spi.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_spi.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_spi.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_spi.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_spi.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_spi.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_spi.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_spi.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_spi.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_spi.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_spi.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_spi.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_spi.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_spi.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_spi.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_spi.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_spi.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_spi.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_spi.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_spi.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_spi.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_spi.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_spi.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_tim.o(.rev16_text), (4 bytes).
+    Removing stm32f4xx_tim.o(.revsh_text), (4 bytes).
+    Removing stm32f4xx_tim.o(.rrx_text), (6 bytes).
+    Removing stm32f4xx_tim.o(i.TIM_ARRPreloadConfig), (24 bytes).
+    Removing stm32f4xx_tim.o(i.TIM_BDTRConfig), (32 bytes).
+    Removing stm32f4xx_tim.o(i.TIM_BDTRStructInit), (18 bytes).
+    Removing stm32f4xx_tim.o(i.TIM_CCPreloadControl), (24 bytes).
+    Removing stm32f4xx_tim.o(i.TIM_CCxCmd), (30 bytes).
+    Removing stm32f4xx_tim.o(i.TIM_CCxNCmd), (30 bytes).
+    Removing stm32f4xx_tim.o(i.TIM_ClearFlag), (6 bytes).
+    Removing stm32f4xx_tim.o(i.TIM_ClearITPendingBit), (6 bytes).
+    Removing stm32f4xx_tim.o(i.TIM_ClearOC1Ref), (18 bytes).
+    Removing stm32f4xx_tim.o(i.TIM_ClearOC2Ref), (24 bytes).
+    Removing stm32f4xx_tim.o(i.TIM_ClearOC3Ref), (18 bytes).
+    Removing stm32f4xx_tim.o(i.TIM_ClearOC4Ref), (24 bytes).
+    Removing stm32f4xx_tim.o(i.TIM_Cmd), (24 bytes).
+    Removing stm32f4xx_tim.o(i.TIM_CounterModeConfig), (18 bytes).
+    Removing stm32f4xx_tim.o(i.TIM_CtrlPWMOutputs), (30 bytes).
+    Removing stm32f4xx_tim.o(i.TIM_DMACmd), (18 bytes).
+    Removing stm32f4xx_tim.o(i.TIM_DMAConfig), (10 bytes).
+    Removing stm32f4xx_tim.o(i.TIM_DeInit), (400 bytes).
+    Removing stm32f4xx_tim.o(i.TIM_ETRClockMode1Config), (54 bytes).
+    Removing stm32f4xx_tim.o(i.TIM_ETRClockMode2Config), (32 bytes).
+    Removing stm32f4xx_tim.o(i.TIM_ETRConfig), (28 bytes).
+    Removing stm32f4xx_tim.o(i.TIM_EncoderInterfaceConfig), (66 bytes).
+    Removing stm32f4xx_tim.o(i.TIM_ForcedOC1Config), (18 bytes).
+    Removing stm32f4xx_tim.o(i.TIM_ForcedOC2Config), (26 bytes).
+    Removing stm32f4xx_tim.o(i.TIM_ForcedOC3Config), (18 bytes).
+    Removing stm32f4xx_tim.o(i.TIM_ForcedOC4Config), (26 bytes).
+    Removing stm32f4xx_tim.o(i.TIM_GenerateEvent), (4 bytes).
+    Removing stm32f4xx_tim.o(i.TIM_GetCapture1), (6 bytes).
+    Removing stm32f4xx_tim.o(i.TIM_GetCapture2), (6 bytes).
+    Removing stm32f4xx_tim.o(i.TIM_GetCapture3), (6 bytes).
+    Removing stm32f4xx_tim.o(i.TIM_GetCapture4), (6 bytes).
+    Removing stm32f4xx_tim.o(i.TIM_GetCounter), (6 bytes).
+    Removing stm32f4xx_tim.o(i.TIM_GetFlagStatus), (18 bytes).
+    Removing stm32f4xx_tim.o(i.TIM_GetITStatus), (34 bytes).
+    Removing stm32f4xx_tim.o(i.TIM_GetPrescaler), (6 bytes).
+    Removing stm32f4xx_tim.o(i.TIM_ICInit), (110 bytes).
+    Removing stm32f4xx_tim.o(i.TIM_ICStructInit), (18 bytes).
+    Removing stm32f4xx_tim.o(i.TIM_ITConfig), (18 bytes).
+    Removing stm32f4xx_tim.o(i.TIM_ITRxExternalClockConfig), (24 bytes).
+    Removing stm32f4xx_tim.o(i.TIM_InternalClockConfig), (12 bytes).
+    Removing stm32f4xx_tim.o(i.TIM_OC1FastConfig), (18 bytes).
+    Removing stm32f4xx_tim.o(i.TIM_OC1Init), (124 bytes).
+    Removing stm32f4xx_tim.o(i.TIM_OC1NPolarityConfig), (18 bytes).
+    Removing stm32f4xx_tim.o(i.TIM_OC1PolarityConfig), (18 bytes).
+    Removing stm32f4xx_tim.o(i.TIM_OC1PreloadConfig), (18 bytes).
+    Removing stm32f4xx_tim.o(i.TIM_OC2FastConfig), (26 bytes).
+    Removing stm32f4xx_tim.o(i.TIM_OC2Init), (164 bytes).
+    Removing stm32f4xx_tim.o(i.TIM_OC2NPolarityConfig), (26 bytes).
+    Removing stm32f4xx_tim.o(i.TIM_OC2PolarityConfig), (26 bytes).
+    Removing stm32f4xx_tim.o(i.TIM_OC2PreloadConfig), (26 bytes).
+    Removing stm32f4xx_tim.o(i.TIM_OC3FastConfig), (18 bytes).
+    Removing stm32f4xx_tim.o(i.TIM_OC3Init), (160 bytes).
+    Removing stm32f4xx_tim.o(i.TIM_OC3NPolarityConfig), (26 bytes).
+    Removing stm32f4xx_tim.o(i.TIM_OC3PolarityConfig), (26 bytes).
+    Removing stm32f4xx_tim.o(i.TIM_OC3PreloadConfig), (18 bytes).
+    Removing stm32f4xx_tim.o(i.TIM_OC4FastConfig), (26 bytes).
+    Removing stm32f4xx_tim.o(i.TIM_OC4Init), (120 bytes).
+    Removing stm32f4xx_tim.o(i.TIM_OC4PolarityConfig), (26 bytes).
+    Removing stm32f4xx_tim.o(i.TIM_OC4PreloadConfig), (26 bytes).
+    Removing stm32f4xx_tim.o(i.TIM_OCStructInit), (20 bytes).
+    Removing stm32f4xx_tim.o(i.TIM_PWMIConfig), (124 bytes).
+    Removing stm32f4xx_tim.o(i.TIM_PrescalerConfig), (6 bytes).
+    Removing stm32f4xx_tim.o(i.TIM_RemapConfig), (6 bytes).
+    Removing stm32f4xx_tim.o(i.TIM_SelectCCDMA), (24 bytes).
+    Removing stm32f4xx_tim.o(i.TIM_SelectCOM), (24 bytes).
+    Removing stm32f4xx_tim.o(i.TIM_SelectHallSensor), (24 bytes).
+    Removing stm32f4xx_tim.o(i.TIM_SelectInputTrigger), (18 bytes).
+    Removing stm32f4xx_tim.o(i.TIM_SelectMasterSlaveMode), (18 bytes).
+    Removing stm32f4xx_tim.o(i.TIM_SelectOCxM), (86 bytes).
+    Removing stm32f4xx_tim.o(i.TIM_SelectOnePulseMode), (18 bytes).
+    Removing stm32f4xx_tim.o(i.TIM_SelectOutputTrigger), (18 bytes).
+    Removing stm32f4xx_tim.o(i.TIM_SelectSlaveMode), (18 bytes).
+    Removing stm32f4xx_tim.o(i.TIM_SetAutoreload), (4 bytes).
+    Removing stm32f4xx_tim.o(i.TIM_SetClockDivision), (18 bytes).
+    Removing stm32f4xx_tim.o(i.TIM_SetCompare1), (4 bytes).
+    Removing stm32f4xx_tim.o(i.TIM_SetCompare2), (4 bytes).
+    Removing stm32f4xx_tim.o(i.TIM_SetCompare3), (4 bytes).
+    Removing stm32f4xx_tim.o(i.TIM_SetCompare4), (4 bytes).
+    Removing stm32f4xx_tim.o(i.TIM_SetCounter), (4 bytes).
+    Removing stm32f4xx_tim.o(i.TIM_SetIC1Prescaler), (18 bytes).
+    Removing stm32f4xx_tim.o(i.TIM_SetIC2Prescaler), (26 bytes).
+    Removing stm32f4xx_tim.o(i.TIM_SetIC3Prescaler), (18 bytes).
+    Removing stm32f4xx_tim.o(i.TIM_SetIC4Prescaler), (26 bytes).
+    Removing stm32f4xx_tim.o(i.TIM_TIxExternalClockConfig), (62 bytes).
+    Removing stm32f4xx_tim.o(i.TIM_TimeBaseInit), (132 bytes).
+    Removing stm32f4xx_tim.o(i.TIM_TimeBaseStructInit), (18 bytes).
+    Removing stm32f4xx_tim.o(i.TIM_UpdateDisableConfig), (24 bytes).
+    Removing stm32f4xx_tim.o(i.TIM_UpdateRequestConfig), (24 bytes).
+    Removing stm32f4xx_tim.o(i._ZN37_INTERNAL_15_stm32f4xx_tim_c_c458916b10TI1_ConfigEP11TIM_TypeDefttt), (58 bytes).
+    Removing stm32f4xx_tim.o(i._ZN37_INTERNAL_15_stm32f4xx_tim_c_c458916b10TI2_ConfigEP11TIM_TypeDefttt), (80 bytes).
+    Removing stm32f4xx_tim.o(i._ZN37_INTERNAL_15_stm32f4xx_tim_c_c458916b10TI3_ConfigEP11TIM_TypeDefttt), (72 bytes).
+    Removing stm32f4xx_tim.o(i._ZN37_INTERNAL_15_stm32f4xx_tim_c_c458916b10TI4_ConfigEP11TIM_TypeDefttt), (80 bytes).
+    Removing stm32f4xx_tim.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_tim.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_tim.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_tim.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_tim.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_tim.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_tim.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_tim.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_tim.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_tim.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_tim.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_tim.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_tim.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_tim.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_tim.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_tim.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_tim.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_tim.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_tim.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_tim.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_tim.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_tim.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_tim.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_tim.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_tim.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_tim.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_tim.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_tim.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_tim.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_tim.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_tim.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_tim.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_tim.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_tim.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_tim.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_tim.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_tim.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_tim.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_tim.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_tim.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_tim.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_tim.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_tim.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_tim.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_tim.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_tim.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_tim.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_tim.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_tim.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_tim.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_tim.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_tim.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_tim.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_tim.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_tim.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_tim.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_tim.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_tim.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_tim.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_tim.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_tim.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_tim.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_tim.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_tim.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_tim.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_tim.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_tim.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_tim.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_tim.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_tim.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_tim.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_tim.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_tim.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_tim.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_tim.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_tim.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_tim.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_tim.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_tim.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_tim.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_tim.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_tim.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_tim.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_tim.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_tim.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_tim.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_tim.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_tim.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_tim.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_tim.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_tim.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_tim.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_usart.o(.rev16_text), (4 bytes).
+    Removing stm32f4xx_usart.o(.revsh_text), (4 bytes).
+    Removing stm32f4xx_usart.o(.rrx_text), (6 bytes).
+    Removing stm32f4xx_usart.o(i.USART_ClearFlag), (18 bytes).
+    Removing stm32f4xx_usart.o(i.USART_ClearITPendingBit), (30 bytes).
+    Removing stm32f4xx_usart.o(i.USART_ClockInit), (32 bytes).
+    Removing stm32f4xx_usart.o(i.USART_ClockStructInit), (12 bytes).
+    Removing stm32f4xx_usart.o(i.USART_DMACmd), (18 bytes).
+    Removing stm32f4xx_usart.o(i.USART_DeInit), (240 bytes).
+    Removing stm32f4xx_usart.o(i.USART_GetFlagStatus), (26 bytes).
+    Removing stm32f4xx_usart.o(i.USART_GetITStatus), (84 bytes).
+    Removing stm32f4xx_usart.o(i.USART_HalfDuplexCmd), (24 bytes).
+    Removing stm32f4xx_usart.o(i.USART_ITConfig), (74 bytes).
+    Removing stm32f4xx_usart.o(i.USART_IrDACmd), (24 bytes).
+    Removing stm32f4xx_usart.o(i.USART_IrDAConfig), (18 bytes).
+    Removing stm32f4xx_usart.o(i.USART_LINBreakDetectLengthConfig), (18 bytes).
+    Removing stm32f4xx_usart.o(i.USART_LINCmd), (24 bytes).
+    Removing stm32f4xx_usart.o(i.USART_OneBitMethodCmd), (24 bytes).
+    Removing stm32f4xx_usart.o(i.USART_OverSampling8Cmd), (22 bytes).
+    Removing stm32f4xx_usart.o(i.USART_ReceiveData), (10 bytes).
+    Removing stm32f4xx_usart.o(i.USART_ReceiverWakeUpCmd), (24 bytes).
+    Removing stm32f4xx_usart.o(i.USART_SendBreak), (10 bytes).
+    Removing stm32f4xx_usart.o(i.USART_SendData), (8 bytes).
+    Removing stm32f4xx_usart.o(i.USART_SetAddress), (18 bytes).
+    Removing stm32f4xx_usart.o(i.USART_SetGuardTime), (16 bytes).
+    Removing stm32f4xx_usart.o(i.USART_SetPrescaler), (16 bytes).
+    Removing stm32f4xx_usart.o(i.USART_SmartCardCmd), (24 bytes).
+    Removing stm32f4xx_usart.o(i.USART_SmartCardNACKCmd), (24 bytes).
+    Removing stm32f4xx_usart.o(i.USART_StructInit), (24 bytes).
+    Removing stm32f4xx_usart.o(i.USART_WakeUpConfig), (18 bytes).
+    Removing stm32f4xx_usart.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_usart.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_usart.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_usart.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_usart.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_usart.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_usart.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_usart.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_usart.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_usart.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_usart.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_usart.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_usart.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_usart.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_usart.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_usart.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_usart.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_usart.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_usart.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_usart.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_usart.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_usart.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_usart.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_usart.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_usart.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_usart.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_usart.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_usart.o(.ARM.exidx), (8 bytes).
+    Removing stm32f4xx_usart.o(.ARM.exidx), (8 bytes).
+    Removing system_stm32f4xx.o(.rev16_text), (4 bytes).
+    Removing system_stm32f4xx.o(.revsh_text), (4 bytes).
+    Removing system_stm32f4xx.o(.rrx_text), (6 bytes).
+    Removing system_stm32f4xx.o(i.SystemCoreClockUpdate), (192 bytes).
+    Removing system_stm32f4xx.o(.ARM.exidx), (8 bytes).
+    Removing system_stm32f4xx.o(.ARM.exidx), (8 bytes).
+    Removing system_stm32f4xx.o(.constdata), (16 bytes).
+    Removing system_stm32f4xx.o(.data), (4 bytes).
+
+730 unused section(s) (total 15927 bytes) removed from the image.

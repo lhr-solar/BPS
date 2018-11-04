@@ -88,6 +88,7 @@ void LTC6811_Init(cell_asic *battMod){
 /********************************************************
 *********************************************************/
 
+
 void LTC6811_init_reg_limits(uint8_t total_ic, cell_asic ic[])
 {
   for (uint8_t cic=0; cic<total_ic; cic++)
@@ -121,6 +122,7 @@ void LTC6811_adcvsc(
 {
   LTC681x_adcvsc(MD,DCP);
 }
+
 
 // Starts cell voltage  and GPIO 1&2 conversion
 void LTC6811_adcvax(
