@@ -18,6 +18,7 @@
     (date 2018-10-31)
     (rev Rev1.2)
     (company "UT Solar Vehicle Team")
+    (comment 1 "See Schematic Rev3.1.")
   )
 
   (layers
