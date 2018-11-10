@@ -8,6 +8,10 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "Terminal.h"
+#include "Current.h"
+#include "Voltage.h"
+#include "Temperature.h"
+#include "Gyro.h"
 
 int _read(int file, char *data, int len){
 
@@ -17,7 +21,7 @@ int _write(int file, char *data, int len){
 
 }
 
-void * Terminal_HandleInput(char * input){
+void Terminal_HandleInput(char * input){
 	char ** ops = Terminal_splitOps(input);
 
 	if(strcmp(ops[0], "i") == 0){			// Current status
@@ -27,7 +31,7 @@ void * Terminal_HandleInput(char * input){
 	}else if(strcmp(ops[0], "t") == 0){		// Temperature status
 		Terminal_temperatureStatus();
 	}else if(strcmp(ops[0], "st") == 0){		// General status
-		Terminal_currentStatus());
+		Terminal_currentStatus();
 		Terminal_voltageStatus();
 		Terminal_temperatureStatus();
 		Terminal_contactorStatus();
@@ -72,15 +76,15 @@ void * Terminal_HandleInput(char * input){
 	printf("\n\r"); // Do a newline for the next command
 }
 
-void * Terminal_currentStatus(void){
-	string stat = Current_IsSafe() ? "SAFE" : "NOT SAFE";
+void Terminal_currentStatus(void){
+	char * stat = Current_IsSafe() ? "SAFE" : "NOT SAFE";
 	printf("The current level is %s\n\r", stat);
 	printf("High-precision: %u\n\r", Current_HighPrecisionAmperes());
 	printf("Low-precision: %u\n\r", Current_LowPrecisionAmperes());
 }
 
-void * Terminal_voltageStatus(void){
-	string stat = Voltage_IsSafe() ? "SAFE" : "NOT SAFE";
+void Terminal_voltageStatus(void){
+	char * stat = Voltage_IsSafe() ? "SAFE" : "NOT SAFE";
 	printf("The voltage level is %s\n\r", stat);
 	printf("Total pack voltage: %u\n\r", Voltage_TotalPackVoltage());
 	printf("Modules in danger: ");
@@ -91,8 +95,8 @@ void * Terminal_voltageStatus(void){
 	printf("\n\r");
 }
 
-char * Terminal_temperatureStatus(void){
-	string stat = Temperature_IsSafe() ? "SAFE" : "NOT SAFE";
+void Terminal_temperatureStatus(void){
+	char * stat = Temperature_IsSafe() ? "SAFE" : "NOT SAFE";
 	printf("The temperature level is %s\n\r", stat);
 	printf("Average temperature: %u\n\r", Temperature_TotalPackAvgTemperature());
 	printf("Modules in danger: ");
@@ -103,39 +107,39 @@ char * Terminal_temperatureStatus(void){
 	printf("\n\r");
 }
 
-char * Terminal_contactorStatus(void){
+void Terminal_contactorStatus(void){
 
 }
 
-char * Terminal_setContactor(char * status){
+void Terminal_setContactor(int status){
 
 }
 
 /**
  * @param the axes to read from, where 0 = all, 1 = x, 2 = y, 3 = z
  */
-char * Terminal_gyroStatus(uint8_t axes){
-	stat = ICM20600_IsFlipped() ? "FLIPPED" : "NOT FLIPPED";
+void Terminal_gyroStatus(uint8_t axes){
+	char * stat = ICM20600_IsFlipped() ? "FLIPPED" : "NOT FLIPPED";
 	printf("The car is currently %s", stat);
 }
 
-char * Terminal_watchdogStatus(){
+void Terminal_watchdogStatus(){
 
 }
 
-char * Terminal_eepromStatus(){
+void Terminal_eepromStatus(){
 
 }
 
-char * Terminal_canStatus(){
+void Terminal_canStatus(){
 
 }
 
-char * Terminal_spiStatus(){
+void Terminal_spiStatus(){
 
 }
 
-char * Terminal_i2cStatus(){
+void Terminal_i2cStatus(){
 
 }
 
@@ -146,8 +150,8 @@ char ** Terminal_splitOps (char * input){
 	return ops;
 }
 
-char * Terminal_helpMenu(){
-	return
+void Terminal_helpMenu(){
+	printf(
 		"This is the help menu for the BeVolt CLI.\n"
 		"The availible commands are listed below.\n"
 		"-----------------------------------------\n"
@@ -181,5 +185,5 @@ char * Terminal_helpMenu(){
 		"i2c -- list information relating to the \n"
 		"\ti2c communication buses\n"
 		"\n"
-		"h -- print the help menu\n";
+		"h -- print the help menu\n");
 }
