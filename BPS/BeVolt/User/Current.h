@@ -27,7 +27,7 @@ void Current_SetLimits(uint16_t ceiling);
  * @param Amps of low precision hall efect sensor
  * @return 1 if successfully stored, 0 if failed
  */
-uint8_t Current_UpdateMeasurements();
+uint8_t Current_UpdateMeasurements(void);
 
 /** isSafe
  * Checks if pack does not have a short circuit

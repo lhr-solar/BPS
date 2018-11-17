@@ -50,7 +50,7 @@ Copyright 2017 Linear Technology Corp. (LTC)
 #ifndef LTC6811_H
 #define LTC6811_H
 
-#include "stdint.h"
+#include <stdint.h>
 #include "LTC681x.h"
 
 /*********************************************************/
@@ -104,17 +104,17 @@ void LTC6811_init_reg_limits(uint8_t total_ic, cell_asic ic[]);
  the bit will be set to 1 for a failure and 0 if the test has been passed.
 
 */
-void LTC6811_diagn();
+void LTC6811_diagn(void);
 
 
 //! Sends the poll adc command
 //! @returns 1 byte read back after a pladc command. If the byte is not 0xFF ADC conversion has completed
-uint8_t LTC6811_pladc();
+uint8_t LTC6811_pladc(void);
 
 
 //! This function will block operation until the ADC has finished it's conversion
 //! @returns the approximate time it took for the ADC function to complete.
-uint32_t LTC6811_pollAdc();
+uint32_t LTC6811_pollAdc(void);
 
 /*! Starts cell voltage conversion
 */
@@ -238,19 +238,19 @@ int8_t LTC6811_rdstat(uint8_t reg, //Determines which Stat  register is read bac
 
 /*!  Clears the LTC6811 cell voltage registers
 */
-void LTC6811_clrcell();
+void LTC6811_clrcell(void);
 
 /*! Clears the LTC6811 Auxiliary registers
 */
-void LTC6811_clraux();
+void LTC6811_clraux(void);
 
 /*!  Clears the LTC6811 Stat registers
 */
-void LTC6811_clrstat();
+void LTC6811_clrstat(void);
 
 /*!  Clears the LTC6811 Sctrl registers
 */
-void LTC6811_clrsctrl();
+void LTC6811_clrsctrl(void);
 
 /*!  Write the LTC6811 configuration register
 */
@@ -310,7 +310,7 @@ int8_t LTC6811_rdsctrl(uint8_t nIC, //!< number of ICs in the daisy chain
 /*!  Start Sctrl data communication
 This command will start the sctrl pulse communication over the spins
 */
-void LTC6811_stsctrl();
+void LTC6811_stsctrl(void);
 
 
 /*!  Write the LTC6811 COMM register
@@ -332,7 +332,7 @@ int8_t LTC6811_rdcomm(uint8_t total_ic, //!< number of ICs in the daisy chain
                      );
 
 /*!  issues a stcomm command and clocks data out of the COMM register */
-void LTC6811_stcomm();
+void LTC6811_stcomm(void);
 
 
 /*! @returns returns the register data pattern for a given ADC MD and Self test */

@@ -26,7 +26,7 @@ void Temperature_SetLimits(uint16_t ceiling);
  * @param pointer to new temperature measurements
  * @return 1 if successfully stored, 0 if failed
  */
-uint8_t Temperature_UpdateMeasurements();
+uint8_t Temperature_UpdateMeasurements(void);
 
 /** isSafe
  * Checks if all modules are safe
