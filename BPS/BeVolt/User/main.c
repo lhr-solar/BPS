@@ -70,7 +70,7 @@ void initialize(void){
 
 // LTC6811 Test
 #include "SPI.h"
-//#include "LTC6811.h"
+#include "LTC6811.h"
 #include "UART.h"
 #include "Definition.h"
 #include <string.h>
@@ -192,8 +192,8 @@ int gyroTestmain(){
 
 
 #include "ADC.h"
-#include "stdio.h"
-int main(){
+#include <stdio.h>
+int ADCmain(){
 	char str[50];
 	UART3_Init(9600);
 	ADC_InitHilo();

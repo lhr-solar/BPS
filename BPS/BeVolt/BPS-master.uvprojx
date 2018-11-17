@@ -334,7 +334,7 @@
             <v6WtE>0</v6WtE>
             <v6Rtti>0</v6Rtti>
             <VariousControls>
-              <MiscControls>--cpp11</MiscControls>
+              <MiscControls></MiscControls>
               <Define>USE_STDPERIPH_DRIVER</Define>
               <Undefine></Undefine>
               <IncludePath>..\;.\STM32F4xx_StdPeriph_Driver;.\STM32F4xx_StdPeriph_Driver\inc;.\STM32F4xx_StdPeriph_Driver\src;.\CMSIS\Device\ST\STM32F4xx\Include;.\User;.\CMSIS;.\CMSIS\Include</IncludePath>
@@ -456,6 +456,11 @@
               <FileType>1</FileType>
               <FilePath>.\User\Terminal.c</FilePath>
             </File>
+            <File>
+              <FileName>ADC.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\User\ADC.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -536,6 +541,11 @@
               <FileType>5</FileType>
               <FilePath>.\User\Terminal.h</FilePath>
             </File>
+            <File>
+              <FileName>ADC.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\User\ADC.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -575,6 +585,11 @@
               <FileName>stm32f4xx_usart.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_usart.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f4xx_adc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_adc.c</FilePath>
             </File>
           </Files>
         </Group>

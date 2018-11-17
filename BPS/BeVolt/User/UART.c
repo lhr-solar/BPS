@@ -30,6 +30,7 @@ struct __FILE{
 static uint32_t TxErrorCnt = 0;
 static uint32_t RxErrorCnt = 0;
 FILE __stdout;
+FILE __stdin;
 
 // Private Function Prototypes
 void copySoftwareToHardware(void);
@@ -232,6 +233,7 @@ int fgetc(FILE *f){
 	}else{
 		UART3_Read(&letter, 1);
 	}
+	return letter;
 }
 
 /***************************** Interrupt Service Routines ******************************/
