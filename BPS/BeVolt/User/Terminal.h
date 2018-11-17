@@ -24,16 +24,16 @@ char * Terminal_generalStatus(void);
  */
 char * Terminal_gyroStatus(uint8_t axes);
 
-char * Terminal_watchdogStatus();
+char * Terminal_watchdogStatus(void);
 
-char * Terminal_eepromStatus();
+char * Terminal_eepromStatus(void);
 
-char * Terminal_canStatus();
+char * Terminal_canStatus(void);
 
-char * Terminal_spiStatus();
+char * Terminal_spiStatus(void);
 
-char * Terminal_i2cStatus();
+char * Terminal_i2cStatus(void);
 
-char * Terminal_helpMenu();
+char * Terminal_helpMenu(void);
 
 char * Terminal_concatInt(char * str, uint16_t n);

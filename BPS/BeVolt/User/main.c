@@ -5,6 +5,8 @@
  */
 
 #include <stdint.h>
+#include <stdio.h>
+#include <string.h>
 #include "Voltage.h"
 #include "Current.h"
 #include "Temperature.h"
@@ -16,7 +18,7 @@
 #include "stm32f4xx.h"
 
 
-void initialize();
+void initialize(void);
 
 int Mainmain(){
 	initialize();
@@ -56,6 +58,7 @@ void initialize(void){
 #include "Definition.h"
 #include <string.h>
 void printCells(cell_asic *mods);
+void print_config(cell_asic *bms_ic);
 int main(){
 	// Local var
 	int8_t error = 0;
@@ -64,36 +67,68 @@ int main(){
 	__disable_irq();
 	cell_asic battMod[NUM_VOLTAGE_BOARDS];
 	UART3_Init(9600);
+	printf("Testing LTC6811:\n\r");
 	LTC6811_Init(battMod);
+	LTC6811_wrcfg(NUM_VOLTAGE_BOARDS, battMod);
+	print_config(battMod);
 	wakeup_sleep(NUM_VOLTAGE_BOARDS);
+	error = LTC6811_rdcfg(NUM_VOLTAGE_BOARDS, battMod);
   LTC6811_adcv(ADC_CONVERSION_MODE, ADC_DCP, CELL_CH_TO_CONVERT);
 	__enable_irq();
 	while(1){
-		UART3_Write("Waiting...\n\r", 12);
+		printf("Waiting...\n\r");
 		wakeup_sleep(NUM_VOLTAGE_BOARDS);
+		LTC6811_adcv(ADC_CONVERSION_MODE,ADC_DCP,CELL_CH_TO_CONVERT);
+    LTC6811_pollAdc();
     error = LTC6811_rdcv(0, NUM_VOLTAGE_BOARDS, battMod); // Set to read back all cell voltage registers
 		printCells(battMod);
-		for(uint32_t i = 0; i < 1000000; i++);
+		for(uint32_t i = 0; i < 10000000; i++);
 	}
 }
 
 void printCells(cell_asic *mods){
-	/*
 	for (int current_ic = 0 ; current_ic < NUM_VOLTAGE_BOARDS; current_ic++){
 		for (int i=0; i<mods[0].ic_reg.cell_channels; i++){
-      UART3_Write(" C", 2);
-      Serial.print(i+1,DEC);
-      Serial.print(":");
-      Serial.print(bms_ic[current_ic].cells.c_codes[i]*0.0001,4);
-      Serial.print(",");
+      printf("C%d", i + 1);
+      printf(":");
+      printf("%4f", mods[current_ic].cells.c_codes[i]*0.0001);
+      printf("\n\r");
     }
-		Serial.println();
+		printf("\n\r");
   }
-  Serial.println();
-	*/
 }
 
+void print_config(cell_asic *bms_ic)
+{
+  int cfg_pec;
+
+  printf("Written Configuration: ");
+  for (int current_ic = 0; current_ic<NUM_VOLTAGE_BOARDS; current_ic++)
+  {
+    printf(" IC ");
+    printf("%d", current_ic+1);
+    printf(": ");
+    printf("0x");
+    printf("%x", bms_ic[current_ic].config.tx_data[0]);
+    printf(", 0x");
+    printf("%x", bms_ic[current_ic].config.tx_data[1]);
+    printf(", 0x");
+    printf("%x", bms_ic[current_ic].config.tx_data[2]);
+    printf(", 0x%x", bms_ic[current_ic].config.tx_data[3]);
+    printf(", 0x%x", bms_ic[current_ic].config.tx_data[4]);
+    printf(", 0x%x", bms_ic[current_ic].config.tx_data[5]);
+    cfg_pec = pec15_calc(6,&bms_ic[current_ic].config.tx_data[0]);
+		printf(", Calculated PEC: 0x%x",(uint8_t)(cfg_pec>>8));
+    printf((uint8_t)(cfg_pec>>8));
+    printf(", 0x%x", (uint8_t)cfg_pec);
+    printf("\n\r");
+  }
+}
+
+
 // SPI Test
+#include "SPI.h"
+#include "UART.h"
 int SPITestmain(){
 	__disable_irq();
 	UART3_Init(9600);
@@ -120,11 +155,10 @@ int SPITestmain(){
 }
 
 // Debug UART Test
-int UARTTestmain(){
-	char str[] = "Hello there.";
+int UARTmain(){
 	UART3_Init(9600);
 	while(1){
-		UART3_Write(str, strlen(str));
+		printf("Die world\n");
 		for(uint32_t i = 0; i < 100000; i++);
 	}
 }

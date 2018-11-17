@@ -16,8 +16,6 @@
 #include <stdio.h>
 #include "stm32f4xx.h"
 
-#include "UART.h"
-
 /** SPI_Init8
  * Initializes SPI1 for multiple slaves to use. This SPI line is for 8 bit message formats.
  */
@@ -110,13 +108,13 @@ void SPI_Write8(uint8_t *txBuf, uint32_t txSize){
 	//SPI1->DR = 0xCC;
 	for(uint32_t i = 0; i < txSize; i++){
 		while((SPI1->SR&SPI_SR_BSY) == SPI_SR_BSY);	// Wait until transmission is done
-		//while((SPI1->SR&SPI_SR_TXE) == SPI_SR_TXE);	// Have to wait until transmission is done
+		while((SPI1->SR&SPI_SR_TXE) == 0);					// Wait until transmit buffer empty
 		SPI1->DR = txBuf[i] & 0xFF;
 		while((SPI1->SR&SPI_SR_BSY) == SPI_SR_BSY);	// Wait until transmission is done
-		//while((SPI1->SR&SPI_SR_RXNE) == SPI_SR_RXNE);
+		while((SPI1->SR&SPI_SR_RXNE) == 0);					// Wait until data has been received
 		uint32_t junk = SPI1->DR;
 	}
-	while((SPI1->SR&SPI_SR_BSY) == SPI_SR_BSY);	// Wait until transmission is done
+	while((SPI1->SR&SPI_SR_BSY) == SPI_SR_BSY);		// Wait until transmission is done
 }
 
 /** SPI_Read8
@@ -127,21 +125,14 @@ void SPI_Write8(uint8_t *txBuf, uint32_t txSize){
 void SPI_Read8(uint8_t *rxBuf, uint32_t rxSize){
 	for(uint32_t i = 0; i < rxSize; i++){
 		while((SPI1->SR&SPI_SR_BSY) == SPI_SR_BSY);	// Wait until transmission is done
+		while((SPI1->SR&SPI_SR_TXE) == 0);					// Have to wait until transmission is done
 		SPI1->DR = 0xFF;		// Send nothing
 		while((SPI1->SR&SPI_SR_BSY) == SPI_SR_BSY);	// Wait until transmission is done
+		while((SPI1->SR&SPI_SR_RXNE) == 0);					// Wait until data has been received
 		rxBuf[i] = SPI1->DR & 0xFF;
-		char str[100];
-		sprintf(str, "%d\t", rxBuf[i]);
-		UART3_Write((char *)str, rxSize);
 	}
 	
-	while((SPI1->SR&SPI_SR_BSY) == SPI_SR_BSY);	// Wait until transmission is done
-	
-	// DEBUG
-	
-	UART3_Write((char *)rxBuf, rxSize);
-	// DEBUG
-	
+	while((SPI1->SR&SPI_SR_BSY) == SPI_SR_BSY);		// Wait until transmission is done	
 }
 
 /** SPI_WriteRead8

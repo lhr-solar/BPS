@@ -34,6 +34,6 @@ void WDTimer_Stop(void);
 /** WDTimer_FaultDetection
  *
  */
-uint8_t WDTimer_FaultDetection();
+uint8_t WDTimer_FaultDetection(void);
 
 #endif
