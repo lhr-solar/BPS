@@ -38,7 +38,7 @@ void Temperature_SetLimits(uint16_t ceiling){
  * @return 1 if successfully stored, 0 if failed
  */
 uint8_t Temperature_UpdateMeasurements(){
-	ModuleTemperatures = LTC2983_Measure();
+	//ModuleTemperatures = LTC2983_Measure();
 
 	if(sizeof(ModuleTemperatures)/sizeof(uint16_t) == NUM_BATTERY_MODULES){
 		return 1;
