@@ -125,7 +125,7 @@ void SPI_Write8(uint8_t *txBuf, uint32_t txSize){
 void SPI_Read8(uint8_t *rxBuf, uint32_t rxSize){
 	for(uint32_t i = 0; i < rxSize; i++){
 		while((SPI1->SR&SPI_SR_BSY) == SPI_SR_BSY);	// Wait until transmission is done
-		while((SPI1->SR&SPI_SR_TXE) == 0);					// Have to wait until transmission is done
+		while((SPI1->SR&SPI_SR_TXE) == 0);					// Wait until transmit buffer is empty
 		SPI1->DR = 0xFF;		// Send nothing
 		while((SPI1->SR&SPI_SR_BSY) == SPI_SR_BSY);	// Wait until transmission is done
 		while((SPI1->SR&SPI_SR_RXNE) == 0);					// Wait until data has been received

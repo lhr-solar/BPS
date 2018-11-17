@@ -136,7 +136,7 @@ void print_config(cell_asic *bms_ic)
     printf(", 0x%x", bms_ic[current_ic].config.tx_data[5]);
     cfg_pec = pec15_calc(6,&bms_ic[current_ic].config.tx_data[0]);
 		printf(", Calculated PEC: 0x%x",(uint8_t)(cfg_pec>>8));
-    printf((uint8_t)(cfg_pec>>8));
+    printf("%d", (uint8_t)(cfg_pec>>8));
     printf(", 0x%x", (uint8_t)cfg_pec);
     printf("\n\r");
   }
