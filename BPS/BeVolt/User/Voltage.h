@@ -30,7 +30,7 @@ void Voltage_SetLimits(uint16_t ceiling, uint16_t floor);
  * @param pointer to new voltage measurements
  * @return 1 if successfully stored, 0 if failed
  */
-uint8_t Voltage_UpdateMeasurements();
+uint8_t Voltage_UpdateMeasurements(void);
 
 /** isSafe
  * Checks if all modules are safe

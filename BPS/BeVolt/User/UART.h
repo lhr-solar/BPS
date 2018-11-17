@@ -4,8 +4,13 @@
  * @lastRevised 10/2/2018
  */
 
-#ifndef UART_H__
-#define UART_H__
+#ifndef __UART_H__
+#define __UART_H__
+
+#include <stdint.h>
+#include "stm32f4xx.h"
+#include "FIFO.h"
+#include "Definition.h"
 
 /***** Unlike SPI, UART cannot have multiple modules connected to the same tx/rx line *****/
 // ONLY USE UART3 FOR DEBUGGING ON NUCLEO!!!!
