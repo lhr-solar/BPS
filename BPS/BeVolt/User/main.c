@@ -5,6 +5,7 @@
  */
 
 #include <stdint.h>
+#include <string.h>
 #include "Voltage.h"
 #include "Current.h"
 #include "Temperature.h"
@@ -45,11 +46,10 @@ void initialize(void){
 
 // LTC6811 Test
 #include "SPI.h"
-#include "LTC6811.h"
+//#include "LTC6811.h"
 #include "UART.h"
-#include <string.h>
 int LTC6811Testmain(){
-	LTC6811_Init();
+	//LTC6811_Init();
 	UART3_Init(9600);
 	while(1){
 		
@@ -57,7 +57,7 @@ int LTC6811Testmain(){
 }
 
 // SPI Test
-int main(){
+int SPITestmain(){
 	__disable_irq();
 	UART3_Init(9600);
 	SPI_Init8();
@@ -100,4 +100,17 @@ int gyroTestmain(){
 		uint16_t *vals = FXAS21002CQR1_Measure();
 		// print or something
 	}
+}
+
+
+#include "ADC.h"
+#include "stdio.h"
+int main(){
+	char str[50];
+	UART3_Init(9600);
+	ADC_InitHilo();
+	while(1){
+		sprintf(str,"%d\t%d\n",(int)ADC_ReadHigh(),(int)ADC_ReadLow());
+		UART3_Write(str,strlen(str));
+	}		
 }
