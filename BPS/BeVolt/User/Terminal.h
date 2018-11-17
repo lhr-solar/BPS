@@ -1,39 +1,51 @@
-#include <stdint.h>
+/** FIFO.h
+ * Software Fifo used for transmitting data and not take up CPU resources
+ * @authors Chase Block
+ * @lastRevised 11/10/2018
+ */
+ 
+#ifndef TERMINAL_H__
+#define TERMINAL_H__
+
+#include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include "Current.h"
 #include "Voltage.h"
 #include "Temperature.h"
+#include "Gyro.h"
 
-char * Terminal_HandleInput(char * input);
+void Terminal_CheckInput();
+
+void Terminal_HandleInput(char * op, char * arg);
 
 char ** Terminal_splitOps (char * input);
 
-char * Terminal_currentStatus(void);
+void Terminal_currentStatus(void);
 
-char * Terminal_voltageStatus(void);
+void Terminal_voltageStatus(void);
 
-char * Terminal_temperatureStatus(void);
+void Terminal_temperatureStatus(void);
 
-char * Terminal_contactorStatus(void);
+void Terminal_contactorStatus(void);
 
-char * Terminal_setContactor(char * status);
-
-char * Terminal_generalStatus(void);
+void Terminal_setContactor(int status);
 
 /**
  * @param the axes to read from, where 0 = all, 1 = x, 2 = y, 3 = z
  */
-char * Terminal_gyroStatus(uint8_t axes);
+void Terminal_gyroStatus(uint8_t axes);
 
-char * Terminal_watchdogStatus(void);
+void Terminal_watchdogStatus();
 
-char * Terminal_eepromStatus(void);
+void Terminal_eepromStatus();
 
-char * Terminal_canStatus(void);
+void Terminal_canStatus();
 
-char * Terminal_spiStatus(void);
+void Terminal_spiStatus();
 
-char * Terminal_i2cStatus(void);
+void Terminal_i2cStatus();
 
-char * Terminal_helpMenu(void);
+void Terminal_helpMenu();
 
-char * Terminal_concatInt(char * str, uint16_t n);
+#endif
