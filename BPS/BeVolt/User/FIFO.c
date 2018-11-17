@@ -4,7 +4,7 @@
  * @lastRevised 10/2/2018
  */
 
-#include <stdint.h>
+#include "FIFO.h"
 
 // Global variables
 

@@ -1,6 +1,6 @@
-// FXAS21002CQR1.h
+// ICM-20600
 /**
- * Driver for FXAS21002CQR1 chip related functions. 
+ * Driver for ICM-20600 chip related functions.
  * @authors Chase Block
  * @lastRevised 10/13/2018
  */
@@ -9,54 +9,55 @@
 #define GYRO_H__
 
 #include "stm32f4xx.h"
+#include "SPI.h"
 #include <stdint.h>
+#include <string.h>
+#include <stdlib.h>
 
-#define STATUS		0x00
-#define OUT_X_MSB	0x01
-#define OUT_X_LSB	0x02
-#define OUT_Y_MSB	0x03
-#define OUT_Y_LSB	0x04
-#define OUT_Z_MSB	0x05
-#define OUT_Z_LSB	0x06
-#define CTRL_REG1	0x13
-#define CTRL_REG2	0x14
-#define CTRL_REG3	0x15
+#define DRDY_CONF	0x37
+#define OUT_X_MSB	0x43
+#define OUT_X_LSB	0x44
+#define OUT_Y_MSB	0x45
+#define OUT_Y_LSB	0x46
+#define OUT_Z_MSB	0x47
+#define OUT_Z_LSB	0x48
+#define GNRL_CONF       0x1A
+#define GYRO_CONF       0x1B
+#define ACCL_CONF       0x1C
 
-double headings [3]; // x,y,z
-
-/** FXAS21002CQR1_Init
+/** ICM20600_Init
  * Initializes SPI for FXAS21002CQR1
  * Initializes and configures LTC6811
  */
-void FXAS21002CQR1_Init(void);
+void ICM20600_Init(void);
 
-/** FXAS21002CQR1_SendCmd
+/** ICM20600_SendCmd
  * Sends command data to FXAS21002CQR1
  * @param unsigned int 16-bit data
  */
-uint16_t *FXAS21002CQR1_SendCmd(uint8_t address, uint8_t data, uint8_t rw, uint32_t readSize);
+uint16_t *ICM20600_SendCmd(uint8_t address, uint8_t data, uint8_t rw, uint32_t readSize);
 
-/** FXAS21002CQR1_Measure
+/** ICM20600_Measure
  * Sends command to FXAS21002CQR1 to gather and save all heading values
- * @return unsigned int 16-bit measurements from all ADC's
+ * @return unsigned int 16-bit measurements from all axes {x,y,z}
  */
-uint16_t *FXAS21002CQR1_Measure(void);
+uint16_t *ICM20600_Measure(void);
 
-/** FXAS21002CQR1_CurrentHeading
+/** ICM20600_CurrentHeading
  * Updates the heading before returning
  * This should be called periodically
  * @return the current heading of the car
  */
-double *FXAS21002CQR1_CurrentHeading(void);
- 
-/** FXAS21002CQR1_ResetHeadings
+double *ICM20600_CurrentHeading(void);
+
+/** ICM20600_ResetHeadings
  * Resets the heading values
  */
-void FXAS21002CQR1_ResetHeadings(void);
+void ICM20600_ResetHeadings(void);
 
 /**
  * @return 0 if the car is not flipped over, 1 if it is
  */
-uint8_t isFlipped(void);
+uint8_t ICM20600_IsFlipped(void);
 
 #endif

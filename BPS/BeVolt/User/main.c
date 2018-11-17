@@ -16,6 +16,7 @@
 #include "WDTimer.h"
 //#include "Gyro.h"
 #include "stm32f4xx.h"
+#include "Terminal.h"
 
 
 void initialize(void);
@@ -24,11 +25,27 @@ int Mainmain(){
 	initialize();
 	WDTimer_Start();
 	while(1){
-		if(Voltage_IsSafe() && Current_IsSafe() && Temperature_IsSafe()){
-			Voltage_UpdateMeasurements();
-			Current_UpdateMeasurements();
-			Temperature_UpdateMeasurements();
+		Voltage_UpdateMeasurements();
+		Current_UpdateMeasurements();
+		Temperature_UpdateMeasurements();
+		
+		if(!Current_IsSafe()){
+			// contactor off
+			// Current LED on
 		}
+		if(!Temperature_IsSafe()){
+			// contactor off
+			// Temperature LED on
+		}
+		if(!Voltage_IsSafe()){
+			// contactor off
+			// Voltage LED on
+		}
+		if(Current_IsSafe() && Temperature_IsSafe() && Voltage_IsSafe()){
+			// contactor on
+		}
+		
+		Terminal_CheckInput();
 		
 		WDTimer_Reset();
 	}

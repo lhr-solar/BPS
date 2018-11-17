@@ -531,6 +531,11 @@
               <FileType>5</FileType>
               <FilePath>.\User\FIFO.h</FilePath>
             </File>
+            <File>
+              <FileName>Terminal.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\User\Terminal.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
