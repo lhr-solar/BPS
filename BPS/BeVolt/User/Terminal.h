@@ -3,12 +3,21 @@
  * @authors Chase Block
  * @lastRevised 11/10/2018
  */
-#include <stdint.h>
+ 
+#ifndef TERMINAL_H__
+#define TERMINAL_H__
+
+#include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include "Current.h"
 #include "Voltage.h"
 #include "Temperature.h"
+#include "Gyro.h"
 
-void Terminal_HandleInput(char * input);
+void Terminal_CheckInput();
+
+void Terminal_HandleInput(char * op, char * arg);
 
 char ** Terminal_splitOps (char * input);
 
@@ -38,3 +47,5 @@ void Terminal_spiStatus();
 void Terminal_i2cStatus();
 
 void Terminal_helpMenu();
+
+#endif

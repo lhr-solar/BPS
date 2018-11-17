@@ -3,50 +3,42 @@
  * @authors Chase Block
  * @lastRevised 11/10/2018
  */
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdio.h>
 #include "Terminal.h"
-#include "Current.h"
-#include "Voltage.h"
-#include "Temperature.h"
-#include "Gyro.h"
 
-int _read(int file, char *data, int len){
-
+void Terminal_CheckInput(){
+	char * op;
+	if(scanf("%s", op) > 0){
+		char * arg;
+		scanf("%s", arg);
+		Terminal_HandleInput(op, arg);
+	}
 }
 
-int _write(int file, char *data, int len){
+void Terminal_HandleInput(char * op, char * arg){
 
-}
-
-void Terminal_HandleInput(char * input){
-	char ** ops = Terminal_splitOps(input);
-
-	if(strcmp(ops[0], "i") == 0){			// Current status
+	if(strcmp(op, "i") == 0){			// Current status
 		Terminal_currentStatus();
-	}else if(strcmp(ops[0], "v") == 0){		// Voltage status
+	}else if(strcmp(op, "v") == 0){		// Voltage status
 		Terminal_voltageStatus();
-	}else if(strcmp(ops[0], "t") == 0){		// Temperature status
+	}else if(strcmp(op, "t") == 0){		// Temperature status
 		Terminal_temperatureStatus();
-	}else if(strcmp(ops[0], "st") == 0){		// General status
+	}else if(strcmp(op, "st") == 0){		// General status
 		Terminal_currentStatus();
 		Terminal_voltageStatus();
 		Terminal_temperatureStatus();
 		Terminal_contactorStatus();
 		Terminal_gyroStatus(0);
-	}else if(strcmp(ops[0], "c") == 0){		// Contactor status
-		if(ops[1] != NULL){
-			int stat = ops[1][0] - '0';
+	}else if(strcmp(op, "c") == 0){		// Contactor status
+		if(arg != NULL){
+			int stat = arg[0] - '0';
 			Terminal_setContactor(stat);
 		}
 		Terminal_contactorStatus();
-	}else if(strcmp(ops[0], "gyro") == 0){		// Gyro status
-		if(ops[1] == NULL){
+	}else if(strcmp(op, "gyro") == 0){		// Gyro status
+		if(arg == NULL){
 			Terminal_gyroStatus(0);
 		}else{
-			switch(ops[1][0]){
+			switch(arg[0]){
 			case 'x':
 				Terminal_gyroStatus(1);
 				break;
@@ -57,34 +49,34 @@ void Terminal_HandleInput(char * input){
 				Terminal_gyroStatus(3);
 			}
 		}
-	}else if(strcmp(ops[0], "wd") == 0){		// Watchdog status
+	}else if(strcmp(op, "wd") == 0){		// Watchdog status
 		Terminal_watchdogStatus();
-	}else if(strcmp(ops[0], "ee") == 0){		// EEPROM status
+	}else if(strcmp(op, "ee") == 0){		// EEPROM status
 		Terminal_eepromStatus();
-	}else if(strcmp(ops[0], "can") == 0){		// CAN bus status
-		Terminal_canStatus();
-	}else if(strcmp(ops[0], "spi") == 0){		// SPI bus status
-		Terminal_spiStatus();
-	}else if(strcmp(ops[0], "i2c") == 0){		// I2C status
-		Terminal_i2cStatus();
-	}else if(strcmp(ops[0], "h") == 0){		// Print help menu
+//	}else if(strcmp(op, "can") == 0){		// CAN bus status
+//		Terminal_canStatus();
+//	}else if(strcmp(op, "spi") == 0){		// SPI bus status
+//		Terminal_spiStatus();
+//	}else if(strcmp(op, "i2c") == 0){		// I2C status
+//		Terminal_i2cStatus();
+	}else if(strcmp(op, "h") == 0){		// Print help menu
 		Terminal_helpMenu();
 	}else{
-		printf("\"%s\" is not recognized as a command.", ops[0]);
+		printf("\"%s\" is not recognized as a command.", op);
 	}
 
 	printf("\n\r"); // Do a newline for the next command
 }
 
 void Terminal_currentStatus(void){
-	char * stat = Current_IsSafe() ? "SAFE" : "NOT SAFE";
+	const char* stat = Current_IsSafe() ? "SAFE" : "NOT SAFE";
 	printf("The current level is %s\n\r", stat);
 	printf("High-precision: %u\n\r", Current_HighPrecisionAmperes());
 	printf("Low-precision: %u\n\r", Current_LowPrecisionAmperes());
 }
 
 void Terminal_voltageStatus(void){
-	char * stat = Voltage_IsSafe() ? "SAFE" : "NOT SAFE";
+	const char * stat = Voltage_IsSafe() ? "SAFE" : "NOT SAFE";
 	printf("The voltage level is %s\n\r", stat);
 	printf("Total pack voltage: %u\n\r", Voltage_TotalPackVoltage());
 	printf("Modules in danger: ");
@@ -96,7 +88,7 @@ void Terminal_voltageStatus(void){
 }
 
 void Terminal_temperatureStatus(void){
-	char * stat = Temperature_IsSafe() ? "SAFE" : "NOT SAFE";
+	const char * stat = Temperature_IsSafe() ? "SAFE" : "NOT SAFE";
 	printf("The temperature level is %s\n\r", stat);
 	printf("Average temperature: %u\n\r", Temperature_TotalPackAvgTemperature());
 	printf("Modules in danger: ");
@@ -119,7 +111,7 @@ void Terminal_setContactor(int status){
  * @param the axes to read from, where 0 = all, 1 = x, 2 = y, 3 = z
  */
 void Terminal_gyroStatus(uint8_t axes){
-	char * stat = ICM20600_IsFlipped() ? "FLIPPED" : "NOT FLIPPED";
+	const char * stat = ICM20600_IsFlipped() ? "FLIPPED" : "NOT FLIPPED";
 	printf("The car is currently %s", stat);
 }
 
@@ -132,15 +124,15 @@ void Terminal_eepromStatus(){
 }
 
 void Terminal_canStatus(){
-
+	// Not used
 }
 
 void Terminal_spiStatus(){
-
+	// Not used
 }
 
 void Terminal_i2cStatus(){
-
+	// Not used
 }
 
 char ** Terminal_splitOps (char * input){
@@ -175,15 +167,6 @@ void Terminal_helpMenu(){
 		"\n"
 		"ee -- output status of the eeprom\n"
 		"\t(conected, error, etc.)\n"
-		"\n"
-		"can -- list information relating to \n"
-		"\tthe CAN bus\n"
-		"\n"
-		"spi -- list information relating to the \n"
-		"\tSPI communication buses\n"
-		"\n"
-		"i2c -- list information relating to the \n"
-		"\ti2c communication buses\n"
 		"\n"
 		"h -- print the help menu\n");
 }

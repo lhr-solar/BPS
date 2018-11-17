@@ -7,6 +7,8 @@
 #ifndef FIFO_H__
 #define FIFO_H__
 
+#include <stdint.h>
+
 /** FIFO_Init
  * Initializes empty FIFO
  */
@@ -66,5 +68,3 @@ void FIFO_Put_Rx(uint8_t data);
 
 
 #endif
-
- 

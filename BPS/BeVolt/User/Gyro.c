@@ -8,10 +8,8 @@
  */
 
 #include "Gyro.h"
-#include "SPI.h"
-#include <stdint.h>
-#include <string.h>
-#include <stdlib.h>
+
+double headings [3]; // x,y,z
 
 /** ICM20600_Init
  * Initializes SPI for ICM20600
@@ -90,9 +88,9 @@ void ICM20600_ResetHeadings(void){
  * @return 0 if the car is not flipped over, 1 if it is
  */
 uint8_t ICM20600_IsFlipped(void){
-	double * headings = ICM20600_CurrentHeading();	// Update and grab the values
+	double * _headings = ICM20600_CurrentHeading();	// Update and grab the values
 
-	if(abs((int)headings[0]) > 90 || abs((int)headings[1]) > 90) return 0x01;
+	if(abs((int)_headings[0]) > 90 || abs((int)_headings[1]) > 90) return 0x01;
 
 	return 0x00;
 }

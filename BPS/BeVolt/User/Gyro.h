@@ -9,7 +9,10 @@
 #define GYRO_H__
 
 #include "stm32f4xx.h"
+#include "SPI.h"
 #include <stdint.h>
+#include <string.h>
+#include <stdlib.h>
 
 #define DRDY_CONF	0x37
 #define OUT_X_MSB	0x43
@@ -21,8 +24,6 @@
 #define GNRL_CONF       0x1A
 #define GYRO_CONF       0x1B
 #define ACCL_CONF       0x1C
-
-double headings [3]; // x,y,z
 
 /** ICM20600_Init
  * Initializes SPI for FXAS21002CQR1

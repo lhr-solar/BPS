@@ -15,10 +15,7 @@
  *		rx : PD9
  */
  
-#include <stdint.h>
-#include "stm32f4xx.h"
-#include "FIFO.h"
-#include "Definition.h"
+#include "UART.h"
 
 // Global variables
 static uint32_t TxErrorCnt = 0;
