@@ -92,6 +92,6 @@ void WDTimer_Stop(void){
  */
 void TIM3_IRQHandler(void)
 {
-    Contactor_Off();
+//  Contactor_Off();
 }
 
