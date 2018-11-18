@@ -59,7 +59,7 @@ uint16_t pec15 (char *data, int len);
 void LTC6811_Init(void){
 	SPI1_Init();
 	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
-	GPIOA->MODER
+	GPIOA->MODER;
 }
 
 /** LTC6811_SendCmd
