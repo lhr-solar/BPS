@@ -2,8 +2,8 @@
 /**
  * Driver for the watch dog timer. Whenever the Watch Dog Timer reaches 0,
  * all contactors will be opened (the battery pack will be disconnected from the car).
- * @authors Sijin Woo, Chase Block
- * @lastRevised 9/4/2018
+ * @authors Sijin Woo, Chase Block, Manolo Alvarez
+ * @lastRevised 11/21/2018
  */
 
 #ifndef WDTIMER_H__
@@ -25,11 +25,6 @@ void WDTimer_Start(void);
  * Resets the Watch Dog Timer. Does not stop the counter. Counts Up!!
  */
 void WDTimer_Reload(void);
-
-/** WDTimer_Freeze
- * Stops the Watch Dog Timer. Does not reset the counter.
- */
-void WDTimer_Freeze(void);
 
 /** WWDG_IRQHandler
  *	Problem -> Disconnects the contactor
