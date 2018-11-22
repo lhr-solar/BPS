@@ -1,65 +1,52 @@
-/* 
-Contactor
-		Sets Contactor on or off
-		Checks if flag is high or low. If high, return 1, if low, return 0.
-*/
+
+// Contactor.c
+/**
+ * Sets Contactor on or off
+ * Checks if flag is high or low. If high, return 1, if low, return 0.
+ * @author Manolo Alvarez
+ * @lastRevised 11/21/2018
+ */
 
 #include <stdint.h>
-#include "stm32f4xx.h"
 #include "Contactor.h"
+#include "stm32f4xx.h"
+#include "stm32f4xx_gpio.h"
+#include "stm32f4xx_rcc.h"
 
-/* 
-	 Inputs: 0
-	 Outputs: GPIOA
-	 Modifies: PA6 and PA7
-*/
 
+/** 
+ *	 Initiliazes GPIOA_Pin_6
+ */
 void Contactor_Init(void){
+	// Initialize clock
 	RCC_AHB1PeriphClockCmd(RCC_AHB1_Periph_GPIOA, ENABLE);
-	GPIO_InitTypDef GPIO_InitStruct;
+	// Initialize PA6
 	GPIO_InitStruct.GPIO_Pin = GPIO_Pin_6;
 	GPIO_InitStruct.GPIO_Mode = GPIO_Mode_OUT;
-	GPIO_InitStruct.GPIO_Speed = GPIO_Speed_25MHz;
+	GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
 	GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
 	GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_DOWN;
-	GPIO_Init(GPIOA, &GPIO_InitStruct);	
-	GPIO_InitStruct.GPIO_Pin = GPIO_Pin_7;
-	GPIO_InitStruct.GPIO_Mode = GPIO_Mode_IN;
-	GPIO_Init(GPIOA, &GPIO_InitStruct);	
+	GPIO_Init(GPIOA, &GPIO_InitStruct);
 
+/**
+ * 	Closes contactor, GPIO_Pin_6 = 1
+ */
+void Contactor_On(void){
+	GPIO_WriteBit(GPIOA, GPIO_Pin_6, Bit_SET);					// Set pin 6 high
 }
 
-/* 
-	 Inputs: 0
-	 Outputs: PA6 = 1
-	 Modifies: PA6
-*/
-uint32_t Contactor_On(void){
-	GPIOA->ODR |= 0x40;			// Set pin 6 high
+/**
+ *	Opens contactor, GPIO_Pin_6 = 0
+ */
+void Contactor_Off(void){
+	GPIO_WriteBit(GPIOA, GPIO_Pin_6, Bit_RESET);				// Set pin 6 low
 }
 
-/* 
-	 Inputs: 0
-	 Outputs: PA6 = 0
-	 Modifies: PA6
-*/
-uint32_t Contactor_Off(void){
-	GPIOA->ODR &= 0xFFFFFFBF;			// Set pin 6 low
-}
-
-/* 
-	 Inputs: PA7
-	 Outputs: 0 or 1
-	 Modifies: nothing
-*/
+/**
+ *	 Outputs: flag status (0 or 1)
+ */
 uint32_t Contactor_Flag(void){
-		if (ODR&0x080 == 0x080){
-//			printf('Normal operation\n');
-			return 1;
-		} 
-		else{
-//			printf('Fault\n');
-			return 0;
-		}
+		if (GPIO_ReadOutputDataBit(GPIOA, GPIO_Pin_6) == Bit_SET) return 1;
+		else return 0;
 }
 	

@@ -24,7 +24,7 @@ void WDTimer_Start(void);
 /** WDTimer_Reload
  * Resets the Watch Dog Timer. Does not stop the counter. Counts Up!!
  */
-void WDTimer_Reload(void);
+void WDTimer_Reset(void);
 
 /** WWDG_IRQHandler
  *	Problem -> Disconnects the contactor

@@ -36,7 +36,7 @@ void WDTimer_Init(void){
     WWDG_SetWindowValue(WWDG_CFR_W);                        // Sets the WWDG window value.
 /* Independent Watchdog Init */
     FLASH_OB_Unlock();                                      // Enable the FLASH option control register access
-    FLASH_OB_UserConfig(OB_IWDG_SW, OB_STOP_NoRST, OB_STDBY_NoRST) // Confiuge to software IWDG, no reset during stop and standby mode
+    FLASH_OB_UserConfig(OB_IWDG_SW, OB_STOP_NoRST, OB_STDBY_NoRST); // Confiuge to software IWDG, no reset during stop and standby mode
     FLASH_OB_Launch();                                      // Launch the Option Bytes programming process
     FLASH_OB_Lock();                                        // Disable the FLASH option control register
     RCC_LSICmd(ENABLE);                                     // Initializes LSI clock at 32KHz used for IWDG
@@ -57,7 +57,7 @@ void WDTimer_Start(void){
  /** WDTimer_Reload
  * Reloads the Watch Dog Timer. Does not stop the counter.
  */
-void WDTimer_Reload(void){
+void WDTimer_Reset(void){
     WWDG_Enable(WWDG_CFR_W);                    // Reloads the Window Watchdog Timer
     IWDG_ReloadCounter();                       // Reloads the Independent Watchdog Timer
  }
@@ -65,7 +65,7 @@ void WDTimer_Reload(void){
  /** WWDG_IRQHandler
  * Interrupts every 41.94304 ms when running at APB1 Bus Speed of 50MHz
  */
-uint8_t WWDG_IRQHandler(){
+void WWDG_IRQHandler(void){
     Contactor_Off();                             // Fault: open contactor
     WWDG_ClearFlag();                            // Clear EWI Flag
 }

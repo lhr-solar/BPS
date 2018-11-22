@@ -105,19 +105,11 @@ Section Cross References
     eeprom.o(.ARM.exidx) refers to eeprom.o(i._Z24EEPROM_ReadMultipleBytestj) for i._Z24EEPROM_ReadMultipleBytestj
     eeprom.o(.ARM.exidx) refers to eeprom.o(i._Z21EEPROM_ReadSingleBytet) for i._Z21EEPROM_ReadSingleBytet
     wdtimer.o(i._Z12WDTimer_Initv) refers to stm32f4xx_rcc.o(i.RCC_APB1PeriphClockCmd) for RCC_APB1PeriphClockCmd
-    wdtimer.o(i._Z12WDTimer_Initv) refers to stm32f4xx_tim.o(i.TIM_TimeBaseInit) for TIM_TimeBaseInit
-    wdtimer.o(i._Z12WDTimer_Initv) refers to stm32f4xx_tim.o(i.TIM_Cmd) for TIM_Cmd
-    wdtimer.o(i._Z12WDTimer_Initv) refers to stm32f4xx_tim.o(i.TIM_ITConfig) for TIM_ITConfig
-    wdtimer.o(i._Z12WDTimer_Stopv) refers to stm32f4xx_tim.o(i.TIM_Cmd) for TIM_Cmd
-    wdtimer.o(i._Z13WDTimer_Resetv) refers to stm32f4xx_tim.o(i.TIM_SetCounter) for TIM_SetCounter
-    wdtimer.o(i._Z13WDTimer_Startv) refers to stm32f4xx_tim.o(i.TIM_Cmd) for TIM_Cmd
-    wdtimer.o(i._Z20EnableTimerInterruptv) refers to misc.o(i.NVIC_Init) for NVIC_Init
+    wdtimer.o(i._Z12WDTimer_Initv) refers to stm32f4xx_rcc.o(i.RCC_LSICmd) for RCC_LSICmd
     wdtimer.o(.ARM.exidx) refers to wdtimer.o(i._Z12WDTimer_Initv) for i._Z12WDTimer_Initv
-    wdtimer.o(.ARM.exidx) refers to wdtimer.o(i._Z20EnableTimerInterruptv) for i._Z20EnableTimerInterruptv
     wdtimer.o(.ARM.exidx) refers to wdtimer.o(i._Z13WDTimer_Startv) for i._Z13WDTimer_Startv
     wdtimer.o(.ARM.exidx) refers to wdtimer.o(i._Z13WDTimer_Resetv) for i._Z13WDTimer_Resetv
-    wdtimer.o(.ARM.exidx) refers to wdtimer.o(i._Z12WDTimer_Stopv) for i._Z12WDTimer_Stopv
-    wdtimer.o(.ARM.exidx) refers to wdtimer.o(i._Z15TIM3_IRQHandlerv) for i._Z15TIM3_IRQHandlerv
+    wdtimer.o(.ARM.exidx) refers to wdtimer.o(i._Z15WWDG_IRQHandlerv) for i._Z15WWDG_IRQHandlerv
     spi.o(i._Z14SPI1_WriteReadPhjS_j) refers to spi.o(i._Z10SPI1_WritePhj) for SPI1_Write(unsigned char*, unsigned)
     spi.o(i._Z14SPI1_WriteReadPhjS_j) refers to spi.o(i._Z9SPI1_ReadPhj) for SPI1_Read(unsigned char*, unsigned)
     spi.o(i._Z9SPI1_Initv) refers to stm32f4xx_rcc.o(i.RCC_AHB1PeriphClockCmd) for RCC_AHB1PeriphClockCmd
@@ -776,14 +768,10 @@ Removing Unused input sections from the image.
     Removing wdtimer.o(.rev16_text), (4 bytes).
     Removing wdtimer.o(.revsh_text), (4 bytes).
     Removing wdtimer.o(.rrx_text), (6 bytes).
-    Removing wdtimer.o(i._Z12WDTimer_Initv), (68 bytes).
-    Removing wdtimer.o(i._Z12WDTimer_Stopv), (16 bytes).
-    Removing wdtimer.o(i._Z13WDTimer_Resetv), (16 bytes).
-    Removing wdtimer.o(i._Z13WDTimer_Startv), (16 bytes).
-    Removing wdtimer.o(i._Z15TIM3_IRQHandlerv), (2 bytes).
-    Removing wdtimer.o(i._Z20EnableTimerInterruptv), (32 bytes).
-    Removing wdtimer.o(.ARM.exidx), (8 bytes).
-    Removing wdtimer.o(.ARM.exidx), (8 bytes).
+    Removing wdtimer.o(i._Z12WDTimer_Initv), (86 bytes).
+    Removing wdtimer.o(i._Z13WDTimer_Resetv), (14 bytes).
+    Removing wdtimer.o(i._Z13WDTimer_Startv), (14 bytes).
+    Removing wdtimer.o(i._Z15WWDG_IRQHandlerv), (12 bytes).
     Removing wdtimer.o(.ARM.exidx), (8 bytes).
     Removing wdtimer.o(.ARM.exidx), (8 bytes).
     Removing wdtimer.o(.ARM.exidx), (8 bytes).
@@ -1392,4 +1380,4 @@ Removing Unused input sections from the image.
     Removing system_stm32f4xx.o(.constdata), (16 bytes).
     Removing system_stm32f4xx.o(.data), (4 bytes).
 
-714 unused section(s) (total 16044 bytes) removed from the image.
+710 unused section(s) (total 16004 bytes) removed from the image.
