@@ -335,7 +335,7 @@
             <v6WtE>0</v6WtE>
             <v6Rtti>0</v6Rtti>
             <VariousControls>
-              <MiscControls>--cpp11</MiscControls>
+              <MiscControls></MiscControls>
               <Define>USE_STDPERIPH_DRIVER</Define>
               <Undefine></Undefine>
               <IncludePath>..\;.\STM32F4xx_StdPeriph_Driver;.\STM32F4xx_StdPeriph_Driver\inc;.\STM32F4xx_StdPeriph_Driver\src;.\CMSIS\Device\ST\STM32F4xx\Include;.\User;.\CMSIS;.\CMSIS\Include</IncludePath>
@@ -408,6 +408,11 @@
               <FilePath>.\User\LTC6811.c</FilePath>
             </File>
             <File>
+              <FileName>LTC681x.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\User\LTC681x.c</FilePath>
+            </File>
+            <File>
               <FileName>LTC2983.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\User\LTC2983.c</FilePath>
@@ -421,6 +426,11 @@
               <FileName>EEPROM.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\User\EEPROM.c</FilePath>
+            </File>
+            <File>
+              <FileName>Gyro.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\User\Gyro.c</FilePath>
             </File>
             <File>
               <FileName>WDTimer.c</FileName>
@@ -441,6 +451,16 @@
               <FileName>FIFO.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\User\FIFO.c</FilePath>
+            </File>
+            <File>
+              <FileName>Terminal.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\User\Terminal.c</FilePath>
+            </File>
+            <File>
+              <FileName>ADC.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\User\ADC.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -473,6 +493,11 @@
               <FilePath>.\User\LTC6811.h</FilePath>
             </File>
             <File>
+              <FileName>LTC681x.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\User\LTC681x.h</FilePath>
+            </File>
+            <File>
               <FileName>LTC2983.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\User\LTC2983.h</FilePath>
@@ -486,6 +511,11 @@
               <FileName>EEPROM.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\User\EEPROM.h</FilePath>
+            </File>
+            <File>
+              <FileName>Gyro.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\User\Gyro.h</FilePath>
             </File>
             <File>
               <FileName>WDTimer.h</FileName>
@@ -506,6 +536,16 @@
               <FileName>FIFO.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\User\FIFO.h</FilePath>
+            </File>
+            <File>
+              <FileName>Terminal.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\User\Terminal.h</FilePath>
+            </File>
+            <File>
+              <FileName>ADC.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\User\ADC.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -547,7 +587,15 @@
               <FileType>1</FileType>
               <FilePath>.\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_usart.c</FilePath>
             </File>
+            <File>
+              <FileName>stm32f4xx_adc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_adc.c</FilePath>
+            </File>
           </Files>
+        </Group>
+        <Group>
+          <GroupName>Drivers</GroupName>
         </Group>
         <Group>
           <GroupName>::CMSIS</GroupName>

@@ -26,9 +26,4 @@ void WDTimer_Start(void);
  */
 void WDTimer_Reset(void);
 
-/** WWDG_IRQHandler
- *	Problem -> Disconnects the contactor
- */
-void WWDG_IRQHandler(void);
-
 #endif

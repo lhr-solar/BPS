@@ -16,13 +16,21 @@
  */
  
 #include <stdint.h>
+#include <stdio.h>
 #include "stm32f4xx.h"
 #include "FIFO.h"
 #include "Definition.h"
 
+// This is required to use printf
+struct __FILE{
+	int file;
+};
+
 // Global variables
 static uint32_t TxErrorCnt = 0;
 static uint32_t RxErrorCnt = 0;
+FILE __stdout;
+FILE __stdin;
 
 // Private Function Prototypes
 void copySoftwareToHardware(void);
@@ -101,7 +109,7 @@ void UART1_Write(char *txBuf, uint32_t txSize){
  */
 void UART1_Read(char *rxBuf, uint32_t rxSize){
 	for(uint32_t i = 0; i < rxSize; i++){
-		
+		// TODO:
 	}
 }
 
@@ -151,8 +159,8 @@ void UART3_Init(uint32_t baud){
  */
 void UART3_Write(char *txBuf, uint32_t txSize){
 	for(uint32_t i = 0; i < txSize; i++){
-		USART3->DR = txBuf[i] & 0xFF;
 		while((USART3->SR&USART_SR_TC) == 0);	// Wait until transmission is done
+		USART3->DR = txBuf[i] & 0xFF;
 	}
 }
 
@@ -193,6 +201,39 @@ void copyHardwareToSoftware(void){
 	}else{
 		FIFO_Put_Rx(data & 0xFF);
 	}
+}
+
+void UART1_OutChar(char data){
+	while(FIFO_IsFull_Tx());
+	FIFO_Put_Tx(data);
+	USART_ITConfig(USART1, USART_IT_TC, DISABLE);
+	copySoftwareToHardware();
+	USART_ITConfig(USART1, USART_IT_TC, ENABLE);
+}
+
+void UART3_OutChar(char data){
+	while((USART3->SR&USART_SR_TC) == 0);	// Wait until transmission is done
+	USART3->DR = data & 0xFF;
+}
+
+// this is used for printf to output to the usb uart
+int fputc(int ch, FILE *f){
+	if(!NUCLEO){
+		UART1_OutChar(ch);
+	}else{
+		UART3_Write((char *)&ch, 1);
+	}
+  return 1;
+}
+
+int fgetc(FILE *f){
+	char letter;
+	if(!NUCLEO){
+		UART1_Read(&letter, 1);
+	}else{
+		UART3_Read(&letter, 1);
+	}
+	return letter;
 }
 
 /***************************** Interrupt Service Routines ******************************/

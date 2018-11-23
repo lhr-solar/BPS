@@ -6,7 +6,16 @@
  * @lastRevised 10/2/2018
  */
  
-#define NUM_MODULES 31
+ #ifndef DEF_H__
+ #define DEF_H__
+ 
+#define NUCLEO		1
+
+#define NUM_BATTERY_MODULES			31
+#define NUM_VOLTAGE_BOARDS				1
+#define NUM_TEMPERATURE_BOARDS		3
 
 // PRIORITIES
 #define UART1_PRIORITY		8			// Terminal (PuTTY) interface. Keep this at the lowest priority out of all interrupts.
+
+#endif
