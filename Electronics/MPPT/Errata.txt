@@ -33,15 +33,3 @@ Explanation:
 During PCB design, I had assumed we would be able to find all of our capacitors in size 0805, and having run into a time-crunch didn't double-check that that was the case. As it turns out, we can't find SMD 100uF capacitors in sizes smaller than 1210 or SMD 47uF capacitors in sizes smaller than 1206. The 1206 is just small enough to be soldered into the 0805, and while the 1210 has the same length, it's far wider. This could make populating the board difficult.
 
 Lesson learned. Always double-check footprints before ordering.
-
-------------------------------------------------------------
-3. Oversized RC Filter Capacitors on Voltage Sensors
-
-Summary:
-The footprints for the voltage sensor RC filters are 1206 rather than 0805. Appropriate capacitors can still be found in that size, but most of the rest of our capacitors are 0805.
-
-Corrective Action:
-  - None; no effect on performance.
-
-Explanation:
-Simple mistake I didn't notice before production.
