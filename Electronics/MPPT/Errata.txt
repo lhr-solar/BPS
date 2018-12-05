@@ -1,21 +1,6 @@
-Errata in Rev1.2
+Errata in Rev1.2+
 ============================================================
-1. Incorrect Annotation on Diodes for Array Voltage Sensor
-
-Summary:
-D5 and D6 refer to the correct footprints but are incorrectly annotated; D5 should be annotated "zener" while D6 should be annotated "ordinary".
-
-Corrective Action:
-  a. Cover silkscreen annotation with a new label with the
-     correct annotation.
-  b. Keep a note in the assembly instructions to be careful
-     with these components.
-
-Explanation:
-Many of our components have a pair of diodes for over- and under-voltage protection: one zener, one general purpose. To help in assembly, they are labeled "zener" and "ordinary", respectively. However, in moving and rotating the diodes for the Solar Array's voltage sensors, I accidentally swapped these labels, and this was not caught before production.
-
-------------------------------------------------------------
-2. Incorrect Footprints on Regulator Capacitors
+1. Incorrect Footprints on Regulator Capacitors
 
 Summary:
 C4, C5, and C24 are sized 0805, but the only available capacitors in their recommended capacitances are size 1206 or 1210.
