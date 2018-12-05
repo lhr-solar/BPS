@@ -35,19 +35,7 @@ During PCB design, I had assumed we would be able to find all of our capacitors 
 Lesson learned. Always double-check footprints before ordering.
 
 ------------------------------------------------------------
-3. Missing Protection Diodes on Current Sensor Outputs
-
-Summary:
-The voltage sensor outputs and the FET driver inputs have diodes to protect the Nucleo against voltage spikes; the current sensors lack these on their outputs.
-
-Corrective Action:
-  - None; it should be safe enough.
-
-Explanation:
-During schematic design, I hadn't yet realized the purpose of the diodes, so when I replaced the old current sensors with our new ones, I didn't keep them. I didn't realize their purpose until I was picking diode parts after the PCB had been ordered. The design of the sensor has enough headroom that the Nucleo should be safe, but in future revisions the protection diodes should be reinserted.
-
-------------------------------------------------------------
-4. Oversized RC Filter Capacitors on Voltage Sensors
+3. Oversized RC Filter Capacitors on Voltage Sensors
 
 Summary:
 The footprints for the voltage sensor RC filters are 1206 rather than 0805. Appropriate capacitors can still be found in that size, but most of the rest of our capacitors are 0805.
@@ -59,7 +47,7 @@ Explanation:
 Simple mistake I didn't notice before production.
 
 ------------------------------------------------------------
-5. Mechanical PCB-Lock Holes Have Pads
+4. Mechanical PCB-Lock Holes Have Pads
 
 Summary:
 The non-plated through-holes for the Phoenix and Molex connectors have pads surrounding them; they should not.
@@ -71,7 +59,7 @@ Explanation:
 Simple mistake during footprint design that wasn't worth the time to fix before production. Because the PCB-lock devices on the connectors are plastic and the pads themselves are not connected to any electrical trace or plane, there is no hazard or liability induced by this mistake.
 
 ------------------------------------------------------------
-6. Mechanical PCB-Lock Holes Misaligned for Phoenix Conn.
+5. Mechanical PCB-Lock Holes Misaligned for Phoenix Conn.
 
 Summary: The mechanical holes for the Phoenix Contact connectors are misaligned, making them impossible to use.
 
