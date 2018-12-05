@@ -69,3 +69,14 @@ Corrective Action:
 
 Explanation:
 Simple mistake during footprint design that wasn't worth the time to fix before production. Because the PCB-lock devices on the connectors are plastic and the pads themselves are not connected to any electrical trace or plane, there is no hazard or liability induced by this mistake.
+
+------------------------------------------------------------
+6. Mechanical PCB-Lock Holes Misaligned for Phoenix Conn.
+
+Summary: The mechanical holes for the Phoenix Contact connectors are misaligned, making them impossible to use.
+
+Corrective Action:
+  - None; no real solution beyond drilling new holes
+
+Explanation:
+This was a mistake during footprint design. I based a distance measurement from the wrong point and didn't notice until board assembly.
