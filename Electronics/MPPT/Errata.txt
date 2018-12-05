@@ -1,20 +1,4 @@
 Errata in Rev1.2+
 ============================================================
-1. Incorrect Footprints on Regulator Capacitors
 
-Summary:
-C4, C5, and C24 are sized 0805, but the only available capacitors in their recommended capacitances are size 1206 or 1210.
-
-Corrective Action:
-  a. Find smaller capacitance capacitors to use in place of
-     originally specified capacitances.
-  b. Attempt to solder on components onto the smaller pads.
-     There may be just enough room.
-  c. Jerry-rig larger capacitors with leads onto the pads.
-     This would be very precarious, and may not hold up to
-     vibrations in the car. This is a last-ditch option.
-
-Explanation:
-During PCB design, I had assumed we would be able to find all of our capacitors in size 0805, and having run into a time-crunch didn't double-check that that was the case. As it turns out, we can't find SMD 100uF capacitors in sizes smaller than 1210 or SMD 47uF capacitors in sizes smaller than 1206. The 1206 is just small enough to be soldered into the 0805, and while the 1210 has the same length, it's far wider. This could make populating the board difficult.
-
-Lesson learned. Always double-check footprints before ordering.
+None so far.
