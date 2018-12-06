@@ -1,4 +1,4 @@
-Assembly and Test Instructions
+Assembly and Test Instructions (PCB Rev1.2)
 ============================================================
 The board should be assembled and tested in sections to ensure proper functioning. Assembly goes through the following sections in order:
 
@@ -104,7 +104,11 @@ You can also check the last two by using the Battery and Array Current test poin
 
 Next install the shunt resistors R8 and R11 and the bypass capacitors C17 and C18.
 
-TODO: Testing this?
+The best way to test these sensors is using a constant current source. The sensors are designed to read 0-6A of current. To test the array sensor, route current from the GND plane through the array's - terminal. To test the battery sensor, route current from the battery's - terminal through the GND plane. Run the MPPT software and verify that it reads current.
+
+If you don't have a constant current source, you can use a power resistor and a constant voltage source to simulate one. A 1ohm 50W resistor will translate 6V to 6A. You can either solder one lead onto the GND plane (one of the large capacitors is a good place to do this) or screw it into the connector for the sensor being tested. Use the voltage source to route current as you would with the constant current source.
+
+Now may be a good time to calibrate these sensors as well.
 
 ------------------------------------------------------------
 3.2 Voltage Sensors, LEDs, and Test Points
@@ -113,7 +117,9 @@ NOTE: Due to a silkscreen mistake, the "zener" and "ordinary" labels are swapped
 
 Start by installing the D5-8 and LED1-2. Be careful to install the diodes in the correct orientation - there are silkscreen labels indicating orientation. Then install the resistors R3-6 and R12-13. Finally, install test points 1, 2, 23, and 24.
 
-TODO: Testing this?
+To test these sensors, apply large voltages across Battery +/- and across Array +/-. The LED circuitry for the array is designed for up to 70V, while the LED circuitry for the battery is designed for 80-130V. Run the MPPT software and verify that it reads voltage.
+
+Now may be a good time to calibrate these sensors as well.
 
 ------------------------------------------------------------
 4. FET Driver
