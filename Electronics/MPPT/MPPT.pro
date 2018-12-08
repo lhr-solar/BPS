@@ -1,4 +1,4 @@
-update=10/30/2018 8:56:59 PM
+update=12/5/2018 1:17:41 AM
 version=1
 last_client=kicad
 [pcbnew]
@@ -63,8 +63,6 @@ LibName33=utsvt-power-regulators
 LibName34=utsvt-microcontrollers
 LibName35=utsvt-connectors
 LibName36=utsvt-chips
-[general]
-version=1
 [schematic_editor]
 version=1
 PageLayoutDescrFile=
@@ -75,3 +73,5 @@ NetFmtName=Pcbnew
 SpiceForceRefPrefix=0
 SpiceUseNetNumbers=0
 LabSize=40
+[general]
+version=1
