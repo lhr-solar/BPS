@@ -402,6 +402,31 @@
               <FilePath>.\User\Temperature.c</FilePath>
             </File>
             <File>
+              <FileName>Display.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\User\Display.c</FilePath>
+            </File>
+            <File>
+              <FileName>Terminal.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\User\Terminal.c</FilePath>
+            </File>
+            <File>
+              <FileName>Gyro.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\User\Gyro.c</FilePath>
+            </File>
+            <File>
+              <FileName>Contactor.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\User\Contactor.c</FilePath>
+            </File>
+            <File>
+              <FileName>EEPROM.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\User\EEPROM.c</FilePath>
+            </File>
+            <File>
               <FileName>LTC6811.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\User\LTC6811.c</FilePath>
@@ -417,54 +442,9 @@
               <FilePath>.\User\LTC2983.c</FilePath>
             </File>
             <File>
-              <FileName>Display.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\User\Display.c</FilePath>
-            </File>
-            <File>
-              <FileName>EEPROM.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\User\EEPROM.c</FilePath>
-            </File>
-            <File>
-              <FileName>Gyro.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\User\Gyro.c</FilePath>
-            </File>
-            <File>
               <FileName>WDTimer.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\User\WDTimer.c</FilePath>
-            </File>
-            <File>
-              <FileName>SPI.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\User\SPI.c</FilePath>
-            </File>
-            <File>
-              <FileName>UART.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\User\UART.c</FilePath>
-            </File>
-            <File>
-              <FileName>FIFO.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\User\FIFO.c</FilePath>
-            </File>
-            <File>
-              <FileName>Terminal.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\User\Terminal.c</FilePath>
-            </File>
-            <File>
-              <FileName>ADC.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\User\ADC.c</FilePath>
-            </File>
-            <File>
-              <FileName>Contactor.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\User\Contactor.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -554,6 +534,36 @@
           </Files>
         </Group>
         <Group>
+          <GroupName>Drivers</GroupName>
+          <Files>
+            <File>
+              <FileName>UART.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\User\UART.c</FilePath>
+            </File>
+            <File>
+              <FileName>FIFO.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\User\FIFO.c</FilePath>
+            </File>
+            <File>
+              <FileName>LED.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\User\LED.c</FilePath>
+            </File>
+            <File>
+              <FileName>ADC.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\User\ADC.c</FilePath>
+            </File>
+            <File>
+              <FileName>SPI.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\User\SPI.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
           <GroupName>StdPeriph</GroupName>
           <Files>
             <File>
@@ -612,9 +622,6 @@
               <FilePath>.\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_flash.c</FilePath>
             </File>
           </Files>
-        </Group>
-        <Group>
-          <GroupName>Drivers</GroupName>
         </Group>
         <Group>
           <GroupName>::CMSIS</GroupName>
