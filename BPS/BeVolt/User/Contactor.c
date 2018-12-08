@@ -10,16 +10,16 @@
 #include <stdint.h>
 #include "Contactor.h"
 #include "stm32f4xx.h"
-#include "stm32f4xx_gpio.h"
-#include "stm32f4xx_rcc.h"
-
 
 /** 
  *	 Initiliazes GPIOA_Pin_6
  */
 void Contactor_Init(void){
+	GPIO_InitTypeDef GPIO_InitStruct;
+	
 	// Initialize clock
-	RCC_AHB1PeriphClockCmd(RCC_AHB1_Periph_GPIOA, ENABLE);
+	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
+	
 	// Initialize PA6
 	GPIO_InitStruct.GPIO_Pin = GPIO_Pin_6;
 	GPIO_InitStruct.GPIO_Mode = GPIO_Mode_OUT;
@@ -27,7 +27,8 @@ void Contactor_Init(void){
 	GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
 	GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_DOWN;
 	GPIO_Init(GPIOA, &GPIO_InitStruct);
-
+}
+	
 /**
  * 	Closes contactor, GPIO_Pin_6 = 1
  */

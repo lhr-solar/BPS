@@ -15,7 +15,7 @@
 #include "Temperature.h"
 #include "Gyro.h"
 
-void Terminal_CheckInput();
+void Terminal_CheckInput(void);
 
 void Terminal_HandleInput(char * op, char * arg);
 
@@ -36,16 +36,16 @@ void Terminal_setContactor(int status);
  */
 void Terminal_gyroStatus(uint8_t axes);
 
-void Terminal_watchdogStatus();
+void Terminal_watchdogStatus(void);
 
-void Terminal_eepromStatus();
+void Terminal_eepromStatus(void);
 
-void Terminal_canStatus();
+void Terminal_canStatus(void);
 
-void Terminal_spiStatus();
+void Terminal_spiStatus(void);
 
-void Terminal_i2cStatus();
+void Terminal_i2cStatus(void);
 
-void Terminal_helpMenu();
+void Terminal_helpMenu(void);
 
 #endif
