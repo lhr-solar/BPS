@@ -1,4 +1,3 @@
-
 // Contactor.c
 /**
  * Sets Contactor on or off
@@ -11,8 +10,8 @@
 #include "Contactor.h"
 #include "stm32f4xx.h"
 
-/** 
- *	 Initiliazes GPIOA_Pin_6
+/** Contactor_Init
+ * Initialize PA6 as output pin.
  */
 void Contactor_Init(void){
 	GPIO_InitTypeDef GPIO_InitStruct;
@@ -20,7 +19,7 @@ void Contactor_Init(void){
 	// Initialize clock
 	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
 	
-	// Initialize PA6
+	// Initialize PA6 as output
 	GPIO_InitStruct.GPIO_Pin = GPIO_Pin_6;
 	GPIO_InitStruct.GPIO_Mode = GPIO_Mode_OUT;
 	GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
@@ -47,7 +46,6 @@ void Contactor_Off(void){
  *	 Outputs: flag status (0 or 1)
  */
 uint32_t Contactor_Flag(void){
-		if (GPIO_ReadOutputDataBit(GPIOA, GPIO_Pin_6) == Bit_SET) return 1;
-		else return 0;
+		
 }
 	

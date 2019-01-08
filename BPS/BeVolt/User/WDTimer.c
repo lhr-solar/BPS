@@ -5,9 +5,9 @@
  * @authors Sijin Woo, Chase Block, Manolo Alvarez
  * @lastRevised 11/21/2018
  */
- #include "WDTimer.h"
- #include "Contactor.h"
- #include "stm32f4xx.h"
+#include "WDTimer.h"
+#include "Contactor.h"
+#include "stm32f4xx.h"
 
 /** 
  * Window Watchdog is used for its interrupt feature, and ceiling (if timer is reloaded too fast it may interrupt. Not set up, but it is an option)

@@ -1,0 +1,493 @@
+EESchema Schematic File Version 4
+LIBS:BPSMaster-cache
+EELAYER 26 0
+EELAYER END
+$Descr A4 11693 8268
+encoding utf-8
+Sheet 2 8
+Title ""
+Date ""
+Rev ""
+Comp ""
+Comment1 ""
+Comment2 ""
+Comment3 ""
+Comment4 ""
+$EndDescr
+$Comp
+L utsvt-connectors:CarPowerConnector J?
+U 1 1 5C35F236
+P 2900 3400
+F 0 "J?" H 2950 3750 60  0000 C CNN
+F 1 "CarPowerConnector" H 2600 3650 60  0000 C CNN
+F 2 "" H 2900 3400 60  0001 C CNN
+F 3 "" H 2900 3400 60  0001 C CNN
+	1    2900 3400
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	3200 3300 3250 3300
+Wire Wire Line
+	3200 3500 3250 3500
+Wire Wire Line
+	3250 3500 3250 3600
+$Comp
+L power:+12V #PWR?
+U 1 1 5C35F2D2
+P 3250 3150
+F 0 "#PWR?" H 3250 3000 50  0001 C CNN
+F 1 "+12V" H 3265 3323 50  0000 C CNN
+F 2 "" H 3250 3150 50  0001 C CNN
+F 3 "" H 3250 3150 50  0001 C CNN
+	1    3250 3150
+	1    0    0    -1  
+$EndComp
+$Comp
+L utsvt-power-regulators:PQMC3-Dx-Sx-S U?
+U 1 1 5C35F491
+P 4800 3400
+F 0 "U?" H 4800 3850 60  0000 C CNN
+F 1 "PQMC3-D12-S5-S" H 4800 3750 60  0000 C CNN
+F 2 "" H 4800 3450 60  0001 C CNN
+F 3 "" H 4800 3450 60  0001 C CNN
+	1    4800 3400
+	1    0    0    -1  
+$EndComp
+NoConn ~ 4500 3450
+Connection ~ 3250 3600
+Wire Wire Line
+	3250 3600 3250 3650
+$Comp
+L Device:C C?
+U 1 1 5C35F7E4
+P 3500 3400
+F 0 "C?" H 3618 3446 50  0000 L CNN
+F 1 "100uF" H 3618 3355 50  0000 L CNN
+F 2 "" H 3538 3250 50  0001 C CNN
+F 3 "~" H 3500 3400 50  0001 C CNN
+	1    3500 3400
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	4500 3550 4450 3550
+Wire Wire Line
+	4450 3250 4450 3200
+$Comp
+L Device:C C?
+U 1 1 5C35FCD1
+P 4100 3400
+F 0 "C?" H 4218 3446 50  0000 L CNN
+F 1 "47uF" H 4218 3355 50  0000 L CNN
+F 2 "" H 4138 3250 50  0001 C CNN
+F 3 "~" H 4100 3400 50  0001 C CNN
+	1    4100 3400
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	3250 3600 3500 3600
+$Comp
+L Device:L L?
+U 1 1 5C35FFD4
+P 3800 3200
+F 0 "L?" V 3990 3200 50  0000 C CNN
+F 1 "4.7uH" V 3899 3200 50  0000 C CNN
+F 2 "" H 3800 3200 50  0001 C CNN
+F 3 "~" H 3800 3200 50  0001 C CNN
+	1    3800 3200
+	0    -1   -1   0   
+$EndComp
+Wire Wire Line
+	3250 3150 3250 3200
+Wire Wire Line
+	3250 3200 3500 3200
+Connection ~ 3250 3200
+Wire Wire Line
+	3250 3200 3250 3300
+Wire Wire Line
+	3500 3250 3500 3200
+Connection ~ 3500 3200
+Wire Wire Line
+	3500 3200 3650 3200
+Wire Wire Line
+	3500 3550 3500 3600
+Connection ~ 3500 3600
+Wire Wire Line
+	3500 3600 4100 3600
+Wire Wire Line
+	4100 3250 4100 3200
+Wire Wire Line
+	4100 3200 3950 3200
+Connection ~ 4100 3200
+Wire Wire Line
+	4100 3550 4100 3600
+Wire Wire Line
+	4100 3200 4450 3200
+Wire Wire Line
+	4450 3250 4500 3250
+Wire Wire Line
+	4450 3550 4450 3600
+Wire Wire Line
+	4450 3600 4100 3600
+Connection ~ 4100 3600
+$Comp
+L Device:C C?
+U 1 1 5C361B55
+P 5350 3350
+F 0 "C?" V 5200 3450 50  0000 C CNN
+F 1 "10uF" V 5200 3250 50  0000 C CNN
+F 2 "" H 5388 3200 50  0001 C CNN
+F 3 "~" H 5350 3350 50  0001 C CNN
+	1    5350 3350
+	0    -1   -1   0   
+$EndComp
+Wire Wire Line
+	5600 3550 5600 3350
+Wire Wire Line
+	5600 3350 5500 3350
+Wire Wire Line
+	5600 3650 5600 3550
+Connection ~ 5600 3550
+$Comp
+L Device:C C?
+U 1 1 5C3626E7
+P 5900 3350
+F 0 "C?" H 6018 3396 50  0000 L CNN
+F 1 "CP" H 6018 3305 50  0000 L CNN
+F 2 "" H 5938 3200 50  0001 C CNN
+F 3 "~" H 5900 3350 50  0001 C CNN
+	1    5900 3350
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	5900 3500 5900 3550
+Wire Wire Line
+	5900 3550 5600 3550
+Wire Wire Line
+	5250 3250 5250 3150
+Wire Wire Line
+	5900 3150 5900 3200
+Wire Wire Line
+	5100 3250 5250 3250
+$Comp
+L power:+3.3V #PWR?
+U 1 1 5C362CF6
+P 6350 4500
+F 0 "#PWR?" H 6350 4350 50  0001 C CNN
+F 1 "+3.3V" H 6365 4673 50  0000 C CNN
+F 2 "" H 6350 4500 50  0001 C CNN
+F 3 "" H 6350 4500 50  0001 C CNN
+	1    6350 4500
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	5900 3100 5900 3150
+Connection ~ 5900 3150
+Text HLabel 6450 4550 2    50   Output ~ 0
++3.3V
+Wire Wire Line
+	5900 3150 6000 3150
+Text HLabel 6000 3550 2    50   Output ~ 0
+GND
+Wire Wire Line
+	6000 3550 5900 3550
+Connection ~ 5900 3550
+$Comp
+L power:+12V #PWR?
+U 1 1 5C3735E7
+P 3500 4550
+F 0 "#PWR?" H 3500 4400 50  0001 C CNN
+F 1 "+12V" H 3515 4723 50  0000 C CNN
+F 2 "" H 3500 4550 50  0001 C CNN
+F 3 "" H 3500 4550 50  0001 C CNN
+	1    3500 4550
+	1    0    0    -1  
+$EndComp
+$Comp
+L utsvt-power-regulators:PQMC3-Dx-Sx-S U?
+U 1 1 5C3735ED
+P 4800 4800
+F 0 "U?" H 4800 5250 60  0000 C CNN
+F 1 "PQMC3-D12-S3-S" H 4800 5150 60  0000 C CNN
+F 2 "" H 4800 4850 60  0001 C CNN
+F 3 "" H 4800 4850 60  0001 C CNN
+	1    4800 4800
+	1    0    0    -1  
+$EndComp
+NoConn ~ 4500 4850
+Wire Wire Line
+	3500 5000 3500 5050
+$Comp
+L Device:CP C?
+U 1 1 5C3735F7
+P 3500 4800
+F 0 "C?" H 3618 4846 50  0000 L CNN
+F 1 "100uF" H 3618 4755 50  0000 L CNN
+F 2 "" H 3538 4650 50  0001 C CNN
+F 3 "~" H 3500 4800 50  0001 C CNN
+	1    3500 4800
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	4500 4950 4450 4950
+Wire Wire Line
+	4450 4650 4450 4600
+$Comp
+L Device:CP C?
+U 1 1 5C373600
+P 4100 4800
+F 0 "C?" H 4218 4846 50  0000 L CNN
+F 1 "47uF" H 4218 4755 50  0000 L CNN
+F 2 "" H 4138 4650 50  0001 C CNN
+F 3 "~" H 4100 4800 50  0001 C CNN
+	1    4100 4800
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:L L?
+U 1 1 5C373608
+P 3800 4600
+F 0 "L?" V 3990 4600 50  0000 C CNN
+F 1 "4.7uH" V 3899 4600 50  0000 C CNN
+F 2 "" H 3800 4600 50  0001 C CNN
+F 3 "~" H 3800 4600 50  0001 C CNN
+	1    3800 4600
+	0    -1   -1   0   
+$EndComp
+Wire Wire Line
+	3500 4650 3500 4600
+Connection ~ 3500 4600
+Wire Wire Line
+	3500 4600 3650 4600
+Wire Wire Line
+	3500 4950 3500 5000
+Connection ~ 3500 5000
+Wire Wire Line
+	3500 5000 4100 5000
+Wire Wire Line
+	4100 4650 4100 4600
+Wire Wire Line
+	4100 4600 3950 4600
+Connection ~ 4100 4600
+Wire Wire Line
+	4100 4950 4100 5000
+Wire Wire Line
+	4100 4600 4450 4600
+Wire Wire Line
+	4450 4650 4500 4650
+Wire Wire Line
+	4450 4950 4450 5000
+Wire Wire Line
+	4450 5000 4100 5000
+Connection ~ 4100 5000
+$Comp
+L Device:CP C?
+U 1 1 5C373623
+P 5800 4750
+F 0 "C?" V 5650 4850 50  0000 C CNN
+F 1 "10uF" V 5650 4650 50  0000 C CNN
+F 2 "" H 5838 4600 50  0001 C CNN
+F 3 "~" H 5800 4750 50  0001 C CNN
+	1    5800 4750
+	0    -1   -1   0   
+$EndComp
+Wire Wire Line
+	6050 4950 6050 4750
+Wire Wire Line
+	6050 4750 5950 4750
+Wire Wire Line
+	6050 5050 6050 4950
+Connection ~ 6050 4950
+$Comp
+L Device:CP C?
+U 1 1 5C37363A
+P 6350 4750
+F 0 "C?" H 6468 4796 50  0000 L CNN
+F 1 "CP" H 6468 4705 50  0000 L CNN
+F 2 "" H 6388 4600 50  0001 C CNN
+F 3 "~" H 6350 4750 50  0001 C CNN
+	1    6350 4750
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	6350 4900 6350 4950
+Wire Wire Line
+	6350 4950 6050 4950
+Wire Wire Line
+	5250 4650 5250 4550
+Wire Wire Line
+	6350 4550 6350 4600
+Wire Wire Line
+	5100 4650 5250 4650
+Wire Wire Line
+	6350 4500 6350 4550
+Connection ~ 6350 4550
+Wire Wire Line
+	5100 4750 5650 4750
+Wire Wire Line
+	5100 4950 6050 4950
+Wire Wire Line
+	5250 4550 6350 4550
+Wire Wire Line
+	6350 4550 6450 4550
+Text Notes 3050 2650 0    50   ~ 0
+Two separate converters would cause more noise on the board but less power waste.\nIf too much noise, add 5 to 3.3V regulator.\n
+Text HLabel 6000 3150 2    50   Output ~ 0
++5V
+$Comp
+L power:+5V #PWR?
+U 1 1 5C376123
+P 5900 3100
+F 0 "#PWR?" H 5900 2950 50  0001 C CNN
+F 1 "+5V" H 5915 3273 50  0000 C CNN
+F 2 "" H 5900 3100 50  0001 C CNN
+F 3 "" H 5900 3100 50  0001 C CNN
+	1    5900 3100
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	3500 4550 3500 4600
+Wire Wire Line
+	5100 3550 5600 3550
+Wire Wire Line
+	5100 3350 5200 3350
+Wire Wire Line
+	5250 3150 5400 3150
+$Comp
+L Connector:TestPoint TP?
+U 1 1 5C37D606
+P 3500 3150
+F 0 "TP?" H 3500 3500 50  0000 L CNN
+F 1 "+12V_TP" H 3500 3400 50  0000 L CNN
+F 2 "" H 3700 3150 50  0001 C CNN
+F 3 "~" H 3700 3150 50  0001 C CNN
+	1    3500 3150
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	3500 3150 3500 3200
+$Comp
+L Connector:TestPoint TP?
+U 1 1 5C37E6A3
+P 5400 3100
+F 0 "TP?" H 5458 3220 50  0000 L CNN
+F 1 "+5V_TP" H 5458 3129 50  0000 L CNN
+F 2 "" H 5600 3100 50  0001 C CNN
+F 3 "~" H 5600 3100 50  0001 C CNN
+	1    5400 3100
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	5400 3100 5400 3150
+Connection ~ 5400 3150
+Wire Wire Line
+	5400 3150 5900 3150
+$Comp
+L Connector:TestPoint TP?
+U 1 1 5C37F6B1
+P 5900 3650
+F 0 "TP?" H 5842 3677 50  0000 R CNN
+F 1 "GND_TP" H 5842 3768 50  0000 R CNN
+F 2 "" H 6100 3650 50  0001 C CNN
+F 3 "~" H 6100 3650 50  0001 C CNN
+	1    5900 3650
+	-1   0    0    1   
+$EndComp
+Wire Wire Line
+	5900 3650 5900 3550
+$Comp
+L power:GND #PWR?
+U 1 1 5C58D746
+P 7300 3800
+F 0 "#PWR?" H 7300 3550 50  0001 C CNN
+F 1 "GND" H 7305 3627 50  0000 C CNN
+F 2 "" H 7300 3800 50  0001 C CNN
+F 3 "" H 7300 3800 50  0001 C CNN
+	1    7300 3800
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:LED_ALT D?
+U 1 1 5C58D83E
+P 7300 3600
+F 0 "D?" V 7338 3482 50  0000 R CNN
+F 1 "PowerOn" V 7247 3482 50  0000 R CNN
+F 2 "" H 7300 3600 50  0001 C CNN
+F 3 "~" H 7300 3600 50  0001 C CNN
+F 4 "Green" V 7300 3600 50  0001 C CNN "Color"
+F 5 "APTD2012LCGCK" V 7300 3600 50  0001 C CNN "P/N"
+	1    7300 3600
+	0    -1   -1   0   
+$EndComp
+$Comp
+L Device:R R?
+U 1 1 5C58D993
+P 7300 3250
+F 0 "R?" H 7370 3296 50  0000 L CNN
+F 1 "R" H 7370 3205 50  0000 L CNN
+F 2 "" V 7230 3250 50  0001 C CNN
+F 3 "~" H 7300 3250 50  0001 C CNN
+	1    7300 3250
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	7300 3800 7300 3750
+Wire Wire Line
+	7300 3450 7300 3400
+$Comp
+L power:+5V #PWR?
+U 1 1 5C58FEF6
+P 7300 3050
+F 0 "#PWR?" H 7300 2900 50  0001 C CNN
+F 1 "+5V" H 7315 3223 50  0000 C CNN
+F 2 "" H 7300 3050 50  0001 C CNN
+F 3 "" H 7300 3050 50  0001 C CNN
+	1    7300 3050
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	7300 3050 7300 3100
+$Comp
+L power:GND #PWR?
+U 1 1 5C3F3B1F
+P 5600 3650
+F 0 "#PWR?" H 5600 3400 50  0001 C CNN
+F 1 "GND" H 5605 3477 50  0000 C CNN
+F 2 "" H 5600 3650 50  0001 C CNN
+F 3 "" H 5600 3650 50  0001 C CNN
+	1    5600 3650
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GND #PWR?
+U 1 1 5C3F3B4E
+P 6050 5050
+F 0 "#PWR?" H 6050 4800 50  0001 C CNN
+F 1 "GND" H 6055 4877 50  0000 C CNN
+F 2 "" H 6050 5050 50  0001 C CNN
+F 3 "" H 6050 5050 50  0001 C CNN
+	1    6050 5050
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GNDPWR #PWR?
+U 1 1 5C3F7204
+P 3250 3650
+F 0 "#PWR?" H 3250 3450 50  0001 C CNN
+F 1 "GNDPWR" H 3254 3496 50  0000 C CNN
+F 2 "" H 3250 3600 50  0001 C CNN
+F 3 "" H 3250 3600 50  0001 C CNN
+	1    3250 3650
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GNDPWR #PWR?
+U 1 1 5C3F760F
+P 3500 5050
+F 0 "#PWR?" H 3500 4850 50  0001 C CNN
+F 1 "GNDPWR" H 3504 4896 50  0000 C CNN
+F 2 "" H 3500 5000 50  0001 C CNN
+F 3 "" H 3500 5000 50  0001 C CNN
+	1    3500 5050
+	1    0    0    -1  
+$EndComp
+$EndSCHEMATC

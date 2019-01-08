@@ -7,67 +7,119 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
+#include "stm32f4xx.h"
 #include "Voltage.h"
 #include "Current.h"
 #include "Temperature.h"
-//#include "Contactor.h"
+#include "Contactor.h"
 #include "EEPROM.h"
 //#include "CANlib.h"
 #include "WDTimer.h"
-//#include "Gyro.h"
-#include "stm32f4xx.h"
+#include "Gyro.h"
 #include "Terminal.h"
 
-
 void initialize(void);
+void preliminaryCheck(void);
+void faultCondition(void);
 
 int Mainmain(){
-	initialize();
+	__disable_irq();				// Disable all interrupts until initialization is done
+	initialize();					// Initialize codes/pins
+	preliminaryCheck();		// Wait until all boards are powered on
+	__enable_irq();				// Enable interrupts
+	
 	WDTimer_Start();
 	while(1){
+		// First update the measurements.
 		Voltage_UpdateMeasurements();
 		Current_UpdateMeasurements();
 		Temperature_UpdateMeasurements();
 		
-		if(!Current_IsSafe()){
-			// contactor off
-			// Current LED on
-		}
-		if(!Temperature_IsSafe()){
-			// contactor off
-			// Temperature LED on
-		}
-		if(!Voltage_IsSafe()){
-			// contactor off
-			// Voltage LED on
-		}
-		if(Current_IsSafe() && Temperature_IsSafe() && Voltage_IsSafe()){
-			// contactor on
+		// Check if everything is safe
+		if(Current_IsSafe() && Temperature_IsSafe(Current_IsCharging()) && Voltage_IsSafe()){
+			Contactor_On();
+		}else{
+			break;
 		}
 		
+		// Update necessary
+		// CAN_SendMessageStatus()	// Most likely need to put this on a timer if sending too frequently
 		Terminal_CheckInput();
+		// Display_UpdateScreen()
 		
 		WDTimer_Reset();
 	}
+	
+	// BPS has tripped if this line is reached
+	faultCondition();
 }
 
+/**
+ * Initialize system.
+ *	1. Initialize device drivers.
+ *			- This includes communication protocols, GPIO pins, timers
+ *	2. Get EEPROM data that holds all fault conditions.
+ *			- By regulations, we are not allowed to be able to set the voltage, current, temperature
+ *				limits while the car is moving. To make sure this doesn't happen, the EEPROM needs to be
+ *				written and cannot be modified (locked) once programmed.
+ *	3. Set the current, voltage, and temperature limits.
+ *			- Give wrappers (Voltage, Current, Temperature) the limits
+ */
 void initialize(void){
+	Contactor_Init();
+	Contactor_Off();
 	EEPROM_Init();
 	WDTimer_Init();
-	//TODO EEPROM
-	//VoltSlave.setLimits();
-	//AmpSlave.setLimits();
-	//CelsiusSlave.setLimits();
+	
+	Current_Init();
+	Voltage_Init();
+	Temperature_Init();
+}
+
+/** preliminaryCheck
+ * Before starting any data monitoring, check if all the boards are powered. If we start the data
+ * collection before everything is powered on, then the system will immediately fault and not turn on
+ * even though everything is safe.
+ */
+void preliminaryCheck(void){
+	
+}
+
+/** faultCondition
+ * This block of code will be executed whenever there is a fault.
+ * If bps trips, make it spin and impossible to connect the battery to car again
+ * until complete reboot is done.
+ */
+void faultCondition(void){
+	while(1){
+		// CAN_SendMessageStatus()
+		if(!Current_IsSafe()){
+			// Toggle Current fault LED
+		}
+		
+		if(!Voltage_IsSafe()){
+			// Toggle Voltage fault LED
+		}
+		
+		if(!Temperature_IsSafe(Current_IsCharging())){
+			// Toggle Temperature fault LED
+		}
+	}
 }
 
 
-
-
-
-//*************************************************************************************
+//****************************************************************************************
 // The following code is for testing individual pieces of code.
-//*************************************************************************************
+//****************************************************************************************
+// If you want to test an individual test, change the #define NAME to what you want to what
+// to use. This is used mainly to save memory for both the microcontroller and Keil.
+// Keil has a limit of how much memory you can compile.
+// E.g. If you want to run a LTC6811 test, change "#define CHANGE_THIS_TO_TEST_NAME" to the
+//		following:
+//		#define LTC6811_TEST
+#define CHANGE_THIS_TO_TEST_NAME
 
+#ifdef LTC6811_TEST
 // LTC6811 Test
 #include "SPI.h"
 #include "LTC6811.h"
@@ -141,8 +193,10 @@ void print_config(cell_asic *bms_ic)
     printf("\n\r");
   }
 }
+#endif
 
-
+#ifdef SPI_TEST
+//****************************************************************************************
 // SPI Test
 #include "SPI.h"
 #include "UART.h"
@@ -170,7 +224,10 @@ int SPITestmain(){
 		
 	}
 }
+#endif
 
+#ifdef UART_TEST
+//****************************************************************************************
 // Debug UART Test
 int UARTmain(){
 	UART3_Init(9600);
@@ -179,7 +236,10 @@ int UARTmain(){
 		for(uint32_t i = 0; i < 100000; i++);
 	}
 }
+#endif
 
+#ifdef GYRO_TEST
+//****************************************************************************************
 // Gyro test
 int gyroTestmain(){
 	//FXAS21002CQR1_Init();
@@ -189,8 +249,10 @@ int gyroTestmain(){
 		// print or something
 	}
 }
+#endif
 
-
+#ifdef ADC_TEST
+//****************************************************************************************
 #include "ADC.h"
 #include <stdio.h>
 int ADCmain(){
@@ -202,3 +264,4 @@ int ADCmain(){
 		UART3_Write(str,strlen(str));
 	}		
 }
+#endif

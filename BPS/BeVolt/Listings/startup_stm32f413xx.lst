@@ -83,26 +83,26 @@ ARM Macro Assembler    Page 2
    43 00000000         ;   <o> Stack Size (in Bytes) <0x0-0xFFFFFFFF:8>
    44 00000000         ; </h>
    45 00000000         
-   46 00000000 00000400 
+   46 00000000 00001000 
                        Stack_Size
-                               EQU              0x00000400
+                               EQU              0x00001000
    47 00000000         
    48 00000000                 AREA             STACK, NOINIT, READWRITE, ALIGN
 =3
    49 00000000         Stack_Mem
                                SPACE            Stack_Size
-   50 00000400         __initial_sp
-   51 00000400         
-   52 00000400         
-   53 00000400         ; <h> Heap Configuration
-   54 00000400         ;   <o>  Heap Size (in Bytes) <0x0-0xFFFFFFFF:8>
-   55 00000400         ; </h>
-   56 00000400         
-   57 00000400 00000200 
+   50 00001000         __initial_sp
+   51 00001000         
+   52 00001000         
+   53 00001000         ; <h> Heap Configuration
+   54 00001000         ;   <o>  Heap Size (in Bytes) <0x0-0xFFFFFFFF:8>
+   55 00001000         ; </h>
+   56 00001000         
+   57 00001000 00000200 
                        Heap_Size
                                EQU              0x00000200
-   58 00000400         
-   59 00000400                 AREA             HEAP, NOINIT, READWRITE, ALIGN=
+   58 00001000         
+   59 00001000                 AREA             HEAP, NOINIT, READWRITE, ALIGN=
 3
    60 00000000         __heap_base
    61 00000000         Heap_Mem
@@ -773,7 +773,7 @@ ARM Macro Assembler    Page 12
               00000000 
               00000000 
               00000000 
-              00000400 
+              00001000 
               00000200 
               00000000 
 Command Line: --debug --xref --diag_suppress=9931 --cpu=Cortex-M4.fp --apcs=int
@@ -784,12 +784,11 @@ erwork --depend=.\objects\startup_stm32f413xx.d -o.\objects\startup_stm32f413xx
 ARM Macro Assembler    Page 13 
 
 
-.o -I.\RTE\_Target_1 -I"D:\Program Files\Keil\ARM\PACK\ARM\CMSIS\5.3.0\CMSIS\In
-clude" -I"D:\Program Files\Keil\ARM\PACK\Keil\STM32F4xx_DFP\2.13.0\Drivers\CMSI
-S\Device\ST\STM32F4xx\Include" --predefine="__EVAL SETA 1" --predefine="__UVISI
-ON_VERSION SETA 525" --predefine="_RTE_ SETA 1" --predefine="STM32F413xx SETA 1
-" --list=.\listings\startup_stm32f413xx.lst RTE\Device\STM32F413RHTx\startup_st
-m32f413xx.s
+.o -I.\RTE\_Target_1 -IC:\Keil_v5\ARM\PACK\ARM\CMSIS\5.4.0\CMSIS\Core\Include -
+IC:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\2.13.0\Drivers\CMSIS\Device\ST\STM32F4x
+x\Include --predefine="__UVISION_VERSION SETA 525" --predefine="_RTE_ SETA 1" -
+-predefine="STM32F413xx SETA 1" --list=.\listings\startup_stm32f413xx.lst RTE\D
+evice\STM32F413RHTx\startup_stm32f413xx.s
 
 
 
@@ -813,7 +812,7 @@ Symbol: Stack_Mem
       At line 475 in file RTE\Device\STM32F413RHTx\startup_stm32f413xx.s
       At line 477 in file RTE\Device\STM32F413RHTx\startup_stm32f413xx.s
 
-__initial_sp 00000400
+__initial_sp 00001000
 
 Symbol: __initial_sp
    Definitions
@@ -1983,7 +1982,7 @@ Symbol: Heap_Size
       At line 61 in file RTE\Device\STM32F413RHTx\startup_stm32f413xx.s
       At line 476 in file RTE\Device\STM32F413RHTx\startup_stm32f413xx.s
 
-Stack_Size 00000400
+Stack_Size 00001000
 
 Symbol: Stack_Size
    Definitions
@@ -2032,4 +2031,4 @@ Symbol: __use_two_region_memory
       None
 Comment: __use_two_region_memory unused
 3 symbols
-463 symbols in table
+462 symbols in table

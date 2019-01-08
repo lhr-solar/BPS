@@ -1,0 +1,504 @@
+EESchema Schematic File Version 4
+LIBS:BPSMaster-cache
+EELAYER 26 0
+EELAYER END
+$Descr A4 11693 8268
+encoding utf-8
+Sheet 4 8
+Title ""
+Date ""
+Rev ""
+Comp ""
+Comment1 ""
+Comment2 ""
+Comment3 ""
+Comment4 ""
+$EndDescr
+$Comp
+L Connector_Generic:Conn_01x04 J?
+U 1 1 5C2DA595
+P 9550 3700
+F 0 "J?" H 9700 3700 50  0000 R CNN
+F 1 "ContactorConnector" H 10350 3600 50  0000 R CNN
+F 2 "Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical" H 9550 3700 50  0001 C CNN
+F 3 "~" H 9550 3700 50  0001 C CNN
+	1    9550 3700
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GND #PWR?
+U 1 1 5C30292A
+P 9250 4000
+F 0 "#PWR?" H 9250 3750 50  0001 C CNN
+F 1 "GND" H 9255 3827 50  0000 C CNN
+F 2 "" H 9250 4000 50  0001 C CNN
+F 3 "" H 9250 4000 50  0001 C CNN
+	1    9250 4000
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:R R?
+U 1 1 5C302C24
+P 8450 3900
+F 0 "R?" V 8350 3900 50  0000 C CNN
+F 1 "1k" V 8450 3900 50  0000 C CNN
+F 2 "" V 8380 3900 50  0001 C CNN
+F 3 "~" H 8450 3900 50  0001 C CNN
+	1    8450 3900
+	0    -1   -1   0   
+$EndComp
+Wire Wire Line
+	9250 4000 9250 3800
+Wire Wire Line
+	9350 3900 8700 3900
+$Comp
+L Device:C C?
+U 1 1 5C3030F2
+P 8200 4150
+F 0 "C?" H 8315 4196 50  0000 L CNN
+F 1 "1uF" H 8315 4105 50  0000 L CNN
+F 2 "Capacitor_SMD:C_0805_2012Metric" H 8238 4000 50  0001 C CNN
+F 3 "~" H 8200 4150 50  0001 C CNN
+	1    8200 4150
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	8200 4000 8200 3900
+Wire Wire Line
+	8200 3900 8300 3900
+Wire Wire Line
+	8200 4400 8200 4300
+$Comp
+L utsvt-bps:BAS70-04 U?
+U 1 1 5C304528
+P 7700 3700
+F 0 "U?" H 7572 3546 50  0000 R CNN
+F 1 "BAS70-04" H 7572 3455 50  0000 R CNN
+F 2 "Package_TO_SOT_SMD:SOT-23" H 8150 3700 50  0001 C CNN
+F 3 "" H 8150 3700 50  0001 C CNN
+	1    7700 3700
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GND #PWR?
+U 1 1 5C304D16
+P 8200 4400
+F 0 "#PWR?" H 8200 4150 50  0001 C CNN
+F 1 "GND" H 8205 4227 50  0000 C CNN
+F 2 "" H 8200 4400 50  0001 C CNN
+F 3 "" H 8200 4400 50  0001 C CNN
+	1    8200 4400
+	1    0    0    -1  
+$EndComp
+Connection ~ 8200 3900
+$Comp
+L power:GND #PWR?
+U 1 1 5C305432
+P 7700 4200
+F 0 "#PWR?" H 7700 3950 50  0001 C CNN
+F 1 "GND" H 7705 4027 50  0000 C CNN
+F 2 "" H 7700 4200 50  0001 C CNN
+F 3 "" H 7700 4200 50  0001 C CNN
+	1    7700 4200
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	7700 4200 7700 4150
+$Comp
+L power:+5V #PWR?
+U 1 1 5C305723
+P 7700 3550
+F 0 "#PWR?" H 7700 3400 50  0001 C CNN
+F 1 "+5V" H 7715 3723 50  0000 C CNN
+F 2 "" H 7700 3550 50  0001 C CNN
+F 3 "" H 7700 3550 50  0001 C CNN
+	1    7700 3550
+	1    0    0    -1  
+$EndComp
+Text HLabel 8000 4000 3    50   Input ~ 0
+CONTACTOR_CHECK
+Wire Wire Line
+	8000 4000 8000 3900
+Connection ~ 8000 3900
+Wire Wire Line
+	8000 3900 8200 3900
+Wire Wire Line
+	7900 3900 8000 3900
+Wire Wire Line
+	9350 3700 8800 3700
+Text Label 8800 3700 0    50   ~ 0
+CONTACTOR_V-
+Wire Wire Line
+	8800 3600 9350 3600
+Text Label 8800 3600 0    50   ~ 0
+CONTACTOR_V+
+Wire Wire Line
+	9250 3800 9350 3800
+$Comp
+L power:+12V #PWR?
+U 1 1 5C30CB9C
+P 5200 2850
+F 0 "#PWR?" H 5200 2700 50  0001 C CNN
+F 1 "+12V" H 5215 3023 50  0000 C CNN
+F 2 "" H 5200 2850 50  0001 C CNN
+F 3 "" H 5200 2850 50  0001 C CNN
+	1    5200 2850
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	5200 3300 5850 3300
+Wire Wire Line
+	5200 3600 5200 3650
+$Comp
+L Device:Q_NMOS_GDS Q?
+U 1 1 5C30DEE4
+P 5100 3900
+F 0 "Q?" H 5305 3946 50  0000 L CNN
+F 1 "VND5N07-E" H 5305 3855 50  0000 L CNN
+F 2 "Package_TO_SOT_SMD:TO-252-2" H 5300 4000 50  0001 C CNN
+F 3 "~" H 5100 3900 50  0001 C CNN
+	1    5100 3900
+	1    0    0    -1  
+$EndComp
+Text Label 5850 3300 2    50   ~ 0
+CONTACTOR_V+
+Wire Wire Line
+	5200 3600 5850 3600
+Text Label 5850 3600 2    50   ~ 0
+CONTACTOR_V-
+$Comp
+L Device:R R?
+U 1 1 5C30E2C4
+P 4800 4150
+F 0 "R?" H 4850 4150 50  0000 L CNN
+F 1 "100k" V 4800 4050 50  0000 L CNN
+F 2 "" V 4730 4150 50  0001 C CNN
+F 3 "~" H 4800 4150 50  0001 C CNN
+	1    4800 4150
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	4800 4000 4800 3900
+Wire Wire Line
+	4800 3900 4900 3900
+Wire Wire Line
+	4800 4300 4800 4400
+Wire Wire Line
+	4800 4400 5200 4400
+Wire Wire Line
+	5200 4400 5200 4100
+Wire Wire Line
+	5200 4500 5200 4400
+Connection ~ 5200 4400
+$Comp
+L Device:R R?
+U 1 1 5C30EC57
+P 4550 3900
+F 0 "R?" V 4450 3900 50  0000 C CNN
+F 1 "0" V 4550 3900 50  0000 C CNN
+F 2 "" V 4480 3900 50  0001 C CNN
+F 3 "~" H 4550 3900 50  0001 C CNN
+	1    4550 3900
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	4700 3900 4800 3900
+Connection ~ 4800 3900
+$Comp
+L utsvt-bps:SI8261ABC-IS U?
+U 1 1 5C30F57F
+P 3350 3600
+F 0 "U?" H 3350 2950 50  0000 C CNN
+F 1 "SI8261ABC-IS" H 3350 3050 50  0000 C CNN
+F 2 "Package_SO:SOIC-8_3.9x4.9mm_P1.27mm" H 3350 3600 50  0001 C CNN
+F 3 "" H 3350 3600 50  0001 C CNN
+	1    3350 3600
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:+12V #PWR?
+U 1 1 5C30FC6C
+P 2950 2850
+F 0 "#PWR?" H 2950 2700 50  0001 C CNN
+F 1 "+12V" H 2965 3023 50  0000 C CNN
+F 2 "" H 2950 2850 50  0001 C CNN
+F 3 "" H 2950 2850 50  0001 C CNN
+	1    2950 2850
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:C C?
+U 1 1 5C30FCB3
+P 2950 3100
+F 0 "C?" H 3065 3146 50  0000 L CNN
+F 1 "10uF" H 3065 3055 50  0000 L CNN
+F 2 "" H 2988 2950 50  0001 C CNN
+F 3 "~" H 2950 3100 50  0001 C CNN
+	1    2950 3100
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:C C?
+U 1 1 5C310937
+P 3400 3100
+F 0 "C?" H 3515 3146 50  0000 L CNN
+F 1 "0.1uF" H 3515 3055 50  0000 L CNN
+F 2 "" H 3438 2950 50  0001 C CNN
+F 3 "~" H 3400 3100 50  0001 C CNN
+	1    3400 3100
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	2950 3350 2950 3300
+Text Notes 3500 5150 0    50   ~ 0
+Since +12V is used to drive the contactor, use GNDPWR to keep 12V line\nisolated from the main electronics of the BPS.
+Wire Wire Line
+	2950 3300 3400 3300
+Wire Wire Line
+	3400 3300 3400 3250
+Connection ~ 2950 3300
+Wire Wire Line
+	2950 3300 2950 3250
+Wire Wire Line
+	2950 2850 2950 2900
+Wire Wire Line
+	2950 2900 3400 2900
+Wire Wire Line
+	3400 2900 3400 2950
+Connection ~ 2950 2900
+Wire Wire Line
+	2950 2900 2950 2950
+Connection ~ 3400 2900
+Text Notes 2500 2550 0    50   ~ 0
+Recommended in datasheet.\nPlace these two bypass caps as close to possible on PCB.
+Wire Wire Line
+	3400 2900 4000 2900
+Wire Wire Line
+	3900 3700 4000 3700
+Wire Wire Line
+	4000 3700 4000 2900
+NoConn ~ 3900 3800
+Wire Wire Line
+	4000 4100 4000 4000
+Wire Wire Line
+	4000 4000 3900 4000
+$Comp
+L Device:R R?
+U 1 1 5C3152A3
+P 2550 3800
+F 0 "R?" V 2450 3800 50  0000 C CNN
+F 1 "150" V 2550 3800 50  0000 C CNN
+F 2 "" V 2480 3800 50  0001 C CNN
+F 3 "~" H 2550 3800 50  0001 C CNN
+	1    2550 3800
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	2700 3800 2800 3800
+Text HLabel 2300 3800 0    50   Input ~ 0
+CONTACTOR_EN
+Wire Wire Line
+	2300 3800 2400 3800
+Wire Wire Line
+	2800 3900 2700 3900
+Wire Wire Line
+	2700 3900 2700 4100
+Text HLabel 2300 3900 0    50   Input ~ 0
+GND
+Wire Wire Line
+	2300 3900 2700 3900
+Connection ~ 2700 3900
+$Comp
+L power:GND #PWR?
+U 1 1 5C3176E5
+P 2700 4100
+F 0 "#PWR?" H 2700 3850 50  0001 C CNN
+F 1 "GND" H 2705 3927 50  0000 C CNN
+F 2 "" H 2700 4100 50  0001 C CNN
+F 3 "" H 2700 4100 50  0001 C CNN
+	1    2700 4100
+	1    0    0    -1  
+$EndComp
+Text Notes 5300 4400 0    50   ~ 0
+Please check footprint and symbol matches!\n1: G\n2: D\n3: S
+NoConn ~ 2800 4000
+NoConn ~ 2800 3700
+$Comp
+L Device:D_ALT D?
+U 1 1 5C31D45E
+P 4900 3450
+F 0 "D?" V 4854 3529 50  0000 L CNN
+F 1 "1N4148WS" V 4945 3529 50  0000 L CNN
+F 2 "Diode_SMD:D_SOD-323" H 4900 3450 50  0001 C CNN
+F 3 "~" H 4900 3450 50  0001 C CNN
+	1    4900 3450
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	4900 3300 4900 3250
+Wire Wire Line
+	4900 3250 5200 3250
+Connection ~ 5200 3250
+Wire Wire Line
+	5200 3250 5200 3300
+Wire Wire Line
+	4900 3600 4900 3650
+Wire Wire Line
+	4900 3650 5200 3650
+Connection ~ 5200 3650
+Wire Wire Line
+	5200 3650 5200 3700
+Wire Wire Line
+	3900 3900 4200 3900
+$Comp
+L Connector:TestPoint TP?
+U 1 1 5C380C7F
+P 4200 3750
+F 0 "TP?" H 4258 3870 50  0000 L CNN
+F 1 "Gate_TP" H 4258 3779 50  0000 L CNN
+F 2 "" H 4400 3750 50  0001 C CNN
+F 3 "~" H 4400 3750 50  0001 C CNN
+	1    4200 3750
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	4200 3750 4200 3900
+Connection ~ 4200 3900
+Wire Wire Line
+	4200 3900 4300 3900
+$Comp
+L Device:R R?
+U 1 1 5C381FF3
+P 4300 4150
+F 0 "R?" H 4370 4196 50  0000 L CNN
+F 1 "5.1k" V 4300 4050 50  0000 L CNN
+F 2 "" V 4230 4150 50  0001 C CNN
+F 3 "~" H 4300 4150 50  0001 C CNN
+	1    4300 4150
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	4300 4000 4300 3900
+Connection ~ 4300 3900
+Wire Wire Line
+	4300 3900 4400 3900
+$Comp
+L Device:LED_ALT D?
+U 1 1 5C382DF7
+P 4300 4500
+F 0 "D?" V 4338 4383 50  0000 R CNN
+F 1 "ContactorEn" V 4247 4383 50  0000 R CNN
+F 2 "" H 4300 4500 50  0001 C CNN
+F 3 "~" H 4300 4500 50  0001 C CNN
+F 4 "Green" V 4300 4500 50  0001 C CNN "Color"
+F 5 "APTD2012LCGCK" V 4300 4500 50  0001 C CNN "P/N"
+	1    4300 4500
+	0    -1   -1   0   
+$EndComp
+Wire Wire Line
+	4300 4350 4300 4300
+Wire Wire Line
+	4300 4700 4300 4650
+$Comp
+L Device:R R?
+U 1 1 5C3945DD
+P 8200 3600
+F 0 "R?" V 8100 3600 50  0000 C CNN
+F 1 "4.7k" V 8200 3600 50  0000 C CNN
+F 2 "" V 8130 3600 50  0001 C CNN
+F 3 "~" H 8200 3600 50  0001 C CNN
+	1    8200 3600
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	7700 3550 7700 3600
+Wire Wire Line
+	7700 3600 8050 3600
+Connection ~ 7700 3600
+Wire Wire Line
+	7700 3600 7700 3650
+Wire Wire Line
+	8350 3600 8700 3600
+Wire Wire Line
+	8700 3600 8700 3900
+Connection ~ 8700 3900
+Wire Wire Line
+	8700 3900 8600 3900
+$Comp
+L power:GNDPWR #PWR?
+U 1 1 5C3F7EDD
+P 4300 4700
+F 0 "#PWR?" H 4300 4500 50  0001 C CNN
+F 1 "GNDPWR" H 4304 4546 50  0000 C CNN
+F 2 "" H 4300 4650 50  0001 C CNN
+F 3 "" H 4300 4650 50  0001 C CNN
+	1    4300 4700
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GNDPWR #PWR?
+U 1 1 5C3F7F9B
+P 5200 4500
+F 0 "#PWR?" H 5200 4300 50  0001 C CNN
+F 1 "GNDPWR" H 5204 4346 50  0000 C CNN
+F 2 "" H 5200 4450 50  0001 C CNN
+F 3 "" H 5200 4450 50  0001 C CNN
+	1    5200 4500
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GNDPWR #PWR?
+U 1 1 5C3F8405
+P 2950 3350
+F 0 "#PWR?" H 2950 3150 50  0001 C CNN
+F 1 "GNDPWR" H 2954 3196 50  0000 C CNN
+F 2 "" H 2950 3300 50  0001 C CNN
+F 3 "" H 2950 3300 50  0001 C CNN
+	1    2950 3350
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:C C?
+U 1 1 5C3F87F6
+P 5550 2950
+F 0 "C?" V 5298 2950 50  0000 C CNN
+F 1 "1uF" V 5389 2950 50  0000 C CNN
+F 2 "" H 5588 2800 50  0001 C CNN
+F 3 "~" H 5550 2950 50  0001 C CNN
+	1    5550 2950
+	0    1    1    0   
+$EndComp
+$Comp
+L power:GNDPWR #PWR?
+U 1 1 5C3F88F8
+P 5900 3000
+F 0 "#PWR?" H 5900 2800 50  0001 C CNN
+F 1 "GNDPWR" H 5904 2846 50  0000 C CNN
+F 2 "" H 5900 2950 50  0001 C CNN
+F 3 "" H 5900 2950 50  0001 C CNN
+	1    5900 3000
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	5900 3000 5900 2950
+Wire Wire Line
+	5900 2950 5700 2950
+Wire Wire Line
+	5200 2850 5200 2950
+Wire Wire Line
+	5400 2950 5200 2950
+Connection ~ 5200 2950
+Wire Wire Line
+	5200 2950 5200 3250
+$Comp
+L power:GNDPWR #PWR?
+U 1 1 5C3FD54A
+P 4000 4100
+F 0 "#PWR?" H 4000 3900 50  0001 C CNN
+F 1 "GNDPWR" H 4004 3946 50  0000 C CNN
+F 2 "" H 4000 4050 50  0001 C CNN
+F 3 "" H 4000 4050 50  0001 C CNN
+	1    4000 4100
+	1    0    0    -1  
+$EndComp
+$EndSCHEMATC

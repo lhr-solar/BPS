@@ -1,0 +1,292 @@
+EESchema Schematic File Version 4
+LIBS:BPSMaster-cache
+EELAYER 26 0
+EELAYER END
+$Descr A4 11693 8268
+encoding utf-8
+Sheet 5 8
+Title ""
+Date ""
+Rev ""
+Comp ""
+Comment1 ""
+Comment2 ""
+Comment3 ""
+Comment4 ""
+$EndDescr
+Text HLabel 2300 3700 0    50   BiDi ~ 0
+SDA
+Text HLabel 2300 3600 0    50   BiDi ~ 0
+SCL
+Text HLabel 4950 3700 2    50   Input ~ 0
+GND
+$Comp
+L utsvt-bps:M24128 U?
+U 1 1 5C3511BE
+P 4250 3300
+F 0 "U?" H 4250 3465 50  0000 C CNN
+F 1 "M24128" H 4250 3374 50  0000 C CNN
+F 2 "UTSVT_BPS:M24128-BRMN6P" H 4250 3300 50  0001 C CNN
+F 3 "" H 4250 3300 50  0001 C CNN
+	1    4250 3300
+	-1   0    0    -1  
+$EndComp
+Text HLabel 2300 3100 0    50   Input ~ 0
++3.3V
+$Comp
+L Device:C C?
+U 1 1 5C35143C
+P 3200 3300
+F 0 "C?" H 3315 3346 50  0000 L CNN
+F 1 "0.1uF" H 3315 3255 50  0000 L CNN
+F 2 "" H 3238 3150 50  0001 C CNN
+F 3 "~" H 3200 3300 50  0001 C CNN
+	1    3200 3300
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GND #PWR?
+U 1 1 5C3514DC
+P 4850 3800
+F 0 "#PWR?" H 4850 3550 50  0001 C CNN
+F 1 "GND" H 4855 3627 50  0000 C CNN
+F 2 "" H 4850 3800 50  0001 C CNN
+F 3 "" H 4850 3800 50  0001 C CNN
+	1    4850 3800
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	4750 3700 4850 3700
+Wire Wire Line
+	4850 3700 4850 3800
+Connection ~ 4850 3700
+Wire Wire Line
+	4850 3700 4950 3700
+$Comp
+L power:GND #PWR?
+U 1 1 5C3516F5
+P 3650 3850
+F 0 "#PWR?" H 3650 3600 50  0001 C CNN
+F 1 "GND" H 3655 3677 50  0000 C CNN
+F 2 "" H 3650 3850 50  0001 C CNN
+F 3 "" H 3650 3850 50  0001 C CNN
+	1    3650 3850
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	3650 3850 3650 3500
+Wire Wire Line
+	3650 3500 3750 3500
+$Comp
+L Device:R R?
+U 1 1 5C351986
+P 2800 3350
+F 0 "R?" H 2870 3396 50  0000 L CNN
+F 1 "4.7k" H 2870 3305 50  0000 L CNN
+F 2 "" V 2730 3350 50  0001 C CNN
+F 3 "~" H 2800 3350 50  0001 C CNN
+	1    2800 3350
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:R R?
+U 1 1 5C3519B6
+P 2400 3350
+F 0 "R?" H 2470 3396 50  0000 L CNN
+F 1 "4.7k" H 2470 3305 50  0000 L CNN
+F 2 "" V 2330 3350 50  0001 C CNN
+F 3 "~" H 2400 3350 50  0001 C CNN
+	1    2400 3350
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:+3.3V #PWR?
+U 1 1 5C351A76
+P 2400 3000
+F 0 "#PWR?" H 2400 2850 50  0001 C CNN
+F 1 "+3.3V" H 2415 3173 50  0000 C CNN
+F 2 "" H 2400 3000 50  0001 C CNN
+F 3 "" H 2400 3000 50  0001 C CNN
+	1    2400 3000
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	2300 3100 2400 3100
+Wire Wire Line
+	3650 3100 3650 3400
+Wire Wire Line
+	3650 3400 3750 3400
+Wire Wire Line
+	2400 3200 2400 3100
+Connection ~ 2400 3100
+Wire Wire Line
+	2400 3100 2800 3100
+Wire Wire Line
+	2800 3200 2800 3100
+Connection ~ 2800 3100
+Wire Wire Line
+	2300 3600 2400 3600
+Wire Wire Line
+	2400 3600 2400 3500
+Wire Wire Line
+	2400 3600 3750 3600
+Connection ~ 2400 3600
+Wire Wire Line
+	3200 3500 3650 3500
+Connection ~ 3650 3500
+Wire Wire Line
+	2800 3100 3200 3100
+Wire Wire Line
+	3200 3150 3200 3100
+Connection ~ 3200 3100
+Wire Wire Line
+	3200 3100 3650 3100
+Wire Wire Line
+	3200 3450 3200 3500
+Wire Wire Line
+	2800 3500 2800 3700
+Wire Wire Line
+	2800 3700 2300 3700
+Wire Wire Line
+	2800 3700 3750 3700
+Connection ~ 2800 3700
+Wire Wire Line
+	2400 3000 2400 3100
+Wire Wire Line
+	4750 3500 5200 3500
+$Comp
+L Jumper:SolderJumper_3_Bridged12 JP?
+U 1 1 5C3552F2
+P 6250 3500
+F 0 "JP?" V 6296 3568 50  0000 L CNN
+F 1 "SolderJumper_3_Open" V 6205 3568 50  0000 L CNN
+F 2 "Jumper:SolderJumper-3_P1.3mm_Bridged12_Pad1.0x1.5mm" H 6250 3500 50  0001 C CNN
+F 3 "~" H 6250 3500 50  0001 C CNN
+	1    6250 3500
+	0    1    -1   0   
+$EndComp
+$Comp
+L Jumper:SolderJumper_3_Bridged12 JP?
+U 1 1 5C355357
+P 6800 4050
+F 0 "JP?" V 6846 4118 50  0000 L CNN
+F 1 "SolderJumper_3_Open" V 6755 4118 50  0000 L CNN
+F 2 "Jumper:SolderJumper-3_P1.3mm_Bridged12_Pad1.0x1.5mm" H 6800 4050 50  0001 C CNN
+F 3 "~" H 6800 4050 50  0001 C CNN
+	1    6800 4050
+	0    1    -1   0   
+$EndComp
+$Comp
+L Jumper:SolderJumper_3_Bridged12 JP?
+U 1 1 5C355391
+P 7350 4600
+F 0 "JP?" V 7396 4668 50  0000 L CNN
+F 1 "SolderJumper_3_Open" V 7305 4668 50  0000 L CNN
+F 2 "Jumper:SolderJumper-3_P1.3mm_Bridged12_Pad1.0x1.5mm" H 7350 4600 50  0001 C CNN
+F 3 "~" H 7350 4600 50  0001 C CNN
+	1    7350 4600
+	0    1    -1   0   
+$EndComp
+Wire Wire Line
+	4750 3600 5200 3600
+Wire Wire Line
+	4750 3400 5200 3400
+Text Label 5200 3400 2    50   ~ 0
+E0
+Text Label 5200 3500 2    50   ~ 0
+E1
+Text Label 5200 3600 2    50   ~ 0
+E2
+Wire Wire Line
+	6100 3500 5900 3500
+Text Label 5900 3500 0    50   ~ 0
+E0
+Text Label 6450 4050 0    50   ~ 0
+E1
+Wire Wire Line
+	7200 4600 7000 4600
+Text Label 7000 4600 0    50   ~ 0
+E2
+$Comp
+L power:GND #PWR?
+U 1 1 5C356B3E
+P 6250 3750
+F 0 "#PWR?" H 6250 3500 50  0001 C CNN
+F 1 "GND" H 6255 3577 50  0000 C CNN
+F 2 "" H 6250 3750 50  0001 C CNN
+F 3 "" H 6250 3750 50  0001 C CNN
+	1    6250 3750
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GND #PWR?
+U 1 1 5C3572BE
+P 6800 4300
+F 0 "#PWR?" H 6800 4050 50  0001 C CNN
+F 1 "GND" H 6805 4127 50  0000 C CNN
+F 2 "" H 6800 4300 50  0001 C CNN
+F 3 "" H 6800 4300 50  0001 C CNN
+	1    6800 4300
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GND #PWR?
+U 1 1 5C3572D7
+P 7350 4850
+F 0 "#PWR?" H 7350 4600 50  0001 C CNN
+F 1 "GND" H 7355 4677 50  0000 C CNN
+F 2 "" H 7350 4850 50  0001 C CNN
+F 3 "" H 7350 4850 50  0001 C CNN
+	1    7350 4850
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	6250 3750 6250 3700
+Wire Wire Line
+	6800 4250 6800 4300
+Wire Wire Line
+	7350 4800 7350 4850
+$Comp
+L power:+3.3V #PWR?
+U 1 1 5C358A09
+P 6250 3250
+F 0 "#PWR?" H 6250 3100 50  0001 C CNN
+F 1 "+3.3V" H 6265 3423 50  0000 C CNN
+F 2 "" H 6250 3250 50  0001 C CNN
+F 3 "" H 6250 3250 50  0001 C CNN
+	1    6250 3250
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	6250 3250 6250 3300
+$Comp
+L power:+3.3V #PWR?
+U 1 1 5C358E92
+P 6800 3800
+F 0 "#PWR?" H 6800 3650 50  0001 C CNN
+F 1 "+3.3V" H 6815 3973 50  0000 C CNN
+F 2 "" H 6800 3800 50  0001 C CNN
+F 3 "" H 6800 3800 50  0001 C CNN
+	1    6800 3800
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	6800 3800 6800 3850
+$Comp
+L power:+3.3V #PWR?
+U 1 1 5C359303
+P 7350 4350
+F 0 "#PWR?" H 7350 4200 50  0001 C CNN
+F 1 "+3.3V" H 7365 4523 50  0000 C CNN
+F 2 "" H 7350 4350 50  0001 C CNN
+F 3 "" H 7350 4350 50  0001 C CNN
+	1    7350 4350
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	7350 4350 7350 4400
+Wire Wire Line
+	6450 4050 6650 4050
+Text Notes 5900 2950 0    50   ~ 0
+These jumpers let's you change the EEPROM address if there is a conflict.\nFor now, the EEPROM address is 0x50.
+$EndSCHEMATC

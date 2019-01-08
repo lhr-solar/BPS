@@ -16,23 +16,14 @@
 uint16_t *ModuleTemperatures;				// list of voltages of all modules
 uint16_t MaxTemperatureLimit;				// Max temperature the battery can reach before danger
 
-/** Constructor
- * Creates Temperature instance with NULL pointer to temperature list
- * @param max temperature limit of the lithium ion cells
+/** Temperature_Init
+ * Initializes device drivers including SPI and LTC2983 for Temperature Monitoring
  */
-void Temperature_Init(uint16_t ceiling){
-	Temperature_SetLimits(ceiling);
+void Temperature_Init(void){
+	
 }
 
-/** setLimits
- * Sets the max temperature limit the cells can reach before danger
- * @param max temperature limit
- */
-void Temperature_SetLimits(uint16_t ceiling){
-	MaxTemperatureLimit = ceiling;
-}
-
-/** updateMeasurements
+/** Temperature_UpdateMeasurements
  * Stores and updates the new measurements received
  * @param pointer to new temperature measurements
  * @return 1 if successfully stored, 0 if failed
@@ -47,28 +38,40 @@ uint8_t Temperature_UpdateMeasurements(){
 	}
 }
 
-/** isSafe
+/** Temperature_IsSafe
  * Checks if all modules are safe
+ * @param 1 if pack is charging, 0 if discharging
  * @return 1 if pack is safe, 0 if in danger
  */
-uint8_t Temperature_IsSafe(void){
+uint8_t Temperature_IsSafe(uint8_t isCharging){
+	
+	/* TODO: Change to accomodate for charge and discharge limits
 	for(int i = 0; i < sizeof(ModuleTemperatures)/sizeof(uint16_t); ++i){
-		if(Temperature_ModuleTemperature(i) > MaxTemperatureLimit){
+		if(Temperature_GetModuleTemperature(i) > MaxTemperatureLimit){
 			return 0;
 		}
 	}
-
+	*/
 	return 1;
 }
 
-/** modulesInDanger
+/** Temperature_SetLimits
+ * Sets the max temperature limit the cells can reach before danger
+ * @param max temperature limit
+ */
+void Temperature_SetLimits(uint16_t ceiling){
+	MaxTemperatureLimit = ceiling;
+}
+
+
+/** Temperature_GetModulesInDanger
  * Finds all modules that in danger and stores them into a list
  * @return pointer to index of modules that are in danger
  */
-uint16_t *Temperature_ModulesInDanger(void){
+uint16_t *Temperature_GetModulesInDanger(void){
 	uint8_t checks[NUM_BATTERY_MODULES];
 	for(int i = 0; i < NUM_BATTERY_MODULES; ++i){
-		if(Temperature_ModuleTemperature(i) > MaxTemperatureLimit){
+		if(Temperature_GetModuleTemperature(i) > MaxTemperatureLimit){
 			checks[i] = 1;	// 1 shows that the unit is in danger
 		}else{
 			checks[i] = 0;	// 0 shows that the unit is not in danger
@@ -93,23 +96,23 @@ uint16_t *Temperature_ModulesInDanger(void){
 	return endangeredModules;
 }
 
-/** moduleTemperature
+/** Temperature_GetModuleTemperature
  * Gets the temperature of a certain module in the battery pack
  * @param index of module
  * @return temperature of module at specified index
  */
-uint16_t Temperature_ModuleTemperature(uint16_t moduleIdx){
+uint16_t Temperature_GetModuleTemperature(uint16_t moduleIdx){
 	return ModuleTemperatures[moduleIdx];
 }
 
-/** totalPackAvgTemperature
+/** Temperature_GetTotalPackAvgTemperature
  * Gets the average temperature of the whole battery pack
  * @return average temperature of battery pack
  */
-uint16_t Temperature_TotalPackAvgTemperature(void){
+uint16_t Temperature_GetTotalPackAvgTemperature(void){
 	int sum = 0;
 	for(int i = 0; i < sizeof(ModuleTemperatures)/sizeof(uint16_t); ++i){
-		sum += Temperature_ModuleTemperature(i);
+		sum += Temperature_GetModuleTemperature(i);
 	}
 	return (sum / (sizeof(ModuleTemperatures)/sizeof(uint16_t)));
 }
