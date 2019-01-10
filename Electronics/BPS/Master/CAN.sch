@@ -15,10 +15,10 @@ Comment3 ""
 Comment4 ""
 $EndDescr
 $Comp
-L utsvt-connectors:CANConnector J?
+L utsvt-connectors:CANConnector J5
 U 1 1 5C2B42F3
 P 9250 3800
-F 0 "J?" H 9250 3550 60  0000 C CNN
+F 0 "J5" H 9250 3550 60  0000 C CNN
 F 1 "CAN_Out" H 9250 4050 60  0000 C CNN
 F 2 "UTSVT_Connectors:Molex_MicroFit3.0_1x4xP3.00mm_PolarizingPeg_Vertical" H 9400 4100 60  0001 C CNN
 F 3 "" H 9400 4100 60  0001 C CNN
@@ -26,10 +26,10 @@ F 3 "" H 9400 4100 60  0001 C CNN
 	-1   0    0    -1  
 $EndComp
 $Comp
-L Device:R R?
+L Device:R R3
 U 1 1 5C2B42FA
 P 8200 3550
-F 0 "R?" V 8280 3550 50  0000 C CNN
+F 0 "R3" V 8280 3550 50  0000 C CNN
 F 1 "60" V 8200 3550 50  0000 C CNN
 F 2 "Resistors_SMD:R_0805_HandSoldering" V 8130 3550 50  0001 C CNN
 F 3 "" H 8200 3550 50  0001 C CNN
@@ -37,10 +37,10 @@ F 3 "" H 8200 3550 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L Device:R R?
+L Device:R R2
 U 1 1 5C2B4301
 P 8000 3550
-F 0 "R?" V 8080 3550 50  0000 C CNN
+F 0 "R2" V 8080 3550 50  0000 C CNN
 F 1 "60" V 8000 3550 50  0000 C CNN
 F 2 "Resistors_SMD:R_0805_HandSoldering" V 7930 3550 50  0001 C CNN
 F 3 "" H 8000 3550 50  0001 C CNN
@@ -48,10 +48,10 @@ F 3 "" H 8000 3550 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L Device:Jumper_NO_Small JP?
+L Device:Jumper_NO_Small JP1
 U 1 1 5C2B4308
 P 8100 3250
-F 0 "JP?" H 8100 3330 50  0000 C CNN
+F 0 "JP1" H 8100 3330 50  0000 C CNN
 F 1 "Termination Resistors" H 8100 3200 50  0000 C CNN
 F 2 "Pin_Headers:Pin_Header_Straight_1x02_Pitch2.54mm" H 8100 3250 50  0001 C CNN
 F 3 "" H 8100 3250 50  0001 C CNN
@@ -59,10 +59,10 @@ F 3 "" H 8100 3250 50  0001 C CNN
 	-1   0    0    1   
 $EndComp
 $Comp
-L Device:C_Small C?
+L Device:C_Small C25
 U 1 1 5C2B4310
 P 2150 3350
-F 0 "C?" H 2160 3420 50  0000 L CNN
+F 0 "C25" H 2160 3420 50  0000 L CNN
 F 1 "10uF" H 2160 3270 50  0000 L CNN
 F 2 "Capacitors_SMD:C_0805" H 2150 3350 50  0001 C CNN
 F 3 "" H 2150 3350 50  0001 C CNN
@@ -70,10 +70,10 @@ F 3 "" H 2150 3350 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L Device:C_Small C?
+L Device:C_Small C26
 U 1 1 5C2B4317
 P 2500 3350
-F 0 "C?" H 2510 3420 50  0000 L CNN
+F 0 "C26" H 2510 3420 50  0000 L CNN
 F 1 "0.1uF" H 2510 3270 50  0000 L CNN
 F 2 "Capacitors_SMD:C_0805" H 2500 3350 50  0001 C CNN
 F 3 "" H 2500 3350 50  0001 C CNN
@@ -81,10 +81,10 @@ F 3 "" H 2500 3350 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L Device:C_Small C?
+L Device:C_Small C27
 U 1 1 5C2B431E
 P 2950 3350
-F 0 "C?" H 2960 3420 50  0000 L CNN
+F 0 "C27" H 2960 3420 50  0000 L CNN
 F 1 "0.1uF" H 2960 3270 50  0000 L CNN
 F 2 "Capacitors_SMD:C_0805" H 2950 3350 50  0001 C CNN
 F 3 "" H 2950 3350 50  0001 C CNN
@@ -92,10 +92,10 @@ F 3 "" H 2950 3350 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L Device:C_Small C?
+L Device:C_Small C28
 U 1 1 5C2B4325
 P 3300 3350
-F 0 "C?" H 3310 3420 50  0000 L CNN
+F 0 "C28" H 3310 3420 50  0000 L CNN
 F 1 "0.01uF" H 3310 3270 50  0000 L CNN
 F 2 "Capacitors_SMD:C_0805" H 3300 3350 50  0001 C CNN
 F 3 "" H 3300 3350 50  0001 C CNN
@@ -103,10 +103,10 @@ F 3 "" H 3300 3350 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L Device:C_Small C?
+L Device:C_Small C22
 U 1 1 5C2B432E
 P 6150 3200
-F 0 "C?" H 6160 3270 50  0000 L CNN
+F 0 "C22" H 6160 3270 50  0000 L CNN
 F 1 "0.22uF" H 6160 3120 50  0000 L CNN
 F 2 "Capacitors_SMD:C_0805_HandSoldering" H 6150 3200 50  0001 C CNN
 F 3 "" H 6150 3200 50  0001 C CNN
@@ -114,10 +114,10 @@ F 3 "" H 6150 3200 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L Device:C_Small C?
+L Device:C_Small C21
 U 1 1 5C2B4335
 P 5750 3200
-F 0 "C?" H 5760 3270 50  0000 L CNN
+F 0 "C21" H 5760 3270 50  0000 L CNN
 F 1 "10uF" H 5760 3120 50  0000 L CNN
 F 2 "Capacitors_SMD:C_0805_HandSoldering" H 5750 3200 50  0001 C CNN
 F 3 "" H 5750 3200 50  0001 C CNN
@@ -125,10 +125,10 @@ F 3 "" H 5750 3200 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L Device:Ferrite_Bead_Small L?
+L Device:Ferrite_Bead_Small L2
 U 1 1 5C2B433C
 P 5950 3050
-F 0 "L?" V 5850 3100 50  0000 L CNN
+F 0 "L2" V 5850 3100 50  0000 L CNN
 F 1 "2kH" V 5850 2900 50  0000 L CNN
 F 2 "Inductors_SMD:L_0805_HandSoldering" V 5880 3050 50  0001 C CNN
 F 3 "" H 5950 3050 50  0001 C CNN
@@ -136,10 +136,10 @@ F 3 "" H 5950 3050 50  0001 C CNN
 	0    1    1    0   
 $EndComp
 $Comp
-L Device:Ferrite_Bead_Small L?
+L Device:Ferrite_Bead_Small L3
 U 1 1 5C2B4343
 P 5950 3350
-F 0 "L?" V 6050 3400 50  0000 L CNN
+F 0 "L3" V 6050 3400 50  0000 L CNN
 F 1 "2kH" V 6050 3200 50  0000 L CNN
 F 2 "Inductors_SMD:L_0805_HandSoldering" V 5880 3350 50  0001 C CNN
 F 3 "" H 5950 3350 50  0001 C CNN
@@ -147,10 +147,10 @@ F 3 "" H 5950 3350 50  0001 C CNN
 	0    1    1    0   
 $EndComp
 $Comp
-L Device:C_Small C?
+L Device:C_Small C23
 U 1 1 5C2B434A
 P 6550 3200
-F 0 "C?" H 6560 3270 50  0000 L CNN
+F 0 "C23" H 6560 3270 50  0000 L CNN
 F 1 "0.1uF" H 6560 3120 50  0000 L CNN
 F 2 "Capacitors_SMD:C_0805_HandSoldering" H 6550 3200 50  0001 C CNN
 F 3 "" H 6550 3200 50  0001 C CNN
@@ -158,10 +158,10 @@ F 3 "" H 6550 3200 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L Device:C_Small C?
+L Device:C_Small C24
 U 1 1 5C2B4351
 P 6850 3200
-F 0 "C?" H 6860 3270 50  0000 L CNN
+F 0 "C24" H 6860 3270 50  0000 L CNN
 F 1 "0.01uF" H 6860 3120 50  0000 L CNN
 F 2 "Capacitors_SMD:C_0805_HandSoldering" H 6850 3200 50  0001 C CNN
 F 3 "" H 6850 3200 50  0001 C CNN
@@ -169,10 +169,10 @@ F 3 "" H 6850 3200 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L utsvt-chips:ADM3055E U?
+L utsvt-chips:ADM3055E U5
 U 1 1 5C2B4359
 P 4350 3600
-F 0 "U?" H 4100 4250 60  0000 C CNN
+F 0 "U5" H 4100 4250 60  0000 C CNN
 F 1 "ADM3055E" H 4550 3500 60  0000 C CNN
 F 2 "UTSVT_ICs:SOIC-20W_7.5x15.4mm_Pitch1.27mm" H 4350 3700 60  0001 C CNN
 F 3 "" H 4350 3700 60  0001 C CNN
@@ -187,10 +187,10 @@ Must be close\nto V_ISO_Out
 Text Notes 6550 2900 0    40   ~ 0
 Must be close\nto V_ISO_In
 $Comp
-L Connector:TestPoint TP?
+L Connector:TestPoint TP6
 U 1 1 5C2B4371
 P 5100 2900
-F 0 "TP?" V 5200 3100 50  0000 L BNN
+F 0 "TP6" V 5200 3100 50  0000 L BNN
 F 1 "CAN_ISO_Vin" V 5100 3100 50  0000 L CNN
 F 2 "Measurement_Points:Test_Point_Keystone_5005-5009_Compact" H 5100 2900 50  0001 C CNN
 F 3 "" H 5100 2900 50  0001 C CNN
@@ -198,10 +198,10 @@ F 3 "" H 5100 2900 50  0001 C CNN
 	0    -1   -1   0   
 $EndComp
 $Comp
-L Connector:TestPoint TP?
+L Connector:TestPoint TP8
 U 1 1 5C2B4378
 P 6200 3700
-F 0 "TP?" V 6300 3900 50  0000 L BNN
+F 0 "TP8" V 6300 3900 50  0000 L BNN
 F 1 "CAN_ISO_GndOut" V 6200 3900 50  0000 L CNN
 F 2 "Measurement_Points:Test_Point_Keystone_5005-5009_Compact" H 6200 3700 50  0001 C CNN
 F 3 "" H 6200 3700 50  0001 C CNN
@@ -209,10 +209,10 @@ F 3 "" H 6200 3700 50  0001 C CNN
 	0    1    1    0   
 $EndComp
 $Comp
-L Connector:TestPoint TP?
+L Connector:TestPoint TP7
 U 1 1 5C2B437F
 P 6200 3550
-F 0 "TP?" V 6300 3750 50  0000 L BNN
+F 0 "TP7" V 6300 3750 50  0000 L BNN
 F 1 "CAN_ISO_GndIn" V 6200 3750 50  0000 L CNN
 F 2 "Measurement_Points:Test_Point_Keystone_5005-5009_Compact" H 6200 3550 50  0001 C CNN
 F 3 "" H 6200 3550 50  0001 C CNN
@@ -220,10 +220,10 @@ F 3 "" H 6200 3550 50  0001 C CNN
 	0    1    1    0   
 $EndComp
 $Comp
-L Connector:TestPoint TP?
+L Connector:TestPoint TP5
 U 1 1 5C2B4386
 P 5100 2750
-F 0 "TP?" V 5200 2950 50  0000 L BNN
+F 0 "TP5" V 5200 2950 50  0000 L BNN
 F 1 "CAN_ISO_Vout" V 5100 2950 50  0000 L CNN
 F 2 "Measurement_Points:Test_Point_Keystone_5005-5009_Compact" H 5100 2750 50  0001 C CNN
 F 3 "" H 5100 2750 50  0001 C CNN
@@ -232,10 +232,10 @@ F 3 "" H 5100 2750 50  0001 C CNN
 $EndComp
 NoConn ~ 3650 4100
 $Comp
-L power:PWR_FLAG #FLG?
+L power:PWR_FLAG #FLG01
 U 1 1 5C2B4394
 P 7300 3000
-F 0 "#FLG?" H 7300 3075 50  0001 C CNN
+F 0 "#FLG01" H 7300 3075 50  0001 C CNN
 F 1 "PWR_FLAG" H 7300 2900 30  0000 C CNN
 F 2 "" H 7300 3000 50  0001 C CNN
 F 3 "" H 7300 3000 50  0001 C CNN
@@ -243,10 +243,10 @@ F 3 "" H 7300 3000 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L power:PWR_FLAG #FLG?
+L power:PWR_FLAG #FLG02
 U 1 1 5C2B439A
 P 7300 3200
-F 0 "#FLG?" H 7300 3275 50  0001 C CNN
+F 0 "#FLG02" H 7300 3275 50  0001 C CNN
 F 1 "PWR_FLAG" H 7200 3150 50  0001 L CNN
 F 2 "" H 7300 3200 50  0001 C CNN
 F 3 "" H 7300 3200 50  0001 C CNN
@@ -254,10 +254,10 @@ F 3 "" H 7300 3200 50  0001 C CNN
 	-1   0    0    1   
 $EndComp
 $Comp
-L utsvt-chips:CDSOT23-T24CAN U?
+L utsvt-chips:CDSOT23-T24CAN U4
 U 1 1 5C2B43A0
 P 8100 2850
-F 0 "U?" H 8100 2700 60  0000 C CNN
+F 0 "U4" H 8100 2700 60  0000 C CNN
 F 1 "CDSOT23-T24CAN" H 8100 3000 60  0000 C CNN
 F 2 "TO_SOT_Packages_SMD:SOT-23W_Handsoldering" H 8100 2850 60  0001 C CNN
 F 3 "" H 8100 2850 60  0001 C CNN
@@ -267,10 +267,10 @@ $EndComp
 Text Notes 7950 2600 0    40   ~ 0
 CAN Bus\nProtection
 $Comp
-L Connector:TestPoint TP?
+L Connector:TestPoint TP9
 U 1 1 5C2B43B6
 P 7300 3800
-F 0 "TP?" H 7300 4100 50  0000 C BNN
+F 0 "TP9" H 7300 4100 50  0000 C BNN
 F 1 "CAN_H" H 7300 4050 50  0000 C CNN
 F 2 "Measurement_Points:Test_Point_Keystone_5005-5009_Compact" H 7300 3800 50  0001 C CNN
 F 3 "" H 7300 3800 50  0001 C CNN
@@ -278,10 +278,10 @@ F 3 "" H 7300 3800 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L Connector:TestPoint TP?
+L Connector:TestPoint TP12
 U 1 1 5C2B43BD
 P 7300 4000
-F 0 "TP?" H 7250 4200 50  0000 L BNN
+F 0 "TP12" H 7250 4200 50  0000 L BNN
 F 1 "CAN_L" H 7200 4300 50  0000 L CNN
 F 2 "Measurement_Points:Test_Point_Keystone_5005-5009_Compact" H 7300 4000 50  0001 C CNN
 F 3 "" H 7300 4000 50  0001 C CNN
@@ -289,10 +289,10 @@ F 3 "" H 7300 4000 50  0001 C CNN
 	-1   0    0    1   
 $EndComp
 $Comp
-L Device:R R?
+L Device:R R4
 U 1 1 5C2B43C4
 P 5550 4150
-F 0 "R?" V 5630 4150 50  0000 C CNN
+F 0 "R4" V 5630 4150 50  0000 C CNN
 F 1 "0" V 5550 4150 50  0000 C CNN
 F 2 "Resistors_SMD:R_0805_HandSoldering" V 5480 4150 50  0001 C CNN
 F 3 "" H 5550 4150 50  0001 C CNN
@@ -435,10 +435,10 @@ Wire Wire Line
 Wire Wire Line
 	3400 3800 3650 3800
 $Comp
-L Connector:TestPoint TP?
+L Connector:TestPoint TP10
 U 1 1 5C28B6DC
 P 3100 3850
-F 0 "TP?" H 3350 3950 50  0000 R CNN
+F 0 "TP10" H 3350 3950 50  0000 R CNN
 F 1 "CAN_TX" H 3350 4050 50  0000 R CNN
 F 2 "" H 3300 3850 50  0001 C CNN
 F 3 "~" H 3300 3850 50  0001 C CNN
@@ -446,10 +446,10 @@ F 3 "~" H 3300 3850 50  0001 C CNN
 	-1   0    0    1   
 $EndComp
 $Comp
-L Connector:TestPoint TP?
+L Connector:TestPoint TP11
 U 1 1 5C28BA47
 P 3400 3850
-F 0 "TP?" H 3650 3950 50  0000 R CNN
+F 0 "TP11" H 3650 3950 50  0000 R CNN
 F 1 "CAN_RX" H 3650 4050 50  0000 R CNN
 F 2 "" H 3600 3850 50  0001 C CNN
 F 3 "~" H 3600 3850 50  0001 C CNN
@@ -457,10 +457,10 @@ F 3 "~" H 3600 3850 50  0001 C CNN
 	-1   0    0    1   
 $EndComp
 $Comp
-L power:GND #PWR?
+L power:GND #PWR042
 U 1 1 5C28BDDE
 P 2150 3550
-F 0 "#PWR?" H 2150 3300 50  0001 C CNN
+F 0 "#PWR042" H 2150 3300 50  0001 C CNN
 F 1 "GND" H 2300 3500 50  0000 C CNN
 F 2 "" H 2150 3550 50  0001 C CNN
 F 3 "" H 2150 3550 50  0001 C CNN
