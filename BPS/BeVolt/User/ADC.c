@@ -1,3 +1,9 @@
+/** main.c
+ * Program for UTSVT BeVolt's Battery Protection System ADC initialization
+ * @authors Garrett Wong, Sijin Woo
+ * @lastRevised 1/11/2019
+ */
+
 #include <stdint.h>
 #include "stm32f4xx.h"
 

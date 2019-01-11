@@ -1,3 +1,9 @@
+/** main.c
+ * Program for UTSVT BeVolt's Battery Protection System SOC
+ * @authors Garrett Wong, Sijin Woo
+ * @lastRevised 1/11/2019
+ */
+
 #include <stdint.h>
 #include "stm32f4xx.h"
 
@@ -6,8 +12,6 @@
  * calculation algorithm.
  */
 void SoC_Init(void){
-	uint32_t x = 5;
-
 	// TODO: Initilize timer. 32 bit timer.
 }
 

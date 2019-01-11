@@ -1,6 +1,6 @@
 /** main.c
  * Program for UTSVT BeVolt's Battery Protection System
- * @authors Sijin Woo, Chase Block
+ * @authors Sijin Woo, Chase Block,Garrett Wong
  * @lastRevised 10/2/2018
  */
 
