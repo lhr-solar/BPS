@@ -7,6 +7,7 @@
  */
 void SoC_Init(void){
 	uint32_t x = 5;
+
 	// TODO: Initilize timer. 32 bit timer.
 }
 
