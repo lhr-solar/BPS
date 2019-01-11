@@ -402,19 +402,14 @@
               <FilePath>.\User\Temperature.c</FilePath>
             </File>
             <File>
+              <FileName>SoC.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\User\SoC.c</FilePath>
+            </File>
+            <File>
               <FileName>Display.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\User\Display.c</FilePath>
-            </File>
-            <File>
-              <FileName>Terminal.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\User\Terminal.c</FilePath>
-            </File>
-            <File>
-              <FileName>Gyro.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\User\Gyro.c</FilePath>
             </File>
             <File>
               <FileName>Contactor.c</FileName>

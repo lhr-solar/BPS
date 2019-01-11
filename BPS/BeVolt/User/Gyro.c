@@ -46,9 +46,9 @@ uint16_t *ICM20600_SendCmd(uint8_t address, uint8_t data, uint8_t rw, uint32_t r
 	cmd = (rw ? 0x8000 : 0x0000) | (address << 8);	// RW and address bits
 	if(!rw) cmd |= data;
 
-	uint16_t *result;
+	uint16_t result;
 	GPIOB->ODR &= ~GPIO_Pin_12;
-	SPI_WriteRead16(&cmd, 1, result, readSize);
+	*result = SPI_WriteRead16(&cmd, 1, result, readSize);
 
 	return result;
 }

@@ -41,6 +41,15 @@ uint8_t Current_IsSafe(void){
 	return HighPrecisionCurrent < MaxCurrentLimit && LowPrecisionCurrent < MaxCurrentLimit;
 }
 
+/** Current_IsCharging
+ * Determines if the the battery pack is being charged or discharged depending on
+ * the sign of the current
+ * @return 1 if charge, 0 if discharge
+ */
+uint8_t Current_IsCharging(void){
+	
+}
+
 /** Current_SetLimits
  * Sets the max current (Amps) limit the cells can reach before danger
  * @param max current limit

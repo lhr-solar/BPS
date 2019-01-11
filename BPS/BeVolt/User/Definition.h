@@ -9,6 +9,9 @@
 #ifndef DEFINITION_H__
 #define DEFINITION_H__
 
+// NUCLEO or custom
+#define NUCLEO		1		// Change 1 if using nucleo, 0 if not
+
 // Basic Parameters of BPS layout
 #define NUM_BATTERY_MODULES			31		// Number of Battery Modules
 #define NUM_VOLTAGE_BOARDS				1			// Number of Voltage Slave Boards

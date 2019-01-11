@@ -22,7 +22,7 @@ void initialize(void);
 void preliminaryCheck(void);
 void faultCondition(void);
 
-int Mainmain(){
+int main(){
 	__disable_irq();				// Disable all interrupts until initialization is done
 	initialize();					// Initialize codes/pins
 	preliminaryCheck();		// Wait until all boards are powered on
@@ -44,7 +44,7 @@ int Mainmain(){
 		
 		// Update necessary
 		// CAN_SendMessageStatus()	// Most likely need to put this on a timer if sending too frequently
-		Terminal_CheckInput();
+		//Terminal_CheckInput();
 		// Display_UpdateScreen()
 		
 		WDTimer_Reset();

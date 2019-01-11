@@ -228,8 +228,8 @@ void SPI_WriteMulti16(uint16_t *txBuf, uint32_t txSize){
 	for(uint32_t i = 0; i < txSize; i++){
 		SPI_Wait(SPI2);
 		SPI2->DR = txBuf[i] & 0xFFFF;
-		SPI_Wait(SPI2)
-		uint16_t volatile junk = SPI2->DR;
+		SPI_Wait(SPI2);
+		volatile uint16_t junk = SPI2->DR;
 	}
 }
 

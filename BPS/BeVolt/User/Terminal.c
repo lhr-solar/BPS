@@ -68,17 +68,18 @@ void Terminal_HandleInput(char * op, char * arg){
 	printf("\n\r"); // Do a newline for the next command
 }
 
+/*
 void Terminal_currentStatus(void){
 	const char* stat = Current_IsSafe() ? "SAFE" : "NOT SAFE";
 	printf("The current level is %s\n\r", stat);
 	printf("High-precision: %u\n\r", Current_HighPrecisionAmperes());
-	printf("Low-precision: %u\n\r", Current_LowPrecisionAmperes());
+	printf("Low-precision: %u\n\r", Current_GetLowPrecAmps());
 }
 
 void Terminal_voltageStatus(void){
 	const char * stat = Voltage_IsSafe() ? "SAFE" : "NOT SAFE";
 	printf("The voltage level is %s\n\r", stat);
-	printf("Total pack voltage: %u\n\r", Voltage_TotalPackVoltage());
+	printf("Total pack voltage: %u\n\r", Voltage_GetTotalPackVoltage());
 	printf("Modules in danger: ");
 	uint16_t * modules = Voltage_ModulesInDanger();
 	for(int i = 0; i < sizeof(modules)/sizeof(uint16_t); ++i){
@@ -98,7 +99,7 @@ void Terminal_temperatureStatus(void){
 	}
 	printf("\n\r");
 }
-
+*/
 void Terminal_contactorStatus(void){
 
 }
