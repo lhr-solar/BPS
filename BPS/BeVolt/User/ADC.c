@@ -1,3 +1,9 @@
+/** main.c
+ * Program for UTSVT BeVolt's Battery Protection System ADC initialization
+ * @authors Garrett Wong, Sijin Woo
+ * @lastRevised 1/11/2019
+ */
+
 #include <stdint.h>
 #include "stm32f4xx.h"
 
@@ -54,3 +60,15 @@ uint32_t ADC_ReadLow(void){
 	// INITIALIZE ADC PIN "ALTERNATE FUNCTION"
 	// SAME THING FOR OTHER ONES
 	// RETURN 
+
+/** ADC_Conversion
+ * Returns the converted current value given the ADC readings
+ * @returns converted current
+ */
+uint32_t ADC_Conversion (uint32_t ADC_Reading){
+ // note Fred's board already converts the -4 to 4 volts to 0-4 
+ uint32_t convertedVoltage = (ADC_Reading*4.096)/2047; // converts ADC reading to a voltage
+ uint32_t convertedCurrent = convertedVoltage*(200/4); // takes voltage and converts to a current reading, given linear slope
+ return convertedCurrent; 
+}
+
