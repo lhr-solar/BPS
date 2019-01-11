@@ -6,7 +6,8 @@
  * calculation algorithm.
  */
 void SoC_Init(void){
-	int32_t accum = 0;
+	uint32_t x = 5;
+
 	// TODO: Initilize timer. 32 bit timer.
 }
 
