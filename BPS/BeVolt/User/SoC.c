@@ -10,9 +10,22 @@
 /** Soc_Init
  * Initializes necessary timer and values to begin state of charge
  * calculation algorithm.
+ * Info found on reference sheet stm32f413 page 535
  */
-void SoC_Init(void){
-	// TODO: Initilize timer. 32 bit timer.
+void SoC_Init(void){ 
+	// TODO: Initilize timer. 32 bit timer..
+	
+	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE); 	//Enable TIM clock
+	
+	TIM_TimeBaseInitTypeDef Init_TIM2;								 		//make struct
+	Init_TIM2.TIM_Prescaler = 0;
+	Init_TIM2.TIM_CounterMode = TIM_CounterMode_Down;
+	Init_TIM2.TIM_Period = 0xFFFF;
+	Init_TIM2.TIM_ClockDivision = TIM_CKD_DIV1;
+	
+	TIM_TimeBaseInit(TIM2, &Init_TIM2);										//call function
+	TIM_Cmd(TIM2,ENABLE);																	//enable counter	
+	
 }
 
 /** SoC_Calculate
@@ -22,6 +35,7 @@ void SoC_Init(void){
 void SoC_Calculate(int32_t amps){
 	// TODO: Coloumb counting algorithm.
 	// Accumulator summation
+	
 }
 
 /** SoC_Calibrate
