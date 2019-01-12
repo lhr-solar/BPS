@@ -618,7 +618,7 @@ Removing Unused input sections from the image.
     Removing soc.o(i.SoC_Calculate), (2 bytes).
     Removing soc.o(i.SoC_Calibrate), (2 bytes).
     Removing soc.o(i.SoC_GetPercent), (2 bytes).
-    Removing soc.o(i.SoC_Init), (2 bytes).
+    Removing soc.o(i.SoC_Init), (4 bytes).
     Removing soc.o(i.SoC_SetAccum), (2 bytes).
     Removing display.o(.rev16_text), (4 bytes).
     Removing display.o(.revsh_text), (4 bytes).
@@ -1166,7 +1166,7 @@ Removing Unused input sections from the image.
     Removing system_stm32f4xx.o(.constdata), (24 bytes).
     Removing system_stm32f4xx.o(.data), (4 bytes).
 
-567 unused section(s) (total 23373 bytes) removed from the image.
+567 unused section(s) (total 23375 bytes) removed from the image.
 
 ==============================================================================
 
