@@ -72,3 +72,15 @@ uint32_t ADC_Conversion (uint32_t ADC_Reading){
  return convertedCurrent; 
 }
 
+/** ADC_ChooseHiLo
+ * Chooses which value of ADC readings to choose from
+ * High or Low current Tamura Sensor
+ * @returns converted value
+ */
+uint32_t ADC_ChooseHiLo (uint32_t highReading, uint32_t lowReading){
+	if (ADC_Conversion(highReading) < 50){
+		return ADC_Conversion(lowReading);
+	}
+	return ADC_Conversion(highReading);
+}
+
