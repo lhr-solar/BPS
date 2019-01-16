@@ -1,12 +1,17 @@
 /** main.c
  * Program for UTSVT BeVolt's Battery Protection System SOC
  * @authors Garrett Wong, Sijin Woo
- * @lastRevised 1/11/2019
+ * @lastRevised 1/13/2019
  */
 
 #include <stdint.h>
 #include "stm32f4xx.h"
+#include "ADC.h"
 
+ uint32_t cumulativeNegativeSoc = 0;
+ uint32_t initialSoc = 100;
+ uint32_t finalSoc;
+ 
 /** Soc_Init
  * Initializes necessary timer and values to begin state of charge
  * calculation algorithm.
@@ -18,8 +23,8 @@ void SoC_Init(void){
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE); 	//Enable TIM clock
 	
 	TIM_TimeBaseInitTypeDef Init_TIM2;								 		//make struct
-	Init_TIM2.TIM_Prescaler = 0;
-	Init_TIM2.TIM_CounterMode = TIM_CounterMode_Down;
+	Init_TIM2.TIM_Prescaler = 1;
+	Init_TIM2.TIM_CounterMode = TIM_CounterMode_Up;
 	Init_TIM2.TIM_Period = 0xFFFF;
 	Init_TIM2.TIM_ClockDivision = TIM_CKD_DIV1;
 	
@@ -31,11 +36,17 @@ void SoC_Init(void){
 /** SoC_Calculate
  * Calculates new SoC depending on the current reading
  * @param current reading from hall effect sensors. Fixed point of 0.0001 (1.500 Amps = 15000)
+ * not a constant samping. Add on however much from the previous
  */
-void SoC_Calculate(int32_t amps){
+void SoC_Calculate(int32_t amps){uint32_t counter; uint32_t timeElapsed;
 	// TODO: Coloumb counting algorithm.
 	// Accumulator summation
-	
+	// need to find out how to raise a flag or access count register
+	counter = TIM2->CNT;							//find current value of up counter
+	TIM2->CNT = 0;										//set counter to zero to count up again
+	timeElapsed = counter/(80000000); //time passed when you call the counter
+	cumulativeNegativeSoc = cumulativeNegativeSoc + timeElapsed*(ADC_Conversion(ADC_ReadLow()));
+	finalSoc = initialSoc - cumulativeNegativeSoc;
 }
 
 /** SoC_Calibrate
@@ -52,8 +63,10 @@ void SoC_Calibrate(int32_t faultType){
  * Gets the percentage of charge left in the battery pack
  * @return fixed point percentage. Resolution = 0.01 (45.55% = 4555)
  */
-int32_t SoC_GetPercent(void){
+int32_t SoC_GetPercent(void){uint32_t socPercent;
 	// TODO: returns percentage of charge
+	socPercent = (finalSoc/ initialSoc)*100;
+	return socPercent;
 }
 
 /** SoC_SetAccum 
