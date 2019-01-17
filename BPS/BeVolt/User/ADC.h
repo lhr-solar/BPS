@@ -10,4 +10,6 @@ uint32_t ADC_ReadLow(void);
 
 uint32_t ADC_Conversion(uint32_t ADC_Reading);
 
+uint32_t ADC_ChooseHiLo (uint32_t highReading, uint32_t lowReading);
+
 #endif
