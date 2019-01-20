@@ -152,143 +152,6 @@ Wire Wire Line
 Connection ~ 2800 3200
 Wire Wire Line
 	2400 2500 2400 2600
-Wire Wire Line
-	4750 3000 5200 3000
-$Comp
-L Jumper:SolderJumper_3_Bridged12 JP2
-U 1 1 5C3552F2
-P 6300 2900
-F 0 "JP2" V 6346 2968 50  0000 L CNN
-F 1 "SolderJumper_3_Open" V 6255 2968 50  0000 L CNN
-F 2 "Jumper:SolderJumper-3_P1.3mm_Bridged12_Pad1.0x1.5mm" H 6300 2900 50  0001 C CNN
-F 3 "~" H 6300 2900 50  0001 C CNN
-	1    6300 2900
-	0    1    -1   0   
-$EndComp
-$Comp
-L Jumper:SolderJumper_3_Bridged12 JP3
-U 1 1 5C355357
-P 6850 3450
-F 0 "JP3" V 6896 3518 50  0000 L CNN
-F 1 "SolderJumper_3_Open" V 6805 3518 50  0000 L CNN
-F 2 "Jumper:SolderJumper-3_P1.3mm_Bridged12_Pad1.0x1.5mm" H 6850 3450 50  0001 C CNN
-F 3 "~" H 6850 3450 50  0001 C CNN
-	1    6850 3450
-	0    1    -1   0   
-$EndComp
-$Comp
-L Jumper:SolderJumper_3_Bridged12 JP4
-U 1 1 5C355391
-P 7400 4000
-F 0 "JP4" V 7446 4068 50  0000 L CNN
-F 1 "SolderJumper_3_Open" V 7355 4068 50  0000 L CNN
-F 2 "Jumper:SolderJumper-3_P1.3mm_Bridged12_Pad1.0x1.5mm" H 7400 4000 50  0001 C CNN
-F 3 "~" H 7400 4000 50  0001 C CNN
-	1    7400 4000
-	0    1    -1   0   
-$EndComp
-Wire Wire Line
-	4750 3100 5200 3100
-Wire Wire Line
-	4750 2900 5200 2900
-Text Label 5200 2900 2    50   ~ 0
-E0
-Text Label 5200 3000 2    50   ~ 0
-E1
-Text Label 5200 3100 2    50   ~ 0
-E2
-Wire Wire Line
-	6150 2900 5950 2900
-Text Label 5950 2900 0    50   ~ 0
-E0
-Text Label 6500 3450 0    50   ~ 0
-E1
-Wire Wire Line
-	7250 4000 7050 4000
-Text Label 7050 4000 0    50   ~ 0
-E2
-$Comp
-L power:GND #PWR057
-U 1 1 5C356B3E
-P 6300 3150
-F 0 "#PWR057" H 6300 2900 50  0001 C CNN
-F 1 "GND" H 6305 2977 50  0000 C CNN
-F 2 "" H 6300 3150 50  0001 C CNN
-F 3 "" H 6300 3150 50  0001 C CNN
-	1    6300 3150
-	1    0    0    -1  
-$EndComp
-$Comp
-L power:GND #PWR061
-U 1 1 5C3572BE
-P 6850 3700
-F 0 "#PWR061" H 6850 3450 50  0001 C CNN
-F 1 "GND" H 6855 3527 50  0000 C CNN
-F 2 "" H 6850 3700 50  0001 C CNN
-F 3 "" H 6850 3700 50  0001 C CNN
-	1    6850 3700
-	1    0    0    -1  
-$EndComp
-$Comp
-L power:GND #PWR063
-U 1 1 5C3572D7
-P 7400 4250
-F 0 "#PWR063" H 7400 4000 50  0001 C CNN
-F 1 "GND" H 7405 4077 50  0000 C CNN
-F 2 "" H 7400 4250 50  0001 C CNN
-F 3 "" H 7400 4250 50  0001 C CNN
-	1    7400 4250
-	1    0    0    -1  
-$EndComp
-Wire Wire Line
-	6300 3150 6300 3100
-Wire Wire Line
-	6850 3650 6850 3700
-Wire Wire Line
-	7400 4200 7400 4250
-$Comp
-L power:+3.3V #PWR056
-U 1 1 5C358A09
-P 6300 2650
-F 0 "#PWR056" H 6300 2500 50  0001 C CNN
-F 1 "+3.3V" H 6315 2823 50  0000 C CNN
-F 2 "" H 6300 2650 50  0001 C CNN
-F 3 "" H 6300 2650 50  0001 C CNN
-	1    6300 2650
-	1    0    0    -1  
-$EndComp
-Wire Wire Line
-	6300 2650 6300 2700
-$Comp
-L power:+3.3V #PWR058
-U 1 1 5C358E92
-P 6850 3200
-F 0 "#PWR058" H 6850 3050 50  0001 C CNN
-F 1 "+3.3V" H 6865 3373 50  0000 C CNN
-F 2 "" H 6850 3200 50  0001 C CNN
-F 3 "" H 6850 3200 50  0001 C CNN
-	1    6850 3200
-	1    0    0    -1  
-$EndComp
-Wire Wire Line
-	6850 3200 6850 3250
-$Comp
-L power:+3.3V #PWR062
-U 1 1 5C359303
-P 7400 3750
-F 0 "#PWR062" H 7400 3600 50  0001 C CNN
-F 1 "+3.3V" H 7415 3923 50  0000 C CNN
-F 2 "" H 7400 3750 50  0001 C CNN
-F 3 "" H 7400 3750 50  0001 C CNN
-	1    7400 3750
-	1    0    0    -1  
-$EndComp
-Wire Wire Line
-	7400 3750 7400 3800
-Wire Wire Line
-	6500 3450 6700 3450
-Text Notes 5950 2350 0    50   ~ 0
-These jumpers let's you change the EEPROM address if there is a conflict.\nFor now, the EEPROM address is 0x50.
 Text Label 3600 3100 2    50   ~ 0
 SCL
 Text Label 3600 3200 2    50   ~ 0
@@ -341,13 +204,9 @@ Wire Wire Line
 	4300 4700 4400 4700
 Connection ~ 4300 4700
 Wire Wire Line
-	3700 5600 3250 5600
-Wire Wire Line
 	3700 5700 3250 5700
 Text Label 3250 5700 0    50   ~ 0
 SCL
-Text Label 3250 5600 0    50   ~ 0
-SDA
 $Comp
 L Device:C C32
 U 1 1 5CA0C7FA
@@ -406,8 +265,6 @@ Wire Wire Line
 	4900 4700 5350 4700
 Wire Wire Line
 	4900 5100 5350 5100
-Text Notes 5900 4950 0    50   ~ 0
-These caps. have to be placed at each VDD pin. One cap per VDD pin.
 Text Notes 3900 2300 0    100  ~ 20
 EEPROM
 Text Notes 4200 4250 0    100  ~ 20
@@ -416,48 +273,7 @@ NoConn ~ 3700 5800
 Text Notes 3950 3400 0    50   ~ 0
 Addr: 0x50
 Text Notes 4500 6050 0    50   ~ 0
-Addr: 0x65
-$Comp
-L Jumper:SolderJumper_3_Bridged12 JP5
-U 1 1 5CA180BC
-P 7400 5500
-F 0 "JP5" V 7446 5568 50  0000 L CNN
-F 1 "SolderJumper_3_Open" V 7355 5568 50  0000 L CNN
-F 2 "Jumper:SolderJumper-3_P1.3mm_Bridged12_Pad1.0x1.5mm" H 7400 5500 50  0001 C CNN
-F 3 "~" H 7400 5500 50  0001 C CNN
-	1    7400 5500
-	0    1    -1   0   
-$EndComp
-Wire Wire Line
-	7250 5500 7050 5500
-$Comp
-L power:GND #PWR068
-U 1 1 5CA180C5
-P 7400 5750
-F 0 "#PWR068" H 7400 5500 50  0001 C CNN
-F 1 "GND" H 7405 5577 50  0000 C CNN
-F 2 "" H 7400 5750 50  0001 C CNN
-F 3 "" H 7400 5750 50  0001 C CNN
-	1    7400 5750
-	1    0    0    -1  
-$EndComp
-Wire Wire Line
-	7400 5700 7400 5750
-$Comp
-L power:+3.3V #PWR066
-U 1 1 5CA180CC
-P 7400 5250
-F 0 "#PWR066" H 7400 5100 50  0001 C CNN
-F 1 "+3.3V" H 7415 5423 50  0000 C CNN
-F 2 "" H 7400 5250 50  0001 C CNN
-F 3 "" H 7400 5250 50  0001 C CNN
-	1    7400 5250
-	1    0    0    -1  
-$EndComp
-Wire Wire Line
-	7400 5250 7400 5300
-Text Label 7050 5500 0    50   ~ 0
-SA0
+Addr: 0x64
 Text Label 3250 5200 0    50   ~ 0
 SA0
 Wire Wire Line
@@ -482,37 +298,22 @@ Wire Wire Line
 Connection ~ 3650 5400
 Wire Wire Line
 	3650 5400 3700 5400
-$Comp
-L power:PWR_FLAG #FLG05
-U 1 1 5CC89108
-P 5200 2900
-F 0 "#FLG05" H 5200 2975 50  0001 C CNN
-F 1 "PWR_FLAG" V 5200 3028 50  0000 L CNN
-F 2 "" H 5200 2900 50  0001 C CNN
-F 3 "~" H 5200 2900 50  0001 C CNN
-	1    5200 2900
-	0    1    1    0   
-$EndComp
-$Comp
-L power:PWR_FLAG #FLG06
-U 1 1 5CC89201
-P 5200 3000
-F 0 "#FLG06" H 5200 3075 50  0001 C CNN
-F 1 "PWR_FLAG" V 5200 3128 50  0000 L CNN
-F 2 "" H 5200 3000 50  0001 C CNN
-F 3 "~" H 5200 3000 50  0001 C CNN
-	1    5200 3000
-	0    1    1    0   
-$EndComp
-$Comp
-L power:PWR_FLAG #FLG07
-U 1 1 5CC89222
-P 5200 3100
-F 0 "#FLG07" H 5200 3175 50  0001 C CNN
-F 1 "PWR_FLAG" V 5200 3228 50  0000 L CNN
-F 2 "" H 5200 3100 50  0001 C CNN
-F 3 "~" H 5200 3100 50  0001 C CNN
-	1    5200 3100
-	0    1    1    0   
-$EndComp
+Wire Wire Line
+	3700 5600 3650 5600
+Wire Wire Line
+	3650 5600 3650 5400
+Wire Wire Line
+	4850 3200 4850 3100
+Wire Wire Line
+	4850 2900 4750 2900
+Wire Wire Line
+	4750 3000 4850 3000
+Connection ~ 4850 3000
+Wire Wire Line
+	4850 3000 4850 2900
+Wire Wire Line
+	4750 3100 4850 3100
+Connection ~ 4850 3100
+Wire Wire Line
+	4850 3100 4850 3000
 $EndSCHEMATC

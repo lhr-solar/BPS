@@ -48,12 +48,12 @@ F 3 "" H 8000 3550 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L Device:Jumper_NO_Small JP1
+L Device:Jumper_NC_Small JP1
 U 1 1 5C2B4308
 P 8100 3250
 F 0 "JP1" H 8100 3330 50  0000 C CNN
 F 1 "Termination Resistors" H 8100 3200 50  0000 C CNN
-F 2 "Pin_Headers:Pin_Header_Straight_1x02_Pitch2.54mm" H 8100 3250 50  0001 C CNN
+F 2 "Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical" H 8100 3250 50  0001 C CNN
 F 3 "" H 8100 3250 50  0001 C CNN
 	1    8100 3250
 	-1   0    0    1   
@@ -259,7 +259,7 @@ U 1 1 5C2B43A0
 P 8100 2850
 F 0 "U4" H 8100 2700 60  0000 C CNN
 F 1 "CDSOT23-T24CAN" H 8100 3000 60  0000 C CNN
-F 2 "TO_SOT_Packages_SMD:SOT-23W_Handsoldering" H 8100 2850 60  0001 C CNN
+F 2 "Package_TO_SOT_SMD:SOT-23W" H 8100 2850 60  0001 C CNN
 F 3 "" H 8100 2850 60  0001 C CNN
 	1    8100 2850
 	1    0    0    -1  
@@ -315,8 +315,6 @@ Wire Wire Line
 Wire Wire Line
 	6150 2900 6150 3050
 Wire Wire Line
-	5050 3550 5250 3550
-Wire Wire Line
 	6150 3300 6150 3350
 Wire Wire Line
 	5750 3350 5750 3300
@@ -327,16 +325,11 @@ Wire Wire Line
 Connection ~ 6150 3050
 Connection ~ 6150 3350
 Wire Wire Line
-	2950 3700 3100 3700
-Wire Wire Line
-	2950 3800 3400 3800
-Wire Wire Line
 	5400 4150 5050 4150
 Wire Wire Line
 	5250 3450 5250 3550
 Wire Wire Line
 	5250 3450 5050 3450
-Connection ~ 5250 3550
 Wire Wire Line
 	5250 3250 5250 3350
 Wire Wire Line
@@ -397,12 +390,6 @@ Wire Wire Line
 Wire Wire Line
 	6050 3050 6150 3050
 Wire Wire Line
-	3100 3850 3100 3700
-Connection ~ 3100 3700
-Wire Wire Line
-	3400 3850 3400 3800
-Connection ~ 3400 3800
-Wire Wire Line
 	7300 3800 7300 3850
 Wire Wire Line
 	5700 4150 6150 4150
@@ -430,32 +417,6 @@ Wire Wire Line
 	5750 3350 5750 3700
 Wire Wire Line
 	6150 3550 6200 3550
-Wire Wire Line
-	3100 3700 3650 3700
-Wire Wire Line
-	3400 3800 3650 3800
-$Comp
-L Connector:TestPoint TP10
-U 1 1 5C28B6DC
-P 3100 3850
-F 0 "TP10" H 3350 3950 50  0000 R CNN
-F 1 "CAN_TX" H 3350 4050 50  0000 R CNN
-F 2 "TestPoint:TestPoint_Keystone_5005-5009_Compact" H 3300 3850 50  0001 C CNN
-F 3 "~" H 3300 3850 50  0001 C CNN
-	1    3100 3850
-	-1   0    0    1   
-$EndComp
-$Comp
-L Connector:TestPoint TP11
-U 1 1 5C28BA47
-P 3400 3850
-F 0 "TP11" H 3650 3950 50  0000 R CNN
-F 1 "CAN_RX" H 3650 4050 50  0000 R CNN
-F 2 "TestPoint:TestPoint_Keystone_5005-5009_Compact" H 3600 3850 50  0001 C CNN
-F 3 "~" H 3600 3850 50  0001 C CNN
-	1    3400 3850
-	-1   0    0    1   
-$EndComp
 $Comp
 L power:GND #PWR042
 U 1 1 5C28BDDE
@@ -636,4 +597,11 @@ F 3 "" H 2500 3000 50  0001 C CNN
 	1    2500 3000
 	1    0    0    -1  
 $EndComp
+Connection ~ 5250 3550
+Wire Wire Line
+	5050 3550 5250 3550
+Wire Wire Line
+	2950 3700 3650 3700
+Wire Wire Line
+	2950 3800 3650 3800
 $EndSCHEMATC

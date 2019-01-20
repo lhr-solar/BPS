@@ -17,111 +17,44 @@ $EndDescr
 Text Notes 4700 1400 0    50   ~ 10
 This page hods other miscellenious connections that are required:\n- Strobe/Error light indicator\n- Fan connectors
 $Comp
-L Connector_Generic:Conn_01x02 J11
+L Connector_Generic:Conn_02x04_Counter_Clockwise J11
 U 1 1 5C39DF85
-P 8350 2450
-F 0 "J11" H 8430 2442 50  0000 L CNN
-F 1 "Fan1" H 8430 2351 50  0000 L CNN
-F 2 "UTSVT_Connectors:Molex_MicroFit3.0_1x2xP3.00mm_PolarizingPeg_Vertical" H 8350 2450 50  0001 C CNN
-F 3 "~" H 8350 2450 50  0001 C CNN
-	1    8350 2450
+P 8350 2650
+F 0 "J11" H 8350 2850 50  0000 L CNN
+F 1 "FrontFans" H 8250 2350 50  0000 L CNN
+F 2 "UTSVT_Connectors:Molex_MicroFit3.0_2x4xP3.00mm_PolarizingPeg_Vertical" H 8350 2650 50  0001 C CNN
+F 3 "~" H 8350 2650 50  0001 C CNN
+	1    8350 2650
 	1    0    0    -1  
 $EndComp
 Text Notes 8200 2150 0    100  ~ 20
 Fans
 $Comp
-L Connector_Generic:Conn_01x02 J12
+L Connector_Generic:Conn_02x04_Counter_Clockwise J12
 U 1 1 5C39DFFD
-P 8350 2750
-F 0 "J12" H 8430 2742 50  0000 L CNN
-F 1 "Fan2" H 8430 2651 50  0000 L CNN
-F 2 "UTSVT_Connectors:Molex_MicroFit3.0_1x2xP3.00mm_PolarizingPeg_Vertical" H 8350 2750 50  0001 C CNN
-F 3 "~" H 8350 2750 50  0001 C CNN
-	1    8350 2750
-	1    0    0    -1  
-$EndComp
-$Comp
-L Connector_Generic:Conn_01x02 J14
-U 1 1 5C39E02D
-P 8350 3050
-F 0 "J14" H 8430 3042 50  0000 L CNN
-F 1 "Fan3" H 8430 2951 50  0000 L CNN
-F 2 "UTSVT_Connectors:Molex_MicroFit3.0_1x2xP3.00mm_PolarizingPeg_Vertical" H 8350 3050 50  0001 C CNN
-F 3 "~" H 8350 3050 50  0001 C CNN
-	1    8350 3050
-	1    0    0    -1  
-$EndComp
-$Comp
-L Connector_Generic:Conn_01x02 J15
-U 1 1 5C39E047
-P 8350 3350
-F 0 "J15" H 8430 3342 50  0000 L CNN
-F 1 "Fan4" H 8430 3251 50  0000 L CNN
-F 2 "UTSVT_Connectors:Molex_MicroFit3.0_1x2xP3.00mm_PolarizingPeg_Vertical" H 8350 3350 50  0001 C CNN
-F 3 "~" H 8350 3350 50  0001 C CNN
-	1    8350 3350
+P 8350 3400
+F 0 "J12" H 8350 3600 50  0000 L CNN
+F 1 "BackFans" H 8250 3100 50  0000 L CNN
+F 2 "UTSVT_Connectors:Molex_MicroFit3.0_2x4xP3.00mm_PolarizingPeg_Vertical" H 8350 3400 50  0001 C CNN
+F 3 "~" H 8350 3400 50  0001 C CNN
+	1    8350 3400
 	1    0    0    -1  
 $EndComp
 $Comp
 L power:+12V #PWR0112
 U 1 1 5C39E1C8
-P 8050 2350
-F 0 "#PWR0112" H 8050 2200 50  0001 C CNN
-F 1 "+12V" H 8065 2523 50  0000 C CNN
-F 2 "" H 8050 2350 50  0001 C CNN
-F 3 "" H 8050 2350 50  0001 C CNN
-	1    8050 2350
+P 8050 2450
+F 0 "#PWR0112" H 8050 2300 50  0001 C CNN
+F 1 "+12V" H 8065 2623 50  0000 C CNN
+F 2 "" H 8050 2450 50  0001 C CNN
+F 3 "" H 8050 2450 50  0001 C CNN
+	1    8050 2450
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
-	8050 2350 8050 2450
+	8050 2450 8050 2550
 Wire Wire Line
-	8050 2450 8150 2450
-Wire Wire Line
-	8050 2450 8050 2750
-Wire Wire Line
-	8050 2750 8150 2750
-Connection ~ 8050 2450
-Wire Wire Line
-	8050 2750 8050 3050
-Wire Wire Line
-	8050 3050 8150 3050
-Connection ~ 8050 2750
-Wire Wire Line
-	8050 3050 8050 3350
-Wire Wire Line
-	8050 3350 8150 3350
-Connection ~ 8050 3050
-$Comp
-L power:GND #PWR0121
-U 1 1 5C39E259
-P 7950 4750
-F 0 "#PWR0121" H 7950 4500 50  0001 C CNN
-F 1 "GND" H 7955 4577 50  0000 C CNN
-F 2 "" H 7950 4750 50  0001 C CNN
-F 3 "" H 7950 4750 50  0001 C CNN
-	1    7950 4750
-	1    0    0    -1  
-$EndComp
-Wire Wire Line
-	7950 4750 7950 4650
-Wire Wire Line
-	7950 3450 8150 3450
-Wire Wire Line
-	8150 3150 7950 3150
-Wire Wire Line
-	7950 3150 7950 3450
-Connection ~ 7950 3450
-Wire Wire Line
-	8150 2850 7950 2850
-Wire Wire Line
-	7950 2850 7950 3150
-Connection ~ 7950 3150
-Wire Wire Line
-	8150 2550 7950 2550
-Wire Wire Line
-	7950 2550 7950 2850
-Connection ~ 7950 2850
+	8050 2650 8150 2650
 $Comp
 L Connector_Generic:Conn_01x02 J13
 U 1 1 5C39EBB1
@@ -350,14 +283,14 @@ Connection ~ 4200 3450
 $Comp
 L Device:R R?
 U 1 1 5C372AD7
-P 2100 3000
+P 2100 3350
 AR Path="/5C38C674/5C372AD7" Ref="R?"  Part="1" 
 AR Path="/5C392C6A/5C372AD7" Ref="R41"  Part="1" 
-F 0 "R41" H 2170 3046 50  0000 L CNN
-F 1 "1.6k" V 2100 2900 50  0000 L CNN
-F 2 "Resistor_SMD:R_0805_2012Metric" V 2030 3000 50  0001 C CNN
-F 3 "~" H 2100 3000 50  0001 C CNN
-	1    2100 3000
+F 0 "R41" H 2170 3396 50  0000 L CNN
+F 1 "1.6k" V 2100 3250 50  0000 L CNN
+F 2 "Resistor_SMD:R_0805_2012Metric" V 2030 3350 50  0001 C CNN
+F 3 "~" H 2100 3350 50  0001 C CNN
+	1    2100 3350
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
@@ -425,16 +358,16 @@ Wire Wire Line
 $Comp
 L Device:LED_ALT D?
 U 1 1 5C37D1A1
-P 2100 3350
+P 2100 3000
 AR Path="/5C37D1A1" Ref="D?"  Part="1" 
 AR Path="/5C392C6A/5C37D1A1" Ref="D5"  Part="1" 
-F 0 "D5" V 2138 3233 50  0000 R CNN
-F 1 "Fault" V 2047 3233 50  0000 R CNN
-F 2 "LED_SMD:LED_0805_2012Metric" H 2100 3350 50  0001 C CNN
-F 3 "~" H 2100 3350 50  0001 C CNN
-F 4 "Red" V 2100 3350 50  0001 C CNN "Color"
-F 5 "APTD2012LSURCK" V 2100 3350 50  0001 C CNN "P/N"
-	1    2100 3350
+F 0 "D5" V 2138 2883 50  0000 R CNN
+F 1 "Fault" V 2047 2883 50  0000 R CNN
+F 2 "LED_SMD:LED_0805_2012Metric" H 2100 3000 50  0001 C CNN
+F 3 "~" H 2100 3000 50  0001 C CNN
+F 4 "Red" V 2100 3000 50  0001 C CNN "Color"
+F 5 "APTD2012LSURCK" V 2100 3000 50  0001 C CNN "P/N"
+	1    2100 3000
 	0    -1   -1   0   
 $EndComp
 Text HLabel 2200 5200 0    50   Input ~ 0
@@ -752,90 +685,6 @@ Wire Wire Line
 Wire Wire Line
 	2500 3350 2500 3300
 $Comp
-L Connector_Generic:Conn_01x02 J16
-U 1 1 5C90C90C
-P 8350 3650
-F 0 "J16" H 8430 3642 50  0000 L CNN
-F 1 "Fan5" H 8430 3551 50  0000 L CNN
-F 2 "UTSVT_Connectors:Molex_MicroFit3.0_1x2xP3.00mm_PolarizingPeg_Vertical" H 8350 3650 50  0001 C CNN
-F 3 "~" H 8350 3650 50  0001 C CNN
-	1    8350 3650
-	1    0    0    -1  
-$EndComp
-$Comp
-L Connector_Generic:Conn_01x02 J17
-U 1 1 5C90C913
-P 8350 3950
-F 0 "J17" H 8430 3942 50  0000 L CNN
-F 1 "Fan6" H 8430 3851 50  0000 L CNN
-F 2 "UTSVT_Connectors:Molex_MicroFit3.0_1x2xP3.00mm_PolarizingPeg_Vertical" H 8350 3950 50  0001 C CNN
-F 3 "~" H 8350 3950 50  0001 C CNN
-	1    8350 3950
-	1    0    0    -1  
-$EndComp
-$Comp
-L Connector_Generic:Conn_01x02 J18
-U 1 1 5C90C91A
-P 8350 4250
-F 0 "J18" H 8430 4242 50  0000 L CNN
-F 1 "Fan7" H 8430 4151 50  0000 L CNN
-F 2 "UTSVT_Connectors:Molex_MicroFit3.0_1x2xP3.00mm_PolarizingPeg_Vertical" H 8350 4250 50  0001 C CNN
-F 3 "~" H 8350 4250 50  0001 C CNN
-	1    8350 4250
-	1    0    0    -1  
-$EndComp
-$Comp
-L Connector_Generic:Conn_01x02 J19
-U 1 1 5C90C921
-P 8350 4550
-F 0 "J19" H 8430 4542 50  0000 L CNN
-F 1 "Fan8" H 8430 4451 50  0000 L CNN
-F 2 "UTSVT_Connectors:Molex_MicroFit3.0_1x2xP3.00mm_PolarizingPeg_Vertical" H 8350 4550 50  0001 C CNN
-F 3 "~" H 8350 4550 50  0001 C CNN
-	1    8350 4550
-	1    0    0    -1  
-$EndComp
-Wire Wire Line
-	8150 3650 8050 3650
-Wire Wire Line
-	8050 3650 8050 3350
-Connection ~ 8050 3350
-Wire Wire Line
-	8150 3950 8050 3950
-Wire Wire Line
-	8050 3950 8050 3650
-Connection ~ 8050 3650
-Wire Wire Line
-	8150 4250 8050 4250
-Wire Wire Line
-	8050 4250 8050 3950
-Connection ~ 8050 3950
-Wire Wire Line
-	8150 4550 8050 4550
-Wire Wire Line
-	8050 4550 8050 4250
-Connection ~ 8050 4250
-Wire Wire Line
-	8150 4650 7950 4650
-Connection ~ 7950 4650
-Wire Wire Line
-	7950 4650 7950 4350
-Wire Wire Line
-	8150 4350 7950 4350
-Connection ~ 7950 4350
-Wire Wire Line
-	7950 4350 7950 4050
-Wire Wire Line
-	8150 4050 7950 4050
-Connection ~ 7950 4050
-Wire Wire Line
-	7950 4050 7950 3750
-Wire Wire Line
-	8150 3750 7950 3750
-Connection ~ 7950 3750
-Wire Wire Line
-	7950 3750 7950 3450
-$Comp
 L Device:Q_NMOS_GSD Q4
 U 1 1 5C978B9A
 P 2000 3850
@@ -935,8 +784,93 @@ Wire Wire Line
 Connection ~ 1650 4250
 Wire Wire Line
 	2100 4050 2100 4250
+Wire Wire Line
+	8150 2550 8050 2550
+Connection ~ 8050 2550
+Wire Wire Line
+	8050 2550 8050 2650
+Wire Wire Line
+	8150 2750 8050 2750
+Wire Wire Line
+	8050 2750 8050 2650
+Connection ~ 8050 2650
+Wire Wire Line
+	8150 2850 8050 2850
+Wire Wire Line
+	8050 2850 8050 2750
+Connection ~ 8050 2750
+Wire Wire Line
+	8750 3700 8750 3600
+Wire Wire Line
+	8750 2850 8650 2850
+Wire Wire Line
+	8750 2850 8750 2750
+Wire Wire Line
+	8750 2550 8650 2550
+Connection ~ 8750 2850
+Wire Wire Line
+	8650 2750 8750 2750
+Connection ~ 8750 2750
+Wire Wire Line
+	8750 2750 8750 2650
+Wire Wire Line
+	8650 2650 8750 2650
+Connection ~ 8750 2650
+Wire Wire Line
+	8750 2650 8750 2550
+Wire Wire Line
+	8650 3600 8750 3600
+Connection ~ 8750 3600
+Wire Wire Line
+	8750 3600 8750 3500
+Wire Wire Line
+	8650 3500 8750 3500
+Connection ~ 8750 3500
+Wire Wire Line
+	8750 3500 8750 3400
+Wire Wire Line
+	8650 3400 8750 3400
+Connection ~ 8750 3400
+Wire Wire Line
+	8750 3400 8750 3300
+Wire Wire Line
+	8650 3300 8750 3300
+Connection ~ 8750 3300
+Wire Wire Line
+	8750 3300 8750 2850
+Wire Wire Line
+	8050 2850 8050 3300
+Wire Wire Line
+	8050 3300 8150 3300
+Connection ~ 8050 2850
+Wire Wire Line
+	8050 3300 8050 3400
+Wire Wire Line
+	8050 3400 8150 3400
+Connection ~ 8050 3300
+Wire Wire Line
+	8050 3400 8050 3500
+Wire Wire Line
+	8050 3500 8150 3500
+Connection ~ 8050 3400
+Wire Wire Line
+	8050 3500 8050 3600
+Wire Wire Line
+	8050 3600 8150 3600
 Wire Bus Line
 	5500 5200 6100 5200
 Wire Bus Line
 	2200 5200 4900 5200
+Connection ~ 8050 3500
+$Comp
+L power:GNDPWR #PWR0121
+U 1 1 5C82C789
+P 8750 3700
+F 0 "#PWR0121" H 8750 3500 50  0001 C CNN
+F 1 "GNDPWR" H 8754 3546 50  0000 C CNN
+F 2 "" H 8750 3650 50  0001 C CNN
+F 3 "" H 8750 3650 50  0001 C CNN
+	1    8750 3700
+	1    0    0    -1  
+$EndComp
 $EndSCHEMATC

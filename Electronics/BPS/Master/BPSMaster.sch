@@ -439,7 +439,7 @@ Text Label 6900 2150 2    50   ~ 0
 ADC1_CH2
 Text Label 6900 2250 2    50   ~ 0
 ADC1_CH3
-Text Notes 8050 6050 0    50   ~ 0
+Text Notes 8500 6050 0    50   ~ 0
 PA2 high precision hall effect sensor.\nPA3 low precision hall effect sensor.
 $Sheet
 S 1000 900  1000 500 
@@ -1188,12 +1188,12 @@ $EndComp
 Text Notes 8150 5100 0    100  ~ 20
 Current Board
 Wire Wire Line
-	8750 5650 8250 5650
+	8750 5650 8550 5650
 Wire Wire Line
-	8750 5750 8250 5750
-Text Label 8250 5650 0    50   ~ 0
+	8750 5750 8550 5750
+Text Label 7350 5650 0    50   ~ 0
 ADC1_CH2
-Text Label 8250 5750 0    50   ~ 0
+Text Label 7350 5750 0    50   ~ 0
 ADC1_CH3
 Wire Wire Line
 	8750 5550 8300 5550
@@ -1326,12 +1326,6 @@ F 3 "" H 2200 7000 50  0001 C CNN
 	1    2200 7000
 	1    0    0    -1  
 $EndComp
-Wire Bus Line
-	7000 2250 7000 2450
-Wire Bus Line
-	4400 3350 4400 3950
-Wire Bus Line
-	7000 4250 7000 4850
 $Comp
 L power:+5V #PWR0134
 U 1 1 5C4C0F65
@@ -1343,4 +1337,88 @@ F 3 "" H 8700 5350 50  0001 C CNN
 	1    8700 5350
 	1    0    0    -1  
 $EndComp
+$Comp
+L Device:R R58
+U 1 1 5C83A7AA
+P 8400 5750
+F 0 "R58" V 8450 5950 50  0000 C CNN
+F 1 "220k" V 8400 5750 50  0000 C CNN
+F 2 "Resistor_SMD:R_0805_2012Metric" V 8330 5750 50  0001 C CNN
+F 3 "~" H 8400 5750 50  0001 C CNN
+	1    8400 5750
+	0    1    1    0   
+$EndComp
+$Comp
+L Device:R R57
+U 1 1 5C845E9E
+P 8400 5650
+F 0 "R57" V 8450 5850 50  0000 C CNN
+F 1 "220k" V 8400 5650 50  0000 C CNN
+F 2 "Resistor_SMD:R_0805_2012Metric" V 8330 5650 50  0001 C CNN
+F 3 "~" H 8400 5650 50  0001 C CNN
+	1    8400 5650
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	8250 5650 7800 5650
+Wire Wire Line
+	7350 5750 8150 5750
+$Comp
+L Device:C C54
+U 1 1 5C868333
+P 8150 6000
+F 0 "C54" H 8265 6046 50  0000 L CNN
+F 1 "1uF" H 8265 5955 50  0000 L CNN
+F 2 "Capacitor_SMD:C_0805_2012Metric" H 8188 5850 50  0001 C CNN
+F 3 "~" H 8150 6000 50  0001 C CNN
+	1    8150 6000
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	8150 5850 8150 5750
+Connection ~ 8150 5750
+Wire Wire Line
+	8150 5750 8250 5750
+$Comp
+L Device:C C53
+U 1 1 5C873D8D
+P 7800 6000
+F 0 "C53" H 7915 6046 50  0000 L CNN
+F 1 "1uF" H 7915 5955 50  0000 L CNN
+F 2 "Capacitor_SMD:C_0805_2012Metric" H 7838 5850 50  0001 C CNN
+F 3 "~" H 7800 6000 50  0001 C CNN
+	1    7800 6000
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	7800 5850 7800 5650
+Connection ~ 7800 5650
+Wire Wire Line
+	7800 5650 7350 5650
+$Comp
+L power:GND #PWR0138
+U 1 1 5C896080
+P 8150 6250
+F 0 "#PWR0138" H 8150 6000 50  0001 C CNN
+F 1 "GND" H 8250 6100 50  0000 R CNN
+F 2 "" H 8150 6250 50  0001 C CNN
+F 3 "" H 8150 6250 50  0001 C CNN
+	1    8150 6250
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	8150 6250 8150 6200
+Wire Wire Line
+	8150 6200 7800 6200
+Wire Wire Line
+	7800 6200 7800 6150
+Connection ~ 8150 6200
+Wire Wire Line
+	8150 6200 8150 6150
+Wire Bus Line
+	7000 2250 7000 2450
+Wire Bus Line
+	4400 3350 4400 3950
+Wire Bus Line
+	7000 4250 7000 4850
 $EndSCHEMATC

@@ -414,4 +414,17 @@ Wire Wire Line
 Wire Wire Line
 	5100 2850 5100 3200
 Connection ~ 5100 3200
+$Comp
+L Connector:TestPoint TP15
+U 1 1 5C82CEA3
+P 3400 3650
+F 0 "TP15" H 3342 3677 50  0000 R CNN
+F 1 "GNDPWR_TP" H 3342 3768 50  0000 R CNN
+F 2 "TestPoint:TestPoint_Keystone_5005-5009_Compact" H 3600 3650 50  0001 C CNN
+F 3 "~" H 3600 3650 50  0001 C CNN
+	1    3400 3650
+	-1   0    0    1   
+$EndComp
+Wire Wire Line
+	3400 3650 3400 3600
 $EndSCHEMATC
