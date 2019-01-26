@@ -522,14 +522,6 @@ Text Label 8000 3350 2    50   ~ 0
 TERM_H
 Text Label 8200 3350 0    50   ~ 0
 TERM_L
-Text Label 5250 2900 0    50   ~ 0
-CAN_ISO_VIN
-Text Label 5250 3050 0    50   ~ 0
-CAN_ISA_VOUT
-Text Label 5250 3350 0    50   ~ 0
-GND_ISO_OUT
-Text Label 5250 3550 0    50   ~ 0
-GND_ISO_IN
 Connection ~ 5750 3050
 Wire Wire Line
 	5750 3050 5850 3050

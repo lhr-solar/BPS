@@ -94,10 +94,10 @@ GND
 Wire Wire Line
 	5400 4750 5500 4750
 $Comp
-L Power_Protection:SP0503BAHT D13
+L Power_Protection:SP0503BAHT D14
 U 1 1 5C496C9B
 P 3950 4800
-F 0 "D13" H 4155 4846 50  0000 L CNN
+F 0 "D14" H 4155 4846 50  0000 L CNN
 F 1 "SP0503BAHT" H 4000 4650 50  0000 L CNN
 F 2 "Package_TO_SOT_SMD:SOT-143" H 4175 4750 50  0001 L CNN
 F 3 "http://www.littelfuse.com/~/media/files/littelfuse/technical%20resources/documents/data%20sheets/sp05xxba.pdf" H 4075 4925 50  0001 C CNN
@@ -189,10 +189,10 @@ Text HLabel 4700 2800 0    50   Input ~ 0
 Wire Wire Line
 	4700 2800 4800 2800
 $Comp
-L Device:R R54
+L Device:R R59
 U 1 1 5C49B01B
 P 4800 3000
-F 0 "R54" H 4870 3046 50  0000 L CNN
+F 0 "R59" H 4870 3046 50  0000 L CNN
 F 1 "1k" H 4870 2955 50  0000 L CNN
 F 2 "Resistor_SMD:R_0805_2012Metric" V 4730 3000 50  0001 C CNN
 F 3 "~" H 4800 3000 50  0001 C CNN
