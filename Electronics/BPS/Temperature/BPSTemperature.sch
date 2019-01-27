@@ -24,17 +24,6 @@ F 3 "http://cds.linear.com/docs/en/datasheet/2983fc.pdf" H 6600 3500 50  0001 C 
 	1    6600 3500
 	1    0    0    -1  
 $EndComp
-$Comp
-L power:+5V #PWR?
-U 1 1 5C4CC3F1
-P 6600 1750
-F 0 "#PWR?" H 6600 1600 50  0001 C CNN
-F 1 "+5V" H 6615 1923 50  0000 C CNN
-F 2 "" H 6600 1750 50  0001 C CNN
-F 3 "" H 6600 1750 50  0001 C CNN
-	1    6600 1750
-	1    0    0    -1  
-$EndComp
 Wire Wire Line
 	6600 1750 6600 1950
 Wire Wire Line
@@ -109,17 +98,6 @@ F 3 "~" H 7750 3650 50  0001 C CNN
 $EndComp
 $Comp
 L Device:C C?
-U 1 1 5C4CC859
-P 9550 1850
-F 0 "C?" H 9665 1896 50  0000 L CNN
-F 1 "C" H 9665 1805 50  0000 L CNN
-F 2 "" H 9588 1700 50  0001 C CNN
-F 3 "~" H 9550 1850 50  0001 C CNN
-	1    9550 1850
-	1    0    0    -1  
-$EndComp
-$Comp
-L Device:C C?
 U 1 1 5C4CC88B
 P 7500 2550
 F 0 "C?" H 7615 2596 50  0000 L CNN
@@ -144,17 +122,6 @@ Wire Wire Line
 	7400 2400 7500 2400
 Wire Wire Line
 	7500 2700 7400 2700
-$Comp
-L power:GND #PWR?
-U 1 1 5C4CCB2D
-P 9850 1750
-F 0 "#PWR?" H 9850 1500 50  0001 C CNN
-F 1 "GND" H 9855 1577 50  0000 C CNN
-F 2 "" H 9850 1750 50  0001 C CNN
-F 3 "" H 9850 1750 50  0001 C CNN
-	1    9850 1750
-	1    0    0    -1  
-$EndComp
 $Comp
 L power:GND #PWR?
 U 1 1 5C4CCEAB
@@ -299,50 +266,6 @@ Wire Wire Line
 	8050 2800 8150 2800
 Wire Wire Line
 	7750 2800 7400 2800
-$Comp
-L Device:R R?
-U 1 1 5C4D96FF
-P 9100 1000
-F 0 "R?" H 9170 1046 50  0000 L CNN
-F 1 "1k" H 9170 955 50  0000 L CNN
-F 2 "" V 9030 1000 50  0001 C CNN
-F 3 "~" H 9100 1000 50  0001 C CNN
-	1    9100 1000
-	1    0    0    -1  
-$EndComp
-$Comp
-L Device:C C?
-U 1 1 5C4D97A0
-P 9100 1450
-F 0 "C?" H 9215 1496 50  0000 L CNN
-F 1 "1uF" H 9215 1405 50  0000 L CNN
-F 2 "" H 9138 1300 50  0001 C CNN
-F 3 "~" H 9100 1450 50  0001 C CNN
-	1    9100 1450
-	1    0    0    -1  
-$EndComp
-$Comp
-L power:GND #PWR?
-U 1 1 5C4D9F5A
-P 9100 1700
-F 0 "#PWR?" H 9100 1450 50  0001 C CNN
-F 1 "GND" H 9105 1527 50  0000 C CNN
-F 2 "" H 9100 1700 50  0001 C CNN
-F 3 "" H 9100 1700 50  0001 C CNN
-	1    9100 1700
-	1    0    0    -1  
-$EndComp
-Wire Wire Line
-	9100 850  8900 850 
-Wire Wire Line
-	9100 1700 9100 1600
-Wire Wire Line
-	9100 1150 9100 1200
-Wire Wire Line
-	9100 1200 9200 1200
-Connection ~ 9100 1200
-Wire Wire Line
-	9100 1200 9100 1300
 $Comp
 L Device:R R?
 U 1 1 5C4DF311
@@ -1689,4 +1612,6 @@ Text Label 8400 4650 0    50   ~ 0
 CS5_OUT
 Text Label 8400 4750 0    50   ~ 0
 CS6_OUT
+Text Label 6600 1750 1    50   ~ 0
+5V
 $EndSCHEMATC
