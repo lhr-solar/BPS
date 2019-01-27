@@ -1585,4 +1585,108 @@ Wire Wire Line
 	7550 4300 7400 4300
 Wire Wire Line
 	7400 4400 7550 4400
+Wire Wire Line
+	7850 4250 8400 4250
+Wire Wire Line
+	7950 4350 8400 4350
+Wire Wire Line
+	8050 4450 8400 4450
+Wire Wire Line
+	8050 4550 8400 4550
+Wire Wire Line
+	8050 4450 8050 4500
+Wire Wire Line
+	7950 4650 8400 4650
+Wire Wire Line
+	7950 4350 7950 4500
+Wire Wire Line
+	7850 4750 8400 4750
+Wire Wire Line
+	7850 4250 7850 4500
+Wire Wire Line
+	8050 4500 7950 4500
+Connection ~ 8050 4500
+Wire Wire Line
+	8050 4500 8050 4550
+Connection ~ 7950 4500
+Wire Wire Line
+	7950 4500 7950 4650
+Wire Wire Line
+	7850 4500 7950 4500
+Connection ~ 7850 4500
+Wire Wire Line
+	7850 4500 7850 4750
+Wire Wire Line
+	7850 4500 7400 4500
+$Comp
+L Switch:SW_DIP_x06 SW?
+U 1 1 5C72A387
+P 8200 5600
+F 0 "SW?" H 8200 6167 50  0000 C CNN
+F 1 "SW_DIP_x06" H 8200 6076 50  0000 C CNN
+F 2 "" H 8200 5600 50  0001 C CNN
+F 3 "" H 8200 5600 50  0001 C CNN
+	1    8200 5600
+	1    0    0    -1  
+$EndComp
+Text Label 7750 5300 2    50   ~ 0
+CS1
+Text Label 7750 5400 2    50   ~ 0
+CS2
+Text Label 7750 5500 2    50   ~ 0
+CS3
+Text Label 7750 5600 2    50   ~ 0
+CS4
+Text Label 7750 5700 2    50   ~ 0
+CS5
+Text Label 7750 5800 2    50   ~ 0
+CS6
+Text Label 8650 5300 0    50   ~ 0
+CS1_OUT
+Text Label 8650 5400 0    50   ~ 0
+CS2_OUT
+Text Label 8650 5500 0    50   ~ 0
+CS3_OUT
+Text Label 8650 5600 0    50   ~ 0
+CS4_OUT
+Text Label 8650 5700 0    50   ~ 0
+CS5_OUT
+Text Label 8650 5800 0    50   ~ 0
+CS6_OUT
+Wire Wire Line
+	8500 5300 8650 5300
+Wire Wire Line
+	8650 5400 8500 5400
+Wire Wire Line
+	8500 5500 8650 5500
+Wire Wire Line
+	8650 5600 8500 5600
+Wire Wire Line
+	8500 5700 8650 5700
+Wire Wire Line
+	8650 5800 8500 5800
+Wire Wire Line
+	7900 5800 7750 5800
+Wire Wire Line
+	7750 5700 7900 5700
+Wire Wire Line
+	7900 5600 7750 5600
+Wire Wire Line
+	7750 5500 7900 5500
+Wire Wire Line
+	7900 5400 7750 5400
+Wire Wire Line
+	7750 5300 7900 5300
+Text Label 8400 4250 0    50   ~ 0
+CS1_OUT
+Text Label 8400 4350 0    50   ~ 0
+CS2_OUT
+Text Label 8400 4450 0    50   ~ 0
+CS3_OUT
+Text Label 8400 4550 0    50   ~ 0
+CS4_OUT
+Text Label 8400 4650 0    50   ~ 0
+CS5_OUT
+Text Label 8400 4750 0    50   ~ 0
+CS6_OUT
 $EndSCHEMATC
