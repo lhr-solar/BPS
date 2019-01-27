@@ -1,5 +1,4 @@
 EESchema Schematic File Version 4
-LIBS:Temper Board-cache
 EELAYER 26 0
 EELAYER END
 $Descr A4 11693 8268
@@ -1454,4 +1453,136 @@ Wire Wire Line
 	10400 5550 10300 5550
 Text Notes 9650 650  0    50   ~ 0
 CT2196MST-ND  : 6 position dip switch
+Text Label 1300 700  2    50   ~ 0
+CH1_LPF
+Text Label 1300 1800 2    50   ~ 0
+CH2_LPF
+Text Label 1300 2900 2    50   ~ 0
+CH3_LPF
+Text Label 1300 4000 2    50   ~ 0
+CH4_LPF
+Text Label 1300 5100 2    50   ~ 0
+CH5_LPF
+Text Label 1300 6200 2    50   ~ 0
+CH6_LPF
+Text Label 1900 700  2    50   ~ 0
+CH7_LPF
+Text Label 1900 1800 2    50   ~ 0
+CH8_LPF
+Text Label 1900 2900 2    50   ~ 0
+CH9_LPF
+Text Label 1900 4000 2    50   ~ 0
+CH10_LPF
+Text Label 1900 5100 2    50   ~ 0
+CH11_LPF
+Text Label 1900 6200 2    50   ~ 0
+CH12_LPF
+Text Label 2450 700  2    50   ~ 0
+CH13_LPF
+Text Label 2450 1800 2    50   ~ 0
+CH14_LPF
+Text Label 2450 2900 2    50   ~ 0
+CH15_LPF
+Text Label 2450 4000 2    50   ~ 0
+CH16_LPF
+Text Label 2450 5100 2    50   ~ 0
+CH17_LPF
+Text Label 2450 6200 2    50   ~ 0
+CH18_LPF
+Text Label 3000 700  2    50   ~ 0
+CH19_LPF
+Text Label 3000 1800 2    50   ~ 0
+CH20_LPF
+Text Label 5650 2400 2    50   ~ 0
+CH1
+Text Label 5650 2500 2    50   ~ 0
+CH2
+Text Label 5650 2600 2    50   ~ 0
+CH3
+Text Label 5650 2700 2    50   ~ 0
+CH4
+Text Label 5650 2800 2    50   ~ 0
+CH5
+Text Label 5650 2900 2    50   ~ 0
+CH6
+Text Label 5650 3000 2    50   ~ 0
+CH7
+Text Label 5650 3100 2    50   ~ 0
+CH8
+Text Label 5650 3200 2    50   ~ 0
+CH9
+Text Label 5650 3300 2    50   ~ 0
+CH10
+Text Label 5650 3400 2    50   ~ 0
+CH11
+Text Label 5650 3500 2    50   ~ 0
+CH12
+Text Label 5650 3600 2    50   ~ 0
+CH13
+Text Label 5650 3700 2    50   ~ 0
+CH14
+Text Label 5650 3800 2    50   ~ 0
+CH15
+Text Label 5650 3900 2    50   ~ 0
+CH16
+Text Label 5650 4000 2    50   ~ 0
+CH17
+Text Label 5650 4100 2    50   ~ 0
+CH18
+Text Label 5650 4200 2    50   ~ 0
+CH19
+Text Label 5650 4300 2    50   ~ 0
+CH20
+Wire Wire Line
+	5650 2400 5800 2400
+Wire Wire Line
+	5650 2500 5800 2500
+Wire Wire Line
+	5800 2600 5650 2600
+Wire Wire Line
+	5650 2700 5800 2700
+Wire Wire Line
+	5800 2800 5650 2800
+Wire Wire Line
+	5650 2900 5800 2900
+Wire Wire Line
+	5800 3000 5650 3000
+Wire Wire Line
+	5650 3100 5800 3100
+Wire Wire Line
+	5800 3200 5650 3200
+Wire Wire Line
+	5650 3300 5800 3300
+Wire Wire Line
+	5800 3400 5650 3400
+Wire Wire Line
+	5650 3500 5800 3500
+Wire Wire Line
+	5650 3600 5800 3600
+Wire Wire Line
+	5650 3700 5800 3700
+Wire Wire Line
+	5650 3800 5800 3800
+Wire Wire Line
+	5800 3900 5650 3900
+Wire Wire Line
+	5650 4000 5800 4000
+Wire Wire Line
+	5800 4100 5650 4100
+Wire Wire Line
+	5650 4200 5800 4200
+Wire Wire Line
+	5800 4300 5650 4300
+Text Label 7550 4200 0    50   ~ 0
+MISO
+Text Label 7550 4300 0    50   ~ 0
+MOSI
+Text Label 7550 4400 0    50   ~ 0
+SCK
+Wire Wire Line
+	7400 4200 7550 4200
+Wire Wire Line
+	7550 4300 7400 4300
+Wire Wire Line
+	7400 4400 7550 4400
 $EndSCHEMATC
