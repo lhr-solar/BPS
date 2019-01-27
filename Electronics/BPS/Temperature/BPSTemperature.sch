@@ -1,5 +1,4 @@
 EESchema Schematic File Version 4
-LIBS:Temper Board-cache
 EELAYER 26 0
 EELAYER END
 $Descr A4 11693 8268
@@ -23,17 +22,6 @@ F 1 "LTC2983" H 6600 4987 50  0000 C CNN
 F 2 "Package_QFP:LQFP-48_7x7mm_P0.5mm" H 5850 4700 50  0001 C CNN
 F 3 "http://cds.linear.com/docs/en/datasheet/2983fc.pdf" H 6600 3500 50  0001 C CNN
 	1    6600 3500
-	1    0    0    -1  
-$EndComp
-$Comp
-L power:+5V #PWR?
-U 1 1 5C4CC3F1
-P 6600 1750
-F 0 "#PWR?" H 6600 1600 50  0001 C CNN
-F 1 "+5V" H 6615 1923 50  0000 C CNN
-F 2 "" H 6600 1750 50  0001 C CNN
-F 3 "" H 6600 1750 50  0001 C CNN
-	1    6600 1750
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
@@ -110,17 +98,6 @@ F 3 "~" H 7750 3650 50  0001 C CNN
 $EndComp
 $Comp
 L Device:C C?
-U 1 1 5C4CC859
-P 9550 1850
-F 0 "C?" H 9665 1896 50  0000 L CNN
-F 1 "C" H 9665 1805 50  0000 L CNN
-F 2 "" H 9588 1700 50  0001 C CNN
-F 3 "~" H 9550 1850 50  0001 C CNN
-	1    9550 1850
-	1    0    0    -1  
-$EndComp
-$Comp
-L Device:C C?
 U 1 1 5C4CC88B
 P 7500 2550
 F 0 "C?" H 7615 2596 50  0000 L CNN
@@ -145,17 +122,6 @@ Wire Wire Line
 	7400 2400 7500 2400
 Wire Wire Line
 	7500 2700 7400 2700
-$Comp
-L power:GND #PWR?
-U 1 1 5C4CCB2D
-P 9850 1750
-F 0 "#PWR?" H 9850 1500 50  0001 C CNN
-F 1 "GND" H 9855 1577 50  0000 C CNN
-F 2 "" H 9850 1750 50  0001 C CNN
-F 3 "" H 9850 1750 50  0001 C CNN
-	1    9850 1750
-	1    0    0    -1  
-$EndComp
 $Comp
 L power:GND #PWR?
 U 1 1 5C4CCEAB
@@ -300,50 +266,6 @@ Wire Wire Line
 	8050 2800 8150 2800
 Wire Wire Line
 	7750 2800 7400 2800
-$Comp
-L Device:R R?
-U 1 1 5C4D96FF
-P 9100 1000
-F 0 "R?" H 9170 1046 50  0000 L CNN
-F 1 "1k" H 9170 955 50  0000 L CNN
-F 2 "" V 9030 1000 50  0001 C CNN
-F 3 "~" H 9100 1000 50  0001 C CNN
-	1    9100 1000
-	1    0    0    -1  
-$EndComp
-$Comp
-L Device:C C?
-U 1 1 5C4D97A0
-P 9100 1450
-F 0 "C?" H 9215 1496 50  0000 L CNN
-F 1 "1uF" H 9215 1405 50  0000 L CNN
-F 2 "" H 9138 1300 50  0001 C CNN
-F 3 "~" H 9100 1450 50  0001 C CNN
-	1    9100 1450
-	1    0    0    -1  
-$EndComp
-$Comp
-L power:GND #PWR?
-U 1 1 5C4D9F5A
-P 9100 1700
-F 0 "#PWR?" H 9100 1450 50  0001 C CNN
-F 1 "GND" H 9105 1527 50  0000 C CNN
-F 2 "" H 9100 1700 50  0001 C CNN
-F 3 "" H 9100 1700 50  0001 C CNN
-	1    9100 1700
-	1    0    0    -1  
-$EndComp
-Wire Wire Line
-	9100 850  8900 850 
-Wire Wire Line
-	9100 1700 9100 1600
-Wire Wire Line
-	9100 1150 9100 1200
-Wire Wire Line
-	9100 1200 9200 1200
-Connection ~ 9100 1200
-Wire Wire Line
-	9100 1200 9100 1300
 $Comp
 L Device:R R?
 U 1 1 5C4DF311
@@ -1454,4 +1376,242 @@ Wire Wire Line
 	10400 5550 10300 5550
 Text Notes 9650 650  0    50   ~ 0
 CT2196MST-ND  : 6 position dip switch
+Text Label 1300 700  2    50   ~ 0
+CH1_LPF
+Text Label 1300 1800 2    50   ~ 0
+CH2_LPF
+Text Label 1300 2900 2    50   ~ 0
+CH3_LPF
+Text Label 1300 4000 2    50   ~ 0
+CH4_LPF
+Text Label 1300 5100 2    50   ~ 0
+CH5_LPF
+Text Label 1300 6200 2    50   ~ 0
+CH6_LPF
+Text Label 1900 700  2    50   ~ 0
+CH7_LPF
+Text Label 1900 1800 2    50   ~ 0
+CH8_LPF
+Text Label 1900 2900 2    50   ~ 0
+CH9_LPF
+Text Label 1900 4000 2    50   ~ 0
+CH10_LPF
+Text Label 1900 5100 2    50   ~ 0
+CH11_LPF
+Text Label 1900 6200 2    50   ~ 0
+CH12_LPF
+Text Label 2450 700  2    50   ~ 0
+CH13_LPF
+Text Label 2450 1800 2    50   ~ 0
+CH14_LPF
+Text Label 2450 2900 2    50   ~ 0
+CH15_LPF
+Text Label 2450 4000 2    50   ~ 0
+CH16_LPF
+Text Label 2450 5100 2    50   ~ 0
+CH17_LPF
+Text Label 2450 6200 2    50   ~ 0
+CH18_LPF
+Text Label 3000 700  2    50   ~ 0
+CH19_LPF
+Text Label 3000 1800 2    50   ~ 0
+CH20_LPF
+Text Label 5650 2400 2    50   ~ 0
+CH1
+Text Label 5650 2500 2    50   ~ 0
+CH2
+Text Label 5650 2600 2    50   ~ 0
+CH3
+Text Label 5650 2700 2    50   ~ 0
+CH4
+Text Label 5650 2800 2    50   ~ 0
+CH5
+Text Label 5650 2900 2    50   ~ 0
+CH6
+Text Label 5650 3000 2    50   ~ 0
+CH7
+Text Label 5650 3100 2    50   ~ 0
+CH8
+Text Label 5650 3200 2    50   ~ 0
+CH9
+Text Label 5650 3300 2    50   ~ 0
+CH10
+Text Label 5650 3400 2    50   ~ 0
+CH11
+Text Label 5650 3500 2    50   ~ 0
+CH12
+Text Label 5650 3600 2    50   ~ 0
+CH13
+Text Label 5650 3700 2    50   ~ 0
+CH14
+Text Label 5650 3800 2    50   ~ 0
+CH15
+Text Label 5650 3900 2    50   ~ 0
+CH16
+Text Label 5650 4000 2    50   ~ 0
+CH17
+Text Label 5650 4100 2    50   ~ 0
+CH18
+Text Label 5650 4200 2    50   ~ 0
+CH19
+Text Label 5650 4300 2    50   ~ 0
+CH20
+Wire Wire Line
+	5650 2400 5800 2400
+Wire Wire Line
+	5650 2500 5800 2500
+Wire Wire Line
+	5800 2600 5650 2600
+Wire Wire Line
+	5650 2700 5800 2700
+Wire Wire Line
+	5800 2800 5650 2800
+Wire Wire Line
+	5650 2900 5800 2900
+Wire Wire Line
+	5800 3000 5650 3000
+Wire Wire Line
+	5650 3100 5800 3100
+Wire Wire Line
+	5800 3200 5650 3200
+Wire Wire Line
+	5650 3300 5800 3300
+Wire Wire Line
+	5800 3400 5650 3400
+Wire Wire Line
+	5650 3500 5800 3500
+Wire Wire Line
+	5650 3600 5800 3600
+Wire Wire Line
+	5650 3700 5800 3700
+Wire Wire Line
+	5650 3800 5800 3800
+Wire Wire Line
+	5800 3900 5650 3900
+Wire Wire Line
+	5650 4000 5800 4000
+Wire Wire Line
+	5800 4100 5650 4100
+Wire Wire Line
+	5650 4200 5800 4200
+Wire Wire Line
+	5800 4300 5650 4300
+Text Label 7550 4200 0    50   ~ 0
+MISO
+Text Label 7550 4300 0    50   ~ 0
+MOSI
+Text Label 7550 4400 0    50   ~ 0
+SCK
+Wire Wire Line
+	7400 4200 7550 4200
+Wire Wire Line
+	7550 4300 7400 4300
+Wire Wire Line
+	7400 4400 7550 4400
+Wire Wire Line
+	7850 4250 8400 4250
+Wire Wire Line
+	7950 4350 8400 4350
+Wire Wire Line
+	8050 4450 8400 4450
+Wire Wire Line
+	8050 4550 8400 4550
+Wire Wire Line
+	8050 4450 8050 4500
+Wire Wire Line
+	7950 4650 8400 4650
+Wire Wire Line
+	7950 4350 7950 4500
+Wire Wire Line
+	7850 4750 8400 4750
+Wire Wire Line
+	7850 4250 7850 4500
+Wire Wire Line
+	8050 4500 7950 4500
+Connection ~ 8050 4500
+Wire Wire Line
+	8050 4500 8050 4550
+Connection ~ 7950 4500
+Wire Wire Line
+	7950 4500 7950 4650
+Wire Wire Line
+	7850 4500 7950 4500
+Connection ~ 7850 4500
+Wire Wire Line
+	7850 4500 7850 4750
+Wire Wire Line
+	7850 4500 7400 4500
+$Comp
+L Switch:SW_DIP_x06 SW?
+U 1 1 5C72A387
+P 8200 5600
+F 0 "SW?" H 8200 6167 50  0000 C CNN
+F 1 "SW_DIP_x06" H 8200 6076 50  0000 C CNN
+F 2 "" H 8200 5600 50  0001 C CNN
+F 3 "" H 8200 5600 50  0001 C CNN
+	1    8200 5600
+	1    0    0    -1  
+$EndComp
+Text Label 7750 5300 2    50   ~ 0
+CS1
+Text Label 7750 5400 2    50   ~ 0
+CS2
+Text Label 7750 5500 2    50   ~ 0
+CS3
+Text Label 7750 5600 2    50   ~ 0
+CS4
+Text Label 7750 5700 2    50   ~ 0
+CS5
+Text Label 7750 5800 2    50   ~ 0
+CS6
+Text Label 8650 5300 0    50   ~ 0
+CS1_OUT
+Text Label 8650 5400 0    50   ~ 0
+CS2_OUT
+Text Label 8650 5500 0    50   ~ 0
+CS3_OUT
+Text Label 8650 5600 0    50   ~ 0
+CS4_OUT
+Text Label 8650 5700 0    50   ~ 0
+CS5_OUT
+Text Label 8650 5800 0    50   ~ 0
+CS6_OUT
+Wire Wire Line
+	8500 5300 8650 5300
+Wire Wire Line
+	8650 5400 8500 5400
+Wire Wire Line
+	8500 5500 8650 5500
+Wire Wire Line
+	8650 5600 8500 5600
+Wire Wire Line
+	8500 5700 8650 5700
+Wire Wire Line
+	8650 5800 8500 5800
+Wire Wire Line
+	7900 5800 7750 5800
+Wire Wire Line
+	7750 5700 7900 5700
+Wire Wire Line
+	7900 5600 7750 5600
+Wire Wire Line
+	7750 5500 7900 5500
+Wire Wire Line
+	7900 5400 7750 5400
+Wire Wire Line
+	7750 5300 7900 5300
+Text Label 8400 4250 0    50   ~ 0
+CS1_OUT
+Text Label 8400 4350 0    50   ~ 0
+CS2_OUT
+Text Label 8400 4450 0    50   ~ 0
+CS3_OUT
+Text Label 8400 4550 0    50   ~ 0
+CS4_OUT
+Text Label 8400 4650 0    50   ~ 0
+CS5_OUT
+Text Label 8400 4750 0    50   ~ 0
+CS6_OUT
+Text Label 6600 1750 1    50   ~ 0
+5V
 $EndSCHEMATC
