@@ -1179,26 +1179,22 @@ Text Notes 1050 4800 0    50   ~ 0
 $Comp
 L Connector_Generic:Conn_01x04 J3
 U 1 1 5CA1D80F
-P 8950 5550
-F 0 "J3" H 9029 5542 50  0000 L CNN
-F 1 "CurrentSlaveConnector" H 9029 5451 50  0000 L CNN
-F 2 "UTSVT_Connectors:Molex_MicroFit3.0_1x4xP3.00mm_PolarizingPeg_Vertical" H 8950 5550 50  0001 C CNN
-F 3 "~" H 8950 5550 50  0001 C CNN
-	1    8950 5550
+P 9450 5550
+F 0 "J3" H 9529 5542 50  0000 L CNN
+F 1 "CurrentSlaveConnector" H 9529 5451 50  0000 L CNN
+F 2 "UTSVT_Connectors:Molex_MicroFit3.0_1x4xP3.00mm_PolarizingPeg_Vertical" H 9450 5550 50  0001 C CNN
+F 3 "~" H 9450 5550 50  0001 C CNN
+	1    9450 5550
 	1    0    0    -1  
 $EndComp
 Text Notes 8150 5100 0    100  ~ 20
 Current Board
 Wire Wire Line
 	8750 5650 8550 5650
-Wire Wire Line
-	8750 5750 8550 5750
 Text Label 7350 5750 0    50   ~ 0
 ADC1_CH2
 Text Label 7350 5650 0    50   ~ 0
 ADC1_CH3
-Wire Wire Line
-	8750 5550 8300 5550
 Wire Wire Line
 	8700 5350 8700 5450
 Wire Wire Line
@@ -1233,8 +1229,6 @@ Connection ~ 8300 5550
 Wire Wire Line
 	8300 5550 8250 5550
 Connection ~ 8700 5450
-Wire Wire Line
-	8700 5450 8750 5450
 Wire Wire Line
 	3950 6100 3950 6050
 Connection ~ 3950 6050
@@ -1459,6 +1453,38 @@ Wire Wire Line
 	2000 7250 2500 7250
 Text Label 2500 7250 2    50   ~ 0
 RUN
+$Comp
+L Device:Ferrite_Bead_Small L5
+U 1 1 5C515416
+P 8850 5650
+F 0 "L5" V 8800 5550 50  0000 C CNN
+F 1 "600" V 8800 5800 50  0000 C CNN
+F 2 "Inductor_SMD:L_0805_2012Metric" V 8780 5650 50  0001 C CNN
+F 3 "~" H 8850 5650 50  0001 C CNN
+	1    8850 5650
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	8950 5650 9250 5650
+Wire Wire Line
+	8300 5550 9250 5550
+Wire Wire Line
+	8700 5450 9250 5450
+$Comp
+L Device:Ferrite_Bead_Small L6
+U 1 1 5C53EB53
+P 9050 5750
+F 0 "L6" V 9000 5650 50  0000 C CNN
+F 1 "600" V 9000 5900 50  0000 C CNN
+F 2 "Inductor_SMD:L_0805_2012Metric" V 8980 5750 50  0001 C CNN
+F 3 "~" H 9050 5750 50  0001 C CNN
+	1    9050 5750
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	9150 5750 9250 5750
+Wire Wire Line
+	8550 5750 8950 5750
 Wire Bus Line
 	7000 2250 7000 2550
 Wire Bus Line
