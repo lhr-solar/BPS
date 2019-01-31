@@ -1102,7 +1102,7 @@ Wire Wire Line
 Wire Wire Line
 	8600 5300 8500 5300
 Wire Wire Line
-	9550 5400 9100 5400
+	9550 5900 9100 5900
 $Comp
 L utsvt-bps:GND_A #PWR088
 U 1 1 5C5CEB11
@@ -1115,47 +1115,23 @@ F 3 "" H 9000 3650 50  0001 C CNN
 	0    -1   -1   0   
 $EndComp
 Wire Wire Line
-	9550 5700 9100 5700
+	9550 5600 9100 5600
 Wire Wire Line
-	9550 5800 9100 5800
+	9550 5500 9100 5500
 Wire Wire Line
-	9550 5900 9100 5900
-Text Label 9550 5400 2    50   ~ 0
-CONN7
-Text Label 9550 5500 2    50   ~ 0
-CONN8
-Text Label 9550 5600 2    50   ~ 0
-CONN9
-Text Label 9550 5700 2    50   ~ 0
-CONN10
-Text Label 9550 5800 2    50   ~ 0
-CONN11
+	9550 5400 9100 5400
 Text Label 9550 5900 2    50   ~ 0
-CONN12
-Wire Wire Line
-	10550 4350 10100 4350
-Wire Wire Line
-	10550 4250 10100 4250
-Wire Wire Line
-	10550 4150 10100 4150
-Wire Wire Line
-	10550 4050 10100 4050
-Wire Wire Line
-	10550 3950 10100 3950
-Wire Wire Line
-	10550 3850 10100 3850
-Text Label 10550 4350 2    50   ~ 0
-CONN7
-Text Label 10550 4250 2    50   ~ 0
-CONN8
-Text Label 10550 4150 2    50   ~ 0
-CONN9
-Text Label 10550 4050 2    50   ~ 0
-CONN10
-Text Label 10550 3950 2    50   ~ 0
-CONN11
-Text Label 10550 3850 2    50   ~ 0
-CONN12
+CS6
+Text Label 9550 5800 2    50   ~ 0
+CS5
+Text Label 9550 5700 2    50   ~ 0
+CS4
+Text Label 9550 5600 2    50   ~ 0
+CS3
+Text Label 9550 5500 2    50   ~ 0
+CS2
+Text Label 9550 5400 2    50   ~ 0
+CS1
 Text Notes 9600 4150 2    50   ~ 0
 MISO
 $Comp
@@ -1170,9 +1146,9 @@ F 3 "~" H 8950 5400 50  0001 C CNN
 	0    1    1    0   
 $EndComp
 Wire Wire Line
-	9550 5600 9100 5600
+	9550 5700 9100 5700
 Wire Wire Line
-	9550 5500 9100 5500
+	9550 5800 9100 5800
 Wire Wire Line
 	8500 5400 8800 5400
 $Comp
@@ -1674,6 +1650,30 @@ Wire Wire Line
 Wire Wire Line
 	9500 4250 9600 4250
 Connection ~ 9500 4350
+Wire Wire Line
+	10550 4350 10100 4350
+Wire Wire Line
+	10550 4050 10100 4050
+Wire Wire Line
+	10550 3950 10100 3950
+Wire Wire Line
+	10550 3850 10100 3850
+Text Label 10550 4350 2    50   ~ 0
+CS6
+Text Label 10550 4250 2    50   ~ 0
+CS5
+Text Label 10550 4150 2    50   ~ 0
+CS4
+Text Label 10550 4050 2    50   ~ 0
+CS3
+Text Label 10550 3950 2    50   ~ 0
+CS2
+Text Label 10550 3850 2    50   ~ 0
+CS1
+Wire Wire Line
+	10550 4150 10100 4150
+Wire Wire Line
+	10550 4250 10100 4250
 Wire Bus Line
 	6350 5400 6350 6000
 $EndSCHEMATC
