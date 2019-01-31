@@ -656,7 +656,7 @@ Entry Wire Line
 	5400 5300 5500 5200
 Entry Wire Line
 	5900 5300 6000 5200
-Text Label 5400 5300 3    50   ~ 0
+Text Label 6400 5300 3    50   ~ 0
 PA5
 Text Label 5900 5300 3    50   ~ 0
 PA6
@@ -889,7 +889,7 @@ Wire Wire Line
 	5900 6400 6400 6400
 Entry Wire Line
 	6400 5300 6500 5200
-Text Label 6400 5300 3    50   ~ 0
+Text Label 5400 5300 3    50   ~ 0
 PA7
 Text HLabel 1000 3850 0    50   Input ~ 0
 FAULT
@@ -897,10 +897,10 @@ Wire Wire Line
 	2950 5600 2950 5400
 Wire Wire Line
 	2950 5400 2200 5400
+Text HLabel 2200 5400 0    50   Input ~ 0
+RUN
 Wire Bus Line
 	5500 5200 6600 5200
 Wire Bus Line
 	2200 5200 4900 5200
-Text HLabel 2200 5400 0    50   Input ~ 0
-RUN
 $EndSCHEMATC
