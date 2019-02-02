@@ -467,7 +467,7 @@ F 3 "" H 1250 4250 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
-	1250 3400 1050 3400
+	1250 3400 1100 3400
 Wire Wire Line
 	1250 4250 1250 4150
 Wire Wire Line
@@ -887,8 +887,6 @@ F 3 "" H 1550 7250 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
-	1550 6400 1350 6400
-Wire Wire Line
 	1550 7250 1550 7150
 Wire Wire Line
 	1550 6700 1550 6750
@@ -1227,45 +1225,45 @@ Wire Wire Line
 	10400 5550 10300 5550
 Text Notes 7600 6000 0    50   ~ 0
  6 position dip switch : Omron A6s-610x
-Text Label 950  1650 2    50   ~ 0
+Text Label 950  2250 3    50   ~ 0
 CH1_LPF
-Text Label 1800 1650 2    50   ~ 0
+Text Label 1850 2200 3    50   ~ 0
 CH2_LPF
-Text Label 2750 1650 2    50   ~ 0
+Text Label 2800 2350 3    50   ~ 0
 CH3_LPF
-Text Label 3700 1650 2    50   ~ 0
+Text Label 3800 2300 3    50   ~ 0
 CH4_LPF
-Text Label 4500 1650 2    50   ~ 0
+Text Label 4500 2350 3    50   ~ 0
 CH5_LPF
-Text Label 1050 3400 2    50   ~ 0
+Text Label 1050 4000 2    50   ~ 0
 CH6_LPF
-Text Label 1950 3400 2    50   ~ 0
+Text Label 1900 4050 2    50   ~ 0
 CH7_LPF
-Text Label 2850 3400 2    50   ~ 0
+Text Label 2800 4050 2    50   ~ 0
 CH8_LPF
-Text Label 3750 3400 2    50   ~ 0
+Text Label 3700 4150 2    50   ~ 0
 CH9_LPF
-Text Label 4600 3400 2    50   ~ 0
+Text Label 4550 4150 2    50   ~ 0
 CH10_LPF
-Text Label 1100 5000 2    50   ~ 0
+Text Label 1050 5650 2    50   ~ 0
 CH11_LPF
-Text Label 2000 5000 2    50   ~ 0
+Text Label 1950 5650 2    50   ~ 0
 CH12_LPF
-Text Label 2900 4950 2    50   ~ 0
+Text Label 2850 5650 2    50   ~ 0
 CH13_LPF
-Text Label 3800 4950 2    50   ~ 0
+Text Label 3750 5600 2    50   ~ 0
 CH14_LPF
-Text Label 4650 4950 2    50   ~ 0
+Text Label 4600 5500 2    50   ~ 0
 CH15_LPF
-Text Label 1350 6400 2    50   ~ 0
+Text Label 1300 7050 2    50   ~ 0
 CH16_LPF
-Text Label 2250 6400 2    50   ~ 0
+Text Label 2200 7100 2    50   ~ 0
 CH17_LPF
-Text Label 3150 6400 2    50   ~ 0
+Text Label 3050 7050 2    50   ~ 0
 CH18_LPF
-Text Label 4050 6400 2    50   ~ 0
+Text Label 4000 7050 2    50   ~ 0
 CH19_LPF
-Text Label 4900 6400 2    50   ~ 0
+Text Label 4850 7150 2    50   ~ 0
 CH20_LPF
 Wire Wire Line
 	5800 4300 5650 4300
@@ -1621,8 +1619,6 @@ Wire Wire Line
 Wire Wire Line
 	5650 2400 5650 1300
 Wire Wire Line
-	5650 1300 1750 1300
-Wire Wire Line
 	1350 1300 1350 2000
 Wire Wire Line
 	1350 2000 1150 2000
@@ -1650,8 +1646,6 @@ Wire Wire Line
 Wire Wire Line
 	5500 1450 4200 1450
 Wire Wire Line
-	3900 2000 4100 2000
-Wire Wire Line
 	5500 2700 5800 2700
 Wire Wire Line
 	5450 2800 5450 2000
@@ -1664,11 +1658,7 @@ Wire Wire Line
 Wire Wire Line
 	5800 2900 1450 2900
 Wire Wire Line
-	1450 2900 1450 3000
-Wire Wire Line
 	5800 3000 2350 3000
-Wire Wire Line
-	2350 3000 2350 3050
 Wire Wire Line
 	3050 3750 3250 3750
 Wire Wire Line
@@ -1718,8 +1708,6 @@ Wire Wire Line
 Wire Wire Line
 	5400 4700 5050 4700
 Wire Wire Line
-	5050 4700 5050 4750
-Wire Wire Line
 	4850 5300 5050 5300
 Wire Wire Line
 	5400 3800 5800 3800
@@ -1742,15 +1730,11 @@ Wire Wire Line
 Wire Wire Line
 	5500 6150 2700 6150
 Wire Wire Line
-	2700 6150 2700 6300
-Wire Wire Line
 	2450 6750 2700 6750
 Wire Wire Line
 	5500 4000 5500 6150
 Wire Wire Line
 	5550 6200 3600 6200
-Wire Wire Line
-	3600 6200 3600 6350
 Wire Wire Line
 	3350 6750 3600 6750
 Wire Wire Line
@@ -1758,15 +1742,11 @@ Wire Wire Line
 Wire Wire Line
 	5600 6250 4500 6250
 Wire Wire Line
-	4500 6250 4500 6400
-Wire Wire Line
 	4250 6750 4500 6750
 Wire Wire Line
 	5600 4200 5600 6250
 Wire Wire Line
 	5650 6300 5350 6300
-Wire Wire Line
-	5350 6300 5350 6350
 Wire Wire Line
 	5100 6750 5350 6750
 Wire Wire Line
@@ -1818,26 +1798,24 @@ $EndComp
 $Comp
 L Device:Ferrite_Bead L3
 U 1 1 5C554A06
-P 1600 1300
-F 0 "L3" V 1326 1300 50  0000 C CNN
-F 1 "Ferrite_Bead" V 1417 1300 50  0000 C CNN
-F 2 "Inductor_SMD:L_0805_2012Metric" V 1530 1300 50  0001 C CNN
-F 3 "~" H 1600 1300 50  0001 C CNN
-	1    1600 1300
-	0    1    1    0   
+P 950 2000
+F 0 "L3" V 676 2000 50  0000 C CNN
+F 1 "Ferrite_Bead" V 767 2000 50  0000 C CNN
+F 2 "Inductor_SMD:L_0805_2012Metric" V 880 2000 50  0001 C CNN
+F 3 "~" H 950 2000 50  0001 C CNN
+	1    950  2000
+	1    0    0    -1  
 $EndComp
-Wire Wire Line
-	1450 1300 1350 1300
 $Comp
 L Device:Ferrite_Bead L5
 U 1 1 5C554AFF
-P 2250 1500
-F 0 "L5" V 2100 1250 50  0000 C CNN
-F 1 "Ferrite_Bead" V 2200 1200 50  0000 C CNN
-F 2 "Inductor_SMD:L_0805_2012Metric" V 2180 1500 50  0001 C CNN
-F 3 "~" H 2250 1500 50  0001 C CNN
-	1    2250 1500
-	0    1    1    0   
+P 1800 1950
+F 0 "L5" V 1650 1700 50  0000 C CNN
+F 1 "Ferrite_Bead" V 1750 1650 50  0000 C CNN
+F 2 "Inductor_SMD:L_0805_2012Metric" V 1730 1950 50  0001 C CNN
+F 3 "~" H 1800 1950 50  0001 C CNN
+	1    1800 1950
+	1    0    0    -1  
 $EndComp
 Wire Wire Line
 	2200 2000 2200 1650
@@ -1846,19 +1824,17 @@ Wire Wire Line
 Wire Wire Line
 	2100 1650 2100 1500
 Wire Wire Line
-	2400 1500 2600 1500
-Wire Wire Line
 	2600 1500 2600 1350
 $Comp
 L Device:Ferrite_Bead L9
 U 1 1 5C58CB4C
-P 3200 1550
-F 0 "L9" V 3050 1300 50  0000 C CNN
-F 1 "Ferrite_Bead" V 3150 1250 50  0000 C CNN
-F 2 "Inductor_SMD:L_0805_2012Metric" V 3130 1550 50  0001 C CNN
-F 3 "~" H 3200 1550 50  0001 C CNN
-	1    3200 1550
-	0    1    1    0   
+P 2750 2050
+F 0 "L9" V 2600 1800 50  0000 C CNN
+F 1 "Ferrite_Bead" V 2700 1750 50  0000 C CNN
+F 2 "Inductor_SMD:L_0805_2012Metric" V 2680 2050 50  0001 C CNN
+F 3 "~" H 2750 2050 50  0001 C CNN
+	1    2750 2050
+	1    0    0    -1  
 $EndComp
 Wire Wire Line
 	3150 1700 3050 1700
@@ -1871,241 +1847,195 @@ Wire Wire Line
 $Comp
 L Device:Ferrite_Bead L13
 U 1 1 5C5FDDD4
-P 4050 1550
-F 0 "L13" V 4150 1650 50  0000 C CNN
-F 1 "Ferrite_Bead" V 4000 1250 50  0000 C CNN
-F 2 "Inductor_SMD:L_0805_2012Metric" V 3980 1550 50  0001 C CNN
-F 3 "~" H 4050 1550 50  0001 C CNN
-	1    4050 1550
-	0    1    1    0   
+P 3700 2050
+F 0 "L13" V 3800 2150 50  0000 C CNN
+F 1 "Ferrite_Bead" V 3650 1750 50  0000 C CNN
+F 2 "Inductor_SMD:L_0805_2012Metric" V 3630 2050 50  0001 C CNN
+F 3 "~" H 3700 2050 50  0001 C CNN
+	1    3700 2050
+	1    0    0    -1  
 $EndComp
-Wire Wire Line
-	4200 1550 4200 1450
-Wire Wire Line
-	4100 2000 4100 1700
-Wire Wire Line
-	4100 1700 3950 1700
-Wire Wire Line
-	3950 1700 3950 1600
-Wire Wire Line
-	3950 1600 3900 1600
-Wire Wire Line
-	3900 1600 3900 1550
 $Comp
 L Device:Ferrite_Bead L19
 U 1 1 5C654B22
-P 5200 2000
-F 0 "L19" V 4900 2000 50  0000 C CNN
-F 1 "Ferrite_Bead" V 5000 2000 50  0000 C CNN
-F 2 "Inductor_SMD:L_0805_2012Metric" V 5130 2000 50  0001 C CNN
-F 3 "~" H 5200 2000 50  0001 C CNN
-	1    5200 2000
-	0    1    1    0   
+P 4500 2100
+F 0 "L19" V 4200 2100 50  0000 C CNN
+F 1 "Ferrite_Bead" V 4300 2100 50  0000 C CNN
+F 2 "Inductor_SMD:L_0805_2012Metric" V 4430 2100 50  0001 C CNN
+F 3 "~" H 4500 2100 50  0001 C CNN
+	1    4500 2100
+	1    0    0    -1  
 $EndComp
 $Comp
 L Device:Ferrite_Bead L1
 U 1 1 5C672A7D
-P 1450 3150
-F 0 "L1" H 1587 3196 50  0000 L CNN
-F 1 "Ferrite_Bead" H 1587 3105 50  0000 L CNN
-F 2 "Inductor_SMD:L_0805_2012Metric" V 1380 3150 50  0001 C CNN
-F 3 "~" H 1450 3150 50  0001 C CNN
-	1    1450 3150
-	1    0    0    -1  
+P 1100 3800
+F 0 "L1" H 1237 3846 50  0000 L CNN
+F 1 "Ferrite_Bead" H 1237 3755 50  0000 L CNN
+F 2 "Inductor_SMD:L_0805_2012Metric" V 1030 3800 50  0001 C CNN
+F 3 "~" H 1100 3800 50  0001 C CNN
+	1    1100 3800
+	-1   0    0    1   
 $EndComp
-Wire Wire Line
-	1450 3300 1450 3750
 $Comp
 L Device:Ferrite_Bead L6
 U 1 1 5C672B35
-P 2350 3200
-F 0 "L6" H 2487 3246 50  0000 L CNN
-F 1 "Ferrite_Bead" H 2487 3155 50  0000 L CNN
-F 2 "Inductor_SMD:L_0805_2012Metric" V 2280 3200 50  0001 C CNN
-F 3 "~" H 2350 3200 50  0001 C CNN
-	1    2350 3200
-	1    0    0    -1  
+P 1950 3850
+F 0 "L6" H 2087 3896 50  0000 L CNN
+F 1 "Ferrite_Bead" H 2087 3805 50  0000 L CNN
+F 2 "Inductor_SMD:L_0805_2012Metric" V 1880 3850 50  0001 C CNN
+F 3 "~" H 1950 3850 50  0001 C CNN
+	1    1950 3850
+	-1   0    0    1   
 $EndComp
-Wire Wire Line
-	2350 3350 2350 3750
 $Comp
 L Device:Ferrite_Bead L10
 U 1 1 5C67314F
-P 3250 3250
-F 0 "L10" H 3387 3296 50  0000 L CNN
-F 1 "Ferrite_Bead" H 3387 3205 50  0000 L CNN
-F 2 "Inductor_SMD:L_0805_2012Metric" V 3180 3250 50  0001 C CNN
-F 3 "~" H 3250 3250 50  0001 C CNN
-	1    3250 3250
-	1    0    0    -1  
+P 2850 3850
+F 0 "L10" H 2987 3896 50  0000 L CNN
+F 1 "Ferrite_Bead" H 2987 3805 50  0000 L CNN
+F 2 "Inductor_SMD:L_0805_2012Metric" V 2780 3850 50  0001 C CNN
+F 3 "~" H 2850 3850 50  0001 C CNN
+	1    2850 3850
+	-1   0    0    1   
 $EndComp
-Wire Wire Line
-	3250 3400 3250 3750
 $Comp
 L Device:Ferrite_Bead L14
 U 1 1 5C6732CA
-P 4150 3350
-F 0 "L14" H 4000 3500 50  0000 L CNN
-F 1 "Ferrite_Bead" H 4200 3200 50  0000 L CNN
-F 2 "Inductor_SMD:L_0805_2012Metric" V 4080 3350 50  0001 C CNN
-F 3 "~" H 4150 3350 50  0001 C CNN
-	1    4150 3350
-	1    0    0    -1  
+P 3750 3950
+F 0 "L14" H 3600 4100 50  0000 L CNN
+F 1 "Ferrite_Bead" H 3800 3800 50  0000 L CNN
+F 2 "Inductor_SMD:L_0805_2012Metric" V 3680 3950 50  0001 C CNN
+F 3 "~" H 3750 3950 50  0001 C CNN
+	1    3750 3950
+	-1   0    0    1   
 $EndComp
-Wire Wire Line
-	4150 3500 4150 3750
 $Comp
 L Device:Ferrite_Bead L17
 U 1 1 5C6737F5
-P 5050 3450
-F 0 "L17" H 4800 3650 50  0000 L CNN
-F 1 "Ferrite_Bead" H 4550 3600 50  0000 L CNN
-F 2 "Inductor_SMD:L_0805_2012Metric" V 4980 3450 50  0001 C CNN
-F 3 "~" H 5050 3450 50  0001 C CNN
-	1    5050 3450
+P 4600 3950
+F 0 "L17" H 4350 4150 50  0000 L CNN
+F 1 "Ferrite_Bead" H 4100 4100 50  0000 L CNN
+F 2 "Inductor_SMD:L_0805_2012Metric" V 4530 3950 50  0001 C CNN
+F 3 "~" H 4600 3950 50  0001 C CNN
+	1    4600 3950
 	1    0    0    -1  
 $EndComp
-Wire Wire Line
-	5050 3600 5050 3750
 $Comp
 L Device:Ferrite_Bead L2
 U 1 1 5C673A75
-P 1550 4650
-F 0 "L2" H 1687 4696 50  0000 L CNN
-F 1 "Ferrite_Bead" H 1687 4605 50  0000 L CNN
-F 2 "Inductor_SMD:L_0805_2012Metric" V 1480 4650 50  0001 C CNN
-F 3 "~" H 1550 4650 50  0001 C CNN
-	1    1550 4650
-	1    0    0    -1  
+P 1100 5450
+F 0 "L2" H 1237 5496 50  0000 L CNN
+F 1 "Ferrite_Bead" H 1237 5405 50  0000 L CNN
+F 2 "Inductor_SMD:L_0805_2012Metric" V 1030 5450 50  0001 C CNN
+F 3 "~" H 1100 5450 50  0001 C CNN
+	1    1100 5450
+	-1   0    0    1   
 $EndComp
-Wire Wire Line
-	1550 4800 1550 5350
 $Comp
 L Device:Ferrite_Bead L7
 U 1 1 5C673B37
-P 2450 4700
-F 0 "L7" H 2587 4746 50  0000 L CNN
-F 1 "Ferrite_Bead" H 2587 4655 50  0000 L CNN
-F 2 "Inductor_SMD:L_0805_2012Metric" V 2380 4700 50  0001 C CNN
-F 3 "~" H 2450 4700 50  0001 C CNN
-	1    2450 4700
-	1    0    0    -1  
+P 2000 5450
+F 0 "L7" H 2137 5496 50  0000 L CNN
+F 1 "Ferrite_Bead" H 2137 5405 50  0000 L CNN
+F 2 "Inductor_SMD:L_0805_2012Metric" V 1930 5450 50  0001 C CNN
+F 3 "~" H 2000 5450 50  0001 C CNN
+	1    2000 5450
+	-1   0    0    1   
 $EndComp
-Wire Wire Line
-	2450 4850 2450 5350
 $Comp
 L Device:Ferrite_Bead L11
 U 1 1 5C673BFB
-P 3350 4750
-F 0 "L11" H 3487 4796 50  0000 L CNN
-F 1 "Ferrite_Bead" H 3487 4705 50  0000 L CNN
-F 2 "Inductor_SMD:L_0805_2012Metric" V 3280 4750 50  0001 C CNN
-F 3 "~" H 3350 4750 50  0001 C CNN
-	1    3350 4750
-	1    0    0    -1  
+P 2900 5450
+F 0 "L11" H 3037 5496 50  0000 L CNN
+F 1 "Ferrite_Bead" H 3037 5405 50  0000 L CNN
+F 2 "Inductor_SMD:L_0805_2012Metric" V 2830 5450 50  0001 C CNN
+F 3 "~" H 2900 5450 50  0001 C CNN
+	1    2900 5450
+	-1   0    0    1   
 $EndComp
-Wire Wire Line
-	3350 4900 3350 5300
 $Comp
 L Device:Ferrite_Bead L15
 U 1 1 5C673CC1
-P 4250 4800
-F 0 "L15" H 4387 4846 50  0000 L CNN
-F 1 "Ferrite_Bead" H 4387 4755 50  0000 L CNN
-F 2 "Inductor_SMD:L_0805_2012Metric" V 4180 4800 50  0001 C CNN
-F 3 "~" H 4250 4800 50  0001 C CNN
-	1    4250 4800
-	1    0    0    -1  
+P 3800 5400
+F 0 "L15" H 3937 5446 50  0000 L CNN
+F 1 "Ferrite_Bead" H 3937 5355 50  0000 L CNN
+F 2 "Inductor_SMD:L_0805_2012Metric" V 3730 5400 50  0001 C CNN
+F 3 "~" H 3800 5400 50  0001 C CNN
+	1    3800 5400
+	-1   0    0    1   
 $EndComp
-Wire Wire Line
-	4250 4950 4250 5300
 $Comp
 L Device:Ferrite_Bead L18
 U 1 1 5C673D8B
-P 5050 4900
-F 0 "L18" H 5187 4946 50  0000 L CNN
-F 1 "Ferrite_Bead" H 5050 5050 50  0000 L CNN
-F 2 "Inductor_SMD:L_0805_2012Metric" V 4980 4900 50  0001 C CNN
-F 3 "~" H 5050 4900 50  0001 C CNN
-	1    5050 4900
-	1    0    0    -1  
+P 4650 5250
+F 0 "L18" H 4787 5296 50  0000 L CNN
+F 1 "Ferrite_Bead" H 4650 5400 50  0000 L CNN
+F 2 "Inductor_SMD:L_0805_2012Metric" V 4580 5250 50  0001 C CNN
+F 3 "~" H 4650 5250 50  0001 C CNN
+	1    4650 5250
+	-1   0    0    1   
 $EndComp
-Wire Wire Line
-	5050 5050 5050 5300
 $Comp
 L Device:Ferrite_Bead L4
 U 1 1 5C6743D7
-P 1800 6250
-F 0 "L4" H 1937 6296 50  0000 L CNN
-F 1 "Ferrite_Bead" H 1937 6205 50  0000 L CNN
-F 2 "Inductor_SMD:L_0805_2012Metric" V 1730 6250 50  0001 C CNN
-F 3 "~" H 1800 6250 50  0001 C CNN
-	1    1800 6250
-	1    0    0    -1  
+P 1350 6850
+F 0 "L4" H 1487 6896 50  0000 L CNN
+F 1 "Ferrite_Bead" H 1487 6805 50  0000 L CNN
+F 2 "Inductor_SMD:L_0805_2012Metric" V 1280 6850 50  0001 C CNN
+F 3 "~" H 1350 6850 50  0001 C CNN
+	1    1350 6850
+	-1   0    0    1   
 $EndComp
-Wire Wire Line
-	1800 6400 1800 6750
 $Comp
 L Device:Ferrite_Bead L8
 U 1 1 5C6744A3
-P 2700 6450
-F 0 "L8" H 2850 6300 50  0000 L CNN
-F 1 "Ferrite_Bead" H 2837 6405 50  0000 L CNN
-F 2 "Inductor_SMD:L_0805_2012Metric" V 2630 6450 50  0001 C CNN
-F 3 "~" H 2700 6450 50  0001 C CNN
-	1    2700 6450
-	1    0    0    -1  
+P 2250 6900
+F 0 "L8" H 2400 6750 50  0000 L CNN
+F 1 "Ferrite_Bead" H 2387 6855 50  0000 L CNN
+F 2 "Inductor_SMD:L_0805_2012Metric" V 2180 6900 50  0001 C CNN
+F 3 "~" H 2250 6900 50  0001 C CNN
+	1    2250 6900
+	-1   0    0    1   
 $EndComp
-Wire Wire Line
-	2700 6600 2700 6750
 $Comp
 L Device:Ferrite_Bead L12
 U 1 1 5C674DC7
-P 3600 6500
-F 0 "L12" H 3737 6546 50  0000 L CNN
-F 1 "Ferrite_Bead" H 3737 6455 50  0000 L CNN
-F 2 "Inductor_SMD:L_0805_2012Metric" V 3530 6500 50  0001 C CNN
-F 3 "~" H 3600 6500 50  0001 C CNN
-	1    3600 6500
-	1    0    0    -1  
+P 3150 6850
+F 0 "L12" H 3287 6896 50  0000 L CNN
+F 1 "Ferrite_Bead" H 3287 6805 50  0000 L CNN
+F 2 "Inductor_SMD:L_0805_2012Metric" V 3080 6850 50  0001 C CNN
+F 3 "~" H 3150 6850 50  0001 C CNN
+	1    3150 6850
+	-1   0    0    1   
 $EndComp
-Wire Wire Line
-	3600 6650 3600 6750
 $Comp
 L Device:Ferrite_Bead L16
 U 1 1 5C674E93
-P 4500 6550
-F 0 "L16" H 4637 6596 50  0000 L CNN
-F 1 "Ferrite_Bead" H 4637 6505 50  0000 L CNN
-F 2 "Inductor_SMD:L_0805_2012Metric" V 4430 6550 50  0001 C CNN
-F 3 "~" H 4500 6550 50  0001 C CNN
-	1    4500 6550
-	1    0    0    -1  
+P 4050 6850
+F 0 "L16" H 4187 6896 50  0000 L CNN
+F 1 "Ferrite_Bead" H 4187 6805 50  0000 L CNN
+F 2 "Inductor_SMD:L_0805_2012Metric" V 3980 6850 50  0001 C CNN
+F 3 "~" H 4050 6850 50  0001 C CNN
+	1    4050 6850
+	-1   0    0    1   
 $EndComp
-Wire Wire Line
-	4500 6700 4500 6750
 $Comp
 L Device:Ferrite_Bead L20
 U 1 1 5C674F67
-P 5350 6500
-F 0 "L20" H 5487 6546 50  0000 L CNN
-F 1 "Ferrite_Bead" H 5487 6455 50  0000 L CNN
-F 2 "Inductor_SMD:L_0805_2012Metric" V 5280 6500 50  0001 C CNN
-F 3 "~" H 5350 6500 50  0001 C CNN
-	1    5350 6500
-	1    0    0    -1  
+P 4900 6900
+F 0 "L20" H 5037 6946 50  0000 L CNN
+F 1 "Ferrite_Bead" H 5037 6855 50  0000 L CNN
+F 2 "Inductor_SMD:L_0805_2012Metric" V 4830 6900 50  0001 C CNN
+F 3 "~" H 4900 6900 50  0001 C CNN
+	1    4900 6900
+	-1   0    0    1   
 $EndComp
 Wire Wire Line
-	5350 6650 5350 6750
-Wire Wire Line
 	4700 1950 4700 2000
-Wire Wire Line
-	5050 2000 4700 2000
 Connection ~ 4700 2000
 Wire Wire Line
 	4700 2000 4700 2100
-Wire Wire Line
-	5350 2000 5450 2000
 $Comp
 L Device:R R21
 U 1 1 5C544364
@@ -2125,4 +2055,164 @@ Wire Wire Line
 	9050 3950 9050 4050
 Wire Wire Line
 	9050 4050 9700 4050
+Wire Wire Line
+	4900 7150 4900 7050
+Wire Wire Line
+	5350 6300 5350 6750
+Wire Wire Line
+	4900 7150 4850 7150
+Wire Wire Line
+	4900 6750 4900 6400
+Wire Wire Line
+	4000 7050 4050 7050
+Wire Wire Line
+	4050 7050 4050 7000
+Wire Wire Line
+	4050 6700 4050 6400
+Wire Wire Line
+	4500 6250 4500 6750
+Wire Wire Line
+	3050 7050 3150 7050
+Wire Wire Line
+	3150 7050 3150 7000
+Wire Wire Line
+	3150 6400 3150 6700
+Wire Wire Line
+	2200 7100 2250 7100
+Wire Wire Line
+	2250 7100 2250 7050
+Wire Wire Line
+	2250 6750 2250 6400
+Wire Wire Line
+	2700 6150 2700 6750
+Wire Wire Line
+	3600 6200 3600 6750
+Wire Wire Line
+	1300 7050 1350 7050
+Wire Wire Line
+	1350 7050 1350 7000
+Wire Wire Line
+	1350 6700 1350 6400
+Wire Wire Line
+	1350 6400 1550 6400
+Wire Wire Line
+	1800 6100 1800 6750
+Wire Wire Line
+	4650 5400 4650 5500
+Wire Wire Line
+	4650 5500 4600 5500
+Wire Wire Line
+	4650 5100 4650 4950
+Wire Wire Line
+	5050 4700 5050 5300
+Wire Wire Line
+	3800 5550 3800 5600
+Wire Wire Line
+	3800 5600 3750 5600
+Wire Wire Line
+	3800 5250 3800 4950
+Wire Wire Line
+	4250 4650 4250 5300
+Wire Wire Line
+	2850 5650 2900 5650
+Wire Wire Line
+	2900 5650 2900 5600
+Wire Wire Line
+	2900 5300 2900 4950
+Wire Wire Line
+	3350 4600 3350 5300
+Wire Wire Line
+	2000 5600 2000 5650
+Wire Wire Line
+	2000 5650 1950 5650
+Wire Wire Line
+	2000 5300 2000 5000
+Wire Wire Line
+	2450 4550 2450 5350
+Wire Wire Line
+	1050 5650 1100 5650
+Wire Wire Line
+	1100 5650 1100 5600
+Wire Wire Line
+	1100 5300 1100 5000
+Wire Wire Line
+	1550 4500 1550 5350
+Wire Wire Line
+	4550 4150 4600 4150
+Wire Wire Line
+	4600 4150 4600 4100
+Wire Wire Line
+	4600 3800 4600 3400
+Wire Wire Line
+	5050 3300 5050 3750
+Wire Wire Line
+	3750 4100 3750 4150
+Wire Wire Line
+	3750 4150 3700 4150
+Wire Wire Line
+	3750 3800 3750 3400
+Wire Wire Line
+	4150 3200 4150 3750
+Wire Wire Line
+	2800 4050 2850 4050
+Wire Wire Line
+	2850 4050 2850 4000
+Wire Wire Line
+	2850 3700 2850 3400
+Wire Wire Line
+	3250 3100 3250 3750
+Wire Wire Line
+	1900 4050 1950 4050
+Wire Wire Line
+	1950 4050 1950 4000
+Wire Wire Line
+	1950 3700 1950 3400
+Wire Wire Line
+	2350 3000 2350 3750
+Wire Wire Line
+	1100 3400 1100 3650
+Wire Wire Line
+	1100 3950 1100 4000
+Wire Wire Line
+	1100 4000 1050 4000
+Wire Wire Line
+	1450 2900 1450 3750
+Wire Wire Line
+	4500 2350 4500 2250
+Wire Wire Line
+	4500 1950 4500 1650
+Wire Wire Line
+	4700 2000 5450 2000
+Wire Wire Line
+	3800 2300 3800 2200
+Wire Wire Line
+	3800 2200 3700 2200
+Wire Wire Line
+	3700 1900 3700 1650
+Wire Wire Line
+	4200 1450 4200 2000
+Wire Wire Line
+	3900 2000 4200 2000
+Wire Wire Line
+	2800 2350 2800 2200
+Wire Wire Line
+	2800 2200 2750 2200
+Wire Wire Line
+	2750 1900 2750 1650
+Wire Wire Line
+	3050 1550 3350 1550
+Wire Wire Line
+	2100 1500 2600 1500
+Wire Wire Line
+	1800 2100 1850 2100
+Wire Wire Line
+	1850 2100 1850 2200
+Wire Wire Line
+	1800 1650 1800 1800
+Wire Wire Line
+	950  2150 950  2250
+Wire Wire Line
+	950  1850 950  1650
+Wire Wire Line
+	1350 1300 5650 1300
 $EndSCHEMATC
