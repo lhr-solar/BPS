@@ -15,7 +15,7 @@ Comment3 ""
 Comment4 ""
 $EndDescr
 $Comp
-L utsvt-bps:LTC6811-1 U1
+L BPSVoltage-rescue:LTC6811-1-utsvt-bps U1
 U 1 1 5C356477
 P 6400 2650
 F 0 "U1" H 6400 2978 50  0000 C CNN
@@ -890,8 +890,6 @@ F 3 "" H 8050 4050 50  0001 C CNN
 $EndComp
 Wire Wire Line
 	7950 4050 8050 4050
-NoConn ~ 7200 4150
-NoConn ~ 7200 4250
 NoConn ~ 7200 4750
 $Comp
 L power:GND #PWR0106
@@ -1201,7 +1199,7 @@ IPA
 Text Label 7200 4450 0    50   ~ 0
 IMA
 $Comp
-L utsvt-bps:HX1188FNL U2
+L BPSVoltage-rescue:HX1188FNL-utsvt-bps U2
 U 1 1 5CAB08B5
 P 9700 5250
 F 0 "U2" H 9700 5415 50  0000 C CNN
@@ -1212,7 +1210,7 @@ F 3 "" H 9700 5250 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L utsvt-connectors:CarPowerConnector J1
+L BPSVoltage-rescue:CarPowerConnector-utsvt-connectors J1
 U 1 1 5CAB16B3
 P 10750 5450
 F 0 "J1" H 10573 5508 60  0000 R CNN
@@ -1223,7 +1221,7 @@ F 3 "" H 10750 5450 60  0001 C CNN
 	-1   0    0    -1  
 $EndComp
 $Comp
-L utsvt-connectors:CarPowerConnector J2
+L BPSVoltage-rescue:CarPowerConnector-utsvt-connectors J2
 U 1 1 5CADF981
 P 10750 5850
 F 0 "J2" H 10573 5908 60  0000 R CNN
@@ -1523,7 +1521,7 @@ U 1 1 5CE069FE
 P 700 4300
 F 0 "J4" H 750 4850 50  0000 C CNN
 F 1 "Conn_01x07" H 750 4750 50  0000 C CNN
-F 2 "Connector_Molex:Molex_Micro-Fit_3.0_43650-0715_1x07_P3.00mm_Vertical" H 700 4300 50  0001 C CNN
+F 2 "UTSVT_Connectors:Molex_MicroFit_01x07_Horizontal" H 700 4300 50  0001 C CNN
 F 3 "~" H 700 4300 50  0001 C CNN
 	1    700  4300
 	-1   0    0    1   
@@ -1534,7 +1532,7 @@ U 1 1 5CE06D8A
 P 700 3700
 F 0 "J3" H 620 3175 50  0000 C CNN
 F 1 "Conn_01x06" H 620 3266 50  0000 C CNN
-F 2 "Connector_Molex:Molex_Micro-Fit_3.0_43650-0615_1x06_P3.00mm_Vertical" H 700 3700 50  0001 C CNN
+F 2 "UTSVT_Connectors:Molex_MicroFit_01x06_Horizontal" H 700 3700 50  0001 C CNN
 F 3 "~" H 700 3700 50  0001 C CNN
 	1    700  3700
 	-1   0    0    1   
@@ -1673,7 +1671,7 @@ F 1 "Conn_01x05" H 9180 1851 50  0000 L CNN
 F 2 "Connector_PinHeader_2.54mm:PinHeader_1x05_P2.54mm_Vertical" H 9100 1900 50  0001 C CNN
 F 3 "~" H 9100 1900 50  0001 C CNN
 	1    9100 1900
-	1    0    0    -1  
+	1    0    0    1   
 $EndComp
 Text Label 8650 2100 0    50   ~ 0
 GPIO1
@@ -1695,49 +1693,29 @@ Wire Wire Line
 	8650 2000 8900 2000
 Wire Wire Line
 	8650 2100 8900 2100
-$Comp
-L Connector_Generic:Conn_02x03_Odd_Even J7
-U 1 1 5C69EFB9
-P 10250 4550
-F 0 "J7" H 10300 4867 50  0000 C CNN
-F 1 "Conn_02x03_Counter_Clockwise" H 10300 4776 50  0000 C CNN
-F 2 "Connector_PinHeader_2.54mm:PinHeader_2x03_P2.54mm_Vertical" H 10250 4550 50  0001 C CNN
-F 3 "~" H 10250 4550 50  0001 C CNN
-	1    10250 4550
-	1    0    0    -1  
-$EndComp
-Text Label 9850 4450 0    50   ~ 0
+Text Label 10000 3550 0    50   ~ 0
 IPA
-Text Label 9850 4550 0    50   ~ 0
+Text Label 10000 3650 0    50   ~ 0
 IMA
 Wire Wire Line
-	9850 4450 10050 4450
+	10000 3550 10200 3550
 Wire Wire Line
-	9850 4550 10050 4550
+	10000 3650 10200 3650
 $Comp
 L power:GND #PWR0114
 U 1 1 5C6CFA3C
-P 9850 4750
-F 0 "#PWR0114" H 9850 4500 50  0001 C CNN
-F 1 "GND" H 10000 4700 50  0000 C CNN
-F 2 "" H 9850 4750 50  0001 C CNN
-F 3 "" H 9850 4750 50  0001 C CNN
-	1    9850 4750
+P 10000 4050
+F 0 "#PWR0114" H 10000 3800 50  0001 C CNN
+F 1 "GND" H 10150 4000 50  0000 C CNN
+F 2 "" H 10000 4050 50  0001 C CNN
+F 3 "" H 10000 4050 50  0001 C CNN
+	1    10000 4050
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
-	9850 4750 9850 4650
+	10000 4050 10000 3950
 Wire Wire Line
-	9850 4650 10050 4650
-Text Label 10700 4450 0    50   ~ 0
-IPB
-Wire Wire Line
-	10550 4450 10700 4450
-Text Label 10700 4550 0    50   ~ 0
-IMB
-Wire Wire Line
-	10550 4550 10700 4550
-NoConn ~ 10550 4650
+	10000 3950 10200 3950
 Text Label 2500 1400 0    50   ~ 0
 L11
 Text Label 2500 1900 0    50   ~ 0
@@ -2431,4 +2409,69 @@ Wire Wire Line
 Wire Wire Line
 	5500 5250 5500 7150
 Connection ~ 3300 7150
+$Comp
+L Connector_Generic:Conn_01x05 J7
+U 1 1 5C56A49F
+P 10400 3750
+F 0 "J7" H 10480 3792 50  0000 L CNN
+F 1 "Conn_01x05" H 10480 3701 50  0000 L CNN
+F 2 "Connector_PinHeader_2.54mm:PinHeader_1x05_P2.54mm_Vertical" H 10400 3750 50  0001 C CNN
+F 3 "~" H 10400 3750 50  0001 C CNN
+	1    10400 3750
+	1    0    0    -1  
+$EndComp
+Text Label 7200 4150 0    50   ~ 0
+SDO
+Text Label 7200 4250 0    50   ~ 0
+SDI
+Text Label 10000 3850 0    50   ~ 0
+SDO
+Text Label 10000 3750 0    50   ~ 0
+SDI
+Wire Wire Line
+	10000 3750 10200 3750
+Wire Wire Line
+	10000 3850 10200 3850
+Wire Notes Line
+	5850 6600 6800 6600
+Wire Notes Line
+	6800 6600 6800 7550
+Wire Notes Line
+	7600 5000 7600 6550
+Wire Notes Line
+	7600 6550 11250 6550
+Wire Notes Line
+	11250 6550 11250 5000
+Wire Notes Line
+	11250 5000 7600 5000
+Wire Notes Line
+	9850 3350 9850 4250
+Wire Notes Line
+	9850 4250 11050 4250
+Wire Notes Line
+	11050 4250 11050 3350
+Wire Notes Line
+	11050 3350 9850 3350
+Wire Notes Line
+	9750 550  9750 3050
+Wire Notes Line
+	9750 3050 11150 3050
+Wire Notes Line
+	11150 3050 11150 550 
+Wire Notes Line
+	11150 550  9750 550 
+Wire Notes Line
+	8550 1550 9750 1550
+Wire Notes Line
+	8550 750  8550 2250
+Wire Notes Line
+	8000 750  8000 2250
+Wire Notes Line
+	8000 750  9750 750 
+Wire Notes Line
+	8000 2250 9750 2250
+Wire Notes Line
+	6800 7550 5850 7550
+Wire Notes Line
+	5850 7550 5850 6600
 $EndSCHEMATC
