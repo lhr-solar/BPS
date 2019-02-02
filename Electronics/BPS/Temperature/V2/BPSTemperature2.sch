@@ -2215,4 +2215,19 @@ Wire Wire Line
 	950  1850 950  1650
 Wire Wire Line
 	1350 1300 5650 1300
+$Comp
+L Connector_Generic:Conn_01x02 J5
+U 1 1 5C58671C
+P 10100 6000
+F 0 "J5" H 10180 5992 50  0000 L CNN
+F 1 "Conn_01x02" H 10180 5901 50  0000 L CNN
+F 2 "UTSVT_Connectors:43650-0202_01x02_Microfit 3.0_horizontal" H 10100 6000 50  0001 C CNN
+F 3 "~" H 10100 6000 50  0001 C CNN
+	1    10100 6000
+	1    0    0    -1  
+$EndComp
+Text Label 9900 6000 2    50   ~ 0
++5V
+Text Label 9900 6100 2    50   ~ 0
+GND
 $EndSCHEMATC
