@@ -1067,7 +1067,7 @@ U 1 1 5C4FB2E5
 P 10000 5050
 F 0 "J1" H 10050 5667 50  0000 C CNN
 F 1 "Conn_02x10_Counter_Clockwise" H 10050 5576 50  0000 C CNN
-F 2 "Connector_Molex:Molex_Micro-Fit_3.0_43045-2012_2x10_P3.00mm_Vertical" H 10000 5050 50  0001 C CNN
+F 2 "UTSVT_Connectors:Molex_Micro-Fit_3.0_43045-2010_2x10-1MP_P3.00mm_Horizontal" H 10000 5050 50  0001 C CNN
 F 3 "~" H 10000 5050 50  0001 C CNN
 	1    10000 5050
 	1    0    0    -1  
