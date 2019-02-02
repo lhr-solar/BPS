@@ -4,7 +4,7 @@ EELAYER 26 0
 EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
-Sheet 5 8
+Sheet 5 7
 Title ""
 Date ""
 Rev ""
@@ -128,8 +128,6 @@ Wire Wire Line
 	2300 3100 2400 3100
 Wire Wire Line
 	2400 3100 2400 3000
-Wire Wire Line
-	2400 3100 3750 3100
 Connection ~ 2400 3100
 Wire Wire Line
 	3200 3000 3650 3000
@@ -145,10 +143,6 @@ Wire Wire Line
 	3200 2950 3200 3000
 Wire Wire Line
 	2800 3000 2800 3200
-Wire Wire Line
-	2800 3200 2300 3200
-Wire Wire Line
-	2800 3200 3750 3200
 Connection ~ 2800 3200
 Wire Wire Line
 	2400 2500 2400 2600
@@ -174,4 +168,31 @@ Wire Wire Line
 Connection ~ 4850 3100
 Wire Wire Line
 	4850 3100 4850 3000
+$Comp
+L Connector_Generic:Conn_01x02 J14
+U 1 1 5C646686
+P 2600 3700
+F 0 "J14" V 2473 3780 50  0000 L CNN
+F 1 "Conn_01x03" V 2564 3780 50  0000 L CNN
+F 2 "Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical" H 2600 3700 50  0001 C CNN
+F 3 "~" H 2600 3700 50  0001 C CNN
+	1    2600 3700
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	2800 3200 3750 3200
+Wire Wire Line
+	2400 3100 2600 3100
+Wire Wire Line
+	2600 3500 2600 3100
+Connection ~ 2600 3100
+Wire Wire Line
+	2600 3100 3750 3100
+Wire Wire Line
+	2500 3500 2500 3200
+Wire Wire Line
+	2300 3200 2500 3200
+Connection ~ 2500 3200
+Wire Wire Line
+	2500 3200 2800 3200
 $EndSCHEMATC

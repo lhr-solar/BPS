@@ -4,7 +4,7 @@ EELAYER 26 0
 EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
-Sheet 1 8
+Sheet 1 7
 Title ""
 Date ""
 Rev ""
@@ -739,14 +739,14 @@ Wire Wire Line
 Text Notes 4100 6150 0    50   ~ 0
 The crystal and caps have to be as close to the uC as possible.
 $Comp
-L Connector_Generic:Conn_02x07_Counter_Clockwise J2
+L Connector_Generic:Conn_02x05_Odd_Even J2
 U 1 1 5C3000B6
-P 8600 4300
-F 0 "J2" H 8650 4817 50  0000 C CNN
-F 1 "Logic Analyzer" H 8650 4726 50  0000 C CNN
-F 2 "Connector_PinHeader_2.54mm:PinHeader_2x07_P2.54mm_Vertical" H 8600 4300 50  0001 C CNN
-F 3 "~" H 8600 4300 50  0001 C CNN
-	1    8600 4300
+P 8600 4200
+F 0 "J2" H 8650 4600 50  0000 C CNN
+F 1 "Logic Analyzer" H 8650 4500 50  0000 C CNN
+F 2 "Connector_PinHeader_2.54mm:PinHeader_2x05_P2.54mm_Vertical" H 8600 4200 50  0001 C CNN
+F 3 "~" H 8600 4200 50  0001 C CNN
+	1    8600 4200
 	1    0    0    -1  
 $EndComp
 $Comp
@@ -763,66 +763,37 @@ $EndComp
 Wire Wire Line
 	7900 4000 8400 4000
 Wire Wire Line
-	8400 4100 7900 4100
+	8900 4200 9400 4200
 Wire Wire Line
-	8400 4200 7900 4200
+	8900 4300 9400 4300
 Wire Wire Line
-	8400 4300 7900 4300
-Wire Wire Line
-	8400 4400 7900 4400
-Text Label 7900 4100 0    50   ~ 0
+	8900 4400 9400 4400
+Text Label 9400 4200 2    50   ~ 0
 SPI1_CLK
-Text Label 7900 4200 0    50   ~ 0
+Text Label 9400 4300 2    50   ~ 0
 SPI1_MISO
-Text Label 7900 4300 0    50   ~ 0
+Text Label 9400 4400 2    50   ~ 0
 SPI1_MOSI
-Text Label 7900 4400 0    50   ~ 0
-LTC6811_CS
-Wire Wire Line
-	8400 4500 7900 4500
-Text Label 7900 4500 0    50   ~ 0
-DISPLAY_CS
 Wire Wire Line
 	6400 4350 6900 4350
 Text Label 6900 4350 2    50   ~ 0
 DISPLAY_CS
 Wire Wire Line
-	8900 4100 9400 4100
+	8400 4100 7900 4100
 Wire Wire Line
-	8900 4200 9400 4200
-Text Label 9400 4100 2    50   ~ 0
+	8400 4200 7900 4200
+Text Label 7900 4100 0    50   ~ 0
 UART1_TX
-Text Label 9400 4200 2    50   ~ 0
+Text Label 7900 4200 0    50   ~ 0
 UART1_RX
 Wire Wire Line
-	8900 4400 9400 4400
-Text Label 9400 4400 2    50   ~ 0
+	8900 4100 9400 4100
+Text Label 9400 4100 2    50   ~ 0
 CAN1_RX
 Wire Wire Line
-	8900 4300 9400 4300
-Text Label 9400 4300 2    50   ~ 0
+	8900 4000 9400 4000
+Text Label 9400 4000 2    50   ~ 0
 CAN1_TX
-Wire Wire Line
-	8900 4600 9400 4600
-Text Label 9400 4600 2    50   ~ 0
-I2C3_SDA
-Wire Wire Line
-	8900 4500 9400 4500
-Text Label 9400 4500 2    50   ~ 0
-I2C3_SCL
-$Comp
-L power:GND #PWR020
-U 1 1 5C369850
-P 9400 4000
-F 0 "#PWR020" H 9400 3750 50  0001 C CNN
-F 1 "GND" H 9405 3827 50  0000 C CNN
-F 2 "" H 9400 4000 50  0001 C CNN
-F 3 "" H 9400 4000 50  0001 C CNN
-	1    9400 4000
-	0    -1   1    0   
-$EndComp
-Wire Wire Line
-	9400 4000 8900 4000
 Wire Wire Line
 	5000 4050 4500 4050
 Wire Wire Line
@@ -983,54 +954,6 @@ Wire Wire Line
 	2200 4650 2200 4600
 Wire Wire Line
 	2000 4750 2400 4750
-$Sheet
-S 1000 5900 1000 600 
-U 5C3A2E97
-F0 "USB" 50
-F1 "USB.sch" 50
-F2 "GND" I R 2000 6350 50 
-F3 "+3.3V" I R 2000 6050 50 
-F4 "UART_RX" I R 2000 6150 50 
-F5 "UART_TX" O R 2000 6250 50 
-$EndSheet
-Wire Wire Line
-	2000 6150 2500 6150
-Wire Wire Line
-	2000 6250 2500 6250
-Text Label 2500 6150 2    50   ~ 0
-UART1_TX
-Text Label 2500 6250 2    50   ~ 0
-UART1_RX
-$Comp
-L power:GND #PWR030
-U 1 1 5C45DAE4
-P 2200 6400
-F 0 "#PWR030" H 2200 6150 50  0001 C CNN
-F 1 "GND" H 2205 6227 50  0000 C CNN
-F 2 "" H 2200 6400 50  0001 C CNN
-F 3 "" H 2200 6400 50  0001 C CNN
-	1    2200 6400
-	1    0    0    -1  
-$EndComp
-Wire Wire Line
-	2200 6400 2200 6350
-Wire Wire Line
-	2200 6350 2000 6350
-$Comp
-L power:+3.3V #PWR029
-U 1 1 5C4686E9
-P 2200 6000
-F 0 "#PWR029" H 2200 5850 50  0001 C CNN
-F 1 "+3.3V" H 2215 6173 50  0000 C CNN
-F 2 "" H 2200 6000 50  0001 C CNN
-F 3 "" H 2200 6000 50  0001 C CNN
-	1    2200 6000
-	1    0    0    -1  
-$EndComp
-Wire Wire Line
-	2200 6000 2200 6050
-Wire Wire Line
-	2200 6050 2000 6050
 Wire Bus Line
 	2000 5350 2600 5350
 Text Notes 8650 1150 0    100  ~ 20
@@ -1256,7 +1179,6 @@ NoConn ~ 6400 3450
 NoConn ~ 5000 3350
 NoConn ~ 6400 2350
 NoConn ~ 6400 2050
-NoConn ~ 8400 4600
 $Comp
 L power:PWR_FLAG #FLG01
 U 1 1 5CC7D7CD
