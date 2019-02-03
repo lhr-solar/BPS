@@ -1067,50 +1067,50 @@ U 1 1 5C4FB2E5
 P 10000 5050
 F 0 "J1" H 10050 5667 50  0000 C CNN
 F 1 "Conn_02x10_Counter_Clockwise" H 10050 5576 50  0000 C CNN
-F 2 "Connector_Molex:Molex_Micro-Fit_3.0_43045-2012_2x10_P3.00mm_Vertical" H 10000 5050 50  0001 C CNN
+F 2 "UTSVT_Connectors:Molex_Micro-Fit_3.0_43045-2010_2x10-1MP_P3.00mm_Horizontal" H 10000 5050 50  0001 C CNN
 F 3 "~" H 10000 5050 50  0001 C CNN
 	1    10000 5050
 	1    0    0    -1  
 $EndComp
-Text Label 9700 5550 2    50   ~ 0
-CH1_LPF
-Text Label 9700 5450 2    50   ~ 0
-CH2_LPF
-Text Label 9700 5350 2    50   ~ 0
-CH3_LPF
-Text Label 9700 5250 2    50   ~ 0
-CH4_LPF
-Text Label 9700 5150 2    50   ~ 0
-CH5_LPF
-Text Label 9700 5050 2    50   ~ 0
-CH6_LPF
-Text Label 9700 4950 2    50   ~ 0
-CH7_LPF
-Text Label 9700 4850 2    50   ~ 0
-CH8_LPF
-Text Label 9700 4750 2    50   ~ 0
-CH9_LPF
 Text Label 9700 4650 2    50   ~ 0
+CH1_LPF
+Text Label 9700 4750 2    50   ~ 0
+CH2_LPF
+Text Label 9700 4850 2    50   ~ 0
+CH3_LPF
+Text Label 9700 4950 2    50   ~ 0
+CH4_LPF
+Text Label 9700 5050 2    50   ~ 0
+CH5_LPF
+Text Label 9700 5150 2    50   ~ 0
+CH6_LPF
+Text Label 9700 5250 2    50   ~ 0
+CH7_LPF
+Text Label 9700 5350 2    50   ~ 0
+CH8_LPF
+Text Label 9700 5450 2    50   ~ 0
+CH9_LPF
+Text Label 9700 5550 2    50   ~ 0
 CH10_LPF
-Text Label 10400 4650 0    50   ~ 0
-CH11_LPF
-Text Label 10400 4750 0    50   ~ 0
-CH12_LPF
-Text Label 10400 4850 0    50   ~ 0
-CH13_LPF
-Text Label 10400 5050 0    50   ~ 0
-CH15_LPF
-Text Label 10400 4950 0    50   ~ 0
-CH14_LPF
-Text Label 10400 5150 0    50   ~ 0
-CH16_LPF
-Text Label 10400 5250 0    50   ~ 0
-CH17_LPF
-Text Label 10400 5350 0    50   ~ 0
-CH18_LPF
-Text Label 10400 5450 0    50   ~ 0
-CH19_LPF
 Text Label 10400 5550 0    50   ~ 0
+CH11_LPF
+Text Label 10400 5450 0    50   ~ 0
+CH12_LPF
+Text Label 10400 5350 0    50   ~ 0
+CH13_LPF
+Text Label 10400 5150 0    50   ~ 0
+CH15_LPF
+Text Label 10400 5250 0    50   ~ 0
+CH14_LPF
+Text Label 10400 5050 0    50   ~ 0
+CH16_LPF
+Text Label 10400 4950 0    50   ~ 0
+CH17_LPF
+Text Label 10400 4850 0    50   ~ 0
+CH18_LPF
+Text Label 10400 4750 0    50   ~ 0
+CH19_LPF
+Text Label 10400 4650 0    50   ~ 0
 CH20_LPF
 $Comp
 L Connector_Generic:Conn_02x06_Counter_Clockwise J3
@@ -2215,4 +2215,19 @@ Wire Wire Line
 	950  1850 950  1650
 Wire Wire Line
 	1350 1300 5650 1300
+$Comp
+L Connector_Generic:Conn_01x02 J5
+U 1 1 5C58671C
+P 10100 6000
+F 0 "J5" H 10180 5992 50  0000 L CNN
+F 1 "Conn_01x02" H 10180 5901 50  0000 L CNN
+F 2 "UTSVT_Connectors:43650-0202_01x02_Microfit 3.0_horizontal" H 10100 6000 50  0001 C CNN
+F 3 "~" H 10100 6000 50  0001 C CNN
+	1    10100 6000
+	1    0    0    -1  
+$EndComp
+Text Label 9900 6000 2    50   ~ 0
++5V
+Text Label 9900 6100 2    50   ~ 0
+GND
 $EndSCHEMATC
