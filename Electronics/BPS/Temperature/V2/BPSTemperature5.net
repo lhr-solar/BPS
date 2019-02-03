@@ -1,7 +1,7 @@
 (export (version D)
   (design
     (source "C:\\Users\\corbi\\Documents\\UT Stuff\\GitHub\\SolarCar\\Electronics\\BPS\\Temperature\\V2\\BPSTemperature2.sch")
-    (date "2/2/2019 2:57:32 PM")
+    (date "2/2/2019 6:08:06 PM")
     (tool "Eeschema (5.0.0)")
     (sheet (number 1) (name /) (tstamps /)
       (title_block
@@ -346,7 +346,7 @@
       (tstamp 5C4F1BB7))
     (comp (ref J1)
       (value Conn_02x10_Counter_Clockwise)
-      (footprint UTSVT_Connectors:Molex_Micro-Fit_3.0_43045-2010_2x10-1MP_P3.00mm_Horizontal)
+      (footprint UTSVT_Connectors:02x10_Microfit_3.0_horizontal)
       (datasheet ~)
       (libsource (lib Connector_Generic) (part Conn_02x10_Counter_Clockwise) (description "Generic connector, double row, 02x10, counter clockwise pin numbering scheme (similar to DIP packge numbering), script generated (kicad-library-utils/schlib/autogen/connector/)"))
       (sheetpath (names /) (tstamps /))
