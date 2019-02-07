@@ -1,8 +1,0 @@
-(fp_lib_table
-  (lib (name UTSVT_Passive)(type KiCad)(uri ${KIPRJMOD}/../Common/UTSVT_Passive.pretty)(options "")(descr "Footprints for passive components specific to the UT SVT."))
-  (lib (name UTSVT_ICs)(type KiCad)(uri ${KIPRJMOD}/../Common/UTSVT_ICs.pretty)(options "")(descr "Footprints for ICs specific to the UT SVT."))
-  (lib (name UTSVT_Special)(type KiCad)(uri ${KIPRJMOD}/../Common/UTSVT_Special.pretty)(options "")(descr "Footprints for more unique components specific to the UT SVT."))
-  (lib (name UTSVT_Connectors)(type KiCad)(uri ${KIPRJMOD}/../Common/UTSVT_Connectors.pretty)(options "")(descr "Footprints for connectors specific to the UT SVT."))
-  (lib (name UTSVT_Mechanical)(type KiCad)(uri ${KIPRJMOD}/../Common/UTSVT_Mechanical.pretty)(options "")(descr "Footprints for mechanical components (i.e. screws) specific to the UT SVT."))
-  (lib (name MPPT_Custom)(type KiCad)(uri ${KIPRJMOD}/MPPT_Custom.pretty)(options "")(descr "Footprints for MPPT-specific components."))
-)

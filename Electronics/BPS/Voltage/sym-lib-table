@@ -1,8 +1,0 @@
-(sym_lib_table
-  (lib (name utsvt-bps)(type Legacy)(uri "D:/Personal Files/Documents/SVT/SolarCar/Electronics/BPS/Library/utsvt-bps.lib")(options "")(descr ""))
-  (lib (name utsvt-chips)(type Legacy)(uri "D:/Personal Files/Documents/SVT/SolarCar/Electronics/Common/utsvt-chips.lib")(options "")(descr ""))
-  (lib (name utsvt-connectors)(type Legacy)(uri "D:/Personal Files/Documents/SVT/SolarCar/Electronics/Common/utsvt-connectors.lib")(options "")(descr ""))
-  (lib (name utsvt-microcontrollers)(type Legacy)(uri "D:/Personal Files/Documents/SVT/SolarCar/Electronics/Common/utsvt-microcontrollers.lib")(options "")(descr ""))
-  (lib (name utsvt-power-regulators)(type Legacy)(uri "D:/Personal Files/Documents/SVT/SolarCar/Electronics/Common/utsvt-power-regulators.lib")(options "")(descr ""))
-  (lib (name BPSVoltage-rescue)(type Legacy)(uri ${KIPRJMOD}/BPSVoltage-rescue.lib)(options "")(descr ""))
-)

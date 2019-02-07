@@ -1,8 +1,0 @@
-(fp_lib_table
-  (lib (name UTSVT_Connectors)(type KiCad)(uri C:/Users/Sijin/Documents/SolarCar/Electronics/Common/UTSVT_Connectors.pretty)(options "")(descr ""))
-  (lib (name UTSVT_ICs)(type KiCad)(uri C:/Users/Sijin/Documents/SolarCar/Electronics/Common/UTSVT_ICs.pretty)(options "")(descr ""))
-  (lib (name UTSVT_Mechanical)(type KiCad)(uri C:/Users/Sijin/Documents/SolarCar/Electronics/Common/UTSVT_Mechanical.pretty)(options "")(descr ""))
-  (lib (name UTSVT_Passive)(type KiCad)(uri C:/Users/Sijin/Documents/SolarCar/Electronics/Common/UTSVT_Passive.pretty)(options "")(descr ""))
-  (lib (name UTSVT_Special)(type KiCad)(uri C:/Users/Sijin/Documents/SolarCar/Electronics/Common/UTSVT_Special.pretty)(options "")(descr ""))
-  (lib (name UTSVT_BPS)(type KiCad)(uri C:/Users/Sijin/Documents/SolarCar/Electronics/BPS/Library/UTSVT_BPS.pretty)(options "")(descr ""))
-)
