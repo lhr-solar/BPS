@@ -95,21 +95,6 @@ void SPI_Init16(void){
 	SPI_Cmd(SPI2, ENABLE);
 }
 
-/** SPI_InitCS
- * Initializes Port B pin for SPI chip select
- * Use GPIO_Pin_x (replace x) for easier code readablity.
- * @param pin number
- */
-void SPI_InitCS(uint16_t pin){
-	GPIO_InitTypeDef GPIO_InitStruct;
-	GPIO_InitStruct.GPIO_Pin = pin;
-	GPIO_InitStruct.GPIO_Mode = GPIO_Mode_OUT;
-	GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_UP;
-	GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
-	GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
-	GPIO_Init(GPIOB, &GPIO_InitStruct);
-}
-
 /** SPI_Write8
  * Sends single 8-bit packet to slave.
  * This function is usually used to send a command to a slave and then calling a read function
@@ -300,20 +285,3 @@ void SPI_WriteReadMulti16(uint16_t *txBuf, uint32_t txSize, uint16_t *rxBuf, uin
 	}
 }
 
-/** SPI_CSHigh
- * Sets PortB pin to high.
- * Use GPIO_Pin_x (replace x) for easier code readablity.
- * @param pin number of PortB
- */
-void SPI_CSHigh(uint16_t pin){
-	GPIO_SetBits(GPIOB, pin);
-}
-
-/** SPI_CSLow
- * Resets PortB pin to low.
- * Use GPIO_Pin_x (replace x) for easier code readablity.
- * @param pin number if PortB
- */
-void SPI_CSLow(uint16_t pin){
-	GPIO_ResetBits(GPIOB, pin);
-}

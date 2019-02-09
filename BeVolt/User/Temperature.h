@@ -12,6 +12,10 @@
 #define TEMPERATURE_H__
 
 #include <stdint.h>
+#include "LTC2983.h"
+#include "Definition.h"
+#include <stdlib.h>
+#include <stdbool.h>
 
 /** Temperature_Init
  * Initializes device drivers including SPI and LTC2983 for Temperature Monitoring
@@ -23,14 +27,14 @@ void Temperature_Init(void);
  * @param pointer to new temperature measurements
  * @return 1 if successfully stored, 0 if failed
  */
-uint8_t Temperature_UpdateMeasurements(void);
+bool Temperature_UpdateMeasurements(void);
 
 /** Temperature_IsSafe
  * Checks if all modules are safe
  * @param 1 if pack is charging, 0 if discharging
  * @return 1 if pack is safe, 0 if in danger
  */
-uint8_t Temperature_IsSafe(uint8_t isCharging);
+bool Temperature_IsSafe(uint8_t isCharging);
 
 /** Temperature_SetLimits
  * Sets the max temperature limit the cells can reach before danger

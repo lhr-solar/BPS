@@ -69,11 +69,13 @@ void EEPROM_Write(uint16_t address, uint8_t data){
  * @return unsigned 8-bit list of data
  */
 uint8_t *EEPROM_ReadMultipleBytes(uint16_t address, uint32_t bytes){
+	uint8_t data[bytes];
+	
 	for(int i = 0; i < bytes; ++i){
-	//	data[i] = EEPROM_ReadSingleByte(address + i);
+		data[i] = EEPROM_ReadSingleByte(address + i);
 	}
 	
-	//return data;
+	return data;
 }
 
 /** EEPROM_ReadSingleByte

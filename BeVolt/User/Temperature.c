@@ -9,9 +9,6 @@
 // NOTE: All units are in Celsius
 
 #include "Temperature.h"
-#include "LTC2983.h"
-#include "Definition.h"
-#include <stdlib.h>
 
 uint16_t *ModuleTemperatures;				// list of voltages of all modules
 uint16_t MaxTemperatureLimit;				// Max temperature the battery can reach before danger
@@ -28,7 +25,7 @@ void Temperature_Init(void){
  * @param pointer to new temperature measurements
  * @return 1 if successfully stored, 0 if failed
  */
-uint8_t Temperature_UpdateMeasurements(){
+bool Temperature_UpdateMeasurements(){
 	//ModuleTemperatures = LTC2983_Measure();
 
 	if(sizeof(ModuleTemperatures)/sizeof(uint16_t) == NUM_BATTERY_MODULES){
@@ -43,7 +40,7 @@ uint8_t Temperature_UpdateMeasurements(){
  * @param 1 if pack is charging, 0 if discharging
  * @return 1 if pack is safe, 0 if in danger
  */
-uint8_t Temperature_IsSafe(uint8_t isCharging){
+bool Temperature_IsSafe(uint8_t isCharging){
 	
 	/* TODO: Change to accomodate for charge and discharge limits
 	for(int i = 0; i < sizeof(ModuleTemperatures)/sizeof(uint16_t); ++i){
