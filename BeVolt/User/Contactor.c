@@ -6,7 +6,6 @@
  * @lastRevised 11/21/2018
  */
 
-#include <stdint.h>
 #include "Contactor.h"
 #include "stm32f4xx.h"
 

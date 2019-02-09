@@ -16,51 +16,47 @@ void Terminal_CheckInput(){
 
 void Terminal_HandleInput(char * op, char * arg){
 
-	if(strcmp(op, "i") == 0){			// Current status
-		Terminal_currentStatus();
+	if(strcmp(op,"halt") == 0){				// Kill the car
+		Terminal_Halt();
+  }else if(strcmp(op, "i") == 0){	 	// Current status
+		Terminal_CurrentStatus();
 	}else if(strcmp(op, "v") == 0){		// Voltage status
-		Terminal_voltageStatus();
+		Terminal_VoltageStatus();
 	}else if(strcmp(op, "t") == 0){		// Temperature status
-		Terminal_temperatureStatus();
+		Terminal_TemperatureStatus(Current_IsCharging());
 	}else if(strcmp(op, "st") == 0){		// General status
-		Terminal_currentStatus();
-		Terminal_voltageStatus();
-		Terminal_temperatureStatus();
-		Terminal_contactorStatus();
-		Terminal_gyroStatus(0);
+		Terminal_CurrentStatus();
+		Terminal_VoltageStatus();
+		Terminal_TemperatureStatus(Current_IsCharging());
+		Terminal_ContactorStatus();
+		Terminal_GyroStatus(0);
 	}else if(strcmp(op, "c") == 0){		// Contactor status
 		if(arg != NULL){
 			int stat = arg[0] - '0';
-			Terminal_setContactor(stat);
+			Terminal_SetContactor(stat);
 		}
-		Terminal_contactorStatus();
+		Terminal_ContactorStatus();
 	}else if(strcmp(op, "gyro") == 0){		// Gyro status
 		if(arg == NULL){
-			Terminal_gyroStatus(0);
+			Terminal_GyroStatus(0);
 		}else{
 			switch(arg[0]){
 			case 'x':
-				Terminal_gyroStatus(1);
+				Terminal_GyroStatus(1);
 				break;
 			case 'y':
-				Terminal_gyroStatus(2);
+				Terminal_GyroStatus(2);
 				break;
 			case 'z':
-				Terminal_gyroStatus(3);
+				Terminal_GyroStatus(3);
 			}
 		}
 	}else if(strcmp(op, "wd") == 0){		// Watchdog status
-		Terminal_watchdogStatus();
+		Terminal_WatchdogStatus();
 	}else if(strcmp(op, "ee") == 0){		// EEPROM status
-		Terminal_eepromStatus();
-//	}else if(strcmp(op, "can") == 0){		// CAN bus status
-//		Terminal_canStatus();
-//	}else if(strcmp(op, "spi") == 0){		// SPI bus status
-//		Terminal_spiStatus();
-//	}else if(strcmp(op, "i2c") == 0){		// I2C status
-//		Terminal_i2cStatus();
+		Terminal_EepromStatus();
 	}else if(strcmp(op, "h") == 0){		// Print help menu
-		Terminal_helpMenu();
+		Terminal_HelpMenu();
 	}else{
 		printf("\"%s\" is not recognized as a command.", op);
 	}
@@ -68,12 +64,15 @@ void Terminal_HandleInput(char * op, char * arg){
 	printf("\n\r"); // Do a newline for the next command
 }
 
-/*
+void Terminal_halt(){
+	
+}
+
 void Terminal_currentStatus(void){
 	const char* stat = Current_IsSafe() ? "SAFE" : "NOT SAFE";
 	printf("The current level is %s\n\r", stat);
-	printf("High-precision: %u\n\r", Current_HighPrecisionAmperes());
-	printf("Low-precision: %u\n\r", Current_GetLowPrecAmps());
+	printf("High-precision: %u\n\r", Current_GetHighPrecReading());
+	printf("Low-precision: %u\n\r", Current_GetLowPrecReading());
 }
 
 void Terminal_voltageStatus(void){
@@ -81,31 +80,34 @@ void Terminal_voltageStatus(void){
 	printf("The voltage level is %s\n\r", stat);
 	printf("Total pack voltage: %u\n\r", Voltage_GetTotalPackVoltage());
 	printf("Modules in danger: ");
-	uint16_t * modules = Voltage_ModulesInDanger();
+	uint16_t * modules = Voltage_GetModulesInDanger();
 	for(int i = 0; i < sizeof(modules)/sizeof(uint16_t); ++i){
 		printf("%u ", modules[i]);
 	}
 	printf("\n\r");
 }
 
-void Terminal_temperatureStatus(void){
-	const char * stat = Temperature_IsSafe() ? "SAFE" : "NOT SAFE";
+void Terminal_temperatureStatus(uint8_t isCharging){
+	const char * stat = Temperature_IsSafe(isCharging) ? "SAFE" : "NOT SAFE";
 	printf("The temperature level is %s\n\r", stat);
-	printf("Average temperature: %u\n\r", Temperature_TotalPackAvgTemperature());
+	printf("Average temperature: %u\n\r", Temperature_GetTotalPackAvgTemperature());
 	printf("Modules in danger: ");
-	uint16_t * modules = Temperature_ModulesInDanger();
+	uint16_t * modules = Temperature_GetModulesInDanger();
 	for(int i = 0; i < sizeof(modules)/sizeof(uint16_t); ++i){
 		printf("%u ", modules[i]);
 	}
 	printf("\n\r");
 }
-*/
-void Terminal_contactorStatus(void){
 
+void Terminal_contactorStatus(void){
+	printf("The contactor is currently %s", Contactor_Flag() == 0 ? "off" : "on");
 }
 
-void Terminal_setContactor(int status){
-
+void Terminal_setContactor(uint8_t status){
+	if(status == 1)
+		Contactor_On();
+	else
+		Contactor_Off();
 }
 
 /**
@@ -117,30 +119,11 @@ void Terminal_gyroStatus(uint8_t axes){
 }
 
 void Terminal_watchdogStatus(){
-
+	
 }
 
 void Terminal_eepromStatus(){
 
-}
-
-void Terminal_canStatus(){
-	// Not used
-}
-
-void Terminal_spiStatus(){
-	// Not used
-}
-
-void Terminal_i2cStatus(){
-	// Not used
-}
-
-char ** Terminal_splitOps (char * input){
-	char ** ops;
-	ops[0] = strtok(input, " ");
-	ops[1] = strtok(NULL, " ");
-	return ops;
 }
 
 void Terminal_helpMenu(){
@@ -148,6 +131,7 @@ void Terminal_helpMenu(){
 		"This is the help menu for the BeVolt CLI.\n"
 		"The availible commands are listed below.\n"
 		"-----------------------------------------\n"
+		"halt -- kill everything and shut down immediately\n"
 		"i [n] -- access the current readings\n"
 		"\n"
 		"v [n] -- access the voltage readings\n"

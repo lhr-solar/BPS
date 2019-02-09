@@ -6,6 +6,8 @@
  * @lastRevised 11/21/2018
  */
 
+#include <stdint.h>
+
 #ifndef CONTACTOR_H__
 #define CONTACTOR_H__
 

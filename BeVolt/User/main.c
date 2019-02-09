@@ -23,7 +23,7 @@ void preliminaryCheck(void);
 void faultCondition(void);
 
 int main(){
-	__disable_irq();				// Disable all interrupts until initialization is done
+	__disable_irq();			// Disable all interrupts until initialization is done
 	initialize();					// Initialize codes/pins
 	preliminaryCheck();		// Wait until all boards are powered on
 	__enable_irq();				// Enable interrupts
