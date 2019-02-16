@@ -1,4 +1,5 @@
 # ignore
-./BeVolt/BPS-master.uvguix.*
-./BeVolt/Objects
-./BeVolt/Listings
+*BPS-master.uvguix.*
+*Objects
+*Listings
+*DebugConfig
