@@ -1,2 +1,4 @@
-BPS/BeVolt/BPS-master.uvguix.*
-BPS/BeVolt/Objects
+# ignore
+./BeVolt/BPS-master.uvguix.*
+./BeVolt/Objects
+./BeVolt/Listings
