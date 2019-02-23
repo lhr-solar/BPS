@@ -16,6 +16,9 @@ double headings [3]; // x,y,z
  * Initializes and configures LTC6811
  */
 void ICM20600_Init(void){
+	
+	// This needs to be made to work with the global SPI lines
+	
 	GPIO_InitTypeDef GPIO_InitStruct;
 
 	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);	// 1) Initialize GPIO port A clock
@@ -42,15 +45,7 @@ void ICM20600_Init(void){
  * @param unsigned int 8-bit Read/Write' (1/0)
  */
 uint16_t *ICM20600_SendCmd(uint8_t address, uint8_t data, uint8_t rw, uint32_t readSize){
-	uint16_t cmd;
-	cmd = (rw ? 0x8000 : 0x0000) | (address << 8);	// RW and address bits
-	if(!rw) cmd |= data;
-
-	uint16_t result;
-	GPIOB->ODR &= ~GPIO_Pin_12;
-	*result = SPI_WriteRead16(&cmd, 1, result, readSize);
-
-	return result;
+	return 0;	// TODO: Complete this function
 }
 
 /** ICM20600_Measure

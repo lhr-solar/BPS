@@ -15,10 +15,25 @@
 
 #define EEPROM_ADDRESS 0x10
 
+#define EEPROM_SELECT_CODE_READ 	0xA1	// this might be different in practice
+#define EEPROM_SELECT_CODE_WRITE 	0xA0	// this might be different in practice
+
+#define EEPROM_FAULT_CODE_ADDR 0x01
+#define EEPROM_TEMP_FAULT  		 0x10
+#define EEPROM_VOLT_FAULT		   0x20
+#define EEPROM_CURRENT_FAULT	 0x30
+#define EEPROM_WWDG_FAULT		   0x40
+#define EEPROM_CAN_FAULT			 0x50
+
 /** EEPROM_Init
  * Initializes I2C to communicate with EEPROM (M24128)
  */
 void EEPROM_Init(void);
+
+/** EEPROM_Log
+ * Logs some information to the EEPROM
+ */
+void EEPROM_Log(uint8_t logType, uint8_t data);
 
 /** EEPROM_Write
  * Saves data to the EEPROM at the specified address
@@ -33,7 +48,7 @@ void EEPROM_Write(uint16_t address, uint8_t data);
  * @param number of bytes to read
  * @return unsigned 8-bit list of data
  */
-uint8_t *EEPROM_ReadMultipleBytes(uint16_t address, uint32_t bytes);
+void EEPROM_ReadMultipleBytes(uint16_t address, uint32_t bytes, uint8_t* buffer);
 
 /** EEPROM_ReadSingleByte
  * Gets multiple bytes of data sequentially from EEPROM beginning at specified address
