@@ -47,4 +47,4 @@ void Contactor_Off(void){
 uint32_t Contactor_Flag(void){
 	return GPIOB->IDR & GPIO_Pin_1;
 }
-	
+

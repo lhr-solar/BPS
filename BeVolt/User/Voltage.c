@@ -33,6 +33,7 @@ uint8_t Voltage_UpdateMeasurements(){
 	LTC6811_adcv(ADC_CONVERSION_MODE,ADC_DCP,CELL_CH_TO_CONVERT);
 	LTC6811_pollAdc();
 	error = LTC6811_rdcv(0, NUM_VOLTAGE_BOARDS, Modules); // Set to read back all cell voltage registers
+	return error;
 }
 
 /** Voltage_IsSafe

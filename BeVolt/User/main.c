@@ -195,6 +195,87 @@ void print_config(cell_asic *bms_ic)
 }
 #endif
 
+#ifdef VOLTAGE_TEST
+int main(){
+	UART3_Init(9600);
+	Voltage_Init();
+	Voltage_UpdateMeasurements();
+	printf("\n\rVoltage Test:\n\r");
+	printf("Is it safe? %d\n\r\n\r", Voltage_IsSafe());
+	printf("Voltages of all modules:\n\r");
+	for(int32_t i = 0; i < NUM_BATTERY_MODULES; i++){
+		printf("%d : %d\n\r", i, Voltage_GetModuleVoltage(i));
+	}
+	while(1){
+	
+	}
+}
+#endif
+
+#ifdef CURRENT_TEST
+int main(){
+	UART3_Init(9600);
+	Current_Init();
+	Current_UpdateMeasurements();
+	printf("\n\rCurrent Test:\n\r");
+	printf("Is it safe? %d\n\r", Current_IsSafe());
+	printf("Is the battery charging? %d\n\r\n\r", Current_IsCharging());
+	printf("Low Precision: %d\n\r", Current_GetLowPrecReading());
+	printf("High Precision: %d\n\r", Current_GetHighPrecReading());
+	while(1){
+	
+	}
+}
+#endif
+
+#ifdef TEMPERATURE_TEST
+int main(){
+
+	while(1){
+	
+	}
+}
+#endif
+
+#ifdef CONTACTOR_TEST
+int main(){
+	Contactor_Init();
+	Contactor_Off();
+	for(int32_t i = 0; i < 1000000; i++);	// delay
+	Contactor_On();
+	for(int32_t i = 0; i < 5000000; i++);	// delay
+	Contactor_Off();
+	while(1){
+	
+	}
+}
+#endif
+
+#ifdef WATCHDOG_TEST
+int main(){
+	WDTimer_Init();
+	WDTimer_Start();
+	
+	// reset WDTimer 10 times. With this counter, the watchdog timer should not reset the system shortly after it starts.
+	for(int32_t i = 0; i < 10; i++){
+		for(int32_t j = 0; j < 100000; j++);	// Delay
+		WDTimer_Reset();
+	}
+	while(1){
+		
+	}
+}
+#endif
+
+#ifdef SOC_TEST
+int main(){
+	SoC_Init();
+	while(1){
+	
+	}
+}
+#endif
+
 #ifdef SPI_TEST
 //****************************************************************************************
 // SPI Test
@@ -241,8 +322,11 @@ int UARTmain(){
 #ifdef I2C_TEST
 //****************************************************************************************
 // I2C test
+#include "I2C.h"
 int main(){
-	
+	uint8_t randomData[5] = {0x04, 0x02, 0x42, 0x24, 0x44};
+	I2C3_Init();
+	I2C3_WriteMultiple(0xA0, 0xCC, randomData);
 	while(1){
 	
 	}

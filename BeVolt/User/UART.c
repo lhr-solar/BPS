@@ -15,11 +15,11 @@
  *		rx : PD9
  */
  
-#include <stdint.h>
-#include <stdio.h>
-#include "stm32f4xx.h"
-#include "FIFO.h"
-#include "Settings.h"
+#include "UART.h"
+
+#define FIFO_SIZE		32
+#define FIFO_SUCCESS	1
+#define FIFO_FAIL		0
 
 // This is required to use printf
 struct __FILE{
@@ -27,14 +27,20 @@ struct __FILE{
 };
 
 // Global variables
+static bool NewCommandReceivedFlag = false;
 static uint32_t TxErrorCnt = 0;
 static uint32_t RxErrorCnt = 0;
 FILE __stdout;
 FILE __stdin;
 
+AddIndexFifo(Rx, FIFO_SIZE, char, FIFO_SUCCESS, FIFO_FAIL)
+AddIndexFifo(Tx, FIFO_SUCCESS, char, FIFO_SUCCESS, FIFO_FAIL)
+
 // Private Function Prototypes
 void copySoftwareToHardware(void);
 void copyHardwareToSoftware(void);
+void UART1_OutChar(char data);
+void UART3_OutChar(char data);
 
 // Public Function Definitions
 /** UART1_Init
@@ -60,8 +66,8 @@ void UART1_Init(uint32_t baud){
 	GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
 	GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_UP;
 	GPIO_Init(GPIOA, &GPIO_InitStruct);
-	GPIO_PinAFConfig(GPIOA, GPIO_PinSource8, GPIO_AF_USART3);
-	GPIO_PinAFConfig(GPIOA, GPIO_PinSource9, GPIO_AF_USART3);
+	GPIO_PinAFConfig(GPIOA, GPIO_PinSource9, GPIO_AF_USART1);
+	GPIO_PinAFConfig(GPIOA, GPIO_PinSource10, GPIO_AF_USART1);
 	
 	// Initialize USART1
 	USART_InitStruct.USART_BaudRate = baud;
@@ -74,14 +80,17 @@ void UART1_Init(uint32_t baud){
 	USART_Cmd(USART1, ENABLE);
 	
 	USART_ITConfig(USART1, USART_IT_RXNE, ENABLE);
-	USART_ITConfig(USART1, USART_IT_TC, DISABLE);
+	USART_ITConfig(USART1, USART_IT_TXE, DISABLE);
 	
 	// Set NVIC
-	NVIC_InitStruct.NVIC_IRQChannel = UART4_IRQn;
+	NVIC_InitStruct.NVIC_IRQChannel = USART1_IRQn;
 	NVIC_InitStruct.NVIC_IRQChannelPreemptionPriority = 0;
 	NVIC_InitStruct.NVIC_IRQChannelSubPriority = UART1_PRIORITY;
 	NVIC_InitStruct.NVIC_IRQChannelCmd = ENABLE;
 	NVIC_Init(&NVIC_InitStruct);
+	
+	RxFifo_Init();
+	TxFifo_Init();
 }
 
 /** UART1_Write
@@ -90,27 +99,30 @@ void UART1_Init(uint32_t baud){
  */
 void UART1_Write(char *txBuf, uint32_t txSize){
 	for(uint32_t i = 0; i < txSize; i++){
-		if(FIFO_IsFull_Tx() != 0){
-			TxErrorCnt++;
-		}else{
-			FIFO_Put_Tx(txBuf[i]);
-		}			
+		UART1_OutChar(*txBuf);
+		txBuf++;
 	}
 	
 	// Enable interrupt since Fifo now has contents
-	USART_ClearITPendingBit(USART1, USART_IT_TC);
-	USART_ITConfig(USART1, USART_IT_TC, ENABLE);
+	USART_ClearITPendingBit(USART1, USART_IT_TXE);
+	USART_ITConfig(USART1, USART_IT_TXE, ENABLE);
 }
 
 /** UART1_Read
- * Sends data through tx pin for UART1
+ * Reads data from rx pin for UART1
  * The data received will be stored in rxBuf
+ * Make sure your buffer size is enough to get whole string.
  * @param ptr to char buffer, size of buffer
+ * @param 1 if successfully got new string, 0 if not
  */
-void UART1_Read(char *rxBuf, uint32_t rxSize){
-	for(uint32_t i = 0; i < rxSize; i++){
-		// TODO:
+bool UART1_Read(char *rxBuf, uint32_t rxSize){
+	if(NewCommandReceivedFlag){
+		for(uint32_t i = 0; i < rxSize && RxFifo_Size() > 0; i++){
+			RxFifo_Get(&rxBuf[i]);
+		}
+		return true;
 	}
+	return false;
 }
 
 /**************** WARNING ***************/
@@ -149,8 +161,6 @@ void UART3_Init(uint32_t baud){
 	USART_InitStruct.USART_WordLength = USART_WordLength_8b;
 	USART_Init(USART3, &USART_InitStruct);
 	USART_Cmd(USART3, ENABLE);
-	
-	FIFO_Init();
 }
 
 /** UART3_Write
@@ -176,17 +186,20 @@ void UART3_Read(char *rxBuf, uint32_t rxSize){
 	}
 }
 
+
+
 // Private Function Definitions
 /** copySoftwareToHardware
  * Places contents of tx software buffer to hardware FIFO
  */
 void copySoftwareToHardware(void){
-	if(FIFO_IsEmpty_Tx()){
-		USART_ClearITPendingBit(USART1, USART_IT_TC);
-		USART_ITConfig(USART1, USART_IT_TC, DISABLE);
+	char letter;
+	if(TxFifo_Size() == 0){
+		USART_ITConfig(USART1, USART_IT_TXE, DISABLE);
 		TxErrorCnt++;
 	}else{
-		USART1->DR = FIFO_Get_Tx();
+		TxFifo_Get(&letter);
+		USART1->DR = letter;
 	}
 }
 
@@ -195,20 +208,23 @@ void copySoftwareToHardware(void){
  */
 void copyHardwareToSoftware(void){
 	uint32_t data = USART1->DR;
-	if(FIFO_IsFull_Rx()){
+	if(RxFifo_Size() >= (FIFO_SIZE - 1)){
 		volatile uint32_t junk = data;
 		RxErrorCnt++;
 	}else{
-		FIFO_Put_Rx(data & 0xFF);
+		RxFifo_Put(data & 0xFF);
+		if(data == '\n' || data == '\r'){
+			NewCommandReceivedFlag = true;
+		}
 	}
+	UART1_OutChar(data);	// echo
 }
 
 void UART1_OutChar(char data){
-	while(FIFO_IsFull_Tx());
-	FIFO_Put_Tx(data);
-	USART_ITConfig(USART1, USART_IT_TC, DISABLE);
+	while(TxFifo_Put(data) == FIFO_FAIL);
+	USART_ITConfig(USART1, USART_IT_TXE, DISABLE);
 	copySoftwareToHardware();
-	USART_ITConfig(USART1, USART_IT_TC, ENABLE);
+	USART_ITConfig(USART1, USART_IT_TXE, ENABLE);
 }
 
 void UART3_OutChar(char data){
@@ -239,11 +255,16 @@ int fgetc(FILE *f){
 /***************************** Interrupt Service Routines ******************************/
 void USART1_IRQHandler(void){
 	// Transmission Complete ISR
-	if(USART_GetITStatus(USART1, USART_IT_TC) != RESET){
+	if(USART_GetITStatus(USART1, USART_IT_TXE) != RESET){
+		USART_ClearITPendingBit(USART1, USART_IT_TXE);	// acknowledge
 		copySoftwareToHardware();
+		if(TxFifo_Size() == 0){
+			USART_ITConfig(USART1, USART_IT_TXE, DISABLE);
+		}
 	}
 	// Rx Fifo Not Empty ISR
 	if(USART_GetITStatus(USART1, USART_IT_RXNE) != RESET){
+		USART_ClearITPendingBit(USART1, USART_IT_RXNE);	// acknowledge
 		copyHardwareToSoftware();
 	}
 	// Overflow error ISR

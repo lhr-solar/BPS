@@ -1,11 +1,3 @@
-/**
-* @file FIFO.h
-* @brief For creating FIFOs
-*
-* @author Valvano
-*
-* @date 2/04/2019
-*/
 // FIFO.h
 // Runs on any LM3Sxxx
 // Provide functions that initialize a FIFO, put data in, get data out,
@@ -56,7 +48,7 @@ int NAME ## Fifo_Put (TYPE data){       \
     return(FAIL);      \
   }                    \
   NAME ## Fifo[ NAME ## PutI &(SIZE-1)] = data; \
-  NAME ## PutI ## ++;  \
+  NAME ## PutI++;  \
   return(SUCCESS);     \
 }                      \
 int NAME ## Fifo_Get (TYPE *datapt){  \
@@ -64,7 +56,7 @@ int NAME ## Fifo_Get (TYPE *datapt){  \
     return(FAIL);      \
   }                    \
   *datapt = NAME ## Fifo[ NAME ## GetI &(SIZE-1)];  \
-  NAME ## GetI ## ++;  \
+  NAME ## GetI++;  \
   return(SUCCESS);     \
 }                      \
 unsigned short NAME ## Fifo_Size (void){  \
@@ -104,7 +96,7 @@ int NAME ## Fifo_Get (TYPE *datapt){    \
   if( NAME ## PutPt == NAME ## GetPt ){ \
     return(FAIL);                       \
   }                                     \
-  *datapt = *( NAME ## GetPt ## ++);    \
+  *datapt = *( NAME ## GetPt++);    \
   if( NAME ## GetPt == &NAME ## Fifo[SIZE]){ \
     NAME ## GetPt = &NAME ## Fifo[0];   \
   }                                     \

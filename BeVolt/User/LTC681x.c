@@ -72,7 +72,7 @@ void delay_m(uint16_t milli)
 
 void wakeup_idle(uint8_t total_ic)
 {
-	uint8_t tempReg;		// Temporary buffer
+	volatile uint8_t tempReg;		// Temporary buffer
   for (int i =0; i<total_ic; i++)
   {
     CSLow(CS_PIN);
@@ -1608,7 +1608,7 @@ void LTC681x_stcomm()
 
   uint8_t cmd[4];
   uint16_t cmd_pec;
-	uint8_t temp;
+	volatile uint8_t temp;
 
   cmd[0] = 0x07;
   cmd[1] = 0x23;
