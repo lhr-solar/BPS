@@ -441,16 +441,6 @@
               <FileType>1</FileType>
               <FilePath>.\User\WDTimer.c</FilePath>
             </File>
-            <File>
-              <FileName>Terminal.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\User\Terminal.c</FilePath>
-            </File>
-            <File>
-              <FileName>Gyro.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\User\Gyro.c</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
@@ -552,11 +542,6 @@
               <FilePath>.\User\UART.c</FilePath>
             </File>
             <File>
-              <FileName>FIFO.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\User\FIFO.c</FilePath>
-            </File>
-            <File>
               <FileName>LED.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\User\LED.c</FilePath>
@@ -570,6 +555,11 @@
               <FileName>SPI.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\User\SPI.c</FilePath>
+            </File>
+            <File>
+              <FileName>I2C.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\User\I2C.c</FilePath>
             </File>
           </Files>
         </Group>

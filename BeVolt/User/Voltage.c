@@ -8,18 +8,18 @@
 
 #include "Voltage.h"
 #include "LTC6811.h"
-#include "Definition.h"
+#include "Settings.h"
 #include <stdlib.h>
 
-uint16_t static Modules[NUM_BATTERY_MODULES];		// Holds voltage values of modules
-uint16_t static MaxVoltageLimit;	// maximum voltage limit the battery can reach before danger
-uint16_t static MinVoltageLimit;	// minimum voltage limit the battery can reach before danger
+cell_asic Modules[NUM_VOLTAGE_BOARDS];
 
 /** Voltage_Init
  * Initializes all device drivers including LTC6811 and GPIO to begin Voltage Monitoring
  */
 void Voltage_Init(void){
-	
+	wakeup_sleep(NUM_VOLTAGE_BOARDS);
+	LTC6811_Init(Modules);
+	LTC6811_wrcfg(NUM_VOLTAGE_BOARDS, Modules);
 }
 
 /** updateMeasurements
@@ -28,13 +28,11 @@ void Voltage_Init(void){
  * @return 1 if successfully stored, 0 if failed
  */
 uint8_t Voltage_UpdateMeasurements(){
-//	Modules = LTC6811_Measure();
-	
-	if(sizeof(Modules)/sizeof(uint16_t) == NUM_BATTERY_MODULES){
-		return 1;
-	}else{
-		return 0;
-	}
+	int32_t error;
+	wakeup_sleep(NUM_VOLTAGE_BOARDS);
+	LTC6811_adcv(ADC_CONVERSION_MODE,ADC_DCP,CELL_CH_TO_CONVERT);
+	LTC6811_pollAdc();
+	error = LTC6811_rdcv(0, NUM_VOLTAGE_BOARDS, Modules); // Set to read back all cell voltage registers
 }
 
 /** Voltage_IsSafe
@@ -42,8 +40,9 @@ uint8_t Voltage_UpdateMeasurements(){
  * @return 1 if pack is safe, 0 if in danger
  */
 uint8_t Voltage_IsSafe(void){
-	for(int i = 0; i < sizeof(Modules)/sizeof(uint16_t); ++i){
-		if(Voltage_GetModuleVoltage(i) > MaxVoltageLimit || Voltage_GetModuleVoltage(i) < MinVoltageLimit){
+	for(int32_t i = 0; i < NUM_BATTERY_MODULES; i++){
+		uint16_t voltage = Modules[i / 12].cells.c_codes[i % 12];
+		if(voltage < MAX_VOLTAGE_LIMIT || voltage < MIN_VOLTAGE_LIMIT){
 			return 0;
 		}
 	}
@@ -57,8 +56,7 @@ uint8_t Voltage_IsSafe(void){
  * @param min voltage limit
  */
 void Voltage_SetLimits(uint16_t ceiling, uint16_t floor){
-	MaxVoltageLimit = ceiling;
-	MinVoltageLimit = floor;
+	
 }
 
 /** Voltage_GetModulesInDanger
@@ -66,9 +64,9 @@ void Voltage_SetLimits(uint16_t ceiling, uint16_t floor){
  * @return pointer to index of modules that are in danger
  */
 uint16_t *Voltage_GetModulesInDanger(void){
-	int checks[NUM_BATTERY_MODULES];
+	static uint16_t checks[NUM_BATTERY_MODULES];
 	for(int i = 0; i < NUM_BATTERY_MODULES; ++i){
-		if(Voltage_GetModuleVoltage(i) > MaxVoltageLimit || Voltage_GetModuleVoltage(i) < MinVoltageLimit){
+		if(Voltage_GetModuleVoltage(i) > MAX_VOLTAGE_LIMIT || Voltage_GetModuleVoltage(i) < MIN_VOLTAGE_LIMIT){
 			checks[i] = 1;	// 1 shows that the unit is in danger
 		}else{
 			checks[i] = 0;	// 0 shows that the unit is not in danger
@@ -80,8 +78,9 @@ uint16_t *Voltage_GetModulesInDanger(void){
 		sum += checks[i];
 	}
 
+	/*
 	// TODO: Figure out if this is bad practice
-	uint16_t * endangeredModules = (uint16_t *) malloc(sum);
+	uint16_t endangeredModules[;
 	int j = 0;
 	for(int i = 0; i < sum; ++i){
 		if(checks[i]){
@@ -91,6 +90,8 @@ uint16_t *Voltage_GetModulesInDanger(void){
 	}
 
 	return endangeredModules;
+	*/
+	return checks;
 }
 
 /** Voltage_GetModuleVoltage
@@ -99,7 +100,8 @@ uint16_t *Voltage_GetModulesInDanger(void){
  * @return voltage of module at specified index
  */
 uint16_t Voltage_GetModuleVoltage(uint16_t moduleIdx){
-	return Modules[moduleIdx];
+	int32_t boardIdx = moduleIdx / 12;
+	return Modules[boardIdx].cells.c_codes[moduleIdx % 12];
 }
 
 /** Voltage_GetTotalPackVoltage
@@ -108,8 +110,8 @@ uint16_t Voltage_GetModuleVoltage(uint16_t moduleIdx){
  */
 uint16_t Voltage_GetTotalPackVoltage(void){
 	int sum = 0;
-	for(int i = 0; i < sizeof(Modules)/sizeof(uint16_t); ++i){
-		sum += Modules[i];
+	for(int32_t i = 0; i < NUM_BATTERY_MODULES; i++){
+		sum += Modules[i / 12].cells.c_codes[i % 12];
 	}
 
 	return sum;

@@ -19,7 +19,7 @@
 #include <stdio.h>
 #include "stm32f4xx.h"
 #include "FIFO.h"
-#include "Definition.h"
+#include "Settings.h"
 
 // This is required to use printf
 struct __FILE{

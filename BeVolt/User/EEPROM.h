@@ -13,7 +13,7 @@
 
 #include <stdint.h>
 
-#define EEPROM_ADDRESS 0x10
+#define EEPROM_ADDRESS 0x50 << 1
 
 #define EEPROM_SELECT_CODE_READ 	0xA1	// this might be different in practice
 #define EEPROM_SELECT_CODE_WRITE 	0xA0	// this might be different in practice

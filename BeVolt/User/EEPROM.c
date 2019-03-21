@@ -7,14 +7,14 @@
 
 #include "EEPROM.h"
 #include "stm32f4xx.h"
-#include "I2C_Driver.h"	// Just making up a name for now
+#include "I2C.h"
 #include <stdlib.h>
 
 /** EEPROM_Init
  * Initializes I2C to communicate with EEPROM (M24128)
  */
 void EEPROM_Init(void){
-	I2C_Begin();	// Again, making up names
+	I2C3_Init();
 }
 
 /** EEPROM_Log
@@ -53,11 +53,7 @@ void EEPROM_Log(uint8_t logType, uint8_t data){
  * @param unsigned byte of data
  */
 void EEPROM_Write(uint16_t address, uint8_t data){
-	I2C_BeginTransmission(EEPROM_ADDRESS);
-	I2C_Write((uint8_t)(address >> 4));
-	I2C_Write((uint8_t)(address & 0xFF));
-	I2C_Write((data));
-	I2C_EndTransmission();
+	I2C3_Write(EEPROM_ADDRESS, address, data);
 }
 
 /** EEPROM_ReadMultipleBytes
@@ -67,14 +63,7 @@ void EEPROM_Write(uint16_t address, uint8_t data){
  * @return unsigned 8-bit list of data
  */
 void EEPROM_ReadMultipleBytes(uint16_t address, uint32_t bytes, uint8_t* buffer){
-	I2C_BeginTransmission(EEPROM_ADDRESS);
-	I2C_Write((uint8_t)(address >> 4));
-	I2C_Write((uint8_t)(address & 0xFF));
-	I2C_EndTransmission();
-	I2C_RequestFrom(EEPROM_ADDRESS, bytes);
-	for (int i = 0; i < bytes; ++i){
-		if(I2C_Available()) buffer[i] = I2C_Read();
-	}
+	I2C3_ReadMultiple(EEPROM_ADDRESS, address, buffer, bytes);
 	
 }
 
@@ -84,14 +73,5 @@ void EEPROM_ReadMultipleBytes(uint16_t address, uint32_t bytes, uint8_t* buffer)
  * @return unsigned 8-bit data
  */
 uint8_t EEPROM_ReadSingleByte(uint16_t address){
-	uint8_t data;
-	I2C_BeginTransmission(EEPROM_ADDRESS);
-	I2C_Write((uint8_t)(address >> 4));
-	I2C_Write((uint8_t)(address & 0xFF);
-	I2C_EndTransmission();
-	I2C_RequestFrom(EEPROM_ADDRESS, 1);
-	
-	if(I2C_Available()) data = I2C_Read();
-	
-	return data;
+	return I2C3_Read(EEPROM_ADDRESS, address);
 }
