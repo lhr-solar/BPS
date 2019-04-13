@@ -1,6 +1,14 @@
-/** LED.h
- * LED driver for status signals.
- * @authors Chase Block
- * @lastRevised 11/17/18
- */
- 
+#ifndef LED_H
+#define LED_H
+
+typedef enum led{FAULT, RUN, UVOLT, OVOLT, OTEMP, OCURR, WDOG, CAN, EXTRA} led;
+
+void LED_Init(void);
+
+void LED_Toggle(led signal);
+
+void LED_On(led signal);
+
+void LED_Off(led signal);
+
+#endif

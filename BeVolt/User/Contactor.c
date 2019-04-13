@@ -16,7 +16,7 @@ void Contactor_Init(void){
 	GPIO_InitTypeDef GPIO_InitStruct;
 	
 	// Initialize clock
-	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
+	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
 	
 	// Initialize PB0 as output
 	GPIO_InitStruct.GPIO_Pin = GPIO_Pin_0 | GPIO_Pin_1;

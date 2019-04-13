@@ -22,7 +22,7 @@ void initialize(void);
 void preliminaryCheck(void);
 void faultCondition(void);
 
-int main(){
+int mainmain(){
 	__disable_irq();			// Disable all interrupts until initialization is done
 	initialize();					// Initialize codes/pins
 	preliminaryCheck();		// Wait until all boards are powered on
@@ -117,7 +117,36 @@ void faultCondition(void){
 // E.g. If you want to run a LTC6811 test, change "#define CHANGE_THIS_TO_TEST_NAME" to the
 //		following:
 //		#define LTC6811_TEST
-#define CHANGE_THIS_TO_TEST_NAME
+#define CONTACTOR_TEST
+
+#ifdef LED_TEST
+#include "LED.h"
+void LEDdelay(int time){
+	for(int i = 0; i < time; i++);
+}
+
+int main(){
+	LED_Init();
+	while(1){
+		LED_Toggle(FAULT);
+		LEDdelay(100000);
+		LED_On(UVOLT);
+		LEDdelay(100000);
+		LED_Toggle(OVOLT);
+		LEDdelay(100000);
+		LED_Toggle(OTEMP);
+		LEDdelay(100000);
+		LED_Toggle(OCURR);
+		LEDdelay(100000);
+		LED_Toggle(WDOG);
+		LEDdelay(100000);
+		LED_Toggle(CAN);
+		LEDdelay(100000);
+		LED_Toggle(EXTRA);
+		LEDdelay(100000);
+	}
+}
+#endif
 
 #ifdef LTC6811_TEST
 // LTC6811 Test
@@ -241,12 +270,12 @@ int main(){
 int main(){
 	Contactor_Init();
 	Contactor_Off();
-	for(int32_t i = 0; i < 1000000; i++);	// delay
-	Contactor_On();
-	for(int32_t i = 0; i < 5000000; i++);	// delay
-	Contactor_Off();
+	//for(int32_t i = 0; i < 1000000; i++);	// delay
+	//Contactor_On();
+	//for(int32_t i = 0; i < 5000000; i++);	// delay
+	//Contactor_Off();
 	while(1){
-	
+		//Contactor_On();
 	}
 }
 #endif
@@ -310,7 +339,7 @@ int SPITestmain(){
 #ifdef UART_TEST
 //****************************************************************************************
 // Debug UART Test
-int UARTmain(){
+int main(){
 	UART3_Init(9600);
 	while(1){
 		printf("Die world\n");
