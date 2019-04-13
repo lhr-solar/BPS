@@ -67,9 +67,11 @@ uint32_t ADC_ReadLow(void){
  */
 uint32_t ADC_Conversion (uint32_t ADC_Reading){
  // note Fred's board already converts the -4 to 4 volts to 0-4 
- uint32_t convertedVoltage = (ADC_Reading*4.096)/2047; // converts ADC reading to a voltage
- uint32_t convertedCurrent = convertedVoltage*(200/4); // takes voltage and converts to a current reading, given linear slope
- return convertedCurrent; 
+ //uint32_t convertedVoltage = ((ADC_Reading*4.096)/2047)*1000; // converts ADC reading to a voltage
+ uint32_t convertedVoltage = (((ADC_Reading*3300)/4096));
+ int32_t convertedCurrent = (convertedVoltage-2048)*(100/4); // takes voltage and converts to a current reading, given linear slope
+ return convertedCurrent;
+ //return convertedVoltage;	
 }
 
 /** ADC_ChooseHiLo
@@ -78,9 +80,10 @@ uint32_t ADC_Conversion (uint32_t ADC_Reading){
  * @returns converted value
  */
 uint32_t ADC_ChooseHiLo (uint32_t highReading, uint32_t lowReading){
-	if (ADC_Conversion(highReading) < 50){
+	return ADC_Conversion(lowReading);
+	/*if (ADC_Conversion(highReading) < 50){
 		return ADC_Conversion(lowReading);
 	}
-	return ADC_Conversion(highReading);
+	return ADC_Conversion(highReading);*/
 }
 
