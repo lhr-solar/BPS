@@ -22,7 +22,7 @@ void initialize(void);
 void preliminaryCheck(void);
 void faultCondition(void);
 
-int main(){
+int mainmain(){
 	__disable_irq();			// Disable all interrupts until initialization is done
 	initialize();					// Initialize codes/pins
 	preliminaryCheck();		// Wait until all boards are powered on
@@ -117,7 +117,7 @@ void faultCondition(void){
 // E.g. If you want to run a LTC6811 test, change "#define CHANGE_THIS_TO_TEST_NAME" to the
 //		following:
 //		#define LTC6811_TEST
-#define CHANGE_THIS_TO_TEST_NAME
+#define SOC_TEST
 
 #ifdef LTC6811_TEST
 // LTC6811 Test
@@ -255,13 +255,35 @@ int gyroTestmain(){
 //****************************************************************************************
 #include "ADC.h"
 #include <stdio.h>
+#include <UART.h>
 int ADCmain(){
 	char str[50];
 	UART3_Init(9600);
 	ADC_InitHilo();
 	while(1){
-		sprintf(str,"%d\t%d\n",(int)ADC_ReadHigh(),(int)ADC_ReadLow());
+		//sprintf(str,"%d\n",ADC_ChooseHiLo(ADC_ReadHigh(),ADC_ReadLow()));
+		sprintf(str,"%d\r\n",ADC_Conversion(ADC_ReadLow()));
 		UART3_Write(str,strlen(str));
 	}		
 }
+#endif
+
+#ifdef SOC_TEST
+// *****************************************************************************************
+#include "SOC.h"
+#include <stdio.h>
+#include <UART.h>
+int main(){
+	char str[50];
+	UART3_Init(9600);
+	SoC_Init();
+	sprintf(str,"die world");
+	UART3_Write(str, strlen(str));
+	while(1){
+		int counter = TIM2->CNT;							//find current value of up counter
+		sprintf(str,"%d\r\n",counter);  
+		UART3_Write(str, strlen(str));
+	}
+}
+	
 #endif
