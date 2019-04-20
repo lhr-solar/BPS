@@ -8,9 +8,11 @@
 #define __UART_H__
 
 #include <stdint.h>
+#include <stdio.h>
+#include <stdbool.h>
 #include "stm32f4xx.h"
 #include "FIFO.h"
-#include "Definition.h"
+#include "Settings.h"
 
 /***** Unlike SPI, UART cannot have multiple modules connected to the same tx/rx line *****/
 // ONLY USE UART3 FOR DEBUGGING ON NUCLEO!!!!
@@ -40,11 +42,13 @@ void UART1_Init(uint32_t baud);
 void UART1_Write(char *txBuf, uint32_t txSize);
 
 /** UART1_Read
- * Sends data through tx pin for UART1
+ * Reads data from rx pin for UART1
  * The data received will be stored in rxBuf
+ * Make sure your buffer size is enough to get whole string.
  * @param ptr to char buffer, size of buffer
+ * @param 1 if successfully got new string, 0 if not
  */
-void UART1_Read(char *rxBuf, uint32_t rxSize);
+bool UART1_Read(char *rxBuf, uint32_t rxSize);
 
 /**************** WARNING ***************/
 // ONLY USE THIS FOR DEBUGGING ON NUCLEO!!!!!

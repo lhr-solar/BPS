@@ -68,7 +68,7 @@ Copyright 2017 Linear Technology Corp. (LTC)
 #include <stdint.h>
 #include "LTC681x.h"
 #include "LTC6811.h"
-#include "definition.h"
+#include "Settings.h"
 #include "stm32f4xx.h"
 #include "SPI.h"
 
@@ -77,8 +77,16 @@ Copyright 2017 Linear Technology Corp. (LTC)
 /*********************************************************/
 void LTC6811_Init(cell_asic *battMod){	
 	SPI_Init8();							// Initialize 8 bit SPI
-	SPI_InitCS(GPIO_Pin_6);	// Initialize PB6 as chip select.
-	SPI_CSHigh(GPIO_Pin_6);
+	
+	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);	// 1) Initialize GPIO port A clock
+	
+	GPIO_InitTypeDef GPIO_InitStruct;
+	GPIO_InitStruct.GPIO_Pin = GPIO_Pin_6;								// 2) Initialize which pins to use
+	GPIO_InitStruct.GPIO_Mode = GPIO_Mode_OUT;						// 3) Set as output
+	GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_UP;							// 4) Set the resistor to pull-up
+	GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;				// 5) Initialize the speed of communication as 25 MHz
+	GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;						// 6) Set to push/pull
+	GPIO_Init(GPIOB, &GPIO_InitStruct);
 	
 	LTC681x_init_cfg(NUM_VOLTAGE_BOARDS, battMod);
 	LTC6811_reset_crc_count(NUM_VOLTAGE_BOARDS, battMod);

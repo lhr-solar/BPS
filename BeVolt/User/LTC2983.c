@@ -67,3 +67,4 @@ void LTC2983_SendCmd(uint16_t *data){
 uint16_t *LTC2983_Measure(void){
 	
 }
+

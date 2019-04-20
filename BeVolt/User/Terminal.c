@@ -5,42 +5,34 @@
  */
 #include "Terminal.h"
 
-void Terminal_CheckInput(){
-	char * op;
-	if(scanf("%s", op) > 0){
-		char * arg;
-		scanf("%s", arg);
-		Terminal_HandleInput(op, arg);
-	}
-}
+void Terminal_HandleInput(char ** op){
 
-void Terminal_HandleInput(char * op, char * arg){
-
-	if(strcmp(op,"halt") == 0){				// Kill the car
+	char* cmd = op[0];
+	
+	if(strcmp(cmd,"halt") == 0){				// Kill the car
 		Terminal_Halt();
-  }else if(strcmp(op, "i") == 0){	 	// Current status
+  }else if(strcmp(cmd, "i") == 0){	 	// Current status
 		Terminal_CurrentStatus();
-	}else if(strcmp(op, "v") == 0){		// Voltage status
+	}else if(strcmp(cmd, "v") == 0){		// Voltage status
 		Terminal_VoltageStatus();
-	}else if(strcmp(op, "t") == 0){		// Temperature status
+	}else if(strcmp(cmd, "t") == 0){		// Temperature status
 		Terminal_TemperatureStatus(Current_IsCharging());
-	}else if(strcmp(op, "st") == 0){		// General status
+	}else if(strcmp(cmd, "st") == 0){		// General status
 		Terminal_CurrentStatus();
 		Terminal_VoltageStatus();
 		Terminal_TemperatureStatus(Current_IsCharging());
 		Terminal_ContactorStatus();
 		Terminal_GyroStatus(0);
-	}else if(strcmp(op, "c") == 0){		// Contactor status
-		if(arg != NULL){
-			int stat = arg[0] - '0';
-			Terminal_SetContactor(stat);
+	}else if(strcmp(cmd, "c") == 0){		// Contactor status
+		if(op[1] != NULL){
+			Terminal_SetContactor(!strcmp(op[1], "on"));	// If op == "on", then strcmp returns 0, which when inverted is 1.
 		}
 		Terminal_ContactorStatus();
-	}else if(strcmp(op, "gyro") == 0){		// Gyro status
-		if(arg == NULL){
+	}else if(strcmp(cmd, "gyro") == 0){		// Gyro status
+		if(op[1] == NULL){
 			Terminal_GyroStatus(0);
 		}else{
-			switch(arg[0]){
+			switch(op[1][0]){
 			case 'x':
 				Terminal_GyroStatus(1);
 				break;
@@ -51,31 +43,31 @@ void Terminal_HandleInput(char * op, char * arg){
 				Terminal_GyroStatus(3);
 			}
 		}
-	}else if(strcmp(op, "wd") == 0){		// Watchdog status
+	}else if(strcmp(cmd, "wd") == 0){		// Watchdog status
 		Terminal_WatchdogStatus();
-	}else if(strcmp(op, "ee") == 0){		// EEPROM status
+	}else if(strcmp(cmd, "ee") == 0){		// EEPROM status
 		Terminal_EepromStatus();
-	}else if(strcmp(op, "h") == 0){		// Print help menu
+	}else if(strcmp(cmd, "h") == 0){		// Print help menu
 		Terminal_HelpMenu();
 	}else{
-		printf("\"%s\" is not recognized as a command.", op);
+		printf("\"%s\" is not recognized as a command.", cmd);
 	}
 
 	printf("\n\r"); // Do a newline for the next command
 }
 
-void Terminal_halt(){
-	
+void Terminal_Halt(){
+	Terminal_SetContactor(0);
 }
 
-void Terminal_currentStatus(void){
+void Terminal_CurrentStatus(void){
 	const char* stat = Current_IsSafe() ? "SAFE" : "NOT SAFE";
 	printf("The current level is %s\n\r", stat);
 	printf("High-precision: %u\n\r", Current_GetHighPrecReading());
 	printf("Low-precision: %u\n\r", Current_GetLowPrecReading());
 }
 
-void Terminal_voltageStatus(void){
+void Terminal_VoltageStatus(void){
 	const char * stat = Voltage_IsSafe() ? "SAFE" : "NOT SAFE";
 	printf("The voltage level is %s\n\r", stat);
 	printf("Total pack voltage: %u\n\r", Voltage_GetTotalPackVoltage());
@@ -87,7 +79,7 @@ void Terminal_voltageStatus(void){
 	printf("\n\r");
 }
 
-void Terminal_temperatureStatus(uint8_t isCharging){
+void Terminal_TemperatureStatus(uint8_t isCharging){
 	const char * stat = Temperature_IsSafe(isCharging) ? "SAFE" : "NOT SAFE";
 	printf("The temperature level is %s\n\r", stat);
 	printf("Average temperature: %u\n\r", Temperature_GetTotalPackAvgTemperature());
@@ -99,11 +91,11 @@ void Terminal_temperatureStatus(uint8_t isCharging){
 	printf("\n\r");
 }
 
-void Terminal_contactorStatus(void){
+void Terminal_ContactorStatus(void){
 	printf("The contactor is currently %s", Contactor_Flag() == 0 ? "off" : "on");
 }
 
-void Terminal_setContactor(uint8_t status){
+void Terminal_SetContactor(uint8_t status){
 	if(status == 1)
 		Contactor_On();
 	else
@@ -113,25 +105,27 @@ void Terminal_setContactor(uint8_t status){
 /**
  * @param the axes to read from, where 0 = all, 1 = x, 2 = y, 3 = z
  */
-void Terminal_gyroStatus(uint8_t axes){
+void Terminal_GyroStatus(uint8_t axes){
 	const char * stat = ICM20600_IsFlipped() ? "FLIPPED" : "NOT FLIPPED";
 	printf("The car is currently %s", stat);
 }
 
-void Terminal_watchdogStatus(){
-	
+void Terminal_WatchdogStatus(){
+	// WDTimer_GetStatus();
 }
 
-void Terminal_eepromStatus(){
-
+void Terminal_EepromStatus(){
+	// EEPROM_GetStatus();
 }
 
-void Terminal_helpMenu(){
+void Terminal_HelpMenu(){
 	printf(
 		"This is the help menu for the BeVolt CLI.\n"
 		"The availible commands are listed below.\n"
 		"-----------------------------------------\n"
-		"halt -- kill everything and shut down immediately\n"
+		"halt -- kill everything; equivalent to\n"
+	  "\tc 0\n"
+	  "\n"
 		"i [n] -- access the current readings\n"
 		"\n"
 		"v [n] -- access the voltage readings\n"

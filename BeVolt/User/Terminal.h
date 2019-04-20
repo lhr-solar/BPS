@@ -20,7 +20,7 @@ void Terminal_Halt();
 
 void Terminal_CheckInput(void);
 
-void Terminal_HandleInput(char * op, char * arg);
+void Terminal_HandleInput(char ** op);
 
 void Terminal_CurrentStatus(void);
 
@@ -30,7 +30,7 @@ void Terminal_TemperatureStatus(uint8_t isCharging);
 
 void Terminal_ContactorStatus(void);
 
-void Terminal_SetContactor(int status);
+void Terminal_SetContactor(uint8_t status);
 
 /**
  * @param the axes to read from, where 0 = all, 1 = x, 2 = y, 3 = z
