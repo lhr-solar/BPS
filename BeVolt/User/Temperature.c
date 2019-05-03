@@ -10,6 +10,7 @@
 
 #include "Temperature.h"
 
+
 uint16_t *ModuleTemperatures;				// list of voltages of all modules
 uint16_t MaxTemperatureLimit;				// Max temperature the battery can reach before danger
 
@@ -17,6 +18,7 @@ uint16_t MaxTemperatureLimit;				// Max temperature the battery can reach before
  * Initializes device drivers including SPI and LTC2983 for Temperature Monitoring
  */
 void Temperature_Init(void){
+	LTC2983_Init();
 	
 }
 

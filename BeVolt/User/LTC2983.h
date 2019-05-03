@@ -13,6 +13,7 @@
 #define LTC2983_H__
 
 #include <stdint.h>
+#include <stdbool.h>
 
 /** LTC2983_Init
  * Initializes SPI pins
@@ -20,16 +21,26 @@
  */
 void LTC2983_Init(void);
 
-/** LTC2983_SendCmd
- * Sends command data to LTC2983
- * @param unsigned int 16-bit data
+/** LTC2983_Ready
+ * Checks if LTC2984 is ready after startup
+ * @return unsigned int 16-bit data
  */
-void LTC2983_SendCmd(uint16_t *data);
+bool LTC2983_Ready(void);
+
+/** LTC2983_MeasureSingleChannel
+ * Sends command to LTC2983 to gather and save all ADC values
+ * @param 16 bit channel size in a 1 byte array
+ * @return unsigned int 16-bit measurements from all ADCs
+ */
+int32_t LTC2983_MeasureSingleChannel(void /*uint8_t *channelAddr*/);
 
 /** LTC2983_Measure
  * Sends command to LTC2983 to gather and save all ADC values
  * @return unsigned int 16-bit measurements from all ADCs
  */
 uint16_t *LTC2983_Measure(void);
+
+
+uint32_t LTC2983_ReadChannel(uint16_t channel);
 
 #endif
