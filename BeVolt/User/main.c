@@ -266,12 +266,17 @@ int main(){
 int main(){
 	UART3_Init(9600);
 			printf("Hello\n\r");
-	SPI_Init8();
-	SPI_Write8(0x03);
 	Temperature_Init();
-	//uint8_t buffer[4];	// Size = 4 bytes
+
+	
+//	GPIOB->ODR &= ~GPIO_Pin_13;
+//	SPI_Write8(0x03);
+//	GPIOB->ODR |= GPIO_Pin_13;
+
+//	//uint8_t buffer[4];	// Size = 4 bytes
 	int32_t temp;
 	while(1){
+		SPI_Write8(0x00);
 		//if(!LTC2983_Ready()) {
 		temp = LTC2983_MeasureSingleChannel();
 		//if(temp & (0x01000000)) {
