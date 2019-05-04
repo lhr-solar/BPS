@@ -20,13 +20,13 @@
 void SoC_Init(void){ 
 	// TODO: Initilize timer. 32 bit timer..
 	
-	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE); 	//Enable TIM clock
-	
+	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE); 	//Enable TIM clock	
 	TIM_TimeBaseInitTypeDef Init_TIM2;								 		//make struct
+	
 	Init_TIM2.TIM_Prescaler = 1;
-	Init_TIM2.TIM_CounterMode = TIM_CounterMode_Up;
+	Init_TIM2.TIM_CounterMode = TIM_CounterMode_Down;
 	Init_TIM2.TIM_Period = 0xFFFF;
-	Init_TIM2.TIM_ClockDivision = TIM_CKD_DIV1;
+	Init_TIM2.TIM_ClockDivision = TIM_CKD_DIV1;	
 	
 	TIM_TimeBaseInit(TIM2, &Init_TIM2);										//call function
 	TIM_Cmd(TIM2,ENABLE);																	//enable counter	
@@ -45,8 +45,8 @@ void SoC_Calculate(int32_t amps){uint32_t counter; uint32_t timeElapsed;
 	counter = TIM2->CNT;							//find current value of up counter
 	TIM2->CNT = 0;										//set counter to zero to count up again
 	timeElapsed = counter/(80000000); //time passed when you call the counter
-	cumulativeNegativeSoc = cumulativeNegativeSoc + timeElapsed*(ADC_Conversion(ADC_ReadLow()));
-	finalSoc = initialSoc - cumulativeNegativeSoc;
+	//cumulativeNegativeSoc = cumulativeNegativeSoc + timeElapsed*(ADC_Conversion(ADC_ReadLow()));
+	//finalSoc = initialSoc - cumulativeNegativeSoc;
 }
 
 /** SoC_Calibrate
@@ -63,7 +63,8 @@ void SoC_Calibrate(int32_t faultType){
  * Gets the percentage of charge left in the battery pack
  * @return fixed point percentage. Resolution = 0.01 (45.55% = 4555)
  */
-int32_t SoC_GetPercent(void){uint32_t socPercent;
+int32_t SoC_GetPercent(void){
+	uint32_t socPercent;
 	// TODO: returns percentage of charge
 	socPercent = (finalSoc/ initialSoc)*100;
 	return socPercent;
