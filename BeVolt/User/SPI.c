@@ -152,7 +152,6 @@ void SPI_ReadMulti8(uint8_t *rxBuf, uint32_t rxSize){
  * @return rxData single byte that was read from the slave.
  */
 uint8_t SPI_WriteRead8(uint8_t txData){
-	printf("%x ", txData);
 	SPI_Wait(SPI1);
 	SPI1->DR = txData & 0x00FF;
 	SPI_Wait(SPI1);
