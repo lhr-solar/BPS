@@ -51,9 +51,9 @@ void SPI_Init8(void){
 	SPI_InitStruct.SPI_CPOL = SPI_CPOL_High;
 	SPI_InitStruct.SPI_CPHA = SPI_CPHA_2Edge;
 	SPI_InitStruct.SPI_NSS = SPI_NSS_Soft;
-	SPI_InitStruct.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_256;
+	SPI_InitStruct.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_16;
 	SPI_InitStruct.SPI_FirstBit = SPI_FirstBit_MSB;
-	SPI_InitStruct.SPI_CRCPolynomial = 7;	
+	SPI_InitStruct.SPI_CRCPolynomial = 0;	
 	SPI_Init(SPI1, &SPI_InitStruct);
 	SPI_Cmd(SPI1, ENABLE);
 }
@@ -116,10 +116,7 @@ void SPI_Write8(uint8_t txData){
  */
 void SPI_WriteMulti8(uint8_t *txBuf, uint32_t txSize){
 	for(uint32_t i = 0; i < txSize; i++){
-		SPI_Wait(SPI1);
-		SPI1->DR = txBuf[i] & 0x00FF;
-		SPI_Wait(SPI1);
-		uint8_t volatile junk = SPI1->DR;
+		SPI_WriteRead8(txBuf[i]);
 	}
 }
 
@@ -144,10 +141,7 @@ uint8_t SPI_Read8(void){
  */
 void SPI_ReadMulti8(uint8_t *rxBuf, uint32_t rxSize){
 	for(uint32_t i = 0; i < rxSize; i++){
-		SPI_Wait(SPI1);
-		SPI1->DR = 0x00;
-		SPI_Wait(SPI1);
-		rxBuf[i] = SPI1->DR & 0x00FF;
+		rxBuf[i] = SPI_WriteRead8(0x00);
 	}
 }
 
@@ -158,7 +152,7 @@ void SPI_ReadMulti8(uint8_t *rxBuf, uint32_t rxSize){
  * @return rxData single byte that was read from the slave.
  */
 uint8_t SPI_WriteRead8(uint8_t txData){
-
+	printf("%x ", txData);
 	SPI_Wait(SPI1);
 	SPI1->DR = txData & 0x00FF;
 	SPI_Wait(SPI1);
@@ -285,4 +279,3 @@ void SPI_WriteReadMulti16(uint16_t *txBuf, uint32_t txSize, uint16_t *rxBuf, uin
 		}
 	}
 }
-
