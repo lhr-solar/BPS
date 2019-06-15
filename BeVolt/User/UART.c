@@ -18,8 +18,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include "stm32f4xx.h"
-#include "FIFO.h"
-#include "Definition.h"
+#include "Settings.h"
 
 // This is required to use printf
 struct __FILE{
@@ -27,8 +26,8 @@ struct __FILE{
 };
 
 // Global variables
-static uint32_t TxErrorCnt = 0;
-static uint32_t RxErrorCnt = 0;
+//static uint32_t TxErrorCnt = 0;
+//static uint32_t RxErrorCnt = 0;
 FILE __stdout;
 FILE __stdin;
 
@@ -47,7 +46,7 @@ void copyHardwareToSoftware(void);
 void UART1_Init(uint32_t baud){
 	GPIO_InitTypeDef GPIO_InitStruct;
 	USART_InitTypeDef USART_InitStruct;
-	NVIC_InitTypeDef NVIC_InitStruct;
+	//NVIC_InitTypeDef NVIC_InitStruct;
 	
 	// Initialize clocks
 	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
@@ -164,8 +163,6 @@ void UART3_Init(uint32_t baud){
 	USART_InitStruct.USART_WordLength = USART_WordLength_8b;
 	USART_Init(USART3, &USART_InitStruct);
 	USART_Cmd(USART3, ENABLE);
-	
-	FIFO_Init();
 }
 
 /** UART3_Write
@@ -196,26 +193,26 @@ void UART3_Read(char *rxBuf, uint32_t rxSize){
  * Places contents of tx software buffer to hardware FIFO
  */
 void copySoftwareToHardware(void){
-	if(FIFO_IsEmpty_Tx()){
-		USART_ClearITPendingBit(USART1, USART_IT_TC);
-		USART_ITConfig(USART1, USART_IT_TC, DISABLE);
-		TxErrorCnt++;
-	}else{
-		USART1->DR = FIFO_Get_Tx();
-	}
+//	if(FIFO_IsEmpty_Tx()){
+//		USART_ClearITPendingBit(USART1, USART_IT_TC);
+//		USART_ITConfig(USART1, USART_IT_TC, DISABLE);
+//		TxErrorCnt++;
+//	}else{
+//		USART1->DR = FIFO_Get_Tx();
+//	}
 }
 
 /** copyHardwareToSoftware
  * Places contents of rx hardware FIFO to software buffer
  */
 void copyHardwareToSoftware(void){
-	uint32_t data = USART1->DR;
-	if(FIFO_IsFull_Rx()){
-		volatile uint32_t junk = data;
-		RxErrorCnt++;
-	}else{
-		FIFO_Put_Rx(data & 0xFF);
-	}
+//	uint32_t data = USART1->DR;
+//	if(FIFO_IsFull_Rx()){
+//		volatile uint32_t junk = data;
+//		RxErrorCnt++;
+//	}else{
+//		FIFO_Put_Rx(data & 0xFF);
+//	}
 }
 
 void UART1_OutChar(char data){

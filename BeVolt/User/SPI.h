@@ -174,6 +174,27 @@ uint8_t SPI_WriteRead16(uint16_t txData);
  */
 void SPI_WriteReadMulti16(uint16_t *txBuf, uint32_t txSize, uint16_t *rxBuf, uint32_t rxSize, bool cmd);
 
+/** SPI_InitCS
+ * Initializes Port B pin for SPI chip select
+ * Use GPIO_Pin_x (replace x) for easier code readablity.
+ * @param pin number
+ */
+void SPI_InitCS(uint16_t pin);
+
+/** SPI_CSHigh
+ * Sets PortB pin to high.
+ * Use GPIO_Pin_x (replace x) for easier code readablity.
+ * @param pin number of PortB
+ */
+void SPI_CSHigh(uint16_t pin);
+
+/** SPI_CSLow
+ * Resets PortB pin to low.
+ * Use GPIO_Pin_x (replace x) for easier code readablity.
+ * @param pin number if PortB
+ */
+void SPI_CSLow(uint16_t pin);
+
 #ifdef __cplusplus
 }
 #endif

@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "stm32f4xx.h"
+#include "Settings.h"
 #include "Voltage.h"
 #include "Current.h"
 #include "Temperature.h"
@@ -118,7 +119,7 @@ void faultCondition(void){
 //		following:
 //		#define LTC6811_TEST
 
-#define CONTACTOR_TEST
+#define LTC6811_TEST
 
 #ifdef LED_TEST
 #include "LED.h"
@@ -154,7 +155,6 @@ int main(){
 #include "SPI.h"
 #include "LTC6811.h"
 #include "UART.h"
-#include "Definition.h"
 #include <string.h>
 void printCells(cell_asic *mods);
 void print_config(cell_asic *bms_ic);

@@ -51,7 +51,7 @@ void SPI_Init8(void){
 	SPI_InitStruct.SPI_CPOL = SPI_CPOL_High;
 	SPI_InitStruct.SPI_CPHA = SPI_CPHA_2Edge;
 	SPI_InitStruct.SPI_NSS = SPI_NSS_Soft;
-	SPI_InitStruct.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_16;
+	SPI_InitStruct.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_64;
 	SPI_InitStruct.SPI_FirstBit = SPI_FirstBit_MSB;
 	SPI_InitStruct.SPI_CRCPolynomial = 0;	
 	SPI_Init(SPI1, &SPI_InitStruct);
@@ -94,6 +94,23 @@ void SPI_Init16(void){
 	SPI_Init(SPI2, &SPI_InitStruct);
 	SPI_Cmd(SPI2, ENABLE);
 }
+
+/** SPI_InitCS
+ * Initializes Port B pin for SPI chip select
+ * Use GPIO_Pin_x (replace x) for easier code readablity.
+ * @param pin number
+ */
+void SPI_InitCS(uint16_t pin){
+	GPIO_InitTypeDef GPIO_InitStruct;
+	GPIO_InitStruct.GPIO_Pin = pin;
+	GPIO_InitStruct.GPIO_Mode = GPIO_Mode_OUT;
+	GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_UP;
+	GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
+	GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
+	GPIO_Init(GPIOB, &GPIO_InitStruct);
+}
+
+#include <stdio.h>
 
 /** SPI_Write8
  * Sends single 8-bit packet to slave.
@@ -152,6 +169,7 @@ void SPI_ReadMulti8(uint8_t *rxBuf, uint32_t rxSize){
  * @return rxData single byte that was read from the slave.
  */
 uint8_t SPI_WriteRead8(uint8_t txData){
+	printf("%x ", txData);
 	SPI_Wait(SPI1);
 	SPI1->DR = txData & 0x00FF;
 	SPI_Wait(SPI1);
@@ -277,4 +295,22 @@ void SPI_WriteReadMulti16(uint16_t *txBuf, uint32_t txSize, uint16_t *rxBuf, uin
 			rxBuf[i] = SPI_WriteRead16(0x0000);
 		}
 	}
+}
+
+/** SPI_CSHigh
+ * Sets PortB pin to high.
+ * Use GPIO_Pin_x (replace x) for easier code readablity.
+ * @param pin number of PortB
+ */
+void SPI_CSHigh(uint16_t pin){
+	GPIO_SetBits(GPIOB, pin);
+}
+
+/** SPI_CSLow
+ * Resets PortB pin to low.
+ * Use GPIO_Pin_x (replace x) for easier code readablity.
+ * @param pin number if PortB
+ */
+void SPI_CSLow(uint16_t pin){
+	GPIO_ResetBits(GPIOB, pin);
 }
