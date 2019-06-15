@@ -117,7 +117,7 @@ void faultCondition(void){
 // E.g. If you want to run a LTC6811 test, change "#define CHANGE_THIS_TO_TEST_NAME" to the
 //		following:
 //		#define LTC6811_TEST
-#define CONTACTOR_TEST
+#define TEMPERATURE_TEST
 
 #ifdef LED_TEST
 #include "LED.h"
@@ -266,23 +266,25 @@ int main(){
 int main(){
 	UART3_Init(9600);
 			printf("Hello\n\r");
+	for(int i = 0; i < 1000000; i++);
 	Temperature_Init();
-
+			printf("Initialization Done\n\r");
 	
 //	GPIOB->ODR &= ~GPIO_Pin_13;
 //	SPI_Write8(0x03);
 //	GPIOB->ODR |= GPIO_Pin_13;
 
 //	//uint8_t buffer[4];	// Size = 4 bytes
-	int32_t temp;
+	int32_t temp = 0;
+	//temp = LTC2983_MeasureSingleChannel();
+			printf("ADC Value : %d\n\r", temp);
 	while(1){
-		SPI_Write8(0x00);
-		//if(!LTC2983_Ready()) {
-		temp = LTC2983_MeasureSingleChannel();
+		if(LTC2983_Ready()) {
+			temp = LTC2983_MeasureSingleChannel();
+			//uint32_t temp1 = 0x00000001 &
 		//if(temp & (0x01000000)) {
-		
-		printf("%d\n\r", temp);
-		//}
+			printf("Current Voltage: 0x%x\n\r", temp);
+		}
 		printf("Kill me\n\r");
 		//}
 		//else printf("Please\n\r");

@@ -29,6 +29,7 @@ uint8_t channel1_result[2] = {0x01, 0x00};
  * Initializes and configures LTC2983 chip 
  */
 void LTC2983_Init(void){
+	for(int i = 0; i < 2000000; i++) ;
 	uint8_t message[7] = {WRITE_CMD, 0x02, 0x00, 0xF4, 0x00, 0x00, 0x00};	
 	SPI_Init8();
 	
@@ -43,9 +44,11 @@ void LTC2983_Init(void){
 	
 	GPIOB->ODR |= GPIO_Pin_13;			// Start CS High
 	
+	uint8_t readyToTransmit = 0x40;
 	
-	
-	while(!LTC2983_Ready()) {};	// Wait until LTC2983 is ready starting up (might not be necessary
+	while(LTC2983_Ready()) {
+		printf("Delay Init\n\r");
+	};	// Wait until LTC2983 is ready starting up (might not be necessary
 	
 	uint8_t directADCOption[4] = {0xF4, 0x00, 0x00, 0x00};			// ADC Data Option Command
 	
@@ -56,7 +59,7 @@ void LTC2983_Init(void){
 	GPIOB->ODR &= ~GPIO_Pin_13;
 	SPI_WriteMulti8(message, 7);
 	GPIOB->ODR |= GPIO_Pin_13;
-
+printf("          Direct ADC selected\r\n");
   
 		
 //	uint8_t *buff;
@@ -95,16 +98,21 @@ void LTC2983_Init(void){
  */
 bool LTC2983_Ready(void){
 	uint8_t message[3] = {READ_CMD, 0x00, 0x00};
+	uint8_t result[1];
 //	SPI_Write8(READ_CMD);		// Send read cmd
 //	SPI_WriteMulti8(COMMAND_STATUS_REGISTER, 2); 
 	GPIOB->ODR &= ~GPIO_Pin_13;
-	SPI_WriteMulti8(message, 3);
-  if(SPI_Read8() == 0x40) {
-		GPIOB->ODR |= GPIO_Pin_13;
+	//SPI_WriteMulti8(message, 3);
+	
+	SPI_WriteReadMulti8(message, 3, result, 1, true);
+	GPIOB->ODR |= GPIO_Pin_13;
+	printf("Slave Ready : %c\n\r", result[0]);
+  if(/*SPI_Read8()*/result[0] == 0x40) {
+		//GPIOB->ODR |= GPIO_Pin_13;
 		return true;
 	}
   else {
-		GPIOB->ODR |= GPIO_Pin_13;
+		//GPIOB->ODR |= GPIO_Pin_13;
 		return false;
 	}
 	
@@ -120,27 +128,38 @@ bool LTC2983_Ready(void){
  */
 int32_t LTC2983_MeasureSingleChannel(void /*uint8_t *channelAddr*/){
 	uint8_t result[4];
-	uint8_t message[4] = {WRITE_CMD, 0x00, 0x00, START_CONVERSION_CH1};
-	uint8_t receive[3] ={READ_CMD, 0x01, 0x00};
+	uint8_t status[3];
+	uint8_t message[4] = {WRITE_CMD, 0x00, 0x00, 0x81};	 // Command, Address, Data
+				// message for start conversion
+	uint8_t receive[3] = {READ_CMD, 0x01, 0x00};
+				// Read conversion result from channel 1 
 	// Initiate conversion
 //	SPI_Write8(WRITE_CMD);
 //	SPI_WriteMulti8(COMMAND_STATUS_REGISTER, 2);
 //	SPI_Write8(START_CONVERSION_CH1);
 	GPIOB->ODR &= ~GPIO_Pin_13;
-	SPI_WriteMulti8(message, 4);
+	SPI_WriteReadMulti8(message, 4, status, 1, true);
 	GPIOB->ODR &= ~GPIO_Pin_13;
-	while(!LTC2983_Ready()) {}		// Wait until conversion done		
+	status[0] &= 0x40;
+	//printf("Status: %c\n\r", status[0]);
+	//if(status[0] != 0x40) return -1;
+	//while(LTC2983_Ready()) {
+	//	printf("Waiting");
+	//}		// Wait until conversion done		
 // Should I exit function and run rest of program until ready when I call again?
 	
 	// Read result
 //	SPI_Write8(READ_CMD);
 //	SPI_WriteMulti8(channel1_result, 2);
 //	SPI_ReadMulti8(result, 4);
-	GPIOB->ODR &= ~GPIO_Pin_13;
-	SPI_WriteMulti8(receive, 3);		
+	GPIOB->ODR &= ~GPIO_Pin_13;			
+	//SPI_WriteMulti8(receive, 3);		
+	//SPI_ReadMulti8(result, 4);
+		
+	SPI_WriteReadMulti8(receive, 4, result, 4, true);
 	GPIOB->ODR |= GPIO_Pin_13;	
 		
-	if((result[0] & 0x01) != 0) {
+	if((result[0] & 0x01) == 0x01) {
 		return ((int32_t)result & 0x00FFFFFF);
 	} else {
 		return -1;
