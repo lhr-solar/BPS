@@ -279,12 +279,12 @@ int main(){
 	//temp = LTC2983_MeasureSingleChannel();
 			printf("ADC Value : %d\n\r", temp);
 	while(1){
-		if(LTC2983_Ready()) {
+		//if(LTC2983_Ready()) {
 			temp = LTC2983_MeasureSingleChannel();
 			//uint32_t temp1 = 0x00000001 &
 		//if(temp & (0x01000000)) {
 			printf("Current Voltage: 0x%x\n\r", temp);
-		}
+		//}
 		printf("Kill me\n\r");
 		//}
 		//else printf("Please\n\r");
