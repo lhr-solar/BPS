@@ -19,6 +19,7 @@
 #include "Gyro.h"
 #include "Terminal.h"
 
+
 void initialize(void);
 void preliminaryCheck(void);
 void faultCondition(void);
@@ -118,8 +119,8 @@ void faultCondition(void){
 // E.g. If you want to run a LTC6811 test, change "#define CHANGE_THIS_TO_TEST_NAME" to the
 //		following:
 //		#define LTC6811_TEST
+#define VOLTAGE_TEST
 
-#define LTC6811_TEST
 
 #ifdef LED_TEST
 #include "LED.h"
@@ -130,12 +131,14 @@ void LEDdelay(int time){
 int main(){
 	LED_Init();
 	while(1){
+		//printf("I'm Alive");
 		LED_Toggle(FAULT);
 		LEDdelay(100000);
 		LED_On(UVOLT);
 		LEDdelay(100000);
 		LED_Toggle(OVOLT);
 		LEDdelay(100000);
+		printf("Dead?");
 		LED_Toggle(OTEMP);
 		LEDdelay(100000);
 		LED_Toggle(OCURR);
@@ -226,18 +229,28 @@ void print_config(cell_asic *bms_ic)
 #endif
 
 #ifdef VOLTAGE_TEST
+#include "UART.h"
+
 int main(){
-	UART3_Init(9600);
-	Voltage_Init();
+	UART1_Init(115200);
+	//printf("Are you alive?");
+	while(Voltage_Init()) {
+		printf("Communication Failed.\n\r");
+	}
+	printf("Writing and Reading to Configuration Register Successful. Initialization Complete\n\r");
+	
 	Voltage_UpdateMeasurements();
+	printf("Successfully Updated Voltages.\n\r");
 	printf("\n\rVoltage Test:\n\r");
 	printf("Is it safe? %d\n\r\n\r", Voltage_IsSafe());
 	printf("Voltages of all modules:\n\r");
 	for(int32_t i = 0; i < NUM_BATTERY_MODULES; i++){
-		printf("%d : %d\n\r", i, Voltage_GetModuleVoltage(i));
+		printf("%d : %f\n\r", i, (float)(Voltage_GetModuleVoltage(i)*0.0001));  // Place decimal point.
 	}
 	while(1){
-	
+//		for(int32_t i = 0; i < NUM_BATTERY_MODULES; i++){
+//			printf("%d : %d\n\r", i, Voltage_GetModuleVoltage(i));
+//		}
 	}
 }
 #endif
@@ -259,10 +272,36 @@ int main(){
 #endif
 
 #ifdef TEMPERATURE_TEST
-int main(){
+#include "UART.h"
+#include "LTC2983.h"
 
-	while(1){
+
+
+int main(){
+	UART3_Init(9600);
+			printf("Hello\n\r");
+	for(int i = 0; i < 1000000; i++);
+	Temperature_Init();
+			printf("Initialization Done\n\r");
 	
+//	GPIOB->ODR &= ~GPIO_Pin_13;
+//	SPI_Write8(0x03);
+//	GPIOB->ODR |= GPIO_Pin_13;
+
+//	//uint8_t buffer[4];	// Size = 4 bytes
+	int32_t temp = 0;
+	//temp = LTC2983_MeasureSingleChannel();
+			printf("ADC Value : %d\n\r", temp);
+	while(1){
+		//if(LTC2983_Ready()) {
+			temp = LTC2983_MeasureSingleChannel();
+			//uint32_t temp1 = 0x00000001 &
+		//if(temp & (0x01000000)) {
+			printf("Current Voltage: 0x%x\n\r", temp);
+		//}
+
+		//}
+		//else printf("Please\n\r");
 	}
 }
 #endif

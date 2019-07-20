@@ -13,6 +13,7 @@
 #define LTC2983_H
 
 #include <stdint.h>
+#include <stdbool.h>
 #include "stm32f4xx.h"
 
 /** LTC2983_Init
@@ -21,11 +22,23 @@
  */
 void LTC2983_Init(void);
 
-/** LTC2983_SendCmd
- * Sends command data to LTC2983
- * @param unsigned int 16-bit data
+/** LTC2983_Ready
+ * Checks if LTC2984 is ready after startup
+ * @return unsigned int 16-bit data
  */
+
+bool LTC2983_Ready(void);
+
+/** LTC2983_MeasureSingleChannel
+ * Sends command to LTC2983 to gather and save all ADC values
+ * @param 16 bit channel size in a 1 byte array
+ * @return unsigned int 16-bit measurements from all ADCs
+ */
+int32_t LTC2983_MeasureSingleChannel(void /*uint8_t *channelAddr*/);
+
+
 void LTC2983_SendCmd(uint16_t *data);
+
 
 /** LTC2983_Measure
  * Sends command to LTC2983 to gather and save all ADC values
@@ -34,3 +47,4 @@ void LTC2983_SendCmd(uint16_t *data);
 uint16_t *LTC2983_Measure(void);
 
 #endif
+
