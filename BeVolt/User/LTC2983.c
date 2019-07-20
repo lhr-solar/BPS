@@ -29,7 +29,7 @@ uint8_t channel1_result[2] = {0x01, 0x00};
  * Initializes and configures LTC2983 chip 
  */
 void LTC2983_Init(void){
-	for(int i = 0; i < 2000000; i++) ;
+	//for(int i = 0; i < 2000000; i++) ;
 	uint8_t message[7] = {WRITE_CMD, 0x02, 0x00, 0xF4, 0x00, 0x00, 0x00};	
 	SPI_Init8();
 	
@@ -87,7 +87,6 @@ printf("          Direct ADC selected\r\n");
 //		buff[2] += 4;
 //		
 //	}	
-	
 }
 
 

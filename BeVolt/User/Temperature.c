@@ -18,7 +18,7 @@ uint16_t MaxTemperatureLimit;				// Max temperature the battery can reach before
  * Initializes device drivers including SPI and LTC2983 for Temperature Monitoring
  */
 void Temperature_Init(void){
-	LTC2983_Init();
+	//LTC2983_Init();
 	
 }
 

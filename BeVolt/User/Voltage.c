@@ -15,11 +15,27 @@ cell_asic Modules[NUM_VOLTAGE_BOARDS];
 
 /** Voltage_Init
  * Initializes all device drivers including LTC6811 and GPIO to begin Voltage Monitoring
+ * @return 0 if successfully stored, 1 if failed and an error occurred
  */
-void Voltage_Init(void){
+int8_t Voltage_Init(void){
+	int8_t error = 0;
+	
 	wakeup_sleep(NUM_VOLTAGE_BOARDS);
 	LTC6811_Init(Modules);
+	
+	// Write Configuration Register
 	LTC6811_wrcfg(NUM_VOLTAGE_BOARDS, Modules);
+
+	// Read Configuration Register
+	wakeup_sleep(NUM_VOLTAGE_BOARDS);
+	error = LTC6811_rdcfg(NUM_VOLTAGE_BOARDS, Modules);
+	
+	if(error >= 0) {		// No Error
+		return 0;
+	} else {
+		return 1;		// Failure
+	}
+		
 }
 
 /** updateMeasurements
@@ -28,12 +44,23 @@ void Voltage_Init(void){
  * @return 1 if successfully stored, 0 if failed
  */
 uint8_t Voltage_UpdateMeasurements(){
-	int32_t error;
+	int8_t error = 0;
+	uint32_t conv_time = 0;
+	
+	// Start Cell ADC Measurements
 	wakeup_sleep(NUM_VOLTAGE_BOARDS);
 	LTC6811_adcv(ADC_CONVERSION_MODE,ADC_DCP,CELL_CH_TO_CONVERT);
-	LTC6811_pollAdc();
+	//conv_time = LTC6811_pollAdc();		 // In case you want to time the length of the conversion time
+	
+	// Read Cell Voltage Registers
+	wakeup_sleep(NUM_VOLTAGE_BOARDS); // Not sure if wakeup is necessary if you start conversion then read consecutively
 	error = LTC6811_rdcv(0, NUM_VOLTAGE_BOARDS, Modules); // Set to read back all cell voltage registers
-	return error;
+
+	if(error >= 0) {
+		return 1;
+	} else {
+		return 0;
+	}
 }
 
 /** Voltage_IsSafe
@@ -117,4 +144,7 @@ uint16_t Voltage_GetTotalPackVoltage(void){
 
 	return sum;
 }
+
+
+
 

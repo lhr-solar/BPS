@@ -19,6 +19,7 @@
 #include "Gyro.h"
 #include "Terminal.h"
 
+
 void initialize(void);
 void preliminaryCheck(void);
 void faultCondition(void);
@@ -118,7 +119,7 @@ void faultCondition(void){
 // E.g. If you want to run a LTC6811 test, change "#define CHANGE_THIS_TO_TEST_NAME" to the
 //		following:
 //		#define LTC6811_TEST
-#define LTC6811_TEST
+#define VOLTAGE_TEST
 
 
 #ifdef LED_TEST
@@ -130,12 +131,14 @@ void LEDdelay(int time){
 int main(){
 	LED_Init();
 	while(1){
+		//printf("I'm Alive");
 		LED_Toggle(FAULT);
 		LEDdelay(100000);
 		LED_On(UVOLT);
 		LEDdelay(100000);
 		LED_Toggle(OVOLT);
 		LEDdelay(100000);
+		printf("Dead?");
 		LED_Toggle(OTEMP);
 		LEDdelay(100000);
 		LED_Toggle(OCURR);
@@ -226,18 +229,28 @@ void print_config(cell_asic *bms_ic)
 #endif
 
 #ifdef VOLTAGE_TEST
+#include "UART.h"
+
 int main(){
-	UART3_Init(9600);
-	Voltage_Init();
+	UART1_Init(115200);
+	//printf("Are you alive?");
+	while(Voltage_Init()) {
+		printf("Communication Failed.\n\r");
+	}
+	printf("Writing and Reading to Configuration Register Successful. Initialization Complete\n\r");
+	
 	Voltage_UpdateMeasurements();
+	printf("Successfully Updated Voltages.\n\r");
 	printf("\n\rVoltage Test:\n\r");
 	printf("Is it safe? %d\n\r\n\r", Voltage_IsSafe());
 	printf("Voltages of all modules:\n\r");
 	for(int32_t i = 0; i < NUM_BATTERY_MODULES; i++){
-		printf("%d : %d\n\r", i, Voltage_GetModuleVoltage(i));
+		printf("%d : %f\n\r", i, (float)(Voltage_GetModuleVoltage(i)*0.0001));  // Place decimal point.
 	}
 	while(1){
-	
+//		for(int32_t i = 0; i < NUM_BATTERY_MODULES; i++){
+//			printf("%d : %d\n\r", i, Voltage_GetModuleVoltage(i));
+//		}
 	}
 }
 #endif
