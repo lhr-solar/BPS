@@ -15,8 +15,9 @@ enum VoltageStatus {OverVoltage, UnderVoltage};
 
 /** Voltage_Init
  * Initializes all device drivers including LTC6811 and GPIO to begin Voltage Monitoring
+ * @return 1 if successfully stored, -1 if failed and an error occurred
  */
-void Voltage_Init(void);
+int8_t Voltage_Init(void);
 
 /** Voltage_UpdateMeasurements
  * Stores and updates the new measurements received
