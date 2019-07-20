@@ -1,4 +1,4 @@
-// LTC2983.c
+// LTC2983.h
 /**
  * Driver for LTC2983 chip related functions. The IC uses SPI to communicate to
  * to MCU. IsoSPI is not required since temperature sensors are galvanically isolated.
@@ -8,6 +8,9 @@
  * @authors Sijin Woo, Chase Block
  * @lastRevised 9/3/2018
  */
+
+#ifndef LTC2983_H
+#define LTC2983_H
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -23,6 +26,7 @@ void LTC2983_Init(void);
  * Checks if LTC2984 is ready after startup
  * @return unsigned int 16-bit data
  */
+
 bool LTC2983_Ready(void);
 
 /** LTC2983_MeasureSingleChannel
@@ -33,9 +37,14 @@ bool LTC2983_Ready(void);
 int32_t LTC2983_MeasureSingleChannel(void /*uint8_t *channelAddr*/);
 
 
+void LTC2983_SendCmd(uint16_t *data);
+
+
 /** LTC2983_Measure
  * Sends command to LTC2983 to gather and save all ADC values
  * @return unsigned int 16-bit measurements from all ADCs
  */
+uint16_t *LTC2983_Measure(void);
 
-//#endif
+#endif
+

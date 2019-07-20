@@ -40,6 +40,9 @@ Copyright 2015 Linear Technology Corp. (LTC)
 #define LTC681X_H
 #include <stdint.h>
 #include <stdbool.h>
+#include "stm32f4xx.h"
+
+#define CS_PIN GPIO_Pin_6 						// Changed for stm32f413 to PB6 (PB8 for debugging)
 
 #define MD_422HZ_1KHZ 0
 #define MD_27KHZ_14KHZ 1
@@ -88,7 +91,6 @@ Copyright 2015 Linear Technology Corp. (LTC)
 #define LTC681X_STAT 3
 #define LTC681X_CFGR 0
 #define LTC681X_CFGRB 4
-#define CS_PIN 0x40						// Changed for stm32f413 to PB6
 
 //! Cell Voltage data structure.
 typedef struct
@@ -164,7 +166,7 @@ typedef struct
 /*!   calculates  and returns the CRC15
   @returns The calculated pec15 as an unsigned int
 */
-uint16_t pec15_calc(uint8_t len, //!< the length of the data array being passed to the function
+uint16_t pec15_calc(int32_t len, //!< the length of the data array being passed to the function
                     uint8_t *data //!<  the array of data that the PEC will be generated from
                    );
 
@@ -573,6 +575,8 @@ const uint16_t crc15Table[256] {0x0,0xc599, 0xceab, 0xb32, 0xd8cf, 0x1d56, 0x166
 
 #else*/
 extern const uint16_t crc15Table[256];
+
+void init_PEC15_Table(void);
 
 //#endif
 #endif

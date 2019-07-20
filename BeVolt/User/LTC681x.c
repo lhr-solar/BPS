@@ -44,14 +44,6 @@ Copyright 2017 Linear Technology Corp. (LTC)
 #include "SPI.h"
 #include "stm32f4xx.h"
 
-void CSLow(uint8_t Pin){
-	GPIOB->ODR &= ~Pin;
-}
-
-void CSHigh(uint8_t Pin){
-	GPIOB->ODR |= Pin;
-}
-
 void delay_u(uint16_t micro)
 {
   uint32_t delay = SystemCoreClock / 1000000;
@@ -75,10 +67,10 @@ void wakeup_idle(uint8_t total_ic)
 	volatile uint8_t tempReg;		// Temporary buffer
   for (int i =0; i<total_ic; i++)
   {
-    CSLow(CS_PIN);
+    SPI_CSLow(CS_PIN);
     //delayMicroseconds(2); //Guarantees the isoSPI will be in ready mode
     tempReg = SPI_Read8();
-    CSLow(CS_PIN);
+    SPI_CSHigh(CS_PIN);
   }
 }
 
@@ -87,9 +79,9 @@ void wakeup_sleep(uint8_t total_ic)
 {
   for (int i =0; i<total_ic; i++)
   {
-    CSLow(CS_PIN);
+    SPI_CSLow(CS_PIN);
     delay_u(300); // Guarantees the LTC6813 will be in standby
-    CSHigh(CS_PIN);
+    SPI_CSHigh(CS_PIN);
     delay_u(10);
   }
 }
@@ -105,10 +97,11 @@ void cmd_68(uint8_t tx_cmd[2])
   cmd[1] =  tx_cmd[1];
   cmd_pec = pec15_calc(2, cmd);
   cmd[2] = (uint8_t)(cmd_pec >> 8);
-  cmd[3] = (uint8_t)(cmd_pec);
-  CSLow(CS_PIN);
+  cmd[3] = (uint8_t)(cmd_pec & 0x00FF);
+	//cmd[3] = (uint8_t)(cmd_pec >> 8);
+  SPI_CSLow(CS_PIN);
   SPI_WriteMulti8(cmd, 4);
-  CSHigh(CS_PIN);
+  SPI_CSHigh(CS_PIN);
 }
 
 //Generic function to write 68xx commands and write payload data. Function calculated PEC for tx_cmd data
@@ -125,7 +118,7 @@ void write_68(uint8_t total_ic , uint8_t tx_cmd[2], uint8_t data[])
   cmd[1] = tx_cmd[1];
   cmd_pec = pec15_calc(2, cmd);
   cmd[2] = (uint8_t)(cmd_pec >> 8);
-  cmd[3] = (uint8_t)(cmd_pec);
+  cmd[3] = (uint8_t)(cmd_pec & 0x00FF);
   cmd_index = 4;
   for (uint8_t current_ic = total_ic; current_ic > 0; current_ic--)       // executes for each LTC681x in daisy chain, this loops starts with
   {
@@ -145,9 +138,9 @@ void write_68(uint8_t total_ic , uint8_t tx_cmd[2], uint8_t data[])
   }
 
 
-  CSLow(CS_PIN);
+  SPI_CSLow(CS_PIN);
   SPI_WriteMulti8(cmd, CMD_LEN);
-  CSHigh(CS_PIN);
+  SPI_CSHigh(CS_PIN);
 }
 
 //Generic function to write 68xx commands and read data. Function calculated PEC for tx_cmd data
@@ -167,12 +160,12 @@ int8_t read_68( uint8_t total_ic, uint8_t tx_cmd[2], uint8_t *rx_data)
   cmd[1] = tx_cmd[1];
   cmd_pec = pec15_calc(2, cmd);
   cmd[2] = (uint8_t)(cmd_pec >> 8);
-  cmd[3] = (uint8_t)(cmd_pec);
+  cmd[3] = (uint8_t)(cmd_pec & 0x00FF);
 
 
-  CSLow(CS_PIN);
+  SPI_CSLow(CS_PIN);
   SPI_WriteReadMulti8(cmd, 4, data, (BYTES_IN_REG*total_ic), true);         //Read the configuration data of all ICs on the daisy chain into
-  CSHigh(CS_PIN);                          //rx_data[] array
+  SPI_CSHigh(CS_PIN);                          //rx_data[] array
 
   for (uint8_t current_ic = 0; current_ic < total_ic; current_ic++)       //executes for each LTC681x in the daisy chain and packs the data
   {
@@ -198,7 +191,7 @@ int8_t read_68( uint8_t total_ic, uint8_t tx_cmd[2], uint8_t *rx_data)
 /*
   Calculates  and returns the CRC15
   */
-uint16_t pec15_calc(uint8_t len, //Number of bytes that will be used to calculate a PEC
+uint16_t pec15_calc(int32_t len, //Number of bytes that will be used to calculate a PEC
                     uint8_t *data //Array of data that will be used to calculate  a PEC
                    )
 {
@@ -340,14 +333,14 @@ uint8_t LTC681x_pladc()
   cmd[1] = 0x14;
   cmd_pec = pec15_calc(2, cmd);
   cmd[2] = (uint8_t)(cmd_pec >> 8);
-  cmd[3] = (uint8_t)(cmd_pec);
+  cmd[3] = (uint8_t)(cmd_pec & 0x00FF);
 
 
-  CSLow(CS_PIN);
+  SPI_CSLow(CS_PIN);
   SPI_WriteMulti8(cmd,4);
 // adc_state = spi_read_byte(0xFF);
 
-  CSHigh(CS_PIN);
+  SPI_CSHigh(CS_PIN);
   return(adc_state);
 }
 
@@ -365,9 +358,9 @@ uint32_t LTC681x_pollAdc()
   cmd[1] = 0x14;
   cmd_pec = pec15_calc(2, cmd);
   cmd[2] = (uint8_t)(cmd_pec >> 8);
-  cmd[3] = (uint8_t)(cmd_pec);
+  cmd[3] = (uint8_t)(cmd_pec & 0x00FF);
 
-  CSLow(CS_PIN);
+  SPI_CSLow(CS_PIN);
   SPI_WriteMulti8(cmd, 4);
 
   while ((counter<200000)&&(finished == 0))
@@ -383,7 +376,7 @@ uint32_t LTC681x_pollAdc()
     }
   }
 
-  CSHigh(CS_PIN);
+  SPI_CSHigh(CS_PIN);
 
 
   return(counter);
@@ -515,11 +508,11 @@ void LTC681x_rdcv_reg(uint8_t reg, //Determines which cell voltage register is r
 
   cmd_pec = pec15_calc(2, cmd);
   cmd[2] = (uint8_t)(cmd_pec >> 8);
-  cmd[3] = (uint8_t)(cmd_pec);
+  cmd[3] = (uint8_t)(cmd_pec & 0x00FF);
 
-  CSLow(CS_PIN);
+  SPI_CSLow(CS_PIN);
   SPI_WriteReadMulti8(cmd, 4, data, (REG_LEN*total_ic), true);
-  CSHigh(CS_PIN);
+  SPI_CSHigh(CS_PIN);
 
 }
 
@@ -607,11 +600,11 @@ void LTC681x_rdaux_reg(uint8_t reg, //Determines which GPIO voltage register is 
 
   cmd_pec = pec15_calc(2, cmd);
   cmd[2] = (uint8_t)(cmd_pec >> 8);
-  cmd[3] = (uint8_t)(cmd_pec);
+  cmd[3] = (uint8_t)(cmd_pec & 0x00FF);
 
-  CSLow(CS_PIN);
+  SPI_CSLow(CS_PIN);
   SPI_WriteReadMulti8(cmd, 4, data, (REG_LEN*total_ic), true);
-  CSHigh(CS_PIN);
+  SPI_CSHigh(CS_PIN);
 
 }
 
@@ -649,11 +642,11 @@ void LTC681x_rdstat_reg(uint8_t reg, //Determines which stat register is read ba
 
   cmd_pec = pec15_calc(2, cmd);
   cmd[2] = (uint8_t)(cmd_pec >> 8);
-  cmd[3] = (uint8_t)(cmd_pec);
+  cmd[3] = (uint8_t)(cmd_pec & 0x00FF);
 
-  CSLow(CS_PIN);
+  SPI_CSLow(CS_PIN);
   SPI_WriteReadMulti8(cmd, 4, data, (REG_LEN*total_ic), true);
-  CSHigh(CS_PIN);
+  SPI_CSHigh(CS_PIN);
 
 }
 
@@ -716,7 +709,7 @@ uint8_t LTC681x_rdcv(uint8_t reg, // Controls which cell voltage register is rea
                     )
 {
   int8_t pec_error = 0;
-  uint8_t cell_data[LTC681X_NUM_RX_BYT*total_ic];
+  uint8_t cell_data[LTC681X_NUM_RX_BYT*total_ic];;
   uint8_t c_ic = 0;
 
   if (reg == 0)
@@ -1614,15 +1607,15 @@ void LTC681x_stcomm()
   cmd[1] = 0x23;
   cmd_pec = pec15_calc(2, cmd);
   cmd[2] = (uint8_t)(cmd_pec >> 8);
-  cmd[3] = (uint8_t)(cmd_pec);
+  cmd[3] = (uint8_t)(cmd_pec & 0x00FF);
 
-  CSLow(CS_PIN);
+  SPI_CSLow(CS_PIN);
   SPI_WriteMulti8(cmd,4);
   for (int i = 0; i<9; i++)
   {
     temp = SPI_Read8();
   }
-  CSHigh(CS_PIN);
+  SPI_CSHigh(CS_PIN);
 
 }
 

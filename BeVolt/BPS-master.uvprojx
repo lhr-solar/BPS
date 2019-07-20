@@ -432,11 +432,6 @@
               <FilePath>.\User\LTC681x.c</FilePath>
             </File>
             <File>
-              <FileName>LTC2983.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\User\LTC2983.c</FilePath>
-            </File>
-            <File>
               <FileName>WDTimer.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\User\WDTimer.c</FilePath>
@@ -446,11 +441,6 @@
         <Group>
           <GroupName>Inc</GroupName>
           <Files>
-            <File>
-              <FileName>Definition.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\User\Definition.h</FilePath>
-            </File>
             <File>
               <FileName>Current.h</FileName>
               <FileType>5</FileType>
@@ -530,6 +520,11 @@
               <FileName>Contactor.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\User\Contactor.h</FilePath>
+            </File>
+            <File>
+              <FileName>Settings.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\User\Settings.h</FilePath>
             </File>
           </Files>
         </Group>

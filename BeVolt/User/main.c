@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "stm32f4xx.h"
+#include "Settings.h"
 #include "Voltage.h"
 #include "Current.h"
 #include "Temperature.h"
@@ -117,7 +118,8 @@ void faultCondition(void){
 // E.g. If you want to run a LTC6811 test, change "#define CHANGE_THIS_TO_TEST_NAME" to the
 //		following:
 //		#define LTC6811_TEST
-#define TEMPERATURE_TEST
+#define LTC6811_TEST
+
 
 #ifdef LED_TEST
 #include "LED.h"
@@ -153,7 +155,6 @@ int main(){
 #include "SPI.h"
 #include "LTC6811.h"
 #include "UART.h"
-#include "Definition.h"
 #include <string.h>
 void printCells(cell_asic *mods);
 void print_config(cell_asic *bms_ic);
@@ -285,7 +286,7 @@ int main(){
 		//if(temp & (0x01000000)) {
 			printf("Current Voltage: 0x%x\n\r", temp);
 		//}
-		printf("Kill me\n\r");
+
 		//}
 		//else printf("Please\n\r");
 	}
