@@ -70,7 +70,7 @@ uint8_t Voltage_UpdateMeasurements(){
 uint8_t Voltage_IsSafe(void){
 	for(int32_t i = 0; i < NUM_BATTERY_MODULES; i++){
 		uint16_t voltage = Modules[i / 12].cells.c_codes[i % 12];
-		if(voltage < MAX_VOLTAGE_LIMIT || voltage < MIN_VOLTAGE_LIMIT){
+		if(voltage > MAX_VOLTAGE_LIMIT || voltage < MIN_VOLTAGE_LIMIT){
 			return 0;
 		}
 	}
