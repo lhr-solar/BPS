@@ -58,15 +58,15 @@
 
 
 
-extern SPI_HandleTypeDef hspi1;
+SPI_HandleTypeDef hspi1;
 
 
 
 EPD_Pin epd_cs_pin = {
 
-  SPI_CS_GPIO_Port,
+  GPIOA,
 
-  SPI_CS_Pin,
+  GPIO_PIN_8,
 
 };
 
@@ -74,9 +74,9 @@ EPD_Pin epd_cs_pin = {
 
 EPD_Pin epd_rst_pin = {
 
-  RST_GPIO_Port,
+  GPIOA,
 
-  RST_Pin,
+  GPIO_PIN_10,
 
 };
 
@@ -84,9 +84,9 @@ EPD_Pin epd_rst_pin = {
 
 EPD_Pin epd_dc_pin = {
 
-  DC_GPIO_Port,
+  GPIOA,
 
-  DC_Pin,
+  GPIO_PIN_9,
 
 };
 
@@ -94,9 +94,9 @@ EPD_Pin epd_dc_pin = {
 
 EPD_Pin epd_busy_pin = {
 
-  BUSY_GPIO_Port,
+  GPIOA,
 
-  BUSY_Pin,
+  GPIO_PIN_11,
 
 };
 
