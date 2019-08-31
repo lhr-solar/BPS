@@ -18,7 +18,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include "stm32f4xx.h"
-#include "Settings.h"
+#include "config.h"
 
 // This is required to use printf
 struct __FILE{

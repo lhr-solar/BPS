@@ -8,7 +8,7 @@
 
 #include "Voltage.h"
 #include "LTC6811.h"
-#include "Settings.h"
+#include "config.h"
 #include <stdlib.h>
 
 cell_asic Modules[NUM_VOLTAGE_BOARDS];

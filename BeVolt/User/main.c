@@ -8,16 +8,14 @@
 #include <stdio.h>
 #include <string.h>
 #include "stm32f4xx.h"
-#include "Settings.h"
+#include "config.h"
 #include "Voltage.h"
 #include "Current.h"
 #include "Temperature.h"
 #include "Contactor.h"
 #include "EEPROM.h"
-//#include "CANlib.h"
 #include "WDTimer.h"
-#include "Gyro.h"
-#include "Terminal.h"
+#include "CAN.h"
 
 
 void initialize(void);

@@ -482,9 +482,9 @@
               <FilePath>.\User\EEPROM.h</FilePath>
             </File>
             <File>
-              <FileName>Gyro.h</FileName>
+              <FileName>Contactor.h</FileName>
               <FileType>5</FileType>
-              <FilePath>.\User\Gyro.h</FilePath>
+              <FilePath>.\User\Contactor.h</FilePath>
             </File>
             <File>
               <FileName>WDTimer.h</FileName>
@@ -507,24 +507,19 @@
               <FilePath>.\User\FIFO.h</FilePath>
             </File>
             <File>
-              <FileName>Terminal.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\User\Terminal.h</FilePath>
-            </File>
-            <File>
               <FileName>ADC.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\User\ADC.h</FilePath>
             </File>
             <File>
-              <FileName>Contactor.h</FileName>
+              <FileName>CAN.h</FileName>
               <FileType>5</FileType>
-              <FilePath>.\User\Contactor.h</FilePath>
+              <FilePath>.\User\CAN.h</FilePath>
             </File>
             <File>
-              <FileName>Settings.h</FileName>
+              <FileName>config.h</FileName>
               <FileType>5</FileType>
-              <FilePath>.\User\Settings.h</FilePath>
+              <FilePath>.\User\config.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -555,6 +550,11 @@
               <FileName>I2C.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\User\I2C.c</FilePath>
+            </File>
+            <File>
+              <FileName>CAN.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\User\CAN.c</FilePath>
             </File>
           </Files>
         </Group>

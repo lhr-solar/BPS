@@ -68,7 +68,7 @@ Copyright 2017 Linear Technology Corp. (LTC)
 #include <stdint.h>
 #include "LTC681x.h"
 #include "LTC6811.h"
-#include "Settings.h"
+#include "config.h"
 #include "stm32f4xx.h"
 #include "SPI.h"
 

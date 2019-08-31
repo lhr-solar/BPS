@@ -32,6 +32,7 @@
 /* Includes ------------------------------------------------------------------*/
 /* Uncomment the line below to enable peripheral header file inclusion */
 #include "stm32f4xx_adc.h"
+#include "stm32f4xx_can.h"
 #include "stm32f4xx_crc.h"
 #include "stm32f4xx_dbgmcu.h"
 #include "stm32f4xx_dma.h"
