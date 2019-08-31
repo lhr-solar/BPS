@@ -165,7 +165,7 @@ int main(){
 	// Initialize LTC
 	__disable_irq();
 	cell_asic battMod[NUM_VOLTAGE_BOARDS];
-	UART3_Init(9600);
+	UART1_Init(115200);
 	printf("Testing LTC6811:\n\r");
 	LTC6811_Init(battMod);
 	LTC6811_wrcfg(NUM_VOLTAGE_BOARDS, battMod);

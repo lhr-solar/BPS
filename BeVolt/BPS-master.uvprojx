@@ -442,6 +442,11 @@
           <GroupName>Inc</GroupName>
           <Files>
             <File>
+              <FileName>Settings.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\User\Settings.h</FilePath>
+            </File>
+            <File>
               <FileName>Current.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\User\Current.h</FilePath>
@@ -520,11 +525,6 @@
               <FileName>Contactor.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\User\Contactor.h</FilePath>
-            </File>
-            <File>
-              <FileName>Settings.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\User\Settings.h</FilePath>
             </File>
           </Files>
         </Group>
