@@ -34,17 +34,17 @@ bool LTC2983_Ready(void);
  * @param 16 bit channel size in a 1 byte array
  * @return unsigned int 16-bit measurements from all ADCs
  */
-int32_t LTC2983_MeasureSingleChannel(void /*uint8_t *channelAddr*/);
+int32_t LTC2983_MeasureSingleChannel(void);
 
 
-void LTC2983_SendCmd(uint16_t *data);
+//void LTC2983_SendCmd(uint16_t *data);
 
 
 /** LTC2983_Measure
  * Sends command to LTC2983 to gather and save all ADC values
  * @return unsigned int 16-bit measurements from all ADCs
  */
-uint16_t *LTC2983_Measure(void);
+//uint16_t *LTC2983_Measure(void);
 
 #endif
 

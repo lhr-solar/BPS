@@ -235,9 +235,9 @@ void UART3_OutChar(char data){
 // this is used for printf to output to the usb uart
 int fputc(int ch, FILE *f){
 	if(!NUCLEO){
-		UART1_OutChar(ch);
+		UART3_OutChar(ch);
 	}else{
-		UART1_Write((char *)&ch, 1);
+		UART3_Write((char *)&ch, 1);
 	}
   return 1;
 }
