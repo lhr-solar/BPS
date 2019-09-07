@@ -9,9 +9,7 @@
  * @lastRevised 9/3/2018
  */
 
-#include <stdint.h>
-#include "stm32f4xx.h"
-#include "SPI.h"
+
 #include "LTC2983.h"
 
 
@@ -19,47 +17,85 @@
 
 const uint8_t READ_CMD = 0x03;
 const uint8_t WRITE_CMD = 0x02;
-uint8_t COMMAND_STATUS_REGISTER[2] = {0x00, 0x00};
-uint8_t START_CONVERSION_CH1 = 0x81;
+const uint16_t CHANNEL_RESULTS_OFFSET = 0x0010;
 
-// Test
-uint8_t channel1_configure[2] = {0x02, 0x00};		// Channel 1 address
-uint8_t channel1_result[2] = {0x01, 0x00};
+
 
 /** LTC2983_Init
- * Initializes SPI pins
  * Initializes and configures LTC2983 chip 
+ * @preconditions		SPI_Init8 and GPIO Pins: PC6-8 & PB13-15 are initialized
  */
 void LTC2983_Init(void){
-	uint8_t message[7] = {WRITE_CMD, 0x02, 0x04, 0xF4, 0x00, 0x00, 0x00};	
-	SPI_Init8();
-	
-	// Initialize pins
-	GPIO_InitTypeDef GPIO_InitStruct;
-	GPIO_InitStruct.GPIO_Pin = GPIO_Pin_13;
-	GPIO_InitStruct.GPIO_Mode = GPIO_Mode_OUT;
-	GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_UP;			// Up vs Down
-	GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
-	GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
-	GPIO_Init(GPIOB, &GPIO_InitStruct);
-	
-	GPIOB->ODR |= GPIO_Pin_13;			// Start CS High
-	
-	for(uint32_t i = 0; i < 5000; ++i);
-	
+	// CMD(0), Channel Address(1-2), Data or Command(3-6)
+	uint8_t message[7] = {WRITE_CMD, 0x02, 0x00, 0xF4, 0x00, 0x00, 0x00};
+	uint8_t maskConfig[7] = {WRITE_CMD, 0x00, 0xF4, 0x00, 0x0F, 0xFF, 0xFF};	
+
+	// Wait until LTC2983 is ready starting up (might not be necessary due to timing)
 	while(!LTC2983_Ready()) {
-		printf("Delay Init\n\r");
-	};	// Wait until LTC2983 is ready starting up (might not be necessary)
+		//printf("Delay Init\n\r");
+	};
 	
-	// Configure channel 1 to ADC mode
-	GPIOB->ODR &= ~GPIO_Pin_13;
-	SPI_WriteMulti8(message, 7);
-	GPIOB->ODR |= GPIO_Pin_13;
-	
-printf("Direct ADC selected\r\n");
-  
-	
+	// Set channels for board 1 to Direct ADC mode
+	for(board tempBoard = TEMP_CS1; tempBoard <= TEMP_CS6; tempBoard++) {
+		for(uint32_t i = 0; i < BOARD_CS1; i++) {
+			Board_Select(tempBoard, 0);
+			SPI_WriteMulti8(message, 7);
+			Board_Select(tempBoard, 1);
+		
+			message[2] += 4;					// Increment to next channel
+		}
+		message[2] = 0;			// reset channel selection
+		
+		// Set multichannel conversion setting
+		Board_Select(tempBoard, 0);
+		SPI_WriteMulti8(maskConfig, 7);
+		Board_Select(tempBoard, 1);
+	}
+ 
 }
+
+/** Board_Select
+ * Uses specified CS pins for selected board.
+ * @param enumerated type Board. List in "Settings.h". If correct board isn't selected, don't do anything
+ * @param state of the CS line (1 or 0). Note that SPI CS lines are HIGH or 1 during idle
+ */
+void Board_Select(board tempBoard, bool state) {
+	switch(tempBoard) {
+		case TEMP_CS1: 
+			if(state) GPIOB->ODR |= GPIO_Pin_13;
+			else GPIOB->ODR &= ~GPIO_Pin_13;
+			break;
+		case TEMP_CS2:
+			if(state) GPIOB->ODR |= GPIO_Pin_14;
+			else GPIOB->ODR &= ~GPIO_Pin_14;
+			break;
+			
+		case TEMP_CS3:
+			if(state) GPIOB->ODR |= GPIO_Pin_15;
+			else GPIOB->ODR &= ~GPIO_Pin_15;
+			break;
+		
+		case TEMP_CS4:
+			if(state) GPIOC->ODR |= GPIO_Pin_6;
+			else GPIOC->ODR &= ~GPIO_Pin_6;
+			break;
+		
+		case TEMP_CS5:
+			if(state) GPIOC->ODR |= GPIO_Pin_7;
+			else GPIOC->ODR &= ~GPIO_Pin_7;
+			break;
+			
+		case TEMP_CS6:	
+			if(state) GPIOC->ODR |= GPIO_Pin_8;
+			else GPIOC->ODR &= ~GPIO_Pin_8;
+			break;
+			
+		default:	return;
+	}
+
+}
+
+
 
 
 
@@ -75,7 +111,7 @@ bool LTC2983_Ready(void){
 	SPI_WriteReadMulti8(message, 3, &result, 1, true);
 	GPIOB->ODR |= GPIO_Pin_13;
 	
-printf("Slave Ready : 0x%x\n\r", result);
+printf("Board is Ready : 0x%x\n\r", result);
 
   if((result & 0xC0) == 0x40) {
 		printf("true\r\n");
@@ -93,7 +129,7 @@ printf("Slave Ready : 0x%x\n\r", result);
 /** LTC2983_MeasureSingleChannel
  * Sends command to LTC2983 to gather and save all ADC values
  * @param 16 bit channel size in a 1 byte array
- * @return unsigned int 32-bit measurements from specified channel.
+ * @return signed 32-bit measurements from specified channel.
  *       returns a -1 if invalid ADC measurement
  */
 int32_t LTC2983_MeasureSingleChannel(void){
@@ -101,16 +137,10 @@ int32_t LTC2983_MeasureSingleChannel(void){
 	uint8_t result[4];
 	uint8_t status[3];
 	
-	uint8_t message[4] = {WRITE_CMD, 0x00, 0x00, 0x82};	 // Command, Address, Data
+	uint8_t message[4] = {WRITE_CMD, 0x00, 0x00, 0x81};	 // Command, Address, Data
 				// message for start conversion
-	uint8_t receive[3] = {READ_CMD, 0x00, 0x14};
+	uint8_t receive[3] = {READ_CMD, 0x00, 0x10};
 				// Read conversion result from channel 1 
-	
-	
-	// Initiate conversion
-//	SPI_Write8(WRITE_CMD);
-//	SPI_WriteMulti8(COMMAND_STATUS_REGISTER, 2);
-//	SPI_Write8(START_CONVERSION_CH1);
 	
 	GPIOB->ODR &= ~GPIO_Pin_13;
 	SPI_WriteMulti8(message, 4);
@@ -132,9 +162,12 @@ int32_t LTC2983_MeasureSingleChannel(void){
 	
 	printf("Raw Result: 0x%x,%x,%x,%x\n\r", result[0], result[1], result[2], result[3]);
 	printf("Result received\r\n");
+	printf("Or: %u \r\n", *(uint32_t *)result);
 		
+	printf("%d.%d\r\n", result[1]>>5, (result[1]&0x1F) * 10000 /32);
+	
 	if((result[0] & 0x01) == 0x01) {
-		return ((int32_t)result & 0x007FFFFF);
+		return (*(int32_t *)result & 0x007FFFFF);
 	} else {
 		return -1;
 	}
@@ -144,56 +177,80 @@ int32_t LTC2983_MeasureSingleChannel(void){
 
 
 
-///** LTC2983_Measure
-// * Sends command to LTC2983 to gather and save all ADC values
-// * @return unsigned int 16-bit measurements from all ADCs
-// */
-//uint16_t *LTC2983_Measure(void){
-//	
-//}
+/** LTC2983_StartMeasuringADC
+ * Starts direct ADC conversion for all channels of selected board
+ * @note Conversions are initiated consecutively so if you read the Command
+ *		Status Register or the INTERRUPT pin, then it won't be ready until All
+ *		channels are finished converting.
+ * @param Selected Temperature Board CS (enumerated type in "Settings.h")
+ */
+void LTC2983_StartMeasuringADC(board temperatureBoard) {
+	// CMD(0), Channel Address(1-2), Data or Command(3-6)
+	uint8_t startConversion[4] = {WRITE_CMD, 0x00, 0x00, 0x80};
+	
+	// Start multichannel conversion for all channels.
+	Board_Select(temperatureBoard, 0);
+	SPI_WriteMulti8(startConversion, 4);
+	Board_Select(temperatureBoard, 1);
+	
+	// Channel conversions are initiated consecutively and CSR won't be ready until all channels are ready.
+	while(!LTC2983_Ready()) {
+		printf("Board not ready\n\r");
+	}
+	
+}
 
 
 
-///** LTC2983_ReadChannel
-// * Reads the 24 bit ADC value at specified channel
-// *    Message Format:
-// *        1.) CMD (read = 0x02)
-// *        2.) Channel Address (2 bytes : 0x200 - 0x24C)
-// *        3.) Data (4 bytes : Either received or transmitted)
-// * @param unsigned int 16-bit channel number
-// * @return unsinged 32-bit data for channel
-// */
-//uint32_t LTC2983_ReadChannel(uint16_t channel) {
-//	uint16_t const CHANNEL_OFFSET = 0x010;
-//	uint8_t const READ_CMD = 0x03;
-//	
-//	uint16_t conversion;
-//	//uint8_t convert[2];
-//	uint16_t channelAddr;
-//	
-//	// Buffers to send and receive
-//	uint8_t txBuff[3];
-//	uint8_t rxBuff[4];
-//	
-//	channelAddr = (channel * 4) + CHANNEL_OFFSET;		// Get address of the channel (4 bytes each)
-//	conversion = channelAddr;   // Temp
-//	
-////	convert[1] = (uint8_t)(channelAddr & 0x00FF);
-////	convert[0] = (uint8_t)((conversion & 0xFF00) >> 8);
-//	
-//	txBuff[2] = (uint8_t)(channelAddr & 0x00FF);
-//	txBuff[1] = (uint8_t)((conversion & 0xFF00) >> 8);
-//	
-//	txBuff[0] = READ_CMD;			// First instruction READ = 0x02
-////	txBuff[1] = convert[0];
-////	txBuff[2] = convert[1];
-//	
-//	// Transmit
-//	SPI_WriteMulti8(txBuff, 3);
-//	SPI_ReadMulti8(rxBuff, 4);
-//	
-//	return (uint32_t)rxBuff[0];
-//} 
+/**	LTC2983_ReadConversions
+ * Reads all channels from temperature board and stores in buffer
+ * @param pointer to a buffer to store conversion results
+ * @param temperature board CS (enumerated type in "Settings.h")
+ * @param number of Channels, use "Settings.h" definitions
+ * @preconditions All channels on the board finished conversion before running this function
+ */
+void LTC2983_ReadConversions(int32_t *Buf, board temperatureBoard, uint8_t numOfChannels) {
+	uint8_t readConversionResult[3] = {READ_CMD, 0x00, 0x10};
+	uint8_t result[4];
+	
+	for(uint32_t i = 0; i < numOfChannels; i++) {
+		Board_Select(temperatureBoard, 0);
+		SPI_WriteReadMulti8(readConversionResult, 3, result, 4, true);
+		Board_Select(temperatureBoard, 1);
+		
+		readConversionResult[2] += 4;				// Increment to next channel address	
+		Buf[i] = *(int32_t *)result;
+	}
+	
+}
+
+
+
+
+/** LTC2983_ReadChannel
+ * Reads the 24 bit ADC value at a specified channel
+ * @preconditions Specified channel to be read finished conversion before running this function
+ * @param Selected temperature board CS (enumerated type in "Settings.h")
+ * @param unsigned int 16-bit channel number
+ * @return signed 32-bit (unconverted) data for channel
+ */
+int32_t LTC2983_ReadChannel(board temperatureBoard, uint8_t channel) {
+	uint8_t convert[2];
+	uint16_t channelAddr;
+	uint8_t singleChannelResult[4];
+	
+	channelAddr = (channel * 4) + CHANNEL_RESULTS_OFFSET;		// Get address of the channel (every 4 bytes in memory)
+	
+	convert[1] = (uint8_t)(channelAddr & 0x00FF);						// Isolate channel address (4 bytes long) into 2 separate bytes
+	convert[0] = (uint8_t)((channelAddr & 0xFF00) >> 8);	
+	
+	uint8_t readSingleChannel[3] = {READ_CMD, convert[0], convert[1]};		// Message for SPI
+	
+	Board_Select(temperatureBoard, 0);
+	SPI_WriteReadMulti8(readSingleChannel, 3, singleChannelResult, 4, true);
+	Board_Select(temperatureBoard, 1);
+	
+} 
 
 
 

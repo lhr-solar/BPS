@@ -27,4 +27,21 @@
 // PRIORITIES
 #define UART1_PRIORITY		8			// Terminal (PuTTY) interface. Keep this at the lowest priority out of all interrupts.
 
+// Temperature Configurations
+#define BOARD_CS1		20			// Number of temperature channels used in board 1 (20 channels max)
+#define BOARD_CS2		20			// Number of temperature channels used in board 2 (20 channels max)
+#define BOARD_CS3		20			// Number of temperature channels used in board 3 (20 channels max)
+#define BOARD_CS4		20			// Number of temperature channels used in board 4 (20 channels max)
+#define BOARD_CS5		20			// Number of temperature channels used in board 5 (20 channels max)
+#define BOARD_CS6		20			// Number of temperature channels used in board 6 (20 channels max)
+
+typedef enum board {
+	TEMP_CS1,
+	TEMP_CS2,
+	TEMP_CS3,
+	TEMP_CS4,
+	TEMP_CS5,
+	TEMP_CS6
+} board;
+
 #endif

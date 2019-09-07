@@ -16,6 +16,8 @@
 #include <stdbool.h>
 #include "LTC2983.h"
 #include "Settings.h"
+#include "SPI.h"
+
 
 /** Temperature_Init
  * Initializes device drivers including SPI and LTC2983 for Temperature Monitoring

@@ -277,20 +277,20 @@ int main(){
 #include "SPI.h"
 #include "stm32f4xx.h"
 
+
+
+
+
+
+
 int main(){
 	UART3_Init(9600);
 	printf("I'm alive\n\r");
 	
 	Temperature_Init();
-	//while(1);
-	int32_t temp = LTC2983_MeasureSingleChannel();
 
-	printf("ADC Measurement: %d\n\r", temp);
-	
-	//while(1);
+
 	while(1){
-	//int32_t temp = LTC2983_MeasureSingleChannel();
-	//printf("ADC Measurement: %d\n\r", temp);
 
 	}
 }
