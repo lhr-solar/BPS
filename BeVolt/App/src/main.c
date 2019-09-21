@@ -1,6 +1,5 @@
 /** main.c
  * Program for UTSVT BeVolt's Battery Protection System
- * @lastRevised 10/2/2018
  */
 
 #include <stdint.h>
