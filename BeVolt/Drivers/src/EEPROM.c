@@ -6,6 +6,9 @@
 #include "stm32f4xx.h"
 #include "I2C.h"
 #include <stdlib.h>
+#include "config.h"
+#include "Voltage.h"
+#include "Temperature.h"
 
 /** EEPROM_Init
  * Initializes I2C to communicate with EEPROM (M24128)
@@ -16,9 +19,68 @@ void EEPROM_Init(void){
 
 /** EEPROM_Save
  * Save some information to the EEPROM
+ * logType is type of fault (error code)
+ * data is additional information (which sensor tripped fault)
  */
 void EEPROM_Save(uint8_t logType, uint8_t data){
-
+	//initialize pointers to data in EEPROM
+	static uint16_t faultCodePtr = EEPROM_FAULT_CODE_ADDR;
+	static uint16_t tempFaultPtr = EEPROM_TEMP_FAULT;
+	static uint16_t voltFaultPtr = EEPROM_VOLT_FAULT;
+	static uint16_t currentFaultPtr = EEPROM_CURRENT_FAULT;
+	static uint16_t watchdogFaultPtr = EEPROM_WWDG_FAULT;
+	static uint16_t canFaultPtr = EEPROM_CAN_FAULT;
+	uint16_t *battery_modules;
+	
+	if (faultCodePtr < (EEPROM_TEMP_FAULT - 1)) {		//only store errors if there have been less than 256 faults (so buffers don't overflow)
+		EEPROM_WriteByte(faultCodePtr, logType);
+		faultCodePtr++;
+		EEPROM_WriteByte(faultCodePtr, 0xff);		//terminate array with 0xff
+	
+		switch (logType) {
+			case FAULT_HIGH_TEMP:
+				//write which temperature sensor faulted to EEPROM
+				break;
+			case FAULT_HIGH_VOLT:
+				//write which voltage sensor faulted to EEPROM
+				battery_modules = Voltage_GetModulesInDanger();
+				//iterate through array and store bad modules
+				for (uint8_t i = 0; i < NUM_BATTERY_MODULES; i++){
+					if (battery_modules[i] == 1){		//if module is in danger, write module index to array
+						EEPROM_WriteByte(voltFaultPtr, i);
+						voltFaultPtr++;
+					}
+				}
+				//terminate each entry with 0xfe 
+				EEPROM_WriteByte(voltFaultPtr, 0xfe);
+				voltFaultPtr++;
+				//terminate entire array with 0xff
+				EEPROM_WriteByte(voltFaultPtr, 0xff);
+				break;
+			case FAULT_LOW_VOLT:
+				//write which voltage sensor faulted to EEPROM
+				battery_modules = Voltage_GetModulesInDanger();
+				//iterate through array and store bad modules
+				for (uint8_t i = 0; i < NUM_BATTERY_MODULES; i++){
+					if (battery_modules[i] == 1){		//if module is in danger, write module index to array
+						EEPROM_WriteByte(voltFaultPtr, i);
+						voltFaultPtr++;
+					}
+				}
+				//terminate each entry with 0xfe 
+				EEPROM_WriteByte(voltFaultPtr, 0xfe);
+				voltFaultPtr++;
+				//terminate entire array with 0xff
+				EEPROM_WriteByte(voltFaultPtr, 0xff);
+				break;
+			case FAULT_HIGH_CURRENT:
+				//write info about current sensor to EEPROM
+				break;
+			case FAULT_WATCHDOG:
+				//write information about watchdog timer to EEPROM
+				break;
+		}
+	}
 }
 
 /** EEPROM_WriteByte
