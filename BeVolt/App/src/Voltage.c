@@ -102,19 +102,6 @@ uint16_t *Voltage_GetModulesInDanger(void){
 		sum += checks[i];
 	}
 
-	/*
-	// TODO: Figure out if this is bad practice
-	uint16_t endangeredModules[;
-	int j = 0;
-	for(int i = 0; i < sum; ++i){
-		if(checks[i]){
-			endangeredModules[j] = i;
-			++j;
-		}
-	}
-
-	return endangeredModules;
-	*/
 	return checks;
 }
 

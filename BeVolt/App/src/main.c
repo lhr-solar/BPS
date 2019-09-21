@@ -25,7 +25,6 @@ int main(){
 	preliminaryCheck();		// Wait until all boards are powered on
 	__enable_irq();				// Enable interrupts
 	
-	WDTimer_Start();
 	while(1){
 		// First update the measurements.
 		Voltage_UpdateMeasurements();
@@ -43,7 +42,6 @@ int main(){
 		// CAN_SendMessageStatus()	// Most likely need to put this on a timer if sending too frequently
 		//Terminal_CheckInput();
 		
-		WDTimer_Reset();
 	}
 	
 	// BPS has tripped if this line is reached
@@ -65,7 +63,6 @@ void initialize(void){
 	Contactor_Init();
 	Contactor_Off();
 	EEPROM_Init();
-	WDTimer_Init();
 	
 	Current_Init();
 	Voltage_Init();
