@@ -13,7 +13,7 @@
 #include "Contactor.h"
 #include "EEPROM.h"
 #include "WDTimer.h"
-
+#include "StrobeLight.h"
 
 void initialize(void);
 void preliminaryCheck(void);
@@ -24,7 +24,22 @@ int main(){
 	initialize();					// Initialize codes/pins
 	preliminaryCheck();		// Wait until all boards are powered on
 	__enable_irq();				// Enable interrupts
+
+StrobeLight_Init();
+//Initializes variable GPIO_Init at Pin 12
+StrobeLight_On();
+// Turns strobelight on
+StrobeLight_Off();
+//turns strobelight off
+uint32_t StrobeLight();
+//returns value of pin 12 as 0 or 1 if its off or on
 	
+		
+	
+ while (1) {
+ 
+ }
+	 
 	while(1){
 		// First update the measurements.
 		Voltage_UpdateMeasurements();

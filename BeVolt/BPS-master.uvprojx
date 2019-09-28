@@ -412,6 +412,11 @@
               <FileType>1</FileType>
               <FilePath>.\App\src\SoC.c</FilePath>
             </File>
+            <File>
+              <FileName>StrobeLight.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\StrobeLight.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -446,6 +451,11 @@
               <FileName>SoC.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\App\inc\SoC.h</FilePath>
+            </File>
+            <File>
+              <FileName>StrobeLight.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\App\inc\StrobeLight.h</FilePath>
             </File>
           </Files>
         </Group>
