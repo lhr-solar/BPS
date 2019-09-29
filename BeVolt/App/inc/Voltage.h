@@ -41,6 +41,12 @@ void Voltage_SetLimits(uint16_t ceiling, uint16_t floor);
  * @return pointer to index of modules that are in danger
  */
 uint16_t *Voltage_GetModulesInDanger(void);
+ 
+/** Voltage_OpenWire
+ * Uses the built-in adow function to check for open wires
+ * @return 1 if open wire, 0 if good
+ */
+uint8_t Voltage_OpenWire(void);
 
 /** Voltage_GetModuleVoltage
  * Gets the voltage of a certain module in the battery pack
@@ -48,6 +54,12 @@ uint16_t *Voltage_GetModulesInDanger(void);
  * @return voltage of module at specified index
  */
 uint16_t Voltage_GetModuleVoltage(uint16_t moduleIdx);
+
+/** *Voltage_GetOpenWire
+ * Finds the pin locations of the open wires
+ * @return array of battery modules (1 means disconnect, 0 means safe)
+ */
+uint8_t *Voltage_GetOpenWire(void);
 
 /** Voltage_GetTotalPackVoltage
  * Gets the total voltage of the battery pack

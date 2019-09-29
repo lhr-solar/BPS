@@ -451,7 +451,7 @@ void LTC681x_adstatd(
 
 // Start an open wire Conversion
 void LTC681x_adow(
-  uint8_t MD, //ADC Mode
+  uint8_t MD, //ADC Mode (UTSVT ACD Mode = 0b10 -- LTC86811.h)
   uint8_t PUP //Discharge Permit
 )
 {
