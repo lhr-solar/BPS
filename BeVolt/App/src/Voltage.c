@@ -120,15 +120,18 @@ uint8_t *Voltage_GetOpenWire(void){
 	uint8_t count = 0;
 	for(uint8_t i = 0; i < NUM_VOLTAGE_BOARDS; i++){
 		long bin_openwire = Modules[i].system_open_wire;
-		if(bin_openwire & 1){
-			open_wires[count] = 1;
-		} else{
-			open_wires[count] = 0;
+		while(count < NUM_BATTERY_MODULES){
+			if(bin_openwire & 1){
+				open_wires[count] = 1;
+			} else {
+				open_wires[count] = 0;
+			}
+			bin_openwire>>=1;
+			count++;
 		}
-		bin_openwire>>=1;
 	}
 	return open_wires;
-}
+} //TODO: Test with BPS System
 
 /** Voltage_GetModuleVoltage
  * Gets the voltage of a certain module in the battery pack
