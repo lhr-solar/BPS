@@ -68,9 +68,8 @@ SafetyStatus Voltage_IsSafe(void){
 		if(voltage > MAX_VOLTAGE_LIMIT || voltage < MIN_VOLTAGE_LIMIT){
 			return DANGER;
 		}
-	}
-
-	return DANGER;
+	} 
+	return SAFE;
 }
 
 /** Voltage_GetModulesInDanger
@@ -93,6 +92,40 @@ uint16_t *Voltage_GetModulesInDanger(void){
 	}
 
 	return checks;
+}
+
+/** Voltage_OpenWire
+ * Uses the LTC6811_run_openwire() function to check for open wires
+ * @return 1 if open wire, 0 if good
+ */
+uint8_t Voltage_OpenWire(void){
+	LTC6811_run_openwire(NUM_VOLTAGE_BOARDS, Modules);
+	for(uint8_t i = 0; i < NUM_VOLTAGE_BOARDS; i++){
+		if(Modules[i].system_open_wire != 0){
+			return 1;
+		}
+	}
+	return 0;
+}
+
+/** *Voltage_GetOpenWire
+ * Finds the pin locations of the open wires
+ * @return array of battery modules (1 means disconnect, 0 means safe)
+ */
+uint8_t *Voltage_GetOpenWire(void){
+	LTC6811_run_openwire(NUM_VOLTAGE_BOARDS, Modules);
+	static uint8_t open_wires[NUM_BATTERY_MODULES];
+	uint8_t count = 0;
+	for(uint8_t i = 0; i < NUM_VOLTAGE_BOARDS; i++){
+		long bin_openwire = Modules[i].system_open_wire;
+		if(bin_openwire & 1){
+			open_wires[count] = 1;
+		} else{
+			open_wires[count] = 0;
+		}
+		bin_openwire>>=1;
+	}
+	return open_wires;
 }
 
 /** Voltage_GetModuleVoltage
