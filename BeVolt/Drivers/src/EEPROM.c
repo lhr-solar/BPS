@@ -31,6 +31,7 @@ void EEPROM_Save(uint8_t logType, uint8_t data){
 	static uint16_t watchdogFaultPtr = EEPROM_WWDG_FAULT;
 	static uint16_t canFaultPtr = EEPROM_CAN_FAULT;
 	uint16_t *battery_modules;
+	uint16_t *temperature_modules;
 	
 	if (faultCodePtr < (EEPROM_TEMP_FAULT - 1)) {		//only store errors if there have been less than 256 faults (so buffers don't overflow)
 		EEPROM_WriteByte(faultCodePtr, logType);
@@ -38,9 +39,26 @@ void EEPROM_Save(uint8_t logType, uint8_t data){
 		EEPROM_WriteByte(faultCodePtr, 0xff);		//terminate array with 0xff
 	
 		switch (logType) {
+			
 			case FAULT_HIGH_TEMP:
 				//write which temperature sensor faulted to EEPROM
+				temperature_modules = Temperature_GetModulesInDanger();
+				// iterate through array and store bad modules
+				for (uint8_t i = 0; i < NUM_BATTERY_MODULES; i++)
+				{
+					if (battery_modules[i] == 1)
+					{
+						EEPROM_WriteByte(tempFaultPtr, i);
+						tempFaultPtr ++;
+					}
+				}
+				//terminate each entry with 0xfe 
+				EEPROM_WriteByte(tempFaultPtr, 0xfe);
+				tempFaultPtr++;
+				//terminate entire array with 0xff
+				EEPROM_WriteByte(tempFaultPtr, 0xff);
 				break;
+			
 			case FAULT_HIGH_VOLT:
 				//write which voltage sensor faulted to EEPROM
 				battery_modules = Voltage_GetModulesInDanger();
@@ -57,6 +75,7 @@ void EEPROM_Save(uint8_t logType, uint8_t data){
 				//terminate entire array with 0xff
 				EEPROM_WriteByte(voltFaultPtr, 0xff);
 				break;
+				
 			case FAULT_LOW_VOLT:
 				//write which voltage sensor faulted to EEPROM
 				battery_modules = Voltage_GetModulesInDanger();
@@ -73,11 +92,17 @@ void EEPROM_Save(uint8_t logType, uint8_t data){
 				//terminate entire array with 0xff
 				EEPROM_WriteByte(voltFaultPtr, 0xff);
 				break;
+				
 			case FAULT_HIGH_CURRENT:
 				//write info about current sensor to EEPROM
 				break;
+			
 			case FAULT_WATCHDOG:
 				//write information about watchdog timer to EEPROM
+				break;
+			
+			case FAULT_CAN_BUS:
+				// write info about CAN bus to EEPROM
 				break;
 		}
 	}
