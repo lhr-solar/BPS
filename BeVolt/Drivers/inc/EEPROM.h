@@ -35,7 +35,7 @@ void EEPROM_Init(void);
 
 /** EEPROM_Save
  * Save some information to the EEPROM
- * logType is type of fault (error code)
+ * logType is type of fault (fault code)
  * data is additional information (which sensor tripped fault)
  */
 void EEPROM_Save(uint8_t logType, uint8_t data);
