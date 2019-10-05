@@ -12,25 +12,13 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include "LTC2983.h"
-<<<<<<< HEAD:BeVolt/User/Temperature.h
-#include "Settings.h"
 #include "SPI.h"
-
-=======
 #include "config.h"
->>>>>>> master:BeVolt/App/inc/Temperature.h
 
 /** Temperature_Init
  * Initializes device drivers including SPI and LTC2983 for Temperature Monitoring
  */
 void Temperature_Init(void);
-
-/** Temperature_StartMeasurements
- * Stores and updates the new measurements received
- * @param pointer to new temperature measurements
- * @return 1 if successfully stored, 0 if failed (FOR FUTURE EDIT, BUT YOU CAN'T TELL IF FAILED EXCEPT IF YOU HAVE TO WAIT FOR A LONG TIME)
- */
-bool Temperature_StartMeasurements(void);
 
 /** Temperature_UpdateMeasurements
  * Stores and updates the new measurements received

@@ -36,13 +36,11 @@ void LTC2983_Init(void);
 void Board_Select(board Board, bool state);
 
 
-
 /** LTC2983_Ready
  * Checks if LTC2984 is ready after startup
  * @return unsigned int 16-bit data
  */
 bool LTC2983_Ready(void);
-
 
 
 /** LTC2983_MeasureSingleChannel
@@ -86,7 +84,6 @@ void LTC2983_ReadConversions(int32_t *Buf, board temperatureBoard, uint8_t numOf
  * @return signed 32-bit (unconverted) data for channel
  */
 int32_t LTC2983_ReadChannel(board temperatureBoard, uint8_t channel);
-
 
 
 #endif

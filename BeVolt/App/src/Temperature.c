@@ -40,49 +40,24 @@ void Temperature_Init(void){
 	LTC2983_Init();
 }
 
-
-
-/** Temperature_StartMeasurements
- * Stores and updates the new measurements received
- * @param pointer to new temperature measurements
- * @return 1 if successfully stored, 0 if failed (FOR FUTURE EDIT, BUT YOU CAN'T TELL IF FAILED EXCEPT IF YOU HAVE TO WAIT FOR A LONG TIME)
- */
-bool Temperature_StartMeasurements(void){
-	for(board tempBoard = TEMP_CS1; tempBoard <= TEMP_CS4; tempBoard++) {
-		LTC2983_StartMeasuringADC(tempBoard);
-	}
-	return true;
-}
-
-
 /** Temperature_UpdateMeasurements
  * Stores and updates the new measurements received
  * @param pointer to new temperature measurements
  * @return SUCCESS or ERROR
  */
-<<<<<<< HEAD:BeVolt/User/Temperature.c
-bool Temperature_UpdateMeasurements(void){}
-
-=======
 Status Temperature_UpdateMeasurements(){
 	//ModuleTemperatures = LTC2983_Measure();
 	
 	
 	return ERROR;
 }
->>>>>>> master:BeVolt/App/src/Temperature.c
 
 /** Temperature_IsSafe
  * Checks if all modules are safe
  * @param 1 if pack is charging, 0 if discharging
  * @return SUCCESS or ERROR
  */
-<<<<<<< HEAD:BeVolt/User/Temperature.c
-bool Temperature_IsSafe(uint8_t isCharging){
-
-
-}
-
+Status Temperature_IsSafe(uint8_t isCharging){
 
 
 /** Temperature_SetLimits
@@ -94,8 +69,6 @@ void Temperature_SetLimits(uint16_t ceiling){
 }
 
 
-=======
-Status Temperature_IsSafe(uint8_t isCharging){
 	
 	/* TODO: Change to accomodate for charge and discharge limits
 	for(int i = 0; i < sizeof(ModuleTemperatures)/sizeof(uint16_t); ++i){
@@ -107,7 +80,6 @@ Status Temperature_IsSafe(uint8_t isCharging){
 	return ERROR;
 }
 
->>>>>>> master:BeVolt/App/src/Temperature.c
 /** Temperature_GetModulesInDanger
  * Finds all modules that in danger and stores them into a list
  * @return pointer to index of modules that are in danger
@@ -116,7 +88,6 @@ uint16_t *Temperature_GetModulesInDanger(void){
 	
 	return NULL;
 }
-
 
 /** Temperature_GetModuleTemperature
  * Gets the temperature of a certain module in the battery pack

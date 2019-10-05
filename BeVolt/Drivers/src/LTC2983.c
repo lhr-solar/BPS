@@ -6,7 +6,6 @@
  * If using isoSPI: MCU --SPI--> LTC6820 --isoSPI--> LTC2983
  */
 
-
 #include "LTC2983.h"
 
 
@@ -144,7 +143,7 @@ int32_t LTC2983_MeasureSingleChannel(void){
 				// message for start conversion
 	uint8_t receive[3] = {READ_CMD, 0x00, 0x10};
 				// Read conversion result from channel 1 
-	
+
 	GPIOB->ODR &= ~GPIO_Pin_13;
 	SPI_WriteMulti8(message, 4);
 	GPIOB->ODR |= GPIO_Pin_13;
@@ -176,7 +175,6 @@ int32_t LTC2983_MeasureSingleChannel(void){
 	}
 		
 }
-
 
 
 
@@ -265,6 +263,7 @@ int32_t LTC2983_ReadChannel(board temperatureBoard, uint8_t channel) {
 	Board_Select(temperatureBoard, 1);
 	
 } 
+
 
 
 

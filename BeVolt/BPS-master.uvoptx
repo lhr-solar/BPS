@@ -374,7 +374,6 @@
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
-<<<<<<< HEAD
     <File>
       <GroupNumber>1</GroupNumber>
       <FileNumber>12</FileNumber>
@@ -382,25 +381,21 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>.\User\LTC2983.c</PathWithFileName>
-      <FilenameWithoutPath>LTC2983.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
   </Group>
 
   <Group>
-    <GroupName>Inc</GroupName>
-    <tvExp>1</tvExp>
+    <GroupName>Drivers/src</GroupName>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
-=======
->>>>>>> master
     <File>
-      <GroupNumber>2</GroupNumber>
+      <GroupNumber>3</GroupNumber>
       <FileNumber>13</FileNumber>
-      <FileType>5</FileType>
+      <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
@@ -418,33 +413,17 @@
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
     <File>
-<<<<<<< HEAD
-      <GroupNumber>2</GroupNumber>
-      <FileNumber>14</FileNumber>
-      <FileType>5</FileType>
-=======
       <GroupNumber>3</GroupNumber>
       <FileNumber>13</FileNumber>
       <FileType>1</FileType>
->>>>>>> master
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
       <PathWithFileName>.\Drivers\src\EEPROM.c</PathWithFileName>
       <FilenameWithoutPath>EEPROM.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-<<<<<<< HEAD
-      <GroupNumber>2</GroupNumber>
-      <FileNumber>15</FileNumber>
-      <FileType>5</FileType>
-=======
       <GroupNumber>3</GroupNumber>
       <FileNumber>14</FileNumber>
       <FileType>1</FileType>
->>>>>>> master
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
@@ -454,38 +433,26 @@
       <bShared>0</bShared>
     </File>
     <File>
-<<<<<<< HEAD
       <GroupNumber>2</GroupNumber>
-      <FileNumber>16</FileNumber>
+      <FileNumber>15</FileNumber>
       <FileType>5</FileType>
-=======
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>.\Drivers\src\LTC681x.c</PathWithFileName>
+      <FilenameWithoutPath>LTC681x.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
       <GroupNumber>3</GroupNumber>
       <FileNumber>15</FileNumber>
       <FileType>1</FileType>
->>>>>>> master
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
       <PathWithFileName>.\Drivers\src\LTC2983.c</PathWithFileName>
       <FilenameWithoutPath>LTC2983.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-<<<<<<< HEAD
-      <GroupNumber>2</GroupNumber>
-      <FileNumber>17</FileNumber>
-      <FileType>5</FileType>
-=======
-      <GroupNumber>3</GroupNumber>
-      <FileNumber>16</FileNumber>
-      <FileType>1</FileType>
->>>>>>> master
-      <tvExp>0</tvExp>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <bDave2>0</bDave2>
-      <PathWithFileName>.\Drivers\src\LTC6811.c</PathWithFileName>
-      <FilenameWithoutPath>LTC6811.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -498,14 +465,9 @@
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
     <File>
-<<<<<<< HEAD
-      <GroupNumber>2</GroupNumber>
-      <FileNumber>18</FileNumber>
-=======
-      <GroupNumber>4</GroupNumber>
-      <FileNumber>17</FileNumber>
->>>>>>> master
-      <FileType>5</FileType>
+      <GroupNumber>3</GroupNumber>
+      <FileNumber>16</FileNumber>
+      <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
@@ -514,14 +476,17 @@
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
+  </Group>
+
+  <Group>
+    <GroupName>Drivers/inc</GroupName>
+    <tvExp>0</tvExp>
+    <tvExpOptDlg>0</tvExpOptDlg>
+    <cbSel>0</cbSel>
+    <RteFlg>0</RteFlg>
     <File>
-<<<<<<< HEAD
-      <GroupNumber>2</GroupNumber>
-      <FileNumber>19</FileNumber>
-=======
       <GroupNumber>4</GroupNumber>
-      <FileNumber>18</FileNumber>
->>>>>>> master
+      <FileNumber>17</FileNumber>
       <FileType>5</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -532,13 +497,10 @@
       <bShared>0</bShared>
     </File>
     <File>
-<<<<<<< HEAD
-      <GroupNumber>2</GroupNumber>
-      <FileNumber>20</FileNumber>
-=======
       <GroupNumber>4</GroupNumber>
       <FileNumber>19</FileNumber>
->>>>>>> master
+      <GroupNumber>4</GroupNumber>
+      <FileNumber>18</FileNumber>
       <FileType>5</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -549,13 +511,9 @@
       <bShared>0</bShared>
     </File>
     <File>
-<<<<<<< HEAD
-      <GroupNumber>2</GroupNumber>
-      <FileNumber>21</FileNumber>
-=======
       <GroupNumber>4</GroupNumber>
-      <FileNumber>20</FileNumber>
->>>>>>> master
+      <GroupNumber>4</GroupNumber>
+      <FileNumber>19</FileNumber>
       <FileType>5</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -574,15 +532,9 @@
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
     <File>
-<<<<<<< HEAD
-      <GroupNumber>2</GroupNumber>
-      <FileNumber>22</FileNumber>
-      <FileType>5</FileType>
-=======
       <GroupNumber>5</GroupNumber>
       <FileNumber>21</FileNumber>
       <FileType>1</FileType>
->>>>>>> master
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
@@ -591,16 +543,23 @@
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
+  </Group>
+
+  <Group>
+    <GroupName>Periphs/src</GroupName>
+    <tvExp>0</tvExp>
+    <tvExpOptDlg>0</tvExpOptDlg>
+    <cbSel>0</cbSel>
+    <RteFlg>0</RteFlg>
     <File>
-<<<<<<< HEAD
-      <GroupNumber>2</GroupNumber>
-      <FileNumber>23</FileNumber>
-      <FileType>5</FileType>
-=======
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>.\Periphs\src\ADC.c</PathWithFileName>
+      <FilenameWithoutPath>ADC.c</FilenameWithoutPath>
       <GroupNumber>5</GroupNumber>
       <FileNumber>22</FileNumber>
       <FileType>1</FileType>
->>>>>>> master
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
@@ -610,15 +569,14 @@
       <bShared>0</bShared>
     </File>
     <File>
-<<<<<<< HEAD
-      <GroupNumber>2</GroupNumber>
-      <FileNumber>24</FileNumber>
-      <FileType>5</FileType>
-=======
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>.\Periphs\src\CAN.c</PathWithFileName>
+      <FilenameWithoutPath>CAN.c</FilenameWithoutPath>
       <GroupNumber>5</GroupNumber>
       <FileNumber>23</FileNumber>
       <FileType>1</FileType>
->>>>>>> master
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
@@ -628,15 +586,17 @@
       <bShared>0</bShared>
     </File>
     <File>
-<<<<<<< HEAD
-      <GroupNumber>2</GroupNumber>
-      <FileNumber>25</FileNumber>
-      <FileType>5</FileType>
-=======
+      <GroupNumber>5</GroupNumber>
+      <FileNumber>23</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>.\Periphs\src\I2C.c</PathWithFileName>
+      <FilenameWithoutPath>I2C.c</FilenameWithoutPath>
       <GroupNumber>5</GroupNumber>
       <FileNumber>24</FileNumber>
       <FileType>1</FileType>
->>>>>>> master
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
@@ -646,15 +606,17 @@
       <bShared>0</bShared>
     </File>
     <File>
-<<<<<<< HEAD
-      <GroupNumber>2</GroupNumber>
-      <FileNumber>26</FileNumber>
-      <FileType>5</FileType>
-=======
+      <GroupNumber>5</GroupNumber>
+      <FileNumber>24</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>.\Periphs\src\LED.c</PathWithFileName>
+      <FilenameWithoutPath>LED.c</FilenameWithoutPath>
       <GroupNumber>5</GroupNumber>
       <FileNumber>25</FileNumber>
       <FileType>1</FileType>
->>>>>>> master
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
@@ -664,15 +626,9 @@
       <bShared>0</bShared>
     </File>
     <File>
-<<<<<<< HEAD
-      <GroupNumber>2</GroupNumber>
-      <FileNumber>27</FileNumber>
-      <FileType>5</FileType>
-=======
       <GroupNumber>5</GroupNumber>
       <FileNumber>26</FileNumber>
       <FileType>1</FileType>
->>>>>>> master
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
@@ -682,15 +638,9 @@
       <bShared>0</bShared>
     </File>
     <File>
-<<<<<<< HEAD
-      <GroupNumber>2</GroupNumber>
-      <FileNumber>28</FileNumber>
-      <FileType>5</FileType>
-=======
       <GroupNumber>5</GroupNumber>
       <FileNumber>27</FileNumber>
       <FileType>1</FileType>
->>>>>>> master
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
@@ -708,14 +658,9 @@
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
     <File>
-<<<<<<< HEAD
-      <GroupNumber>2</GroupNumber>
-      <FileNumber>29</FileNumber>
-=======
-      <GroupNumber>6</GroupNumber>
-      <FileNumber>28</FileNumber>
->>>>>>> master
-      <FileType>5</FileType>
+      <GroupNumber>5</GroupNumber>
+      <FileNumber>27</FileNumber>
+      <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
@@ -725,33 +670,19 @@
       <bShared>0</bShared>
     </File>
     <File>
-<<<<<<< HEAD
-      <GroupNumber>3</GroupNumber>
-      <FileNumber>30</FileNumber>
-      <FileType>1</FileType>
-=======
       <GroupNumber>6</GroupNumber>
       <FileNumber>29</FileNumber>
       <FileType>5</FileType>
->>>>>>> master
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>.\Periphs\inc\CAN.h</PathWithFileName>
-      <FilenameWithoutPath>CAN.h</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
     <File>
-<<<<<<< HEAD
-      <GroupNumber>3</GroupNumber>
-      <FileNumber>31</FileNumber>
-      <FileType>1</FileType>
-=======
       <GroupNumber>6</GroupNumber>
       <FileNumber>30</FileNumber>
       <FileType>5</FileType>
->>>>>>> master
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
@@ -761,15 +692,9 @@
       <bShared>0</bShared>
     </File>
     <File>
-<<<<<<< HEAD
-      <GroupNumber>3</GroupNumber>
-      <FileNumber>32</FileNumber>
-      <FileType>1</FileType>
-=======
       <GroupNumber>6</GroupNumber>
       <FileNumber>31</FileNumber>
       <FileType>5</FileType>
->>>>>>> master
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
@@ -779,17 +704,10 @@
       <bShared>0</bShared>
     </File>
     <File>
-<<<<<<< HEAD
-      <GroupNumber>3</GroupNumber>
-      <FileNumber>33</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>1</tvExp>
-=======
       <GroupNumber>6</GroupNumber>
       <FileNumber>32</FileNumber>
       <FileType>5</FileType>
       <tvExp>0</tvExp>
->>>>>>> master
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
       <PathWithFileName>.\Periphs\inc\LED.h</PathWithFileName>
@@ -798,15 +716,17 @@
       <bShared>0</bShared>
     </File>
     <File>
-<<<<<<< HEAD
-      <GroupNumber>3</GroupNumber>
-      <FileNumber>34</FileNumber>
-      <FileType>1</FileType>
-=======
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>.\Periphs\inc\LED.h</PathWithFileName>
+      <FilenameWithoutPath>LED.h</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
       <GroupNumber>6</GroupNumber>
       <FileNumber>33</FileNumber>
       <FileType>5</FileType>
->>>>>>> master
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
@@ -848,13 +768,8 @@
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
     <File>
-<<<<<<< HEAD
-      <GroupNumber>4</GroupNumber>
-      <FileNumber>35</FileNumber>
-=======
       <GroupNumber>7</GroupNumber>
       <FileNumber>36</FileNumber>
->>>>>>> master
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -865,13 +780,8 @@
       <bShared>0</bShared>
     </File>
     <File>
-<<<<<<< HEAD
-      <GroupNumber>4</GroupNumber>
-      <FileNumber>36</FileNumber>
-=======
       <GroupNumber>7</GroupNumber>
       <FileNumber>37</FileNumber>
->>>>>>> master
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -882,13 +792,8 @@
       <bShared>0</bShared>
     </File>
     <File>
-<<<<<<< HEAD
-      <GroupNumber>4</GroupNumber>
-      <FileNumber>37</FileNumber>
-=======
       <GroupNumber>7</GroupNumber>
       <FileNumber>38</FileNumber>
->>>>>>> master
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -899,13 +804,8 @@
       <bShared>0</bShared>
     </File>
     <File>
-<<<<<<< HEAD
-      <GroupNumber>4</GroupNumber>
-      <FileNumber>38</FileNumber>
-=======
       <GroupNumber>7</GroupNumber>
       <FileNumber>39</FileNumber>
->>>>>>> master
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -916,13 +816,8 @@
       <bShared>0</bShared>
     </File>
     <File>
-<<<<<<< HEAD
-      <GroupNumber>4</GroupNumber>
-      <FileNumber>39</FileNumber>
-=======
       <GroupNumber>7</GroupNumber>
       <FileNumber>40</FileNumber>
->>>>>>> master
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -933,13 +828,8 @@
       <bShared>0</bShared>
     </File>
     <File>
-<<<<<<< HEAD
-      <GroupNumber>4</GroupNumber>
-      <FileNumber>40</FileNumber>
-=======
       <GroupNumber>7</GroupNumber>
       <FileNumber>41</FileNumber>
->>>>>>> master
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -950,13 +840,8 @@
       <bShared>0</bShared>
     </File>
     <File>
-<<<<<<< HEAD
-      <GroupNumber>4</GroupNumber>
-      <FileNumber>41</FileNumber>
-=======
       <GroupNumber>7</GroupNumber>
       <FileNumber>42</FileNumber>
->>>>>>> master
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -967,13 +852,8 @@
       <bShared>0</bShared>
     </File>
     <File>
-<<<<<<< HEAD
-      <GroupNumber>4</GroupNumber>
-      <FileNumber>42</FileNumber>
-=======
       <GroupNumber>7</GroupNumber>
       <FileNumber>43</FileNumber>
->>>>>>> master
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -984,13 +864,8 @@
       <bShared>0</bShared>
     </File>
     <File>
-<<<<<<< HEAD
-      <GroupNumber>4</GroupNumber>
-      <FileNumber>43</FileNumber>
-=======
       <GroupNumber>7</GroupNumber>
       <FileNumber>44</FileNumber>
->>>>>>> master
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -1001,13 +876,8 @@
       <bShared>0</bShared>
     </File>
     <File>
-<<<<<<< HEAD
-      <GroupNumber>4</GroupNumber>
-      <FileNumber>44</FileNumber>
-=======
       <GroupNumber>7</GroupNumber>
       <FileNumber>45</FileNumber>
->>>>>>> master
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -1018,13 +888,8 @@
       <bShared>0</bShared>
     </File>
     <File>
-<<<<<<< HEAD
-      <GroupNumber>4</GroupNumber>
-      <FileNumber>45</FileNumber>
-=======
       <GroupNumber>7</GroupNumber>
       <FileNumber>46</FileNumber>
->>>>>>> master
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -1035,13 +900,8 @@
       <bShared>0</bShared>
     </File>
     <File>
-<<<<<<< HEAD
-      <GroupNumber>4</GroupNumber>
-      <FileNumber>46</FileNumber>
-=======
       <GroupNumber>7</GroupNumber>
       <FileNumber>47</FileNumber>
->>>>>>> master
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>

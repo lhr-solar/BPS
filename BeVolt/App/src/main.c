@@ -110,11 +110,8 @@ void faultCondition(void){
 // E.g. If you want to run a LTC6811 test, change "#define CHANGE_THIS_TO_TEST_NAME" to the
 //		following:
 //		#define LTC6811_TEST
-<<<<<<< HEAD:BeVolt/User/main.c
-#define TEMPERATURE_TEST
-=======
 #define CHANGE_NAME_TO_TEST
->>>>>>> master:BeVolt/App/src/main.c
+
 
 
 #ifdef LED_TEST
@@ -269,9 +266,6 @@ int main(){
 #include "LTC2983.h"
 #include "SPI.h"
 #include "stm32f4xx.h"
-
-
-
 
 
 

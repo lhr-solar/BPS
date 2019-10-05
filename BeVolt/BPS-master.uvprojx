@@ -447,11 +447,6 @@
               <FileType>5</FileType>
               <FilePath>.\App\inc\SoC.h</FilePath>
             </File>
-            <File>
-              <FileName>LTC2983.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\User\LTC2983.c</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
