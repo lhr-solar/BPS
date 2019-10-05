@@ -9,47 +9,56 @@
 
 
 uint16_t *ModuleTemperatures;				// list of voltages of all modules
-uint16_t MaxTemperatureLimit;				// Max temperature the battery can reach before danger
 
 /** Temperature_Init
  * Initializes device drivers including SPI and LTC2983 for Temperature Monitoring
  */
 void Temperature_Init(void){
-	//LTC2983_Init();
+	// Initialize CS pins (PC6-8, PB13-15)
+	GPIO_InitTypeDef GPIOB_InitStruct;
+	GPIOB_InitStruct.GPIO_Pin = GPIO_Pin_13 | GPIO_Pin_14 | GPIO_Pin_15;
+	GPIOB_InitStruct.GPIO_Mode = GPIO_Mode_OUT;
+	GPIOB_InitStruct.GPIO_PuPd = GPIO_PuPd_UP;			// Up vs Down
+	GPIOB_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
+	GPIOB_InitStruct.GPIO_OType = GPIO_OType_PP;
+	GPIO_Init(GPIOB, &GPIOB_InitStruct);
 	
+	GPIO_InitTypeDef GPIOC_InitStruct;
+	GPIOC_InitStruct.GPIO_Pin = GPIO_Pin_6 | GPIO_Pin_7 | GPIO_Pin_8;
+	GPIOC_InitStruct.GPIO_Mode = GPIO_Mode_OUT;
+	GPIOC_InitStruct.GPIO_PuPd = GPIO_PuPd_UP;			// Up vs Down
+	GPIOC_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
+	GPIOC_InitStruct.GPIO_OType = GPIO_OType_PP;
+	GPIO_Init(GPIOC, &GPIOC_InitStruct);
+	
+	// Start all temperature CS pins HIGH
+	GPIOB->ODR = GPIOB->ODR | GPIO_Pin_13 | GPIO_Pin_14 | GPIO_Pin_15;
+	GPIOC->ODR = GPIOC->ODR | GPIO_Pin_6 | GPIO_Pin_7 | GPIO_Pin_8;
+	
+	SPI_Init8();
+	
+	LTC2983_Init();
 }
 
 /** Temperature_UpdateMeasurements
  * Stores and updates the new measurements received
  * @param pointer to new temperature measurements
- * @return 1 if successfully stored, 0 if failed
+ * @return SUCCESS or ERROR
  */
-bool Temperature_UpdateMeasurements(){
+Status Temperature_UpdateMeasurements(){
 	//ModuleTemperatures = LTC2983_Measure();
-
-	if(sizeof(ModuleTemperatures)/sizeof(uint16_t) == NUM_BATTERY_MODULES){
-		return 1;
-	}else{
-		return 0;
-	}
+	
+	
+	return ERROR;
 }
 
 /** Temperature_IsSafe
  * Checks if all modules are safe
  * @param 1 if pack is charging, 0 if discharging
- * @return 1 if pack is safe, 0 if in danger
+ * @return SUCCESS or ERROR
  */
-bool Temperature_IsSafe(uint8_t isCharging){
-	
-	/* TODO: Change to accomodate for charge and discharge limits
-	for(int i = 0; i < sizeof(ModuleTemperatures)/sizeof(uint16_t); ++i){
-		if(Temperature_GetModuleTemperature(i) > MaxTemperatureLimit){
-			return 0;
-		}
-	}
-	*/
-	return 1;
-}
+Status Temperature_IsSafe(uint8_t isCharging){
+
 
 /** Temperature_SetLimits
  * Sets the max temperature limit the cells can reach before danger
@@ -60,36 +69,24 @@ void Temperature_SetLimits(uint16_t ceiling){
 }
 
 
+	
+	/* TODO: Change to accomodate for charge and discharge limits
+	for(int i = 0; i < sizeof(ModuleTemperatures)/sizeof(uint16_t); ++i){
+		if(Temperature_GetModuleTemperature(i) > MaxTemperatureLimit){
+			return 0;
+		}
+	}
+	*/
+	return ERROR;
+}
+
 /** Temperature_GetModulesInDanger
  * Finds all modules that in danger and stores them into a list
  * @return pointer to index of modules that are in danger
  */
 uint16_t *Temperature_GetModulesInDanger(void){
-	uint8_t checks[NUM_BATTERY_MODULES];
-	for(int i = 0; i < NUM_BATTERY_MODULES; ++i){
-		if(Temperature_GetModuleTemperature(i) > MaxTemperatureLimit){
-			checks[i] = 1;	// 1 shows that the unit is in danger
-		}else{
-			checks[i] = 0;	// 0 shows that the unit is not in danger
-		}
-	}
-
-	int sum = 0;
-	for(int i = 0; i < NUM_BATTERY_MODULES; ++i){
-		sum += checks[i];
-	}
 	
-	// TODO: Figure out if this is bad practice
-	uint16_t * endangeredModules = (uint16_t *) malloc(sum);
-	int j = 0;
-	for(int i = 0; i < sum; ++i){
-		if(checks[i]){
-			endangeredModules[j] = i;
-			++j;
-		}
-	}
-
-	return endangeredModules;
+	return NULL;
 }
 
 /** Temperature_GetModuleTemperature
@@ -100,6 +97,7 @@ uint16_t *Temperature_GetModulesInDanger(void){
 uint16_t Temperature_GetModuleTemperature(uint16_t moduleIdx){
 	return ModuleTemperatures[moduleIdx];
 }
+
 
 /** Temperature_GetTotalPackAvgTemperature
  * Gets the average temperature of the whole battery pack

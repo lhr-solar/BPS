@@ -15,36 +15,76 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include "stm32f4xx.h"
+#include "SPI.h"
+#include "Settings.h"
+
 
 /** LTC2983_Init
- * Initializes SPI pins
  * Initializes and configures LTC2983 chip 
+ * @preconditions		SPI_Init8 and GPIO Pins: PC6-8 & PB13-15 are initialized
  */
 void LTC2983_Init(void);
+
+
+
+/** Board_Select
+ * Uses specified CS pins for selected board.
+ * @param enumerated type Board. List in Settings.h
+ * @param state of the CS line (1 or 0). Note that SPI CS lines are HIGH or 1 during idle
+ * @note Make sure the CS line returns to 1 if you're finished transmitting or receiving SPI messages
+ */
+void Board_Select(board Board, bool state);
+
 
 /** LTC2983_Ready
  * Checks if LTC2984 is ready after startup
  * @return unsigned int 16-bit data
  */
-
 bool LTC2983_Ready(void);
+
 
 /** LTC2983_MeasureSingleChannel
  * Sends command to LTC2983 to gather and save all ADC values
  * @param 16 bit channel size in a 1 byte array
- * @return unsigned int 16-bit measurements from all ADCs
+ * @return signed 32-bit measurements from specified channel.
+ *       returns a -1 if invalid ADC measurement
  */
-int32_t LTC2983_MeasureSingleChannel(void /*uint8_t *channelAddr*/);
+int32_t LTC2983_MeasureSingleChannel(void);
 
 
-void LTC2983_SendCmd(uint16_t *data);
 
-
-/** LTC2983_Measure
- * Sends command to LTC2983 to gather and save all ADC values
- * @return unsigned int 16-bit measurements from all ADCs
+/** LTC2983_StartMeasuringADC
+ * Starts direct ADC conversion for all channels of selected board
+ * @note Conversions are initiated consecutively so if you read the Command
+ *		Status Register or the INTERRUPT pin, then it won't be ready until All
+ *		channels are finished converting.
+ * @param Selected Temperature Board CS (enumerated type in "Settings.h")
  */
-uint16_t *LTC2983_Measure(void);
+void LTC2983_StartMeasuringADC(board temperatureBoard);
+
+
+
+/**	LTC2983_ReadConversions
+ * Reads all channels from temperature board and stores in buffer
+ * @param pointer to a buffer to store conversion results
+ * @param temperature board CS (enumerated type in "Settings.h")
+ * @param number of Channels, use "Settings.h" definitions
+ * @preconditions All channels on the board finished conversion before running this function
+ */
+void LTC2983_ReadConversions(int32_t *Buf, board temperatureBoard, uint8_t numOfChannels);
+
+
+
+
+/** LTC2983_ReadChannel
+ * Reads the 24 bit ADC value at a specified channel
+ * @preconditions Specified channel to be read finished conversion before running this function
+ * @param Selected temperature board CS (enumerated type in "Settings.h")
+ * @param unsigned int 16-bit channel number
+ * @return signed 32-bit (unconverted) data for channel
+ */
+int32_t LTC2983_ReadChannel(board temperatureBoard, uint8_t channel);
+
 
 #endif
 

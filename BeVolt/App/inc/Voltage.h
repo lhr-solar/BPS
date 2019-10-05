@@ -7,34 +7,28 @@
 #define VOLTAGE_H__
 
 #include <stdint.h>
+#include "config.h"
 
 enum VoltageStatus {OverVoltage, UnderVoltage};
 
 /** Voltage_Init
  * Initializes all device drivers including LTC6811 and GPIO to begin Voltage Monitoring
- * @return 1 if successfully stored, -1 if failed and an error occurred
+ * @return SUCCESS or ERROR
  */
-int8_t Voltage_Init(void);
+ErrorStatus Voltage_Init(void);
 
 /** Voltage_UpdateMeasurements
  * Stores and updates the new measurements received
  * @param pointer to new voltage measurements
- * @return 1 if successfully stored, 0 if failed
+ * @return SUCCESS or ERROR
  */
-uint8_t Voltage_UpdateMeasurements(void);
+ErrorStatus Voltage_UpdateMeasurements(void);
 
 /** Voltage_IsSafe
  * Checks if all modules are safe
- * @return 1 if pack is safe, 0 if in danger
+ * @return SAFE or DANGER
  */
-uint8_t Voltage_IsSafe(void);
-
-/** Voltage_SetLimits
- * Sets the max and min voltage limit the cells can reach before danger
- * @param max voltage limit
- * @param min voltage limit
- */
-void Voltage_SetLimits(uint16_t ceiling, uint16_t floor);
+SafetyStatus Voltage_IsSafe(void);
 
 /** Voltage_GetModulesInDanger
  * Finds all modules that in danger and stores them into a list
