@@ -113,7 +113,6 @@ void faultCondition(void){
 #define UART_TEST
 
 
-
 #ifdef LED_TEST
 #include "LED.h"
 void LEDdelay(int time){
@@ -455,4 +454,26 @@ void DischargingSoCTest(void) {
 /** Tests
  * 	TODO: Need to test SetAccumulator, GetPercent and Calibrate on faults
  */
+#endif
+
+#ifdef OPEN_WIRE_TEST
+//******************************************************************************************
+#include "Voltage.h"
+#include <stdio.h>
+#include "UART.h"
+int main(){
+	UART1_Init(115200);
+	Voltage_Init();
+	printf("OPEN_WIRE_TEST running\r\n");
+	printf("%ld", Voltage_OpenWire());
+//	while(Voltage_OpenWire()){
+//		uint8_t *ptr = Voltage_GetOpenWire();
+//		for(int i = 0; i < NUM_BATTERY_MODULES; i++){
+//			if(ptr[i]){
+//				printf("%d/n", i);
+//			}
+//		}
+//	}
+}
+
 #endif
