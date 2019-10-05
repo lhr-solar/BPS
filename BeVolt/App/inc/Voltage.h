@@ -46,7 +46,7 @@ uint16_t *Voltage_GetModulesInDanger(void);
  * Uses the built-in adow function to check for open wires
  * @return 1 if open wire, 0 if good
  */
-uint8_t Voltage_OpenWire(void);
+long Voltage_OpenWire(void);
 
 /** Voltage_GetModuleVoltage
  * Gets the voltage of a certain module in the battery pack
