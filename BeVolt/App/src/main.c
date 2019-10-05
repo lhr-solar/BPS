@@ -19,7 +19,7 @@ void initialize(void);
 void preliminaryCheck(void);
 void faultCondition(void);
 
-int main(){
+int main2(){
 	__disable_irq();			// Disable all interrupts until initialization is done
 	initialize();					// Initialize codes/pins
 	preliminaryCheck();		// Wait until all boards are powered on
@@ -113,7 +113,7 @@ void faultCondition(void){
 // E.g. If you want to run a LTC6811 test, change "#define CHANGE_THIS_TO_TEST_NAME" to the
 //		following:
 //		#define LTC6811_TEST
-#define CHANGE_NAME_TO_TEST
+#define EEPROM_READ_TEST
 
 
 #ifdef LED_TEST
@@ -442,4 +442,44 @@ int SOCmain(){
 	}
 }
 	
+#endif
+
+#ifdef EEPROM_WRITE_TEST
+//******************************************************************************************
+#include "UART.h"
+
+int main(){
+	//initialize stuff
+	UART1_Init(115200);
+	__disable_irq();
+	EEPROM_Init();
+	__enable_irq();
+	printf("done\n");
+	
+	EEPROM_Tester();		//write test codes
+	printf("done");
+	while(1){
+		//printf("done\n\r");
+	};		//get stuck in loop
+	
+}
+	
+#endif
+
+#ifdef EEPROM_READ_TEST
+#include "UART.h"
+
+int main(){
+	UART1_Init(115200);
+	printf("starting\n\r");
+	__disable_irq();
+	initialize();
+	__enable_irq();
+	printf("initialized\n\r");
+
+	EEPROM_SerialPrintData();
+	printf("done");
+	while(1){};
+}
+
 #endif

@@ -40,6 +40,16 @@ void EEPROM_Init(void);
  */
 void EEPROM_Save(uint8_t logType, uint8_t data);
 
+/** EEPROM_SerialPrintData
+ * Prints saved data from EEPROM to serial terminal
+ */
+void EEPROM_SerialPrintData(void);
+
+/** EEPROM_Tester
+ * sends fake error messages to test EEPROM
+*/
+void EEPROM_Tester(void);
+
 /** EEPROM_Write
  * Saves data to the EEPROM at the specified address
  * @param unsigned 16-bit address
