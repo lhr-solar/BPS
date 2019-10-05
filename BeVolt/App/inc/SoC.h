@@ -31,7 +31,7 @@ void SoC_Calibrate(int32_t faultType);
  * Gets the percentage of charge left in the battery pack
  * @return fixed point percentage. Resolution = 0.01 (45.55% = 4555)
  */
-int32_t SoC_GetPercent(void);
+uint32_t SoC_GetPercent(void);
 
 /** SoC_SetAccum 
  * Sets the accumulator of the coloumb counting algorithm
