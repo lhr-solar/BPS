@@ -36,13 +36,15 @@ void LTC2983_Init(void){
 	};
 	
 	// Set channels for board 1 to Direct ADC mode
-	for(board tempBoard = TEMP_CS1; tempBoard <= TEMP_CS6; tempBoard++) {
+	for(board tempBoard = TEMP_CS1; tempBoard <= TEMP_CS1; tempBoard++) {
 		for(uint32_t i = 0; i < BOARD_CS1; i++) {
 			Board_Select(tempBoard, 0);
 			SPI_WriteMulti8(message, 7);
 			Board_Select(tempBoard, 1);
-		
+			for(uint32_t i = 0; i < 80000; i++) {}
+printf("Channel %d\r\n", i+1);
 			message[2] += 4;					// Increment to next channel
+
 		}
 		message[2] = 0;			// reset channel selection
 		
@@ -52,6 +54,9 @@ void LTC2983_Init(void){
 		Board_Select(tempBoard, 1);
 	}
  
+	while(!LTC2983_Ready()) {
+		//printf("Delay Init\n\r");
+	};
 }
 
 /** Board_Select
@@ -109,16 +114,17 @@ bool LTC2983_Ready(void){
 
 	GPIOB->ODR &= ~GPIO_Pin_13;
 	SPI_WriteReadMulti8(message, 3, &result, 1, true);
+	for(uint32_t i = 0; i < 80000; i++) {}
 	GPIOB->ODR |= GPIO_Pin_13;
-	
-printf("Board is Ready : 0x%x\n\r", result);
-
+//printf("Is board ready? ");
+//for(uint32_t i = 0; i < 10000; i++);
   if((result & 0xC0) == 0x40) {
-		printf("true\r\n");
+//		printf("true\r\n");
+		printf("Board is Ready : 0x%x\n\r", result);
 		return true;
 	}
   else {
-		printf("False :(\r\n");
+//		printf("False :( - 0x%x\r\n", result);
 		return false;
 	}
 	
@@ -153,18 +159,18 @@ int32_t LTC2983_MeasureSingleChannel(void){
 		SPI_WriteMulti8(message, 4);			// restart conversion
 		GPIOB->ODR |= GPIO_Pin_13;
 		
-		printf("Not ready.\n\r");
+		//printf("Not ready.\n\r");
 	}
 
 	GPIOB->ODR &= ~GPIO_Pin_13;
 	SPI_WriteReadMulti8(receive, 3, result, 4, true);
 	GPIOB->ODR |= GPIO_Pin_13;	
 	
-	printf("Raw Result: 0x%x,%x,%x,%x\n\r", result[0], result[1], result[2], result[3]);
-	printf("Result received\r\n");
-	printf("Or: %u \r\n", *(uint32_t *)result);
+	//printf("Raw Result: 0x%x,%x,%x,%x\n\r", result[0], result[1], result[2], result[3]);
+	//printf("Result received\r\n");
+	//printf("Or: %u \r\n", *(uint32_t *)result);
 		
-	printf("%d.%d\r\n", result[1]>>5, (result[1]&0x1F) * 10000 /32);
+	//printf("%d.%d\r\n", result[1]>>5, (result[1]&0x1F) * 10000 /32);
 	
 	if((result[0] & 0x01) == 0x01) {
 		return (*(int32_t *)result & 0x007FFFFF);
@@ -195,7 +201,7 @@ void LTC2983_StartMeasuringADC(board temperatureBoard) {
 	
 	// Channel conversions are initiated consecutively and CSR won't be ready until all channels are ready.
 	while(!LTC2983_Ready()) {
-		printf("Board not ready\n\r");
+		//printf("Board not ready\n\r");
 	}
 	
 }
@@ -216,10 +222,21 @@ void LTC2983_ReadConversions(int32_t *Buf, board temperatureBoard, uint8_t numOf
 	for(uint32_t i = 0; i < numOfChannels; i++) {
 		Board_Select(temperatureBoard, 0);
 		SPI_WriteReadMulti8(readConversionResult, 3, result, 4, true);
+		for(uint32_t i = 0; i < 80000; i++){}
 		Board_Select(temperatureBoard, 1);
 		
 		readConversionResult[2] += 4;				// Increment to next channel address	
-		Buf[i] = *(int32_t *)result;
+		
+		if((result[0] & 0x01) == 0x01) {
+			//(*(int32_t *)result & 0x007FFFFF);
+			Buf[i] = *(int32_t *)result & 0x007FFFFF;
+printf("woot\r\n");
+		} else {
+			Buf[i] = -1;
+printf(":(\n\r");
+		}
+		
+printf("Channel %d - ADC raw value: %d\r\n", i+1, Buf[i]);
 	}
 	
 }

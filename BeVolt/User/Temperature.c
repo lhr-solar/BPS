@@ -46,7 +46,7 @@ void Temperature_Init(void){
 
 
 
-/** Temperature_UpdateMeasurements
+/** Temperature_StartMeasurements
  * Stores and updates the new measurements received
  * @param pointer to new temperature measurements
  * @return 1 if successfully stored, 0 if failed (FOR FUTURE EDIT, BUT YOU CAN'T TELL IF FAILED EXCEPT IF YOU HAVE TO WAIT FOR A LONG TIME)
@@ -72,7 +72,10 @@ bool Temperature_UpdateMeasurements(void){}
  * @param 1 if pack is charging, 0 if discharging
  * @return 1 if pack is safe, 0 if in danger
  */
-bool Temperature_IsSafe(uint8_t isCharging){}
+bool Temperature_IsSafe(uint8_t isCharging){
+
+
+}
 
 
 
@@ -117,6 +120,7 @@ uint16_t *Temperature_GetModulesInDanger(void){
 	return endangeredModules;
 }
 
+
 /** Temperature_GetModuleTemperature
  * Gets the temperature of a certain module in the battery pack
  * @param index of module
@@ -125,6 +129,7 @@ uint16_t *Temperature_GetModulesInDanger(void){
 uint16_t Temperature_GetModuleTemperature(uint16_t moduleIdx){
 	return ModuleTemperatures[moduleIdx];
 }
+
 
 /** Temperature_GetTotalPackAvgTemperature
  * Gets the average temperature of the whole battery pack

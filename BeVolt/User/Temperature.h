@@ -24,6 +24,13 @@
  */
 void Temperature_Init(void);
 
+/** Temperature_StartMeasurements
+ * Stores and updates the new measurements received
+ * @param pointer to new temperature measurements
+ * @return 1 if successfully stored, 0 if failed (FOR FUTURE EDIT, BUT YOU CAN'T TELL IF FAILED EXCEPT IF YOU HAVE TO WAIT FOR A LONG TIME)
+ */
+bool Temperature_StartMeasurements(void);
+
 /** Temperature_UpdateMeasurements
  * Stores and updates the new measurements received
  * @param pointer to new temperature measurements

@@ -286,12 +286,15 @@ int main(){
 int main(){
 	UART3_Init(9600);
 	printf("I'm alive\n\r");
+	int32_t buffer[20];
 	
 	Temperature_Init();
 
-
+	LTC2983_ReadConversions(buffer, BOARD_CS1, 20);
 	while(1){
-
+		int32_t buf[20] = {0};
+		LTC2983_StartMeasuringADC(BOARD_CS1);
+		LTC2983_ReadConversions(buf, BOARD_CS1, 20);
 	}
 }
 #endif
