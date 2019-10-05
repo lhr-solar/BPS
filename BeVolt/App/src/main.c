@@ -113,6 +113,7 @@ void faultCondition(void){
 #define CHANGE_NAME_TO_TEST
 
 
+
 #ifdef LED_TEST
 #include "LED.h"
 void LEDdelay(int time){
@@ -263,34 +264,24 @@ int main(){
 #ifdef TEMPERATURE_TEST
 #include "UART.h"
 #include "LTC2983.h"
+#include "SPI.h"
+#include "stm32f4xx.h"
+
 
 
 
 int main(){
 	UART3_Init(9600);
-			printf("Hello\n\r");
-	for(int i = 0; i < 1000000; i++);
-	Temperature_Init();
-			printf("Initialization Done\n\r");
+	printf("I'm alive\n\r");
+	int32_t buffer[20];
 	
-//	GPIOB->ODR &= ~GPIO_Pin_13;
-//	SPI_Write8(0x03);
-//	GPIOB->ODR |= GPIO_Pin_13;
+	Temperature_Init();
 
-//	//uint8_t buffer[4];	// Size = 4 bytes
-	int32_t temp = 0;
-	//temp = LTC2983_MeasureSingleChannel();
-			printf("ADC Value : %d\n\r", temp);
+	LTC2983_ReadConversions(buffer, BOARD_CS1, 20);
 	while(1){
-		//if(LTC2983_Ready()) {
-			temp = LTC2983_MeasureSingleChannel();
-			//uint32_t temp1 = 0x00000001 &
-		//if(temp & (0x01000000)) {
-			printf("Current Voltage: 0x%x\n\r", temp);
-		//}
-
-		//}
-		//else printf("Please\n\r");
+		int32_t buf[20] = {0};
+		LTC2983_StartMeasuringADC(BOARD_CS1);
+		LTC2983_ReadConversions(buf, BOARD_CS1, 20);
 	}
 }
 #endif

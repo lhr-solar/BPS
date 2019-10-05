@@ -14,8 +14,30 @@ uint16_t *ModuleTemperatures;				// list of voltages of all modules
  * Initializes device drivers including SPI and LTC2983 for Temperature Monitoring
  */
 void Temperature_Init(void){
-	//LTC2983_Init();
+	// Initialize CS pins (PC6-8, PB13-15)
+	GPIO_InitTypeDef GPIOB_InitStruct;
+	GPIOB_InitStruct.GPIO_Pin = GPIO_Pin_13 | GPIO_Pin_14 | GPIO_Pin_15;
+	GPIOB_InitStruct.GPIO_Mode = GPIO_Mode_OUT;
+	GPIOB_InitStruct.GPIO_PuPd = GPIO_PuPd_UP;			// Up vs Down
+	GPIOB_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
+	GPIOB_InitStruct.GPIO_OType = GPIO_OType_PP;
+	GPIO_Init(GPIOB, &GPIOB_InitStruct);
 	
+	GPIO_InitTypeDef GPIOC_InitStruct;
+	GPIOC_InitStruct.GPIO_Pin = GPIO_Pin_6 | GPIO_Pin_7 | GPIO_Pin_8;
+	GPIOC_InitStruct.GPIO_Mode = GPIO_Mode_OUT;
+	GPIOC_InitStruct.GPIO_PuPd = GPIO_PuPd_UP;			// Up vs Down
+	GPIOC_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
+	GPIOC_InitStruct.GPIO_OType = GPIO_OType_PP;
+	GPIO_Init(GPIOC, &GPIOC_InitStruct);
+	
+	// Start all temperature CS pins HIGH
+	GPIOB->ODR = GPIOB->ODR | GPIO_Pin_13 | GPIO_Pin_14 | GPIO_Pin_15;
+	GPIOC->ODR = GPIOC->ODR | GPIO_Pin_6 | GPIO_Pin_7 | GPIO_Pin_8;
+	
+	SPI_Init8();
+	
+	LTC2983_Init();
 }
 
 /** Temperature_UpdateMeasurements
@@ -36,6 +58,17 @@ Status Temperature_UpdateMeasurements(){
  * @return SUCCESS or ERROR
  */
 Status Temperature_IsSafe(uint8_t isCharging){
+
+
+/** Temperature_SetLimits
+ * Sets the max temperature limit the cells can reach before danger
+ * @param max temperature limit
+ */
+void Temperature_SetLimits(uint16_t ceiling){
+	MaxTemperatureLimit = ceiling;
+}
+
+
 	
 	/* TODO: Change to accomodate for charge and discharge limits
 	for(int i = 0; i < sizeof(ModuleTemperatures)/sizeof(uint16_t); ++i){
@@ -64,6 +97,7 @@ uint16_t *Temperature_GetModulesInDanger(void){
 uint16_t Temperature_GetModuleTemperature(uint16_t moduleIdx){
 	return ModuleTemperatures[moduleIdx];
 }
+
 
 /** Temperature_GetTotalPackAvgTemperature
  * Gets the average temperature of the whole battery pack

@@ -12,6 +12,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include "LTC2983.h"
+#include "SPI.h"
 #include "config.h"
 
 /** Temperature_Init
