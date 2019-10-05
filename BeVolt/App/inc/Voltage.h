@@ -38,7 +38,7 @@ uint16_t *Voltage_GetModulesInDanger(void);
  
 /** Voltage_OpenWire
  * Uses the built-in adow function to check for open wires
- * @return 1 if open wire, 0 if good
+ * @return ErrorStatus
  */
 long Voltage_OpenWire(void);
 

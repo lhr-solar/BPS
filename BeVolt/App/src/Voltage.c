@@ -96,15 +96,15 @@ uint16_t *Voltage_GetModulesInDanger(void){
 
 /** Voltage_OpenWire
  * Uses the LTC6811_run_openwire() function to check for open wires
- * @return 1 if open wire, 0 if good
+ * @return ErrorStatus
  */
 long Voltage_OpenWire(void){
 	LTC6811_run_openwire(NUM_VOLTAGE_BOARDS, Modules);
 //	for(uint8_t i = 0; i < NUM_VOLTAGE_BOARDS; i++){
 //		if(Modules[i].system_open_wire != 0){
-//			return 1;
+//			return ERROR;
 //		} else {
-//			return 0;
+//			return SUCCESS;
 //		}
 //	}
 	return Modules[0].system_open_wire;
