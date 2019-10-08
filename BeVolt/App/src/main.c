@@ -449,8 +449,10 @@ int SOCmain(){
 int main(){
 	UART1_Init(115200);
 	Voltage_Init();
-	printf("OPEN_WIRE_TEST running\r\n");
-	printf("%ld", Voltage_OpenWire());
+	while(1) {
+		printf("%ld", Voltage_OpenWire());
+		for(int i = 0; i < 100000; i++);
+	}
 //	while(Voltage_OpenWire()){
 //		uint8_t *ptr = Voltage_GetOpenWire();
 //		for(int i = 0; i < NUM_BATTERY_MODULES; i++){
