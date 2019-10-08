@@ -13,7 +13,7 @@
 #include "Contactor.h"
 #include "EEPROM.h"
 #include "WDTimer.h"
-
+#include "SoC.h"
 
 void initialize(void);
 void preliminaryCheck(void);
@@ -40,7 +40,6 @@ int main(){
 		
 		// Update necessary
 		// CAN_SendMessageStatus()	// Most likely need to put this on a timer if sending too frequently
-		//Terminal_CheckInput();
 		
 	}
 	
@@ -75,7 +74,7 @@ void initialize(void){
  * even though everything is safe.
  */
 void preliminaryCheck(void){
-	
+	// Check if Watch dog timer was triggered previously
 }
 
 /** faultCondition
@@ -84,6 +83,7 @@ void preliminaryCheck(void){
  * until complete reboot is done.
  */
 void faultCondition(void){
+	Contactor_Off();
 	while(1){
 		// CAN_SendMessageStatus()
 		if(!Current_IsSafe()){
@@ -104,7 +104,7 @@ void faultCondition(void){
 //****************************************************************************************
 // The following code is for testing individual pieces of code.
 //****************************************************************************************
-// If you want to test an individual test, change the #define NAME to what you want to what
+// If you want to test an individual module, change the #define NAME to what you want to
 // to use. This is used mainly to save memory for both the microcontroller and Keil.
 // Keil has a limit of how much memory you can compile.
 // E.g. If you want to run a LTC6811 test, change "#define CHANGE_THIS_TO_TEST_NAME" to the

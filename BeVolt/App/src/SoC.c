@@ -1,7 +1,5 @@
 /** main.c
  * Program for UTSVT BeVolt's Battery Protection System SOC
- * @authors Garrett Wong, Sijin Woo, Tyler Ta
- * @lastRevised 10/8/2019
  */
 #include <stdint.h>
 #include "stm32f4xx.h"
@@ -10,8 +8,6 @@
 #define MAX_CHARGE 1000*1000																								// In amp-hours (Ah), for now it is a dummy value
 uint32_t fixedPoint_SoC;																										// % of how much charge is left in battery with .01 resolution
 float float_SoC;																														// float vers of SoC
-
-
 
 /** Soc_Init
  * Initializes necessary timer and values to begin state of charge
