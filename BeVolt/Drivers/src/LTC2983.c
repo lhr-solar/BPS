@@ -28,7 +28,7 @@ void LTC2983_Init(void){
 	
 	// Set channels for board 1 to Direct ADC mode
 	for(board tempBoard = TEMP_CS1; tempBoard <= TEMP_CS1; tempBoard++) {
-		for(uint32_t i = 0; i < BOARD_CS1; i++) {
+		for(uint32_t i = 0; i < NUM_SENSORS_ON_TEMP_BOARD_1; i++) {
 			Board_Select(tempBoard, 0);
 			SPI_WriteMulti8(message, 7);
 			Board_Select(tempBoard, 1);

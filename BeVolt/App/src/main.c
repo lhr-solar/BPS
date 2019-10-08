@@ -13,7 +13,7 @@
 #include "Contactor.h"
 #include "EEPROM.h"
 #include "WDTimer.h"
-
+#include "SoC.h"
 
 void initialize(void);
 void preliminaryCheck(void);
