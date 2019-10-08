@@ -153,6 +153,7 @@
           <Name>UL2CM3(-S0 -C0 -P0 ) -FN1 -FC1000 -FD20000000 -FF0STM32F4xx_1536 -FL0180000 -FS08000000 -FP0($$Device:STM32F413RHTx$CMSIS\Flash\STM32F4xx_1536.FLM)</Name>
         </SetRegEntry>
       </TargetDriverDllRegistry>
+<<<<<<< HEAD
       <Breakpoint>
         <Bp>
           <Number>0</Number>
@@ -184,6 +185,9 @@
 >>>>>>> Need to test software vs hardware issue
         </Bp>
       </Breakpoint>
+=======
+      <Breakpoint/>
+>>>>>>> Update
       <WatchWindow1>
         <Ww>
           <count>0</count>

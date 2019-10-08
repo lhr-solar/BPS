@@ -107,7 +107,7 @@ long Voltage_OpenWire(void){
 //			return SUCCESS;
 //		}
 //	}
-	return Modules[0].system_open_wire;
+	return Modules[0].system_open_wire & 0xFFF;
 }
 
 /** *Voltage_GetOpenWire
