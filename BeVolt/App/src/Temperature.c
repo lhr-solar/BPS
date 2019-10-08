@@ -8,7 +8,8 @@
 #include "Temperature.h"
 #include "config.h"
 
-uint16_t ModuleTemperatures[NUM_TEMPERATURE_BOARDS];				// list of voltages of all modules
+uint16_t ModuleTemperatures[NUM_TEMPERATURE_BOARDS][20];	// Each board may not have 20 sensors. Look at config.h for how many sensors
+																												// there are on each board. 20 is just max that the board can handle
 
 /** Temperature_Init
  * Initializes device drivers including SPI and LTC2983 for Temperature Monitoring
@@ -58,6 +59,16 @@ Status Temperature_IsSafe(uint8_t isCharging){
 	return ERROR;
 }
 
+/** Temperature_SetChargeState
+ * Lithium Ion Cells have two separate max temperature limits. There is a limit
+ * when the battery is charging and another limit when the battery is discharging.
+ * We need to account for these two limits by setting which limit should be used.
+ * @param 1 if pack is charging, 0 if discharging
+ */
+void Temperature_SetChargeState(uint8_t isCharging){
+	
+}
+
 /** Temperature_GetModulesInDanger
  * Finds all modules that in danger and stores them into a list
  * @return pointer to index of modules that are in danger
@@ -67,12 +78,14 @@ uint16_t *Temperature_GetModulesInDanger(void){
 }
 
 /** Temperature_GetModuleTemperature
- * Gets the temperature of a certain module in the battery pack
+ * Gets the temperature of a certain module in the battery pack. Since there
+ * are NUM_TEMP_SENSORS_PER_MOD sensors per module, just average all of the sensors
+ * for that module so each module only has one temperature reading
  * @param index of module
  * @return temperature of module at specified index
  */
 uint16_t Temperature_GetModuleTemperature(uint16_t moduleIdx){
-	return ModuleTemperatures[moduleIdx];
+	return 0;
 }
 
 /** Temperature_GetTotalPackAvgTemperature
