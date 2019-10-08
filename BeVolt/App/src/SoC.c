@@ -1,14 +1,13 @@
 /** main.c
  * Program for UTSVT BeVolt's Battery Protection System SOC
- * @authors Garrett Wong, Sijin Woo
- * @lastRevised 1/13/2019
+ * @authors Garrett Wong, Sijin Woo, Tyler Ta
+ * @lastRevised 10/8/2019
  */
-
 #include <stdint.h>
 #include "stm32f4xx.h"
 #include "ADC.h"
 
-#define MAX_CHARGE 1000*1000																								// In amp-hours (Ah)
+#define MAX_CHARGE 1000*1000																								// In amp-hours (Ah), for now it is a dummy value
 uint32_t fixedPoint_SoC;																										// % of how much charge is left in battery with .01 resolution
 float float_SoC;																														// float vers of SoC
 
@@ -20,24 +19,20 @@ float float_SoC;																														// float vers of SoC
  * Info found on reference sheet stm32f413 page 535
  */
 void SoC_Init(void){ 
-	// TODO: Initilize timer. 32 bit timer..
-	
 	/* Timer is used to find the timeDelta */
-
-	/* Initializes Timer2 to */
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE); 					//Enable TIM clock	
-	TIM_TimeBaseInitTypeDef Init_TIM2;								 		//make struct
+	TIM_TimeBaseInitTypeDef Init_TIM2;								 						//make struct
 	
 	Init_TIM2.TIM_Prescaler = 1;				
 	Init_TIM2.TIM_CounterMode = TIM_CounterMode_Down;
-	Init_TIM2.TIM_Period = 0xFFFF-1;											// 65535
+	Init_TIM2.TIM_Period = 0xFFFF-1;									
 	Init_TIM2.TIM_ClockDivision = TIM_CKD_DIV1;	
 	Init_TIM2.TIM_RepetitionCounter = 0;
 	
-	TIM_TimeBaseInit(TIM2, &Init_TIM2);										//call function
-	TIM_Cmd(TIM2,ENABLE);																	//enable counter	
+	TIM_TimeBaseInit(TIM2, &Init_TIM2);										
+	TIM_Cmd(TIM2,ENABLE);																	
 	
-	// Grab from EEPROM what is the current SoC; For now, going to set it to 100.00%
+	// Grab from EEPROM what is the current SoC; For now, going to set it to 100.00% for testing purposes
 	fixedPoint_SoC = 10000;
 	float_SoC = 100.00;
 }
@@ -48,27 +43,25 @@ void SoC_Init(void){
  * not a constant samping. Add on however much from the previous
  */
 void SoC_Calculate(int32_t amps){ 
-	// TODO: Coloumb counting algorithm.
-	// Accumulator summation
-	// need to find out how to raise a flag or access count register
-
-	RCC_ClocksTypeDef RCC_Clocks;
+	
 	/* Get system clocks */
+	RCC_ClocksTypeDef RCC_Clocks;
 	RCC_GetClocksFreq(&RCC_Clocks);
 	
 		
-	uint32_t counter = TIM2->CNT;											//find current value of up counter
-	TIM2->CNT = 0;																		//set counter to zero to count up again
+	uint32_t counter = TIM2->CNT;											// find current value of up counter
+	TIM2->CNT = 0;																		// set counter to zero to count up again
 	
 	float timeElapsed = (0xFFFF - counter)/60;
 	timeElapsed /= 60;
 	timeElapsed /= RCC_Clocks.SYSCLK_Frequency;  			// time in hours
 	
-	float float_amps = amps * .0001;
+	float float_amps = amps * .0001;									// Fixed point to floating point
 	
-	float AhCollected = timeElapsed * float_amps; 	// 1 * .0001 * 10 to get resolution of .01
+	float AhCollected = timeElapsed * float_amps;
 	
-	float_SoC = (AhCollected * 100)/MAX_CHARGE + float_SoC;
+	/* Update SoC */
+	float_SoC = float_SoC + (AhCollected * 100)/MAX_CHARGE;
 	fixedPoint_SoC = float_SoC * 100;
 }
 
@@ -79,7 +72,6 @@ void SoC_Calculate(int32_t amps){
  * @param voltage fault type. 0 if under voltage, 1 if over voltage
  */
 void SoC_Calibrate(int32_t faultType){
-	// TODO: depending on fault type, the accumulator should be set to 0% or 100%
 	if (!(faultType == 0 || faultType == 1)) // ERROR
 	if (faultType == 0) {
 		fixedPoint_SoC = 0;
@@ -96,7 +88,6 @@ void SoC_Calibrate(int32_t faultType){
  * @return fixed point percentage. Resolution = 0.01 (45.55% = 4555)
  */
 uint32_t SoC_GetPercent(void){
-	// TODO: returns percentage of charge
 	return fixedPoint_SoC;
 }
 
