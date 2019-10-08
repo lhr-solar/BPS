@@ -16,7 +16,7 @@
 #include <stdbool.h>
 #include "stm32f4xx.h"
 #include "SPI.h"
-#include "Settings.h"
+#include "config.h"
 
 
 /** LTC2983_Init

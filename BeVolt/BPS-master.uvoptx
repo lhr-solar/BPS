@@ -161,7 +161,7 @@
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>0</BreakIfRCount>
-          <Filename>.\User\LTC2983.c</Filename>
+          <Filename>C:\Users\Sijin\Git\SolarCar\BPS\BeVolt\User\LTC2983.c</Filename>
           <ExecCommand></ExecCommand>
           <Expression></Expression>
         </Bp>
@@ -375,27 +375,9 @@
       <bShared>0</bShared>
     </File>
     <File>
-      <GroupNumber>1</GroupNumber>
+      <GroupNumber>2</GroupNumber>
       <FileNumber>12</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <bDave2>0</bDave2>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-  </Group>
-
-  <Group>
-    <GroupName>Drivers/src</GroupName>
-    <tvExp>0</tvExp>
-    <tvExpOptDlg>0</tvExpOptDlg>
-    <cbSel>0</cbSel>
-    <RteFlg>0</RteFlg>
-    <File>
-      <GroupNumber>3</GroupNumber>
-      <FileNumber>13</FileNumber>
-      <FileType>1</FileType>
+      <FileType>5</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
@@ -408,7 +390,7 @@
 
   <Group>
     <GroupName>Drivers/src</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -421,21 +403,13 @@
       <bDave2>0</bDave2>
       <PathWithFileName>.\Drivers\src\EEPROM.c</PathWithFileName>
       <FilenameWithoutPath>EEPROM.c</FilenameWithoutPath>
-      <GroupNumber>3</GroupNumber>
-      <FileNumber>14</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <bDave2>0</bDave2>
-      <PathWithFileName>.\Drivers\src\LTC681x.c</PathWithFileName>
-      <FilenameWithoutPath>LTC681x.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
     <File>
-      <GroupNumber>2</GroupNumber>
-      <FileNumber>15</FileNumber>
-      <FileType>5</FileType>
+      <GroupNumber>3</GroupNumber>
+      <FileNumber>14</FileNumber>
+      <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
@@ -456,14 +430,6 @@
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
-  </Group>
-
-  <Group>
-    <GroupName>Drivers/inc</GroupName>
-    <tvExp>0</tvExp>
-    <tvExpOptDlg>0</tvExpOptDlg>
-    <cbSel>0</cbSel>
-    <RteFlg>0</RteFlg>
     <File>
       <GroupNumber>3</GroupNumber>
       <FileNumber>16</FileNumber>
@@ -471,8 +437,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>.\Drivers\inc\EEPROM.h</PathWithFileName>
-      <FilenameWithoutPath>EEPROM.h</FilenameWithoutPath>
+      <PathWithFileName>.\Drivers\src\LTC6811.c</PathWithFileName>
+      <FilenameWithoutPath>LTC6811.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -491,6 +457,18 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
+      <PathWithFileName>.\Drivers\inc\EEPROM.h</PathWithFileName>
+      <FilenameWithoutPath>EEPROM.h</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>4</GroupNumber>
+      <FileNumber>18</FileNumber>
+      <FileType>5</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
       <PathWithFileName>.\Drivers\inc\LTC681x.h</PathWithFileName>
       <FilenameWithoutPath>LTC681x.h</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
@@ -499,8 +477,6 @@
     <File>
       <GroupNumber>4</GroupNumber>
       <FileNumber>19</FileNumber>
-      <GroupNumber>4</GroupNumber>
-      <FileNumber>18</FileNumber>
       <FileType>5</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -512,8 +488,7 @@
     </File>
     <File>
       <GroupNumber>4</GroupNumber>
-      <GroupNumber>4</GroupNumber>
-      <FileNumber>19</FileNumber>
+      <FileNumber>20</FileNumber>
       <FileType>5</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -543,20 +518,7 @@
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
-  </Group>
-
-  <Group>
-    <GroupName>Periphs/src</GroupName>
-    <tvExp>0</tvExp>
-    <tvExpOptDlg>0</tvExpOptDlg>
-    <cbSel>0</cbSel>
-    <RteFlg>0</RteFlg>
     <File>
-      <tvExp>0</tvExp>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <bDave2>0</bDave2>
-      <PathWithFileName>.\Periphs\src\ADC.c</PathWithFileName>
-      <FilenameWithoutPath>ADC.c</FilenameWithoutPath>
       <GroupNumber>5</GroupNumber>
       <FileNumber>22</FileNumber>
       <FileType>1</FileType>
@@ -569,11 +531,6 @@
       <bShared>0</bShared>
     </File>
     <File>
-      <tvExp>0</tvExp>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <bDave2>0</bDave2>
-      <PathWithFileName>.\Periphs\src\CAN.c</PathWithFileName>
-      <FilenameWithoutPath>CAN.c</FilenameWithoutPath>
       <GroupNumber>5</GroupNumber>
       <FileNumber>23</FileNumber>
       <FileType>1</FileType>
@@ -587,14 +544,6 @@
     </File>
     <File>
       <GroupNumber>5</GroupNumber>
-      <FileNumber>23</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <bDave2>0</bDave2>
-      <PathWithFileName>.\Periphs\src\I2C.c</PathWithFileName>
-      <FilenameWithoutPath>I2C.c</FilenameWithoutPath>
-      <GroupNumber>5</GroupNumber>
       <FileNumber>24</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
@@ -606,14 +555,6 @@
       <bShared>0</bShared>
     </File>
     <File>
-      <GroupNumber>5</GroupNumber>
-      <FileNumber>24</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <bDave2>0</bDave2>
-      <PathWithFileName>.\Periphs\src\LED.c</PathWithFileName>
-      <FilenameWithoutPath>LED.c</FilenameWithoutPath>
       <GroupNumber>5</GroupNumber>
       <FileNumber>25</FileNumber>
       <FileType>1</FileType>
@@ -658,9 +599,9 @@
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
     <File>
-      <GroupNumber>5</GroupNumber>
-      <FileNumber>27</FileNumber>
-      <FileType>1</FileType>
+      <GroupNumber>6</GroupNumber>
+      <FileNumber>28</FileNumber>
+      <FileType>5</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
@@ -676,6 +617,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
+      <PathWithFileName>.\Periphs\inc\CAN.h</PathWithFileName>
+      <FilenameWithoutPath>CAN.h</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -708,14 +651,6 @@
       <FileNumber>32</FileNumber>
       <FileType>5</FileType>
       <tvExp>0</tvExp>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <bDave2>0</bDave2>
-      <PathWithFileName>.\Periphs\inc\LED.h</PathWithFileName>
-      <FilenameWithoutPath>LED.h</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
       <PathWithFileName>.\Periphs\inc\LED.h</PathWithFileName>

@@ -6,9 +6,9 @@
 // NOTE: All units are in Celsius
 
 #include "Temperature.h"
+#include "config.h"
 
-
-uint16_t *ModuleTemperatures;				// list of voltages of all modules
+uint16_t ModuleTemperatures[NUM_TEMPERATURE_BOARDS];				// list of voltages of all modules
 
 /** Temperature_Init
  * Initializes device drivers including SPI and LTC2983 for Temperature Monitoring
@@ -46,9 +46,6 @@ void Temperature_Init(void){
  * @return SUCCESS or ERROR
  */
 Status Temperature_UpdateMeasurements(){
-	//ModuleTemperatures = LTC2983_Measure();
-	
-	
 	return ERROR;
 }
 
@@ -58,25 +55,6 @@ Status Temperature_UpdateMeasurements(){
  * @return SUCCESS or ERROR
  */
 Status Temperature_IsSafe(uint8_t isCharging){
-
-
-/** Temperature_SetLimits
- * Sets the max temperature limit the cells can reach before danger
- * @param max temperature limit
- */
-void Temperature_SetLimits(uint16_t ceiling){
-	MaxTemperatureLimit = ceiling;
-}
-
-
-	
-	/* TODO: Change to accomodate for charge and discharge limits
-	for(int i = 0; i < sizeof(ModuleTemperatures)/sizeof(uint16_t); ++i){
-		if(Temperature_GetModuleTemperature(i) > MaxTemperatureLimit){
-			return 0;
-		}
-	}
-	*/
 	return ERROR;
 }
 
@@ -85,7 +63,6 @@ void Temperature_SetLimits(uint16_t ceiling){
  * @return pointer to index of modules that are in danger
  */
 uint16_t *Temperature_GetModulesInDanger(void){
-	
 	return NULL;
 }
 
@@ -98,15 +75,10 @@ uint16_t Temperature_GetModuleTemperature(uint16_t moduleIdx){
 	return ModuleTemperatures[moduleIdx];
 }
 
-
 /** Temperature_GetTotalPackAvgTemperature
  * Gets the average temperature of the whole battery pack
  * @return average temperature of battery pack
  */
 uint16_t Temperature_GetTotalPackAvgTemperature(void){
-	int sum = 0;
-	for(int i = 0; i < sizeof(ModuleTemperatures)/sizeof(uint16_t); ++i){
-		sum += Temperature_GetModuleTemperature(i);
-	}
-	return (sum / (sizeof(ModuleTemperatures)/sizeof(uint16_t)));
+	return 0;
 }
