@@ -1,36 +1,40 @@
 /** main.c
  * Program for UTSVT BeVolt's Battery Protection System SOC
- * @authors Garrett Wong, Sijin Woo
- * @lastRevised 1/13/2019
+ * @authors Garrett Wong, Sijin Woo, Tyler Ta
+ * @lastRevised 10/8/2019
  */
-
 #include <stdint.h>
 #include "stm32f4xx.h"
 #include "ADC.h"
 
- uint32_t cumulativeNegativeSoc = 0;
- uint32_t initialSoc = 100;
- uint32_t finalSoc;
- 
+#define MAX_CHARGE 1000*1000																								// In amp-hours (Ah), for now it is a dummy value
+uint32_t fixedPoint_SoC;																										// % of how much charge is left in battery with .01 resolution
+float float_SoC;																														// float vers of SoC
+
+
+
 /** Soc_Init
  * Initializes necessary timer and values to begin state of charge
  * calculation algorithm.
  * Info found on reference sheet stm32f413 page 535
  */
 void SoC_Init(void){ 
-	// TODO: Initilize timer. 32 bit timer..
+	/* Timer is used to find the timeDelta */
+	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE); 					//Enable TIM clock	
+	TIM_TimeBaseInitTypeDef Init_TIM2;								 						//make struct
 	
-	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE); 	//Enable TIM clock	
-	TIM_TimeBaseInitTypeDef Init_TIM2;								 		//make struct
-	
-	Init_TIM2.TIM_Prescaler = 1;
+	Init_TIM2.TIM_Prescaler = 1;				
 	Init_TIM2.TIM_CounterMode = TIM_CounterMode_Down;
-	Init_TIM2.TIM_Period = 0xFFFF;
+	Init_TIM2.TIM_Period = 0xFFFF-1;									
 	Init_TIM2.TIM_ClockDivision = TIM_CKD_DIV1;	
+	Init_TIM2.TIM_RepetitionCounter = 0;
 	
-	TIM_TimeBaseInit(TIM2, &Init_TIM2);										//call function
-	TIM_Cmd(TIM2,ENABLE);																	//enable counter	
+	TIM_TimeBaseInit(TIM2, &Init_TIM2);										
+	TIM_Cmd(TIM2,ENABLE);																	
 	
+	// Grab from EEPROM what is the current SoC; For now, going to set it to 100.00% for testing purposes
+	fixedPoint_SoC = 10000;
+	float_SoC = 100.00;
 }
 
 /** SoC_Calculate
@@ -38,15 +42,27 @@ void SoC_Init(void){
  * @param current reading from hall effect sensors. Fixed point of 0.0001 (1.500 Amps = 15000)
  * not a constant samping. Add on however much from the previous
  */
-void SoC_Calculate(int32_t amps){uint32_t counter; uint32_t timeElapsed;
-	// TODO: Coloumb counting algorithm.
-	// Accumulator summation
-	// need to find out how to raise a flag or access count register
-	counter = TIM2->CNT;							//find current value of up counter
-	TIM2->CNT = 0;										//set counter to zero to count up again
-	timeElapsed = counter/(80000000); //time passed when you call the counter
-	//cumulativeNegativeSoc = cumulativeNegativeSoc + timeElapsed*(ADC_Conversion(ADC_ReadLow()));
-	//finalSoc = initialSoc - cumulativeNegativeSoc;
+void SoC_Calculate(int32_t amps){ 
+	
+	/* Get system clocks */
+	RCC_ClocksTypeDef RCC_Clocks;
+	RCC_GetClocksFreq(&RCC_Clocks);
+	
+		
+	uint32_t counter = TIM2->CNT;											// find current value of up counter
+	TIM2->CNT = 0;																		// set counter to zero to count up again
+	
+	float timeElapsed = (0xFFFF - counter)/60;
+	timeElapsed /= 60;
+	timeElapsed /= RCC_Clocks.SYSCLK_Frequency;  			// time in hours
+	
+	float float_amps = amps * .0001;									// Fixed point to floating point
+	
+	float AhCollected = timeElapsed * float_amps;
+	
+	/* Update SoC */
+	float_SoC = float_SoC + (AhCollected * 100)/MAX_CHARGE;
+	fixedPoint_SoC = float_SoC * 100;
 }
 
 /** SoC_Calibrate
@@ -56,18 +72,23 @@ void SoC_Calculate(int32_t amps){uint32_t counter; uint32_t timeElapsed;
  * @param voltage fault type. 0 if under voltage, 1 if over voltage
  */
 void SoC_Calibrate(int32_t faultType){
-	// TODO: depending on fault type, the accumulator should be set t 0% or 100%
+	if (!(faultType == 0 || faultType == 1)) // ERROR
+	if (faultType == 0) {
+		fixedPoint_SoC = 0;
+		float_SoC = 0;
+	}
+	if (faultType == 1) {
+		fixedPoint_SoC = 10000;
+		float_SoC = 100.00;
+	}
 }
 
 /** SoC_GetPercent
  * Gets the percentage of charge left in the battery pack
  * @return fixed point percentage. Resolution = 0.01 (45.55% = 4555)
  */
-int32_t SoC_GetPercent(void){
-	uint32_t socPercent;
-	// TODO: returns percentage of charge
-	socPercent = (finalSoc/ initialSoc)*100;
-	return socPercent;
+uint32_t SoC_GetPercent(void){
+	return fixedPoint_SoC;
 }
 
 /** SoC_SetAccum 
@@ -75,6 +96,7 @@ int32_t SoC_GetPercent(void){
  * @param accumulator new value. Resolution = 0.0001.
  */
 void SoC_SetAccum(int32_t accum){
-	// TODO: sets accumulator.
+	fixedPoint_SoC = accum/10; 
+	float_SoC = accum/10000;
 }
 
