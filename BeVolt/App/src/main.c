@@ -316,15 +316,6 @@ int main(){
 }
 #endif
 
-#ifdef SOC_TEST
-int main(){
-	SoC_Init();
-	while(1){
-	
-	}
-}
-#endif
-
 #ifdef SPI_TEST
 //****************************************************************************************
 // SPI Test
@@ -417,17 +408,48 @@ int ADCmain(){
 #include "SOC.h"
 #include <stdio.h>
 #include <UART.h>
-int SOCmain(){
-	char str[50];
+void ChargingSoCTest(void);
+void DischargingSoCTest(void);
+
+extern uint32_t fixedPoint_SoC;
+extern float float_SoC;
+
+int main(){
 	UART3_Init(9600);
 	SoC_Init();
-	sprintf(str,"die world");
+	//ChargingSoCTest();
+	//DischargingSoCTest();
+}
+
+void ChargingSoCTest(void) {
+	char str[50];
+	sprintf(str,"Starting SoC Charging Test..");
 	UART3_Write(str, strlen(str));
+	
+	fixedPoint_SoC = 0;
+	float_SoC = 0;
 	while(1){
-		int counter = TIM2->CNT;							//find current value of up counter
-		sprintf(str,"%d\r\n",counter);  
+		SoC_Calculate(500); 									// Charging with 500 mA, should take a while
+		sprintf(str,"SoC: %.2f%%\r\n",float_SoC);
 		UART3_Write(str, strlen(str));
 	}
 }
+
+void DischargingSoCTest(void) {
+	char str[50];
+	sprintf(str,"Starting SoC Discharging Test..");
+	UART3_Write(str, strlen(str));
 	
+	fixedPoint_SoC = 10000;
+	float_SoC = 100.00;
+	while(1){
+		SoC_Calculate(-500); 									// Consuming 500 mA, should take a while
+		sprintf(str,"SoC: %.2f%%\r\n",float_SoC);
+		UART3_Write(str, strlen(str));
+	}
+}
+
+/** Tests
+ * 	TODO: Need to test SetAccumulator, GetPercent and Calibrate on faults
+ */
 #endif
