@@ -4,12 +4,25 @@
  */
 
 // NOTE: All units are in Celsius
+// TODO: Create more testing cases
+// TODO: Make sure data type is consistent, need to revise if going to Fixed Point w/ .01 resolution
+// TODO: Maybe make temperature boards more clean later on once system is more finalized.
 
 #include "Temperature.h"
 #include "config.h"
 
-uint16_t ModuleTemperatures[NUM_TEMPERATURE_BOARDS][20];	// Each board may not have 20 sensors. Look at config.h for how many sensors
+int16_t ModuleTemperatures[NUM_TEMPERATURE_BOARDS][20];	// Each board may not have 20 sensors. Look at config.h for how many sensors
 																												// there are on each board. 20 is just max that the board can handle
+int16_t ModuleTempStatus[NUM_TEMPERATURE_BOARDS];
+
+typedef enum chargeState {
+	discharging,
+	charging
+} chargeState;
+
+uint8_t chargingState;
+
+// Need a temperature conversion function
 
 /** Temperature_Init
  * Initializes device drivers including SPI and LTC2983 for Temperature Monitoring
@@ -47,7 +60,16 @@ void Temperature_Init(void){
  * @return SUCCESS or ERROR
  */
 Status Temperature_UpdateMeasurements(){
-	return ERROR;
+	// Should there be a isCharging here, constantly checking if temperatures are safe whenever updating measurements?
+	// Error for what
+	for (board b = TEMP_CS1; b <= TEMP_CS6; b++) {
+		LTC2983_StartMeasuringADC(b);
+		LTC2983_ReadConversions((int32_t*) ModuleTemperatures[b], b, NUM_SENSORS_ON_TEMP_BOARD_1);			// Need to change this later once devicer driver changes
+		for (int i = 0; i < NUM_SENSORS_ON_TEMP_BOARD_1; i++) {
+			if (ModuleTemperatures[b][i] == -1) return ERROR;  		// Conversion on one temp sensor failed, should this be forgiveable or nah
+		}
+	}
+	return SUCCESS;
 }
 
 /** Temperature_IsSafe
@@ -55,8 +77,21 @@ Status Temperature_UpdateMeasurements(){
  * @param 1 if pack is charging, 0 if discharging
  * @return SUCCESS or ERROR
  */
-Status Temperature_IsSafe(uint8_t isCharging){
-	return ERROR;
+Status Temperature_IsSafe(uint8_t isCharging){									// Maybe have this be an internal thing, change parameters to
+	int16_t maxCharge;
+	if (isCharging == 1) {
+		maxCharge = MAX_CHARGE_TEMPERATURE_LIMIT;
+	} else {
+		maxCharge = MAX_DISCHARGE_TEMPERATURE_LIMIT;
+	}
+	for (int i = 0; i < NUM_TEMPERATURE_BOARDS; i++) {
+		for (int j = 0; j < NUM_SENSORS_ON_TEMP_BOARD_1; j++) {
+			if (ModuleTemperatures[i][j] > MAX_CHARGE_TEMPERATURE_LIMIT) {
+				return ERROR;
+			}
+		}
+	}
+	return SUCCESS;
 }
 
 /** Temperature_SetChargeState
@@ -65,16 +100,16 @@ Status Temperature_IsSafe(uint8_t isCharging){
  * We need to account for these two limits by setting which limit should be used.
  * @param 1 if pack is charging, 0 if discharging
  */
-void Temperature_SetChargeState(uint8_t isCharging){
-	
+void Temperature_SetChargeState(uint8_t isCharging){  				// Maybe have this be the outside connection, why is this here
+	chargingState = isCharging;
 }
 
 /** Temperature_GetModulesInDanger
- * Finds all modules that in danger and stores them into a list
+ * Finds all modules that are in danger and stores them into a list
  * @return pointer to index of modules that are in danger
  */
-uint16_t *Temperature_GetModulesInDanger(void){
-	return NULL;
+int16_t *Temperature_GetModulesInDanger(void){
+	return ModuleTempStatus;
 }
 
 /** Temperature_GetModuleTemperature
@@ -84,14 +119,27 @@ uint16_t *Temperature_GetModulesInDanger(void){
  * @param index of module
  * @return temperature of module at specified index
  */
-uint16_t Temperature_GetModuleTemperature(uint16_t moduleIdx){
-	return 0;
+int16_t Temperature_GetModuleTemperature(uint16_t moduleIdx){
+	// assumes if it wants the first board, then moduleIdx = 0;
+	if (moduleIdx >= NUM_TEMPERATURE_BOARDS) return -1;
+	
+	int32_t total = 0;
+	for (int i = 0; i < NUM_SENSORS_ON_TEMP_BOARD_1; i++) {
+		total += ModuleTemperatures[moduleIdx][i];
+	}
+	total /= NUM_SENSORS_ON_TEMP_BOARD_1;
+	return total;
 }
 
 /** Temperature_GetTotalPackAvgTemperature
  * Gets the average temperature of the whole battery pack
  * @return average temperature of battery pack
  */
-uint16_t Temperature_GetTotalPackAvgTemperature(void){
-	return 0;
+int16_t Temperature_GetTotalPackAvgTemperature(void){
+	int32_t total = 0;
+	for (int i = 0; i < NUM_TEMPERATURE_BOARDS; i++) {
+		total += Temperature_GetModuleTemperature(i);
+	}
+	total /= NUM_TEMPERATURE_BOARDS;
+	return total;
 }

@@ -46,7 +46,7 @@ void Temperature_SetChargeState(uint8_t isCharging);
  * Finds all modules that in danger and stores them into a list
  * @return pointer to index of modules that are in danger
  */
-uint16_t *Temperature_GetModulesInDanger(void);
+int16_t *Temperature_GetModulesInDanger(void);
 
 /** Temperature_GetModuleTemperature
  * Gets the temperature of a certain module in the battery pack. Since there
@@ -55,13 +55,13 @@ uint16_t *Temperature_GetModulesInDanger(void);
  * @param index of module
  * @return temperature of module at specified index
  */
-uint16_t Temperature_GetModuleTemperature(uint16_t moduleIdx);
+int16_t Temperature_GetModuleTemperature(uint16_t moduleIdx);
 
 /** Temperature_GetTotalPackAvgTemperature
  * Gets the average temperature of the whole battery pack
  * @return average temperature of battery pack
  */
-uint16_t Temperature_GetTotalPackAvgTemperature(void);
+int16_t Temperature_GetTotalPackAvgTemperature(void);
 
  
  
