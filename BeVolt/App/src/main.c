@@ -269,21 +269,121 @@ int main(){
 #include "SPI.h"
 #include "stm32f4xx.h"
 
+void checkModuleTemperatureTest(void);
+void checkIndividualSensorTest(void);
+void checkDangerTest(void);
+void checkMasterTest(void);						// To implement later. Able to check everything with easeee
 
+extern int16_t ModuleTemperatures[NUM_TEMPERATURE_BOARDS][20];
 
 
 int main(){
 	UART3_Init(9600);
 	printf("I'm alive\n\r");
-	int32_t buffer[20];
+//	Temperature_Init();
 	
-	Temperature_Init();
+	checkModuleTemperatureTest();
+//	checkIndividualSensorTest();
+//	checkDangerTest();
 
-	LTC2983_ReadConversions(buffer, BOARD_CS1, 20);
-	while(1){
-		int32_t buf[20] = {0};
-		LTC2983_StartMeasuringADC(BOARD_CS1);
-		LTC2983_ReadConversions(buf, BOARD_CS1, 20);
+}
+
+/***** just testing the temperature sensor w/o battery ****/
+void checkIndividualSensorTest(void) {
+	printf("Individual Sensor Test \r\n");
+	int moduleNum;
+	int sensorToTest = 0;
+	while(1) {
+		printf("Board Number: ");
+		while(scanf("%d", &moduleNum) != EOF || moduleNum > NUM_TEMPERATURE_BOARDS || moduleNum < 0) {
+			printf("\r\nERROR -- please input valid board number: ");
+		}
+		printf("\r\nSensor Number (-1 for all): ");
+		while(scanf("%d", &sensorToTest) != EOF || sensorToTest > NUM_SENSORS_ON_TEMP_BOARD_1) {
+			printf("\r\nERROR -- please input valid sensor number: ");
+		}
+		printf("\r\n");
+		
+		Temperature_UpdateMeasurements();
+		if (sensorToTest == -1 ) {
+			for (int i = 0; i < NUM_SENSORS_ON_TEMP_BOARD_1; i++) {
+				printf("Sensor %d: %d Celsius\r\n", i, ModuleTemperatures[moduleNum][i]);
+			}
+		} else {
+			printf("Sensor %d: %d Celsius\r\n", sensorToTest, ModuleTemperatures[moduleNum][sensorToTest]);
+		}
+	}
+}
+
+void checkDangerTest(void) {
+	int isCharging;
+	printf("Danger Test\r\n");
+	printf("Discharging or Charging? (0/1)\r\n");
+	scanf("%d", &isCharging);
+	while (1) {
+		Temperature_UpdateMeasurements();
+		if (Temperature_IsSafe(isCharging) == ERROR) {
+			printf("SOMETHINGS WRONG! AHHH\r\n");
+			printf("----------Dumping Sensor data----------\r\n");
+			int16_t* dangerList = Temperature_GetModulesInDanger();
+			for (int i = 0; i < NUM_TEMPERATURE_BOARDS; i++) {
+				if (dangerList[i] == 1) {
+					printf("Board %d is in danger\r\n", i);
+					for (int j = 0; j < NUM_SENSORS_ON_TEMP_BOARD_1; j++) {
+						printf("B%d Sensor %d : %d Celsius\r\n", i, j, ModuleTemperatures[i][j]);
+					}
+				}
+			}
+			while (1){}
+		} else {
+			printf("we good.. \r\n");
+		}
+	}
+}
+
+void checkModuleTemperatureTest(void) {
+	int moduleToCheck;				// index of module to check average temperature
+	int32_t loopLen;					// how many times you are checking the temperature
+	bool checkAllFlag = false;
+	while (1) {
+		// User input 
+		printf("Please input board number to test or 7 to check all: ");
+		scanf("%d", &moduleToCheck);
+		if (moduleToCheck != 7) printf("\r\nTesting module %d..\r\n", moduleToCheck);
+		else printf("\r\nTesting all modules...\r\n");
+		
+		printf("How many times do you want to check? (input -1 if you want infinite)\r\n");
+		scanf("%d", &loopLen);
+		
+		// Temperature checking
+		if (loopLen >= 0) {
+			printf("----------START----------\r\n");
+			for (int i = 0; i < loopLen; i++) {
+				Temperature_UpdateMeasurements();
+				if(checkAllFlag) {
+					for (int i = 0; i < NUM_TEMPERATURE_BOARDS; i++) {
+						printf("Module %d Temp: %d Celsius\r\n", i, Temperature_GetModuleTemperature(i));
+					}
+					printf("Total Average is %d\r\n", Temperature_GetTotalPackAvgTemperature());
+				} else {
+					printf("Module %d Temp: %d Celsius\r\n", moduleToCheck, Temperature_GetModuleTemperature(moduleToCheck));
+				}
+			}
+			checkAllFlag = false;
+			printf("----------DONE----------\r\n");
+		} else {
+			while (1) {
+				Temperature_UpdateMeasurements();
+				if(checkAllFlag) {
+					for (int i = 0; i < NUM_TEMPERATURE_BOARDS; i++) {
+						printf("Module %d Temp: %d Celsius\r\n", i, Temperature_GetModuleTemperature(i));
+					}
+					printf("Total Average is %d\r\n", Temperature_GetTotalPackAvgTemperature());
+				} else {
+					printf("Module %d Temp: %d Celsius\r\n", moduleToCheck, Temperature_GetModuleTemperature(moduleToCheck));
+				}
+			}
+		}
 	}
 }
 #endif
