@@ -20,7 +20,7 @@ typedef ErrorStatus Status;
 #define NUM_TEMPERATURE_BOARDS			3			// Number of Temperature Slave Boards
 
 //--------------------------------------------------------------------------------
-// Battery Pack layour
+// Battery Pack layout
 #define NUM_BATTERY_MODULES				12		// Number of battery modules
 #define NUM_TEMPERATURE_SENSORS			62		// Number of temperature sensors
 #define NUM_TEMP_SENSORS_PER_MOD		2		// Number of temperature sensors per battery module

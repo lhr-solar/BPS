@@ -19,7 +19,7 @@ void initialize(void);
 void preliminaryCheck(void);
 void faultCondition(void);
 
-int main(){
+int mainmain(){
 	__disable_irq();			// Disable all interrupts until initialization is done
 	initialize();					// Initialize codes/pins
 	preliminaryCheck();		// Wait until all boards are powered on
@@ -110,7 +110,7 @@ void faultCondition(void){
 // E.g. If you want to run a LTC6811 test, change "#define CHANGE_THIS_TO_TEST_NAME" to the
 //		following:
 //		#define LTC6811_TEST
-#define CHANGE_NAME_TO_TEST
+#define UART_TEST
 
 
 
@@ -125,7 +125,9 @@ int main(){
 	while(1){
 		LED_Toggle(FAULT);
 		LEDdelay(100000);
-		LED_On(UVOLT);
+		LED_Toggle(RUN);
+		LEDdelay(100000);
+		LED_Toggle(UVOLT);
 		LEDdelay(100000);
 		LED_Toggle(OVOLT);
 		LEDdelay(100000);
@@ -359,10 +361,11 @@ int SPITestmain(){
 #ifdef UART_TEST
 //****************************************************************************************
 // Debug UART Test
+#include "UART.h"
 int main(){
-	UART3_Init(9600);
+	UART3_Init(115200);
 	while(1){
-		printf("Die world\n");
+		printf("Die world\r\n");
 		for(uint32_t i = 0; i < 100000; i++);
 	}
 }
