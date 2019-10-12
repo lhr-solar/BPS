@@ -16,12 +16,12 @@ typedef ErrorStatus Status;
 
 //--------------------------------------------------------------------------------
 // Basic Parameters of BPS layout
-#define NUM_VOLTAGE_BOARDS				1			// Number of Voltage Slave Boards
+#define NUM_VOLTAGE_BOARDS				2			// Number of Voltage Slave Boards
 #define NUM_TEMPERATURE_BOARDS			3			// Number of Temperature Slave Boards
 
 //--------------------------------------------------------------------------------
 // Battery Pack layout
-#define NUM_BATTERY_MODULES				12		// Number of battery modules
+#define NUM_BATTERY_MODULES				24		// Number of battery modules
 #define NUM_TEMPERATURE_SENSORS			62		// Number of temperature sensors
 #define NUM_TEMP_SENSORS_PER_MOD		2		// Number of temperature sensors per battery module
 

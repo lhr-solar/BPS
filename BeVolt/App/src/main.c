@@ -110,7 +110,7 @@ void faultCondition(void){
 // E.g. If you want to run a LTC6811 test, change "#define CHANGE_THIS_TO_TEST_NAME" to the
 //		following:
 //		#define LTC6811_TEST
-#define UART_TEST
+#define VOLTAGE_TEST
 
 
 
@@ -224,9 +224,9 @@ void print_config(cell_asic *bms_ic)
 #include "UART.h"
 
 int main(){
-	UART1_Init(115200);
-	//printf("Are you alive?");
-	while(Voltage_Init()) {
+	UART3_Init(115200);
+	printf("Are you alive?");
+	while(Voltage_Init() != SUCCESS) {
 		printf("Communication Failed.\n\r");
 	}
 	printf("Writing and Reading to Configuration Register Successful. Initialization Complete\n\r");
@@ -234,16 +234,18 @@ int main(){
 	Voltage_UpdateMeasurements();
 	printf("Successfully Updated Voltages.\n\r");
 	printf("\n\rVoltage Test:\n\r");
-	printf("Is it safe? %d\n\r\n\r", Voltage_IsSafe());
+	printf("Is it safe? %d\n\r\n\r", Voltage_IsSafe() == SAFE);
 	printf("Voltages of all modules:\n\r");
 	for(int32_t i = 0; i < NUM_BATTERY_MODULES; i++){
 		printf("%d : %f\n\r", i, (float)(Voltage_GetModuleVoltage(i)*0.0001));  // Place decimal point.
 	}
-	while(1){
+//	while(1){
 //		for(int32_t i = 0; i < NUM_BATTERY_MODULES; i++){
-//			printf("%d : %d\n\r", i, Voltage_GetModuleVoltage(i));
+//			printf("%d : %f\r\n", i, (float)Voltage_GetModuleVoltage(i) / 10000);
 //		}
-	}
+//		printf("\r\n");
+//		for(int i = 0; i < 100000; i++);
+//	}
 }
 #endif
 
