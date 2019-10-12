@@ -134,7 +134,13 @@ void I2C3_ReadMultiple(uint8_t deviceAddr, uint16_t startAddr, uint8_t *rxData, 
 			rxSize = 0;
 			
 		}else if(rxSize == 1){
+			// Disable ack
+			I2C_AcknowledgeConfig(I2C3, DISABLE);
+			
+			I2C_GenerateSTOP(I2C3, ENABLE);
+			
 			while(I2C_GetFlagStatus(I2C3, I2C_FLAG_RXNE) == RESET);
+			
 			*rxData = I2C_ReceiveData(I2C3);
 			rxData++;
 			rxSize = 0;

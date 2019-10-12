@@ -35,12 +35,13 @@ void EEPROM_Save(uint8_t logType, uint8_t data){
 	uint16_t *battery_modules;
 //	uint16_t *temperature_modules;
 	uint16_t fake_battery_modules[] = {1,2,3,4,8,9,10};
-	
 	if (faultCodePtr < (EEPROM_TEMP_FAULT - 1)) {		//only store errors if there have been less than 256 faults (so buffers don't overflow)
+
 		EEPROM_WriteByte(faultCodePtr, logType);
+		//delay(2);
 		faultCodePtr++;
 		EEPROM_WriteByte(faultCodePtr, 0xff);		//terminate array with 0xff
-	
+		//delay(2);
 		switch (logType) {
 			
 			case FAULT_HIGH_TEMP:
@@ -53,14 +54,17 @@ void EEPROM_Save(uint8_t logType, uint8_t data){
 					if (battery_modules[i] == 1)
 					{
 						EEPROM_WriteByte(tempFaultPtr, i);
+						//delay(2);
 						tempFaultPtr ++;
 					}
 				}
 				//terminate each entry with 0xfe 
 				EEPROM_WriteByte(tempFaultPtr, 0xfe);
+				//delay(2);
 				tempFaultPtr++;
 				//terminate entire array with 0xff
 				EEPROM_WriteByte(tempFaultPtr, 0xff);
+				//delay(2);
 				break;
 			
 			case FAULT_HIGH_VOLT:
@@ -71,14 +75,17 @@ void EEPROM_Save(uint8_t logType, uint8_t data){
 				for (uint8_t i = 0; i < NUM_BATTERY_MODULES; i++){
 					if (battery_modules[i] == 1){		//if module is in danger, write module index to array
 						EEPROM_WriteByte(voltFaultPtr, i);
+						//delay(2);
 						voltFaultPtr++;
 					}
 				}
 				//terminate each entry with 0xfe 
 				EEPROM_WriteByte(voltFaultPtr, 0xfe);
+				//delay(2);
 				voltFaultPtr++;
 				//terminate entire array with 0xff
 				EEPROM_WriteByte(voltFaultPtr, 0xff);
+				//delay(2);
 				break;
 				
 			case FAULT_LOW_VOLT:
@@ -89,14 +96,17 @@ void EEPROM_Save(uint8_t logType, uint8_t data){
 				for (uint8_t i = 0; i < NUM_BATTERY_MODULES; i++){
 					if (battery_modules[i] == 1){		//if module is in danger, write module index to array
 						EEPROM_WriteByte(voltFaultPtr, i);
+						//delay(2);
 						voltFaultPtr++;
 					}
 				}
 				//terminate each entry with 0xfe 
 				EEPROM_WriteByte(voltFaultPtr, 0xfe);
+				//delay(2);
 				voltFaultPtr++;
 				//terminate entire array with 0xff
 				EEPROM_WriteByte(voltFaultPtr, 0xff);
+				//delay(2);
 				break;
 				
 			case FAULT_HIGH_CURRENT:
@@ -118,14 +128,16 @@ void EEPROM_Save(uint8_t logType, uint8_t data){
  * Prints saved data from EEPROM to serial terminal
  */
 void EEPROM_SerialPrintData(void){
-	UART1_Init(115200);
+	//UART1_Init(115200);
 	uint8_t fault_code;
 	uint8_t data;
+	printf("z1\n");
 	uint16_t fault_ptr = EEPROM_FAULT_CODE_ADDR;
 	uint16_t data_ptr;
-	
 	fault_code = EEPROM_ReadByte(fault_ptr);	//read first fault code
+	printf("%d\n", fault_code);
 	while (fault_code != 0xff) {
+		printf("%d\n", fault_code);
 		switch (fault_code) {
 			case FAULT_HIGH_TEMP:
 				printf("fault, high temperature\nmodules in danger: ");
@@ -186,19 +198,27 @@ void EEPROM_SerialPrintData(void){
 void EEPROM_Tester(void){
 	//fake error messages
 	//note: the second parameter does not do anything currently
+	printf("x0\n");
 	EEPROM_Save(FAULT_HIGH_TEMP, 0xff);
+	printf("x1\n");
 	EEPROM_Save(FAULT_HIGH_VOLT, 0x04);
+	printf("x2\n");
 	EEPROM_Save(FAULT_LOW_VOLT, 0x00);
+	printf("x3\n");
 	EEPROM_Save(FAULT_HIGH_CURRENT, 0x45);
+	printf("x4\n");
 	EEPROM_Save(FAULT_WATCHDOG, 0x64);
+	printf("x5\n");
 	EEPROM_Save(FAULT_CAN_BUS, 0x9e);
+	printf("x6\n");
 	EEPROM_Save(FAULT_HIGH_VOLT, 0xd3);
+	printf("x7\n");
 	EEPROM_Save(FAULT_HIGH_TEMP, 0xc5);
 	
 	//test to see if it will let me overflow the buffer
-	for (uint16_t i = 0; i < 1000; i++) {
-		EEPROM_Save(FAULT_CAN_BUS, 0x00);
-	}
+	// for (uint16_t i = 0; i < 1000; i++) {
+		// EEPROM_Save(FAULT_CAN_BUS, 0x00);
+	// }
 }
 	
 /** EEPROM_WriteByte
@@ -221,7 +241,7 @@ void EEPROM_WriteByte(uint16_t address, uint8_t data){
 void EEPROM_ReadMultipleBytes(uint16_t address, uint32_t bytes, uint8_t* buffer){
 	I2C3_ReadMultiple(EEPROM_ADDRESS, address, buffer, bytes);
 	printf("byte read\n\r");
-	for(uint32_t delay = 0; delay < 50000; delay++){};
+	for(uint32_t delay = 0; delay < 10000; delay++){};
 	
 }
 
@@ -233,3 +253,5 @@ void EEPROM_ReadMultipleBytes(uint16_t address, uint32_t bytes, uint8_t* buffer)
 uint8_t EEPROM_ReadByte(uint16_t address){
 	return I2C3_Read(EEPROM_ADDRESS, address);
 }
+
+

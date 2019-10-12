@@ -65,7 +65,7 @@ void initialize(void){
 	Contactor_Init();
 	Contactor_Off();
 	EEPROM_Init();
-	WDTimer_Init();
+	// WDTimer_Init();
 	
 	Current_Init();
 	Voltage_Init();
@@ -476,9 +476,10 @@ int main(){
 	initialize();
 	__enable_irq();
 	printf("initialized\n\r");
-
+	EEPROM_Tester();
+	printf("written\n\r");
 	EEPROM_SerialPrintData();
-	printf("done");
+	printf("done\n\r");
 	while(1){};
 }
 

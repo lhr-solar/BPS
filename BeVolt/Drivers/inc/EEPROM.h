@@ -10,10 +10,10 @@
 
 #include <stdint.h>
 
-#define EEPROM_ADDRESS 0x50 << 1
+#define EEPROM_ADDRESS (0xA0)
 
 //starting addresses for errors
-#define EEPROM_FAULT_CODE_ADDR 0x00000
+#define EEPROM_FAULT_CODE_ADDR 0x00000// TODO: this was originally 0x00000. May want to change back.
 #define EEPROM_TEMP_FAULT  		 0x00100
 #define EEPROM_VOLT_FAULT		   0x04000
 #define EEPROM_CURRENT_FAULT	 0x08000
