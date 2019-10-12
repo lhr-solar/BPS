@@ -86,7 +86,7 @@ Status Temperature_IsSafe(uint8_t isCharging){									// Maybe have this be an 
 	}
 	for (int i = 0; i < NUM_TEMPERATURE_BOARDS; i++) {
 		for (int j = 0; j < NUM_SENSORS_ON_TEMP_BOARD_1; j++) {
-			if (ModuleTemperatures[i][j] > MAX_CHARGE_TEMPERATURE_LIMIT) {
+			if (ModuleTemperatures[i][j] > maxCharge) {
 				ModuleTempStatus[i] = 1;
 				dangerFlag = 1;
 				break;
