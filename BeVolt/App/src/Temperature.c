@@ -7,6 +7,7 @@
 // TODO: Create more testing cases
 // TODO: Make sure data type is consistent, need to revise if going to Fixed Point w/ .01 resolution
 // TODO: Maybe make temperature boards more clean later on once system is more finalized.
+// TODO: How to reset danger flags?
 
 #include "Temperature.h"
 #include "config.h"
@@ -65,9 +66,7 @@ Status Temperature_UpdateMeasurements(){
 	for (board b = TEMP_CS1; b <= TEMP_CS6; b++) {
 		LTC2983_StartMeasuringADC(b);
 		LTC2983_ReadConversions((int32_t*) ModuleTemperatures[b], b, NUM_SENSORS_ON_TEMP_BOARD_1);			// Need to change this later once devicer driver changes
-		for (int i = 0; i < NUM_SENSORS_ON_TEMP_BOARD_1; i++) {
-			if (ModuleTemperatures[b][i] == -1) return ERROR;  		// Conversion on one temp sensor failed, should this be forgiveable or nah
-		}
+		// Need to check for SPI TIMEOUT flag for error
 	}
 	return SUCCESS;
 }
@@ -78,6 +77,7 @@ Status Temperature_UpdateMeasurements(){
  * @return SUCCESS or ERROR
  */
 Status Temperature_IsSafe(uint8_t isCharging){									// Maybe have this be an internal thing, change parameters to
+	bool dangerFlag = false;
 	int16_t maxCharge;
 	if (isCharging == 1) {
 		maxCharge = MAX_CHARGE_TEMPERATURE_LIMIT;
@@ -87,11 +87,13 @@ Status Temperature_IsSafe(uint8_t isCharging){									// Maybe have this be an 
 	for (int i = 0; i < NUM_TEMPERATURE_BOARDS; i++) {
 		for (int j = 0; j < NUM_SENSORS_ON_TEMP_BOARD_1; j++) {
 			if (ModuleTemperatures[i][j] > MAX_CHARGE_TEMPERATURE_LIMIT) {
-				return ERROR;
+				ModuleTempStatus[i] = 1;
+				dangerFlag = 1;
+				break;
 			}
 		}
 	}
-	return SUCCESS;
+	return dangerFlag ? ERROR : SUCCESS;
 }
 
 /** Temperature_SetChargeState
