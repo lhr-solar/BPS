@@ -64,6 +64,7 @@ void SPI3_Init(void){
 	SPI_InitTypeDef SPI_InitStruct;
 	
 	// Initialize clocks
+	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
 	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC, ENABLE);
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_SPI3, ENABLE);
 	

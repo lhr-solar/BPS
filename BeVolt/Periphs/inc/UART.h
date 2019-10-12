@@ -8,16 +8,6 @@
 #include <stdint.h>
 
 /***** Unlike SPI, UART cannot have multiple modules connected to the same tx/rx line *****/
-// ONLY USE UART3 FOR DEBUGGING ON NUCLEO!!!!
-
-/** Pins:
- * UART1:
- *		tx : PA9
- *		rx : PA10
- * UART3:		*** NOTE: Nucleo Board uses these pins for USB ***
- *		tx : PD8
- *		rx : PD9
- */
 
 /** UART1_Init
  * Initializes UART1 Module
@@ -41,14 +31,11 @@ void UART1_Write(char *txBuf, uint32_t txSize);
  */
 void UART1_Read(char *rxBuf, uint32_t rxSize);
 
-/**************** WARNING ***************/
-// ONLY USE THIS FOR DEBUGGING ON NUCLEO!!!!!
-/****************************************/
 /** UART3_Init
  * Initializes UART1 Module
  * Pins: 
- *		tx : PD8
- *		rx : PD9
+ *		tx : PB10
+ *		rx : PC5
  * @param baud rate: 9600, 115200, 500000
  */
 void UART3_Init(uint32_t baud);
