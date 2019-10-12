@@ -4,6 +4,7 @@
 
 #include <stdint.h>
 #include "stm32f4xx.h"
+#include "ADC.h"
 
 /** ADC_InitHilo
  * Initializes PA2 (high prec) and PA3 (low prec) as ADC input pins.
@@ -51,8 +52,26 @@ uint32_t ADC_ReadLow(void){
  * Returns the converted current value given the ADC readings.
  * @returns converted current - fixed point notation of 0.001
  */
-uint32_t ADC_Conversion (uint32_t ADC_Reading){
-
+uint32_t ADC_Conversion (uint32_t ADC_Reading, CurrentSensor s){
+	const int maxReading = 4095;	// The maximum reading the ADC is capable of returning
+																// based on the precision of the ADC.
+	const int operationMilliVoltage = 3300;	// The operating voltage in millivolts
+	const int opAmpGain = 3;	// The gain for the op-amp stage
+	const int opAmpOffset = 4096;	// The offset in millivolts for the op-amp stage
+	
+	// The actual reading on the ADC pin
+	uint32_t milliVolts = ADC_Reading * operationMilliVoltage / maxReading;
+	
+	// The output of the hall sensor (prior to the op-amp stage)
+	uint32_t sensorOutput = milliVolts * opAmpGain - opAmpOffset;
+	
+	// The actual current measured by the sensors
+	switch(s) {
+		case HIGH_PRECISION:	// Rated for currents between -50 and 50 A.
+			return sensorOutput * 50 / 4;	// In mA.
+		case LOW_PRECISION:		// Rated for currents between -100 and 100 A.
+			return sensorOutput * 100 / 4;	// In mA.
+	}
 }
 
 

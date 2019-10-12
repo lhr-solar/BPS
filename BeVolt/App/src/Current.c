@@ -8,6 +8,8 @@
 // TODO: Think of better naming convention of current
 
 #include "Current.h"
+#include "ADC.h"
+#include "config.h"
 
 uint16_t HighPrecisionCurrent;		// Amp measurement of hall effect sensor of high precision
 uint16_t LowPrecisionCurrent;		// Amp measurement of hall effect sensor of high precision
@@ -16,7 +18,7 @@ uint16_t LowPrecisionCurrent;		// Amp measurement of hall effect sensor of high 
  * Initializes two ADCs to begin current monitoring.
  */
 void Current_Init(void){
-	
+	ADC_InitHilo();	// Initialize the ADCs
 }
 
 /** Current_UpdateMeasurements
@@ -24,7 +26,10 @@ void Current_Init(void){
  * @return SUCCESS or ERROR
  */
 ErrorStatus Current_UpdateMeasurements(void){
-	return ERROR;
+	HighPrecisionCurrent = ADC_Conversion(ADC_ReadHigh(), HIGH_PRECISION);
+	LowPrecisionCurrent = ADC_Conversion(ADC_ReadLow(), LOW_PRECISION);
+	
+	return ERROR;	// TODO: Once this has been tested, stop returning errors
 }
 
 /** Current_IsSafe
@@ -33,6 +38,15 @@ ErrorStatus Current_UpdateMeasurements(void){
  */
 SafetyStatus Current_IsSafe(void){
 	
+	if(HighPrecisionCurrent > MAX_HIGH_PRECISION_CURRENT) {
+		return (LowPrecisionCurrent < MAX_CURRENT_LIMIT)
+			? SAFE 
+			: DANGER;
+	} else {
+		return SAFE; 
+	}
+	
+	// This line should never be reached
 	return DANGER;
 }
 
@@ -42,7 +56,8 @@ SafetyStatus Current_IsSafe(void){
  * @return 1 if charge, 0 if discharge
  */
 int8_t Current_IsCharging(void){
-	return 0;
+	// TODO: Make sure that the current board is installed in such a way that negative => charging
+	return HighPrecisionCurrent < 1;
 }
 
 /** Current_GetHighPrecReading
@@ -50,7 +65,7 @@ int8_t Current_IsCharging(void){
  * @return Amperes value
  */
 uint16_t Current_GetHighPrecReading(void){
-	return 0;
+	return HighPrecisionCurrent;
 }
 
 /** Current_GetLowPrecReading
@@ -58,5 +73,5 @@ uint16_t Current_GetHighPrecReading(void){
  * @return Amperes value
  */
 uint16_t Current_GetLowPrecReading(void){
-	return 0;
+	return LowPrecisionCurrent;
 }

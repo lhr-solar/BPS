@@ -34,6 +34,7 @@ typedef ErrorStatus Status;
 #define MAX_CHARGE_TEMPERATURE_LIMIT	48.00	// Max temperature limit (Celcius)	(actual max: 50C)
 
 #define MAX_CURRENT_LIMIT				100		// Max current limit (Amperes)		(Max continuous discharge is 15A per cell)
+#define MAX_HIGH_PRECISION_CURRENT 50	// Max current detectable by the high-precision current sensor
 
 //--------------------------------------------------------------------------------
 // Voltage Board Sensor Configurations
