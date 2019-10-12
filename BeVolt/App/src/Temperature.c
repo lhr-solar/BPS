@@ -50,7 +50,7 @@ void Temperature_Init(void){
 	GPIOB->ODR = GPIOB->ODR | GPIO_Pin_13 | GPIO_Pin_14 | GPIO_Pin_15;
 	GPIOC->ODR = GPIOC->ODR | GPIO_Pin_6 | GPIO_Pin_7 | GPIO_Pin_8;
 	
-	SPI_Init8();
+	SPI3_Init();
 	
 	LTC2983_Init();
 }
