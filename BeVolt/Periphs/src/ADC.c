@@ -6,149 +6,98 @@
 
 #include <stdint.h>
 #include "stm32f4xx.h"
+#include "stm32f4xx_dma.h"
+
+static volatile uint16_t ADCresults[2];
+
+void ADC_InitDMA(void) {
+	// Start the clock for the DMA
+	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_DMA2, ENABLE);
+
+	// Create the DMA structure
+	DMA_InitTypeDef DMA_InitStruct;
+
+	DMA_InitStruct.DMA_Channel = DMA_Channel_0;
+	DMA_InitStruct.DMA_PeripheralBaseAddr = (uint32_t)&(ADC1->DR);
+	DMA_InitStruct.DMA_Memory0BaseAddr = (uint32_t) &ADCresults;
+	DMA_InitStruct.DMA_DIR = DMA_DIR_PeripheralToMemory;
+	DMA_InitStruct.DMA_BufferSize = 2;
+	DMA_InitStruct.DMA_PeripheralInc = DMA_PeripheralInc_Disable;
+	DMA_InitStruct.DMA_MemoryInc = DMA_MemoryInc_Enable;
+	DMA_InitStruct.DMA_PeripheralDataSize = DMA_PeripheralDataSize_HalfWord;
+	DMA_InitStruct.DMA_MemoryDataSize = DMA_MemoryDataSize_HalfWord;
+	DMA_InitStruct.DMA_Mode = DMA_Mode_Circular;
+	DMA_InitStruct.DMA_Priority = DMA_Priority_High;
+	DMA_InitStruct.DMA_FIFOMode = DMA_FIFOMode_Disable;
+	DMA_InitStruct.DMA_FIFOThreshold = DMA_FIFOThreshold_HalfFull;
+	DMA_InitStruct.DMA_MemoryBurst = DMA_MemoryBurst_Single;
+	DMA_InitStruct.DMA_PeripheralBurst = DMA_PeripheralBurst_Single;
+	DMA_Init(DMA2_Stream0, &DMA_InitStruct);
+
+	// Enable DMA2 stream 0
+	DMA_Cmd(DMA2_Stream0, ENABLE);
+}
 
 /** ADC_InitHilo
  * Initializes PA2 (high prec) and PA3 (low prec) as ADC input pins.
  */
 void ADC_InitHilo(void){
-	//uint16_t digitalValue;
-	//channelSelect = 0 = High Precision
-	//channelSelect = 1 = Low Precision
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_ADC1, ENABLE);
-	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_ADC1, ENABLE);	// Enable the ADC clock
+	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);	// Enable the PA clock
+
+	ADC_InitDMA();
 
 	GPIO_InitTypeDef GPIO_InitStruct;
-
-	GPIO_InitStruct.GPIO_Pin = GPIO_Pin_3;
-	GPIO_InitStruct.GPIO_Pin = GPIO_Pin_2;
-
-	GPIO_InitStruct.GPIO_Mode = GPIO_Mode_AN;									// Analog In, used to be =AIN
-
-	GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_NOPULL;							//was =DOWN
+	GPIO_InitStruct.GPIO_Pin = GPIO_Pin_3 | GPIO_Pin_2;	// Using pins PA2 and PA3 for the ADC
+	GPIO_InitStruct.GPIO_Mode = GPIO_Mode_AN;						// Analog Input
+	GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_NOPULL;				// High impedence
 	GPIO_Init(GPIOA,&GPIO_InitStruct);
 
+	// ADC Common Init
+	ADC_CommonInitTypeDef ADC_CommonStruct;
+	ADC_CommonStruct.ADC_Mode = ADC_Mode_Independent;
+	ADC_CommonStruct.ADC_Prescaler = ADC_Prescaler_Div2;
+	ADC_CommonStruct.ADC_DMAAccessMode = ADC_DMAAccessMode_Disabled;
+	ADC_CommonStruct.ADC_TwoSamplingDelay = ADC_TwoSamplingDelay_5Cycles;
+	ADC_CommonInit(&ADC_CommonStruct);
 
-	ADC_InitTypeDef ADC_InitStruct;
-	ADC_InitStruct.ADC_Resolution = ADC_Resolution_12b;
-	ADC_InitStruct.ADC_ScanConvMode = DISABLE;
-	ADC_InitStruct.ADC_ContinuousConvMode = DISABLE;
+	// Set up to use DMA so that multiple channels can be used
+	ADC_InitTypeDef ADC_InitStruct;	// Initialization structure
+	ADC_InitStruct.ADC_Resolution = ADC_Resolution_12b;	// High resolution
+	ADC_InitStruct.ADC_ScanConvMode = ENABLE;						// So we can go through all the channels
+	ADC_InitStruct.ADC_ContinuousConvMode = ENABLE; 		// Cycle the channels
 	ADC_InitStruct.ADC_ExternalTrigConvEdge = ADC_ExternalTrigConvEdge_None;
 	ADC_InitStruct.ADC_ExternalTrigConv = DISABLE;
 	ADC_InitStruct.ADC_DataAlign = ADC_DataAlign_Right;
-	ADC_InitStruct.ADC_NbrOfConversion = 1;
+	ADC_InitStruct.ADC_NbrOfConversion = 2;							// We have two channels that we need to read
 
-	ADC_Init(ADC2, &ADC_InitStruct);
-	// i think this is the right place for this ADC_EOCOnEachRegularChannelCmd(ADC1, ENABLE); Sets endOfConversion flag usage, may be unnecessary
-	//enable and begin
+	ADC_Init(ADC1, &ADC_InitStruct);
 
+	// Configure the channels
+	// TODO: investigate the sample time that is needed for this
+	ADC_RegularChannelConfig(ADC1, ADC_Channel_2, 1, ADC_SampleTime_56Cycles);
+	ADC_RegularChannelConfig(ADC1, ADC_Channel_3, 2, ADC_SampleTime_56Cycles);
+
+	ADC_DMARequestAfterLastTransferCmd(ADC1, ENABLE);
+
+	ADC_DMACmd(ADC1, ENABLE);
+
+	// Enable ADC1
+	ADC_Cmd(ADC1, ENABLE);
+
+	ADC_SoftwareStartConv(ADC1);
 }
+
 /** ADC_ReadLow
  * PA3 (low prec) ADC return value
  */
 uint16_t ADC_ReadLow(void){
-	ADC_RegularChannelConfig(ADC1, ADC_Channel_3, 1, ADC_SampleTime_56Cycles); // Low precision sensor, rank=1, idk about sample time just set lowest val
-	ADC_Cmd(ADC1,ENABLE);
-	ADC_SoftwareStartConv(ADC1);
-	//wait for conversion
-	while (!ADC_GetFlagStatus(ADC1, ADC_FLAG_EOC));
-
-	ADC_Cmd(ADC1,DISABLE);
-	return ADC_GetConversionValue(ADC1);
-
-	/*
-	digitalValue = ADC_GetConversionValue(ADC1);
-	ADC_Cmd(ADC1,DISABLE);
-	return digitalValue;  */
+	return ADCresults[1];
 }
 
 /** ADC_ReadHigh
  * PA2 (high prec) ADC return value
  */
 uint16_t ADC_ReadHigh(void){
-	ADC_RegularChannelConfig(ADC1, ADC_Channel_2, 1, ADC_SampleTime_56Cycles); // High precision sensor, rank=2, idk about sample time just set lowest val
-	ADC_Cmd(ADC1,ENABLE);
-	ADC_SoftwareStartConv(ADC1);
-	//wait for conversion
-	while (!ADC_GetFlagStatus(ADC1, ADC_FLAG_EOC));
-
-	ADC_Cmd(ADC1,DISABLE);
-	return ADC_GetConversionValue(ADC1);
-
-	/*
-	digitalValue = ADC_GetConversionValue(ADC1);
-	ADC_Cmd(ADC1,DISABLE);
-	return digitalValue;  */
+	return ADCresults[0];
 }
-
-/**~~~~~ LEGACY REFRENCE ~~~~~~~~~~
-
-	GPIO_InitStruct.GPIO_Speed = GPIO_Speed_25MHz;
-	GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
-
-	ADC_InitTypeDef ADC_InitStruct;														// Init ADC
-	ADC_InitStruct.ADC_ContinuousConvMode = DISABLE;
-	ADC_InitStruct.ADC_DataAlign = ADC_DataAlign_Right;
-	ADC_InitStruct.ADC_ExternalTrigConv = DISABLE;
-	ADC_InitStruct.ADC_ExternalTrigConvEdge = ADC_ExternalTrigConvEdge_None;
-	ADC_InitStruct.ADC_NbrOfConversion = 2;										// one sample.. fast but not precise
-	ADC_InitStruct.ADC_Resolution = ADC_Resolution_12b;				// 12 bit precision
-	ADC_InitStruct.ADC_ScanConvMode = DISABLE;								// single or all channels
-	ADC_Init(ADC1, &ADC_InitStruct);													// initialize
-	ADC_Cmd(ADC1, ENABLE);																		// command
-
-
-
-
-
- * ADC_ReadHigh
- * Returns the adc value of PA2 (high prec)
- * @return adc value in high prec adc
-uint32_t ADC_ReadHigh(void){
-	// Start ADC conversion
-	//ADC_RegularChannelConfig(ADC1, ADC_Channel_2, 1,ADC_SampleTime_84Cycles);
-
-	// Wait until conversion is finish
-	while (!ADC_GetFlagStatus(ADC1, ADC_FLAG_EOC));
-	return ADC1->DR & 0x00000FFF;
-}
-
- * ADC_ReadLow
- * Returns the adc value of PA3 (low prec)
- * @return adc value of low prec adc
-
-uint32_t ADC_ReadLow(void){
-	ADC_RegularChannelConfig(ADC1, ADC_Channel_3, 1,ADC_SampleTime_84Cycles);
-	ADC_SoftwareStartConv(ADC1);
-	// Wait until conversion is finish
-	while (!ADC_GetFlagStatus(ADC1, ADC_FLAG_EOC));
-	return ADC1->DR & 0x00000FFF;
-}
-	// INITIALIZE ADC PIN "ALTERNATE FUNCTION"
-	// SAME THING FOR OTHER ONES
-	// RETURN
-
- * ADC_Conversion
- * Returns the converted current value given the ADC readings
- * @returns converted current
-
-uint32_t ADC_Conversion (uint32_t ADC_Reading){
- // note Fred's board already converts the -4 to 4 volts to 0-4
- //uint32_t convertedVoltage = ((ADC_Reading*4.096)/2047)*1000; // converts ADC reading to a voltage
- uint32_t convertedVoltage = (((ADC_Reading*3300)/4096));
- int32_t convertedCurrent = (convertedVoltage-2048)*(100/4); // takes voltage and converts to a current reading, given linear slope
- return convertedCurrent;
- //return convertedVoltage;
-}
-
- * ADC_ChooseHiLo
- * Chooses which value of ADC readings to choose from
- * High or Low current Tamura Sensor
- * @returns converted value
-
-uint32_t ADC_ChooseHiLo (uint32_t highReading, uint32_t lowReading){
-	return ADC_Conversion(lowReading);
-	if (ADC_Conversion(highReading) < 50){
-		return ADC_Conversion(lowReading);
-	}
-	return ADC_Conversion(highReading);
-}*/
