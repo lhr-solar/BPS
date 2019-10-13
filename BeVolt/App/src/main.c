@@ -110,7 +110,7 @@ void faultCondition(void){
 // E.g. If you want to run a LTC6811 test, change "#define CHANGE_THIS_TO_TEST_NAME" to the
 //		following:
 //		#define LTC6811_TEST
-#define UART_TEST
+#define TEMPERATURE_TEST
 
 
 
@@ -275,15 +275,22 @@ int main(){
 int main(){
 	UART3_Init(9600);
 	printf("I'm alive\n\r");
-	int32_t buffer[20];
+	int32_t buffer[12];
 	
 	Temperature_Init();
+	printf("Activated\n\r");
 
-	LTC2983_ReadConversions(buffer, BOARD_CS1, 20);
+	LTC2983_ReadConversions(buffer, TEMP_CS1, 12);
 	while(1){
-		int32_t buf[20] = {0};
-		LTC2983_StartMeasuringADC(BOARD_CS1);
-		LTC2983_ReadConversions(buf, BOARD_CS1, 20);
+		int32_t buf[12] = {0};
+		LTC2983_StartMeasuringADC(TEMP_CS1);
+		
+		LTC2983_ReadConversions(buf, TEMP_CS1, 12);
+					printf("\n\r");
+		for(int i = 0; i < 12; i++) {
+		    printf("%d\n\r", buf[i]);
+		}
+		for(int i = 0; i < 10000000; i++);
 	}
 }
 #endif

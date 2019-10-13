@@ -30,7 +30,14 @@ void LTC2983_Init(void){
 	for(board tempBoard = TEMP_CS1; tempBoard <= TEMP_CS1; tempBoard++) {
 		for(uint32_t i = 0; i < NUM_SENSORS_ON_TEMP_BOARD_1; i++) {
 			Board_Select(tempBoard, 0);
-			SPI_WriteMulti8(message, 7);
+			//SPI_WriteMulti8(message, 7);
+			SPI_Write8(message[0]);
+			SPI_Write8(message[1]);
+			SPI_Write8(message[2]);
+			SPI_Write8(message[3]);
+			SPI_Write8(message[4]);
+			SPI_Write8(message[5]);
+			SPI_Write8(message[6]);			
 			Board_Select(tempBoard, 1);
 			for(uint32_t i = 0; i < 80000; i++) {}
 			message[2] += 4;					// Increment to next channel
@@ -40,7 +47,14 @@ void LTC2983_Init(void){
 		
 		// Set multichannel conversion setting
 		Board_Select(tempBoard, 0);
-		SPI_WriteMulti8(maskConfig, 7);
+		//SPI_WriteMulti8(maskConfig, 7);
+			SPI_Write8(maskConfig[0]);
+			SPI_Write8(maskConfig[1]);
+			SPI_Write8(maskConfig[2]);
+			SPI_Write8(maskConfig[3]);
+			SPI_Write8(maskConfig[4]);
+			SPI_Write8(maskConfig[5]);
+			SPI_Write8(maskConfig[6]);			
 		Board_Select(tempBoard, 1);
 	}
  
@@ -97,11 +111,16 @@ void Board_Select(board tempBoard, bool state) {
 bool LTC2983_Ready(void){
 	uint8_t message[3] = {READ_CMD, 0x00, 0x00};
 	uint8_t result;
-
+//printf(" :( \n\r");
 	GPIOB->ODR &= ~GPIO_Pin_13;
-	SPI_WriteReadMulti8(message, 3, &result, 1, true);
+	//SPI_WriteReadMulti8(message, 3, &result, 1, true);
+	SPI_Write8(message[0]);
+	SPI_Write8(message[1]);
+	SPI_Write8(message[2]);
+	result = SPI_Read8();	
 	for(uint32_t i = 0; i < 80000; i++) {}
 	GPIOB->ODR |= GPIO_Pin_13;
+		if(result != 0)
   if((result & 0xC0) == 0x40) {
 		return true;
 	} else {
@@ -133,16 +152,29 @@ int32_t LTC2983_MeasureSingleChannel(void){
 	while(!LTC2983_Ready()) {
 		
 		GPIOB->ODR &= ~GPIO_Pin_13;
-		SPI_WriteMulti8(message, 4);			// restart conversion
+		//SPI_WriteMulti8(message, 4);			// restart conversion
+			SPI_Write8(message[0]);
+			SPI_Write8(message[1]);
+			SPI_Write8(message[2]);
+			SPI_Write8(message[3]);
 		GPIOB->ODR |= GPIO_Pin_13;
 		
 		//printf("Not ready.\n\r");
 	}
 
 	GPIOB->ODR &= ~GPIO_Pin_13;
-	SPI_WriteReadMulti8(receive, 3, result, 4, true);
-	GPIOB->ODR |= GPIO_Pin_13;	
+	//SPI_WriteReadMulti8(receive, 3, result, 4, true);
+	SPI_Write8(receive[0]);
+	SPI_Write8(receive[1]);
+	SPI_Write8(receive[2]);
+	result[3] = SPI_Read8();	
+	result[2] = SPI_Read8();
+	result[1] = SPI_Read8();
+	result[0] = SPI_Read8();
 	
+for(int i = 0; i < 80000; i++);
+	GPIOB->ODR |= GPIO_Pin_13;	
+	printf("%d\n\r", result);
 	if((result[0] & 0x01) == 0x01) {
 		return (*(int32_t *)result & 0x007FFFFF);
 	} else {
@@ -187,13 +219,21 @@ void LTC2983_ReadConversions(int32_t *Buf, board temperatureBoard, uint8_t numOf
 	
 	for(uint32_t i = 0; i < numOfChannels; i++) {
 		Board_Select(temperatureBoard, 0);
-		SPI_WriteReadMulti8(readConversionResult, 3, result, 4, true);
+		//SPI_WriteReadMulti8(readConversionResult, 3, result, 4, true);
+			SPI_Write8(readConversionResult[0]);
+			SPI_Write8(readConversionResult[1]);
+			SPI_Write8(readConversionResult[2]);
+			result[3] = SPI_Read8();
+			result[2] = SPI_Read8();
+			result[1] = SPI_Read8();
+			result[0] = SPI_Read8();			
 		for(uint32_t i = 0; i < 80000; i++){}
 		Board_Select(temperatureBoard, 1);
 		
 		readConversionResult[2] += 4;				// Increment to next channel address	
-		
-		if((result[0] & 0x01) == 0x01) {
+		for(uint32_t i = 0; i < 12*80000; i++){}
+		//	printf("\n\r");
+		if(result[0] == 0x01) {
 			//(*(int32_t *)result & 0x007FFFFF);
 			Buf[i] = *(int32_t *)result & 0x007FFFFF;
 		} else {
@@ -223,6 +263,7 @@ int32_t LTC2983_ReadChannel(board temperatureBoard, uint8_t channel) {
 	
 	Board_Select(temperatureBoard, 0);
 	SPI_WriteReadMulti8(readSingleChannel, 3, singleChannelResult, 4, true);
+	for(int i = 0; i < 80000; i++);
 	Board_Select(temperatureBoard, 1);
 	
 	return *(uint32_t *)singleChannelResult;
