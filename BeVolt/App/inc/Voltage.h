@@ -9,8 +9,6 @@
 #include <stdint.h>
 #include "config.h"
 
-enum VoltageStatus {OverVoltage, UnderVoltage};
-
 /** Voltage_Init
  * Initializes all device drivers including LTC6811 and GPIO to begin Voltage Monitoring
  * @return SUCCESS or ERROR

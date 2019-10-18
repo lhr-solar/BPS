@@ -8,7 +8,7 @@
 
 #include "stm32f4xx.h"
 
-typedef enum {SAFE = 0, DANGER = 1} SafetyStatus;
+typedef enum {SAFE = 0, DANGER = 1, OVERVOLTAGE = 2, UNDERVOLTAGE = 3} SafetyStatus;
 typedef ErrorStatus Status;
 
 // NUCLEO or custom

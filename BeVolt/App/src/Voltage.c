@@ -70,7 +70,7 @@ SafetyStatus Voltage_IsSafe(void){
 		}
 	}
 
-	return DANGER;
+	return SAFE;
 }
 
 /** Voltage_GetModulesInDanger

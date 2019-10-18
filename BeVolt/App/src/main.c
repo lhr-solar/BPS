@@ -14,6 +14,7 @@
 #include "EEPROM.h"
 #include "WDTimer.h"
 #include "SoC.h"
+#include "LED.h"
 
 void initialize(void);
 void preliminaryCheck(void);
@@ -225,27 +226,31 @@ void print_config(cell_asic *bms_ic)
 
 int main(){
 	UART3_Init(115200);
+	LED_Init();
 	printf("Are you alive?");
 	while(Voltage_Init() != SUCCESS) {
 		printf("Communication Failed.\n\r");
 	}
 	printf("Writing and Reading to Configuration Register Successful. Initialization Complete\n\r");
 	
-	Voltage_UpdateMeasurements();
-	printf("Successfully Updated Voltages.\n\r");
-	printf("\n\rVoltage Test:\n\r");
-	printf("Is it safe? %d\n\r\n\r", Voltage_IsSafe() == SAFE);
-	printf("Voltages of all modules:\n\r");
-	for(int32_t i = 0; i < NUM_BATTERY_MODULES; i++){
-		printf("%d : %f\n\r", i, (float)(Voltage_GetModuleVoltage(i)*0.0001));  // Place decimal point.
+	while(1){
+		Voltage_UpdateMeasurements();
+		if(Voltage_IsSafe() != SAFE){
+			break;
+		}
+		
+		LED_Toggle(RUN);
 	}
-//	while(1){
-//		for(int32_t i = 0; i < NUM_BATTERY_MODULES; i++){
-//			printf("%d : %f\r\n", i, (float)Voltage_GetModuleVoltage(i) / 10000);
-//		}
-//		printf("\r\n");
-//		for(int i = 0; i < 100000; i++);
-//	}
+	
+	if(Voltage_IsSafe() == OVERVOLTAGE){
+		LED_On(OVOLT);
+	}
+	
+	if(Voltage_IsSafe() == UNDERVOLTAGE){
+		LED_Off(UVOLT);
+	}
+	
+	while(1);
 }
 #endif
 
