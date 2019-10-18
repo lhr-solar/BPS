@@ -19,7 +19,11 @@ void initialize(void);
 void preliminaryCheck(void);
 void faultCondition(void);
 
+<<<<<<< HEAD
 int mainmain(){
+=======
+int real_main(){
+>>>>>>> 1feedd548e080248488a60e6ef3a331132f52e90
 	__disable_irq();			// Disable all interrupts until initialization is done
 	initialize();					// Initialize codes/pins
 	preliminaryCheck();		// Wait until all boards are powered on
@@ -110,8 +114,7 @@ void faultCondition(void){
 // E.g. If you want to run a LTC6811 test, change "#define CHANGE_THIS_TO_TEST_NAME" to the
 //		following:
 //		#define LTC6811_TEST
-#define UART_TEST
-
+#define OPEN_WIRE_TEST
 
 #ifdef LED_TEST
 #include "LED.h"
@@ -454,6 +457,30 @@ void DischargingSoCTest(void) {
 /** Tests
  * 	TODO: Need to test SetAccumulator, GetPercent and Calibrate on faults
  */
+#endif
+
+#ifdef OPEN_WIRE_TEST
+//******************************************************************************************
+#include "Voltage.h"
+#include <stdio.h>
+#include "UART.h"
+int main(){
+	UART1_Init(115200);
+	Voltage_Init();
+	while(1) {
+		printf("%ld", Voltage_OpenWire());
+		for(int i = 0; i < 100000; i++);
+	}
+//	while(Voltage_OpenWire()){
+//		uint8_t *ptr = Voltage_GetOpenWire();
+//		for(int i = 0; i < NUM_BATTERY_MODULES; i++){
+//			if(ptr[i]){
+//				printf("%d/n", i);
+//			}
+//		}
+//	}
+}
+
 #endif
 
 #ifdef OPEN_WIRE_TEST

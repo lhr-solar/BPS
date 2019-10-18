@@ -154,6 +154,7 @@
         </SetRegEntry>
       </TargetDriverDllRegistry>
 <<<<<<< HEAD
+<<<<<<< HEAD
       <Breakpoint>
         <Bp>
           <Number>0</Number>
@@ -188,6 +189,9 @@
 =======
       <Breakpoint/>
 >>>>>>> Update
+=======
+      <Breakpoint/>
+>>>>>>> 1feedd548e080248488a60e6ef3a331132f52e90
       <WatchWindow1>
         <Ww>
           <count>0</count>
