@@ -247,7 +247,11 @@ int main(){
 	}
 	
 	if(Voltage_IsSafe() == UNDERVOLTAGE){
-		LED_Off(UVOLT);
+		LED_On(UVOLT);
+	}
+	
+	for(int i = 0; i < NUM_BATTERY_MODULES; i++){
+		printf("Battery module %d voltage is %d \r\n", i, Voltage_GetModuleVoltage(i));
 	}
 	
 	while(1);

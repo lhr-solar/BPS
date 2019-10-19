@@ -65,11 +65,13 @@ ErrorStatus Voltage_UpdateMeasurements(void){
 SafetyStatus Voltage_IsSafe(void){
 	for(int32_t i = 0; i < NUM_BATTERY_MODULES; i++){
 		uint16_t voltage = Modules[i / 12].cells.c_codes[i % 12];
-		if(voltage > MAX_VOLTAGE_LIMIT || voltage < MIN_VOLTAGE_LIMIT){
-			return DANGER;
+		if(voltage > MAX_VOLTAGE_LIMIT * 10000){
+			return OVERVOLTAGE;
+		}
+		else if(voltage < MIN_VOLTAGE_LIMIT * 10000){
+			return UNDERVOLTAGE;
 		}
 	}
-
 	return SAFE;
 }
 
