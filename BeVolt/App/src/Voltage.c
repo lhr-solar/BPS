@@ -99,6 +99,7 @@ uint16_t *Voltage_GetModulesInDanger(void){
  * @return ErrorStatus
  */
 long Voltage_OpenWire(void){
+	wakeup_idle(NUM_VOLTAGE_BOARDS);
 	LTC6811_run_openwire(NUM_VOLTAGE_BOARDS, Modules);
 //	for(uint8_t i = 0; i < NUM_VOLTAGE_BOARDS; i++){
 //		if(Modules[i].system_open_wire != 0){
@@ -115,6 +116,7 @@ long Voltage_OpenWire(void){
  * @return array of battery modules (1 means disconnect, 0 means safe)
  */
 uint8_t *Voltage_GetOpenWire(void){
+	wakeup_idle(NUM_VOLTAGE_BOARDS);
 	LTC6811_run_openwire(NUM_VOLTAGE_BOARDS, Modules);
 	static uint8_t open_wires[NUM_BATTERY_MODULES];
 	uint8_t count = 0;
