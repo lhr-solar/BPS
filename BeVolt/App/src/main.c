@@ -110,7 +110,7 @@ void faultCondition(void){
 // E.g. If you want to run a LTC6811 test, change "#define CHANGE_THIS_TO_TEST_NAME" to the
 //		following:
 //		#define LTC6811_TEST
-#define ADC_TEST
+#define CURRENT_TEST
 
 
 #ifdef LED_TEST
@@ -247,17 +247,24 @@ int main(){
 #endif
 
 #ifdef CURRENT_TEST
+#include "UART.h"
 int main(){
-	UART3_Init(9600);
-	Current_Init();
-	Current_UpdateMeasurements();
-	printf("\n\rCurrent Test:\n\r");
-	printf("Is it safe? %d\n\r", Current_IsSafe());
-	printf("Is the battery charging? %d\n\r\n\r", Current_IsCharging());
-	printf("Low Precision: %d\n\r", Current_GetLowPrecReading());
-	printf("High Precision: %d\n\r", Current_GetHighPrecReading());
-	while(1){
-
+	UART3_Init(115200);
+	Current_Init();	// Initialize the driver
+	
+	// Loop over the tests
+	while(true) {
+		Current_UpdateMeasurements();	// Get the most recent readings
+		
+		printf("\n\r==============================\n\rCurrent Test:\n\r");
+		printf("Is the battery safe? %d\n\r", Current_IsSafe());
+		printf("Is the battery charging? %d\n\r", Current_IsCharging());
+		printf("High: %d\n\r", Current_GetHighPrecReading());
+		printf("Low: %d\n\r", Current_GetLowPrecReading());
+		
+		// Poll for next cycle
+		char c[10];
+		scanf("%s", c);
 	}
 }
 #endif
