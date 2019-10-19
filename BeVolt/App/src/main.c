@@ -19,11 +19,8 @@ void initialize(void);
 void preliminaryCheck(void);
 void faultCondition(void);
 
-<<<<<<< HEAD
-int mainmain(){
-=======
+int mainmain(){}
 int real_main(){
->>>>>>> 1feedd548e080248488a60e6ef3a331132f52e90
 	__disable_irq();			// Disable all interrupts until initialization is done
 	initialize();					// Initialize codes/pins
 	preliminaryCheck();		// Wait until all boards are powered on
