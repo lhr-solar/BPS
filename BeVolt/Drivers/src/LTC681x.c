@@ -88,7 +88,7 @@ void wakeup_idle(uint8_t total_ic)
   for (int i =0; i<total_ic; i++)
   {
     cs_set(0);
-    //delayMicroseconds(2); //Guarantees the isoSPI will be in ready mode
+    delay_u(2); //Guarantees the isoSPI will be in ready mode
     tempReg = spi_read8();
     cs_set(1);
   }

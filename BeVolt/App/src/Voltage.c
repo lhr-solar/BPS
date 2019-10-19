@@ -99,7 +99,7 @@ uint16_t *Voltage_GetModulesInDanger(void){
  * @return ErrorStatus
  */
 long Voltage_OpenWire(void){
-	wakeup_idle(NUM_VOLTAGE_BOARDS);
+	wakeup_sleep(NUM_VOLTAGE_BOARDS);
 	LTC6811_run_openwire(NUM_VOLTAGE_BOARDS, Modules);
 //	for(uint8_t i = 0; i < NUM_VOLTAGE_BOARDS; i++){
 //		if(Modules[i].system_open_wire != 0){
@@ -108,7 +108,7 @@ long Voltage_OpenWire(void){
 //			return SUCCESS;
 //		}
 //	}
-	return Modules[0].system_open_wire;
+	return Modules[0].system_open_wire & 0xFFF;
 }
 
 /** *Voltage_GetOpenWire
