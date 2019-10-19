@@ -44,6 +44,26 @@ Copyright 2017 Linear Technology Corp. (LTC)
 #include "SPI.h"
 #include "stm32f4xx.h"
 
+static uint8_t spi_read8(void){
+	return SPI1_Read();
+}
+
+static void spi_write_multi8(uint8_t *txBuf, uint32_t txSize){
+	SPI1_WriteMulti(txBuf, txSize);
+}
+
+static void spi_write_read_multi8(uint8_t *txBuf, uint32_t txSize, uint8_t *rxBuf, uint32_t rxSize){
+	SPI1_WriteReadMulti(txBuf, txSize, rxBuf, rxSize, true);
+}
+
+static void cs_set(uint8_t state){
+	if(state == 0){
+		GPIO_ResetBits(GPIOB, GPIO_Pin_6);
+	}else{
+		GPIO_SetBits(GPIOB, GPIO_Pin_6);
+	}
+}
+
 void delay_u(uint16_t micro)
 {
   uint32_t delay = SystemCoreClock / 1000000;
@@ -67,10 +87,10 @@ void wakeup_idle(uint8_t total_ic)
 	volatile uint8_t tempReg;		// Temporary buffer
   for (int i =0; i<total_ic; i++)
   {
-    SPI_CSLow(CS_PIN);
+    cs_set(0);
     //delayMicroseconds(2); //Guarantees the isoSPI will be in ready mode
-    tempReg = SPI_Read8();
-    SPI_CSHigh(CS_PIN);
+    tempReg = spi_read8();
+    cs_set(1);
   }
 }
 
@@ -79,9 +99,9 @@ void wakeup_sleep(uint8_t total_ic)
 {
   for (int i =0; i<total_ic; i++)
   {
-    SPI_CSLow(CS_PIN);
+    cs_set(0);
     delay_u(300); // Guarantees the LTC6813 will be in standby
-    SPI_CSHigh(CS_PIN);
+    cs_set(1);
     delay_u(10);
   }
 }
@@ -99,9 +119,9 @@ void cmd_68(uint8_t tx_cmd[2])
   cmd[2] = (uint8_t)(cmd_pec >> 8);
   cmd[3] = (uint8_t)(cmd_pec & 0x00FF);
 	//cmd[3] = (uint8_t)(cmd_pec >> 8);
-  SPI_CSLow(CS_PIN);
-  SPI_WriteMulti8(cmd, 4);
-  SPI_CSHigh(CS_PIN);
+  cs_set(0);
+  spi_write_multi8(cmd, 4);
+  cs_set(1);
 }
 
 //Generic function to write 68xx commands and write payload data. Function calculated PEC for tx_cmd data
@@ -138,9 +158,9 @@ void write_68(uint8_t total_ic , uint8_t tx_cmd[2], uint8_t data[])
   }
 
 
-  SPI_CSLow(CS_PIN);
-  SPI_WriteMulti8(cmd, CMD_LEN);
-  SPI_CSHigh(CS_PIN);
+  cs_set(0);
+  spi_write_multi8(cmd, CMD_LEN);
+  cs_set(1);
 }
 
 //Generic function to write 68xx commands and read data. Function calculated PEC for tx_cmd data
@@ -163,9 +183,9 @@ int8_t read_68( uint8_t total_ic, uint8_t tx_cmd[2], uint8_t *rx_data)
   cmd[3] = (uint8_t)(cmd_pec & 0x00FF);
 
 
-  SPI_CSLow(CS_PIN);
-  SPI_WriteReadMulti8(cmd, 4, data, (BYTES_IN_REG*total_ic), true);         //Read the configuration data of all ICs on the daisy chain into
-  SPI_CSHigh(CS_PIN);                          //rx_data[] array
+  cs_set(0);
+  spi_write_read_multi8(cmd, 4, data, (BYTES_IN_REG*total_ic));         //Read the configuration data of all ICs on the daisy chain into
+  cs_set(1);                          //rx_data[] array
 
   for (uint8_t current_ic = 0; current_ic < total_ic; current_ic++)       //executes for each LTC681x in the daisy chain and packs the data
   {
@@ -336,11 +356,9 @@ uint8_t LTC681x_pladc()
   cmd[3] = (uint8_t)(cmd_pec & 0x00FF);
 
 
-  SPI_CSLow(CS_PIN);
-  SPI_WriteMulti8(cmd,4);
-// adc_state = spi_read_byte(0xFF);
-
-  SPI_CSHigh(CS_PIN);
+  cs_set(0);
+  spi_write_multi8(cmd,4);
+  cs_set(1);
   return(adc_state);
 }
 
@@ -360,12 +378,12 @@ uint32_t LTC681x_pollAdc()
   cmd[2] = (uint8_t)(cmd_pec >> 8);
   cmd[3] = (uint8_t)(cmd_pec & 0x00FF);
 
-  SPI_CSLow(CS_PIN);
-  SPI_WriteMulti8(cmd, 4);
+  cs_set(0);
+  spi_write_multi8(cmd, 4);
 
   while ((counter<200000)&&(finished == 0))
   {
-    current_time = SPI_Read8();
+    current_time = spi_read8();
     if (current_time>0)
     {
       finished = 1;
@@ -376,7 +394,7 @@ uint32_t LTC681x_pollAdc()
     }
   }
 
-  SPI_CSHigh(CS_PIN);
+  cs_set(1);
 
 
   return(counter);
@@ -510,10 +528,9 @@ void LTC681x_rdcv_reg(uint8_t reg, //Determines which cell voltage register is r
   cmd[2] = (uint8_t)(cmd_pec >> 8);
   cmd[3] = (uint8_t)(cmd_pec & 0x00FF);
 
-  SPI_CSLow(CS_PIN);
-  SPI_WriteReadMulti8(cmd, 4, data, (REG_LEN*total_ic), true);
-  SPI_CSHigh(CS_PIN);
-
+  cs_set(0);
+  spi_write_read_multi8(cmd, 4, data, (REG_LEN*total_ic));
+  cs_set(1);
 }
 
 //helper function that parses voltage measurement registers
@@ -602,9 +619,9 @@ void LTC681x_rdaux_reg(uint8_t reg, //Determines which GPIO voltage register is 
   cmd[2] = (uint8_t)(cmd_pec >> 8);
   cmd[3] = (uint8_t)(cmd_pec & 0x00FF);
 
-  SPI_CSLow(CS_PIN);
-  SPI_WriteReadMulti8(cmd, 4, data, (REG_LEN*total_ic), true);
-  SPI_CSHigh(CS_PIN);
+  cs_set(0);
+  spi_write_read_multi8(cmd, 4, data, (REG_LEN*total_ic));
+  cs_set(1);
 
 }
 
@@ -644,9 +661,9 @@ void LTC681x_rdstat_reg(uint8_t reg, //Determines which stat register is read ba
   cmd[2] = (uint8_t)(cmd_pec >> 8);
   cmd[3] = (uint8_t)(cmd_pec & 0x00FF);
 
-  SPI_CSLow(CS_PIN);
-  SPI_WriteReadMulti8(cmd, 4, data, (REG_LEN*total_ic), true);
-  SPI_CSHigh(CS_PIN);
+  cs_set(0);
+  spi_write_read_multi8(cmd, 4, data, (REG_LEN*total_ic));
+  cs_set(1);
 
 }
 
@@ -1609,13 +1626,13 @@ void LTC681x_stcomm()
   cmd[2] = (uint8_t)(cmd_pec >> 8);
   cmd[3] = (uint8_t)(cmd_pec & 0x00FF);
 
-  SPI_CSLow(CS_PIN);
-  SPI_WriteMulti8(cmd,4);
+  cs_set(0);
+  spi_write_multi8(cmd,4);
   for (int i = 0; i<9; i++)
   {
-    temp = SPI_Read8();
+    temp = spi_read8();
   }
-  SPI_CSHigh(CS_PIN);
+  cs_set(1);
 
 }
 

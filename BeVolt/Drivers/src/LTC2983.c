@@ -30,7 +30,7 @@ void LTC2983_Init(void){
 	for(board tempBoard = TEMP_CS1; tempBoard <= TEMP_CS1; tempBoard++) {
 		for(uint32_t i = 0; i < NUM_SENSORS_ON_TEMP_BOARD_1; i++) {
 			Board_Select(tempBoard, 0);
-			SPI_WriteMulti8(message, 7);
+			SPI3_WriteMulti(message, 7);
 			Board_Select(tempBoard, 1);
 			for(uint32_t i = 0; i < 80000; i++) {}
 			message[2] += 4;					// Increment to next channel
@@ -40,7 +40,7 @@ void LTC2983_Init(void){
 		
 		// Set multichannel conversion setting
 		Board_Select(tempBoard, 0);
-		SPI_WriteMulti8(maskConfig, 7);
+		SPI3_WriteMulti(maskConfig, 7);
 		Board_Select(tempBoard, 1);
 	}
  
@@ -99,7 +99,7 @@ bool LTC2983_Ready(void){
 	uint8_t result;
 
 	GPIOB->ODR &= ~GPIO_Pin_13;
-	SPI_WriteReadMulti8(message, 3, &result, 1, true);
+	SPI3_WriteReadMulti(message, 3, &result, 1, true);
 	for(uint32_t i = 0; i < 80000; i++) {}
 	GPIOB->ODR |= GPIO_Pin_13;
   if((result & 0xC0) == 0x40) {
@@ -126,21 +126,21 @@ int32_t LTC2983_MeasureSingleChannel(void){
 				// Read conversion result from channel 1 
 
 	GPIOB->ODR &= ~GPIO_Pin_13;
-	SPI_WriteMulti8(message, 4);
+	SPI3_WriteMulti(message, 4);
 	GPIOB->ODR |= GPIO_Pin_13;
 	
 	
 	while(!LTC2983_Ready()) {
 		
 		GPIOB->ODR &= ~GPIO_Pin_13;
-		SPI_WriteMulti8(message, 4);			// restart conversion
+		SPI3_WriteMulti(message, 4);			// restart conversion
 		GPIOB->ODR |= GPIO_Pin_13;
 		
 		//printf("Not ready.\n\r");
 	}
 
 	GPIOB->ODR &= ~GPIO_Pin_13;
-	SPI_WriteReadMulti8(receive, 3, result, 4, true);
+	SPI3_WriteReadMulti(receive, 3, result, 4, true);
 	GPIOB->ODR |= GPIO_Pin_13;	
 	
 	if((result[0] & 0x01) == 0x01) {
@@ -164,7 +164,7 @@ void LTC2983_StartMeasuringADC(board temperatureBoard) {
 	
 	// Start multichannel conversion for all channels.
 	Board_Select(temperatureBoard, 0);
-	SPI_WriteMulti8(startConversion, 4);
+	SPI3_WriteMulti(startConversion, 4);
 	Board_Select(temperatureBoard, 1);
 	
 	// Channel conversions are initiated consecutively and CSR won't be ready until all channels are ready.
@@ -187,7 +187,7 @@ void LTC2983_ReadConversions(int32_t *Buf, board temperatureBoard, uint8_t numOf
 	
 	for(uint32_t i = 0; i < numOfChannels; i++) {
 		Board_Select(temperatureBoard, 0);
-		SPI_WriteReadMulti8(readConversionResult, 3, result, 4, true);
+		SPI3_WriteReadMulti(readConversionResult, 3, result, 4, true);
 		for(uint32_t i = 0; i < 80000; i++){}
 		Board_Select(temperatureBoard, 1);
 		
@@ -222,7 +222,7 @@ int32_t LTC2983_ReadChannel(board temperatureBoard, uint8_t channel) {
 	uint8_t readSingleChannel[3] = {READ_CMD, convert[0], convert[1]};		// Message for SPI
 	
 	Board_Select(temperatureBoard, 0);
-	SPI_WriteReadMulti8(readSingleChannel, 3, singleChannelResult, 4, true);
+	SPI3_WriteReadMulti(readSingleChannel, 3, singleChannelResult, 4, true);
 	Board_Select(temperatureBoard, 1);
 	
 	return *(uint32_t *)singleChannelResult;

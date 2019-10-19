@@ -76,11 +76,19 @@ Copyright 2017 Linear Technology Corp. (LTC)
 /*** Code that was added by UTSVT. ***/
 /*********************************************************/
 void LTC6811_Init(cell_asic *battMod){	
-	SPI_Init8();							// Initialize 8 bit SPI
-	SPI_InitCS(CS_PIN);	// Initialize PB6 as chip select.
-	SPI_CSHigh(CS_PIN);
+	SPI1_Init();				// Initialize SPI1 for voltage board
 	
-	//init_PEC15_Table();
+	// Initialize GPIO PB6 pin for LTC6820 CS pin
+	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
+	GPIO_InitTypeDef GPIO_InitStruct;
+	GPIO_InitStruct.GPIO_Pin = GPIO_Pin_6;
+	GPIO_InitStruct.GPIO_Mode = GPIO_Mode_OUT;
+	GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_UP;
+	GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
+	GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
+	GPIO_Init(GPIOB, &GPIO_InitStruct);
+	GPIO_SetBits(GPIOB, GPIO_Pin_6);
+	
 	LTC681x_init_cfg(NUM_VOLTAGE_BOARDS, battMod);
 	LTC6811_reset_crc_count(NUM_VOLTAGE_BOARDS, battMod);
 	LTC6811_init_reg_limits(NUM_VOLTAGE_BOARDS, battMod);

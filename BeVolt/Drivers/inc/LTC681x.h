@@ -40,9 +40,6 @@ Copyright 2015 Linear Technology Corp. (LTC)
 #define LTC681X_H
 #include <stdint.h>
 #include <stdbool.h>
-#include "stm32f4xx.h"
-
-#define CS_PIN GPIO_Pin_6 						// Changed for stm32f413 to PB6 (PB8 for debugging)
 
 #define MD_422HZ_1KHZ 0
 #define MD_27KHZ_14KHZ 1
