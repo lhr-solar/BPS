@@ -106,7 +106,8 @@ void UART3_Init(uint32_t baud){
 	USART_InitTypeDef USART_InitStruct;
 	
 	// Initialize clocks
-	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, ENABLE);
+	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC, ENABLE);
+	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART3, ENABLE);
 	
 	// Initialize PB10 and PC5

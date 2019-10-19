@@ -1289,7 +1289,7 @@ int16_t LTC681x_run_adc_redundancy_st(uint8_t adc_mode, uint8_t adc_reg, uint8_t
 //Runs the datasheet algorithm for open wire
 void LTC681x_run_openwire(uint8_t total_ic, cell_asic ic[])
 {
-  uint16_t OPENWIRE_THRESHOLD = 4000;
+  uint16_t OPENWIRE_THRESHOLD = 2000;
   const uint8_t  N_CHANNELS = ic[0].ic_reg.cell_channels;
 
   cell_asic pullUp_cell_codes[total_ic];
