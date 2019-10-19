@@ -466,31 +466,6 @@ int main(){
 	Voltage_Init();
 	while(1) {
 		printf("%ld", Voltage_OpenWire());
-		for(int i = 0; i < 100000; i++);
-	}
-//	while(Voltage_OpenWire()){
-//		uint8_t *ptr = Voltage_GetOpenWire();
-//		for(int i = 0; i < NUM_BATTERY_MODULES; i++){
-//			if(ptr[i]){
-//				printf("%d/n", i);
-//			}
-//		}
-//	}
-}
-
-#endif
-
-#ifdef OPEN_WIRE_TEST
-//******************************************************************************************
-#include "Voltage.h"
-#include <stdio.h>
-#include "UART.h"
-int main(){
-	UART1_Init(115200);
-	Voltage_Init();
-	while(1) {
-		printf("%ld", Voltage_OpenWire());
-		for(int i = 0; i < 100000; i++);
 	}
 //	while(Voltage_OpenWire()){
 //		uint8_t *ptr = Voltage_GetOpenWire();
