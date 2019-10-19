@@ -100,9 +100,9 @@ void wakeup_sleep(uint8_t total_ic)
   for (int i =0; i<total_ic; i++)
   {
     cs_set(0);
-    delay_u(600); // Guarantees the LTC6813 will be in standby
+    delay_u(500); // Guarantees the LTC6813 will be in standby
     cs_set(1);
-    delay_u(400);
+    delay_u(150);
   }
 }
 
