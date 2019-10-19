@@ -14,16 +14,10 @@
 
 int16_t ModuleTemperatures[NUM_TEMPERATURE_BOARDS][20];	// Each board may not have 20 sensors. Look at config.h for how many sensors
 																												// there are on each board. 20 is just max that the board can handle
-int16_t ModuleTempStatus[NUM_TEMPERATURE_BOARDS];
 
-typedef enum chargeState {
-	discharging,
-	charging
-} chargeState;
+uint8_t ModuleTempStatus[NUM_TEMPERATURE_BOARDS];				// Used to check and return if a particular module is in danger. 
 
-uint8_t chargingState;
-
-// Need a temperature conversion function
+uint8_t ChargingState;																	// 0 if discharging 1 if charging
 
 /** Temperature_Init
  * Initializes device drivers including SPI and LTC2983 for Temperature Monitoring
@@ -59,14 +53,15 @@ void Temperature_Init(void){
  * Stores and updates the new measurements received
  * @param pointer to new temperature measurements
  * @return SUCCESS or ERROR
+ * CONCERNS: 
+ * Should there be a isCharging here, constantly checking if temperatures are safe whenever updating measurements?
+ * What are we checking for error exactly?
  */
 Status Temperature_UpdateMeasurements(){
-	// Should there be a isCharging here, constantly checking if temperatures are safe whenever updating measurements?
-	// Error for what
-	for (board b = TEMP_CS1; b <= TEMP_CS6; b++) {
+	for (board b = TEMP_CS1; b < NUM_TEMPERATURE_BOARDS; b++) {
 		LTC2983_StartMeasuringADC(b);
 		LTC2983_ReadConversions((int32_t*) ModuleTemperatures[b], b, NUM_SENSORS_ON_TEMP_BOARD_1);			// Need to change this later once devicer driver changes
-		// Need to check for SPI TIMEOUT flag for error
+		// Need to check for SPI TIMEOUT flag for error,
 	}
 	return SUCCESS;
 }
@@ -76,7 +71,7 @@ Status Temperature_UpdateMeasurements(){
  * @param 1 if pack is charging, 0 if discharging
  * @return SUCCESS or ERROR
  */
-Status Temperature_IsSafe(uint8_t isCharging){									// Maybe have this be an internal thing, change parameters to
+Status Temperature_IsSafe(uint8_t isCharging){
 	bool dangerFlag = false;
 	int16_t maxCharge;
 	if (isCharging == 1) {
@@ -84,6 +79,7 @@ Status Temperature_IsSafe(uint8_t isCharging){									// Maybe have this be an 
 	} else {
 		maxCharge = MAX_DISCHARGE_TEMPERATURE_LIMIT;
 	}
+	
 	for (int i = 0; i < NUM_TEMPERATURE_BOARDS; i++) {
 		for (int j = 0; j < NUM_SENSORS_ON_TEMP_BOARD_1; j++) {
 			if (ModuleTemperatures[i][j] > maxCharge) {
@@ -100,17 +96,20 @@ Status Temperature_IsSafe(uint8_t isCharging){									// Maybe have this be an 
  * Lithium Ion Cells have two separate max temperature limits. There is a limit
  * when the battery is charging and another limit when the battery is discharging.
  * We need to account for these two limits by setting which limit should be used.
+ * ChargingState is used for GetModulesInDanger when we can't use the current module to check if charging or discharging
  * @param 1 if pack is charging, 0 if discharging
  */
 void Temperature_SetChargeState(uint8_t isCharging){  				// Maybe have this be the outside connection, why is this here
-	chargingState = isCharging;
+	ChargingState = isCharging;
 }
 
 /** Temperature_GetModulesInDanger
  * Finds all modules that are in danger and stores them into a list
+ * This function is called when you can't use the current module to see if it is charging.
  * @return pointer to index of modules that are in danger
  */
-int16_t *Temperature_GetModulesInDanger(void){
+uint8_t *Temperature_GetModulesInDanger(void){
+	Temperature_IsSafe(ChargingState);
 	return ModuleTempStatus;
 }
 
