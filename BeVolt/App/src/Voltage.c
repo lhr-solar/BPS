@@ -27,6 +27,9 @@ ErrorStatus Voltage_Init(void){
 	wakeup_sleep(NUM_VOLTAGE_BOARDS);
 	error = LTC6811_rdcfg(NUM_VOLTAGE_BOARDS, Modules);
 	
+	//Voltage Init
+	Voltage_UpdateMeasurements();
+	
 	if(error == 0){
 		return SUCCESS;
 	}else{
@@ -43,12 +46,12 @@ ErrorStatus Voltage_UpdateMeasurements(void){
 	int8_t error = 0;
 	
 	// Start Cell ADC Measurements
-	wakeup_sleep(NUM_VOLTAGE_BOARDS);
+	wakeup_idle(NUM_VOLTAGE_BOARDS);
 	LTC6811_adcv(ADC_CONVERSION_MODE,ADC_DCP,CELL_CH_TO_CONVERT);
-	//conv_time = LTC6811_pollAdc();		 // In case you want to time the length of the conversion time
+	LTC6811_pollAdc();	// In case you want to time the length of the conversion time
 	
 	// Read Cell Voltage Registers
-	wakeup_sleep(NUM_VOLTAGE_BOARDS); // Not sure if wakeup is necessary if you start conversion then read consecutively
+	wakeup_idle(NUM_VOLTAGE_BOARDS); // Not sure if wakeup is necessary if you start conversion then read consecutively
 	error = LTC6811_rdcv(0, NUM_VOLTAGE_BOARDS, Modules); // Set to read back all cell voltage registers
 
 	if(error == 0){

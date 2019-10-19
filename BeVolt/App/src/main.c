@@ -231,6 +231,9 @@ int main(){
 	while(Voltage_Init() != SUCCESS) {
 		printf("Communication Failed.\n\r");
 	}
+	for(int i = 0; i < NUM_BATTERY_MODULES; i++){
+		printf("Battery module %d voltage is %d \r\n", i, Voltage_GetModuleVoltage(i));
+	}
 	printf("Writing and Reading to Configuration Register Successful. Initialization Complete\n\r");
 	
 	while(1){
@@ -253,8 +256,6 @@ int main(){
 	for(int i = 0; i < NUM_BATTERY_MODULES; i++){
 		printf("Battery module %d voltage is %d \r\n", i, Voltage_GetModuleVoltage(i));
 	}
-	
-	while(1);
 }
 #endif
 
