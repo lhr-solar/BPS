@@ -8,9 +8,9 @@
  * UART1:
  *		tx : PA9
  *		rx : PA10
- * UART3:		*** NOTE: Nucleo Board uses these pins for USB ***
- *		tx : PD8
- *		rx : PD9
+ * UART3:
+ *		tx : PB10
+ *		rx : PC5
  */
  
 #include <stdint.h>
