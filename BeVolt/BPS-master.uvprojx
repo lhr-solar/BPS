@@ -458,11 +458,6 @@
               <FilePath>.\Drivers\src\EEPROM.c</FilePath>
             </File>
             <File>
-              <FileName>LTC681x.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\Drivers\src\LTC681x.c</FilePath>
-            </File>
-            <File>
               <FileName>LTC2983.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\Drivers\src\LTC2983.c</FilePath>
@@ -481,11 +476,6 @@
               <FileName>EEPROM.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\Drivers\inc\EEPROM.h</FilePath>
-            </File>
-            <File>
-              <FileName>LTC681x.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\Drivers\inc\LTC681x.h</FilePath>
             </File>
             <File>
               <FileName>LTC2983.h</FileName>
