@@ -237,6 +237,7 @@ int main(){
 	LED_Init();
 	Contactor_Init();
 	
+	// delay for UART to USB IC to bootup
 	for(int i = 0; i < 1000000; i++);
 	
 	while(Voltage_Init() != SUCCESS) {
