@@ -255,11 +255,11 @@ int main(){
 		LED_Toggle(RUN);
 	}
 	
-	faultCondition();
-	
 	for(int i = 0; i < NUM_BATTERY_MODULES; i++){
 		printf("Battery module %d voltage is %d \r\n", i, Voltage_GetModuleVoltage(i));
 	}
+	
+	faultCondition();
 }
 #endif
 
