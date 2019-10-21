@@ -27,8 +27,6 @@ ErrorStatus Voltage_Init(void){
 	wakeup_sleep(NUM_VOLTAGE_BOARDS);
 	error = LTC6811_rdcfg(NUM_VOLTAGE_BOARDS, Modules);
 	
-	//Voltage_UpdateMeasurements();
-	
 	if(error == 0){
 		return SUCCESS;
 	}else{
@@ -62,14 +60,18 @@ ErrorStatus Voltage_UpdateMeasurements(void){
 
 /** Voltage_IsSafe
  * Checks if all modules are safe
- * @return SAFE or FAIL
+ * @return SAFE or danger: UNDERVOLTAGE or OVERVOLTAGE
  */
 SafetyStatus Voltage_IsSafe(void){
 	for(int32_t i = 0; i < NUM_BATTERY_MODULES; i++){
 		uint16_t voltage = Modules[i / 12].cells.c_codes[i % 12];
+		
+		// VOLTAGE_LIMITS are in floating point. The LTC6811 sends the voltage data
+		// as unsigned 16-bit fixed point integers with a resolution of 0.00001
 		if(voltage > MAX_VOLTAGE_LIMIT * 10000){
 			return OVERVOLTAGE;
 		}
+		
 		else if(voltage < MIN_VOLTAGE_LIMIT * 10000){
 			return UNDERVOLTAGE;
 		}
@@ -78,7 +80,9 @@ SafetyStatus Voltage_IsSafe(void){
 }
 
 /** Voltage_GetModulesInDanger
- * Finds all modules that in danger and stores them into a list
+ * Finds all modules that in danger and stores them into a list.
+ * Each module corresponds to and index of the array. If the element in the
+ * array is 1, then it means that module in the index is in danger.
  * @return pointer to index of modules that are in danger
  */
 uint16_t *Voltage_GetModulesInDanger(void){

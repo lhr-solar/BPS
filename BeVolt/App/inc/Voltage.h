@@ -24,12 +24,14 @@ ErrorStatus Voltage_UpdateMeasurements(void);
 
 /** Voltage_IsSafe
  * Checks if all modules are safe
- * @return SAFE or DANGER
+ * @return SAFE or danger: UNDERVOLTAGE or OVERVOLTAGE
  */
 SafetyStatus Voltage_IsSafe(void);
 
 /** Voltage_GetModulesInDanger
- * Finds all modules that in danger and stores them into a list
+ * Finds all modules that in danger and stores them into a list.
+ * Each module corresponds to and index of the array. If the element in the
+ * array is 1, then it means that module in the index is in danger.
  * @return pointer to index of modules that are in danger
  */
 uint16_t *Voltage_GetModulesInDanger(void);
