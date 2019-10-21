@@ -41,6 +41,7 @@ Copyright 2017 Linear Technology Corp. (LTC)
 ***********************************************************/
 #include <stdint.h>
 #include "LTC681x.h"
+#include "LTC6811.h"
 #include "SPI.h"
 #include "stm32f4xx.h"
 
@@ -1289,13 +1290,17 @@ int16_t LTC681x_run_adc_redundancy_st(uint8_t adc_mode, uint8_t adc_reg, uint8_t
 //Runs the datasheet algorithm for open wire
 void LTC681x_run_openwire(uint8_t total_ic, cell_asic ic[])
 {
-  uint16_t OPENWIRE_THRESHOLD = 2000;
+  uint16_t OPENWIRE_THRESHOLD = 4000;
   const uint8_t  N_CHANNELS = ic[0].ic_reg.cell_channels;
 
   cell_asic pullUp_cell_codes[total_ic];
   cell_asic pullDwn_cell_codes[total_ic];
   cell_asic openWire_delta[total_ic];
   //int8_t error;
+	
+	//Initialize the register sizes (bug fix from original driver code)
+	LTC6811_init_reg_limits(total_ic, pullUp_cell_codes);
+	LTC6811_init_reg_limits(total_ic, pullDwn_cell_codes);
 
   wakeup_sleep(total_ic);
   LTC681x_adow(MD_7KHZ_3KHZ,PULL_UP_CURRENT);
