@@ -27,7 +27,7 @@ typedef ErrorStatus Status;
 
 //--------------------------------------------------------------------------------
 // MAX and MIN limits of lithium ion cells
-#define MIN_VOLTAGE_LIMIT				2.5		// Under voltage limit (Voltage)	(actual min: 2.5V)
+#define MIN_VOLTAGE_LIMIT				2.7		// Under voltage limit (Voltage)	(actual min: 2.5V)
 #define MAX_VOLTAGE_LIMIT				4.0		// Over voltage limit (Voltage)		(actual max: 4.2V)
 
 #define MAX_DISCHARGE_TEMPERATURE_LIMIT	73.00	// Max temperature limit (Celcius)	(actual max: 75C)
