@@ -85,14 +85,22 @@ void preliminaryCheck(void){
  */
 void faultCondition(void){
 	Contactor_Off();
+	LED_Off(RUN);
+	
 	while(1){
 		// CAN_SendMessageStatus()
 		if(!Current_IsSafe()){
 			// Toggle Current fault LED
 		}
 		
-		if(!Voltage_IsSafe()){
+		if(Voltage_IsSafe() == OVERVOLTAGE){
 			// Toggle Voltage fault LED
+			LED_On(OVOLT);
+		}
+		
+		if(Voltage_IsSafe() == UNDERVOLTAGE){
+			// Toggle Voltage fault LED
+			LED_On(UVOLT);
 		}
 		
 		if(!Temperature_IsSafe(Current_IsCharging())){
@@ -227,7 +235,10 @@ void print_config(cell_asic *bms_ic)
 int main(){
 	UART3_Init(115200);
 	LED_Init();
-	printf("Are you alive?");
+	Contactor_Init();
+	
+	for(int i = 0; i < 1000000; i++);
+	
 	while(Voltage_Init() != SUCCESS) {
 		printf("Communication Failed.\n\r");
 	}
@@ -239,16 +250,11 @@ int main(){
 			break;
 		}
 		
+		Contactor_On();
 		LED_Toggle(RUN);
 	}
 	
-	if(Voltage_IsSafe() == OVERVOLTAGE){
-		LED_On(OVOLT);
-	}
-	
-	if(Voltage_IsSafe() == UNDERVOLTAGE){
-		LED_On(UVOLT);
-	}
+	faultCondition();
 	
 	for(int i = 0; i < NUM_BATTERY_MODULES; i++){
 		printf("Battery module %d voltage is %d \r\n", i, Voltage_GetModuleVoltage(i));

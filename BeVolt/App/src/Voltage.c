@@ -27,8 +27,7 @@ ErrorStatus Voltage_Init(void){
 	wakeup_sleep(NUM_VOLTAGE_BOARDS);
 	error = LTC6811_rdcfg(NUM_VOLTAGE_BOARDS, Modules);
 	
-	//Voltage Init
-	Voltage_UpdateMeasurements();
+	//Voltage_UpdateMeasurements();
 	
 	if(error == 0){
 		return SUCCESS;
