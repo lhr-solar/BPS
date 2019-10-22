@@ -248,8 +248,9 @@ int main(){
 
 #ifdef CURRENT_TEST
 #include "UART.h"
+#include "ADC.h"
 int main(){
-	UART3_Init(115200);
+	UART3_Init(9600);
 	Current_Init();	// Initialize the driver
 	
 	// Loop over the tests
@@ -257,18 +258,18 @@ int main(){
 		Current_UpdateMeasurements();	// Get the most recent readings
 		
 		printf("\n\r==============================\n\rCurrent Test:\n\r");
+		printf("ADC High: %d\n\r", ADC_ReadHigh());
+		printf("ADC Low: %d\n\r", ADC_ReadLow());
 		printf("Is the battery safe? %d\n\r", Current_IsSafe());
 		printf("Is the battery charging? %d\n\r", Current_IsCharging());
 		printf("High: %d\n\r", Current_GetHighPrecReading());
 		printf("Low: %d\n\r", Current_GetLowPrecReading());
 		
-		// Poll for next cycle
-		char c[10];
-		scanf("%s", c);
+		for(int i = 0; i < 10000000; ++i);
 	}
 }
 #endif
-
+//1.154
 #ifdef TEMPERATURE_TEST
 #include "UART.h"
 #include "LTC2983.h"

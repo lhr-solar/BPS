@@ -74,9 +74,10 @@ void ADC_InitHilo(void){
 	ADC_Init(ADC1, &ADC_InitStruct);
 
 	// Configure the channels
-	// TODO: investigate the sample time that is needed for this
-	ADC_RegularChannelConfig(ADC1, ADC_Channel_2, 1, ADC_SampleTime_56Cycles);
-	ADC_RegularChannelConfig(ADC1, ADC_Channel_3, 2, ADC_SampleTime_56Cycles);
+	// Apparently channel 2 has priority, or is at least read first.
+	// If you change the priorities, be prepared to have the order in the array change.
+	ADC_RegularChannelConfig(ADC1, ADC_Channel_2, 2, ADC_SampleTime_480Cycles);
+	ADC_RegularChannelConfig(ADC1, ADC_Channel_3, 1, ADC_SampleTime_480Cycles);
 
 	ADC_DMARequestAfterLastTransferCmd(ADC1, ENABLE);
 

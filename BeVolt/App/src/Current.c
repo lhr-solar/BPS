@@ -11,15 +11,15 @@
 #include "ADC.h"
 #include "config.h"
 
-uint32_t HighPrecisionCurrent;	// Amp measurement of hall effect sensor of high precision
-uint32_t LowPrecisionCurrent;	// Amp measurement of hall effect sensor of high precision
+int32_t HighPrecisionCurrent;	// Amp measurement of hall effect sensor of high precision
+int32_t LowPrecisionCurrent;	// Amp measurement of hall effect sensor of high precision
 
 typedef enum {
 	HIGH_PRECISION,
 	LOW_PRECISION
 } CurrentSensor;
 
-static uint32_t Current_Conversion(uint32_t ADC_Reading, CurrentSensor s);
+static int32_t Current_Conversion(uint32_t ADC_Reading, CurrentSensor s);
 
 /** Current_Init
  * Initializes two ADCs to begin current monitoring.
@@ -68,7 +68,7 @@ int8_t Current_IsCharging(void){
  * Gets the Ampere measurement the high precision hall effect sensor recorded
  * @return Amperes value
  */
-uint16_t Current_GetHighPrecReading(void){
+int16_t Current_GetHighPrecReading(void){
 	return HighPrecisionCurrent;
 }
 
@@ -76,7 +76,7 @@ uint16_t Current_GetHighPrecReading(void){
  * Gets the Ampere measurement the low precision hall effect sensor recorded
  * @return Amperes value
  */
-uint16_t Current_GetLowPrecReading(void){
+int16_t Current_GetLowPrecReading(void){
 	return LowPrecisionCurrent;
 }
 
@@ -84,24 +84,25 @@ uint16_t Current_GetLowPrecReading(void){
  * Returns the converted value of the current read by the sensor
  * @returns converted voltage - fixed point notation of 0.001
  */
-static uint32_t Current_Conversion (uint32_t ADC_Reading, CurrentSensor s){
+static int32_t Current_Conversion (uint32_t ADC_Reading, CurrentSensor s){
+	// These are the ideal values that we should expect
 	const int maxReading = 0x0FFF; // 12-bit value
 	const int operationMilliVoltage = 3300; // 3.3V
 	const int opAmpOffset = 4096;  // The offset in millivolts for the op-amp stage
 	const int opAmpGain = 3;       // Gain applied after the offset
 
 	// The actual reading on the ADC pin
-	uint32_t milliVolts = ADC_Reading * operationMilliVoltage / maxReading;
+	int32_t milliVolts = ADC_Reading * operationMilliVoltage / maxReading;
 
 	// The output of the hall sensor (prior to the op-amp stage)
-	uint32_t sensorOutput = milliVolts * opAmpGain - opAmpOffset;
+	int32_t sensorOutput = milliVolts * opAmpGain - opAmpOffset;
 
 	// The actual current measured by the sensors
 	switch(s) {
 		case HIGH_PRECISION: // Rated for currents between -50 and 50 A.
-			return sensorOutput * 50 / 4;	// In mA.
+			return sensorOutput * (50 / 4);	// In mA.
 		case LOW_PRECISION:  // Rated for currents between -100 and 100 A.
 		default:
-			return sensorOutput * 100 / 4;	// In mA.
+			return sensorOutput * (100 / 4);	// In mA.
 	}
 }
