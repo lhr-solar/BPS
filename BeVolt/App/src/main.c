@@ -464,9 +464,13 @@ void DischargingSoCTest(void) {
 int main(){
 	UART3_Init(115200);
 	Voltage_Init();
-	if(Voltage_OpenWire() == ERROR) {
-		printf("ERROR");
+	printf("%x", Voltage_OpenWireSummary());
+	printf("\n\r");
+	if(Voltage_OpenWire() == DANGER) {
+		printf("return = DANGER\n\r");
+	}
+	else if(Voltage_OpenWire() == SAFE){
+		printf("return = SAFE\n\r");
 	}
 }
-
 #endif

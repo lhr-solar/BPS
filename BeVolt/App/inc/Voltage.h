@@ -36,11 +36,17 @@ SafetyStatus Voltage_IsSafe(void);
  */
 uint16_t *Voltage_GetModulesInDanger(void);
  
+/** Voltage_OpenWireSummary
+ * Runs the open wire method with print=true
+ */
+uint32_t Voltage_OpenWireSummary(void);
+
 /** Voltage_OpenWire
  * Uses the built-in adow function to check for open wires
- * @return ErrorStatus
+ * @return SafetyStatus
  */
-long Voltage_OpenWire(void);
+ 
+SafetyStatus Voltage_OpenWire(void);
 
 /** Voltage_GetModuleVoltage
  * Gets the voltage of a certain module in the battery pack
