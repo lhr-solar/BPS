@@ -17,7 +17,7 @@ typedef ErrorStatus Status;
 //--------------------------------------------------------------------------------
 // Basic Parameters of BPS layout
 #define NUM_BATTERY_MODULES				12		// Number of Battery Modules
-#define NUM_VOLTAGE_BOARDS				1			// Number of Voltage Slave Boards
+#define NUM_VOLTAGE_BOARDS				3			// Number of Voltage Slave Boards
 #define NUM_TEMPERATURE_BOARDS		3			// Number of Temperature Slave Boards
 
 // Max and Min limits of lithium ion cells

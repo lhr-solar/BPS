@@ -95,20 +95,19 @@ uint16_t *Voltage_GetModulesInDanger(void){
 }
 
 /** Voltage_OpenWire
- * Uses the LTC6811_run_openwire() function to check for open wires
+ * Uses the LTC6811_run_openwire_multi() function to check for open wires
  * @return ErrorStatus
  */
 long Voltage_OpenWire(void){
-	wakeup_sleep(NUM_VOLTAGE_BOARDS);
-	LTC6811_run_openwire(NUM_VOLTAGE_BOARDS, Modules);
-//	for(uint8_t i = 0; i < NUM_VOLTAGE_BOARDS; i++){
-//		if(Modules[i].system_open_wire != 0){
-//			return ERROR;
-//		} else {
-//			return SUCCESS;
-//		}
-//	}
-	return Modules[0].system_open_wire & 0xFFF;
+	wakeup_idle(NUM_VOLTAGE_BOARDS);
+	LTC6811_run_openwire_multi(NUM_VOLTAGE_BOARDS, Modules, true);
+	for(uint8_t i = 0; i < NUM_VOLTAGE_BOARDS; i++){
+		if(Modules[i].system_open_wire != 0){
+			return ERROR;
+		} else {
+			return SUCCESS;
+		}
+	}
 }
 
 /** *Voltage_GetOpenWire
@@ -117,7 +116,7 @@ long Voltage_OpenWire(void){
  */
 uint8_t *Voltage_GetOpenWire(void){
 	wakeup_idle(NUM_VOLTAGE_BOARDS);
-	LTC6811_run_openwire(NUM_VOLTAGE_BOARDS, Modules);
+	LTC6811_run_openwire_multi(NUM_VOLTAGE_BOARDS, Modules, true);
 	static uint8_t open_wires[NUM_BATTERY_MODULES];
 	uint8_t count = 0;
 	for(uint8_t i = 0; i < NUM_VOLTAGE_BOARDS; i++){

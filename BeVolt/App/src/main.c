@@ -464,15 +464,9 @@ void DischargingSoCTest(void) {
 int main(){
 	UART3_Init(115200);
 	Voltage_Init();
-	printf("%ld", Voltage_OpenWire());
-//	while(Voltage_OpenWire()){
-//		uint8_t *ptr = Voltage_GetOpenWire();
-//		for(int i = 0; i < NUM_BATTERY_MODULES; i++){
-//			if(ptr[i]){
-//				printf("%d/n", i);
-//			}
-//		}
-//	}
+	if(Voltage_OpenWire() == ERROR) {
+		printf("ERROR");
+	}
 }
 
 #endif

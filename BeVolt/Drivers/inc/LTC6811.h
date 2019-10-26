@@ -154,8 +154,10 @@ void LTC6811_adol(
 /*!  Start an open wire Conversion
 */
 void LTC6811_adow(
-  uint8_t MD, //!< ADC Conversion Mode
-  uint8_t PUP //!< Controls if Discharge is permitted during conversion
+	uint8_t MD, //ADC Mode
+  uint8_t PUP, //Discharge Permit
+	uint8_t CH, //Channels
+	uint8_t DCP//Discharge Permit
 );
 
 
@@ -357,8 +359,9 @@ int16_t LTC6811_run_adc_redundancy_st(uint8_t adc_mode,
                                       cell_asic ic[]);
 
 /*! Helper function that runs the datasheet open wire algorithm*/
-void LTC6811_run_openwire(uint8_t total_ic,
-                          cell_asic ic[]);
+void LTC6811_run_openwire_multi(uint8_t total_ic,
+                          cell_asic ic[],
+													bool print);
 
 void LTC6811_set_discharge(int Cell,
                            uint8_t total_ic,
