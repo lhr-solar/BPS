@@ -6,7 +6,6 @@
 
 #include <stdint.h>
 #include "stm32f4xx.h"
-#include "stm32f4xx_dma.h"
 
 static volatile uint16_t ADCresults[2];
 

@@ -36,7 +36,7 @@ ErrorStatus Current_UpdateMeasurements(void){
 	HighPrecisionCurrent = Current_Conversion(ADC_ReadHigh(), HIGH_PRECISION);
 	LowPrecisionCurrent  = Current_Conversion(ADC_ReadLow(), LOW_PRECISION);
 
-	return ERROR;	// TODO: Once this has been tested, stop returning errors
+	return SUCCESS;	// TODO: Once this has been tested, stop returning errors
 }
 
 /** Current_IsSafe
@@ -61,7 +61,7 @@ SafetyStatus Current_IsSafe(void){
  */
 int8_t Current_IsCharging(void){
 	// TODO: Make sure that the current board is installed in such a way that negative => charging
-	return HighPrecisionCurrent < 1;
+	return HighPrecisionCurrent < 0;
 }
 
 /** Current_GetHighPrecReading
