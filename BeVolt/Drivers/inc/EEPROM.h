@@ -12,14 +12,6 @@
 
 #define EEPROM_ADDRESS (0xA0)
 
-//starting addresses for errors
-#define EEPROM_FAULT_CODE_ADDR 0x00000// TODO: this was originally 0x00000. May want to change back.
-#define EEPROM_TEMP_FAULT  		 0x00100
-#define EEPROM_VOLT_FAULT		   0x04000
-#define EEPROM_CURRENT_FAULT	 0x08000
-#define EEPROM_WWDG_FAULT		   0x08100
-#define EEPROM_CAN_FAULT			 0x08200
-
 //error codes
 #define FAULT_HIGH_TEMP			0x01
 #define FAULT_HIGH_VOLT			0x02
@@ -28,17 +20,42 @@
 #define FAULT_WATCHDOG			0x10
 #define FAULT_CAN_BUS				0x20
 
+#define EEPROM_TERMINATOR		0xFF
+
+#define EEPROM_FAULT_PTR_LOC    0x1000
+#define EEPROM_TEMP_PTR_LOC     0x1002
+#define EEPROM_VOLT_PTR_LOC	    0x1004
+#define EEPROM_CURRENT_PTR_LOC  0x1006
+#define EEPROM_WATCHDOG_PTR_LOC 0x1008
+#define EEPROM_CAN_PTR_LOC		0x100A
+
 /** EEPROM_Init
  * Initializes I2C to communicate with EEPROM (M24128)
  */
 void EEPROM_Init(void);
 
+/** EEPROM_Reset
+ * Resets the EEPROM. This will clear all data that has
+ * been logged so far.
+ *
+ * This is required for clearing data and setting up new
+ * EEPROMs. This cmd really should be reserved for specialized
+ * set-up programs and the cli.
+ */
+void EEPROM_Reset(void);
+
+/** EEPROM_LogData
+ * This logs the given data at an appropriate spot in memory.
+ * This does not log an actual error, but allows more specific
+ * information about failed modules to be logged.
+ */
+void EEPROM_LogData(uint8_t logType, uint8_t data);
+
 /** EEPROM_Save
  * Save some information to the EEPROM
  * logType is type of fault (fault code)
- * data is additional information (which sensor tripped fault)
  */
-void EEPROM_Save(uint8_t logType, uint8_t data);
+void EEPROM_LogError(uint8_t logType);
 
 /** EEPROM_SerialPrintData
  * Prints saved data from EEPROM to serial terminal
@@ -47,13 +64,21 @@ void EEPROM_SerialPrintData(void);
 
 /** EEPROM_Tester
  * sends fake error messages to test EEPROM
+ * TODO: take this out of the EEPROM files and with the rest of the test files
 */
 void EEPROM_Tester(void);
+
+/** EEPROM_WriteMultipleBytes
+ * Saves data to the EEPROM
+ * @param unsigned 16-bit address
+ * @param unsigned 8-bit data
+ */
+void EEPROM_WriteMultipleBytes(uint16_t address, uint32_t bytes, uint8_t* buffer);
 
 /** EEPROM_Write
  * Saves data to the EEPROM at the specified address
  * @param unsigned 16-bit address
- * @param unsigned 8-bit address
+ * @param unsigned 8-bit data
  */
 void EEPROM_WriteByte(uint16_t address, uint8_t data);
 

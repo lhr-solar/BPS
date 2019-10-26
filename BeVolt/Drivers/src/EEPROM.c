@@ -12,115 +12,112 @@
 #include "UART.h"
 #include <stdio.h>
 
+//starting addresses for errors
+const uint16_t EEPROM_FAULT_CODE_ADDR = 0x0000;
+const uint16_t EEPROM_TEMP_FAULT  		= 0x0100;
+const uint16_t EEPROM_VOLT_FAULT		  = 0x0400;
+const uint16_t EEPROM_CURRENT_FAULT	  = 0x0600;
+const uint16_t EEPROM_WWDG_FAULT		  = 0x0700;
+const uint16_t EEPROM_CAN_FAULT			  = 0x0800;
+
+static uint16_t faultCodePtr,
+								tempFaultPtr,
+								voltFaultPtr,
+								currentFaultPtr,
+								watchdogFaultPtr,
+								canFaultPtr;
+
 /** EEPROM_Init
  * Initializes I2C to communicate with EEPROM (M24128)
+ * This involves updating the fault code pointers based on the
+ * addresses specified in the EEPROM.
  */
 void EEPROM_Init(void){
 	I2C3_Init();
+	
+	// Load the pointers in
+	EEPROM_ReadMultipleBytes(EEPROM_FAULT_PTR_LOC,   2, (uint8_t*)&faultCodePtr);
+	EEPROM_ReadMultipleBytes(EEPROM_TEMP_PTR_LOC,    2, (uint8_t*)&tempFaultPtr);
+	EEPROM_ReadMultipleBytes(EEPROM_VOLT_PTR_LOC,    2, (uint8_t*)&voltFaultPtr);
+	EEPROM_ReadMultipleBytes(EEPROM_CURRENT_PTR_LOC, 2, (uint8_t*)&currentFaultPtr);
+	EEPROM_ReadMultipleBytes(EEPROM_WATCHDOG_PTR_LOC,2, (uint8_t*)&watchdogFaultPtr);
+	EEPROM_ReadMultipleBytes(EEPROM_CAN_PTR_LOC,     2, (uint8_t*)&canFaultPtr);
 }
 
-/** EEPROM_Save
+/** EEPROM_Reset
+ * Resets all EEPROM messages
+ *
+ * This SHOULD NOT be called from EEPROM_Init()
+ */
+void EEPROM_Reset(void) {
+	// Reset the error pointers
+	EEPROM_WriteMultipleBytes(EEPROM_FAULT_PTR_LOC,   2, (uint8_t*)&EEPROM_FAULT_CODE_ADDR);
+	EEPROM_WriteMultipleBytes(EEPROM_TEMP_PTR_LOC,    2, (uint8_t*)&EEPROM_TEMP_FAULT);
+	EEPROM_WriteMultipleBytes(EEPROM_VOLT_PTR_LOC,    2, (uint8_t*)&EEPROM_VOLT_FAULT);
+	EEPROM_WriteMultipleBytes(EEPROM_CURRENT_PTR_LOC, 2, (uint8_t*)&EEPROM_CURRENT_FAULT);
+	EEPROM_WriteMultipleBytes(EEPROM_WATCHDOG_PTR_LOC,2, (uint8_t*)&EEPROM_WWDG_FAULT);
+	EEPROM_WriteMultipleBytes(EEPROM_CAN_PTR_LOC,     2, (uint8_t*)&EEPROM_CAN_FAULT);
+	
+	// Reintialize pointers, etc.
+	EEPROM_Init();
+	
+	// Reterminate the EEPROM
+	EEPROM_WriteByte(faultCodePtr,    EEPROM_TERMINATOR);
+	EEPROM_WriteByte(tempFaultPtr,    EEPROM_TERMINATOR);
+	EEPROM_WriteByte(voltFaultPtr,    EEPROM_TERMINATOR);
+	EEPROM_WriteByte(currentFaultPtr, EEPROM_TERMINATOR);
+	EEPROM_WriteByte(watchdogFaultPtr,EEPROM_TERMINATOR);
+	EEPROM_WriteByte(canFaultPtr,     EEPROM_TERMINATOR);
+}
+
+/*
+ * This only logs the data, not the actual error
+ */
+void EEPROM_LogData(uint8_t logType, uint8_t data) {
+	switch(logType) {
+	case FAULT_HIGH_TEMP: 
+		EEPROM_WriteByte(tempFaultPtr++, data);
+		EEPROM_WriteByte(tempFaultPtr, EEPROM_TERMINATOR);	// TODO: define this so that it's not constant
+		break;
+	case FAULT_HIGH_VOLT:
+		EEPROM_WriteByte(voltFaultPtr++, data);
+		EEPROM_WriteByte(voltFaultPtr, EEPROM_TERMINATOR);
+		break;
+	case FAULT_LOW_VOLT:
+		EEPROM_WriteByte(voltFaultPtr++, data);
+		EEPROM_WriteByte(voltFaultPtr, EEPROM_TERMINATOR);
+		break;
+	case FAULT_HIGH_CURRENT:
+		EEPROM_WriteByte(currentFaultPtr++, data);
+		EEPROM_WriteByte(currentFaultPtr, EEPROM_TERMINATOR);
+		break;
+	case FAULT_WATCHDOG:
+		EEPROM_WriteByte(watchdogFaultPtr++, data);
+		EEPROM_WriteByte(watchdogFaultPtr, EEPROM_TERMINATOR);
+		break;
+	case FAULT_CAN_BUS:
+		EEPROM_WriteByte(canFaultPtr++, data);
+		EEPROM_WriteByte(canFaultPtr, EEPROM_TERMINATOR);
+		break;
+	}
+}
+
+/** EEPROM_LogError
  * Save some information to the EEPROM
  * logType is type of fault (fault code)
- * data is additional information (currently not being used)
+ * data is additional information to be used; if this data is 0,
+ *		nothing will be logged.
  */
-void EEPROM_Save(uint8_t logType, uint8_t data){
+void EEPROM_LogError(uint8_t logType){
 	//initialize pointers to data in EEPROM
+	// TODO: this should be stored in the EEPROM to preserve address upon reboot
 	static uint16_t faultCodePtr = EEPROM_FAULT_CODE_ADDR;
-	static uint16_t tempFaultPtr = EEPROM_TEMP_FAULT;
-	static uint16_t voltFaultPtr = EEPROM_VOLT_FAULT;
-	static uint16_t currentFaultPtr = EEPROM_CURRENT_FAULT;
-	static uint16_t watchdogFaultPtr = EEPROM_WWDG_FAULT;
-	static uint16_t canFaultPtr = EEPROM_CAN_FAULT;
-	uint16_t *battery_modules;
-//	uint16_t *temperature_modules;
-	uint16_t fake_battery_modules[] = {1,2,3,4,8,9,10};
+	
 	if (faultCodePtr < (EEPROM_TEMP_FAULT - 1)) {		//only store errors if there have been less than 256 faults (so buffers don't overflow)
-
+		// log the data
 		EEPROM_WriteByte(faultCodePtr, logType);
-		//delay(2);
 		faultCodePtr++;
-		EEPROM_WriteByte(faultCodePtr, 0xff);		//terminate array with 0xff
-		//delay(2);
-		switch (logType) {
-			
-			case FAULT_HIGH_TEMP:
-				//write which temperature sensor faulted to EEPROM
-//				battery_modules = Temperature_GetModulesInDanger();			//commented out for tesing purposes
-				battery_modules = fake_battery_modules;
-				// iterate through array and store bad modules
-				for (uint8_t i = 0; i < NUM_BATTERY_MODULES; i++)
-				{
-					if (battery_modules[i] == 1)
-					{
-						EEPROM_WriteByte(tempFaultPtr, i);
-						//delay(2);
-						tempFaultPtr ++;
-					}
-				}
-				//terminate each entry with 0xfe 
-				EEPROM_WriteByte(tempFaultPtr, 0xfe);
-				//delay(2);
-				tempFaultPtr++;
-				//terminate entire array with 0xff
-				EEPROM_WriteByte(tempFaultPtr, 0xff);
-				//delay(2);
-				break;
-			
-			case FAULT_HIGH_VOLT:
-				//write which voltage sensor faulted to EEPROM
-//				battery_modules = Voltage_GetModulesInDanger();		//commented out for testing
-				battery_modules = fake_battery_modules;			//for testing purposes only
-				//iterate through array and store bad modules
-				for (uint8_t i = 0; i < NUM_BATTERY_MODULES; i++){
-					if (battery_modules[i] == 1){		//if module is in danger, write module index to array
-						EEPROM_WriteByte(voltFaultPtr, i);
-						//delay(2);
-						voltFaultPtr++;
-					}
-				}
-				//terminate each entry with 0xfe 
-				EEPROM_WriteByte(voltFaultPtr, 0xfe);
-				//delay(2);
-				voltFaultPtr++;
-				//terminate entire array with 0xff
-				EEPROM_WriteByte(voltFaultPtr, 0xff);
-				//delay(2);
-				break;
-				
-			case FAULT_LOW_VOLT:
-				//write which voltage sensor faulted to EEPROM
-//				battery_modules = Voltage_GetModulesInDanger();			//commented out for testing
-				battery_modules = fake_battery_modules;			//for testing purposes only
-				//iterate through array and store bad modules
-				for (uint8_t i = 0; i < NUM_BATTERY_MODULES; i++){
-					if (battery_modules[i] == 1){		//if module is in danger, write module index to array
-						EEPROM_WriteByte(voltFaultPtr, i);
-						//delay(2);
-						voltFaultPtr++;
-					}
-				}
-				//terminate each entry with 0xfe 
-				EEPROM_WriteByte(voltFaultPtr, 0xfe);
-				//delay(2);
-				voltFaultPtr++;
-				//terminate entire array with 0xff
-				EEPROM_WriteByte(voltFaultPtr, 0xff);
-				//delay(2);
-				break;
-				
-			case FAULT_HIGH_CURRENT:
-				//write info about current sensor to EEPROM
-				break;
-			
-			case FAULT_WATCHDOG:
-				//write information about watchdog timer to EEPROM
-				break;
-			
-			case FAULT_CAN_BUS:
-				// write info about CAN bus to EEPROM
-				break;
-		}
+		EEPROM_WriteByte(faultCodePtr, EEPROM_TERMINATOR);
 	}
 }
 
@@ -135,7 +132,7 @@ void EEPROM_SerialPrintData(void){
 	uint16_t data_ptr;
 	fault_code = EEPROM_ReadByte(fault_ptr);	//read first fault code
 	//printf("fault code: %d\n\r", fault_code);
-	while (fault_code != 0xff) {
+	while (fault_code != EEPROM_TERMINATOR) {
 		printf("fault code: %d\n\r", fault_code);
 		switch (fault_code) {
 			case FAULT_HIGH_TEMP:
@@ -154,7 +151,7 @@ void EEPROM_SerialPrintData(void){
 				printf("fault, low voltage\n\rmodules in danger: ");
 				data_ptr = EEPROM_VOLT_FAULT;
 				data = EEPROM_ReadByte(data_ptr);
-				while (data != 0xfe) {
+				while (data != EEPROM_TERMINATOR) {
 					printf("%d, ", data);
 					//read next module in danger
 					data_ptr++;
@@ -166,7 +163,7 @@ void EEPROM_SerialPrintData(void){
 				printf("fault, high voltage\n\rmodules in danger: ");
 				data_ptr = EEPROM_VOLT_FAULT;
 				data = EEPROM_ReadByte(data_ptr);
-				while (data != 0xfe) {
+				while (data != EEPROM_TERMINATOR) {
 					printf("%d, ", data);
 					//read next module in danger
 					data_ptr++;
@@ -199,31 +196,24 @@ void EEPROM_Tester(void){
 	//fake error messages
 	//note: the second parameter does not do anything currently
 	printf("x0\n\r");
-	//EEPROM_Save(FAULT_HIGH_TEMP, 0xff);
-	EEPROM_Save(FAULT_HIGH_CURRENT, 0);
+	//EEPROM_LogError(FAULT_HIGH_TEMP, 0xff);
+	EEPROM_LogError(FAULT_HIGH_CURRENT);
 	printf("x1\n\r");
-	//EEPROM_Save(FAULT_HIGH_VOLT, 0x04);
-	EEPROM_Save(FAULT_WATCHDOG, 0x64);
+	//EEPROM_LogError(FAULT_HIGH_VOLT, 0x04);
+	EEPROM_LogError(FAULT_WATCHDOG);
 	printf("x2\n\r");
-	EEPROM_Save(FAULT_HIGH_CURRENT, 0);
-	//EEPROM_Save(FAULT_LOW_VOLT, 0x00);
+	EEPROM_LogError(FAULT_HIGH_CURRENT);
+	//EEPROM_LogError(FAULT_LOW_VOLT, 0x00);
 	printf("x3\n\r");
-	EEPROM_Save(FAULT_HIGH_CURRENT, 0x45);
+	EEPROM_LogError(FAULT_HIGH_CURRENT);
 	printf("x4\n\r");
-	EEPROM_Save(FAULT_WATCHDOG, 0x64);
+	EEPROM_LogError(FAULT_WATCHDOG);
 	printf("x5\n\r");
-	EEPROM_Save(FAULT_CAN_BUS, 0x9e);
+	EEPROM_LogError(FAULT_CAN_BUS);
 	printf("x6\n\r");
-	EEPROM_Save(FAULT_HIGH_VOLT, 0xd3);
+	EEPROM_LogError(FAULT_HIGH_VOLT);
 	printf("x7\n\r");
-	EEPROM_Save(FAULT_HIGH_TEMP, 0xc5);
-	
-	//test to see if it will let me overflow the buffer
-/*
-	for (uint16_t i = 0; i < 300; i++) {
-		EEPROM_Save(FAULT_CAN_BUS, 0x00);
-	}
-	*/
+	EEPROM_LogError(FAULT_HIGH_TEMP);
 }
 	
 /** EEPROM_WriteByte
@@ -237,6 +227,10 @@ void EEPROM_WriteByte(uint16_t address, uint8_t data){
 	for(uint32_t delay = 0; delay < 50000; delay++){};
 }
 
+void EEPROM_WriteMultipleBytes(uint16_t address, uint32_t bytes, uint8_t* buffer){
+	I2C3_WriteMultiple(EEPROM_ADDRESS, address, buffer, bytes);
+}
+
 /** EEPROM_ReadMultipleBytes
  * Gets multiple bytes of data sequentially from EEPROM beginning at specified address
  * @param unsigned 16-bit address
@@ -245,9 +239,6 @@ void EEPROM_WriteByte(uint16_t address, uint8_t data){
  */
 void EEPROM_ReadMultipleBytes(uint16_t address, uint32_t bytes, uint8_t* buffer){
 	I2C3_ReadMultiple(EEPROM_ADDRESS, address, buffer, bytes);
-	//printf("byte read\n\r");
-	for(uint32_t delay = 0; delay < 10000; delay++){};
-	
 }
 
 /** EEPROM_ReadByte
@@ -257,9 +248,7 @@ void EEPROM_ReadMultipleBytes(uint16_t address, uint32_t bytes, uint8_t* buffer)
  */
 uint8_t EEPROM_ReadByte(uint16_t address){
 	uint8_t result = I2C3_Read(EEPROM_ADDRESS, address);
-	printf("read %d from %x\n\r", result, address);
+	//printf("read %d from %x\n\r", result, address);
 	return result;
 	//return I2C3_Read(EEPROM_ADDRESS, address);
 }
-
-
