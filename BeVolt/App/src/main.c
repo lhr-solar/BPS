@@ -115,7 +115,7 @@ void faultCondition(void){
 // E.g. If you want to run a LTC6811 test, change "#define CHANGE_THIS_TO_TEST_NAME" to the
 //		following:
 //		#define LTC6811_TEST
-#define UART_TEST
+#define CAN_TEST
 
 
 
@@ -468,4 +468,38 @@ void DischargingSoCTest(void) {
 /** Tests
  * 	TODO: Need to test SetAccumulator, GetPercent and Calibrate on faults
  */
+#endif
+
+#ifdef CAN_TEST
+// ************************************
+#include "CAN.h"
+#include "UART.h"
+
+int main(){
+	UART3_Init(115200);
+	
+	printf("start\n");
+	CAN1_Init();
+	uint8_t data[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+	uint32_t id = CAN_ID_TEST;
+
+	while(1)
+	{
+		printf("start1\n");
+		uint8_t *RxData = (uint8_t *) malloc(8*sizeof(uint8_t));
+		CAN1_Write(id, data);
+		while(CAN1_Read(RxData) == false)
+		{
+		}
+		printf("CAN RxMessage: ");
+		for(int i = 0; i < 8; i++)
+		{
+			printf("%d", RxData[i]);
+		}
+		printf("\n");
+		free(RxData);
+	}
+
+}
+
 #endif
