@@ -14,6 +14,7 @@
 #include "EEPROM.h"
 #include "WDTimer.h"
 #include "SoC.h"
+#include "LED.h"
 
 void initialize(void);
 void preliminaryCheck(void);
@@ -99,6 +100,10 @@ void faultCondition(void){
 		}
 	}
 }
+
+
+
+
 
 
 //****************************************************************************************
@@ -252,11 +257,11 @@ int main(){
 int main(){
 	UART3_Init(9600);
 	Current_Init();	// Initialize the driver
-	
+
 	// Loop over the tests
 	while(true) {
 		Current_UpdateMeasurements();	// Get the most recent readings
-		
+
 		printf("\n\r==============================\n\rCurrent Test:\n\r");
 		printf("ADC High: %d\n\r", ADC_ReadHigh());
 		printf("ADC Low: %d\n\r", ADC_ReadLow());
@@ -264,7 +269,7 @@ int main(){
 		printf("Is the battery charging? %d\n\r", Current_IsCharging());
 		printf("High: %d\n\r", Current_GetHighPrecReading());
 		printf("Low: %d\n\r", Current_GetLowPrecReading());
-		
+
 		for(int i = 0; i < 10000000; ++i);
 	}
 }
@@ -312,11 +317,19 @@ int main(){
 #ifdef WATCHDOG_TEST
 int main(){
 	WDTimer_Init();
+	LED_Init();
+
+	if(WDTimer_DidSystemReset() != SAFE){
+		LED_On(WDOG);
+		while(1);
+	}
+
 	WDTimer_Start();
 
 	// reset WDTimer 10 times. With this counter, the watchdog timer should not reset the system shortly after it starts.
 	for(int32_t i = 0; i < 10; i++){
 		for(int32_t j = 0; j < 100000; j++);	// Delay
+		LED_Toggle(RUN);
 		WDTimer_Reset();
 	}
 	while(1){

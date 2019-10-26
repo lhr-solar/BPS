@@ -1,7 +1,7 @@
 /** main.c
  * Program for UTSVT BeVolt's Battery Protection System ADC initialization/output
- * @authors Garrett Wong, Sijin Woo, Russell Sutton
- * @lastRevised 09/28/2019
+ * @authors Garrett Wong, Sijin Woo, Russell Sutton, Chase Block
+ * @lastRevised 10/26/2019
  */
 
 #include <stdint.h>
