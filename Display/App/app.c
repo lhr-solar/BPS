@@ -41,24 +41,24 @@ void Display_Temperature(State);
 void Display_Status(State);
 
 void App_Handler(void){
-
+	
 	State s;
-	Paint *background;
-	Paint *stopSign;
+//	Paint *background;
+//	Paint *stopSign;
 
-	s.current = 7;
-	s.stateofCharge = 7;
-	s.voltage = 7;
-	s.temperature = 7;
+//	s.current = 7;
+//	s.stateofCharge = 7;
+//	s.voltage = 7;
+//	s.temperature = 7;
 
-	//Display_Init(Display_Background);	
-	Paint_Init(background, Display_Background, BACKGROUND_WIDTH, BACKGROUND_HEIGHT);
-	Paint_Init(stopSign, Display_StopSign, STOPSIGN_WIDTH, STOPSIGN_HEIGHT);
+//	//Display_Init(Display_Background);	
+//	Paint_Init(background, Display_Background, BACKGROUND_WIDTH, BACKGROUND_HEIGHT);
+//	Paint_Init(stopSign, Display_StopSign, STOPSIGN_WIDTH, STOPSIGN_HEIGHT);
 
-	Paint_DrawCharAt(background, 10, 62, (char) s.current, &Font8, 0); // Draw amount of current in mA. On top of background image. start at pixel 10x62, character to draw, font8, not inverted
-	//Paint_DrawCharAt(background, 20, 136, (char) s.status, Font8, 0) // Draw amount of current in mA. On top of background image. start at pixel 10x62, character to draw, font8, not inverted
-	Paint_DrawCharAt(background, 167, 62, (char) s.stateofCharge, &Font8, 0); // Draw amount of current in mA. On top of background image. start at pixel 10x62, character to draw, font8, not inverted
-	Paint_DrawCharAt(background, 180, 106, (char) s.voltage, &Font8, 0); // Draw amount of current in mA. On top of background image. start at pixel 10x62, character to draw, font8, not inverted
-	Paint_DrawCharAt(background, 183, 146, (char) s.temperature, &Font8, 0); // Draw amount of current in mA. On top of background image. start at pixel 10x62, character to draw, font8, not inverted
+//	Paint_DrawCharAt(background, 10, 62, (char) s.current, &Font8, 0); // Draw amount of current in mA. On top of background image. start at pixel 10x62, character to draw, font8, not inverted
+//	//Paint_DrawCharAt(background, 20, 136, (char) s.status, Font8, 0) // Draw amount of current in mA. On top of background image. start at pixel 10x62, character to draw, font8, not inverted
+//	Paint_DrawCharAt(background, 167, 62, (char) s.stateofCharge, &Font8, 0); // Draw amount of current in mA. On top of background image. start at pixel 10x62, character to draw, font8, not inverted
+//	Paint_DrawCharAt(background, 180, 106, (char) s.voltage, &Font8, 0); // Draw amount of current in mA. On top of background image. start at pixel 10x62, character to draw, font8, not inverted
+//	Paint_DrawCharAt(background, 183, 146, (char) s.temperature, &Font8, 0); // Draw amount of current in mA. On top of background image. start at pixel 10x62, character to draw, font8, not inverted
 
 }

@@ -1,6 +1,7 @@
 --cpu=Cortex-M4.fp
 "display\startup_stm32f413xx.o"
 "display\app.o"
+"display\display_init.c.o"
 "display\main.o"
 "display\stm32f4xx_it.o"
 "display\stm32f4xx_hal_msp.o"

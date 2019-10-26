@@ -31,4 +31,9 @@ display\main.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr.h
 display\main.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr_ex.h
 display\main.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_spi.h
 display\main.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h
-display\main.o: ../App/app.h
+display\main.o: ../BSP/epd2in7.h
+display\main.o: ../Fonts/fonts.h
+display\main.o: ../BSP/epdif.h
+display\main.o: ../BSP/epdpaint.h
+display\main.o: ../BSP/imagedata.h
+display\main.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h

@@ -80,7 +80,7 @@
 
 #define HIGH            1
 
-
+extern SPI_HandleTypeDef hspi1;
 
 typedef struct {
 

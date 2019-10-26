@@ -54,8 +54,6 @@
 
 #include "epdif.h"
 
-#include "main.h"
-
 
 
 SPI_HandleTypeDef hspi1;

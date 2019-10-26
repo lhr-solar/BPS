@@ -768,10 +768,9 @@ Command Line: --debug --xref --diag_suppress=9931 --cpu=Cortex-M4.fp --apcs=int
 erwork --depend=display\startup_stm32f413xx.d -odisplay\startup_stm32f413xx.o -
 I.\RTE\_Display -IC:\Users\manol\AppData\Local\Arm\Packs\ARM\CMSIS\5.5.1\CMSIS\
 Core\Include -IC:\Users\manol\AppData\Local\Arm\Packs\Keil\STM32F4xx_DFP\2.14.0
-\Drivers\CMSIS\Device\ST\STM32F4xx\Include --predefine="__EVAL SETA 1" --predef
-ine="__MICROLIB SETA 1" --predefine="__UVISION_VERSION SETA 528" --predefine="_
-RTE_ SETA 1" --predefine="STM32F413xx SETA 1" --list=startup_stm32f413xx.lst st
-artup_stm32f413xx.s
+\Drivers\CMSIS\Device\ST\STM32F4xx\Include --predefine="__MICROLIB SETA 1" --pr
+edefine="__UVISION_VERSION SETA 528" --predefine="_RTE_ SETA 1" --predefine="ST
+M32F413xx SETA 1" --list=startup_stm32f413xx.lst startup_stm32f413xx.s
 
 
 
@@ -1995,4 +1994,4 @@ Symbol: __main
       At line 209 in file startup_stm32f413xx.s
 Comment: __main used once
 2 symbols
-460 symbols in table
+459 symbols in table
