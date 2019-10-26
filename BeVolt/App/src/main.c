@@ -280,16 +280,19 @@ int main(){
 	Temperature_Init();
 	printf("Activated\n\r");
 
-	LTC2983_ReadConversions(buffer, TEMP_CS1, 12);
+	LTC2983_ReadConversions(buffer, TEMP_CS1, 1);
 	while(1){
 		int32_t buf[12] = {0};
 		LTC2983_StartMeasuringADC(TEMP_CS1);
 		
-		LTC2983_ReadConversions(buf, TEMP_CS1, 12);
+		LTC2983_ReadConversions(buf, TEMP_CS1, 1);
 					printf("\n\r");
-		for(int i = 0; i < 12; i++) {
-		    printf("%d\n\r", buf[i]);
-		}
+		//for(int i = 0; i < 12; i++) {
+		int i = 0;
+			LTC2983_ConversionValidity((uint8_t)(buf[i] >> 24));
+			
+			printf("Channel %d: %f\n\r", i+1, ((float)(buf[i] & 0x007FFFFF) /2097152));
+		//}
 		for(int i = 0; i < 10000000; i++);
 	}
 }

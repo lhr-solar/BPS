@@ -29,7 +29,7 @@ void LTC2983_Init(void);
 
 /** Board_Select
  * Uses specified CS pins for selected board.
- * @param enumerated type Board. List in Settings.h
+ * @param enumerated type Board. List in Config.h
  * @param state of the CS line (1 or 0). Note that SPI CS lines are HIGH or 1 during idle
  * @note Make sure the CS line returns to 1 if you're finished transmitting or receiving SPI messages
  */
@@ -38,18 +38,18 @@ void Board_Select(board Board, bool state);
 
 /** LTC2983_Ready
  * Checks if LTC2984 is ready after startup
- * @return unsigned int 16-bit data
+ * @return TRUE if ready, FALSE if busy
  */
 bool LTC2983_Ready(void);
 
 
 /** LTC2983_MeasureSingleChannel
  * Sends command to LTC2983 to gather and save all ADC values
- * @param 16 bit channel size in a 1 byte array
+ * @param Channel number to read (1 - 20)
  * @return signed 32-bit measurements from specified channel.
  *       returns a -1 if invalid ADC measurement
  */
-int32_t LTC2983_MeasureSingleChannel(void);
+int32_t LTC2983_MeasureSingleChannel(uint8_t channel);
 
 
 
@@ -72,6 +72,17 @@ void LTC2983_StartMeasuringADC(board temperatureBoard);
  * @preconditions All channels on the board finished conversion before running this function
  */
 void LTC2983_ReadConversions(int32_t *Buf, board temperatureBoard, uint8_t numOfChannels);
+
+
+
+
+/** LTC2983_ConversionValidity
+ * Checks the error bits of ADC conversion
+ * @param Most significant byte of received data conversion
+ * @note Used braces with conditional for future updates
+ *			 in case return values or setting flags
+ */
+void LTC2983_ConversionValidity(uint8_t errorBits);
 
 
 
