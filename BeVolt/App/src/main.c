@@ -93,14 +93,20 @@ void faultCondition(void){
 			// Toggle Current fault LED
 		}
 		
-		if(Voltage_IsSafe() == OVERVOLTAGE){
+		if(!Voltage_IsSafe()){
 			// Toggle Voltage fault LED
-			LED_On(OVOLT);
-		}
-		
-		if(Voltage_IsSafe() == UNDERVOLTAGE){
-			// Toggle Voltage fault LED
-			LED_On(UVOLT);
+			switch(Voltage_IsSafe()){
+				case OVERVOLTAGE:
+					LED_On(OVOLT);
+					break;
+				
+				case UNDERVOLTAGE:
+					LED_On(UVOLT);
+					break;
+				
+				default:
+					break;
+			}
 		}
 		
 		if(!Temperature_IsSafe(Current_IsCharging())){
