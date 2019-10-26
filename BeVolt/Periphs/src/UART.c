@@ -69,18 +69,6 @@ void UART1_Init(uint32_t baud){
 	USART_InitStruct.USART_WordLength = USART_WordLength_8b;
 	USART_Init(USART1, &USART_InitStruct);
 	USART_Cmd(USART1, ENABLE);
-	
-	//USART_ITConfig(USART1, USART_IT_RXNE, ENABLE);
-	//USART_ITConfig(USART1, USART_IT_TC, DISABLE);
-	
-	// Set NVIC
-	/*
-	NVIC_InitStruct.NVIC_IRQChannel = UART4_IRQn;
-	NVIC_InitStruct.NVIC_IRQChannelPreemptionPriority = 0;
-	NVIC_InitStruct.NVIC_IRQChannelSubPriority = UART1_PRIORITY;
-	NVIC_InitStruct.NVIC_IRQChannelCmd = ENABLE;
-	NVIC_Init(&NVIC_InitStruct);
-	*/
 }
 
 /** UART1_Write
@@ -92,19 +80,6 @@ void UART1_Write(char *txBuf, uint32_t txSize){
 		while((USART1->SR&USART_SR_TC) == 0);	// Wait until transmission is done
 		USART1->DR = txBuf[i] & 0xFF;
 	}
-	/*
-	for(uint32_t i = 0; i < txSize; i++){
-		if(FIFO_IsFull_Tx() != 0){
-			TxErrorCnt++;
-		}else{
-			FIFO_Put_Tx(txBuf[i]);
-		}			
-	}
-	
-	// Enable interrupt since Fifo now has contents
-	USART_ClearITPendingBit(USART1, USART_IT_TC);
-	USART_ITConfig(USART1, USART_IT_TC, ENABLE);
-	*/
 }
 
 /** UART1_Read
@@ -117,21 +92,13 @@ void UART1_Read(char *rxBuf, uint32_t rxSize){
 		while((USART1->SR&USART_SR_RXNE) == 0);
 		rxBuf[i] = USART1->DR & 0xFF;
 	}
-	
-	/*
-	for(uint32_t i = 0; i < rxSize; i++){
-		// TODO:
-	}
-	*/
 }
 
-/**************** WARNING ***************/
-// ONLY USE THIS FOR DEBUGGING ON NUCLEO!!!!!
 /** UART3_Init
  * Initializes UART1 Module
  * Pins: 
- *		tx : PD8
- *		rx : PD9
+ *		tx : PB10
+ *		rx : PC5
  * @param baud rate: 9600, 115200, 500000
  */
 void UART3_Init(uint32_t baud){
@@ -139,18 +106,21 @@ void UART3_Init(uint32_t baud){
 	USART_InitTypeDef USART_InitStruct;
 	
 	// Initialize clocks
-	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, ENABLE);
+	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC, ENABLE);
+	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART3, ENABLE);
 	
-	// Initialize PD8 and PD9
-	GPIO_InitStruct.GPIO_Pin = GPIO_Pin_8 | GPIO_Pin_9;
+	// Initialize PB10 and PC5
+	GPIO_InitStruct.GPIO_Pin = GPIO_Pin_10;
 	GPIO_InitStruct.GPIO_Mode = GPIO_Mode_AF;
 	GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
 	GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
 	GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_UP;
-	GPIO_Init(GPIOD, &GPIO_InitStruct);
-	GPIO_PinAFConfig(GPIOD, GPIO_PinSource8, GPIO_AF_USART3);
-	GPIO_PinAFConfig(GPIOD, GPIO_PinSource9, GPIO_AF_USART3);
+	GPIO_Init(GPIOB, &GPIO_InitStruct);
+	GPIO_InitStruct.GPIO_Pin = GPIO_Pin_5;
+	GPIO_Init(GPIOC, &GPIO_InitStruct);
+	GPIO_PinAFConfig(GPIOB, GPIO_PinSource10, GPIO_AF_USART3);
+	GPIO_PinAFConfig(GPIOC, GPIO_PinSource5, GPIO_AF_USART3);
 	
 	// Initialize USART3
 	USART_InitStruct.USART_BaudRate = baud;
@@ -186,43 +156,9 @@ void UART3_Read(char *rxBuf, uint32_t rxSize){
 	}
 }
 
-// Private Function Definitions
-/** copySoftwareToHardware
- * Places contents of tx software buffer to hardware FIFO
- */
-void copySoftwareToHardware(void){
-//	if(FIFO_IsEmpty_Tx()){
-//		USART_ClearITPendingBit(USART1, USART_IT_TC);
-//		USART_ITConfig(USART1, USART_IT_TC, DISABLE);
-//		TxErrorCnt++;
-//	}else{
-//		USART1->DR = FIFO_Get_Tx();
-//	}
-}
-
-/** copyHardwareToSoftware
- * Places contents of rx hardware FIFO to software buffer
- */
-void copyHardwareToSoftware(void){
-//	uint32_t data = USART1->DR;
-//	if(FIFO_IsFull_Rx()){
-//		volatile uint32_t junk = data;
-//		RxErrorCnt++;
-//	}else{
-//		FIFO_Put_Rx(data & 0xFF);
-//	}
-}
-
 void UART1_OutChar(char data){
 	while((USART1->SR&USART_SR_TC) == 0);	// Wait until transmission is done
 	USART1->DR = data & 0xFF;
-	/*
-	while(FIFO_IsFull_Tx());
-	FIFO_Put_Tx(data);
-	USART_ITConfig(USART1, USART_IT_TC, DISABLE);
-	copySoftwareToHardware();
-	USART_ITConfig(USART1, USART_IT_TC, ENABLE);
-	*/
 }
 
 void UART3_OutChar(char data){
@@ -232,11 +168,7 @@ void UART3_OutChar(char data){
 
 // this is used for printf to output to the usb uart
 int fputc(int ch, FILE *f){
-	if(!NUCLEO){
-		UART1_OutChar(ch);
-	}else{
-		UART1_Write((char *)&ch, 1);
-	}
+	UART1_Write((char *)&ch, 1);
   return 1;
 }
 
@@ -248,20 +180,4 @@ int fgetc(FILE *f){
 		UART1_Read(&letter, 1);
 	}
 	return (int)letter;
-}
-
-/***************************** Interrupt Service Routines ******************************/
-void USART1_IRQHandler(void){
-	// Transmission Complete ISR
-	if(USART_GetITStatus(USART1, USART_IT_TC) != RESET){
-		copySoftwareToHardware();
-	}
-	// Rx Fifo Not Empty ISR
-	if(USART_GetITStatus(USART1, USART_IT_RXNE) != RESET){
-		copyHardwareToSoftware();
-	}
-	// Overflow error ISR
-	if(USART_GetITStatus(USART1, USART_FLAG_ORE) != RESET){
-		//LED_GreenOn();
-	}
 }

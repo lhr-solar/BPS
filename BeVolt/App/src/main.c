@@ -450,16 +450,16 @@ int SOCmain(){
 
 int main(){
 	//initialize stuff
-	UART1_Init(115200);
+	UART3_Init(115200);
 	__disable_irq();
 	EEPROM_Init();
 	__enable_irq();
-	printf("done\n");
+	printf("initialized\n");
 	
 	EEPROM_Tester();		//write test codes
 	printf("done");
 	while(1){
-		//printf("done\n\r");
+		printf("done\n\r");
 	};		//get stuck in loop
 	
 }
@@ -473,7 +473,7 @@ int main(){
 	UART1_Init(115200);
 	printf("starting\n\r");
 	__disable_irq();
-	initialize();
+	EEPROM_Init();
 	__enable_irq();
 	printf("initialized\n\r");
 	EEPROM_Tester();
