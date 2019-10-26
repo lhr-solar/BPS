@@ -8,8 +8,13 @@
 
 void StrobeLight_Init(void)
 {
+	/*
+	Initializes the GPIO port for the Strobelight.
+	*/
 		GPIO_InitTypeDef GPIO_InitStruct;
-	//Initializes Clock
+	/*
+	Initializes Clock
+	*/
 	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
 	
 	GPIO_InitStruct.GPIO_Pin = GPIO_Pin_12;
@@ -19,15 +24,21 @@ void StrobeLight_Init(void)
 	GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_DOWN;
 	GPIO_Init(GPIOB, &GPIO_InitStruct);
 }
-//Checks if Error Light pin 12 is sending signal = 1
+/*
+Checks if Error Light pin 12 is sending signal = 1
+*/
 void StrobeLight_On(void){
 	GPIO_WriteBit(GPIOB, GPIO_Pin_12, Bit_SET);			
 }
-//Checks if Error Light pin 12 is sending signal = 0
+/*
+Checks if Error Light pin 12 is sending signal = 0
+*/
 void StrobeLight_Off(void){
 	GPIO_WriteBit(GPIOB, GPIO_Pin_12, Bit_RESET);		
 }
-//returns value of pin, either 0 or 1
+/*
+returns value of pin, either 0 or 1
+*/
 uint32_t StrobeLight(void){
 	int num = GPIO_Pin_12;
 	printf("%d", num);

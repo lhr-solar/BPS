@@ -14,6 +14,7 @@
 #include "EEPROM.h"
 #include "WDTimer.h"
 #include "SoC.h"
+#include "LED.h"
 
 void initialize(void);
 void preliminaryCheck(void);
@@ -100,6 +101,10 @@ void faultCondition(void){
 		}
 	}
 }
+
+
+
+
 
 
 //****************************************************************************************
@@ -304,11 +309,19 @@ int main(){
 #ifdef WATCHDOG_TEST
 int main(){
 	WDTimer_Init();
+	LED_Init();
+	
+	if(WDTimer_DidSystemReset() != SAFE){
+		LED_On(WDOG);
+		while(1);
+	}
+	
 	WDTimer_Start();
 	
 	// reset WDTimer 10 times. With this counter, the watchdog timer should not reset the system shortly after it starts.
 	for(int32_t i = 0; i < 10; i++){
 		for(int32_t j = 0; j < 100000; j++);	// Delay
+		LED_Toggle(RUN);
 		WDTimer_Reset();
 	}
 	while(1){
