@@ -96,8 +96,9 @@ uint16_t *Voltage_GetModulesInDanger(void){
 /** Voltage_OpenWireSummary
  * Runs the open wire method with print=true
  */
-uint32_t Voltage_OpenWireSummary(void){
-	return LTC6811_run_openwire_multi(NUM_VOLTAGE_BOARDS, Modules, true);
+void Voltage_OpenWireSummary(void){
+	wakeup_idle(NUM_VOLTAGE_BOARDS);
+	LTC6811_run_openwire_multi(NUM_VOLTAGE_BOARDS, Modules, true);
 }
 
 /** Voltage_OpenWire
@@ -114,26 +115,14 @@ SafetyStatus Voltage_OpenWire(void){
 	}
 }
 
-/** *Voltage_GetOpenWire
+/** Voltage_GetOpenWire
  * Finds the pin locations of the open wires
- * @return array of battery modules (1 means disconnect, 0 means safe)
+ * @return hexadecimal string (1 means open wire, 0 means closed)
  */
-uint8_t *Voltage_GetOpenWire(void){
+uint32_t Voltage_GetOpenWire(void){
 	wakeup_idle(NUM_VOLTAGE_BOARDS);
-	long openwires = LTC6811_run_openwire_multi(NUM_VOLTAGE_BOARDS, Modules, false);
-	static uint8_t open_wires[NUM_BATTERY_MODULES*NUM_VOLTAGE_BOARDS];
-	uint8_t count = 0;
-	while(openwires){
-		if((openwires & 1) == 1){
-			open_wires[(NUM_BATTERY_MODULES*NUM_VOLTAGE_BOARDS) - count] = 1;
-		} else {
-			open_wires[count] = 0;
-		}
-		count += 1; 
-		openwires = openwires >> 1;
-	}
-	return open_wires;
-} //TODO: Test with BPS System
+	return LTC6811_run_openwire_multi(NUM_VOLTAGE_BOARDS, Modules, false);
+}
 
 /** Voltage_GetModuleVoltage
  * Gets the voltage of a certain module in the battery pack
