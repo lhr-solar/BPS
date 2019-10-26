@@ -36,11 +36,11 @@ uint16_t ADC_ReadHigh(void){
 	//****		Channel Configuration (Connecting the proper GPIO/ADC Channel to the ADC configuration)
 	ADC_RegularChannelConfig(ADC1,ADC_Channel_2,1,ADC_SampleTime_15Cycles);
 	
-	ADC_Cmd(ADC1,ENABLE);                           //****		ADC ON
-	ADC_SoftwareStartConv(ADC1);                    //****		RUN
+	ADC_Cmd(ADC1,ENABLE);                               //****		ADC ON
+	ADC_SoftwareStartConv(ADC1);                        //****		RUN
 	
-	while (!ADC_GetFlagStatus(ADC1, ADC_FLAG_EOC));	//****		Wait for Reading
-	ADC_Cmd(ADC1,DISABLE);												  //****		ADC OFF
+	while (!ADC_GetFlagStatus(ADC1, ADC_FLAG_EOC));	    //****		Wait for Reading
+	ADC_Cmd(ADC1,DISABLE);                              //****		ADC OFF
 	return ADC_GetConversionValue(ADC1);
 }
 uint16_t ADC_ReadLow(void){
@@ -48,10 +48,10 @@ uint16_t ADC_ReadLow(void){
 	//****		Channel Configuration (Connecting the proper GPIO/ADC Channel to the ADC configuration)
 	ADC_RegularChannelConfig(ADC1,ADC_Channel_3,1,ADC_SampleTime_15Cycles);
 	
-	ADC_Cmd(ADC1,ENABLE);                           //****		ADC ON
-	ADC_SoftwareStartConv(ADC1);                    //****		RUN
+	ADC_Cmd(ADC1,ENABLE);                               //****		ADC ON
+	ADC_SoftwareStartConv(ADC1);                        //****		RUN
 	
-	while (!ADC_GetFlagStatus(ADC1, ADC_FLAG_EOC)); //****		Wait for Reading
-	ADC_Cmd(ADC1,DISABLE);                          //****		ADC OFF
+	while (!ADC_GetFlagStatus(ADC1, ADC_FLAG_EOC));     //****		Wait for Reading
+	ADC_Cmd(ADC1,DISABLE);                              //****		ADC OFF
 	return ADC_GetConversionValue(ADC1);
 }
