@@ -1385,7 +1385,7 @@ void LTC681x_run_openwire(uint8_t total_ic, cell_asic ic[])
 */
 
 /* Runs the data sheet algorithm for open wire for multiple cell and two consecutive cells detection */
- void LTC681x_run_openwire_multi(uint8_t total_ic, // Number of ICs in the daisy chain
+ long LTC681x_run_openwire_multi(uint8_t total_ic, // Number of ICs in the daisy chain
 						  cell_asic ic[], // A two dimensional array that will store the data
 							bool print	// Condition that either prints or just returns the array
 						  )
@@ -1399,9 +1399,11 @@ void LTC681x_run_openwire(uint8_t total_ic, cell_asic ic[])
 
 	int8_t error;
 	int8_t opencells[N_CHANNELS];
-	int8_t n=0;
+	int8_t n=0; // Number of open cells
 	int8_t i,j,k;
 	uint32_t conv_time=0;
+	
+	long openwires = 0;
 
 	wakeup_sleep(total_ic);
 	LTC681x_clrcell();
@@ -1411,7 +1413,7 @@ void LTC681x_run_openwire(uint8_t total_ic, cell_asic ic[])
 	{ 
 		wakeup_idle(total_ic);
 		LTC681x_adow(MD_26HZ_2KHZ,PULL_UP_CURRENT,CELL_CH_ALL,DCP_DISABLED);
-		conv_time =LTC681x_pollAdc();
+		conv_time = LTC681x_pollAdc();
 	} 
 
 	wakeup_idle(total_ic);
@@ -1444,7 +1446,7 @@ void LTC681x_run_openwire(uint8_t total_ic, cell_asic ic[])
 		}
 	}
 
-	for (int cic=0; cic<total_ic; cic++)
+	for (int cic=0; cic<total_ic; cic++) // Main loop
 	{			  
 		for (int cell=0; cell<N_CHANNELS; cell++)
 		{
@@ -1569,10 +1571,18 @@ void LTC681x_run_openwire(uint8_t total_ic, cell_asic ic[])
 				}
 			}
 		}
+		
+		// Store the array into a long to return
+		for(int x=0;x<N_CHANNELS;x++){
+			if(opencells[x] == 1){
+				openwires += (1<<x);
+			}
+		}
 	}
 	if(print){
 		printf("\n\r");
 	}
+	return openwires;
 }
 
 // Runs the ADC overlap test for the IC

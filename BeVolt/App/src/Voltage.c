@@ -100,13 +100,11 @@ uint16_t *Voltage_GetModulesInDanger(void){
  */
 long Voltage_OpenWire(void){
 	wakeup_idle(NUM_VOLTAGE_BOARDS);
-	LTC6811_run_openwire_multi(NUM_VOLTAGE_BOARDS, Modules, true);
-	for(uint8_t i = 0; i < NUM_VOLTAGE_BOARDS; i++){
-		if(Modules[i].system_open_wire != 0){
-			return ERROR;
-		} else {
-			return SUCCESS;
-		}
+	long openwires = LTC6811_run_openwire_multi(NUM_VOLTAGE_BOARDS, Modules, false);
+	if(openwires > 0){
+		return DANGER;
+	} else {
+		return SAFE;
 	}
 }
 
@@ -116,20 +114,16 @@ long Voltage_OpenWire(void){
  */
 uint8_t *Voltage_GetOpenWire(void){
 	wakeup_idle(NUM_VOLTAGE_BOARDS);
-	LTC6811_run_openwire_multi(NUM_VOLTAGE_BOARDS, Modules, true);
+	long openwires = LTC6811_run_openwire_multi(NUM_VOLTAGE_BOARDS, Modules, true);
 	static uint8_t open_wires[NUM_BATTERY_MODULES];
 	uint8_t count = 0;
-	for(uint8_t i = 0; i < NUM_VOLTAGE_BOARDS; i++){
-		long bin_openwire = Modules[i].system_open_wire;
-		while(count < NUM_BATTERY_MODULES){
-			if(bin_openwire & 1){
-				open_wires[count] = 1;
-			} else {
-				open_wires[count] = 0;
-			}
-			bin_openwire>>=1;
-			count++;
+	while(openwires){
+		if((openwires & 1) == 1){
+			open_wires[count] = 1;
+		} else {
+			open_wires[count] = 0;
 		}
+		count += 1; 
 	}
 	return open_wires;
 } //TODO: Test with BPS System
