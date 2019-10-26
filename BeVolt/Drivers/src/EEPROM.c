@@ -125,22 +125,21 @@ void EEPROM_Save(uint8_t logType, uint8_t data){
 }
 
 /** EEPROM_SerialPrintData
- * Prints saved data from EEPROM to serial terminal
+ * Prints saved data from EEPROM to serial terminal (putty)
  */
 void EEPROM_SerialPrintData(void){
-	//UART1_Init(115200);
+	UART1_Init(115200);
 	uint8_t fault_code;
 	uint8_t data;
-	printf("z1\n");
 	uint16_t fault_ptr = EEPROM_FAULT_CODE_ADDR;
 	uint16_t data_ptr;
 	fault_code = EEPROM_ReadByte(fault_ptr);	//read first fault code
-	printf("%d\n", fault_code);
+	//printf("fault code: %d\n\r", fault_code);
 	while (fault_code != 0xff) {
-		printf("%d\n", fault_code);
+		printf("fault code: %d\n\r", fault_code);
 		switch (fault_code) {
 			case FAULT_HIGH_TEMP:
-				printf("fault, high temperature\nmodules in danger: ");
+				printf("fault, high temperature\n\rmodules in danger: ");
 				data_ptr = EEPROM_TEMP_FAULT;
 			  data = EEPROM_ReadByte(data_ptr);
 				while (data != 0xfe) {
@@ -187,6 +186,7 @@ void EEPROM_SerialPrintData(void){
 		}
 		//read next fault code
 		fault_ptr++;
+		printf("fault_ptr: %d\n\r", fault_ptr);
 		fault_code = EEPROM_ReadByte(fault_ptr);
 	}
 	printf("done\n\r");
@@ -198,27 +198,32 @@ void EEPROM_SerialPrintData(void){
 void EEPROM_Tester(void){
 	//fake error messages
 	//note: the second parameter does not do anything currently
-	printf("x0\n");
-	EEPROM_Save(FAULT_HIGH_TEMP, 0xff);
-	printf("x1\n");
-	EEPROM_Save(FAULT_HIGH_VOLT, 0x04);
-	printf("x2\n");
-	EEPROM_Save(FAULT_LOW_VOLT, 0x00);
-	printf("x3\n");
-	EEPROM_Save(FAULT_HIGH_CURRENT, 0x45);
-	printf("x4\n");
+	printf("x0\n\r");
+	//EEPROM_Save(FAULT_HIGH_TEMP, 0xff);
+	EEPROM_Save(FAULT_HIGH_CURRENT, 0);
+	printf("x1\n\r");
+	//EEPROM_Save(FAULT_HIGH_VOLT, 0x04);
 	EEPROM_Save(FAULT_WATCHDOG, 0x64);
-	printf("x5\n");
+	printf("x2\n\r");
+	EEPROM_Save(FAULT_HIGH_CURRENT, 0);
+	//EEPROM_Save(FAULT_LOW_VOLT, 0x00);
+	printf("x3\n\r");
+	EEPROM_Save(FAULT_HIGH_CURRENT, 0x45);
+	printf("x4\n\r");
+	EEPROM_Save(FAULT_WATCHDOG, 0x64);
+	printf("x5\n\r");
 	EEPROM_Save(FAULT_CAN_BUS, 0x9e);
-	printf("x6\n");
+	printf("x6\n\r");
 	EEPROM_Save(FAULT_HIGH_VOLT, 0xd3);
-	printf("x7\n");
+	printf("x7\n\r");
 	EEPROM_Save(FAULT_HIGH_TEMP, 0xc5);
 	
 	//test to see if it will let me overflow the buffer
-	// for (uint16_t i = 0; i < 1000; i++) {
-		// EEPROM_Save(FAULT_CAN_BUS, 0x00);
-	// }
+/*
+	for (uint16_t i = 0; i < 300; i++) {
+		EEPROM_Save(FAULT_CAN_BUS, 0x00);
+	}
+	*/
 }
 	
 /** EEPROM_WriteByte
@@ -228,8 +233,8 @@ void EEPROM_Tester(void){
  */
 void EEPROM_WriteByte(uint16_t address, uint8_t data){
 	I2C3_Write(EEPROM_ADDRESS, address, data);
-	printf("byte written\n\r");
-	for(uint32_t delay = 0; delay < 10000; delay++){};
+	printf("writing: %d to %x\n\r", data, address);
+	for(uint32_t delay = 0; delay < 50000; delay++){};
 }
 
 /** EEPROM_ReadMultipleBytes
@@ -240,7 +245,7 @@ void EEPROM_WriteByte(uint16_t address, uint8_t data){
  */
 void EEPROM_ReadMultipleBytes(uint16_t address, uint32_t bytes, uint8_t* buffer){
 	I2C3_ReadMultiple(EEPROM_ADDRESS, address, buffer, bytes);
-	printf("byte read\n\r");
+	//printf("byte read\n\r");
 	for(uint32_t delay = 0; delay < 10000; delay++){};
 	
 }
@@ -251,7 +256,10 @@ void EEPROM_ReadMultipleBytes(uint16_t address, uint32_t bytes, uint8_t* buffer)
  * @return unsigned 8-bit data
  */
 uint8_t EEPROM_ReadByte(uint16_t address){
-	return I2C3_Read(EEPROM_ADDRESS, address);
+	uint8_t result = I2C3_Read(EEPROM_ADDRESS, address);
+	printf("read %d from %x\n\r", result, address);
+	return result;
+	//return I2C3_Read(EEPROM_ADDRESS, address);
 }
 
 
