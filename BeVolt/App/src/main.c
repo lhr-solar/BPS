@@ -25,25 +25,25 @@ int mainmain(){
 	initialize();					// Initialize codes/pins
 	preliminaryCheck();		// Wait until all boards are powered on
 	__enable_irq();				// Enable interrupts
-	
+
 	while(1){
 		// First update the measurements.
 		Voltage_UpdateMeasurements();
 		Current_UpdateMeasurements();
 		Temperature_UpdateMeasurements();
-		
+
 		// Check if everything is safe
 		if(Current_IsSafe() && Temperature_IsSafe(Current_IsCharging()) && Voltage_IsSafe()){
 			Contactor_On();
 		}else{
 			break;
 		}
-		
+
 		// Update necessary
 		// CAN_SendMessageStatus()	// Most likely need to put this on a timer if sending too frequently
-		
+
 	}
-	
+
 	// BPS has tripped if this line is reached
 	faultCondition();
 }
@@ -63,7 +63,7 @@ void initialize(void){
 	Contactor_Init();
 	Contactor_Off();
 	EEPROM_Init();
-	
+
 	Current_Init();
 	Voltage_Init();
 	Temperature_Init();
@@ -92,7 +92,7 @@ void faultCondition(void){
 		if(!Current_IsSafe()){
 			// Toggle Current fault LED
 		}
-		
+
 		if(!Voltage_IsSafe()){
 			// Toggle Voltage fault LED
 			switch(Voltage_IsSafe()){
@@ -108,7 +108,7 @@ void faultCondition(void){
 					break;
 			}
 		}
-		
+
 		if(!Temperature_IsSafe(Current_IsCharging())){
 			// Toggle Temperature fault LED
 		}
@@ -129,8 +129,7 @@ void faultCondition(void){
 // E.g. If you want to run a LTC6811 test, change "#define CHANGE_THIS_TO_TEST_NAME" to the
 //		following:
 //		#define LTC6811_TEST
-#define LED_TEST
-
+#define CURRENT_TEST
 
 #ifdef LED_TEST
 #include "LED.h"
@@ -174,7 +173,7 @@ void print_config(cell_asic *bms_ic);
 int main(){
 	// Local var
 	int8_t error = 0;
-	
+
 	// Initialize LTC
 	__disable_irq();
 	cell_asic battMod[NUM_VOLTAGE_BOARDS];
@@ -273,21 +272,29 @@ int main(){
 #endif
 
 #ifdef CURRENT_TEST
+#include "UART.h"
+#include "ADC.h"
 int main(){
 	UART3_Init(9600);
-	Current_Init();
-	Current_UpdateMeasurements();
-	printf("\n\rCurrent Test:\n\r");
-	printf("Is it safe? %d\n\r", Current_IsSafe());
-	printf("Is the battery charging? %d\n\r\n\r", Current_IsCharging());
-	printf("Low Precision: %d\n\r", Current_GetLowPrecReading());
-	printf("High Precision: %d\n\r", Current_GetHighPrecReading());
-	while(1){
-	
+	Current_Init();	// Initialize the driver
+
+	// Loop over the tests
+	while(true) {
+		Current_UpdateMeasurements();	// Get the most recent readings
+
+		printf("\n\r==============================\n\rCurrent Test:\n\r");
+		printf("ADC High: %d\n\r", ADC_ReadHigh());
+		printf("ADC Low: %d\n\r", ADC_ReadLow());
+		printf("Is the battery safe? %d\n\r", Current_IsSafe());
+		printf("Is the battery charging? %d\n\r", Current_IsCharging());
+		printf("High: %d\n\r", Current_GetHighPrecReading());
+		printf("Low: %d\n\r", Current_GetLowPrecReading());
+
+		for(int i = 0; i < 10000000; ++i);
 	}
 }
 #endif
-
+//1.154
 #ifdef TEMPERATURE_TEST
 #include "UART.h"
 #include "LTC2983.h"
@@ -301,7 +308,7 @@ int main(){
 	UART3_Init(9600);
 	printf("I'm alive\n\r");
 	int32_t buffer[20];
-	
+
 	Temperature_Init();
 
 	LTC2983_ReadConversions(buffer, BOARD_CS1, 20);
@@ -331,14 +338,14 @@ int main(){
 int main(){
 	WDTimer_Init();
 	LED_Init();
-	
+
 	if(WDTimer_DidSystemReset() != SAFE){
 		LED_On(WDOG);
 		while(1);
 	}
-	
+
 	WDTimer_Start();
-	
+
 	// reset WDTimer 10 times. With this counter, the watchdog timer should not reset the system shortly after it starts.
 	for(int32_t i = 0; i < 10; i++){
 		for(int32_t j = 0; j < 100000; j++);	// Delay
@@ -346,7 +353,7 @@ int main(){
 		WDTimer_Reset();
 	}
 	while(1){
-		
+
 	}
 }
 #endif
@@ -370,14 +377,14 @@ int SPITestmain(){
 	GPIO_Init(GPIOB, &GPIO_InitStruct);
 	GPIOB->ODR |= GPIO_Pin_6;
 	__enable_irq();
-	
+
 	char str[30] = "Testing\n\r";
 	UART3_Write(str, strlen(str));
 	GPIOB->ODR &= ~GPIO_Pin_6;
 	SPI_Write8((uint8_t *)str, strlen(str));
 	GPIOB->ODR |= GPIO_Pin_6;
 	while(1){
-		
+
 	}
 }
 #endif
@@ -404,7 +411,7 @@ int main(){
 	I2C3_Init();
 	I2C3_WriteMultiple(0xA0, 0xCC, randomData);
 	while(1){
-	
+
 	}
 }
 #endif
@@ -425,17 +432,22 @@ int gyroTestmain(){
 #ifdef ADC_TEST
 //****************************************************************************************
 #include "ADC.h"
-#include <stdio.h>
-#include <UART.h>
-int ADCmain(){
-	char str[50];
-	UART3_Init(9600);
+int main(){
+
 	ADC_InitHilo();
+
+	volatile int result = 0;
+	volatile int delay = 0;
+
 	while(1){
-		//sprintf(str,"%d\n",ADC_ChooseHiLo(ADC_ReadHigh(),ADC_ReadLow()));
-		sprintf(str,"%d\r\n",ADC_Conversion(ADC_ReadLow()));
-		UART3_Write(str,strlen(str));
-	}		
+		result = ADC_ReadHigh();	// PA2
+		delay = 0;
+		result = ADC_ReadLow(); // PA3
+		delay = 0;
+
+		// Delay
+		for(int i = 0; i < 1000; ++i);
+	}
 }
 #endif
 
@@ -461,7 +473,7 @@ void ChargingSoCTest(void) {
 	char str[50];
 	sprintf(str,"Starting SoC Charging Test..");
 	UART3_Write(str, strlen(str));
-	
+
 	fixedPoint_SoC = 0;
 	float_SoC = 0;
 	while(1){
@@ -475,7 +487,7 @@ void DischargingSoCTest(void) {
 	char str[50];
 	sprintf(str,"Starting SoC Discharging Test..");
 	UART3_Write(str, strlen(str));
-	
+
 	fixedPoint_SoC = 10000;
 	float_SoC = 100.00;
 	while(1){
