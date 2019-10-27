@@ -85,6 +85,8 @@ void preliminaryCheck(void){
  */
 void faultCondition(void){
 	Contactor_Off();
+	LED_Off(RUN);
+	
 	while(1){
 		// CAN_SendMessageStatus()
 		if(!Current_IsSafe()){
@@ -93,6 +95,18 @@ void faultCondition(void){
 
 		if(!Voltage_IsSafe()){
 			// Toggle Voltage fault LED
+			switch(Voltage_IsSafe()){
+				case OVERVOLTAGE:
+					LED_On(OVOLT);
+					break;
+				
+				case UNDERVOLTAGE:
+					LED_On(UVOLT);
+					break;
+				
+				default:
+					break;
+			}
 		}
 
 		if(!Temperature_IsSafe(Current_IsCharging())){
@@ -116,7 +130,6 @@ void faultCondition(void){
 //		following:
 //		#define LTC6811_TEST
 #define CURRENT_TEST
-
 
 #ifdef LED_TEST
 #include "LED.h"
@@ -228,26 +241,33 @@ void print_config(cell_asic *bms_ic)
 #include "UART.h"
 
 int main(){
-	UART1_Init(115200);
-	//printf("Are you alive?");
-	while(Voltage_Init()) {
+	UART3_Init(115200);
+	LED_Init();
+	Contactor_Init();
+	
+	// delay for UART to USB IC to bootup
+	for(int i = 0; i < 1000000; i++);
+	
+	while(Voltage_Init() != SUCCESS) {
 		printf("Communication Failed.\n\r");
 	}
 	printf("Writing and Reading to Configuration Register Successful. Initialization Complete\n\r");
-
-	Voltage_UpdateMeasurements();
-	printf("Successfully Updated Voltages.\n\r");
-	printf("\n\rVoltage Test:\n\r");
-	printf("Is it safe? %d\n\r\n\r", Voltage_IsSafe());
-	printf("Voltages of all modules:\n\r");
-	for(int32_t i = 0; i < NUM_BATTERY_MODULES; i++){
-		printf("%d : %f\n\r", i, (float)(Voltage_GetModuleVoltage(i)*0.0001));  // Place decimal point.
-	}
+	
 	while(1){
-//		for(int32_t i = 0; i < NUM_BATTERY_MODULES; i++){
-//			printf("%d : %d\n\r", i, Voltage_GetModuleVoltage(i));
-//		}
+		Voltage_UpdateMeasurements();
+		if(Voltage_IsSafe() != SAFE){
+			break;
+		}
+		
+		Contactor_On();
+		LED_Toggle(RUN);
 	}
+	
+	for(int i = 0; i < NUM_BATTERY_MODULES; i++){
+		printf("Battery module %d voltage is %d \r\n", i, Voltage_GetModuleVoltage(i));
+	}
+	
+	faultCondition();
 }
 #endif
 

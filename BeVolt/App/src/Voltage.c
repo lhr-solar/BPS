@@ -43,12 +43,12 @@ ErrorStatus Voltage_UpdateMeasurements(void){
 	int8_t error = 0;
 	
 	// Start Cell ADC Measurements
-	wakeup_sleep(NUM_VOLTAGE_BOARDS);
+	wakeup_idle(NUM_VOLTAGE_BOARDS);
 	LTC6811_adcv(ADC_CONVERSION_MODE,ADC_DCP,CELL_CH_TO_CONVERT);
-	//conv_time = LTC6811_pollAdc();		 // In case you want to time the length of the conversion time
+	LTC6811_pollAdc();	// In case you want to time the length of the conversion time
 	
 	// Read Cell Voltage Registers
-	wakeup_sleep(NUM_VOLTAGE_BOARDS); // Not sure if wakeup is necessary if you start conversion then read consecutively
+	wakeup_idle(NUM_VOLTAGE_BOARDS); // Not sure if wakeup is necessary if you start conversion then read consecutively
 	error = LTC6811_rdcv(0, NUM_VOLTAGE_BOARDS, Modules); // Set to read back all cell voltage registers
 
 	if(error == 0){
@@ -60,21 +60,29 @@ ErrorStatus Voltage_UpdateMeasurements(void){
 
 /** Voltage_IsSafe
  * Checks if all modules are safe
- * @return SAFE or FAIL
+ * @return SAFE or danger: UNDERVOLTAGE or OVERVOLTAGE
  */
 SafetyStatus Voltage_IsSafe(void){
 	for(int32_t i = 0; i < NUM_BATTERY_MODULES; i++){
 		uint16_t voltage = Modules[i / 12].cells.c_codes[i % 12];
-		if(voltage > MAX_VOLTAGE_LIMIT || voltage < MIN_VOLTAGE_LIMIT){
-			return DANGER;
+		
+		// VOLTAGE_LIMITS are in floating point. The LTC6811 sends the voltage data
+		// as unsigned 16-bit fixed point integers with a resolution of 0.00001
+		if(voltage > MAX_VOLTAGE_LIMIT * LTC6811_SCALING_FACTOR){
+			return OVERVOLTAGE;
+		}
+		
+		else if(voltage < MIN_VOLTAGE_LIMIT * LTC6811_SCALING_FACTOR){
+			return UNDERVOLTAGE;
 		}
 	}
-
-	return DANGER;
+	return SAFE;
 }
 
 /** Voltage_GetModulesInDanger
- * Finds all modules that in danger and stores them into a list
+ * Finds all modules that in danger and stores them into a list.
+ * Each module corresponds to and index of the array. If the element in the
+ * array is 1, then it means that module in the index is in danger.
  * @return pointer to index of modules that are in danger
  */
 uint16_t *Voltage_GetModulesInDanger(void){
