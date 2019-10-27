@@ -8,20 +8,19 @@
 
 #include "stm32f4xx.h"
 
-typedef enum {SAFE = 0, DANGER = 1} SafetyStatus;
-typedef ErrorStatus Status;
+typedef enum {SAFE = 0, DANGER = 1, OVERVOLTAGE = 2, UNDERVOLTAGE = 3} SafetyStatus;
 
 // NUCLEO or custom
 #define NUCLEO		0		// Change 1 if using nucleo, 0 if not
 
 //--------------------------------------------------------------------------------
 // Basic Parameters of BPS layout
-#define NUM_VOLTAGE_BOARDS				1			// Number of Voltage Slave Boards
+#define NUM_VOLTAGE_BOARDS				3			// Number of Voltage Slave Boards
 #define NUM_TEMPERATURE_BOARDS			3			// Number of Temperature Slave Boards
 
 //--------------------------------------------------------------------------------
 // Battery Pack layout
-#define NUM_BATTERY_MODULES				12		// Number of battery modules
+#define NUM_BATTERY_MODULES				31		// Number of battery modules
 #define NUM_TEMPERATURE_SENSORS			62		// Number of temperature sensors
 #define NUM_TEMP_SENSORS_PER_MOD		2		// Number of temperature sensors per battery module
 
@@ -34,6 +33,10 @@ typedef ErrorStatus Status;
 #define MAX_CHARGE_TEMPERATURE_LIMIT	48.00	// Max temperature limit (Celcius)	(actual max: 50C)
 
 #define MAX_CURRENT_LIMIT				100		// Max current limit (Amperes)		(Max continuous discharge is 15A per cell)
+
+//--------------------------------------------------------------------------------
+// Helpers
+#define LTC6811_SCALING_FACTOR		10000
 
 //--------------------------------------------------------------------------------
 // Voltage Board Sensor Configurations
