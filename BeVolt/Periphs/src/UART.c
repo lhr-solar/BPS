@@ -177,4 +177,3 @@ int fgetc(FILE *f){
 	UART3_Read(&letter, 1);
 	return (int)letter;
 }
-

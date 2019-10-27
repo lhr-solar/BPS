@@ -8,11 +8,8 @@
 
 void ADC_InitHilo(void);
 
-uint32_t ADC_ReadHigh(void);
+uint16_t ADC_ReadHigh(void);
 
-uint32_t ADC_ReadLow(void);
-
-uint32_t ADC_Conversion(uint32_t ADC_Reading);
-
+uint16_t ADC_ReadLow(void);
 
 #endif

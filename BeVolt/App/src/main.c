@@ -116,6 +116,10 @@ void faultCondition(void){
 }
 
 
+
+
+
+
 //****************************************************************************************
 // The following code is for testing individual pieces of code.
 //****************************************************************************************
@@ -125,8 +129,7 @@ void faultCondition(void){
 // E.g. If you want to run a LTC6811 test, change "#define CHANGE_THIS_TO_TEST_NAME" to the
 //		following:
 //		#define LTC6811_TEST
-#define VOLTAGE_TEST
-
+#define LED_TEST
 
 
 #ifdef LED_TEST
@@ -327,11 +330,19 @@ int main(){
 #ifdef WATCHDOG_TEST
 int main(){
 	WDTimer_Init();
+	LED_Init();
+	
+	if(WDTimer_DidSystemReset() != SAFE){
+		LED_On(WDOG);
+		while(1);
+	}
+	
 	WDTimer_Start();
 	
 	// reset WDTimer 10 times. With this counter, the watchdog timer should not reset the system shortly after it starts.
 	for(int32_t i = 0; i < 10; i++){
 		for(int32_t j = 0; j < 100000; j++);	// Delay
+		LED_Toggle(RUN);
 		WDTimer_Reset();
 	}
 	while(1){
