@@ -15,8 +15,8 @@ typedef enum {SAFE = 0, DANGER = 1, OVERVOLTAGE = 2, UNDERVOLTAGE = 3} SafetySta
 
 //--------------------------------------------------------------------------------
 // Basic Parameters of BPS layout
-#define NUM_VOLTAGE_BOARDS				3			// Number of Voltage Slave Boards
-#define NUM_TEMPERATURE_BOARDS			3			// Number of Temperature Slave Boards
+#define NUM_VOLTAGE_BOARDS				1			// Number of Voltage Slave Boards
+#define NUM_TEMPERATURE_BOARDS			1			// Number of Temperature Slave Boards
 
 //--------------------------------------------------------------------------------
 // Battery Pack layout

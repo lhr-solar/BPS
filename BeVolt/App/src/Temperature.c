@@ -13,6 +13,9 @@
 #include "config.h"
 #include "LTC6811.h"
 
+extern cell_asic Modules[NUM_VOLTAGE_BOARDS];
+
+
 #define MUX1 0x91
 #define MUX2 0x93 
 #define START_CODE 0x06
@@ -32,30 +35,34 @@ cell_asic TempCell[1];
  * Initializes device drivers including SPI and LTC2983 for Temperature Monitoring
  */
 void Temperature_Init(void){
-	// Initialize CS pins (PC6-8, PB13-15)
-	GPIO_InitTypeDef GPIOB_InitStruct;
-	GPIOB_InitStruct.GPIO_Pin = GPIO_Pin_13 | GPIO_Pin_14 | GPIO_Pin_15;
-	GPIOB_InitStruct.GPIO_Mode = GPIO_Mode_OUT;
-	GPIOB_InitStruct.GPIO_PuPd = GPIO_PuPd_UP;			// Up vs Down
-	GPIOB_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
-	GPIOB_InitStruct.GPIO_OType = GPIO_OType_PP;
-	GPIO_Init(GPIOB, &GPIOB_InitStruct);
-	
-	GPIO_InitTypeDef GPIOC_InitStruct;
-	GPIOC_InitStruct.GPIO_Pin = GPIO_Pin_6 | GPIO_Pin_7 | GPIO_Pin_8;
-	GPIOC_InitStruct.GPIO_Mode = GPIO_Mode_OUT;
-	GPIOC_InitStruct.GPIO_PuPd = GPIO_PuPd_UP;			// Up vs Down
-	GPIOC_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
-	GPIOC_InitStruct.GPIO_OType = GPIO_OType_PP;
-	GPIO_Init(GPIOC, &GPIOC_InitStruct);
-	
-	// Start all temperature CS pins HIGH
-	GPIOB->ODR = GPIOB->ODR | GPIO_Pin_13 | GPIO_Pin_14 | GPIO_Pin_15;
-	GPIOC->ODR = GPIOC->ODR | GPIO_Pin_6 | GPIO_Pin_7 | GPIO_Pin_8;
-	
-	SPI3_Init();
-	
-	LTC2983_Init();
+//	// Initialize CS pins (PC6-8, PB13-15)
+//	GPIO_InitTypeDef GPIOB_InitStruct;
+//	GPIOB_InitStruct.GPIO_Pin = GPIO_Pin_13 | GPIO_Pin_14 | GPIO_Pin_15;
+//	GPIOB_InitStruct.GPIO_Mode = GPIO_Mode_OUT;
+//	GPIOB_InitStruct.GPIO_PuPd = GPIO_PuPd_UP;			// Up vs Down
+//	GPIOB_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
+//	GPIOB_InitStruct.GPIO_OType = GPIO_OType_PP;
+//	GPIO_Init(GPIOB, &GPIOB_InitStruct);
+//	
+//	GPIO_InitTypeDef GPIOC_InitStruct;
+//	GPIOC_InitStruct.GPIO_Pin = GPIO_Pin_6 | GPIO_Pin_7 | GPIO_Pin_8;
+//	GPIOC_InitStruct.GPIO_Mode = GPIO_Mode_OUT;
+//	GPIOC_InitStruct.GPIO_PuPd = GPIO_PuPd_UP;			// Up vs Down
+//	GPIOC_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
+//	GPIOC_InitStruct.GPIO_OType = GPIO_OType_PP;
+//	GPIO_Init(GPIOC, &GPIOC_InitStruct);
+//	
+//	// Start all temperature CS pins HIGH
+//	GPIOB->ODR = GPIOB->ODR | GPIO_Pin_13 | GPIO_Pin_14 | GPIO_Pin_15;
+//	GPIOC->ODR = GPIOC->ODR | GPIO_Pin_6 | GPIO_Pin_7 | GPIO_Pin_8;
+//	
+//	SPI3_Init();
+//	
+//	LTC2983_Init();
+
+
+	//LTC6811_set_cfgr_gpio(
+
 }
 
 /** Temperature_UpdateMeasurements
@@ -67,7 +74,7 @@ void Temperature_Init(void){
  * What are we checking for error exactly?
  */
 
-Status Temperature_UpdateMeasurements(){
+ErrorStatus Temperature_UpdateMeasurements(){
 	for (board b = TEMP_CS1; b < NUM_TEMPERATURE_BOARDS; b++) {
 		LTC2983_StartMeasuringADC(b);
 		LTC2983_ReadConversions((int32_t*) ModuleTemperatures[b], b, NUM_SENSORS_ON_TEMP_BOARD_1);			// Need to change this later once devicer driver changes
@@ -137,17 +144,19 @@ ErrorStatus Temperature_ChannelConfig(uint8_t tempChannel) {
 	return SUCCESS;
 }
 
-ErrorStatus Temperature_ReadADC(uint8_t tempChannel) {
-	// Read adc from GPIO1
-	LTC681x_rdaux(0, 1, TempCell);
-	return SUCCESS;
-}
+//ErrorStatus Temperature_ReadADC(uint8_t tempChannel) {
+//	// Read adc from GPIO1
+//	LTC681x_rdaux(0, 1, TempCell);
+//	return SUCCESS;
+//}
+
+
 /** Temperature_IsSafe
  * Checks if all modules are safe
  * @param 1 if pack is charging, 0 if discharging
  * @return SUCCESS or ERROR
  */
-Status Temperature_IsSafe(uint8_t isCharging){
+ErrorStatus Temperature_IsSafe(uint8_t isCharging){
 	bool dangerFlag = false;
 	int16_t maxCharge = isCharging == 1 ? MAX_CHARGE_TEMPERATURE_LIMIT : MAX_DISCHARGE_TEMPERATURE_LIMIT;
 	
@@ -215,3 +224,22 @@ int16_t Temperature_GetTotalPackAvgTemperature(void){
 	total /= NUM_TEMPERATURE_BOARDS;
 	return total;
 }
+
+
+
+uint16_t Temperature_GetRawADC(uint8_t ADCMode, uint8_t GPIOChannel) {
+	
+	wakeup_sleep(NUM_VOLTAGE_BOARDS);
+
+	LTC6811_adax(ADCMode, GPIOChannel);		// Start ADC conversion
+	LTC6811_pollAdc();
+	for(int i = 0; i < 80000; i++);
+	
+  int8_t error = LTC6811_rdaux(0x00C, 1, Modules); 	
+	
+	return Modules[0].aux.a_codes[0];
+}
+	
+	
+
+

@@ -13,6 +13,7 @@
 #include <stdbool.h>
 #include "LTC2983.h"
 #include "SPI.h"
+#include "Voltage.h"
 #include "config.h"
 
 /** Temperature_Init
@@ -25,14 +26,14 @@ void Temperature_Init(void);
  * @param pointer to new temperature measurements
  * @return SUCCESS or ERROR
  */
-Status Temperature_UpdateMeasurements(void);
+ErrorStatus Temperature_UpdateMeasurements(void);
 
 /** Temperature_IsSafe
  * Checks if all modules are safe
  * @param 1 if pack is charging, 0 if discharging
  * @return SUCCESS or ERROR
  */
-Status Temperature_IsSafe(uint8_t isCharging);
+ErrorStatus Temperature_IsSafe(uint8_t isCharging);
 
 /** Temperature_SetChargeState
  * Lithium Ion Cells have two separate max temperature limits. There is a limit
@@ -64,5 +65,6 @@ int16_t Temperature_GetModuleTemperature(uint16_t moduleIdx);
 int16_t Temperature_GetTotalPackAvgTemperature(void);
 
  
+uint16_t Temperature_GetRawADC(uint8_t ADCMode, uint8_t GPIOChannel); 
  
 #endif

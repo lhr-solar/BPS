@@ -129,7 +129,7 @@ void faultCondition(void){
 // E.g. If you want to run a LTC6811 test, change "#define CHANGE_THIS_TO_TEST_NAME" to the
 //		following:
 //		#define LTC6811_TEST
-#define CURRENT_TEST
+#define VOLTAGE_TEST
 
 #ifdef LED_TEST
 #include "LED.h"
@@ -239,11 +239,12 @@ void print_config(cell_asic *bms_ic)
 
 #ifdef VOLTAGE_TEST
 #include "UART.h"
+#include "Temperature.h"
 
 int main(){
 	UART3_Init(115200);
 	LED_Init();
-	Contactor_Init();
+//	Contactor_Init();
 
 	// delay for UART to USB IC to bootup
 	for(int i = 0; i < 1000000; i++);
@@ -253,21 +254,25 @@ int main(){
 	}
 	printf("Writing and Reading to Configuration Register Successful. Initialization Complete\n\r");
 
-	while(1){
-		Voltage_UpdateMeasurements();
-		if(Voltage_IsSafe() != SAFE){
-			break;
-		}
+//	while(1){
+//		Voltage_UpdateMeasurements();
+//		if(Voltage_IsSafe() != SAFE){
+//			break;
+//		}
 
-		Contactor_On();
-		LED_Toggle(RUN);
-	}
+//		Contactor_On();
+//		LED_Toggle(RUN);
+//	}
+//	
+//	
 
-	for(int i = 0; i < NUM_BATTERY_MODULES; i++){
-		printf("Battery module %d voltage is %d \r\n", i, Voltage_GetModuleVoltage(i));
-	}
+//	for(int i = 0; i < NUM_BATTERY_MODULES; i++){
+//		printf("Battery module %d voltage is %d \r\n", i, Voltage_GetModuleVoltage(i));
+//	}
 
-	faultCondition();
+	printf("ADC Raw Data: %d\n\r", Temperature_GetRawADC(2, 0));	
+	while(1){}
+	//faultCondition();
 }
 #endif
 
@@ -656,4 +661,5 @@ void DischargingSoCTest(void) {
 /** Tests
  * 	TODO: Need to test SetAccumulator, GetPercent and Calibrate on faults
  */
+
 #endif

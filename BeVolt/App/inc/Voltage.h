@@ -8,6 +8,12 @@
 
 #include <stdint.h>
 #include "config.h"
+//#include "LTC6811.h"
+//#include "config.h"
+//#include <stdlib.h>
+
+
+//extern cell_asic Modules[NUM_VOLTAGE_BOARDS];
 
 /** Voltage_Init
  * Initializes all device drivers including LTC6811 and GPIO to begin Voltage Monitoring
