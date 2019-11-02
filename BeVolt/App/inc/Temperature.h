@@ -25,14 +25,14 @@ void Temperature_Init(void);
  * @param pointer to new temperature measurements
  * @return SUCCESS or ERROR
  */
-Status Temperature_UpdateMeasurements(void);
+SafetyStatus Temperature_UpdateMeasurements(void);
 
 /** Temperature_IsSafe
  * Checks if all modules are safe
  * @param 1 if pack is charging, 0 if discharging
  * @return SUCCESS or ERROR
  */
-Status Temperature_IsSafe(uint8_t isCharging);
+SafetyStatus Temperature_IsSafe(uint8_t isCharging);
 
 /** Temperature_SetChargeState
  * Lithium Ion Cells have two separate max temperature limits. There is a limit
