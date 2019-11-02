@@ -51,10 +51,12 @@ void CAN1_Init(void){
   CAN_InitStructure.CAN_Mode = CAN_Mode_Normal;
   CAN_InitStructure.CAN_SJW = CAN_SJW_1tq;
     
-  /* CAN Baudrate = 1 MBps (CAN clocked at 30 MHz) */
-  CAN_InitStructure.CAN_BS1 = CAN_BS1_6tq;
-  CAN_InitStructure.CAN_BS2 = CAN_BS2_8tq;
-  CAN_InitStructure.CAN_Prescaler = 2;
+  /* CAN Baudrate = 125 KBps (CAN clocked at 30 MHz) 
+	 * 1/(prescalar + (prescalar*(BS1+1)) + (prescalar*(BS2+1))) * 30M = CAN Baudrate
+	*/
+  CAN_InitStructure.CAN_BS1 = CAN_BS1_2tq;
+  CAN_InitStructure.CAN_BS2 = CAN_BS2_1tq; 
+  CAN_InitStructure.CAN_Prescaler = 60; 
   CAN_Init(CAN1, &CAN_InitStructure);
 
   /* CAN filter init */
