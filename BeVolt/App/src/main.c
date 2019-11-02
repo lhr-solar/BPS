@@ -476,27 +476,27 @@ void DischargingSoCTest(void) {
 #include "UART.h"
 
 int main(){
-	UART3_Init(115200);
+//	UART1_Init(115200);
 	
-	printf("start\n");
+//	printf("start\n");
 	CAN1_Init();
-	uint8_t data[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+	uint8_t data[8] = {1,1,1,1,1,1,1,1};
 	uint32_t id = CAN_ID_TEST;
 
 	while(1)
 	{
-		printf("start1\n");
+	//	printf("start1\n");
 		uint8_t *RxData = (uint8_t *) malloc(8*sizeof(uint8_t));
 		CAN1_Write(id, data);
 		while(CAN1_Read(RxData) == false)
 		{
 		}
-		printf("CAN RxMessage: ");
+	//	printf("CAN RxMessage: ");
 		for(int i = 0; i < 8; i++)
 		{
-			printf("%d", RxData[i]);
+			//printf("%d", RxData[i]);
 		}
-		printf("\n");
+		//printf("\n");
 		free(RxData);
 	}
 

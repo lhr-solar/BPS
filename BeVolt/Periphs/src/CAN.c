@@ -39,7 +39,7 @@ void CAN1_Init(void){
   RCC_APB1PeriphClockCmd(RCC_APB1Periph_CAN1, ENABLE);
   
   /* CAN register init */
-  CAN_DeInit(CAN1);
+  //CAN_DeInit(CAN1);
 
   /* CAN cell init */
   CAN_InitStructure.CAN_TTCM = DISABLE;
