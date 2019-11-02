@@ -11,6 +11,13 @@
 
 #include "Temperature.h"
 #include "config.h"
+#include "LTC6811.h"
+
+#define MUX1 0x91
+#define MUX2 0x93 
+#define START_CODE 0x06
+#define ACK_CODE 0
+#define NACK_STOP_CODE 0x9
 
 int16_t ModuleTemperatures[NUM_TEMPERATURE_BOARDS][20];	// Each board may not have 20 sensors. Look at config.h for how many sensors
 																												// there are on each board. 20 is just max that the board can handle
@@ -18,6 +25,8 @@ int16_t ModuleTemperatures[NUM_TEMPERATURE_BOARDS][20];	// Each board may not ha
 uint8_t ModuleTempStatus[NUM_TEMPERATURE_BOARDS];				// Used to check and return if a particular module is in danger. 
 
 uint8_t ChargingState;																	// 0 if discharging 1 if charging
+
+cell_asic TempCell[1];
 
 /** Temperature_Init
  * Initializes device drivers including SPI and LTC2983 for Temperature Monitoring
@@ -57,6 +66,7 @@ void Temperature_Init(void){
  * Should there be a isCharging here, constantly checking if temperatures are safe whenever updating measurements?
  * What are we checking for error exactly?
  */
+
 Status Temperature_UpdateMeasurements(){
 	for (board b = TEMP_CS1; b < NUM_TEMPERATURE_BOARDS; b++) {
 		LTC2983_StartMeasuringADC(b);
@@ -66,6 +76,72 @@ Status Temperature_UpdateMeasurements(){
 	return SUCCESS;
 }
 
+/** Temperature_ChannelConfig
+ * Configures which temperature channel you're sampling from
+ * Assumes there are only 2 muxes
+ * @Param channel number
+ * @return SUCCESS or ERROR
+ * CONCERNS: 
+ * Should we have tempChannel be from 1 - 16 or 0-15?
+ */
+
+
+ErrorStatus Temperature_ChannelConfig(uint8_t tempChannel) {
+	cell_asic temp;
+	uint8_t muxAddress;
+	uint8_t otherMux;
+	
+	temp.isospi_reverse = false;
+	
+	if (tempChannel > 7) {
+		muxAddress = MUX2;
+		otherMux = MUX1;
+	}
+	else { 
+		muxAddress = MUX1;	
+		otherMux = MUX2;
+	}
+	
+	// 0110 is start code, must be the 4 msb's then the 4 msb's of the data (addr of mux)
+	// remaind of otherMux, then 0000 for just an acknowledge signal at 9th cycle
+	
+	// First clear the other mux so that it does not interfere
+	// FORMAT: SEND ADDRESS OF MUX FIRST
+	temp.com.tx_data[0] = (START_CODE << 4) + ((otherMux & 0xF0)>>4); 				// 0110 START CODE
+	temp.com.tx_data[1] = ((otherMux & 0x0F) << 4) + ACK_CODE;								// Acknowledge signal at 9th cycle
+	
+	
+	// Sends what channel to open. 4th bit is the enable bit
+	// Turn all channels off 
+	temp.com.tx_data[2] = (START_CODE << 4) + (0);
+	temp.com.tx_data[3] = ((0) << 4) + NACK_STOP_CODE;
+	
+	LTC6811_wrcomm(1, &temp);
+	LTC6811_stcomm();
+	
+
+	// Send Address for a particular mux
+	temp.com.tx_data[0] = (START_CODE << 4) + ((muxAddress & 0xF0)>>4); 				// 0110 START CODE
+	temp.com.tx_data[1] = ((muxAddress & 0x0F) << 4) + ACK_CODE;								// Acknowledge signal at 9th cycle
+	
+	
+	// Sends what channel to open. 8 is the enable bit
+	// 8 + temp_channel
+	temp.com.tx_data[2] = (0x6 << 4) + (0);
+	temp.com.tx_data[3] = ((8 + tempChannel) << 4) + NACK_STOP_CODE;
+	
+	
+	LTC6811_wrcomm(1, &temp);
+	LTC6811_stcomm();
+	
+	return SUCCESS;
+}
+
+ErrorStatus Temperature_ReadADC(uint8_t tempChannel) {
+	// Read adc from GPIO1
+	LTC681x_rdaux(0, 1, TempCell);
+	return SUCCESS;
+}
 /** Temperature_IsSafe
  * Checks if all modules are safe
  * @param 1 if pack is charging, 0 if discharging
@@ -73,23 +149,18 @@ Status Temperature_UpdateMeasurements(){
  */
 Status Temperature_IsSafe(uint8_t isCharging){
 	bool dangerFlag = false;
-	int16_t maxCharge;
-	if (isCharging == 1) {
-		maxCharge = MAX_CHARGE_TEMPERATURE_LIMIT;
-	} else {
-		maxCharge = MAX_DISCHARGE_TEMPERATURE_LIMIT;
-	}
+	int16_t maxCharge = isCharging == 1 ? MAX_CHARGE_TEMPERATURE_LIMIT : MAX_DISCHARGE_TEMPERATURE_LIMIT;
 	
 	for (int i = 0; i < NUM_TEMPERATURE_BOARDS; i++) {
 		for (int j = 0; j < NUM_SENSORS_ON_TEMP_BOARD_1; j++) {
 			if (ModuleTemperatures[i][j] > maxCharge) {
 				ModuleTempStatus[i] = 1;
-				dangerFlag = 1;
+				dangerFlag = true;
 				break;
 			}
 		}
 	}
-	return dangerFlag ? ERROR : SUCCESS;
+	return dangerFlag ? DANGER : SAFE;
 }
 
 /** Temperature_SetChargeState
