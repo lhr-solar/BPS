@@ -13,39 +13,37 @@
 #include "Contactor.h"
 #include "EEPROM.h"
 #include "WDTimer.h"
-
+#include "SoC.h"
+#include "LED.h"
 
 void initialize(void);
 void preliminaryCheck(void);
 void faultCondition(void);
 
-int main2(){
+int mainmain(){
 	__disable_irq();			// Disable all interrupts until initialization is done
 	initialize();					// Initialize codes/pins
 	preliminaryCheck();		// Wait until all boards are powered on
 	__enable_irq();				// Enable interrupts
-	
-	WDTimer_Start();
+
 	while(1){
 		// First update the measurements.
 		Voltage_UpdateMeasurements();
 		Current_UpdateMeasurements();
 		Temperature_UpdateMeasurements();
-		
+
 		// Check if everything is safe
 		if(Current_IsSafe() && Temperature_IsSafe(Current_IsCharging()) && Voltage_IsSafe()){
 			Contactor_On();
 		}else{
 			break;
 		}
-		
+
 		// Update necessary
 		// CAN_SendMessageStatus()	// Most likely need to put this on a timer if sending too frequently
-		//Terminal_CheckInput();
-		
-		WDTimer_Reset();
+
 	}
-	
+
 	// BPS has tripped if this line is reached
 	faultCondition();
 }
@@ -65,8 +63,7 @@ void initialize(void){
 	Contactor_Init();
 	Contactor_Off();
 	EEPROM_Init();
-	// WDTimer_Init();
-	
+
 	Current_Init();
 	Voltage_Init();
 	Temperature_Init();
@@ -78,7 +75,7 @@ void initialize(void){
  * even though everything is safe.
  */
 void preliminaryCheck(void){
-	
+	// Check if Watch dog timer was triggered previously
 }
 
 /** faultCondition
@@ -87,16 +84,31 @@ void preliminaryCheck(void){
  * until complete reboot is done.
  */
 void faultCondition(void){
+	Contactor_Off();
+	LED_Off(RUN);
+
 	while(1){
 		// CAN_SendMessageStatus()
 		if(!Current_IsSafe()){
 			// Toggle Current fault LED
 		}
-		
+
 		if(!Voltage_IsSafe()){
 			// Toggle Voltage fault LED
+			switch(Voltage_IsSafe()){
+				case OVERVOLTAGE:
+					LED_On(OVOLT);
+					break;
+
+				case UNDERVOLTAGE:
+					LED_On(UVOLT);
+					break;
+
+				default:
+					break;
+			}
 		}
-		
+
 		if(!Temperature_IsSafe(Current_IsCharging())){
 			// Toggle Temperature fault LED
 		}
@@ -104,10 +116,14 @@ void faultCondition(void){
 }
 
 
+
+
+
+
 //****************************************************************************************
 // The following code is for testing individual pieces of code.
 //****************************************************************************************
-// If you want to test an individual test, change the #define NAME to what you want to what
+// If you want to test an individual module, change the #define NAME to what you want to
 // to use. This is used mainly to save memory for both the microcontroller and Keil.
 // Keil has a limit of how much memory you can compile.
 // E.g. If you want to run a LTC6811 test, change "#define CHANGE_THIS_TO_TEST_NAME" to the
@@ -127,7 +143,9 @@ int main(){
 	while(1){
 		LED_Toggle(FAULT);
 		LEDdelay(100000);
-		LED_On(UVOLT);
+		LED_Toggle(RUN);
+		LEDdelay(100000);
+		LED_Toggle(UVOLT);
 		LEDdelay(100000);
 		LED_Toggle(OVOLT);
 		LEDdelay(100000);
@@ -156,7 +174,7 @@ void print_config(cell_asic *bms_ic);
 int main(){
 	// Local var
 	int8_t error = 0;
-	
+
 	// Initialize LTC
 	__disable_irq();
 	cell_asic battMod[NUM_VOLTAGE_BOARDS];
@@ -224,76 +242,81 @@ void print_config(cell_asic *bms_ic)
 #include "UART.h"
 
 int main(){
-	UART1_Init(115200);
-	//printf("Are you alive?");
-	while(Voltage_Init()) {
+	UART3_Init(115200);
+	LED_Init();
+	Contactor_Init();
+
+	// delay for UART to USB IC to bootup
+	for(int i = 0; i < 1000000; i++);
+
+	while(Voltage_Init() != SUCCESS) {
 		printf("Communication Failed.\n\r");
 	}
 	printf("Writing and Reading to Configuration Register Successful. Initialization Complete\n\r");
-	
-	Voltage_UpdateMeasurements();
-	printf("Successfully Updated Voltages.\n\r");
-	printf("\n\rVoltage Test:\n\r");
-	printf("Is it safe? %d\n\r\n\r", Voltage_IsSafe());
-	printf("Voltages of all modules:\n\r");
-	for(int32_t i = 0; i < NUM_BATTERY_MODULES; i++){
-		printf("%d : %f\n\r", i, (float)(Voltage_GetModuleVoltage(i)*0.0001));  // Place decimal point.
-	}
+
 	while(1){
-//		for(int32_t i = 0; i < NUM_BATTERY_MODULES; i++){
-//			printf("%d : %d\n\r", i, Voltage_GetModuleVoltage(i));
-//		}
+		Voltage_UpdateMeasurements();
+		if(Voltage_IsSafe() != SAFE){
+			break;
+		}
+
+		Contactor_On();
+		LED_Toggle(RUN);
 	}
+
+	for(int i = 0; i < NUM_BATTERY_MODULES; i++){
+		printf("Battery module %d voltage is %d \r\n", i, Voltage_GetModuleVoltage(i));
+	}
+
+	faultCondition();
 }
 #endif
 
 #ifdef CURRENT_TEST
+#include "UART.h"
+#include "ADC.h"
 int main(){
 	UART3_Init(9600);
-	Current_Init();
-	Current_UpdateMeasurements();
-	printf("\n\rCurrent Test:\n\r");
-	printf("Is it safe? %d\n\r", Current_IsSafe());
-	printf("Is the battery charging? %d\n\r\n\r", Current_IsCharging());
-	printf("Low Precision: %d\n\r", Current_GetLowPrecReading());
-	printf("High Precision: %d\n\r", Current_GetHighPrecReading());
-	while(1){
-	
+	Current_Init();	// Initialize the driver
+
+	// Loop over the tests
+	while(true) {
+		Current_UpdateMeasurements();	// Get the most recent readings
+
+		printf("\n\r==============================\n\rCurrent Test:\n\r");
+		printf("ADC High: %d\n\r", ADC_ReadHigh());
+		printf("ADC Low: %d\n\r", ADC_ReadLow());
+		printf("Is the battery safe? %d\n\r", Current_IsSafe());
+		printf("Is the battery charging? %d\n\r", Current_IsCharging());
+		printf("High: %d\n\r", Current_GetHighPrecReading());
+		printf("Low: %d\n\r", Current_GetLowPrecReading());
+
+		for(int i = 0; i < 10000000; ++i);
 	}
 }
 #endif
-
+//1.154
 #ifdef TEMPERATURE_TEST
 #include "UART.h"
 #include "LTC2983.h"
+#include "SPI.h"
+#include "stm32f4xx.h"
+
 
 
 
 int main(){
 	UART3_Init(9600);
-			printf("Hello\n\r");
-	for(int i = 0; i < 1000000; i++);
+	printf("I'm alive\n\r");
+	int32_t buffer[20];
+
 	Temperature_Init();
-			printf("Initialization Done\n\r");
-	
-//	GPIOB->ODR &= ~GPIO_Pin_13;
-//	SPI_Write8(0x03);
-//	GPIOB->ODR |= GPIO_Pin_13;
 
-//	//uint8_t buffer[4];	// Size = 4 bytes
-	int32_t temp = 0;
-	//temp = LTC2983_MeasureSingleChannel();
-			printf("ADC Value : %d\n\r", temp);
+	LTC2983_ReadConversions(buffer, BOARD_CS1, 20);
 	while(1){
-		//if(LTC2983_Ready()) {
-			temp = LTC2983_MeasureSingleChannel();
-			//uint32_t temp1 = 0x00000001 &
-		//if(temp & (0x01000000)) {
-			printf("Current Voltage: 0x%x\n\r", temp);
-		//}
-
-		//}
-		//else printf("Please\n\r");
+		int32_t buf[20] = {0};
+		LTC2983_StartMeasuringADC(BOARD_CS1);
+		LTC2983_ReadConversions(buf, BOARD_CS1, 20);
 	}
 }
 #endif
@@ -315,24 +338,23 @@ int main(){
 #ifdef WATCHDOG_TEST
 int main(){
 	WDTimer_Init();
+	LED_Init();
+
+	if(WDTimer_DidSystemReset() != SAFE){
+		LED_On(WDOG);
+		while(1);
+	}
+
 	WDTimer_Start();
-	
+
 	// reset WDTimer 10 times. With this counter, the watchdog timer should not reset the system shortly after it starts.
 	for(int32_t i = 0; i < 10; i++){
 		for(int32_t j = 0; j < 100000; j++);	// Delay
+		LED_Toggle(RUN);
 		WDTimer_Reset();
 	}
 	while(1){
-		
-	}
-}
-#endif
 
-#ifdef SOC_TEST
-int main(){
-	SoC_Init();
-	while(1){
-	
 	}
 }
 #endif
@@ -356,14 +378,14 @@ int SPITestmain(){
 	GPIO_Init(GPIOB, &GPIO_InitStruct);
 	GPIOB->ODR |= GPIO_Pin_6;
 	__enable_irq();
-	
+
 	char str[30] = "Testing\n\r";
 	UART3_Write(str, strlen(str));
 	GPIOB->ODR &= ~GPIO_Pin_6;
 	SPI_Write8((uint8_t *)str, strlen(str));
 	GPIOB->ODR |= GPIO_Pin_6;
 	while(1){
-		
+
 	}
 }
 #endif
@@ -371,10 +393,11 @@ int SPITestmain(){
 #ifdef UART_TEST
 //****************************************************************************************
 // Debug UART Test
+#include "UART.h"
 int main(){
-	UART3_Init(9600);
+	UART3_Init(115200);
 	while(1){
-		printf("Die world\n");
+		printf("Die world\r\n");
 		for(uint32_t i = 0; i < 100000; i++);
 	}
 }
@@ -389,7 +412,7 @@ int main(){
 	I2C3_Init();
 	I2C3_WriteMultiple(0xA0, 0xCC, randomData);
 	while(1){
-	
+
 	}
 }
 #endif
@@ -410,17 +433,22 @@ int gyroTestmain(){
 #ifdef ADC_TEST
 //****************************************************************************************
 #include "ADC.h"
-#include <stdio.h>
-#include <UART.h>
-int ADCmain(){
-	char str[50];
-	UART3_Init(9600);
+int main(){
+
 	ADC_InitHilo();
+
+	volatile int result = 0;
+	volatile int delay = 0;
+
 	while(1){
-		//sprintf(str,"%d\n",ADC_ChooseHiLo(ADC_ReadHigh(),ADC_ReadLow()));
-		sprintf(str,"%d\r\n",ADC_Conversion(ADC_ReadLow()));
-		UART3_Write(str,strlen(str));
-	}		
+		result = ADC_ReadHigh();	// PA2
+		delay = 0;
+		result = ADC_ReadLow(); // PA3
+		delay = 0;
+
+		// Delay
+		for(int i = 0; i < 1000; ++i);
+	}
 }
 #endif
 
@@ -429,19 +457,50 @@ int ADCmain(){
 #include "SOC.h"
 #include <stdio.h>
 #include <UART.h>
-int SOCmain(){
-	char str[50];
+void ChargingSoCTest(void);
+void DischargingSoCTest(void);
+
+extern uint32_t fixedPoint_SoC;
+extern float float_SoC;
+
+int main(){
 	UART3_Init(9600);
 	SoC_Init();
-	sprintf(str,"die world");
+	//ChargingSoCTest();
+	//DischargingSoCTest();
+}
+
+void ChargingSoCTest(void) {
+	char str[50];
+	sprintf(str,"Starting SoC Charging Test..");
 	UART3_Write(str, strlen(str));
+
+	fixedPoint_SoC = 0;
+	float_SoC = 0;
 	while(1){
-		int counter = TIM2->CNT;							//find current value of up counter
-		sprintf(str,"%d\r\n",counter);  
+		SoC_Calculate(500); 									// Charging with 500 mA, should take a while
+		sprintf(str,"SoC: %.2f%%\r\n",float_SoC);
 		UART3_Write(str, strlen(str));
 	}
 }
-	
+
+void DischargingSoCTest(void) {
+	char str[50];
+	sprintf(str,"Starting SoC Discharging Test..");
+	UART3_Write(str, strlen(str));
+
+	fixedPoint_SoC = 10000;
+	float_SoC = 100.00;
+	while(1){
+		SoC_Calculate(-500); 									// Consuming 500 mA, should take a while
+		sprintf(str,"SoC: %.2f%%\r\n",float_SoC);
+		UART3_Write(str, strlen(str));
+	}
+}
+
+/** Tests
+ * 	TODO: Need to test SetAccumulator, GetPercent and Calibrate on faults
+ */
 #endif
 
 #ifdef EEPROM_WRITE_TEST
@@ -455,15 +514,15 @@ int main(){
 	EEPROM_Init();
 	__enable_irq();
 	printf("initialized\n");
-	
+
 	EEPROM_Tester();		//write test codes
 	printf("done");
 	while(1){
 		printf("done\n\r");
 	};		//get stuck in loop
-	
+
 }
-	
+
 #endif
 
 #ifdef EEPROM_READ_TEST
@@ -471,7 +530,7 @@ int main(){
 
 int main(){
 	UART1_Init(115200);
-	
+
 	printf("starting\n\r");
 	__disable_irq();
 	EEPROM_Init();

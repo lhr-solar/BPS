@@ -12,9 +12,9 @@ cell_asic Modules[NUM_VOLTAGE_BOARDS];
 
 /** Voltage_Init
  * Initializes all device drivers including LTC6811 and GPIO to begin Voltage Monitoring
- * @return 0 if successfully stored, 1 if failed and an error occurred
+ * @return SUCCESS or ERROR
  */
-int8_t Voltage_Init(void){
+ErrorStatus Voltage_Init(void){
 	int8_t error = 0;
 	
 	wakeup_sleep(NUM_VOLTAGE_BOARDS);
@@ -27,64 +27,62 @@ int8_t Voltage_Init(void){
 	wakeup_sleep(NUM_VOLTAGE_BOARDS);
 	error = LTC6811_rdcfg(NUM_VOLTAGE_BOARDS, Modules);
 	
-	if(error >= 0) {		// No Error
-		return 0;
-	} else {
-		return 1;		// Failure
+	if(error == 0){
+		return SUCCESS;
+	}else{
+		return ERROR;
 	}
-		
 }
 
-/** updateMeasurements
+/** Voltage_UpdateMeasurements
  * Stores and updates the new measurements received
  * @param pointer to new voltage measurements
- * @return 1 if successfully stored, 0 if failed
+ * @return SUCCESS or ERROR
  */
-uint8_t Voltage_UpdateMeasurements(){
+ErrorStatus Voltage_UpdateMeasurements(void){
 	int8_t error = 0;
 	
 	// Start Cell ADC Measurements
-	wakeup_sleep(NUM_VOLTAGE_BOARDS);
+	wakeup_idle(NUM_VOLTAGE_BOARDS);
 	LTC6811_adcv(ADC_CONVERSION_MODE,ADC_DCP,CELL_CH_TO_CONVERT);
-	//conv_time = LTC6811_pollAdc();		 // In case you want to time the length of the conversion time
+	LTC6811_pollAdc();	// In case you want to time the length of the conversion time
 	
 	// Read Cell Voltage Registers
-	wakeup_sleep(NUM_VOLTAGE_BOARDS); // Not sure if wakeup is necessary if you start conversion then read consecutively
+	wakeup_idle(NUM_VOLTAGE_BOARDS); // Not sure if wakeup is necessary if you start conversion then read consecutively
 	error = LTC6811_rdcv(0, NUM_VOLTAGE_BOARDS, Modules); // Set to read back all cell voltage registers
 
-	if(error >= 0) {
-		return 1;
-	} else {
-		return 0;
+	if(error == 0){
+		return SUCCESS;
+	}else{
+		return ERROR;
 	}
 }
 
 /** Voltage_IsSafe
  * Checks if all modules are safe
- * @return 1 if pack is safe, 0 if in danger
+ * @return SAFE or danger: UNDERVOLTAGE or OVERVOLTAGE
  */
-uint8_t Voltage_IsSafe(void){
+SafetyStatus Voltage_IsSafe(void){
 	for(int32_t i = 0; i < NUM_BATTERY_MODULES; i++){
 		uint16_t voltage = Modules[i / 12].cells.c_codes[i % 12];
-		if(voltage > MAX_VOLTAGE_LIMIT || voltage < MIN_VOLTAGE_LIMIT){
-			return 0;
+		
+		// VOLTAGE_LIMITS are in floating point. The LTC6811 sends the voltage data
+		// as unsigned 16-bit fixed point integers with a resolution of 0.00001
+		if(voltage > MAX_VOLTAGE_LIMIT * LTC6811_SCALING_FACTOR){
+			return OVERVOLTAGE;
+		}
+		
+		else if(voltage < MIN_VOLTAGE_LIMIT * LTC6811_SCALING_FACTOR){
+			return UNDERVOLTAGE;
 		}
 	}
-
-	return 1;
-}
-
-/** Voltage_SetLimits
- * Sets the max and min voltage limit the cells can reach before danger
- * @param max voltage limit
- * @param min voltage limit
- */
-void Voltage_SetLimits(uint16_t ceiling, uint16_t floor){
-	
+	return SAFE;
 }
 
 /** Voltage_GetModulesInDanger
- * Finds all modules that in danger and stores them into a list
+ * Finds all modules that in danger and stores them into a list.
+ * Each module corresponds to and index of the array. If the element in the
+ * array is 1, then it means that module in the index is in danger.
  * @return pointer to index of modules that are in danger
  */
 uint16_t *Voltage_GetModulesInDanger(void){
@@ -102,19 +100,6 @@ uint16_t *Voltage_GetModulesInDanger(void){
 		sum += checks[i];
 	}
 
-	/*
-	// TODO: Figure out if this is bad practice
-	uint16_t endangeredModules[;
-	int j = 0;
-	for(int i = 0; i < sum; ++i){
-		if(checks[i]){
-			endangeredModules[j] = i;
-			++j;
-		}
-	}
-
-	return endangeredModules;
-	*/
 	return checks;
 }
 
