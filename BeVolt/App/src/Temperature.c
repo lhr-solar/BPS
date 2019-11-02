@@ -46,8 +46,8 @@ void Temperature_Init(void){
  * @param pointer to new temperature measurements
  * @return SUCCESS or ERROR
  */
-Status Temperature_UpdateMeasurements(){
-	return ERROR;
+SafetyStatus Temperature_UpdateMeasurements(){
+	return DANGER;
 }
 
 /** Temperature_IsSafe
@@ -55,8 +55,8 @@ Status Temperature_UpdateMeasurements(){
  * @param 1 if pack is charging, 0 if discharging
  * @return SUCCESS or ERROR
  */
-Status Temperature_IsSafe(uint8_t isCharging){
-	return ERROR;
+SafetyStatus Temperature_IsSafe(uint8_t isCharging){
+	return DANGER;
 }
 
 /** Temperature_SetChargeState
