@@ -27,12 +27,19 @@
 #define EEPROM_VOLT_PTR_LOC	    0x1004
 #define EEPROM_CURRENT_PTR_LOC  0x1006
 #define EEPROM_WATCHDOG_PTR_LOC 0x1008
-#define EEPROM_CAN_PTR_LOC		0x100A
+#define EEPROM_CAN_PTR_LOC		  0x100A
 
 /** EEPROM_Init
  * Initializes I2C to communicate with EEPROM (M24128)
  */
 void EEPROM_Init(void);
+
+/** EEPROM_Load
+ * Loads the pointers from memory. Should be done after
+ * initialization and before reading or writing to the
+ * EEPROM.
+ */
+void EEPROM_Load(void);
 
 /** EEPROM_Reset
  * Resets the EEPROM. This will clear all data that has

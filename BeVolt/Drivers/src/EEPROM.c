@@ -33,9 +33,14 @@ static uint16_t faultCodePtr,
  * addresses specified in the EEPROM.
  */
 void EEPROM_Init(void){
+	// Initialize the I2C driver
 	I2C3_Init();
 	
-	// Load the pointers in
+	EEPROM_Load();
+}
+
+void EEPROM_Load(void) {
+	// Load the pointers
 	EEPROM_ReadMultipleBytes(EEPROM_FAULT_PTR_LOC,   2, (uint8_t*)&faultCodePtr);
 	EEPROM_ReadMultipleBytes(EEPROM_TEMP_PTR_LOC,    2, (uint8_t*)&tempFaultPtr);
 	EEPROM_ReadMultipleBytes(EEPROM_VOLT_PTR_LOC,    2, (uint8_t*)&voltFaultPtr);
@@ -50,7 +55,7 @@ void EEPROM_Init(void){
  * This SHOULD NOT be called from EEPROM_Init()
  */
 void EEPROM_Reset(void) {
-	// Reset the error pointers
+	// Reset the error pointers in the EEPROM memory
 	EEPROM_WriteMultipleBytes(EEPROM_FAULT_PTR_LOC,   2, (uint8_t*)&EEPROM_FAULT_CODE_ADDR);
 	EEPROM_WriteMultipleBytes(EEPROM_TEMP_PTR_LOC,    2, (uint8_t*)&EEPROM_TEMP_FAULT);
 	EEPROM_WriteMultipleBytes(EEPROM_VOLT_PTR_LOC,    2, (uint8_t*)&EEPROM_VOLT_FAULT);
@@ -58,8 +63,8 @@ void EEPROM_Reset(void) {
 	EEPROM_WriteMultipleBytes(EEPROM_WATCHDOG_PTR_LOC,2, (uint8_t*)&EEPROM_WWDG_FAULT);
 	EEPROM_WriteMultipleBytes(EEPROM_CAN_PTR_LOC,     2, (uint8_t*)&EEPROM_CAN_FAULT);
 	
-	// Reintialize pointers, etc.
-	EEPROM_Init();
+	// Reintialize pointers in the program, etc.
+	EEPROM_Load();
 	
 	// Reterminate the EEPROM
 	EEPROM_WriteByte(faultCodePtr,    EEPROM_TERMINATOR);
@@ -74,30 +79,40 @@ void EEPROM_Reset(void) {
  * This only logs the data, not the actual error
  */
 void EEPROM_LogData(uint8_t logType, uint8_t data) {
+	// Write the data byte,
+	// Write the terminator byte,
+	// Write the new ptr to memory
+	
 	switch(logType) {
 	case FAULT_HIGH_TEMP: 
 		EEPROM_WriteByte(tempFaultPtr++, data);
-		EEPROM_WriteByte(tempFaultPtr, EEPROM_TERMINATOR);	// TODO: define this so that it's not constant
+		EEPROM_WriteByte(tempFaultPtr, EEPROM_TERMINATOR);
+		EEPROM_WriteByte(EEPROM_TEMP_PTR_LOC, tempFaultPtr);
 		break;
 	case FAULT_HIGH_VOLT:
 		EEPROM_WriteByte(voltFaultPtr++, data);
 		EEPROM_WriteByte(voltFaultPtr, EEPROM_TERMINATOR);
+		EEPROM_WriteByte(EEPROM_VOLT_PTR_LOC, voltFaultPtr);
 		break;
 	case FAULT_LOW_VOLT:
 		EEPROM_WriteByte(voltFaultPtr++, data);
 		EEPROM_WriteByte(voltFaultPtr, EEPROM_TERMINATOR);
+		EEPROM_WriteByte(EEPROM_VOLT_PTR_LOC, voltFaultPtr);
 		break;
 	case FAULT_HIGH_CURRENT:
 		EEPROM_WriteByte(currentFaultPtr++, data);
 		EEPROM_WriteByte(currentFaultPtr, EEPROM_TERMINATOR);
+		EEPROM_WriteByte(EEPROM_CURRENT_PTR_LOC, currentFaultPtr);
 		break;
 	case FAULT_WATCHDOG:
 		EEPROM_WriteByte(watchdogFaultPtr++, data);
 		EEPROM_WriteByte(watchdogFaultPtr, EEPROM_TERMINATOR);
+		EEPROM_WriteByte(EEPROM_WATCHDOG_PTR_LOC, watchdogFaultPtr);
 		break;
 	case FAULT_CAN_BUS:
 		EEPROM_WriteByte(canFaultPtr++, data);
 		EEPROM_WriteByte(canFaultPtr, EEPROM_TERMINATOR);
+		EEPROM_WriteByte(EEPROM_CAN_PTR_LOC, canFaultPtr);
 		break;
 	}
 }
@@ -108,16 +123,17 @@ void EEPROM_LogData(uint8_t logType, uint8_t data) {
  * data is additional information to be used; if this data is 0,
  *		nothing will be logged.
  */
-void EEPROM_LogError(uint8_t logType){
-	//initialize pointers to data in EEPROM
-	// TODO: this should be stored in the EEPROM to preserve address upon reboot
-	static uint16_t faultCodePtr = EEPROM_FAULT_CODE_ADDR;
-	
+void EEPROM_LogError(uint8_t logType){	
 	if (faultCodePtr < (EEPROM_TEMP_FAULT - 1)) {		//only store errors if there have been less than 256 faults (so buffers don't overflow)
 		// log the data
 		EEPROM_WriteByte(faultCodePtr, logType);
+		
+		// Increment the ptr and write the terminator byte
 		faultCodePtr++;
 		EEPROM_WriteByte(faultCodePtr, EEPROM_TERMINATOR);
+		
+		// Update the pointer in the EEPROM for future boots
+		EEPROM_WriteByte(EEPROM_FAULT_PTR_LOC, faultCodePtr);
 	}
 }
 
@@ -139,7 +155,7 @@ void EEPROM_SerialPrintData(void){
 				printf("fault, high temperature\n\rmodules in danger: ");
 				data_ptr = EEPROM_TEMP_FAULT;
 			  data = EEPROM_ReadByte(data_ptr);
-				while (data != 0xfe) {
+				while (data != EEPROM_TERMINATOR) {
 					printf("%d, ", data);
 					//read next module in danger
 					data_ptr++;
@@ -191,6 +207,7 @@ void EEPROM_SerialPrintData(void){
 
 /** EEPROM_Tester
  * sends fake error messages to test EEPROM
+* TODO: we don't need a tester function in the drive rmodule itself
 */
 void EEPROM_Tester(void){
 	//fake error messages
@@ -223,7 +240,6 @@ void EEPROM_Tester(void){
  */
 void EEPROM_WriteByte(uint16_t address, uint8_t data){
 	I2C3_Write(EEPROM_ADDRESS, address, data);
-	printf("writing: %d to %x\n\r", data, address);
 	for(uint32_t delay = 0; delay < 50000; delay++){};
 }
 

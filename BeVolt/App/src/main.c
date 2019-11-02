@@ -113,7 +113,7 @@ void faultCondition(void){
 // E.g. If you want to run a LTC6811 test, change "#define CHANGE_THIS_TO_TEST_NAME" to the
 //		following:
 //		#define LTC6811_TEST
-#define EEPROM_READ_TEST
+#define EEPROM_RESET
 
 
 #ifdef LED_TEST
@@ -471,6 +471,7 @@ int main(){
 
 int main(){
 	UART1_Init(115200);
+	
 	printf("starting\n\r");
 	__disable_irq();
 	EEPROM_Init();
@@ -481,6 +482,26 @@ int main(){
 	EEPROM_SerialPrintData();
 	printf("done\n\r");
 	while(1){};
+}
+
+#endif
+
+#ifdef EEPROM_RESET
+#include "UART.h"
+
+int main() {
+	UART1_Init(115200);
+
+	printf("Starting reset\n\r");
+	__disable_irq();
+	EEPROM_Init();
+	__enable_irq();
+	printf("Initialized\n\r");
+	//EEPROM_Load();
+	//printf("Loaded\n\r");
+	EEPROM_Reset();
+	printf("EEPROM has been reset\n\r");\
+	while(1);
 }
 
 #endif
