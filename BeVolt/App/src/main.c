@@ -131,6 +131,7 @@ void faultCondition(void){
 //		#define LTC6811_TEST
 #define VOLTAGE_TEST
 
+
 #ifdef LED_TEST
 #include "LED.h"
 void LEDdelay(int time){
@@ -321,6 +322,7 @@ extern int16_t ModuleTemperatures[NUM_TEMPERATURE_BOARDS][20];
 int main(){
 	UART3_Init(9600);
 	printf("I'm alive\n\r");
+<<<<<<< HEAD
 
 	Temperature_Init();
 //	individualSensorDumpTest();
@@ -477,6 +479,27 @@ void checkModuleTemperatureTest(void) {
 				}
 			}
 		}
+/*
+	int32_t buffer[12];
+	
+	Temperature_Init();
+	printf("Activated\n\r");
+
+	LTC2983_ReadConversions(buffer, TEMP_CS1, 1);
+	while(1){
+		int32_t buf[12] = {0};
+		LTC2983_StartMeasuringADC(TEMP_CS1);
+		
+		LTC2983_ReadConversions(buf, TEMP_CS1, 1);
+					printf("\n\r");
+		//for(int i = 0; i < 12; i++) {
+		int i = 0;
+			LTC2983_ConversionValidity((uint8_t)(buf[i] >> 24));
+			
+			printf("Channel %d: %f\n\r", i+1, ((float)(buf[i] & 0x007FFFFF) /2097152));
+		//}
+		for(int i = 0; i < 10000000; i++);
+*/
 	}
 }
 #endif

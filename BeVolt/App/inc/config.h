@@ -49,7 +49,7 @@ typedef enum {SAFE = 0, DANGER = 1, OVERVOLTAGE = 2, UNDERVOLTAGE = 3} SafetySta
 //--------------------------------------------------------------------------------
 // Temperature Board Sensor Configurations
 // Define how many temperature sensors are connected to each board
-#define NUM_SENSORS_ON_TEMP_BOARD_1		20		// Number of temperature channels used in board 1 (20 channels max)
+#define NUM_SENSORS_ON_TEMP_BOARD_1		1		// Number of temperature channels used in board 1 (20 channels max)
 #define NUM_SENSORS_ON_TEMP_BOARD_2		20		// Number of temperature channels used in board 2 (20 channels max)
 #define NUM_SENSORS_ON_TEMP_BOARD_3		20		// Number of temperature channels used in board 3 (20 channels max)
 #define NUM_SENSORS_ON_TEMP_BOARD_4		20		// Number of temperature channels used in board 4 (20 channels max)
