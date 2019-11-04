@@ -86,7 +86,7 @@ void preliminaryCheck(void){
 void faultCondition(void){
 	Contactor_Off();
 	LED_Off(RUN);
-	
+
 	while(1){
 		// CAN_SendMessageStatus()
 		if(!Current_IsSafe()){
@@ -99,11 +99,11 @@ void faultCondition(void){
 				case OVERVOLTAGE:
 					LED_On(OVOLT);
 					break;
-				
+
 				case UNDERVOLTAGE:
 					LED_On(UVOLT);
 					break;
-				
+
 				default:
 					break;
 			}
@@ -129,7 +129,8 @@ void faultCondition(void){
 // E.g. If you want to run a LTC6811 test, change "#define CHANGE_THIS_TO_TEST_NAME" to the
 //		following:
 //		#define LTC6811_TEST
-#define CURRENT_TEST
+#define EEPROM_RESET
+
 
 #ifdef LED_TEST
 #include "LED.h"
@@ -244,29 +245,29 @@ int main(){
 	UART3_Init(115200);
 	LED_Init();
 	Contactor_Init();
-	
+
 	// delay for UART to USB IC to bootup
 	for(int i = 0; i < 1000000; i++);
-	
+
 	while(Voltage_Init() != SUCCESS) {
 		printf("Communication Failed.\n\r");
 	}
 	printf("Writing and Reading to Configuration Register Successful. Initialization Complete\n\r");
-	
+
 	while(1){
 		Voltage_UpdateMeasurements();
 		if(Voltage_IsSafe() != SAFE){
 			break;
 		}
-		
+
 		Contactor_On();
 		LED_Toggle(RUN);
 	}
-	
+
 	for(int i = 0; i < NUM_BATTERY_MODULES; i++){
 		printf("Battery module %d voltage is %d \r\n", i, Voltage_GetModuleVoltage(i));
 	}
-	
+
 	faultCondition();
 }
 #endif
@@ -500,4 +501,66 @@ void DischargingSoCTest(void) {
 /** Tests
  * 	TODO: Need to test SetAccumulator, GetPercent and Calibrate on faults
  */
+#endif
+
+#ifdef EEPROM_WRITE_TEST
+//******************************************************************************************
+#include "UART.h"
+
+int main(){
+	//initialize stuff
+	UART3_Init(115200);
+	__disable_irq();
+	EEPROM_Init();
+	__enable_irq();
+	printf("initialized\n");
+
+	EEPROM_Tester();		//write test codes
+	printf("done");
+	while(1){
+		printf("done\n\r");
+	};		//get stuck in loop
+
+}
+
+#endif
+
+#ifdef EEPROM_READ_TEST
+#include "UART.h"
+
+int main(){
+	UART1_Init(115200);
+
+	printf("starting\n\r");
+	__disable_irq();
+	EEPROM_Init();
+	__enable_irq();
+	printf("initialized\n\r");
+	EEPROM_Tester();
+	printf("written\n\r");
+	EEPROM_SerialPrintData();
+	printf("done\n\r");
+	while(1){};
+}
+
+#endif
+
+#ifdef EEPROM_RESET
+#include "UART.h"
+
+int main() {
+	UART1_Init(115200);
+
+	printf("Starting reset\n\r");
+	__disable_irq();
+	EEPROM_Init();
+	__enable_irq();
+	printf("Initialized\n\r");
+	//EEPROM_Load();
+	//printf("Loaded\n\r");
+	EEPROM_Reset();
+	printf("EEPROM has been reset\n\r");\
+	while(1);
+}
+
 #endif

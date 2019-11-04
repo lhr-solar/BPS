@@ -12,7 +12,7 @@
  *		tx : PB10
  *		rx : PC5
  */
- 
+
 #include <stdint.h>
 #include <stdio.h>
 #include "stm32f4xx.h"
@@ -36,7 +36,7 @@ void copyHardwareToSoftware(void);
 // Public Function Definitions
 /** UART1_Init
  * Initializes UART1 Module
- * Pins: 
+ * Pins:
  *		tx : PA9
  *		rx : PA10
  * @param baud rate: 9600, 115200, 500000
@@ -45,11 +45,11 @@ void UART1_Init(uint32_t baud){
 	GPIO_InitTypeDef GPIO_InitStruct;
 	USART_InitTypeDef USART_InitStruct;
 	//NVIC_InitTypeDef NVIC_InitStruct;
-	
+
 	// Initialize clocks
 	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_USART1, ENABLE);
-	
+
 	// Initialize PA9 and PA10
 	GPIO_InitStruct.GPIO_Pin = GPIO_Pin_9 | GPIO_Pin_10;
 	GPIO_InitStruct.GPIO_Mode = GPIO_Mode_AF;
@@ -59,7 +59,7 @@ void UART1_Init(uint32_t baud){
 	GPIO_Init(GPIOA, &GPIO_InitStruct);
 	GPIO_PinAFConfig(GPIOA, GPIO_PinSource9, GPIO_AF_USART1);
 	GPIO_PinAFConfig(GPIOA, GPIO_PinSource10, GPIO_AF_USART1);
-	
+
 	// Initialize USART1
 	USART_InitStruct.USART_BaudRate = baud;
 	USART_InitStruct.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;
@@ -96,7 +96,7 @@ void UART1_Read(char *rxBuf, uint32_t rxSize){
 
 /** UART3_Init
  * Initializes UART1 Module
- * Pins: 
+ * Pins:
  *		tx : PB10
  *		rx : PC5
  * @param baud rate: 9600, 115200, 500000
@@ -104,12 +104,12 @@ void UART1_Read(char *rxBuf, uint32_t rxSize){
 void UART3_Init(uint32_t baud){
 	GPIO_InitTypeDef GPIO_InitStruct;
 	USART_InitTypeDef USART_InitStruct;
-	
+
 	// Initialize clocks
 	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
 	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC, ENABLE);
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART3, ENABLE);
-	
+
 	// Initialize PB10 and PC5
 	GPIO_InitStruct.GPIO_Pin = GPIO_Pin_10;
 	GPIO_InitStruct.GPIO_Mode = GPIO_Mode_AF;
@@ -121,7 +121,7 @@ void UART3_Init(uint32_t baud){
 	GPIO_Init(GPIOC, &GPIO_InitStruct);
 	GPIO_PinAFConfig(GPIOB, GPIO_PinSource10, GPIO_AF_USART3);
 	GPIO_PinAFConfig(GPIOC, GPIO_PinSource5, GPIO_AF_USART3);
-	
+
 	// Initialize USART3
 	USART_InitStruct.USART_BaudRate = baud;
 	USART_InitStruct.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;
