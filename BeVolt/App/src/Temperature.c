@@ -22,47 +22,32 @@ extern cell_asic Modules[NUM_VOLTAGE_BOARDS];
 #define ACK_CODE 0
 #define NACK_STOP_CODE 0x9
 
-int16_t ModuleTemperatures[NUM_TEMPERATURE_BOARDS][20];	// Each board may not have 20 sensors. Look at config.h for how many sensors
+int16_t ModuleTemperatures[NUM_MINIONS][NUM_TEMP_SENSORS_ON_MINION];	// Each board may not have 20 sensors. Look at config.h for how many sensors
 																												// there are on each board. 20 is just max that the board can handle
 
-uint8_t ModuleTempStatus[NUM_TEMPERATURE_BOARDS];				// Used to check and return if a particular module is in danger. 
+uint8_t ModuleTempStatus[NUM_MINIONS];				// Used to check and return if a particular module is in danger. 
 
 uint8_t ChargingState;																	// 0 if discharging 1 if charging
 
-cell_asic TempCell[1];
+cell_asic TemperatureModule[NUM_MINIONS];
 
 /** Temperature_Init
  * Initializes device drivers including SPI and LTC2983 for Temperature Monitoring
  */
-void Temperature_Init(void){
-//	// Initialize CS pins (PC6-8, PB13-15)
-//	GPIO_InitTypeDef GPIOB_InitStruct;
-//	GPIOB_InitStruct.GPIO_Pin = GPIO_Pin_13 | GPIO_Pin_14 | GPIO_Pin_15;
-//	GPIOB_InitStruct.GPIO_Mode = GPIO_Mode_OUT;
-//	GPIOB_InitStruct.GPIO_PuPd = GPIO_PuPd_UP;			// Up vs Down
-//	GPIOB_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
-//	GPIOB_InitStruct.GPIO_OType = GPIO_OType_PP;
-//	GPIO_Init(GPIOB, &GPIOB_InitStruct);
-//	
-//	GPIO_InitTypeDef GPIOC_InitStruct;
-//	GPIOC_InitStruct.GPIO_Pin = GPIO_Pin_6 | GPIO_Pin_7 | GPIO_Pin_8;
-//	GPIOC_InitStruct.GPIO_Mode = GPIO_Mode_OUT;
-//	GPIOC_InitStruct.GPIO_PuPd = GPIO_PuPd_UP;			// Up vs Down
-//	GPIOC_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
-//	GPIOC_InitStruct.GPIO_OType = GPIO_OType_PP;
-//	GPIO_Init(GPIOC, &GPIOC_InitStruct);
-//	
-//	// Start all temperature CS pins HIGH
-//	GPIOB->ODR = GPIOB->ODR | GPIO_Pin_13 | GPIO_Pin_14 | GPIO_Pin_15;
-//	GPIOC->ODR = GPIOC->ODR | GPIO_Pin_6 | GPIO_Pin_7 | GPIO_Pin_8;
-//	
-//	SPI3_Init();
-//	
-//	LTC2983_Init();
+ErrorStatus Temperature_Init(void){
+	int8_t error = 0;
+	
+	wakeup_sleep(NUM_MINIONS);
+	LTC6811_Init(TemperatureModule);
+	
+	// Write Configuration Register
+	LTC6811_wrcfg(NUM_MINIONS, TemperatureModule);
 
-
-	//LTC6811_set_cfgr_gpio(
-
+	// Read Configuration Register
+	wakeup_sleep(NUM_MINIONS);
+	error = LTC6811_rdcfg(NUM_MINIONS, TemperatureModule);
+	
+	return error == 0 ? SUCCESS : ERROR;
 }
 
 /** Temperature_UpdateMeasurements
@@ -89,9 +74,9 @@ ErrorStatus Temperature_UpdateMeasurements(){
  * @Param channel number
  * @return SUCCESS or ERROR
  * CONCERNS: 
- * Should we have tempChannel be from 1 - 16 or 0-15?
- */
+* Should we have tempChannel be from 1 - 16 or 0-15? ANSWER: SHOULD BE 0 INDEX BASED
 
+ */
 
 ErrorStatus Temperature_ChannelConfig(uint8_t tempChannel) {
 	cell_asic temp;
@@ -229,13 +214,14 @@ int16_t Temperature_GetTotalPackAvgTemperature(void){
 
 uint16_t Temperature_GetRawADC(uint8_t ADCMode, uint8_t GPIOChannel) {
 	
-	wakeup_sleep(NUM_VOLTAGE_BOARDS);
+	wakeup_sleep(1);
 
-	LTC6811_adax(ADCMode, GPIOChannel);		// Start ADC conversion
+	LTC6811_adax(MD_422HZ_1KHZ, 2);		// Start ADC conversion
 	LTC6811_pollAdc();
 	for(int i = 0; i < 80000; i++);
 	
-  int8_t error = LTC6811_rdaux(0x00C, 1, Modules); 	
+	wakeup_sleep(1);
+  int8_t error = LTC6811_rdaux(0, 1, Modules); 	
 	
 	return Modules[0].aux.a_codes[0];
 }

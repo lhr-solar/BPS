@@ -19,7 +19,7 @@
 /** Temperature_Init
  * Initializes device drivers including SPI and LTC2983 for Temperature Monitoring
  */
-void Temperature_Init(void);
+ErrorStatus Temperature_Init(void);
 
 /** Temperature_UpdateMeasurements
  * Stores and updates the new measurements received
@@ -33,7 +33,7 @@ ErrorStatus Temperature_UpdateMeasurements(void);
  * @param 1 if pack is charging, 0 if discharging
  * @return SUCCESS or ERROR
  */
-ErrorStatus Temperature_IsSafe(uint8_t isCharging);
+SafetyStatus Temperature_IsSafe(uint8_t isCharging);
 
 /** Temperature_SetChargeState
  * Lithium Ion Cells have two separate max temperature limits. There is a limit

@@ -17,7 +17,7 @@ typedef enum {SAFE = 0, DANGER = 1, OVERVOLTAGE = 2, UNDERVOLTAGE = 3} SafetySta
 // Basic Parameters of BPS layout
 #define NUM_VOLTAGE_BOARDS				1			// Number of Voltage Slave Boards
 #define NUM_TEMPERATURE_BOARDS			1			// Number of Temperature Slave Boards
-
+#define NUM_MINIONS								1 
 //--------------------------------------------------------------------------------
 // Battery Pack layout
 #define NUM_BATTERY_MODULES				31		// Number of battery modules
@@ -55,6 +55,7 @@ typedef enum {SAFE = 0, DANGER = 1, OVERVOLTAGE = 2, UNDERVOLTAGE = 3} SafetySta
 #define NUM_SENSORS_ON_TEMP_BOARD_4		20		// Number of temperature channels used in board 4 (20 channels max)
 #define NUM_SENSORS_ON_TEMP_BOARD_5		20		// Number of temperature channels used in board 5 (20 channels max)
 #define NUM_SENSORS_ON_TEMP_BOARD_6		20		// Number of temperature channels used in board 6 (20 channels max)
+#define NUM_TEMP_SENSORS_ON_MINION 16
 
 typedef enum board {
 	TEMP_CS1,

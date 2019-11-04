@@ -129,7 +129,7 @@ void faultCondition(void){
 // E.g. If you want to run a LTC6811 test, change "#define CHANGE_THIS_TO_TEST_NAME" to the
 //		following:
 //		#define LTC6811_TEST
-#define VOLTAGE_TEST
+#define TEMPERATURE_TEST
 
 
 #ifdef LED_TEST
@@ -271,8 +271,9 @@ int main(){
 //		printf("Battery module %d voltage is %d \r\n", i, Voltage_GetModuleVoltage(i));
 //	}
 
-	printf("ADC Raw Data: %d\n\r", Temperature_GetRawADC(2, 0));	
-	while(1){}
+	while(1){
+		printf("ADC Raw Data: %d\n\r", Temperature_GetRawADC(2, 0));	
+}
 	//faultCondition();
 }
 #endif
@@ -318,7 +319,43 @@ void moduleTemperatureDumpTest(void);
 
 extern int16_t ModuleTemperatures[NUM_TEMPERATURE_BOARDS][20];
 
+#include "UART.h"
+#include "Temperature.h"
 
+int main(){
+	UART3_Init(115200);
+	LED_Init();
+//	Contactor_Init();
+
+	// delay for UART to USB IC to bootup
+	for(int i = 0; i < 1000000; i++);
+
+	while(Voltage_Init() != SUCCESS) {
+		printf("Communication Failed.\n\r");
+	}
+	printf("Writing and Reading to Configuration Register Successful. Initialization Complete\n\r");
+
+//	while(1){
+//		Voltage_UpdateMeasurements();
+//		if(Voltage_IsSafe() != SAFE){
+//			break;
+//		}
+
+//		Contactor_On();
+//		LED_Toggle(RUN);
+//	}
+//	
+//	
+
+//	for(int i = 0; i < NUM_BATTERY_MODULES; i++){
+//		printf("Battery module %d voltage is %d \r\n", i, Voltage_GetModuleVoltage(i));
+//	}
+
+	while(1){
+		printf("ADC Raw Data: %d\n\r", Temperature_GetRawADC(2, 0));	
+	}
+	//faultCondition();
+}
 int main(){
 	UART3_Init(9600);
 	printf("I'm alive\n\r");
