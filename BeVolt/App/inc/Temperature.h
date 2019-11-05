@@ -85,6 +85,6 @@ int16_t Temperature_GetTotalPackAvgTemperature(void);
  * @param sets the sampling rate 
  * @return raw adc value from GPIO1 from one of the 16 temperature sensors
  */
-int32_t Temperature_GetRawADC(uint8_t ADCMode); 
+ErrorStatus Temperature_GetRawADC(uint8_t ADCMode); 
  
 #endif

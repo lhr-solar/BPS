@@ -463,11 +463,6 @@
               <FilePath>.\Drivers\src\LTC681x.c</FilePath>
             </File>
             <File>
-              <FileName>LTC2983.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\Drivers\src\LTC2983.c</FilePath>
-            </File>
-            <File>
               <FileName>LTC6811.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\Drivers\src\LTC6811.c</FilePath>
@@ -486,11 +481,6 @@
               <FileName>LTC681x.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\Drivers\inc\LTC681x.h</FilePath>
-            </File>
-            <File>
-              <FileName>LTC2983.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\Drivers\inc\LTC2983.h</FilePath>
             </File>
             <File>
               <FileName>LTC6811.h</FileName>

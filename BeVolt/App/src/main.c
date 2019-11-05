@@ -46,6 +46,7 @@ int mainmain(){
 
 	// BPS has tripped if this line is reached
 	faultCondition();
+	return 0;
 }
 
 /**
@@ -515,7 +516,7 @@ void dumpRawData(void){
 	printf("Writing and Reading to Configuration Register Successful. Initialization Complete\n\r");
 
 	while(1){
-		printf("ADC Raw Data: %d\n\r", Temperature_GetRawADC(MD_422HZ_1KHZ, AUX_CH_GPIO1));	
+		printf("ADC Raw Data: %d\n\r", Temperature_GetRawADC(MD_422HZ_1KHZ));	
 	}
 }
 #endif
