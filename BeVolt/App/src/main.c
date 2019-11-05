@@ -130,7 +130,7 @@ void faultCondition(void){
 // E.g. If you want to run a LTC6811 test, change "#define CHANGE_THIS_TO_TEST_NAME" to the
 //		following:
 //		#define LTC6811_TEST
-#define TEMPERATURE_TEST
+#define EEPROM_RESET
 
 
 #ifdef LED_TEST
@@ -264,8 +264,6 @@ int main(){
 		Contactor_On();
 		LED_Toggle(RUN);
 	}
-	
-	
 
 	for(int i = 0; i < NUM_BATTERY_MODULES; i++){
 		printf("Battery module %d voltage is %d \r\n", i, Voltage_GetModuleVoltage(i));
@@ -314,7 +312,7 @@ void moduleTemperatureDumpTest(void);
 
 extern int16_t ModuleTemperatures[NUM_TEMPERATURE_BOARDS][20];
 extern cell_asic TemperatureModule[NUM_MINIONS];
-	
+
 #include "UART.h"
 
 
@@ -481,7 +479,7 @@ void checkModuleTemperatureTest(void) {
 		}
 /*
 	int32_t buffer[12];
-	
+
 	Temperature_Init();
 	printf("Activated\n\r");
 
@@ -489,13 +487,13 @@ void checkModuleTemperatureTest(void) {
 	while(1){
 		int32_t buf[12] = {0};
 		LTC2983_StartMeasuringADC(TEMP_CS1);
-		
+
 		LTC2983_ReadConversions(buf, TEMP_CS1, 1);
 					printf("\n\r");
 		//for(int i = 0; i < 12; i++) {
 		int i = 0;
 			LTC2983_ConversionValidity((uint8_t)(buf[i] >> 24));
-			
+
 			printf("Channel %d: %f\n\r", i+1, ((float)(buf[i] & 0x007FFFFF) /2097152));
 		//}
 		for(int i = 0; i < 10000000; i++);
@@ -516,7 +514,7 @@ void dumpRawData(void){
 	printf("Writing and Reading to Configuration Register Successful. Initialization Complete\n\r");
 
 	while(1){
-		printf("ADC Raw Data: %d\n\r", Temperature_GetRawADC(MD_422HZ_1KHZ));	
+		printf("ADC Raw Data: %d\n\r", Temperature_GetRawADC(MD_422HZ_1KHZ));
 	}
 }
 #endif
@@ -701,5 +699,67 @@ void DischargingSoCTest(void) {
 /** Tests
  * 	TODO: Need to test SetAccumulator, GetPercent and Calibrate on faults
  */
+
+#endif
+
+#ifdef EEPROM_WRITE_TEST
+//******************************************************************************************
+#include "UART.h"
+
+int main(){
+	//initialize stuff
+	UART3_Init(115200);
+	__disable_irq();
+	EEPROM_Init();
+	__enable_irq();
+	printf("initialized\n");
+
+	EEPROM_Tester();		//write test codes
+	printf("done");
+	while(1){
+		printf("done\n\r");
+	};		//get stuck in loop
+
+}
+
+#endif
+
+#ifdef EEPROM_READ_TEST
+#include "UART.h"
+
+int main(){
+	UART1_Init(115200);
+
+	printf("starting\n\r");
+	__disable_irq();
+	EEPROM_Init();
+	__enable_irq();
+	printf("initialized\n\r");
+	EEPROM_Tester();
+	printf("written\n\r");
+	EEPROM_SerialPrintData();
+	printf("done\n\r");
+	while(1){};
+}
+
+#endif
+
+#ifdef EEPROM_RESET
+#include "UART.h"
+
+int main() {
+	UART1_Init(115200);
+
+	printf("Starting reset\n\r");
+	__disable_irq();
+	EEPROM_Init();
+	__enable_irq();
+	printf("Initialized\n\r");
+	//EEPROM_Load();
+	//printf("Loaded\n\r");
+	EEPROM_Reset();
+	printf("EEPROM has been reset\n\r");\
+	while(1);
+}
 
 #endif

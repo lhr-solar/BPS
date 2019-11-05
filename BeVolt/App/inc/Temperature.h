@@ -17,7 +17,7 @@
 #include "LTC6811.h"
 
 #define MUX1 0x91
-#define MUX2 0x93 
+#define MUX2 0x93
 #define AUX_I2C_START 0x06
 #define AUX_I2C_ACK 0
 #define AUX_I2C_NACK_STOP 0x9
@@ -34,13 +34,13 @@ ErrorStatus Temperature_Init(void);
  * @return SUCCESS or ERROR
  */
 ErrorStatus Temperature_ChannelConfig(uint8_t tempChannel);
- 
+
 /** Temperature_UpdateMeasurements
  * Stores and updates the new measurements received
  * @param pointer to new temperature measurements
  * @return SUCCESS or ERROR
  */
-ErrorStatus Temperature_UpdateMeasurements(void);
+SafetyStatus Temperature_UpdateMeasurements(void);
 
 /** Temperature_IsSafe
  * Checks if all modules are safe
@@ -68,7 +68,7 @@ uint8_t *Temperature_GetModulesInDanger(void);
 /** Temperature_GetModuleTemperature
  * Gets the temperature of a certain module in the battery pack. Since there
  * are NUM_TEMP_SENSORS_ON_MINION sensors per module, just average all of the sensors
- * for that module so each module only has one temperature reading 
+ * for that module so each module only has one temperature reading
  * @param index of module
  * @return temperature of module at specified index
  */
@@ -82,9 +82,9 @@ int16_t Temperature_GetTotalPackAvgTemperature(void);
 
  /** Temperature_GetRawADC
  * Starts ADC conversion on GPIO1 on LTC6811's auxiliary registers and returns ADC value
- * @param sets the sampling rate 
+ * @param sets the sampling rate
  * @return raw adc value from GPIO1 from one of the 16 temperature sensors
  */
-ErrorStatus Temperature_GetRawADC(uint8_t ADCMode); 
- 
+ErrorStatus Temperature_GetRawADC(uint8_t ADCMode);
+
 #endif
