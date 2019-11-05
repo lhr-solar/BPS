@@ -304,12 +304,10 @@ int main(){
 //1.154
 #ifdef TEMPERATURE_TEST
 #include "UART.h"
-#include "LTC2983.h"
-#include "SPI.h"
-#include "stm32f4xx.h"
+#include "Temperature.h"
 
 // Backspace needs to be fixed for scanf
-
+void dumpRawData(void);
 void checkModuleTemperatureTest(void);
 void checkIndividualSensorTest(void);
 void checkDangerTest(void);
@@ -318,48 +316,15 @@ void individualSensorDumpTest(void);
 void moduleTemperatureDumpTest(void);
 
 extern int16_t ModuleTemperatures[NUM_TEMPERATURE_BOARDS][20];
-
+extern cell_asic TemperatureModule[NUM_MINIONS];
+	
 #include "UART.h"
-#include "Temperature.h"
 
-int main(){
-	UART3_Init(115200);
-	LED_Init();
-//	Contactor_Init();
 
-	// delay for UART to USB IC to bootup
-	for(int i = 0; i < 1000000; i++);
 
-	while(Voltage_Init() != SUCCESS) {
-		printf("Communication Failed.\n\r");
-	}
-	printf("Writing and Reading to Configuration Register Successful. Initialization Complete\n\r");
-
-//	while(1){
-//		Voltage_UpdateMeasurements();
-//		if(Voltage_IsSafe() != SAFE){
-//			break;
-//		}
-
-//		Contactor_On();
-//		LED_Toggle(RUN);
-//	}
-//	
-//	
-
-//	for(int i = 0; i < NUM_BATTERY_MODULES; i++){
-//		printf("Battery module %d voltage is %d \r\n", i, Voltage_GetModuleVoltage(i));
-//	}
-
-	while(1){
-		printf("ADC Raw Data: %d\n\r", Temperature_GetRawADC(2, 0));	
-	}
-	//faultCondition();
-}
 int main(){
 	UART3_Init(9600);
 	printf("I'm alive\n\r");
-<<<<<<< HEAD
 
 	Temperature_Init();
 //	individualSensorDumpTest();
@@ -367,6 +332,7 @@ int main(){
 //	moduleTemperatureDumpTest();
 //	checkModuleTemperatureTest();
 //	checkDangerTest();
+//  dumpRawData();
 	while(1){}
 }
 
@@ -537,6 +503,23 @@ void checkModuleTemperatureTest(void) {
 		//}
 		for(int i = 0; i < 10000000; i++);
 */
+	}
+}
+
+void dumpRawData(void){
+	UART3_Init(115200);
+	LED_Init();
+
+	// delay for UART to USB IC to bootup
+	for(int i = 0; i < 1000000; i++);
+
+	while(Voltage_Init() != SUCCESS) {
+		printf("Communication Failed.\n\r");
+	}
+	printf("Writing and Reading to Configuration Register Successful. Initialization Complete\n\r");
+
+	while(1){
+		printf("ADC Raw Data: %d\n\r", Temperature_GetRawADC(MD_422HZ_1KHZ, AUX_CH_GPIO1));	
 	}
 }
 #endif

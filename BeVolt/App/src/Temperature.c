@@ -10,33 +10,19 @@
 // TODO: How to reset danger flags?
 
 #include "Temperature.h"
-#include "config.h"
-#include "LTC6811.h"
 
-extern cell_asic Modules[NUM_VOLTAGE_BOARDS];
-
-
-#define MUX1 0x91
-#define MUX2 0x93 
-#define START_CODE 0x06
-#define ACK_CODE 0
-#define NACK_STOP_CODE 0x9
-
-int16_t ModuleTemperatures[NUM_MINIONS][NUM_TEMP_SENSORS_ON_MINION];	// Each board may not have 20 sensors. Look at config.h for how many sensors
-																												// there are on each board. 20 is just max that the board can handle
+int16_t ModuleTemperatures[NUM_MINIONS][NUM_TEMP_SENSORS_ON_MINION];	// Holds the temperatures for each sensor on each board 
 
 uint8_t ModuleTempStatus[NUM_MINIONS];				// Used to check and return if a particular module is in danger. 
 
-uint8_t ChargingState;																	// 0 if discharging 1 if charging
+uint8_t ChargingState;							// 0 if discharging 1 if charging
 
-cell_asic TemperatureModule[NUM_MINIONS];
+cell_asic TemperatureModule[NUM_MINIONS];                               // cell for Temperature module. Temporary until refactoring happens with voltage.c
 
 /** Temperature_Init
- * Initializes device drivers including SPI and LTC2983 for Temperature Monitoring
+ * Initializes device drivers including SPI inside LTC6811_init and LTC6811 for Temperature Monitoring
  */
 ErrorStatus Temperature_Init(void){
-	int8_t error = 0;
-	
 	wakeup_sleep(NUM_MINIONS);
 	LTC6811_Init(TemperatureModule);
 	
@@ -45,7 +31,7 @@ ErrorStatus Temperature_Init(void){
 
 	// Read Configuration Register
 	wakeup_sleep(NUM_MINIONS);
-	error = LTC6811_rdcfg(NUM_MINIONS, TemperatureModule);
+	int8_t error = LTC6811_rdcfg(NUM_MINIONS, TemperatureModule);
 	
 	return error == 0 ? SUCCESS : ERROR;
 }
@@ -55,8 +41,8 @@ ErrorStatus Temperature_Init(void){
  * @param pointer to new temperature measurements
  * @return SUCCESS or ERROR
  * CONCERNS: 
- * Should there be a isCharging here, constantly checking if temperatures are safe whenever updating measurements?
  * What are we checking for error exactly?
+ * Will need to modify later for LTC6811 instead of LTC2983
  */
 
 ErrorStatus Temperature_UpdateMeasurements(){
@@ -71,11 +57,12 @@ ErrorStatus Temperature_UpdateMeasurements(){
 /** Temperature_ChannelConfig
  * Configures which temperature channel you're sampling from
  * Assumes there are only 2 muxes
- * @Param channel number
+ * @param channel number
  * @return SUCCESS or ERROR
  * CONCERNS: 
-* Should we have tempChannel be from 1 - 16 or 0-15? ANSWER: SHOULD BE 0 INDEX BASED
-
+ * Should we have tempChannel be from 1 - 16 or 0-15? ANSWER: SHOULD BE 0 INDEX BASED
+ * is cell_asic temp necessary or should we just use the global cell_asic to send data?
+ * For Later: we clear the otherMux every time a channel is switched even on the same mux; Maybe change depending on speed/optimization
  */
 
 ErrorStatus Temperature_ChannelConfig(uint8_t tempChannel) {
@@ -141,7 +128,7 @@ ErrorStatus Temperature_ChannelConfig(uint8_t tempChannel) {
  * @param 1 if pack is charging, 0 if discharging
  * @return SUCCESS or ERROR
  */
-ErrorStatus Temperature_IsSafe(uint8_t isCharging){
+SafetyStatus Temperature_IsSafe(uint8_t isCharging){
 	bool dangerFlag = false;
 	int16_t maxCharge = isCharging == 1 ? MAX_CHARGE_TEMPERATURE_LIMIT : MAX_DISCHARGE_TEMPERATURE_LIMIT;
 	
@@ -213,17 +200,16 @@ int16_t Temperature_GetTotalPackAvgTemperature(void){
 
 
 uint16_t Temperature_GetRawADC(uint8_t ADCMode, uint8_t GPIOChannel) {
-	
-	wakeup_sleep(1);
+//LTC6811_adax(MD_422HZ_1KHZ, 2);		// Start ADC conversion	
+	wakeup_sleep(NUM_MINIONS);
 
-	LTC6811_adax(MD_422HZ_1KHZ, 2);		// Start ADC conversion
+	LTC6811_adax(ADCMode, GPIOChannel);		// Start ADC conversion
 	LTC6811_pollAdc();
-	for(int i = 0; i < 80000; i++);
 	
 	wakeup_sleep(1);
-  int8_t error = LTC6811_rdaux(0, 1, Modules); 	
-	
-	return Modules[0].aux.a_codes[0];
+//        int8_t error = LTC6811_rdaux(0, 1, Modules);   // 0 for read all registers; 1 for 1 IC; Modules to put it in 	
+	int8_t error = LTC6811_rdaux(GPIOChannel, NUM_MINIONS, TemperatureModule);   // 0 for read all registers; 1 for 1 IC; Modules to put it in 	
+	return TemperatureModule[0].aux.a_codes[0];
 }
 	
 	

@@ -11,10 +11,17 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <stdbool.h>
-#include "LTC2983.h"
+#include "LTC2983.h"    			// <-- not using anymore will take out later
 #include "SPI.h"
 #include "Voltage.h"
 #include "config.h"
+#include "LTC6811.h"
+
+#define MUX1 0x91
+#define MUX2 0x93 
+#define START_CODE 0x06
+#define ACK_CODE 0
+#define NACK_STOP_CODE 0x9
 
 /** Temperature_Init
  * Initializes device drivers including SPI and LTC2983 for Temperature Monitoring
