@@ -240,12 +240,11 @@ void print_config(cell_asic *bms_ic)
 
 #ifdef VOLTAGE_TEST
 #include "UART.h"
-#include "Temperature.h"
 
 int main(){
 	UART3_Init(115200);
 	LED_Init();
-//	Contactor_Init();
+	Contactor_Init();
 
 	// delay for UART to USB IC to bootup
 	for(int i = 0; i < 1000000; i++);
@@ -255,26 +254,23 @@ int main(){
 	}
 	printf("Writing and Reading to Configuration Register Successful. Initialization Complete\n\r");
 
-//	while(1){
-//		Voltage_UpdateMeasurements();
-//		if(Voltage_IsSafe() != SAFE){
-//			break;
-//		}
-
-//		Contactor_On();
-//		LED_Toggle(RUN);
-//	}
-//	
-//	
-
-//	for(int i = 0; i < NUM_BATTERY_MODULES; i++){
-//		printf("Battery module %d voltage is %d \r\n", i, Voltage_GetModuleVoltage(i));
-//	}
-
 	while(1){
-		printf("ADC Raw Data: %d\n\r", Temperature_GetRawADC(2, 0));	
-}
-	//faultCondition();
+		Voltage_UpdateMeasurements();
+		if(Voltage_IsSafe() != SAFE){
+			break;
+		}
+
+		Contactor_On();
+		LED_Toggle(RUN);
+	}
+	
+	
+
+	for(int i = 0; i < NUM_BATTERY_MODULES; i++){
+		printf("Battery module %d voltage is %d \r\n", i, Voltage_GetModuleVoltage(i));
+	}
+
+	faultCondition();
 }
 #endif
 
