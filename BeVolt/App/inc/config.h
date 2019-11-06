@@ -2,10 +2,11 @@
  * Config file to hold any aliases/constants referenced by multiple files
  * Not specific to a single board/unit
  */
- 
+
 #ifndef CONFIG_H__
 #define CONFIG_H__
 
+#include <stdint.h>
 #include "stm32f4xx.h"
 
 typedef enum {SAFE = 0, DANGER = 1, OVERVOLTAGE = 2, UNDERVOLTAGE = 3} SafetyStatus;
@@ -16,6 +17,7 @@ typedef enum {SAFE = 0, DANGER = 1, OVERVOLTAGE = 2, UNDERVOLTAGE = 3} SafetySta
 //--------------------------------------------------------------------------------
 // Basic Parameters of BPS layout
 #define NUM_MINIONS						4		// Number of minion boards
+												//
 
 //--------------------------------------------------------------------------------
 // Battery Pack layout
@@ -41,7 +43,7 @@ typedef enum {SAFE = 0, DANGER = 1, OVERVOLTAGE = 2, UNDERVOLTAGE = 3} SafetySta
 //--------------------------------------------------------------------------------
 // Voltage Sensor Configurations
 // Defines how many voltage sensors are connected to each board
-#define MAX_VOLT_SENSORS_PER_MINION_BOARD	12	// LTC6811 can only measure maximum of 12 modules
+#define MAX_VOLT_SENSORS_PER_MINION_BOARD	8	// User defined. The LTC6811 can actually measure 12 modules.
 
 //--------------------------------------------------------------------------------
 // Temperature Sensor Configurations

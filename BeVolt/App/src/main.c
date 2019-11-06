@@ -56,7 +56,7 @@ void initialize(void){
 	EEPROM_Init();
 
 	Current_Init();
-	Voltage_Init();
+	Voltage_Init(Minions);
 	Temperature_Init(Minions);
 }
 
