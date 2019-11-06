@@ -15,7 +15,7 @@
 static int16_t ModuleTemperatures[NUM_MINIONS][MAX_TEMP_SENSORS_PER_MINION_BOARD];
 
 // Used to check and return if a particular module is in danger.
-static uint8_t ModuleTempStatus[NUM_MINIONS];
+static uint8_t ModuleTempStatus[NUM_BATTERY_MODULES];
 
 // 0 if discharging 1 if charging
 static uint8_t ChargingState;
@@ -113,13 +113,15 @@ ErrorStatus Temperature_ChannelConfig(uint8_t tempChannel) {
 
 ErrorStatus Temperature_UpdateMeasurements(){
 	for (int sensorCh = 0; sensorCh < MAX_TEMP_SENSORS_PER_MINION_BOARD; sensorCh++) {
-		Temperature_ChannelConfig(sensorCh);
+		if (ERROR == Temperature_ChannelConfig(sensorCh)) {
+			return ERROR;
+		}
 		Temperature_GetRawADC(MD_422HZ_1KHZ);
 		for(int board = 0; board < NUM_MINIONS; board++) {
 			ModuleTemperatures[board][sensorCh] = Minions[board].aux.a_codes[0]; // update adc value from GPIO1 stored in a_codes[0]
 		}
 	}
-	return SAFE;
+	return SUCCESS;
 }
 
 /** Temperature_IsSafe
@@ -128,19 +130,21 @@ ErrorStatus Temperature_UpdateMeasurements(){
  * @return SUCCESS or ERROR
  */
 SafetyStatus Temperature_IsSafe(uint8_t isCharging){
-	bool dangerFlag = false;
 	int16_t maxCharge = isCharging == 1 ? MAX_CHARGE_TEMPERATURE_LIMIT : MAX_DISCHARGE_TEMPERATURE_LIMIT;
 
-	for (int i = 0; i < NUM_MINIONS; i++) {
+	for (int i = 0; i < NUM_MINIONS-1; i++) {
 		for (int j = 0; j < MAX_TEMP_SENSORS_PER_MINION_BOARD; j++) {
 			if (ModuleTemperatures[i][j] > maxCharge) {
-				ModuleTempStatus[i] = 1;
-				dangerFlag = true;
-				// break;  // should we break immediately or check all the sensors first?
+				return DANGER;
 			}
 		}
 	}
-	return dangerFlag ? DANGER : SAFE;
+	for (int i = 0; i < NUM_TEMPERATURE_SENSORS%MAX_TEMP_SENSORS_PER_MINION_BOARD; i++) {
+		if (ModuleTemperatures[NUM_MINIONS-1][i] > maxCharge) {
+			return DANGER;
+		}
+	}
+	return SAFE;
 }
 
 /** Temperature_SetChargeState
@@ -160,26 +164,38 @@ void Temperature_SetChargeState(uint8_t isCharging){
  * @return pointer to index of modules that are in danger
  */
 uint8_t *Temperature_GetModulesInDanger(void){
-	Temperature_IsSafe(ChargingState);
+	int16_t limit = ChargingState == 1 ? MAX_CHARGE_TEMPERATURE_LIMIT : MAX_DISCHARGE_TEMPERATURE_LIMIT;
+
+	for (int i = 0; i < NUM_MINIONS-1; i++) {
+		for (int j = 0; j < MAX_TEMP_SENSORS_PER_MINION_BOARD; j++) {
+			if (ModuleTemperatures[i][j] > limit) {
+				ModuleTempStatus[i * MAX_TEMP_SENSORS_PER_MINION_BOARD + j] = 1;
+			}
+		}
+	}
+	for (int i = 0; i < NUM_TEMPERATURE_SENSORS%MAX_TEMP_SENSORS_PER_MINION_BOARD; i++) {
+		if (ModuleTemperatures[NUM_MINIONS-1][i] > limit) {
+			ModuleTempStatus[ (NUM_MINIONS-1) * MAX_TEMP_SENSORS_PER_MINION_BOARD + i] = 1;
+		}
+	}
 	return ModuleTempStatus;
 }
 
 /** Temperature_GetModuleTemperature
- * Gets the temperature of a certain module in the battery pack. Since there
- * are NUM_TEMP_SENSORS_ON_MINION sensors per module, just average all of the sensors
- * for that module so each module only has one temperature reading
- * @param index of module
- * @return temperature of module at specified index
+ * Gets the avg temperature of a certain battery module in the battery pack. Since there
+ * are 2 sensors per module, the return value is the average
+ * @precondition: moduleIdx must be < NUM_BATTERY_MODULE
+ * @param index of board (0-indexed based)
+ * @param index of battery (0-indexed based)
+ * @return temperature of the battery module at specified index
  */
-int16_t Temperature_GetModuleTemperature(uint16_t moduleIdx){
-	// assumes if it wants the first board, then moduleIdx = 0;
-	if (moduleIdx >= NUM_MINIONS) return -1;
-
+int16_t Temperature_GetModuleTemperature(uint8_t moduleIdx){
 	int32_t total = 0;
-	for (int i = 0; i < MAX_TEMP_SENSORS_PER_MINION_BOARD; i++) {
-		total += ModuleTemperatures[moduleIdx][i];
-	}
-	total /= MAX_TEMP_SENSORS_PER_MINION_BOARD;
+	uint8_t board = (moduleIdx * 2) / MAX_TEMP_SENSORS_PER_MINION_BOARD;
+	uint8_t sensor = moduleIdx % (MAX_TEMP_SENSORS_PER_MINION_BOARD / 2);
+	total += ModuleTemperatures[board][sensor];
+	total += ModuleTemperatures[board][sensor + MAX_TEMP_SENSORS_PER_MINION_BOARD / 2];
+	total /= 2;
 	return total;
 }
 
@@ -189,11 +205,10 @@ int16_t Temperature_GetModuleTemperature(uint16_t moduleIdx){
  */
 int16_t Temperature_GetTotalPackAvgTemperature(void){
 	int32_t total = 0;
-	for (int i = 0; i < NUM_MINIONS; i++) {
+	for (int i = 0; i < NUM_BATTERY_MODULES; i++) {
 		total += Temperature_GetModuleTemperature(i);
 	}
-	total /= NUM_MINIONS;
-	return total;
+	return total /= NUM_BATTERY_MODULES;
 }
 
 /** Temperature_GetRawADC

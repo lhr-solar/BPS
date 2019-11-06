@@ -67,10 +67,12 @@ uint8_t *Temperature_GetModulesInDanger(void);
  * Gets the temperature of a certain module in the battery pack. Since there
  * are NUM_TEMP_SENSORS_ON_MINION sensors per module, just average all of the sensors
  * for that module so each module only has one temperature reading
+ * @precondition: boardIdx must < NUM_MINONS; sensorIdx must be < MAX_TEMP_SENSORS_PER_MINON_BOARD
  * @param index of module
  * @return temperature of module at specified index
+ * @note make sure there is a temperature sensor connected at that index or else garbage data will be returned
  */
-int16_t Temperature_GetModuleTemperature(uint16_t moduleIdx);
+int16_t Temperature_GetModuleTemperature(uint8_t moduleIdx);
 
 /** Temperature_GetTotalPackAvgTemperature
  * Gets the average temperature of the whole battery pack
