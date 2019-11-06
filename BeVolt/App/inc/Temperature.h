@@ -12,6 +12,7 @@
 #include <stdlib.h>
 #include "config.h"
 #include "LTC6811.h"
+#include <math.h>
 
 #define MUX1 0x91
 #define MUX2 0x93

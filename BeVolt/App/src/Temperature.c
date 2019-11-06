@@ -2,16 +2,9 @@
  * Temperature class that holds all temperature related information of BeVolt's
  * battery pack.
  */
-
-// NOTE: All units are in Celsius
-// TODO: Create more testing cases
-// TODO: Make sure data type is consistent, need to revise if going to Fixed Point w/ .01 resolution
-// TODO: Maybe make temperature boards more clean later on once system is more finalized.
-// TODO: How to reset danger flags?
-
 #include "Temperature.h"
 
-// Holds the fixed point .001 resolution temperatures for each sensor on each board
+// Holds the temperatures in Celsius for each sensor on each board
 static int16_t ModuleTemperatures[NUM_MINIONS][MAX_TEMP_SENSORS_PER_MINION_BOARD];
 
 // Used to check and return if a particular module is in danger.
@@ -49,7 +42,8 @@ ErrorStatus Temperature_Init(cell_asic *boards){
 /** Temperature_ChannelConfig
  * Configures which temperature channel you're sampling from
  * Assumes there are only 2 muxes; 0 index based - 0 is sensor 1
- * @param channel number
+ * @precondition tempChannel should be < MAX_TEMP_SENSORS_PER_MINION_BOARD
+ * @param channel number (0-indexed based)
  * @return SUCCESS or ERROR
  * @note we clear the otherMux every time a channel is switched even on the same mux; Maybe change depending on speed/optimization
  */
@@ -59,7 +53,10 @@ ErrorStatus Temperature_ChannelConfig(uint8_t tempChannel) {
 	uint8_t otherMux;
 
 	temp.isospi_reverse = false;
-
+	
+	// For safety, in case a number >= MAX_TEMP_SENSORS_PER_MINION_BOARD is passed in.
+	tempChannel %= MAX_TEMP_SENSORS_PER_MINION_BOARD;
+	
 	if (tempChannel > 7) {
 		muxAddress = MUX2;
 		otherMux = MUX1;
@@ -103,14 +100,19 @@ ErrorStatus Temperature_ChannelConfig(uint8_t tempChannel) {
 	return SUCCESS;
 }
 
-/** Temperature_UpdateMeasurements
- * Stores and updates the new measurements received
- * @param pointer to new temperature measurements
- * @return SUCCESS or ERROR
- * CONCERNS:
- * What are we checking for error exactly?
+/** convertVoltageToTemperature
+ *	Converts mv to temperature based on the temperature sensor equation
+ * @param mV from ADC
+ * @return temperature in Celsius
  */
+static int16_t convertVoltageToTemperature(double milliVolt){
+	return (13.582 - sqrt((-13.582)*(-13.582) + 4 * 0.00433 * (2230.8 - milliVolt))/ (2.0 * -0.00433)) + 30;
+}
 
+/** Temperature_UpdateMeasurements
+ * Stores and updates the new measurements received on all temperature sensors
+ * @return SUCCESS or ERROR
+ */
 ErrorStatus Temperature_UpdateMeasurements(){
 	for (int sensorCh = 0; sensorCh < MAX_TEMP_SENSORS_PER_MINION_BOARD; sensorCh++) {
 		if (ERROR == Temperature_ChannelConfig(sensorCh)) {
@@ -118,7 +120,9 @@ ErrorStatus Temperature_UpdateMeasurements(){
 		}
 		Temperature_GetRawADC(MD_422HZ_1KHZ);
 		for(int board = 0; board < NUM_MINIONS; board++) {
-			ModuleTemperatures[board][sensorCh] = Minions[board].aux.a_codes[0]; // update adc value from GPIO1 stored in a_codes[0]
+			
+			// update adc value from GPIO1 stored in a_codes[0]; a_codes[0] is fixed point with .0001 resolution
+			ModuleTemperatures[board][sensorCh] = convertVoltageToTemperature(Minions[board].aux.a_codes[0]*0.0001*1000);
 		}
 	}
 	return SUCCESS;
@@ -139,6 +143,8 @@ SafetyStatus Temperature_IsSafe(uint8_t isCharging){
 			}
 		}
 	}
+	
+	// Last battery module will have less temperature sensors so use a separate for loop
 	for (int i = 0; i < NUM_TEMPERATURE_SENSORS%MAX_TEMP_SENSORS_PER_MINION_BOARD; i++) {
 		if (ModuleTemperatures[NUM_MINIONS-1][i] > maxCharge) {
 			return DANGER;
@@ -173,6 +179,8 @@ uint8_t *Temperature_GetModulesInDanger(void){
 			}
 		}
 	}
+	
+	// Last battery module will have less temperature sensors so use a separate for loop
 	for (int i = 0; i < NUM_TEMPERATURE_SENSORS%MAX_TEMP_SENSORS_PER_MINION_BOARD; i++) {
 		if (ModuleTemperatures[NUM_MINIONS-1][i] > limit) {
 			ModuleTempStatus[ (NUM_MINIONS-1) * MAX_TEMP_SENSORS_PER_MINION_BOARD + i] = 1;
@@ -212,9 +220,9 @@ int16_t Temperature_GetTotalPackAvgTemperature(void){
 }
 
 /** Temperature_GetRawADC
- * Starts ADC conversion on GPIO1 on LTC6811's auxiliary registers and returns ADC value
+ * Starts ADC conversion on GPIO1 on LTC6811's auxiliary registers on all boards
  * @param sets the sampling rate
- * @return raw adc value from GPIO1 from one of the 16 temperature sensors
+ * @return SUCCESS or ERROR
  */
 ErrorStatus Temperature_GetRawADC(uint8_t ADCMode) {
 	wakeup_sleep(NUM_MINIONS);
