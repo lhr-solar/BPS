@@ -10,9 +10,6 @@
 
 #include <stdint.h>
 #include <stdlib.h>
-#include <stdbool.h>
-#include "SPI.h"
-#include "Voltage.h"
 #include "config.h"
 #include "LTC6811.h"
 
@@ -24,8 +21,9 @@
 
 /** Temperature_Init
  * Initializes device drivers including SPI inside LTC6811_init and LTC6811 for Temperature Monitoring
+ * @param boards LTC6811 data structure that contains the values of each register
  */
-ErrorStatus Temperature_Init(void);
+ErrorStatus Temperature_Init(cell_asic *boards);
 
 /** Temperature_ChannelConfig
  * Configures which temperature channel you're sampling from
@@ -40,7 +38,7 @@ ErrorStatus Temperature_ChannelConfig(uint8_t tempChannel);
  * @param pointer to new temperature measurements
  * @return SUCCESS or ERROR
  */
-SafetyStatus Temperature_UpdateMeasurements(void);
+ErrorStatus Temperature_UpdateMeasurements(void);
 
 /** Temperature_IsSafe
  * Checks if all modules are safe

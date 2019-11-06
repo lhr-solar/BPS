@@ -423,6 +423,11 @@
               <FilePath>.\App\inc\config.h</FilePath>
             </File>
             <File>
+              <FileName>common.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\App\inc\common.h</FilePath>
+            </File>
+            <File>
               <FileName>Current.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\App\inc\Current.h</FilePath>
@@ -467,6 +472,11 @@
               <FileType>1</FileType>
               <FilePath>.\Drivers\src\LTC6811.c</FilePath>
             </File>
+            <File>
+              <FileName>LED.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Drivers\src\LED.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -487,6 +497,11 @@
               <FileType>5</FileType>
               <FilePath>.\Drivers\inc\LTC6811.h</FilePath>
             </File>
+            <File>
+              <FileName>LED.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Drivers\inc\LED.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -506,11 +521,6 @@
               <FileName>I2C.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\Periphs\src\I2C.c</FilePath>
-            </File>
-            <File>
-              <FileName>LED.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\Periphs\src\LED.c</FilePath>
             </File>
             <File>
               <FileName>SPI.c</FileName>
@@ -551,11 +561,6 @@
               <FileName>I2C.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\Periphs\inc\I2C.h</FilePath>
-            </File>
-            <File>
-              <FileName>LED.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\Periphs\inc\LED.h</FilePath>
             </File>
             <File>
               <FileName>SPI.h</FileName>

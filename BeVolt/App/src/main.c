@@ -2,19 +2,9 @@
  * Program for UTSVT BeVolt's Battery Protection System
  */
 
-#include <stdint.h>
-#include <stdio.h>
-#include <string.h>
-#include "stm32f4xx.h"
-#include "config.h"
-#include "Voltage.h"
-#include "Current.h"
-#include "Temperature.h"
-#include "Contactor.h"
-#include "EEPROM.h"
-#include "WDTimer.h"
-#include "SoC.h"
-#include "LED.h"
+#include "common.h"
+
+cell_asic Minions[NUM_MINIONS];
 
 void initialize(void);
 void preliminaryCheck(void);
@@ -67,7 +57,7 @@ void initialize(void){
 
 	Current_Init();
 	Voltage_Init();
-	Temperature_Init();
+	Temperature_Init(Minions);
 }
 
 /** preliminaryCheck

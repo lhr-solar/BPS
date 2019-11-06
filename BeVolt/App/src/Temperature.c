@@ -11,28 +11,37 @@
 
 #include "Temperature.h"
 
+// Holds the fixed point .001 resolution temperatures for each sensor on each board
+static int16_t ModuleTemperatures[NUM_MINIONS][MAX_TEMP_SENSORS_PER_MINION_BOARD];
 
-int16_t ModuleTemperatures[NUM_MINIONS][NUM_TEMP_SENSORS_ON_MINION];	// Holds the fixed point .001 resolution temperatures for each sensor on each board
+// Used to check and return if a particular module is in danger.
+static uint8_t ModuleTempStatus[NUM_MINIONS];
 
-uint8_t ModuleTempStatus[NUM_MINIONS];				// Used to check and return if a particular module is in danger.
+// 0 if discharging 1 if charging
+static uint8_t ChargingState;
 
-uint8_t ChargingState;							// 0 if discharging 1 if charging
-
-cell_asic TemperatureModule[NUM_MINIONS];                  // cell for Temperature module. Temporary until refactoring happens with voltage.c
+// Interface to communicate with LTC6811 (Register values)
+// Temperature.c uses auxiliary registers to view ADC data and COM register for I2C with LTC1380 MUX
+static cell_asic *Minions;
 
 /** Temperature_Init
  * Initializes device drivers including SPI inside LTC6811_init and LTC6811 for Temperature Monitoring
+ * @param boards LTC6811 data structure that contains the values of each register
  */
-ErrorStatus Temperature_Init(void){
+ErrorStatus Temperature_Init(cell_asic *boards){
+	// Record pointer
+	Minions = boards;
+
+	// Initialize peripherals
 	wakeup_sleep(NUM_MINIONS);
-	LTC6811_Init(TemperatureModule);
+	LTC6811_Init(Minions);
 
 	// Write Configuration Register
-	LTC6811_wrcfg(NUM_MINIONS, TemperatureModule);
+	LTC6811_wrcfg(NUM_MINIONS, Minions);
 
 	// Read Configuration Register
 	wakeup_sleep(NUM_MINIONS);
-	int8_t error = LTC6811_rdcfg(NUM_MINIONS, TemperatureModule);
+	int8_t error = LTC6811_rdcfg(NUM_MINIONS, Minions);
 
 	return error == 0 ? SUCCESS : ERROR;
 }
@@ -42,9 +51,7 @@ ErrorStatus Temperature_Init(void){
  * Assumes there are only 2 muxes; 0 index based - 0 is sensor 1
  * @param channel number
  * @return SUCCESS or ERROR
- * CONCERNS:
- * is cell_asic temp necessary or should we just use the global cell_asic to send data?
- * For Later: we clear the otherMux every time a channel is switched even on the same mux; Maybe change depending on speed/optimization
+ * @note we clear the otherMux every time a channel is switched even on the same mux; Maybe change depending on speed/optimization
  */
 ErrorStatus Temperature_ChannelConfig(uint8_t tempChannel) {
 	cell_asic temp;
@@ -104,12 +111,12 @@ ErrorStatus Temperature_ChannelConfig(uint8_t tempChannel) {
  * What are we checking for error exactly?
  */
 
-SafetyStatus Temperature_UpdateMeasurements(){
-	for (int sensorCh = 0; sensorCh < NUM_TEMP_SENSORS_ON_MINION; sensorCh++) {
+ErrorStatus Temperature_UpdateMeasurements(){
+	for (int sensorCh = 0; sensorCh < MAX_TEMP_SENSORS_PER_MINION_BOARD; sensorCh++) {
 		Temperature_ChannelConfig(sensorCh);
 		Temperature_GetRawADC(MD_422HZ_1KHZ);
 		for(int board = 0; board < NUM_MINIONS; board++) {
-			ModuleTemperatures[board][sensorCh] = TemperatureModule[board].aux.a_codes[0]; // update adc value from GPIO1 stored in a_codes[0]
+			ModuleTemperatures[board][sensorCh] = Minions[board].aux.a_codes[0]; // update adc value from GPIO1 stored in a_codes[0]
 		}
 	}
 	return SAFE;
@@ -125,7 +132,7 @@ SafetyStatus Temperature_IsSafe(uint8_t isCharging){
 	int16_t maxCharge = isCharging == 1 ? MAX_CHARGE_TEMPERATURE_LIMIT : MAX_DISCHARGE_TEMPERATURE_LIMIT;
 
 	for (int i = 0; i < NUM_MINIONS; i++) {
-		for (int j = 0; j < NUM_TEMP_SENSORS_ON_MINION; j++) {
+		for (int j = 0; j < MAX_TEMP_SENSORS_PER_MINION_BOARD; j++) {
 			if (ModuleTemperatures[i][j] > maxCharge) {
 				ModuleTempStatus[i] = 1;
 				dangerFlag = true;
@@ -169,10 +176,10 @@ int16_t Temperature_GetModuleTemperature(uint16_t moduleIdx){
 	if (moduleIdx >= NUM_MINIONS) return -1;
 
 	int32_t total = 0;
-	for (int i = 0; i < NUM_TEMP_SENSORS_ON_MINION; i++) {
+	for (int i = 0; i < MAX_TEMP_SENSORS_PER_MINION_BOARD; i++) {
 		total += ModuleTemperatures[moduleIdx][i];
 	}
-	total /= NUM_TEMP_SENSORS_ON_MINION;
+	total /= MAX_TEMP_SENSORS_PER_MINION_BOARD;
 	return total;
 }
 
@@ -200,6 +207,6 @@ ErrorStatus Temperature_GetRawADC(uint8_t ADCMode) {
 	LTC6811_pollAdc();
 
 	wakeup_sleep(NUM_MINIONS);
-	int8_t error = LTC6811_rdaux(AUX_CH_GPIO1, NUM_MINIONS, TemperatureModule);   // Update TemperatureModule with fresh values
+	int8_t error = LTC6811_rdaux(AUX_CH_GPIO1, NUM_MINIONS, Minions);   // Update Minions with fresh values
 	return error != -1 ? SUCCESS : ERROR;
 }

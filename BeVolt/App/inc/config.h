@@ -15,9 +15,8 @@ typedef enum {SAFE = 0, DANGER = 1, OVERVOLTAGE = 2, UNDERVOLTAGE = 3} SafetySta
 
 //--------------------------------------------------------------------------------
 // Basic Parameters of BPS layout
-#define NUM_VOLTAGE_BOARDS				1			// Number of Voltage Slave Boards
-#define NUM_TEMPERATURE_BOARDS			1			// Number of Temperature Slave Boards
-#define NUM_MINIONS								1 
+#define NUM_MINIONS						4		// Number of minion boards
+
 //--------------------------------------------------------------------------------
 // Battery Pack layout
 #define NUM_BATTERY_MODULES				31		// Number of battery modules
@@ -33,37 +32,28 @@ typedef enum {SAFE = 0, DANGER = 1, OVERVOLTAGE = 2, UNDERVOLTAGE = 3} SafetySta
 #define MAX_CHARGE_TEMPERATURE_LIMIT	48.00	// Max temperature limit (Celcius)	(actual max: 50C)
 
 #define MAX_CURRENT_LIMIT				100		// Max current limit (Amperes)		(Max continuous discharge is 15A per cell)
-#define MAX_HIGH_PRECISION_CURRENT 50	// Max current detectable by the high-precision current sensor
+#define MAX_HIGH_PRECISION_CURRENT 		50		// Max current detectable by the high-precision current sensor
 
 //--------------------------------------------------------------------------------
 // Helpers
-#define LTC6811_SCALING_FACTOR		10000
+#define LTC6811_SCALING_FACTOR			10000
 
 //--------------------------------------------------------------------------------
-// Voltage Board Sensor Configurations
-// Define how many voltage sensors are connected to each board
-#define NUM_SENSORS_ON_VOLT_BOARD_1		12		// Number of voltage sensors used on board 1 (12 channels max)
-#define NUM_SENSORS_ON_VOLT_BOARD_2		12		// Number of voltage sensors used on board 2 (12 channels max)
-#define NUM_SENSORS_ON_VOLT_BOARD_3		7		// Number of voltage sensors used on board 3 (12 channels max)
+// Voltage Sensor Configurations
+// Defines how many voltage sensors are connected to each board
+#define MAX_VOLT_SENSORS_PER_MINION_BOARD	12	// LTC6811 can only measure maximum of 12 modules
+#define NUM_VOLT_SENSORS_ON_MINION_BOARD_1	8	// Number of voltage sensors used on board 1 (12 channels max)
+#define NUM_VOLT_SENSORS_ON_MINION_BOARD_2	8	// Number of voltage sensors used on board 2 (12 channels max)
+#define NUM_VOLT_SENSORS_ON_MINION_BOARD_3	8	// Number of voltage sensors used on board 3 (12 channels max)
+#define NUM_VOLT_SENSORS_ON_MINION_BOARD_4	7	// Number of voltage sensors used on board 4 (12 channels max)
 
 //--------------------------------------------------------------------------------
-// Temperature Board Sensor Configurations
+// Temperature Sensor Configurations
 // Define how many temperature sensors are connected to each board
-#define NUM_SENSORS_ON_TEMP_BOARD_1		1		// Number of temperature channels used in board 1 (20 channels max)
-#define NUM_SENSORS_ON_TEMP_BOARD_2		20		// Number of temperature channels used in board 2 (20 channels max)
-#define NUM_SENSORS_ON_TEMP_BOARD_3		20		// Number of temperature channels used in board 3 (20 channels max)
-#define NUM_SENSORS_ON_TEMP_BOARD_4		20		// Number of temperature channels used in board 4 (20 channels max)
-#define NUM_SENSORS_ON_TEMP_BOARD_5		20		// Number of temperature channels used in board 5 (20 channels max)
-#define NUM_SENSORS_ON_TEMP_BOARD_6		20		// Number of temperature channels used in board 6 (20 channels max)
-#define NUM_TEMP_SENSORS_ON_MINION 16
-
-typedef enum board {
-	TEMP_CS1,
-	TEMP_CS2,
-	TEMP_CS3,
-	TEMP_CS4,
-	TEMP_CS5,
-	TEMP_CS6
-} board;
+#define MAX_TEMP_SENSORS_PER_MINION_BOARD	16
+#define NUM_TEMP_SENSORS_ON_MINION_BOARD_1	16	// Number of voltage sensors used on board 1 (16 channels max)
+#define NUM_TEMP_SENSORS_ON_MINION_BOARD_2	16	// Number of voltage sensors used on board 2 (16 channels max)
+#define NUM_TEMP_SENSORS_ON_MINION_BOARD_3	16	// Number of voltage sensors used on board 3 (16 channels max)
+#define NUM_TEMP_SENSORS_ON_MINION_BOARD_4	14	// Number of voltage sensors used on board 4 (16 channels max)
 
 #endif
