@@ -8,24 +8,28 @@
 #include "config.h"
 #include <stdlib.h>
 
-cell_asic Modules[NUM_VOLTAGE_BOARDS];
+static cell_asic *Minions;
 
 /** Voltage_Init
  * Initializes all device drivers including LTC6811 and GPIO to begin Voltage Monitoring
+ * @param boards LTC6811 data structure that contains the values of each register
  * @return SUCCESS or ERROR
  */
-ErrorStatus Voltage_Init(void){
+ErrorStatus Voltage_Init(cell_asic *boards){
+	// Record pointer
+	Minions = boards;
+
 	int8_t error = 0;
 	
-	wakeup_sleep(NUM_VOLTAGE_BOARDS);
-	LTC6811_Init(Modules);
+	wakeup_sleep(NUM_MINIONS);
+	LTC6811_Init(Minions);
 	
 	// Write Configuration Register
-	LTC6811_wrcfg(NUM_VOLTAGE_BOARDS, Modules);
+	LTC6811_wrcfg(NUM_MINIONS, Minions);
 
 	// Read Configuration Register
-	wakeup_sleep(NUM_VOLTAGE_BOARDS);
-	error = LTC6811_rdcfg(NUM_VOLTAGE_BOARDS, Modules);
+	wakeup_sleep(NUM_MINIONS);
+	error = LTC6811_rdcfg(NUM_MINIONS, Minions);
 	
 	if(error == 0){
 		return SUCCESS;
@@ -43,13 +47,13 @@ ErrorStatus Voltage_UpdateMeasurements(void){
 	int8_t error = 0;
 	
 	// Start Cell ADC Measurements
-	wakeup_idle(NUM_VOLTAGE_BOARDS);
+	wakeup_idle(NUM_MINIONS);
 	LTC6811_adcv(ADC_CONVERSION_MODE,ADC_DCP,CELL_CH_TO_CONVERT);
 	LTC6811_pollAdc();	// In case you want to time the length of the conversion time
 	
 	// Read Cell Voltage Registers
-	wakeup_idle(NUM_VOLTAGE_BOARDS); // Not sure if wakeup is necessary if you start conversion then read consecutively
-	error = LTC6811_rdcv(0, NUM_VOLTAGE_BOARDS, Modules); // Set to read back all cell voltage registers
+	wakeup_idle(NUM_MINIONS); // Not sure if wakeup is necessary if you start conversion then read consecutively
+	error = LTC6811_rdcv(0, NUM_MINIONS, Minions); // Set to read back all cell voltage registers
 
 	if(error == 0){
 		return SUCCESS;
@@ -59,13 +63,13 @@ ErrorStatus Voltage_UpdateMeasurements(void){
 }
 
 /** Voltage_IsSafe
- * Checks if all modules are safe
+ * Checks if all battery modules are safe
  * @return SAFE or danger: UNDERVOLTAGE or OVERVOLTAGE
  */
 SafetyStatus Voltage_IsSafe(void){
-	for(int32_t i = 0; i < NUM_BATTERY_MODULES; i++){
-		uint16_t voltage = Modules[i / 12].cells.c_codes[i % 12];
-		
+	for(int i = 0; i < NUM_BATTERY_MODULES; i++){
+		uint16_t voltage = Voltage_GetModuleVoltage(i);
+			
 		// VOLTAGE_LIMITS are in floating point. The LTC6811 sends the voltage data
 		// as unsigned 16-bit fixed point integers with a resolution of 0.00001
 		if(voltage > MAX_VOLTAGE_LIMIT * LTC6811_SCALING_FACTOR){
@@ -76,6 +80,7 @@ SafetyStatus Voltage_IsSafe(void){
 			return UNDERVOLTAGE;
 		}
 	}
+	
 	return SAFE;
 }
 
@@ -85,44 +90,42 @@ SafetyStatus Voltage_IsSafe(void){
  * array is 1, then it means that module in the index is in danger.
  * @return pointer to index of modules that are in danger
  */
-uint16_t *Voltage_GetModulesInDanger(void){
-	static uint16_t checks[NUM_BATTERY_MODULES];
-	for(int i = 0; i < NUM_BATTERY_MODULES; ++i){
-		if(Voltage_GetModuleVoltage(i) > MAX_VOLTAGE_LIMIT || Voltage_GetModuleVoltage(i) < MIN_VOLTAGE_LIMIT){
+uint8_t *Voltage_GetModulesInDanger(void){
+	static uint8_t checks[NUM_BATTERY_MODULES];
+	
+	for (int i = 0; i < NUM_BATTERY_MODULES; i++) {
+		
+		// Check if battery is in range of voltage limit
+		if (Voltage_GetModuleVoltage(i) > MAX_VOLTAGE_LIMIT || Voltage_GetModuleVoltage(i) < MIN_VOLTAGE_LIMIT) {
 			checks[i] = 1;	// 1 shows that the unit is in danger
-		}else{
+			
+		} else {
 			checks[i] = 0;	// 0 shows that the unit is not in danger
 		}
 	}
-
-	int sum = 0;
-	for(int i = 0; i < NUM_BATTERY_MODULES; ++i){
-		sum += checks[i];
-	}
-
+	
 	return checks;
 }
 
 /** Voltage_GetModuleVoltage
- * Gets the voltage of a certain module in the battery pack
- * @param index of module
+ * Gets the voltage of a certain battery module in the battery pack
+ * @precondition moduleIdx < NUM_BATTERY_SENSORS
+ * @param index of battery (0-indexed)
  * @return voltage of module at specified index
  */
-uint16_t Voltage_GetModuleVoltage(uint16_t moduleIdx){
-	int32_t boardIdx = moduleIdx / 12;
-	return Modules[boardIdx].cells.c_codes[moduleIdx % 12];
+uint16_t Voltage_GetModuleVoltage(uint8_t moduleIdx){
+	return Minions[moduleIdx / MAX_VOLT_SENSORS_PER_MINION_BOARD].cells.c_codes[moduleIdx % MAX_VOLT_SENSORS_PER_MINION_BOARD];
 }
 
 /** Voltage_GetTotalPackVoltage
  * Gets the total voltage of the battery pack
  * @return voltage of whole battery pack
  */
-uint16_t Voltage_GetTotalPackVoltage(void){
+uint32_t Voltage_GetTotalPackVoltage(void){
 	int sum = 0;
-	for(int32_t i = 0; i < NUM_BATTERY_MODULES; i++){
-		sum += Modules[i / 12].cells.c_codes[i % 12];
+	for (int i = 0; i < NUM_BATTERY_MODULES; i++) {
+		sum += Voltage_GetModuleVoltage(i);
 	}
-
 	return sum;
 }
 

@@ -6,6 +6,7 @@
 #ifndef CONFIG_H__
 #define CONFIG_H__
 
+#include <stdint.h>
 #include "stm32f4xx.h"
 
 typedef enum {SAFE = 0, DANGER = 1, OVERVOLTAGE = 2, UNDERVOLTAGE = 3} SafetyStatus;
@@ -16,6 +17,7 @@ typedef enum {SAFE = 0, DANGER = 1, OVERVOLTAGE = 2, UNDERVOLTAGE = 3} SafetySta
 //--------------------------------------------------------------------------------
 // Basic Parameters of BPS layout
 #define NUM_MINIONS						4		// Number of minion boards
+												//
 
 //--------------------------------------------------------------------------------
 // Battery Pack layout
@@ -41,19 +43,11 @@ typedef enum {SAFE = 0, DANGER = 1, OVERVOLTAGE = 2, UNDERVOLTAGE = 3} SafetySta
 //--------------------------------------------------------------------------------
 // Voltage Sensor Configurations
 // Defines how many voltage sensors are connected to each board
-#define MAX_VOLT_SENSORS_PER_MINION_BOARD	12	// LTC6811 can only measure maximum of 12 modules
-#define NUM_VOLT_SENSORS_ON_MINION_BOARD_1	8	// Number of voltage sensors used on board 1 (12 channels max)
-#define NUM_VOLT_SENSORS_ON_MINION_BOARD_2	8	// Number of voltage sensors used on board 2 (12 channels max)
-#define NUM_VOLT_SENSORS_ON_MINION_BOARD_3	8	// Number of voltage sensors used on board 3 (12 channels max)
-#define NUM_VOLT_SENSORS_ON_MINION_BOARD_4	7	// Number of voltage sensors used on board 4 (12 channels max)
+#define MAX_VOLT_SENSORS_PER_MINION_BOARD	8	// User defined. The LTC6811 can actually measure 12 modules.
 
 //--------------------------------------------------------------------------------
 // Temperature Sensor Configurations
 // Define how many temperature sensors are connected to each board
 #define MAX_TEMP_SENSORS_PER_MINION_BOARD	16
-#define NUM_TEMP_SENSORS_ON_MINION_BOARD_1	16	// Number of voltage sensors used on board 1 (16 channels max)
-#define NUM_TEMP_SENSORS_ON_MINION_BOARD_2	16	// Number of voltage sensors used on board 2 (16 channels max)
-#define NUM_TEMP_SENSORS_ON_MINION_BOARD_3	16	// Number of voltage sensors used on board 3 (16 channels max)
-#define NUM_TEMP_SENSORS_ON_MINION_BOARD_4	14	// Number of voltage sensors used on board 4 (16 channels max)
 
 #endif
