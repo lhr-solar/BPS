@@ -336,7 +336,7 @@
             <v6Rtti>0</v6Rtti>
             <VariousControls>
               <MiscControls></MiscControls>
-              <Define>USE_STDPERIPH_DRIVER</Define>
+              <Define>USE_STDPERIPH_DRIVER __FPU_PRESENT</Define>
               <Undefine></Undefine>
               <IncludePath>..\;.\STM32F4xx_StdPeriph_Driver;.\STM32F4xx_StdPeriph_Driver\inc;.\STM32F4xx_StdPeriph_Driver\src;.\CMSIS\Device\ST\STM32F4xx\Include;.\CMSIS;.\CMSIS\Include;.\App;.\App\inc;.\App\src;.\Drivers;.\Drivers\inc;.\Drivers\src;.\Periphs;.\Periphs\inc;.\Periphs\src</IncludePath>
             </VariousControls>

@@ -9,6 +9,7 @@
 #define CURRENT_H__
 
 #include <stdint.h>
+#include "ADC.h"
 #include "config.h"
  
 /** Current_Init

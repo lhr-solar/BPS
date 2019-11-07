@@ -8,11 +8,9 @@
 #ifndef TEMPERATURE_H__
 #define TEMPERATURE_H__
 
-#include <stdint.h>
-#include <stdlib.h>
+#include "common.h"
 #include "config.h"
 #include "LTC6811.h"
-#include <math.h>
 
 #define MUX1 0x91
 #define MUX2 0x93

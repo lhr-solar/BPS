@@ -8,8 +8,6 @@
 // TODO: Think of better naming convention of current
 
 #include "Current.h"
-#include "ADC.h"
-#include "config.h"
 
 int32_t HighPrecisionCurrent;	// Amp measurement of hall effect sensor of high precision
 int32_t LowPrecisionCurrent;	// Amp measurement of hall effect sensor of high precision

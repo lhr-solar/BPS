@@ -3,7 +3,16 @@
  */
 
 #include "common.h"
-
+#include "stm32f4xx.h"
+#include "config.h"
+#include "Voltage.h"
+#include "Current.h"
+#include "Temperature.h"
+#include "Contactor.h"
+#include "EEPROM.h"
+#include "WDTimer.h"
+#include "SoC.h"
+#include "LED.h"
 cell_asic Minions[NUM_MINIONS];
 
 void initialize(void);

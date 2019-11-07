@@ -7,9 +7,6 @@
 // Holds the temperatures in Celsius for each sensor on each board
 static int16_t ModuleTemperatures[NUM_MINIONS][MAX_TEMP_SENSORS_PER_MINION_BOARD];
 
-// Used to check and return if a particular module is in danger.
-static uint8_t ModuleTempStatus[NUM_BATTERY_MODULES];
-
 // 0 if discharging 1 if charging
 static uint8_t ChargingState;
 
@@ -105,7 +102,7 @@ ErrorStatus Temperature_ChannelConfig(uint8_t tempChannel) {
  * @param mV from ADC
  * @return temperature in Celsius
  */
-static int16_t convertVoltageToTemperature(double milliVolt){
+static int16_t milliVoltToCelsius(double milliVolt){
 	return (13.582 - sqrt((-13.582)*(-13.582) + 4 * 0.00433 * (2230.8 - milliVolt))/ (2.0 * -0.00433)) + 30;
 }
 
@@ -121,8 +118,9 @@ ErrorStatus Temperature_UpdateMeasurements(){
 		Temperature_GetRawADC(MD_422HZ_1KHZ);
 		for(int board = 0; board < NUM_MINIONS; board++) {
 			
-			// update adc value from GPIO1 stored in a_codes[0]; a_codes[0] is fixed point with .0001 resolution
-			ModuleTemperatures[board][sensorCh] = convertVoltageToTemperature(Minions[board].aux.a_codes[0]*0.0001*1000);
+			// update adc value from GPIO1 stored in a_codes[0]; 
+			// a_codes[0] is fixed point with .0001 resolution in volts -> multiply by .0001 * 1000 to get mV in double form
+			ModuleTemperatures[board][sensorCh] = milliVoltToCelsius(Minions[board].aux.a_codes[0]*0.01);
 		}
 	}
 	return SUCCESS;
@@ -134,20 +132,14 @@ ErrorStatus Temperature_UpdateMeasurements(){
  * @return SUCCESS or ERROR
  */
 SafetyStatus Temperature_IsSafe(uint8_t isCharging){
-	int16_t maxCharge = isCharging == 1 ? MAX_CHARGE_TEMPERATURE_LIMIT : MAX_DISCHARGE_TEMPERATURE_LIMIT;
+	int16_t temperatureLimit = isCharging == 1 ? MAX_CHARGE_TEMPERATURE_LIMIT : MAX_DISCHARGE_TEMPERATURE_LIMIT;
 
-	for (int i = 0; i < NUM_MINIONS-1; i++) {
+	for (int i = 0; i < NUM_MINIONS; i++) {
 		for (int j = 0; j < MAX_TEMP_SENSORS_PER_MINION_BOARD; j++) {
-			if (ModuleTemperatures[i][j] > maxCharge) {
+			if (i * MAX_TEMP_SENSORS_PER_MINION_BOARD + j >= NUM_TEMPERATURE_SENSORS) break;
+			if (ModuleTemperatures[i][j] > temperatureLimit) {
 				return DANGER;
 			}
-		}
-	}
-	
-	// Last battery module will have less temperature sensors so use a separate for loop
-	for (int i = 0; i < NUM_TEMPERATURE_SENSORS%MAX_TEMP_SENSORS_PER_MINION_BOARD; i++) {
-		if (ModuleTemperatures[NUM_MINIONS-1][i] > maxCharge) {
-			return DANGER;
 		}
 	}
 	return SAFE;
@@ -170,20 +162,15 @@ void Temperature_SetChargeState(uint8_t isCharging){
  * @return pointer to index of modules that are in danger
  */
 uint8_t *Temperature_GetModulesInDanger(void){
-	int16_t limit = ChargingState == 1 ? MAX_CHARGE_TEMPERATURE_LIMIT : MAX_DISCHARGE_TEMPERATURE_LIMIT;
+	static uint8_t ModuleTempStatus[NUM_BATTERY_MODULES];
+	int16_t temperatureLimit = ChargingState == 1 ? MAX_CHARGE_TEMPERATURE_LIMIT : MAX_DISCHARGE_TEMPERATURE_LIMIT;
 
 	for (int i = 0; i < NUM_MINIONS-1; i++) {
 		for (int j = 0; j < MAX_TEMP_SENSORS_PER_MINION_BOARD; j++) {
-			if (ModuleTemperatures[i][j] > limit) {
-				ModuleTempStatus[i * MAX_TEMP_SENSORS_PER_MINION_BOARD + j] = 1;
+			if (i * MAX_TEMP_SENSORS_PER_MINION_BOARD + j >= NUM_TEMPERATURE_SENSORS) break;
+			if (ModuleTemperatures[i][j] > temperatureLimit) {
+				ModuleTempStatus[(i * (NUM_TEMP_SENSORS_PER_MOD/2)) + (j % (NUM_TEMP_SENSORS_PER_MOD/2))] = 1;
 			}
-		}
-	}
-	
-	// Last battery module will have less temperature sensors so use a separate for loop
-	for (int i = 0; i < NUM_TEMPERATURE_SENSORS%MAX_TEMP_SENSORS_PER_MINION_BOARD; i++) {
-		if (ModuleTemperatures[NUM_MINIONS-1][i] > limit) {
-			ModuleTempStatus[ (NUM_MINIONS-1) * MAX_TEMP_SENSORS_PER_MINION_BOARD + i] = 1;
 		}
 	}
 	return ModuleTempStatus;
@@ -201,7 +188,10 @@ int16_t Temperature_GetModuleTemperature(uint8_t moduleIdx){
 	int32_t total = 0;
 	uint8_t board = (moduleIdx * 2) / MAX_TEMP_SENSORS_PER_MINION_BOARD;
 	uint8_t sensor = moduleIdx % (MAX_TEMP_SENSORS_PER_MINION_BOARD / 2);
+	
 	total += ModuleTemperatures[board][sensor];
+	
+	// Get temperature from other sensor on other side
 	total += ModuleTemperatures[board][sensor + MAX_TEMP_SENSORS_PER_MINION_BOARD / 2];
 	total /= 2;
 	return total;

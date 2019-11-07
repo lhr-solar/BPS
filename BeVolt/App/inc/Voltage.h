@@ -8,6 +8,7 @@
 
 #include <stdint.h>
 #include "config.h"
+#include "LTC6811.h"
 #include "common.h"
 
 /** Voltage_Init
