@@ -13,6 +13,7 @@
 #include "WDTimer.h"
 #include "SoC.h"
 #include "LED.h"
+
 cell_asic Minions[NUM_MINIONS];
 
 void initialize(void);
