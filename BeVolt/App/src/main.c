@@ -15,6 +15,7 @@
 #include "WDTimer.h"
 #include "SoC.h"
 #include "LED.h"
+#include "PLL.h"
 
 void initialize(void);
 void preliminaryCheck(void);
@@ -60,6 +61,7 @@ int mainmain(){
  *			- Give wrappers (Voltage, Current, Temperature) the limits
  */
 void initialize(void){
+	PLL_Init80MHz();
 	Contactor_Init();
 	Contactor_Off();
 	EEPROM_Init();
