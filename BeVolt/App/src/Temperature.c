@@ -98,7 +98,7 @@ ErrorStatus Temperature_ChannelConfig(uint8_t tempChannel) {
 }
 
 /** convertVoltageToTemperature
- *	Converts mv to temperature based on the temperature sensor equation
+ * Converts mv to temperature based on the temperature sensor equation
  * @param mV from ADC
  * @return temperature in Celsius
  */
