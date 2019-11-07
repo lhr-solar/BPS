@@ -8,12 +8,15 @@
 
 #include <stdint.h>
 #include "config.h"
+#include "LTC6811.h"
+#include "common.h"
 
 /** Voltage_Init
  * Initializes all device drivers including LTC6811 and GPIO to begin Voltage Monitoring
+ * @param boards LTC6811 data structure that contains the values of each register
  * @return SUCCESS or ERROR
  */
-ErrorStatus Voltage_Init(void);
+ErrorStatus Voltage_Init(cell_asic *boards);
 
 /** Voltage_UpdateMeasurements
  * Stores and updates the new measurements received
@@ -29,24 +32,25 @@ ErrorStatus Voltage_UpdateMeasurements(void);
 SafetyStatus Voltage_IsSafe(void);
 
 /** Voltage_GetModulesInDanger
- * Finds all modules that in danger and stores them into a list.
- * Each module corresponds to and index of the array. If the element in the
+ * Finds all battery modules that in danger and stores them into a list.
+ * Each battery module corresponds to and index of the array. If the element in the
  * array is 1, then it means that module in the index is in danger.
  * @return pointer to index of modules that are in danger
  */
-uint16_t *Voltage_GetModulesInDanger(void);
+uint8_t *Voltage_GetModulesInDanger(void);
 
 /** Voltage_GetModuleVoltage
- * Gets the voltage of a certain module in the battery pack
- * @param index of module
- * @return voltage of module at specified index
+ * Gets the voltage of a certain battery module in the battery pack
+ * @precondition moduleIdx < NUM_BATTERY_SENSORS
+ * @param index of battery module (0-indexed)
+ * @return voltage of module at specified index (fixed point of 0.00001)
  */
-uint16_t Voltage_GetModuleVoltage(uint16_t moduleIdx);
+uint16_t Voltage_GetModuleVoltage(uint8_t moduleIdx);
 
 /** Voltage_GetTotalPackVoltage
  * Gets the total voltage of the battery pack
- * @return voltage of whole battery pack
+ * @return voltage of whole battery pack (fixed point of 0.00001
  */
-uint16_t Voltage_GetTotalPackVoltage(void);
+uint32_t Voltage_GetTotalPackVoltage(void);
 
 #endif
