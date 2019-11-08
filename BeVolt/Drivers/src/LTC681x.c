@@ -469,23 +469,6 @@ void LTC681x_adstatd(
 }
 
 
-// Start an open wire Conversion
-/*
-void LTC681x_adow(
-  uint8_t MD, //ADC Mode (UTSVT ACD Mode = 0b10 -- LTC86811.h)
-  uint8_t PUP //Discharge Permit
-)
-{
-  uint8_t cmd[2];
-  uint8_t md_bits;
-  md_bits = (MD & 0x02) >> 1;
-  cmd[0] = md_bits + 0x02;
-  md_bits = (MD & 0x01) << 7;
-  cmd[1] =  md_bits + 0x28 + (PUP<<6) ;//+ CH;
-  cmd_68(cmd);
-}
-*/
-
 /* Start an open wire Conversion */
 void LTC681x_adow(uint8_t MD, //ADC Mode
 				  uint8_t PUP,//Pull up/Pull down current
@@ -1308,81 +1291,6 @@ int16_t LTC681x_run_adc_redundancy_st(uint8_t adc_mode, uint8_t adc_reg, uint8_t
   return(error);
 }
 
-//Runs the datasheet algorithm for open wire
-/*
-void LTC681x_run_openwire(uint8_t total_ic, cell_asic ic[])
-{
-  uint16_t OPENWIRE_THRESHOLD = 4000;
-  const uint8_t  N_CHANNELS = ic[0].ic_reg.cell_channels;
-
-  cell_asic pullUp_cell_codes[total_ic];
-  cell_asic pullDwn_cell_codes[total_ic];
-  cell_asic openWire_delta[total_ic];
-  //int8_t error;
-	
-	//Initialize the register sizes (bug fix from original driver code)
-	//LTC6811_init_reg_limits(total_ic, pullUp_cell_codes);
-	//LTC6811_init_reg_limits(total_ic, pullDwn_cell_codes);
-	LTC681x_init_cfg(total_ic, ic);
-	LTC6811_reset_crc_count(total_ic, ic);
-	LTC6811_init_reg_limits(total_ic, ic);
-	
-  wakeup_sleep(total_ic);
-  LTC681x_adow(MD_7KHZ_3KHZ,PULL_UP_CURRENT);
-  LTC681x_pollAdc();
-  wakeup_idle(total_ic);
-  LTC681x_adow(MD_7KHZ_3KHZ,PULL_UP_CURRENT);
-  LTC681x_pollAdc();
-  wakeup_idle(total_ic);
-  int8_t error = LTC681x_rdcv(0, total_ic,pullUp_cell_codes);
-
-  wakeup_idle(total_ic);
-  LTC681x_adow(MD_7KHZ_3KHZ,PULL_DOWN_CURRENT);
-  LTC681x_pollAdc();
-  wakeup_idle(total_ic);
-  LTC681x_adow(MD_7KHZ_3KHZ,PULL_DOWN_CURRENT);
-  LTC681x_pollAdc();
-  wakeup_idle(total_ic);
-  error = LTC681x_rdcv(0, total_ic,pullDwn_cell_codes);
-
-  for (int cic=0; cic<total_ic; cic++)
-  {
-    ic[cic].system_open_wire =0;
-    for (int cell=0; cell<N_CHANNELS; cell++)
-    {
-      if (pullDwn_cell_codes[cic].cells.c_codes[cell]>pullUp_cell_codes[cic].cells.c_codes[cell])
-      {
-        openWire_delta[cic].cells.c_codes[cell] = pullDwn_cell_codes[cic].cells.c_codes[cell] - pullUp_cell_codes[cic].cells.c_codes[cell]  ;
-      }
-      else
-      {
-        openWire_delta[cic].cells.c_codes[cell] = 0;
-      }
-
-    }
-  }
-  for (int cic=0; cic<total_ic; cic++)
-  {
-    for (int cell=1; cell<N_CHANNELS; cell++)
-    {
-
-      if (openWire_delta[cic].cells.c_codes[cell]>OPENWIRE_THRESHOLD)
-      {
-        ic[cic].system_open_wire += (1<<cell);
-
-      }
-    }
-    if (pullUp_cell_codes[cic].cells.c_codes[0] == 0)
-    {
-      ic[cic].system_open_wire += 1;
-    }
-    if (pullUp_cell_codes[cic].cells.c_codes[N_CHANNELS-1] == 0)
-    {
-      ic[cic].system_open_wire += (1<<(N_CHANNELS));
-    }
-  }
-}
-*/
 
 /* Runs the data sheet algorithm for open wire for multiple cell and two consecutive cells detection */
  uint32_t LTC681x_run_openwire_multi(uint8_t total_ic, // Number of ICs in the daisy chain

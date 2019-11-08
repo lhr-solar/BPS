@@ -155,9 +155,9 @@ void LTC6811_adol(
 */
 void LTC6811_adow(
 	uint8_t MD, //ADC Mode
-  uint8_t PUP, //Discharge Permit
-	uint8_t CH, //Channels
-	uint8_t DCP//Discharge Permit
+  uint8_t PUP, // Pull-up/pull-down current for open wire conversions
+	uint8_t CH, // Channels
+	uint8_t DCP // Controls if Discharge is permitted during conversion
 );
 
 

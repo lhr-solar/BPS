@@ -20,7 +20,6 @@ void initialize(void);
 void preliminaryCheck(void);
 void faultCondition(void);
 
-int mainmain(){}
 int real_main(){
 	__disable_irq();			// Disable all interrupts until initialization is done
 	initialize();					// Initialize codes/pins
@@ -116,7 +115,8 @@ void faultCondition(void){
 // E.g. If you want to run a LTC6811 test, change "#define CHANGE_THIS_TO_TEST_NAME" to the
 //		following:
 //		#define LTC6811_TEST
-#define OPEN_WIRE_TEST
+//#define OPEN_WIRE_TEST
+#define UART_TEST
 
 #ifdef LED_TEST
 #include "LED.h"

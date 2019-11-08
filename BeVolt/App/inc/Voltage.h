@@ -38,6 +38,7 @@ uint16_t *Voltage_GetModulesInDanger(void);
  
 /** Voltage_OpenWireSummary
  * Runs the open wire method with print=true
+ * Gives a summary of the open wire status (which wires are open and on which boards)
  */
 void Voltage_OpenWireSummary(void);
 
