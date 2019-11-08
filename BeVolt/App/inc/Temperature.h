@@ -14,6 +14,9 @@
 
 #define MUX1 0x91
 #define MUX2 0x93
+#define AUX_I2C_BLANK 0
+#define AUX_I2C_SLAVE_ACK 0x07
+#define AUX_I2C_SLAVE_ACK_STOP 0x1
 #define AUX_I2C_START 0x06
 #define AUX_I2C_ACK 0
 #define AUX_I2C_NACK_STOP 0x9

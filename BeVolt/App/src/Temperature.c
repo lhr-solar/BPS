@@ -45,11 +45,8 @@ ErrorStatus Temperature_Init(cell_asic *boards){
  * @note we clear the otherMux every time a channel is switched even on the same mux; Maybe change depending on speed/optimization
  */
 ErrorStatus Temperature_ChannelConfig(uint8_t tempChannel) {
-	cell_asic temp;
 	uint8_t muxAddress;
 	uint8_t otherMux;
-
-	temp.isospi_reverse = false;
 	
 	// For safety, in case a number >= MAX_TEMP_SENSORS_PER_MINION_BOARD is passed in.
 	tempChannel %= MAX_TEMP_SENSORS_PER_MINION_BOARD;
@@ -64,34 +61,41 @@ ErrorStatus Temperature_ChannelConfig(uint8_t tempChannel) {
 	}
 
 	// 0110 is start code, must be the 4 msb's then the 4 msb's of the data (addr of mux)
-	// remaind of otherMux, then 0000 for just an acknowledge signal at 9th cycle
+	// remaind of otherMux, then ACK/NACK/STOP from master/slave
 
 	/* Clear other mux */
-	temp.com.tx_data[0] = (AUX_I2C_START << 4) + ((otherMux & 0xF0)>>4); 				// 0110 START CODE
-	temp.com.tx_data[1] = ((otherMux & 0x0F) << 4) + AUX_I2C_ACK;								// Acknowledge signal at 9th cycle
+	Minions[0].com.tx_data[0] = (AUX_I2C_START << 4) + ((otherMux & 0xF0)>>4); 				
+	Minions[0].com.tx_data[1] = ((otherMux & 0x0F) << 4) + AUX_I2C_SLAVE_ACK;								// Acknowledge signal at 9th cycle
 
 
 	// Sends what channel to open. 4th bit is the enable bit
 	// Turn all channels off
-	temp.com.tx_data[2] = (AUX_I2C_START << 4) + (0);
-	temp.com.tx_data[3] = ((0) << 4) + AUX_I2C_NACK_STOP;
+	Minions[0].com.tx_data[2] = (AUX_I2C_START << 4) + AUX_I2C_BLANK;
+	Minions[0].com.tx_data[3] = AUX_I2C_BLANK + AUX_I2C_SLAVE_ACK_STOP;
 
-	LTC6811_wrcomm(1, &temp);
+	Minions[0].com.tx_data[4] = 0;
+	Minions[0].com.tx_data[5] = 0;
+
+	wakeup_sleep(NUM_MINIONS);
+	LTC6811_wrcomm(NUM_MINIONS, Minions);
 	LTC6811_stcomm();
-
-
+		
 	// Send Address for a particular mux
-	temp.com.tx_data[0] = (AUX_I2C_START << 4) + ((muxAddress & 0xF0)>>4); 				// 0110 START CODE
-	temp.com.tx_data[1] = ((muxAddress & 0x0F) << 4) + AUX_I2C_ACK;								// Acknowledge signal at 9th cycle
+	Minions[0].com.tx_data[0] = (AUX_I2C_START << 4) + (muxAddress >> 4); 				
+	Minions[0].com.tx_data[1] = (muxAddress << 4) + AUX_I2C_SLAVE_ACK;								// slave Acknowledge signal at 9th cycle
 
 
+	
 	// Sends what channel to open. 8 is the enable bit
 	// 8 + temp_channel
-	temp.com.tx_data[2] = (AUX_I2C_START << 4) + (0);
-	temp.com.tx_data[3] = ((8 + tempChannel) << 4) + AUX_I2C_NACK_STOP;
+	Minions[0].com.tx_data[2] = (AUX_I2C_START << 4) + AUX_I2C_BLANK;
+	Minions[0].com.tx_data[3] = ((8 + tempChannel) << 4) + AUX_I2C_SLAVE_ACK_STOP;				/// Slave acks, master generates stop sig
+		
+	Minions[0].com.tx_data[4] = 0;
+	Minions[0].com.tx_data[5] = 0;
 
-
-	LTC6811_wrcomm(1, &temp);
+	wakeup_sleep(NUM_MINIONS);
+	LTC6811_wrcomm(NUM_MINIONS, Minions);
 	LTC6811_stcomm();
 
 	return SUCCESS;
