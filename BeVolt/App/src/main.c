@@ -475,31 +475,61 @@ void DischargingSoCTest(void) {
 #include "CAN.h"
 #include "UART.h"
 
+#define CAN_ID_TEST (0x770)
+
+// Define this if listening to yourself
+//#define CAN_SELF_TEST
+
 int main(){
+	// Start UART comms
 	UART3_Init(115200);
-	
 	printf("start\n");
-	CAN1_Init();
-	uint8_t data[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+	
+	// Start CAN comms
+	#ifdef CAN_SELF_TEST
+	CAN1_Init(CAN_Mode_LoopBack);
+	#else
+	CAN1_Init(CAN_Mode_Normal);
+	#endif
+	
+	// Data to transmit
+	uint8_t data[8] = {0xDE, 0xAD, 0xBE, 0xEF, 0xAE, 0xAE, 0xAE, 0xAE};
 	uint32_t id = CAN_ID_TEST;
 
+	uint8_t RxData[8];
+	
 	while(1)
 	{
 		printf("start1\n");
-		uint8_t *RxData = (uint8_t *) malloc(8*sizeof(uint8_t));
-		CAN1_Write(id, data);
-		while(CAN1_Read(RxData) == false)
-		{
+		
+		int box;
+		
+		// Transmit the data
+		do {
+			int box = CAN1_Write(id, data, 8);
+		} while (box == CAN_TxStatus_NoMailBox);
+		int status;
+
+		// Wait for the data to transmit
+		do {
+			status = CAN_TransmitStatus(CAN1, box);
+		} while( status == CAN_TxStatus_Pending);
+		if(status != CAN_TxStatus_Ok) {
+			while(1);
 		}
+		
+		#ifdef CAN_SELF_TEST
+		// Read all the data
+		while(CAN1_Read(RxData) == false);
+		
 		printf("CAN RxMessage: ");
 		for(int i = 0; i < 8; i++)
 		{
 			printf("%d", RxData[i]);
 		}
 		printf("\n");
-		free(RxData);
+		#endif
 	}
-
 }
 
 #endif

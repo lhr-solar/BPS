@@ -22,16 +22,15 @@
 #define CAN_ID_WDOG_TRIGGERED					(CAN_ID_BPS | 0x07)
 #define CAN_ID_ERROR									(CAN_ID_BPS | 0x08)
 
-#define CAN_ID_TEST (0x770)
 /** CAN1_Init
  * Initializes CAN bus for pins:
  *		PB8 : RX
  *		PB9 : TX
- * @param freq of can bus line
+ * @param CAN_Mode The mode for the CAN bus to operate in
  */
-void CAN1_Init();
+void CAN1_Init(int CAN_Mode);
 
-void CAN1_Write(uint32_t id, uint8_t data[8]);
+int CAN1_Write(uint32_t id, uint8_t data[8], uint8_t length);
 
 bool CAN1_Read(uint8_t *data);
 
