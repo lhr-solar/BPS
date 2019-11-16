@@ -9,19 +9,26 @@
 #ifndef CONTACTOR_H__
 #define CONTACTOR_H__
 
-// Initiliazes GPIOA_Pin_6
+/** Contactor_Init
+ * Initialize Pin 0 as Output
+ * Initialize Pin 1 as Input
+ */
 void Contactor_Init(void);
 
-
-// Closes contactor, GPIO_Pin_6 = 1
+/** Contactor_On
+ * Closes contactor, GPIO_Pin_0 = 1
+ */
 void Contactor_On(void);
 
- 
-//Opens contactor, GPIO_Pin_6 = 0
+/** Contactor_Off
+ * Opens contactor, GPIO_Pin_0 = 0
+ */
 void Contactor_Off(void);
-
  
-//Outputs: flag status (0 or 1)
+/** Contactor_Flag
+ * Checks the current status of the contactor
+ * @return ENABLE or DISABLE
+ */
 FunctionalState Contactor_Flag(void);
 
 #endif

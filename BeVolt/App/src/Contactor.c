@@ -10,7 +10,8 @@
 #include "stm32f4xx.h"
 
 /** Contactor_Init
- * Initialize PA6 as output pin.
+ * Initialize Pin 0 as Output
+ * Initialize Pin 1 as Input
  */
 void Contactor_Init(void){
 	GPIO_InitTypeDef GPIO_InitStruct;
@@ -30,22 +31,23 @@ void Contactor_Init(void){
 	GPIO_Init(GPIOB, &GPIO_InitStruct);
 }
 	
-/**
- * 	Closes contactor, GPIO_Pin_6 = 1
+/** Contactor_On
+ * Closes contactor, GPIO_Pin_0 = 1
  */
 void Contactor_On(void){
-	GPIO_WriteBit(GPIOB, GPIO_Pin_0, Bit_SET);					// Set pin 6 high
+	GPIO_WriteBit(GPIOB, GPIO_Pin_0, Bit_SET);					// Set pin 0 high
 }
 
-/**
- *	Opens contactor, GPIO_Pin_6 = 0
+/** Contactor_Off
+ * Opens contactor, GPIO_Pin_0 = 0
  */
 void Contactor_Off(void){
-	GPIO_WriteBit(GPIOB, GPIO_Pin_0, Bit_RESET);				// Set pin 6 low
+	GPIO_WriteBit(GPIOB, GPIO_Pin_0, Bit_RESET);				// Set pin 0 low
 }
 
-/**
- *	 Outputs: flag status
+/** Contactor_Flag
+ * Checks the current status of the contactor
+ * @return ENABLE or DISABLE
  */
 FunctionalState Contactor_Flag(void){
 	if((GPIOB->IDR & GPIO_Pin_1) >> 1) {
