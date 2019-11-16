@@ -5,7 +5,7 @@
 #include "Temperature.h"
 
 // Holds the temperatures in Celsius for each sensor on each board
-static int16_t ModuleTemperatures[NUM_MINIONS][MAX_TEMP_SENSORS_PER_MINION_BOARD];
+int16_t ModuleTemperatures[NUM_MINIONS][MAX_TEMP_SENSORS_PER_MINION_BOARD];
 
 // 0 if discharging 1 if charging
 static uint8_t ChargingState;
@@ -45,14 +45,10 @@ ErrorStatus Temperature_Init(cell_asic *boards){
  * @note we clear the otherMux every time a channel is switched even on the same mux; Maybe change depending on speed/optimization
  */
 ErrorStatus Temperature_ChannelConfig(uint8_t tempChannel) {
-	cell_asic temp;
 	uint8_t muxAddress;
 	uint8_t otherMux;
-
-	temp.isospi_reverse = false;
 	
-	// For safety, in case a number >= MAX_TEMP_SENSORS_PER_MINION_BOARD is passed in.
-	tempChannel %= MAX_TEMP_SENSORS_PER_MINION_BOARD;
+	tempChannel %= MAX_TEMP_SENSORS_PER_MINION_BOARD/2;
 	
 	if (tempChannel > 7) {
 		muxAddress = MUX2;
@@ -64,46 +60,66 @@ ErrorStatus Temperature_ChannelConfig(uint8_t tempChannel) {
 	}
 
 	// 0110 is start code, must be the 4 msb's then the 4 msb's of the data (addr of mux)
-	// remaind of otherMux, then 0000 for just an acknowledge signal at 9th cycle
-
-	/* Clear other mux */
-	temp.com.tx_data[0] = (AUX_I2C_START << 4) + ((otherMux & 0xF0)>>4); 				// 0110 START CODE
-	temp.com.tx_data[1] = ((otherMux & 0x0F) << 4) + AUX_I2C_ACK;								// Acknowledge signal at 9th cycle
-
-
-	// Sends what channel to open. 4th bit is the enable bit
-	// Turn all channels off
-	temp.com.tx_data[2] = (AUX_I2C_START << 4) + (0);
-	temp.com.tx_data[3] = ((0) << 4) + AUX_I2C_NACK_STOP;
-
-	LTC6811_wrcomm(1, &temp);
-	LTC6811_stcomm();
+	// remaind of otherMux, then ACK/NACK/STOP from master/slave
+	
+	for (int board = 0; board < NUM_MINIONS; board++) {
+		/* Clear other mux */
+		Minions[board].com.tx_data[0] = (AUX_I2C_START << 4) + ((otherMux & 0xF0)>>4); 				
+		Minions[board].com.tx_data[1] = ((otherMux & 0x0F) << 4) + AUX_I2C_NACK /*AUX_I2C_SLAVE_ACK*/;								// Acknowledge signal at 9th cycle
 
 
-	// Send Address for a particular mux
-	temp.com.tx_data[0] = (AUX_I2C_START << 4) + ((muxAddress & 0xF0)>>4); 				// 0110 START CODE
-	temp.com.tx_data[1] = ((muxAddress & 0x0F) << 4) + AUX_I2C_ACK;								// Acknowledge signal at 9th cycle
+		// Sends what channel to open. 4th bit is the enable bit
+		// Turn all channels off
+		Minions[board].com.tx_data[2] = (AUX_I2C_BLANK << 4) + 0xF; //AUX_I2C_BLANK;
+		Minions[board].com.tx_data[3] = /*AUX_I2C_BLANK*/ (0 << 4) + AUX_I2C_NACK_STOP;
+
+		// Rest is no transmit with all data bits set to high, makes sure there's nothing else we're sending
+		Minions[board].com.tx_data[4] = (AUX_I2C_NO_TRANSMIT << 4) + 0xF;
+		Minions[board].com.tx_data[5] = (0xF << 4) + AUX_I2C_NACK_STOP;
+
+		wakeup_sleep(NUM_MINIONS);
+		LTC6811_wrcomm(NUM_MINIONS, Minions);
+		LTC6811_stcomm();
+			
+		// Send Address for a particular mux
+		Minions[board].com.tx_data[0] = (AUX_I2C_START << 4) + (muxAddress >> 4); 				
+		Minions[board].com.tx_data[1] = (muxAddress << 4) + AUX_I2C_NACK; //AUX_I2C_SLAVE_ACK;								// slave Acknowledge signal at 9th cycle
 
 
-	// Sends what channel to open. 8 is the enable bit
-	// 8 + temp_channel
-	temp.com.tx_data[2] = (AUX_I2C_START << 4) + (0);
-	temp.com.tx_data[3] = ((8 + tempChannel) << 4) + AUX_I2C_NACK_STOP;
+		
+		// Sends what channel to open. 8 is the enable bit
+		// 8 + temp_channel
+		Minions[board].com.tx_data[2] = (AUX_I2C_BLANK << 4) + 0xF; 							// set dont cares high
+		Minions[board].com.tx_data[3] = ((8 + tempChannel) << 4) + AUX_I2C_NACK_STOP; //AUX_I2C_SLAVE_ACK_STOP;				/// Slave acks, master generates stop sig
+			
+		// Rest is no transmit with all data bits set to high, makes sure there's nothing else we're sending
+		Minions[board].com.tx_data[4] = (AUX_I2C_NO_TRANSMIT << 4) + 0xF;
+		Minions[board].com.tx_data[5] = (0xF << 4) + AUX_I2C_NACK_STOP;
 
-
-	LTC6811_wrcomm(1, &temp);
-	LTC6811_stcomm();
+		wakeup_sleep(NUM_MINIONS);
+		LTC6811_wrcomm(NUM_MINIONS, Minions);
+		LTC6811_stcomm();
+	}
 
 	return SUCCESS;
 }
 
 /** convertVoltageToTemperature
  * Converts mv to temperature based on the temperature sensor equation
+ * Equation : T(in C) = (((13.582 - sqrt((-13.582)*(-13.582) + 4 * 0.00433 * (2230.8 - milliVolt)))/ (2.0 * -0.00433)) + 30)
  * @param mV from ADC
- * @return temperature in Celsius
+ * @return temperature in Celsius (Fixed Point with .001 resolution) 
  */
-static int16_t milliVoltToCelsius(double milliVolt){
-	return (13.582 - sqrt((-13.582)*(-13.582) + 4 * 0.00433 * (2230.8 - milliVolt))/ (2.0 * -0.00433)) + 30;
+int milliVoltToCelsius(float milliVolt){
+	// Typecasting to get rid of warnings
+	float sumInRt = (float)(-13.582)*(float)(-13.582) + (float)4.0 * (float)0.00433 * ((float)2230.8 - milliVolt);
+	float rt = sqrt(sumInRt);				
+	float numerator = (float)13.582 - rt;
+	float denom = (2.0 * -0.00433);		
+	float frac = numerator/denom;			
+	float retVal = frac + 30;			
+	
+	return retVal * 1000;
 }
 
 /** Temperature_UpdateMeasurements
@@ -119,8 +135,8 @@ ErrorStatus Temperature_UpdateMeasurements(){
 		for(int board = 0; board < NUM_MINIONS; board++) {
 			
 			// update adc value from GPIO1 stored in a_codes[0]; 
-			// a_codes[0] is fixed point with .0001 resolution in volts -> multiply by .0001 * 1000 to get mV in double form
-			ModuleTemperatures[board][sensorCh] = milliVoltToCelsius(Minions[board].aux.a_codes[0]*0.01);
+			// a_codes[0] is fixed point with .001 resolution in volts -> multiply by .001 * 1000 to get mV in double form
+			ModuleTemperatures[board][sensorCh] = milliVoltToCelsius(Minions[board].aux.a_codes[0]*0.1);
 		}
 	}
 	return SUCCESS;
@@ -133,6 +149,7 @@ ErrorStatus Temperature_UpdateMeasurements(){
  */
 SafetyStatus Temperature_IsSafe(uint8_t isCharging){
 	int16_t temperatureLimit = isCharging == 1 ? MAX_CHARGE_TEMPERATURE_LIMIT : MAX_DISCHARGE_TEMPERATURE_LIMIT;
+	temperatureLimit *= LTC6811_SCALING_FACTOR;
 
 	for (int i = 0; i < NUM_MINIONS; i++) {
 		for (int j = 0; j < MAX_TEMP_SENSORS_PER_MINION_BOARD; j++) {
