@@ -104,7 +104,9 @@ int CAN1_Write(uint32_t id, uint8_t data[8], uint8_t length){
 	return CAN_Transmit(CAN1, &TxMessage);
 }
 
-bool CAN1_Read(uint8_t *data){
+// todo length
+bool CAN1_Read(uint8_t *data/*, uint8_t length*/){
+  // RxMessage.DLC = length;
 	if(RxFlag){
 		for(int i = 0; i < 8; i++){
 			data[i] = RxMessage.Data[i];

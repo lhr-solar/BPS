@@ -494,7 +494,7 @@ int main(){
 
 	// Data to transmit
 	uint8_t data[8] = {0xDE, 0xAD, 0xBE, 0xEF, 0xAE, 0xAE, 0xAE, 0xAE};
-	uint32_t id = CAN_ID_TEST;
+	uint32_t id = BPS_ALLCLEAR;
 
 	uint8_t RxData[8];
 
@@ -518,8 +518,9 @@ int main(){
 			while(1);
 		}
 
-		#ifdef CAN_SELF_TEST
+		// #ifdef CAN_SELF_TEST
 		// Read all the data
+		while(1) {
 		while(CAN1_Read(RxData) == false);
 
 		printf("CAN RxMessage: ");
@@ -528,7 +529,8 @@ int main(){
 			printf("%d", RxData[i]);
 		}
 		printf("\n");
-		#endif
+		}
+		// #endif
 	}
 }
 
