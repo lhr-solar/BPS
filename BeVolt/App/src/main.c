@@ -87,33 +87,81 @@ void preliminaryCheck(void){
 void faultCondition(void){
 	Contactor_Off();
 	LED_Off(RUN);
+	
+	uint8_t error = 0;
 
-	while(1){
-		// CAN_SendMessageStatus()
-		if(!Current_IsSafe()){
-			// Toggle Current fault LED
-		}
+	if(!Current_IsSafe()){
+		error |= FAULT_HIGH_CURRENT;
+		LED_On(OCURR);
+	}
 
-		if(!Voltage_IsSafe()){
-			// Toggle Voltage fault LED
-			switch(Voltage_IsSafe()){
-				case OVERVOLTAGE:
-					LED_On(OVOLT);
-					break;
+	if(!Voltage_IsSafe()){
+		// Toggle Voltage fault LED
+		switch(Voltage_IsSafe()){
+			case OVERVOLTAGE:
+				error |= FAULT_HIGH_VOLT;
+				LED_On(OVOLT);
+				break;
+				
+			case UNDERVOLTAGE:
+				error |= FAULT_LOW_VOLT;
+				LED_On(UVOLT);
+				break;
 
-				case UNDERVOLTAGE:
-					LED_On(UVOLT);
-					break;
-
-				default:
-					break;
-			}
-		}
-
-		if(!Temperature_IsSafe(Current_IsCharging())){
-			// Toggle Temperature fault LED
+			default:
+				error |= FAULT_VOLT_MISC;
+				LED_On(OVOLT);
+				LED_On(UVOLT);
+				break;
 		}
 	}
+
+	if(!Temperature_IsSafe(Current_IsCharging())){
+		error |= FAULT_HIGH_TEMP;
+		LED_On(OCURR);
+	}
+	
+	// Log all the errors that we have
+	for(int i = 1; i < 0x00FF; i <<= 1) {
+		if(error & i) EEPROM_LogError(i);
+	}
+	
+	// Log all the relevant data for each error
+	for(int i = 1; i < 0x00FF; i <<= 1) {
+		if((error & i) == 0) continue;
+		
+		uint8_t *modules;
+		uint16_t curr;
+		switch(i) {
+		// Temperature fault handling
+		case FAULT_HIGH_TEMP:
+			modules = Temperature_GetModulesInDanger();
+			for(int j = 0; j < NUM_BATTERY_MODULES; ++j)
+				if(modules[j]) EEPROM_LogData(FAULT_HIGH_TEMP, j);
+			break;
+		
+		// Voltage fault handling
+		case FAULT_HIGH_VOLT:
+		case FAULT_LOW_VOLT:
+		case FAULT_VOLT_MISC:
+			modules = Voltage_GetModulesInDanger();
+			for(int j = 0; j < NUM_BATTERY_MODULES; ++j)
+				if(modules[j]) EEPROM_LogData(i, j);
+			break;
+		
+		// Current fault handling
+		case FAULT_HIGH_CURRENT:
+			curr = Current_GetLowPrecReading();
+			EEPROM_LogData(FAULT_HIGH_CURRENT, 0x00FF & curr);
+			EEPROM_LogData(FAULT_HIGH_CURRENT, 0x00FF & (curr >> 8));
+			curr = Current_GetHighPrecReading();
+			EEPROM_LogData(FAULT_HIGH_CURRENT, 0x00FF & curr);
+			EEPROM_LogData(FAULT_HIGH_CURRENT, 0x00FF & (curr >> 8));
+			break;
+		}
+	}
+	
+	while(1);	// Loop
 }
 
 
