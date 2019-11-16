@@ -310,4 +310,5 @@ ErrorStatus I2C3_WriteMultiple(uint8_t deviceAddr, uint16_t startAddr, uint8_t *
 	}
 
 	I2C_GenerateSTOP(I2C3, ENABLE);
+	return SUCCESS;
 }

@@ -149,7 +149,7 @@ ErrorStatus Temperature_UpdateMeasurements(){
  */
 SafetyStatus Temperature_IsSafe(uint8_t isCharging){
 	int16_t temperatureLimit = isCharging == 1 ? MAX_CHARGE_TEMPERATURE_LIMIT : MAX_DISCHARGE_TEMPERATURE_LIMIT;
-	temperatureLimit *= LTC6811_SCALING_FACTOR;
+	temperatureLimit *= MILLI_SCALING_FACTOR;
 
 	for (int i = 0; i < NUM_MINIONS; i++) {
 		for (int j = 0; j < MAX_TEMP_SENSORS_PER_MINION_BOARD; j++) {
