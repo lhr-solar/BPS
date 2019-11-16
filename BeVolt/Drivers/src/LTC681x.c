@@ -1305,11 +1305,11 @@ int16_t LTC681x_run_adc_redundancy_st(uint8_t adc_mode, uint8_t adc_reg, uint8_t
 	uint16_t pullDwn[total_ic][N_CHANNELS];
 	uint16_t openWire_delta[total_ic][N_CHANNELS];
 
-	int8_t error;
+	volatile int8_t error;
 	int8_t opencells[N_CHANNELS];
 	int8_t n=0; // Number of open cells
 	int8_t i,j,k;
-	uint32_t conv_time=0;
+	volatile uint32_t conv_time=0;
 	
 	long openwires = 0;
 
