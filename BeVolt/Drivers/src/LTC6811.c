@@ -231,10 +231,12 @@ void LTC6811_adstatd(
 // Start an open wire Conversion
 void LTC6811_adow(
   uint8_t MD, //ADC Mode
-  uint8_t PUP //Discharge Permit
+  uint8_t PUP, //Discharge Permit
+	uint8_t CH, //Channels
+	uint8_t DCP//Discharge Permit
 )
 {
-  LTC681x_adow(MD,PUP);
+  LTC681x_adow(MD,PUP,CH,DCP);
 }
 
 // Reads and parses the LTC6811 cell voltage registers.
@@ -439,9 +441,9 @@ int16_t LTC6811_run_adc_redundancy_st(uint8_t adc_mode, uint8_t adc_reg, uint8_t
   return(error);
 }
 //Runs the datasheet algorithm for open wire
-void LTC6811_run_openwire(uint8_t total_ic, cell_asic ic[])
+uint32_t LTC6811_run_openwire_multi(uint8_t total_ic, cell_asic ic[], bool print)
 {
-  LTC681x_run_openwire(total_ic,ic);
+  return LTC681x_run_openwire_multi(total_ic,ic, print);
 }
 // Runs the ADC overlap test for the IC
 uint16_t LTC6811_run_adc_overlap(uint8_t total_ic, cell_asic ic[])

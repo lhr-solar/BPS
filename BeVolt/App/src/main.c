@@ -646,3 +646,24 @@ int main() {
 }
 
 #endif
+
+#ifdef OPEN_WIRE_TEST
+//******************************************************************************************
+#include "Voltage.h"
+#include <stdio.h>
+#include "UART.h"
+int main(){
+	UART3_Init(115200);
+	Voltage_Init();
+	printf("%x", Voltage_GetOpenWire());
+	printf("\n\r");
+	if(Voltage_OpenWire() == DANGER){
+		printf("return = DANGER\n\r");
+		Voltage_OpenWireSummary();
+		printf("\n\r");
+	}
+	else if(Voltage_OpenWire() == SAFE){
+		printf("return = SAFE\n\r");
+	}
+}
+#endif

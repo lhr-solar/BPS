@@ -37,7 +37,25 @@ SafetyStatus Voltage_IsSafe(void);
  * array is 1, then it means that module in the index is in danger.
  * @return pointer to index of modules that are in danger
  */
-uint8_t *Voltage_GetModulesInDanger(void);
+SafetyStatus *Voltage_GetModulesInDanger(void);
+ 
+/** Voltage_OpenWireSummary
+ * Runs the open wire method with print=true
+ * Gives a summary of the open wire status (which wires are open and on which boards)
+ */
+void Voltage_OpenWireSummary(void);
+
+/** Voltage_OpenWire
+ * Uses the built-in adow function to check for open wires
+ * @return SafetyStatus
+ */
+SafetyStatus Voltage_OpenWire(void);
+
+/** Voltage_GetOpenWire
+ * Finds the pin locations of the open wires
+ * @return hexadecimal string (1 means open wire, 0 means closed)
+ */
+uint32_t Voltage_GetOpenWire(void);
 
 /** Voltage_GetModuleVoltage
  * Gets the voltage of a certain battery module in the battery pack
@@ -45,7 +63,7 @@ uint8_t *Voltage_GetModulesInDanger(void);
  * @param index of battery module (0-indexed)
  * @return voltage of module at specified index (fixed point of 0.00001)
  */
-uint16_t Voltage_GetModuleVoltage(uint8_t moduleIdx);
+uint16_t Voltage_GetModuleMillivoltage(uint8_t moduleIdx);
 
 /** Voltage_GetTotalPackVoltage
  * Gets the total voltage of the battery pack
