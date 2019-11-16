@@ -48,10 +48,15 @@ uint8_t I2C3_Read(uint8_t deviceAddr, uint16_t regAddr){
 	return data;
 }
 
-void I2C3_ReadMultiple(uint8_t deviceAddr, uint16_t startAddr, uint8_t *rxData, uint32_t rxSize){
+ErrorStatus I2C3_ReadMultiple(uint8_t deviceAddr, uint16_t startAddr, uint8_t *rxData, uint32_t rxSize){
+	int timeout_count = 0;
 	while(I2C_GetFlagStatus(I2C3, I2C_FLAG_BUSY)){
-		// Add timeout later. Since this is not a safety critical part of the system, a timeout would be okay.
-		// The next time this is called, the I2C bus should not be busy.
+		// Assume running at 80 MHz
+		timeout_count++;
+		// Returns and breaks after 3 seconds (240 million iterations)
+		if(timeout_count > 240000000) {
+			return ERROR;
+		}
 	}
 	
 	I2C_AcknowledgeConfig(I2C3, ENABLE);
@@ -121,6 +126,9 @@ void I2C3_ReadMultiple(uint8_t deviceAddr, uint16_t startAddr, uint8_t *rxData, 
 
 	// Generate the stop
 	I2C_GenerateSTOP(I2C3, ENABLE);
+	
+	// Return Success if all executed properly
+	return SUCCESS;
 }
 
 void I2C3_Write(uint8_t deviceAddr, uint16_t regAddr, uint8_t data){
