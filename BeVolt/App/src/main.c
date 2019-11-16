@@ -82,11 +82,10 @@ void initialize(void){
  */
 void preliminaryCheck(void){
 	if (WDTimer_DidSystemReset() == DANGER) {
-		while(1){
 			LED_On(FAULT);
 			LED_On(WDOG);
-		}
 	}
+	while(1);
 	// Check if Watch dog timer was triggered previously
 }
 
@@ -100,7 +99,6 @@ void faultCondition(void){
 	LED_Off(RUN);
 	LED_On(FAULT);
 
-	while(1){
 		// CAN_SendMessageStatus()
 		if(!Current_IsSafe()){
 			LED_On(OCURR);
@@ -126,15 +124,11 @@ void faultCondition(void){
 			// Toggle Temperature fault LED
 		}
 		
-		WDTimer_Reset();	// Even though faulted, WDTimer needs to be updated or else system will reset
-											// causing WDOG error. WDTimer can't be stopped after it starts.
-	}
+		while(1) {
+			WDTimer_Reset();	// Even though faulted, WDTimer needs to be updated or else system will reset
+												// causing WDOG error. WDTimer can't be stopped after it starts.
+		}
 }
-
-
-
-
-
 
 //****************************************************************************************
 // The following code is for testing individual pieces of code.
