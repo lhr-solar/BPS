@@ -45,7 +45,7 @@ uint8_t *Voltage_GetModulesInDanger(void);
  * @param index of battery module (0-indexed)
  * @return voltage of module at specified index (fixed point of 0.00001)
  */
-uint16_t Voltage_GetModuleVoltage(uint8_t moduleIdx);
+uint16_t Voltage_GetModuleMillivoltage(uint8_t moduleIdx);
 
 /** Voltage_GetTotalPackVoltage
  * Gets the total voltage of the battery pack

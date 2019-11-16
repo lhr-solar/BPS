@@ -38,7 +38,7 @@ typedef enum {SAFE = 0, DANGER = 1, OVERVOLTAGE = 2, UNDERVOLTAGE = 3} SafetySta
 
 //--------------------------------------------------------------------------------
 // Helpers
-#define LTC6811_SCALING_FACTOR			10000
+#define MILLI_SCALING_FACTOR			10000
 
 //--------------------------------------------------------------------------------
 // Voltage Sensor Configurations
