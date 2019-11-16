@@ -770,9 +770,12 @@ int main() {
 #include "UART.h"
 int main(){
 	UART3_Init(115200);
-	Voltage_Init();
-	printf("%x", Voltage_GetOpenWire());
-	printf("\n\r");
+	Voltage_Init(Minions);
+	/*
+	//printf("%x", Voltage_GetOpenWire());
+	//printf("\n\r");
+	static uint32_t open_wires = 0;
+	open_wires = Voltage_GetOpenWire();
 	if(Voltage_OpenWire() == DANGER){
 		printf("return = DANGER\n\r");
 		Voltage_OpenWireSummary();
@@ -780,6 +783,12 @@ int main(){
 	}
 	else if(Voltage_OpenWire() == SAFE){
 		printf("return = SAFE\n\r");
+	}
+	*/
+	static uint16_t voltage = 0;
+	Voltage_UpdateMeasurements();
+	for(int i = 0; i < NUM_BATTERY_MODULES; i++) {
+		voltage = Voltage_GetModuleMillivoltage(i);
 	}
 }
 #endif
