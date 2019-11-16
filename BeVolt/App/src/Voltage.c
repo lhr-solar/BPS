@@ -85,31 +85,60 @@ SafetyStatus Voltage_IsSafe(void){
 			return UNDERVOLTAGE;
 		}
 	}
-	
 	return SAFE;
 }
 
 /** Voltage_GetModulesInDanger
  * Finds all modules that in danger and stores them into a list.
- * Each module corresponds to and index of the array. If the element in the
- * array is 1, then it means that module in the index is in danger.
+ * Each module corresponds to an index of the array of SafetyStatus
  * @return pointer to index of modules that are in danger
  */
-uint8_t *Voltage_GetModulesInDanger(void){
-	static uint8_t checks[NUM_BATTERY_MODULES];
+SafetyStatus *Voltage_GetModulesInDanger(void){
+	static SafetyStatus checks[NUM_BATTERY_MODULES];
+	uint32_t open_wires = Voltage_GetOpenWire();
 	
-	for (int i = 0; i < NUM_BATTERY_MODULES; i++) {
-		
+	for (int i = 0; i < NUM_BATTERY_MODULES; i++) {	
 		// Check if battery is in range of voltage limit
 		if (Voltage_GetModuleMillivoltage(i) > MAX_VOLTAGE_LIMIT * MILLI_SCALING_FACTOR || Voltage_GetModuleMillivoltage(i) < MIN_VOLTAGE_LIMIT * MILLI_SCALING_FACTOR) {
-			checks[i] = 1;	// 1 shows that the unit is in danger
-			
+			checks[i] = DANGER;
+		}
+		else if((open_wires >> i) & 1) {
+			checks[i] = DANGER;
 		} else {
-			checks[i] = 0;	// 0 shows that the unit is not in danger
+			checks[i] = SAFE;
 		}
 	}
-	
 	return checks;
+}
+/** Voltage_OpenWireSummary
+ * Runs the open wire method with print=true
+ */
+void Voltage_OpenWireSummary(void){
+	wakeup_idle(NUM_MINIONS);
+	LTC6811_run_openwire_multi(NUM_MINIONS, Minions, true);
+}
+
+/** Voltage_OpenWire
+ * Uses the LTC6811_run_openwire_multi() function to check for open wires
+ * @return SafetyStatus
+ */
+SafetyStatus Voltage_OpenWire(void){
+	wakeup_idle(NUM_MINIONS);
+	long openwires = LTC6811_run_openwire_multi(NUM_MINIONS, Minions, false);
+	if(openwires != 0){
+		return DANGER;
+	} else {
+		return SAFE;
+	}
+}
+
+/** Voltage_GetOpenWire
+ * Finds the pin locations of the open wires
+ * @return hexadecimal string (1 means open wire, 0 means closed)
+ */
+uint32_t Voltage_GetOpenWire(void){
+	wakeup_idle(NUM_MINIONS);
+	return LTC6811_run_openwire_multi(NUM_MINIONS, Minions, false);
 }
 
 /** Voltage_GetModuleVoltage
