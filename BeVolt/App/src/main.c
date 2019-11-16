@@ -76,6 +76,13 @@ void initialize(void){
  * even though everything is safe.
  */
 void preliminaryCheck(void){
+	if (WDTimer_DidSystemReset() == DANGER) {
+		EEPROM_LogError(FAULT_WATCHDOG);
+		while(1){
+			LED_On(FAULT);
+			LED_On(WDOG);
+		}
+	}
 	// Check if Watch dog timer was triggered previously
 }
 
