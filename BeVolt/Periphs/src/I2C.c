@@ -67,30 +67,69 @@ ErrorStatus I2C3_ReadMultiple(uint8_t deviceAddr, uint16_t startAddr, uint8_t *r
 	// Since no one is using the I2C bus, take control
 	I2C_GenerateSTART(I2C3, ENABLE);
 	// Wait until start edge event occurred
-	while(!I2C_CheckEvent(I2C3, I2C_EVENT_MASTER_MODE_SELECT));
+	timeout_count = 0;
+	while(!I2C_CheckEvent(I2C3, I2C_EVENT_MASTER_MODE_SELECT)) {
+		// Assume running at 80 MHz
+		timeout_count++;
+		// Returns and breaks after 3 seconds (240 million iterations)
+		if(timeout_count > 240000000) {
+			return ERROR;
+		}
+	}
 
 	// Select device to talk to
 	I2C_Send7bitAddress(I2C3, deviceAddr, I2C_Direction_Transmitter);		// Sets RW bit to 0
 	// Wait until finished sending
+	timeout_count = 0;
 	while(!I2C_CheckEvent(I2C3, I2C_EVENT_MASTER_TRANSMITTER_MODE_SELECTED)) {
 		if(I2C3->SR1 & 0x0400) {
 			I2C3->SR1 &= ~0x0400;
 			I2C_GenerateSTOP(I2C3, ENABLE);
 			goto readPoll;
 		}
+		// Assume running at 80 MHz
+		timeout_count++;
+		// Returns and breaks after 3 seconds (240 million iterations)
+		if(timeout_count > 240000000) {
+			return ERROR;
+		}
 	}
 
 	// Send start address (MSB first)
 	I2C_SendData(I2C3, (uint8_t)((startAddr & 0xFF00) >> 8));
 	// Wait until transmit event occurred.
-	while(!I2C_CheckEvent(I2C3, I2C_EVENT_MASTER_BYTE_TRANSMITTING));
+	timeout_count = 0;
+	while(!I2C_CheckEvent(I2C3, I2C_EVENT_MASTER_BYTE_TRANSMITTING)) {
+		// Assume running at 80 MHz
+		timeout_count++;
+		// Returns and breaks after 3 seconds (240 million iterations)
+		if(timeout_count > 240000000) {
+			return ERROR;
+		}
+	}
 	// Send rest of start address (LSB)
 	I2C_SendData(I2C3, (uint8_t)(startAddr & 0x00FF));
 	// Wait until transmit event occurred.
-	while(!I2C_CheckEvent(I2C3, I2C_EVENT_MASTER_BYTE_TRANSMITTING));
+	timeout_count = 0;
+	while(!I2C_CheckEvent(I2C3, I2C_EVENT_MASTER_BYTE_TRANSMITTING)) {
+		// Assume running at 80 MHz
+		timeout_count++;
+		// Returns and breaks after 3 seconds (240 million iterations)
+		if(timeout_count > 240000000) {
+			return ERROR;
+		}
+	}
 
 	// Wait until byte transmission finished
-	while(I2C_GetFlagStatus(I2C3, I2C_FLAG_BTF) == RESET);
+	timeout_count = 0;
+	while(I2C_GetFlagStatus(I2C3, I2C_FLAG_BTF) == RESET) {
+		// Assume running at 80 MHz
+		timeout_count++;
+		// Returns and breaks after 3 seconds (240 million iterations)
+		if(timeout_count > 240000000) {
+			return ERROR;
+		}
+	}
 
 
 	// Now read data starting from address that was sent
@@ -98,25 +137,57 @@ ErrorStatus I2C3_ReadMultiple(uint8_t deviceAddr, uint16_t startAddr, uint8_t *r
 	// Since no one is using the I2C bus, take control
 	I2C_GenerateSTART(I2C3, ENABLE);
 	// Wait until start edge event occurred
-	while(!I2C_CheckEvent(I2C3, I2C_EVENT_MASTER_MODE_SELECT));
+	timeout_count = 0;
+	while(!I2C_CheckEvent(I2C3, I2C_EVENT_MASTER_MODE_SELECT)) {
+		// Assume running at 80 MHz
+		timeout_count++;
+		// Returns and breaks after 3 seconds (240 million iterations)
+		if(timeout_count > 240000000) {
+			return ERROR;
+		}
+	}
 
 	// Select device to talk to
 	I2C_Send7bitAddress(I2C3, deviceAddr, I2C_Direction_Receiver);		// Sets RW bit to 1
 	// Wait until finished sending
-	while(!I2C_CheckEvent(I2C3, I2C_EVENT_MASTER_RECEIVER_MODE_SELECTED));
+	timeout_count = 0;
+	while(!I2C_CheckEvent(I2C3, I2C_EVENT_MASTER_RECEIVER_MODE_SELECTED)) {
+		// Assume running at 80 MHz
+		timeout_count++;
+		// Returns and breaks after 3 seconds (240 million iterations)
+		if(timeout_count > 240000000) {
+			return ERROR;
+		}
+	}
 
 	while(rxSize > 0){
 		if(rxSize > 1){
 			// Wait until byte transmission finished
-			while(I2C_GetFlagStatus(I2C3, I2C_FLAG_BTF) == RESET);
+			timeout_count = 0;
+			while(I2C_GetFlagStatus(I2C3, I2C_FLAG_BTF) == RESET) {
+				// Assume running at 80 MHz
+				timeout_count++;
+				// Returns and breaks after 3 seconds (240 million iterations)
+				if(timeout_count > 240000000) {
+					return ERROR;
+				}
+			}
 			*rxData = I2C_ReceiveData(I2C3);
 			rxData++;
 			rxSize--;
 		} else {
 			// Disable ack, since this is the last byte
 			I2C_AcknowledgeConfig(I2C3, DISABLE);
-
-			while(I2C_GetFlagStatus(I2C3, I2C_FLAG_RXNE) == RESET);
+		
+			timeout_count = 0;
+			while(I2C_GetFlagStatus(I2C3, I2C_FLAG_RXNE) == RESET) {
+				// Assume running at 80 MHz
+				timeout_count++;
+				// Returns and breaks after 3 seconds (240 million iterations)
+				if(timeout_count > 240000000) {
+					return ERROR;
+				}
+			}
 
 			*rxData = I2C_ReceiveData(I2C3);
 			rxData++;
