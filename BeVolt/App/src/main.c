@@ -145,7 +145,7 @@ void faultCondition(void){
 // E.g. If you want to run a LTC6811 test, change "#define CHANGE_THIS_TO_TEST_NAME" to the
 //		following:
 //		#define LTC6811_TEST
-#define TEMPERATURE_TEST
+#define CONTACTOR_TEST
 
 
 #ifdef LED_TEST
@@ -405,14 +405,17 @@ void checkDangerTest(void) {
 #ifdef CONTACTOR_TEST
 int main(){
 	Contactor_Init();
+	static uint32_t contactor_status = -1;
 	Contactor_Off();
-	//for(int32_t i = 0; i < 1000000; i++);	// delay
-	//Contactor_On();
-	//for(int32_t i = 0; i < 5000000; i++);	// delay
-	//Contactor_Off();
-	while(1){
+	for(int32_t i = 0; i < 1000000; i++);	// delay
+	Contactor_On();
+	contactor_status = Contactor_Flag();
+	for(int32_t i = 0; i < 5000000; i++);	// delay
+	Contactor_Off();
+	contactor_status = Contactor_Flag();
+	//while(1){
 		//Contactor_On();
-	}
+	//}
 }
 #endif
 
