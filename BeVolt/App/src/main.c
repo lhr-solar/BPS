@@ -21,10 +21,10 @@ void preliminaryCheck(void);
 void faultCondition(void);
 
 int realmainmain(){
-	__disable_irq();			// Disable all interrupts until initialization is done
-	initialize();					// Initialize codes/pins
+	__disable_irq();		// Disable all interrupts until initialization is done
+	initialize();			// Initialize codes/pins
 	preliminaryCheck();		// Wait until all boards are powered on
-	__enable_irq();				// Enable interrupts
+	__enable_irq();			// Enable interrupts
 
 	WDTimer_Start();
 	
@@ -55,20 +55,16 @@ int realmainmain(){
 /**
  * Initialize system.
  *	1. Initialize device drivers.
- *			- This includes communication protocols, GPIO pins, timers
- *	2. Get EEPROM data that holds all fault conditions.
- *			- By regulations, we are not allowed to be able to set the voltage, current, temperature
- *				limits while the car is moving. To make sure this doesn't happen, the EEPROM needs to be
- *				written and cannot be modified (locked) once programmed.
- *	3. Set the current, voltage, and temperature limits.
- *			- Give wrappers (Voltage, Current, Temperature) the limits
+ *		- This includes communication protocols, GPIO pins, timers
+ *	2. Set the current, voltage, and temperature limits.
+ *		- Give wrappers (Voltage, Current, Temperature) the limits
  */
 void initialize(void){
 	LED_Init();
 	Contactor_Init();
 	Contactor_Off();
 	WDTimer_Init();
-	//EEPROM_Init();
+	EEPROM_Init();
 
 	Current_Init();
 	Voltage_Init(Minions);
@@ -81,12 +77,12 @@ void initialize(void){
  * even though everything is safe.
  */
 void preliminaryCheck(void){
-	if (WDTimer_DidSystemReset() == DANGER) {
-			LED_On(FAULT);
-			LED_On(WDOG);
-	}
-	while(1);
 	// Check if Watch dog timer was triggered previously
+	if (WDTimer_DidSystemReset() == DANGER) {
+		LED_On(FAULT);
+		LED_On(WDOG);
+		while(1);		// Spin
+	}
 }
 
 /** faultCondition
@@ -99,35 +95,34 @@ void faultCondition(void){
 	LED_Off(RUN);
 	LED_On(FAULT);
 
-		// CAN_SendMessageStatus()
-		if(!Current_IsSafe()){
-			LED_On(OCURR);
-			// Toggle Current fault LED
-		}
+	// CAN_SendMessageStatus()
+	if(!Current_IsSafe()){
+		LED_On(OCURR);	// Toggle Current fault LED
+	}
 
-		// Toggle Voltage fault LED
-		switch(Voltage_IsSafe()){
-			case OVERVOLTAGE:
-				LED_On(OVOLT);
-				break;
+	// Toggle Voltage fault LED
+	switch(Voltage_IsSafe()){
+		case OVERVOLTAGE:
+			LED_On(OVOLT);
+			break;
 
-			case UNDERVOLTAGE:
-				LED_On(UVOLT);
-				break;
+		case UNDERVOLTAGE:
+			LED_On(UVOLT);
+			break;
 
-			default:
-				break;
-		}
+		default:
+			break;
+	}
 
-		if(!Temperature_IsSafe(Current_IsCharging())){
-			LED_On(OTEMP);
-			// Toggle Temperature fault LED
-		}
-		
-		while(1) {
-			WDTimer_Reset();	// Even though faulted, WDTimer needs to be updated or else system will reset
-												// causing WDOG error. WDTimer can't be stopped after it starts.
-		}
+	if(!Temperature_IsSafe(Current_IsCharging())){
+		// Toggle Temperature fault LED
+		LED_On(OTEMP);
+	}
+
+	while(1) {
+		WDTimer_Reset();	// Even though faulted, WDTimer needs to be updated or else system will reset
+					// causing WDOG error. WDTimer can't be stopped after it starts.
+	}
 }
 
 //****************************************************************************************
@@ -139,7 +134,7 @@ void faultCondition(void){
 // E.g. If you want to run a LTC6811 test, change "#define CHANGE_THIS_TO_TEST_NAME" to the
 //		following:
 //		#define LTC6811_TEST
-#define CONTACTOR_TEST
+#define NO_TEST
 
 
 #ifdef LED_TEST
