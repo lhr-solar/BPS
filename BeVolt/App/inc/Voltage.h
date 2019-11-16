@@ -37,7 +37,7 @@ SafetyStatus Voltage_IsSafe(void);
  * array is 1, then it means that module in the index is in danger.
  * @return pointer to index of modules that are in danger
  */
-uint8_t *Voltage_GetModulesInDanger(void);
+SafetyStatus *Voltage_GetModulesInDanger(void);
  
 /** Voltage_OpenWireSummary
  * Runs the open wire method with print=true
