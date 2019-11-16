@@ -249,7 +249,7 @@ ErrorStatus I2C3_WriteMultiple(uint8_t deviceAddr, uint16_t startAddr, uint8_t *
 		}
 		// Assume running at 80 MHz
 		timeout_count++;
-		// Returns and breaks after 3 seconds (240 million iterations)
+		// Returns and breaks after timeout threshold
 		if(timeout_count > TIMEOUT_THRESHOLD) {
 			return ERROR;
 		}
@@ -262,7 +262,7 @@ ErrorStatus I2C3_WriteMultiple(uint8_t deviceAddr, uint16_t startAddr, uint8_t *
 	while(!I2C_CheckEvent(I2C3, I2C_EVENT_MASTER_BYTE_TRANSMITTING)) {
 		// Assume running at 80 MHz
 		timeout_count++;
-		// Returns and breaks after 3 seconds (240 million iterations)
+		// Returns and breaks after timeout threshold
 		if(timeout_count > TIMEOUT_THRESHOLD) {
 			return ERROR;
 		}
@@ -274,7 +274,7 @@ ErrorStatus I2C3_WriteMultiple(uint8_t deviceAddr, uint16_t startAddr, uint8_t *
 	while(!I2C_CheckEvent(I2C3, I2C_EVENT_MASTER_BYTE_TRANSMITTING)) {
 		// Assume running at 80 MHz
 		timeout_count++;
-		// Returns and breaks after 3 seconds (240 million iterations)
+		// Returns and breaks after timeout threshold
 		if(timeout_count > TIMEOUT_THRESHOLD) {
 			return ERROR;
 		}
@@ -285,7 +285,7 @@ ErrorStatus I2C3_WriteMultiple(uint8_t deviceAddr, uint16_t startAddr, uint8_t *
 	while(I2C_GetFlagStatus(I2C3, I2C_FLAG_BTF) == RESET) {
 		// Assume running at 80 MHz
 		timeout_count++;
-		// Returns and breaks after 3 seconds (240 million iterations)
+		// Returns and breaks after timeout threshold
 		if(timeout_count > TIMEOUT_THRESHOLD) {
 			return ERROR;
 		}
@@ -303,7 +303,7 @@ ErrorStatus I2C3_WriteMultiple(uint8_t deviceAddr, uint16_t startAddr, uint8_t *
 		
 		// Assume running at 80 MHz
 		timeout_count++;
-		// Returns and breaks after 3 seconds (240 million iterations)
+		// Returns and breaks after timeout threshold
 		if(timeout_count > TIMEOUT_THRESHOLD) {
 			return ERROR;
 		}
