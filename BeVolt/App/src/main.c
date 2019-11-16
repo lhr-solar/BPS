@@ -25,25 +25,25 @@ int mainmain(){
 	initialize();					// Initialize codes/pins
 	preliminaryCheck();		// Wait until all boards are powered on
 	__enable_irq();				// Enable interrupts
-	
+
 	while(1){
 		// First update the measurements.
 		Voltage_UpdateMeasurements();
 		Current_UpdateMeasurements();
 		Temperature_UpdateMeasurements();
-		
+
 		// Check if everything is safe
 		if(Current_IsSafe() && Temperature_IsSafe(Current_IsCharging()) && Voltage_IsSafe()){
 			Contactor_On();
 		}else{
 			break;
 		}
-		
+
 		// Update necessary
 		// CAN_SendMessageStatus()	// Most likely need to put this on a timer if sending too frequently
-		
+
 	}
-	
+
 	// BPS has tripped if this line is reached
 	faultCondition();
 }
@@ -63,7 +63,7 @@ void initialize(void){
 	Contactor_Init();
 	Contactor_Off();
 	EEPROM_Init();
-	
+
 	Current_Init();
 	Voltage_Init();
 	Temperature_Init();
@@ -90,11 +90,11 @@ void faultCondition(void){
 		if(!Current_IsSafe()){
 			// Toggle Current fault LED
 		}
-		
+
 		if(!Voltage_IsSafe()){
 			// Toggle Voltage fault LED
 		}
-		
+
 		if(!Temperature_IsSafe(Current_IsCharging())){
 			// Toggle Temperature fault LED
 		}
@@ -161,7 +161,7 @@ void print_config(cell_asic *bms_ic);
 int main(){
 	// Local var
 	int8_t error = 0;
-	
+
 	// Initialize LTC
 	__disable_irq();
 	cell_asic battMod[NUM_VOLTAGE_BOARDS];
@@ -235,7 +235,7 @@ int main(){
 		printf("Communication Failed.\n\r");
 	}
 	printf("Writing and Reading to Configuration Register Successful. Initialization Complete\n\r");
-	
+
 	Voltage_UpdateMeasurements();
 	printf("Successfully Updated Voltages.\n\r");
 	printf("\n\rVoltage Test:\n\r");
@@ -263,7 +263,7 @@ int main(){
 	printf("Low Precision: %d\n\r", Current_GetLowPrecReading());
 	printf("High Precision: %d\n\r", Current_GetHighPrecReading());
 	while(1){
-	
+
 	}
 }
 #endif
@@ -281,7 +281,7 @@ int main(){
 	UART3_Init(9600);
 	printf("I'm alive\n\r");
 	int32_t buffer[20];
-	
+
 	Temperature_Init();
 
 	LTC2983_ReadConversions(buffer, BOARD_CS1, 20);
@@ -311,14 +311,14 @@ int main(){
 int main(){
 	WDTimer_Init();
 	LED_Init();
-	
+
 	if(WDTimer_DidSystemReset() != SAFE){
 		LED_On(WDOG);
 		while(1);
 	}
-	
+
 	WDTimer_Start();
-	
+
 	// reset WDTimer 10 times. With this counter, the watchdog timer should not reset the system shortly after it starts.
 	for(int32_t i = 0; i < 10; i++){
 		for(int32_t j = 0; j < 100000; j++);	// Delay
@@ -326,7 +326,7 @@ int main(){
 		WDTimer_Reset();
 	}
 	while(1){
-		
+
 	}
 }
 #endif
@@ -350,14 +350,14 @@ int SPITestmain(){
 	GPIO_Init(GPIOB, &GPIO_InitStruct);
 	GPIOB->ODR |= GPIO_Pin_6;
 	__enable_irq();
-	
+
 	char str[30] = "Testing\n\r";
 	UART3_Write(str, strlen(str));
 	GPIOB->ODR &= ~GPIO_Pin_6;
 	SPI_Write8((uint8_t *)str, strlen(str));
 	GPIOB->ODR |= GPIO_Pin_6;
 	while(1){
-		
+
 	}
 }
 #endif
@@ -384,7 +384,7 @@ int main(){
 	I2C3_Init();
 	I2C3_WriteMultiple(0xA0, 0xCC, randomData);
 	while(1){
-	
+
 	}
 }
 #endif
@@ -415,7 +415,7 @@ int ADCmain(){
 		//sprintf(str,"%d\n",ADC_ChooseHiLo(ADC_ReadHigh(),ADC_ReadLow()));
 		sprintf(str,"%d\r\n",ADC_Conversion(ADC_ReadLow()));
 		UART3_Write(str,strlen(str));
-	}		
+	}
 }
 #endif
 
@@ -441,7 +441,7 @@ void ChargingSoCTest(void) {
 	char str[50];
 	sprintf(str,"Starting SoC Charging Test..");
 	UART3_Write(str, strlen(str));
-	
+
 	fixedPoint_SoC = 0;
 	float_SoC = 0;
 	while(1){
@@ -455,7 +455,7 @@ void DischargingSoCTest(void) {
 	char str[50];
 	sprintf(str,"Starting SoC Discharging Test..");
 	UART3_Write(str, strlen(str));
-	
+
 	fixedPoint_SoC = 10000;
 	float_SoC = 100.00;
 	while(1){
@@ -484,26 +484,26 @@ int main(){
 	// Start UART comms
 	UART3_Init(115200);
 	printf("start\n");
-	
+
 	// Start CAN comms
 	#ifdef CAN_SELF_TEST
 	CAN1_Init(CAN_Mode_LoopBack);
 	#else
 	CAN1_Init(CAN_Mode_Normal);
 	#endif
-	
+
 	// Data to transmit
 	uint8_t data[8] = {0xDE, 0xAD, 0xBE, 0xEF, 0xAE, 0xAE, 0xAE, 0xAE};
 	uint32_t id = CAN_ID_TEST;
 
 	uint8_t RxData[8];
-	
+
 	while(1)
 	{
 		printf("start1\n");
-		
+
 		int box;
-		
+
 		// Transmit the data
 		do {
 			int box = CAN1_Write(id, data, 8);
@@ -517,11 +517,11 @@ int main(){
 		if(status != CAN_TxStatus_Ok) {
 			while(1);
 		}
-		
+
 		#ifdef CAN_SELF_TEST
 		// Read all the data
 		while(CAN1_Read(RxData) == false);
-		
+
 		printf("CAN RxMessage: ");
 		for(int i = 0; i < 8; i++)
 		{
