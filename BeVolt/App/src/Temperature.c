@@ -73,8 +73,9 @@ ErrorStatus Temperature_ChannelConfig(uint8_t tempChannel) {
 		Minions[board].com.tx_data[2] = (AUX_I2C_BLANK << 4) + 0xF; //AUX_I2C_BLANK;
 		Minions[board].com.tx_data[3] = /*AUX_I2C_BLANK*/ (0 << 4) + AUX_I2C_NACK_STOP;
 
-		//Minions[0].com.tx_data[4] = (0x7 << 4) + 0xF;
-		//Minions[0].com.tx_data[5] = (0x0F << 4) + 0x9;
+		// Rest is no transmit with all data bits set to high, makes sure there's nothing else we're sending
+		Minions[board].com.tx_data[4] = (AUX_I2C_NO_TRANSMIT << 4) + 0xF;
+		Minions[board].com.tx_data[5] = (0xF << 4) + AUX_I2C_NACK_STOP;
 
 		wakeup_sleep(NUM_MINIONS);
 		LTC6811_wrcomm(NUM_MINIONS, Minions);
@@ -91,8 +92,9 @@ ErrorStatus Temperature_ChannelConfig(uint8_t tempChannel) {
 		Minions[board].com.tx_data[2] = (AUX_I2C_BLANK << 4) + 0xF; 							// set dont cares high
 		Minions[board].com.tx_data[3] = ((8 + tempChannel) << 4) + AUX_I2C_NACK_STOP; //AUX_I2C_SLAVE_ACK_STOP;				/// Slave acks, master generates stop sig
 			
-		//Minions[0].com.tx_data[4] = (0x7 << 4) + 0xF;
-		//Minions[0].com.tx_data[5] = (0x0F << 4) + 0x9;
+		// Rest is no transmit with all data bits set to high, makes sure there's nothing else we're sending
+		Minions[board].com.tx_data[4] = (AUX_I2C_NO_TRANSMIT << 4) + 0xF;
+		Minions[board].com.tx_data[5] = (0xF << 4) + AUX_I2C_NACK_STOP;
 
 		wakeup_sleep(NUM_MINIONS);
 		LTC6811_wrcomm(NUM_MINIONS, Minions);
@@ -133,8 +135,8 @@ ErrorStatus Temperature_UpdateMeasurements(){
 		for(int board = 0; board < NUM_MINIONS; board++) {
 			
 			// update adc value from GPIO1 stored in a_codes[0]; 
-			// a_codes[0] is fixed point with .0001 resolution in volts -> multiply by .0001 * 1000 to get mV in double form
-			ModuleTemperatures[board][sensorCh] = milliVoltToCelsius(Minions[board].aux.a_codes[0]*0.01);
+			// a_codes[0] is fixed point with .001 resolution in volts -> multiply by .001 * 1000 to get mV in double form
+			ModuleTemperatures[board][sensorCh] = milliVoltToCelsius(Minions[board].aux.a_codes[0]*0.1);
 		}
 	}
 	return SUCCESS;

@@ -331,7 +331,7 @@ int main(){
 	}
 	printf("Writing and Reading to Configuration Register Successful. Initialization Complete\n\r");
 
-//  singleSensorTest()
+//  singleSensorTest();
 //	individualSensorDumpTest();
 //	moduleTemperatureDumpTest();
 //	checkDangerTest();
@@ -344,7 +344,8 @@ void singleSensorTest(void) {
 	while(1) {
 		Temperature_GetRawADC(MD_422HZ_1KHZ);
 		for (int i = 0; i < NUM_MINIONS; i++) {
-			printf("Board %d Sensor %d : %d", i, sensorIndex, milliVoltToCelsius(Minions[i].aux.a_codes[0]*0.1));
+			int temp = milliVoltToCelsius(Minions[i].aux.a_codes[0]*0.1);
+			printf("Board %d Sensor %d : %d", i, sensorIndex, temp);
 		}
 	}
 }
