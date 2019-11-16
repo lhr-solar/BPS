@@ -114,7 +114,7 @@ void Paint_DrawAbsolutePixel(Paint* paint, int x, int y, int colored) {
 
         if (colored) {
 
-            paint->image[(x + y * paint->width) / 8] |= 0x80 >> (x % 8);
+					paint->image[(x + y * paint->width) / 8] |= 0x80 >> (x % 8);
 
         } else {
 
@@ -134,7 +134,7 @@ void Paint_DrawAbsolutePixel(Paint* paint, int x, int y, int colored) {
 
         }
 
-    }
+    } 
 
 }
 

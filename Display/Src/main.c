@@ -73,9 +73,17 @@ static void MX_SPI1_Init(void);
 int main(void)
 {
 
+	char current[5] = "6.9 A";
+	char voltage[5] = "4.2 V";
+	char temperature[5] = "24 F";
+	char SoC[5] = "25%";
+
   /* USER CODE BEGIN 1 */
   /* you have to edit the startup_stm32fxxx.s file and set a big enough heap size */
-  unsigned char* frame_buffer = (unsigned char*)malloc(EPD_WIDTH * EPD_HEIGHT / 8);
+	
+  //unsigned char* frame_buffer = (unsigned char*)malloc(EPD_WIDTH * EPD_HEIGHT / 8);
+  static unsigned char frame_buffer[5808];
+
   /* USER CODE END 1 */
 
   /* MCU Configuration----------------------------------------------------------*/
@@ -105,29 +113,33 @@ int main(void)
     printf("e-Paper init failed\n");
     return -1;
   }
-  
+ 
   Paint paint;
   Paint_Init(&paint, frame_buffer, epd.width, epd.height);
   Paint_Clear(&paint, UNCOLORED);
   
   /* Draw something to the frame buffer */
   /* For simplicity, the arguments are explicit numerical coordinates */
-  Paint_SetRotate(&paint, ROTATE_0);
-  Paint_DrawStringAt(&paint, 4, 50, "e-Paper Demo", &Font20, COLORED);
-  Paint_DrawRectangle(&paint, 10, 130, 50, 180, COLORED);
-  Paint_DrawLine(&paint, 10, 130, 50, 180, COLORED);
-  Paint_DrawLine(&paint, 50, 130, 10, 180, COLORED);
-  Paint_DrawCircle(&paint, 120, 150, 30, COLORED);
-  Paint_DrawFilledRectangle(&paint, 10, 200, 50, 250, COLORED);
-  Paint_DrawFilledRectangle(&paint, 0, 76, 176, 96, COLORED);
-  Paint_DrawFilledCircle(&paint, 120, 220, 30, COLORED);
-  Paint_DrawStringAt(&paint, 18, 80, "Hello world!", &Font16, UNCOLORED);
-  
+
+  Paint_SetRotate(&paint, ROTATE_90);
+	Paint_DrawStringAt(&paint, 4, 130, current, &Font20, COLORED);
+  Paint_DrawStringAt(&paint, 94, 130, voltage, &Font20, COLORED);
+  Paint_DrawStringAt(&paint, 190, 130, temperature, &Font20, COLORED);
+	Paint_DrawStringAt(&paint, 176, 40, SoC, &Font24, COLORED);
+  Paint_DrawVerticalLine(&paint, 132, 0, 100 , COLORED);	// Top Vertical Line
+	Paint_DrawVerticalLine(&paint, 80, 100, 76 , COLORED);	// b/w current & Voltage
+	Paint_DrawVerticalLine(&paint, 180, 100, 76 , COLORED);	// b/w voltage & temp
+
+	Paint_DrawHorizontalLine(&paint, 0, 100, 264 , COLORED); // main line across
+  Paint_DrawFilledCircle(&paint, 65, 50, 30, COLORED);
+ 
+
   /* Display the frame_buffer */
   EPD_DisplayFrame(&epd, frame_buffer);
-
+	
+	
   /* Display the image buffer */
-  EPD_DisplayFrame(&epd, IMAGE_DATA);
+//  EPD_DisplayFrame(&epd, IMAGE_DATA);
   
   /* USER CODE END 2 */
 
@@ -135,10 +147,7 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-  /* USER CODE END WHILE */
-
-  /* USER CODE BEGIN 3 */
-
+		
   }
   /* USER CODE END 3 */
 

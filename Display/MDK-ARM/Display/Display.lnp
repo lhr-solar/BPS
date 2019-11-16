@@ -26,7 +26,6 @@
 "display\stm32f4xx_hal_exti.o"
 "display\stm32f4xx_hal_can.o"
 "display\stm32f4xx_hal_spi.o"
-"display\stm32f4xx_hal_uart.o"
 "display\system_stm32f4xx.o"
 "display\font8.o"
 "display\font12.o"
