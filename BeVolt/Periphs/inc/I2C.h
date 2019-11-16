@@ -3,6 +3,7 @@
  */
 #ifndef I2C_H
 #define I2C_H
+#define TIMEOUT_THRESHOLD 1200000 // 15 ms delay threshold (3x the write time)
 
 #include <stdio.h>
 #include "stm32f4xx.h"

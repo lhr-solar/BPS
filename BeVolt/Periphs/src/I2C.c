@@ -49,13 +49,12 @@ uint8_t I2C3_Read(uint8_t deviceAddr, uint16_t regAddr){
 }
 
 ErrorStatus I2C3_ReadMultiple(uint8_t deviceAddr, uint16_t startAddr, uint8_t *rxData, uint32_t rxSize){
-	int timeout_threshold = 240000000;
 	int timeout_count = 0;
 	while(I2C_GetFlagStatus(I2C3, I2C_FLAG_BUSY)){
 		// Assume running at 80 MHz
 		timeout_count++;
 		// Returns and breaks after timeout threshold
-		if(timeout_count > timeout_threshold) {
+		if(timeout_count > TIMEOUT_THRESHOLD) {
 			return ERROR;
 		}
 	}
@@ -73,7 +72,7 @@ ErrorStatus I2C3_ReadMultiple(uint8_t deviceAddr, uint16_t startAddr, uint8_t *r
 		// Assume running at 80 MHz
 		timeout_count++;
 		// Returns and breaks after timeout threshold
-		if(timeout_count > timeout_threshold) {
+		if(timeout_count > TIMEOUT_THRESHOLD) {
 			return ERROR;
 		}
 	}
@@ -91,7 +90,7 @@ ErrorStatus I2C3_ReadMultiple(uint8_t deviceAddr, uint16_t startAddr, uint8_t *r
 		// Assume running at 80 MHz
 		timeout_count++;
 		// Returns and breaks after timeout threshold
-		if(timeout_count > timeout_threshold) {
+		if(timeout_count > TIMEOUT_THRESHOLD) {
 			return ERROR;
 		}
 	}
@@ -104,7 +103,7 @@ ErrorStatus I2C3_ReadMultiple(uint8_t deviceAddr, uint16_t startAddr, uint8_t *r
 		// Assume running at 80 MHz
 		timeout_count++;
 		// Returns and breaks after timeout threshold
-		if(timeout_count > timeout_threshold) {
+		if(timeout_count > TIMEOUT_THRESHOLD) {
 			return ERROR;
 		}
 	}
@@ -116,7 +115,7 @@ ErrorStatus I2C3_ReadMultiple(uint8_t deviceAddr, uint16_t startAddr, uint8_t *r
 		// Assume running at 80 MHz
 		timeout_count++;
 		// Returns and breaks after timeout threshold
-		if(timeout_count > timeout_threshold) {
+		if(timeout_count > TIMEOUT_THRESHOLD) {
 			return ERROR;
 		}
 	}
@@ -127,7 +126,7 @@ ErrorStatus I2C3_ReadMultiple(uint8_t deviceAddr, uint16_t startAddr, uint8_t *r
 		// Assume running at 80 MHz
 		timeout_count++;
 		// Returns and breaks after timeout threshold
-		if(timeout_count > timeout_threshold) {
+		if(timeout_count > TIMEOUT_THRESHOLD) {
 			return ERROR;
 		}
 	}
@@ -143,7 +142,7 @@ ErrorStatus I2C3_ReadMultiple(uint8_t deviceAddr, uint16_t startAddr, uint8_t *r
 		// Assume running at 80 MHz
 		timeout_count++;
 		// Returns and breaks after timeout threshold
-		if(timeout_count > timeout_threshold) {
+		if(timeout_count > TIMEOUT_THRESHOLD) {
 			return ERROR;
 		}
 	}
@@ -156,7 +155,7 @@ ErrorStatus I2C3_ReadMultiple(uint8_t deviceAddr, uint16_t startAddr, uint8_t *r
 		// Assume running at 80 MHz
 		timeout_count++;
 		// Returns and breaks after timeout threshold
-		if(timeout_count > timeout_threshold) {
+		if(timeout_count > TIMEOUT_THRESHOLD) {
 			return ERROR;
 		}
 	}
@@ -169,7 +168,7 @@ ErrorStatus I2C3_ReadMultiple(uint8_t deviceAddr, uint16_t startAddr, uint8_t *r
 				// Assume running at 80 MHz
 				timeout_count++;
 				// Returns and breaks after timeout threshold
-				if(timeout_count > timeout_threshold) {
+				if(timeout_count > TIMEOUT_THRESHOLD) {
 					return ERROR;
 				}
 			}
@@ -185,7 +184,7 @@ ErrorStatus I2C3_ReadMultiple(uint8_t deviceAddr, uint16_t startAddr, uint8_t *r
 				// Assume running at 80 MHz
 				timeout_count++;
 				// Returns and breaks after timeout threshold
-				if(timeout_count > timeout_threshold) {
+				if(timeout_count > TIMEOUT_THRESHOLD) {
 					return ERROR;
 				}
 			}
@@ -208,13 +207,12 @@ ErrorStatus I2C3_Write(uint8_t deviceAddr, uint16_t regAddr, uint8_t data){
 }
 
 ErrorStatus I2C3_WriteMultiple(uint8_t deviceAddr, uint16_t startAddr, uint8_t *txData, uint32_t txSize){
-	int timeout_threshold = 240000000;
 	int timeout_count = 0;
 	while(I2C_GetFlagStatus(I2C3, I2C_FLAG_BUSY)){
 		// Assume running at 80 MHz
 		timeout_count++;
 		// Returns and breaks after timeout threshold
-		if(timeout_count > timeout_threshold) {
+		if(timeout_count > TIMEOUT_THRESHOLD) {
 			return ERROR;
 		}
 	}
@@ -232,7 +230,7 @@ ErrorStatus I2C3_WriteMultiple(uint8_t deviceAddr, uint16_t startAddr, uint8_t *
 		// Assume running at 80 MHz
 		timeout_count++;
 		// Returns and breaks after timeout threshold
-		if(timeout_count > timeout_threshold) {
+		if(timeout_count > TIMEOUT_THRESHOLD) {
 			return ERROR;
 		}
 	}
@@ -252,7 +250,7 @@ ErrorStatus I2C3_WriteMultiple(uint8_t deviceAddr, uint16_t startAddr, uint8_t *
 		// Assume running at 80 MHz
 		timeout_count++;
 		// Returns and breaks after 3 seconds (240 million iterations)
-		if(timeout_count > timeout_threshold) {
+		if(timeout_count > TIMEOUT_THRESHOLD) {
 			return ERROR;
 		}
 	}
@@ -265,7 +263,7 @@ ErrorStatus I2C3_WriteMultiple(uint8_t deviceAddr, uint16_t startAddr, uint8_t *
 		// Assume running at 80 MHz
 		timeout_count++;
 		// Returns and breaks after 3 seconds (240 million iterations)
-		if(timeout_count > timeout_threshold) {
+		if(timeout_count > TIMEOUT_THRESHOLD) {
 			return ERROR;
 		}
 	}
@@ -277,7 +275,7 @@ ErrorStatus I2C3_WriteMultiple(uint8_t deviceAddr, uint16_t startAddr, uint8_t *
 		// Assume running at 80 MHz
 		timeout_count++;
 		// Returns and breaks after 3 seconds (240 million iterations)
-		if(timeout_count > timeout_threshold) {
+		if(timeout_count > TIMEOUT_THRESHOLD) {
 			return ERROR;
 		}
 	}
@@ -288,7 +286,7 @@ ErrorStatus I2C3_WriteMultiple(uint8_t deviceAddr, uint16_t startAddr, uint8_t *
 		// Assume running at 80 MHz
 		timeout_count++;
 		// Returns and breaks after 3 seconds (240 million iterations)
-		if(timeout_count > timeout_threshold) {
+		if(timeout_count > TIMEOUT_THRESHOLD) {
 			return ERROR;
 		}
 	}
@@ -306,7 +304,7 @@ ErrorStatus I2C3_WriteMultiple(uint8_t deviceAddr, uint16_t startAddr, uint8_t *
 		// Assume running at 80 MHz
 		timeout_count++;
 		// Returns and breaks after 3 seconds (240 million iterations)
-		if(timeout_count > timeout_threshold) {
+		if(timeout_count > TIMEOUT_THRESHOLD) {
 			return ERROR;
 		}
 	}
