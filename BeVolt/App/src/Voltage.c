@@ -78,6 +78,7 @@ SafetyStatus Voltage_IsSafe(void){
  */
 uint16_t *Voltage_GetModulesInDanger(void){
 	static uint16_t checks[NUM_BATTERY_MODULES];
+	uint32_t open_wires = Voltage_GetOpenWire();
 	for(int i = 0; i < NUM_BATTERY_MODULES; ++i){
 		if(Voltage_GetModuleVoltage(i) > MAX_VOLTAGE_LIMIT || Voltage_GetModuleVoltage(i) < MIN_VOLTAGE_LIMIT){
 			checks[i] = 1;	// 1 shows that the unit is in danger
@@ -85,12 +86,6 @@ uint16_t *Voltage_GetModulesInDanger(void){
 			checks[i] = 0;	// 0 shows that the unit is not in danger
 		}
 	}
-
-	int sum = 0;
-	for(int i = 0; i < NUM_BATTERY_MODULES; ++i){
-		sum += checks[i];
-	}
-
 	return checks;
 }
 /** Voltage_OpenWireSummary
