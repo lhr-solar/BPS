@@ -130,8 +130,7 @@ void faultCondition(void){
 // E.g. If you want to run a LTC6811 test, change "#define CHANGE_THIS_TO_TEST_NAME" to the
 //		following:
 //		#define LTC6811_TEST
-#define EEPROM_RESET
-
+#define OPEN_WIRE_TEST
 
 #ifdef LED_TEST
 #include "LED.h"
@@ -762,4 +761,25 @@ int main() {
 	while(1);
 }
 
+#endif
+
+#ifdef OPEN_WIRE_TEST
+//******************************************************************************************
+#include "Voltage.h"
+#include <stdio.h>
+#include "UART.h"
+int main(){
+	UART3_Init(115200);
+	Voltage_Init();
+	printf("%x", Voltage_GetOpenWire());
+	printf("\n\r");
+	if(Voltage_OpenWire() == DANGER){
+		printf("return = DANGER\n\r");
+		Voltage_OpenWireSummary();
+		printf("\n\r");
+	}
+	else if(Voltage_OpenWire() == SAFE){
+		printf("return = SAFE\n\r");
+	}
+}
 #endif
