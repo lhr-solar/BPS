@@ -20,12 +20,14 @@ void initialize(void);
 void preliminaryCheck(void);
 void faultCondition(void);
 
-int mainmain(){
+int realmainmain(){
 	__disable_irq();			// Disable all interrupts until initialization is done
 	initialize();					// Initialize codes/pins
 	preliminaryCheck();		// Wait until all boards are powered on
 	__enable_irq();				// Enable interrupts
 
+	WDTimer_Start();
+	
 	while(1){
 		// First update the measurements.
 		Voltage_UpdateMeasurements();
@@ -42,6 +44,7 @@ int mainmain(){
 		// Update necessary
 		// CAN_SendMessageStatus()	// Most likely need to put this on a timer if sending too frequently
 
+		WDTimer_Reset();
 	}
 
 	// BPS has tripped if this line is reached
@@ -61,9 +64,11 @@ int mainmain(){
  *			- Give wrappers (Voltage, Current, Temperature) the limits
  */
 void initialize(void){
+	LED_Init();
 	Contactor_Init();
 	Contactor_Off();
-	EEPROM_Init();
+	WDTimer_Init();
+	//EEPROM_Init();
 
 	Current_Init();
 	Voltage_Init(Minions);
@@ -76,6 +81,12 @@ void initialize(void){
  * even though everything is safe.
  */
 void preliminaryCheck(void){
+	if (WDTimer_DidSystemReset() == DANGER) {
+		while(1){
+			LED_On(FAULT);
+			LED_On(WDOG);
+		}
+	}
 	// Check if Watch dog timer was triggered previously
 }
 
@@ -87,32 +98,36 @@ void preliminaryCheck(void){
 void faultCondition(void){
 	Contactor_Off();
 	LED_Off(RUN);
+	LED_On(FAULT);
 
 	while(1){
 		// CAN_SendMessageStatus()
 		if(!Current_IsSafe()){
+			LED_On(OCURR);
 			// Toggle Current fault LED
 		}
 
-		if(!Voltage_IsSafe()){
-			// Toggle Voltage fault LED
-			switch(Voltage_IsSafe()){
-				case OVERVOLTAGE:
-					LED_On(OVOLT);
-					break;
+		// Toggle Voltage fault LED
+		switch(Voltage_IsSafe()){
+			case OVERVOLTAGE:
+				LED_On(OVOLT);
+				break;
 
-				case UNDERVOLTAGE:
-					LED_On(UVOLT);
-					break;
+			case UNDERVOLTAGE:
+				LED_On(UVOLT);
+				break;
 
-				default:
-					break;
-			}
+			default:
+				break;
 		}
 
 		if(!Temperature_IsSafe(Current_IsCharging())){
+			LED_On(OTEMP);
 			// Toggle Temperature fault LED
 		}
+		
+		WDTimer_Reset();	// Even though faulted, WDTimer needs to be updated or else system will reset
+											// causing WDOG error. WDTimer can't be stopped after it starts.
 	}
 }
 
@@ -130,7 +145,7 @@ void faultCondition(void){
 // E.g. If you want to run a LTC6811 test, change "#define CHANGE_THIS_TO_TEST_NAME" to the
 //		following:
 //		#define LTC6811_TEST
-#define EEPROM_RESET
+#define TEMPERATURE_TEST
 
 
 #ifdef LED_TEST
@@ -250,7 +265,7 @@ int main(){
 	// delay for UART to USB IC to bootup
 	for(int i = 0; i < 1000000; i++);
 
-	while(Voltage_Init() != SUCCESS) {
+	while(Voltage_Init(Minions) != SUCCESS) {
 		printf("Communication Failed.\n\r");
 	}
 	printf("Writing and Reading to Configuration Register Successful. Initialization Complete\n\r");
@@ -296,19 +311,15 @@ int main(){
 	}
 }
 #endif
-//1.154
+
 #ifdef TEMPERATURE_TEST
 #include "UART.h"
 #include "Temperature.h"
 
-// Backspace needs to be fixed for scanf
-void dumpRawData(void);
-void checkModuleTemperatureTest(void);
-void checkIndividualSensorTest(void);
-void checkDangerTest(void);
-void checkMasterTest(void);						// To implement later. Able to check everything with easeee
-void individualSensorDumpTest(void);
-void moduleTemperatureDumpTest(void);
+void singleSensorTest(void);												// Prints out a single sensor 
+void individualSensorDumpTest(void);                 // Prints out each individual sensor temperature on all boards
+void batteryModuleTemperatureTest(void);      			// Prints out every battery modules temperature average with their 2 sensors
+void checkDangerTest(void);													// checks for danger
 
 extern int16_t ModuleTemperatures[NUM_MINIONS][MAX_TEMP_SENSORS_PER_MINION_BOARD];
 
@@ -319,59 +330,21 @@ int main(){
 		printf("Communication Failed.\n\r");
 	}
 	printf("Writing and Reading to Configuration Register Successful. Initialization Complete\n\r");
-	
+
+//  singleSensorTest()
 //	individualSensorDumpTest();
-//	checkIndividualSensorTest();
 //	moduleTemperatureDumpTest();
-//	checkModuleTemperatureTest();
 //	checkDangerTest();
-	dumpRawData();
 	while(1){}
 }
 
-/***** just testing the temperature sensor w/o battery ****/
-void checkIndividualSensorTest(void) {
-	printf("Individual Sensor Test\r\n");
-	int moduleNum;
-	int sensorToTest = 0;
-	int loopLen = 1;
-
+void singleSensorTest(void) {
+	int sensorIndex = 0; // <-- replace this with which sensor you want to test
+	Temperature_ChannelConfig(sensorIndex);
 	while(1) {
-		printf("Enter Board Number(0-indexed): ");
-		while(scanf("%d", &moduleNum) == EOF || moduleNum > NUM_MINIONS || moduleNum < 0) {
-			printf("\r\nERROR -- please input valid board number: ");
-		}
-		printf("\r\nSensor Number (-1 for all; 0-indexed): ");
-		while(scanf("%d", &sensorToTest) == EOF || sensorToTest > MAX_TEMP_SENSORS_PER_MINION_BOARD) {
-			printf("\r\nERROR -- please input valid sensor number: ");
-		}
-		printf("\r\n");
-
-		printf("How many times do you want to check? (input -1 if you want infinite)\r\n");
-		scanf("%d", &loopLen);
-		if (loopLen >= 0) {
-			for (int loop = 0; loop < loopLen; loop++) {
-					Temperature_UpdateMeasurements();
-					if (sensorToTest == -1 ) {
-						for (int i = 0; i < MAX_TEMP_SENSORS_PER_MINION_BOARD; i++) {
-							printf("Board %d, Sensor %d: %d Celsius\r\n", moduleNum, i, ModuleTemperatures[moduleNum][i]);
-						}
-					} else {
-						printf("Board %d, Sensor %d: %d Celsius\r\n", moduleNum, sensorToTest, ModuleTemperatures[moduleNum][sensorToTest]);
-					}
-				}
-			}
-		else {
-			while (1) {
-				Temperature_UpdateMeasurements();
-				if (sensorToTest == -1 ) {
-					for (int i = 0; i < MAX_TEMP_SENSORS_PER_MINION_BOARD; i++) {
-						printf("Board %d, Sensor %d: %d Celsius\r\n", moduleNum, i, ModuleTemperatures[moduleNum][i]);
-					}
-				} else {
-					printf("Board %d, Sensor %d: %d Celsius\r\n", moduleNum, sensorToTest, ModuleTemperatures[moduleNum][sensorToTest]);
-				}
-			}
+		Temperature_GetRawADC(MD_422HZ_1KHZ);
+		for (int i = 0; i < NUM_MINIONS; i++) {
+			printf("Board %d Sensor %d : %d", i, sensorIndex, milliVoltToCelsius(Minions[i].aux.a_codes[0]*0.1));
 		}
 	}
 }
@@ -381,18 +354,31 @@ void individualSensorDumpTest(void) {
 		Temperature_UpdateMeasurements();
 		for (int i = 0; i < NUM_MINIONS; i++) {
 			for (int j = 0; j < MAX_TEMP_SENSORS_PER_MINION_BOARD; j++) {
-				printf("Board %d, Sensor %d: %d Celsius\r\n", i+1, j+1, ModuleTemperatures[i][j]);
-				//for(int delay = 0; delay < 800000; delay++){}
+				printf("Board %d, Sensor %d: %d Celsius\r\n", i, j, ModuleTemperatures[i][j]);
+				for(int delay = 0; delay < 800000; delay++){}
 			}
 		}
 	}
 }
 
+void batteryModuleTemperatureTest (void) {
+	while (1) {
+		Temperature_UpdateMeasurements();
+		for (int i = 0; i < NUM_MINIONS; i++) {
+		    for (int j = 0; j < MAX_TEMP_SENSORS_PER_MINION_BOARD/2; j++) {
+			int moduleNum =  i * MAX_TEMP_SENSORS_PER_MINION_BOARD/2 + j;
+		        printf("Board %d Battery Module %d Temp: %d Celsius\r\n", i,  moduleNum, Temperature_GetModuleTemperature(moduleNum));
+		        for(int delay = 0; delay < 800000; delay++){}
+		    }
+		}
+		printf("Total Average is %d\r\n", Temperature_GetTotalPackAvgTemperature());
+		for(int delay = 0; delay < 800000; delay++){}
+	}
+}
+
 void checkDangerTest(void) {
-	int isCharging;
+	int isCharging = 1;  // 1 if pack is charging, 0 if discharging
 	printf("Danger Test\r\n");
-	printf("Discharging or Charging? (0/1)\r\n");
-	scanf("%d", &isCharging);
 	while (1) {
 		Temperature_UpdateMeasurements();
 		if (Temperature_IsSafe(isCharging) == ERROR) {
@@ -401,93 +387,15 @@ void checkDangerTest(void) {
 			uint8_t* dangerList = Temperature_GetModulesInDanger();
 			for (int i = 0; i < NUM_MINIONS; i++) {
 				if (dangerList[i] == 1) {
-					printf("Board %d is in danger\r\n", i+1);
+					printf("Board %d is in danger\r\n", i);
 					for (int j = 0; j < MAX_TEMP_SENSORS_PER_MINION_BOARD; j++) {
-						printf("Board %d Sensor %d : %d Celsius\r\n", i+1, j+1, ModuleTemperatures[i][j]);
+						printf("Board %d Sensor %d : %d Celsius\r\n", i, j, ModuleTemperatures[i][j]);
 					}
 				}
 			}
 			while (1){}
 		} else {
 			printf("we good.. \r\n");
-		}
-	}
-}
-void moduleTemperatureDumpTest (void) {
-	while (1) {
-		Temperature_UpdateMeasurements();
-		for (int i = 0; i < NUM_MINIONS; i++) {
-			printf("Module %d Temp: %d Celsius\r\n", i+1, Temperature_GetModuleTemperature(i));
-			//for(int delay = 0; delay < 800000; delay++){}
-		}
-		printf("Total Average is %d\r\n", Temperature_GetTotalPackAvgTemperature());
-		//for(int delay = 0; delay < 800000; delay++){}
-	}
-}
-
-void checkModuleTemperatureTest(void) {
-	int moduleToCheck;				// index of module to check average temperature
-	int32_t loopLen;					// how many times you are checking the temperature
-	bool checkAllFlag = false;
-	while (1) {
-		// User input
-		printf("Please input board number to test or 7 to check all: ");
-		while(scanf("%d", &moduleToCheck) == EOF || moduleToCheck > NUM_MINIONS || moduleToCheck <= 0) {
-			printf("\r\nERROR -- please input valid board number: ");
-		}
-		if (moduleToCheck != 7) {
-			printf("\r\nTesting module %d..\r\n", moduleToCheck);
-		}
-		else {
-			printf("\r\nTesting all modules...\r\n");
-			checkAllFlag = true;
-		}
-
-		printf("How many times do you want to check? (input -1 if you want infinite)\r\n");
-		scanf("%d", &loopLen);
-
-		// Temperature checking
-		if (loopLen >= 0) {
-			printf("----------START----------\r\n");
-			for (int i = 0; i < loopLen; i++) {
-				Temperature_UpdateMeasurements();
-				if(checkAllFlag) {
-					for (int i = 0; i < NUM_MINIONS; i++) {
-						printf("Module %d Temp: %d Celsius\r\n", i, Temperature_GetModuleTemperature(i));
-					}
-					printf("Total Average is %d\r\n", Temperature_GetTotalPackAvgTemperature());
-				} else {
-					printf("Module %d Temp: %d Celsius\r\n", moduleToCheck, Temperature_GetModuleTemperature(moduleToCheck));
-				}
-			}
-			checkAllFlag = false;
-			printf("----------DONE----------\r\n");
-		} else {
-			while (1) {
-				Temperature_UpdateMeasurements();
-				if(checkAllFlag) {
-					for (int i = 0; i < NUM_MINIONS; i++) {
-						printf("Module %d Temp: %d Celsius\r\n", i, Temperature_GetModuleTemperature(i));
-					}
-					printf("Total Average is %d\r\n", Temperature_GetTotalPackAvgTemperature());
-				} else {
-					printf("Module %d Temp: %d Celsius\r\n", moduleToCheck, Temperature_GetModuleTemperature(moduleToCheck));
-				}
-			}
-		}
-	}
-}
-
-void dumpRawData(void){
-	while(1){
-		for (int i = 0; i < MAX_TEMP_SENSORS_PER_MINION_BOARD; i++) {
-			printf("configuring channel %d\n\r", i);
-			Temperature_ChannelConfig(i);
-			Temperature_GetRawADC(MD_422HZ_1KHZ);
-			for(int j = 0; j < NUM_MINIONS; j++) {
-				printf("Board %d -- sensor %d: %fv \n\r", j, i, Minions[j].aux.a_codes[0]*0.0001);
-			}
-			for(int i = 0; i < 1000000; i++);
 		}
 	}
 }

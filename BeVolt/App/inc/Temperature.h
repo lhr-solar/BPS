@@ -12,14 +12,15 @@
 #include "config.h"
 #include "LTC6811.h"
 
-#define MUX1 0x91
-#define MUX2 0x93
+#define MUX1 0x90
+#define MUX2 0x92
 #define AUX_I2C_BLANK 0
 #define AUX_I2C_SLAVE_ACK 0x07
 #define AUX_I2C_SLAVE_ACK_STOP 0x1
 #define AUX_I2C_START 0x06
 #define AUX_I2C_ACK 0
 #define AUX_I2C_NACK_STOP 0x9
+#define AUX_I2C_NACK 0x8
 
 /** Temperature_Init
  * Initializes device drivers including SPI inside LTC6811_init and LTC6811 for Temperature Monitoring
@@ -89,4 +90,11 @@ int16_t Temperature_GetTotalPackAvgTemperature(void);
  */
 ErrorStatus Temperature_GetRawADC(uint8_t ADCMode);
 
+/** convertVoltageToTemperature
+ * Converts mv to temperature based on the temperature sensor equation
+ * Equation : T(in C) = (((13.582 - sqrt((-13.582)*(-13.582) + 4 * 0.00433 * (2230.8 - milliVolt)))/ (2.0 * -0.00433)) + 30)
+ * @param mV from ADC
+ * @return temperature in Celsius (Fixed Point with .001 resolution) 
+ */
+int milliVoltToCelsius(float milliVolt);
 #endif
