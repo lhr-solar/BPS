@@ -41,6 +41,7 @@ void copyHardwareToSoftware(void);
  *		rx : PA10
  * @param baud rate: 9600, 115200, 500000
  */
+
 void UART1_Init(uint32_t baud){
 	GPIO_InitTypeDef GPIO_InitStruct;
 	USART_InitTypeDef USART_InitStruct;
