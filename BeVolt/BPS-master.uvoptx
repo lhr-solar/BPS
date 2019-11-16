@@ -152,9 +152,9 @@
         <Bp>
           <Number>0</Number>
           <Type>0</Type>
-          <LineNumber>789</LineNumber>
+          <LineNumber>409</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>134222348</Address>
+          <Address>134219050</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
@@ -163,7 +163,39 @@
           <BreakIfRCount>1</BreakIfRCount>
           <Filename>.\App\src\main.c</Filename>
           <ExecCommand></ExecCommand>
-          <Expression>\\BPS_master\App/src/main.c\789</Expression>
+          <Expression>\\BPS_master\App/src/main.c\409</Expression>
+        </Bp>
+        <Bp>
+          <Number>1</Number>
+          <Type>0</Type>
+          <LineNumber>411</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>134219066</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>1</BreakIfRCount>
+          <Filename>.\App\src\main.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression>\\BPS_master\App/src/main.c\411</Expression>
+        </Bp>
+        <Bp>
+          <Number>2</Number>
+          <Type>0</Type>
+          <LineNumber>414</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>134219090</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>1</BreakIfRCount>
+          <Filename>.\App\src\main.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression>\\BPS_master\App/src/main.c\414</Expression>
         </Bp>
       </Breakpoint>
       <WatchWindow1>
@@ -175,7 +207,12 @@
         <Ww>
           <count>1</count>
           <WinNumber>1</WinNumber>
-          <ItemText>Minions[0].cells</ItemText>
+          <ItemText>Minions[0].cells,0x0A</ItemText>
+        </Ww>
+        <Ww>
+          <count>2</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>contactor_status</ItemText>
         </Ww>
       </WatchWindow1>
       <Tracepoint>
@@ -232,7 +269,7 @@
 
   <Group>
     <GroupName>App/src</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -312,7 +349,7 @@
 
   <Group>
     <GroupName>App/inc</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -596,7 +633,7 @@
 
   <Group>
     <GroupName>Periphs/inc</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>

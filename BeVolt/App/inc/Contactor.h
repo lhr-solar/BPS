@@ -4,6 +4,7 @@
  */
 
 #include <stdint.h>
+#include "config.h"
 
 #ifndef CONTACTOR_H__
 #define CONTACTOR_H__
@@ -21,6 +22,6 @@ void Contactor_Off(void);
 
  
 //Outputs: flag status (0 or 1)
-uint32_t Contactor_Flag(void);
+FunctionalState Contactor_Flag(void);
 
 #endif
