@@ -7,12 +7,12 @@
 void I2C3_Init(void){
 	GPIO_InitTypeDef GPIO_InitStruct;
 	I2C_InitTypeDef I2C_InitStruct;
-	
+
 	// Uses PA8 for SCL and PC9 for SDA
 	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
 	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC, ENABLE);
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_I2C3, ENABLE);
-	
+
 	// Initialize PA8 for SCL on I2C3
 	GPIO_InitStruct.GPIO_Pin = GPIO_Pin_8;
 	GPIO_InitStruct.GPIO_Mode = GPIO_Mode_AF;
@@ -20,16 +20,16 @@ void I2C3_Init(void){
 	GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
 	GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_UP;
 	GPIO_Init(GPIOA, &GPIO_InitStruct);
-	
+
 	// Initialize PC9 for SDA on I2C3
 	GPIO_InitStruct.GPIO_Pin = GPIO_Pin_9;	// Only need to change pin since the rest of the pin configurations are the same
 	GPIO_Init(GPIOC, &GPIO_InitStruct);
-	
+
 	// Set which alternate function mode we want for these pins.
 	// We want to make these pins use I2C3.
 	GPIO_PinAFConfig(GPIOA, GPIO_PinSource8, GPIO_AF_I2C3);	// PA8
 	GPIO_PinAFConfig(GPIOC, GPIO_PinSource9, GPIO_AF_I2C3);		// PC9
-	
+
 	I2C_InitStruct.I2C_Mode = I2C_Mode_I2C;						// regular mode
 	I2C_InitStruct.I2C_DutyCycle = I2C_DutyCycle_2;		// 50% duty cycle on clock
 	I2C_InitStruct.I2C_AcknowledgedAddress = I2C_AcknowledgedAddress_7bit;		// 7-bit addressing mode
@@ -54,18 +54,27 @@ void I2C3_ReadMultiple(uint8_t deviceAddr, uint16_t startAddr, uint8_t *rxData, 
 		// The next time this is called, the I2C bus should not be busy.
 	}
 	
+	I2C_AcknowledgeConfig(I2C3, ENABLE);
+
 	// First write address that you want to read from
-	
+
+	readPoll:
 	// Since no one is using the I2C bus, take control
 	I2C_GenerateSTART(I2C3, ENABLE);
 	// Wait until start edge event occurred
 	while(!I2C_CheckEvent(I2C3, I2C_EVENT_MASTER_MODE_SELECT));
-	
+
 	// Select device to talk to
 	I2C_Send7bitAddress(I2C3, deviceAddr, I2C_Direction_Transmitter);		// Sets RW bit to 0
 	// Wait until finished sending
-	while(!I2C_CheckEvent(I2C3, I2C_EVENT_MASTER_TRANSMITTER_MODE_SELECTED));
-	
+	while(!I2C_CheckEvent(I2C3, I2C_EVENT_MASTER_TRANSMITTER_MODE_SELECTED)) {
+		if(I2C3->SR1 & 0x0400) {
+			I2C3->SR1 &= ~0x0400;
+			I2C_GenerateSTOP(I2C3, ENABLE);
+			goto readPoll;
+		}
+	}
+
 	// Send start address (MSB first)
 	I2C_SendData(I2C3, (uint8_t)((startAddr & 0xFF00) >> 8));
 	// Wait until transmit event occurred.
@@ -74,72 +83,44 @@ void I2C3_ReadMultiple(uint8_t deviceAddr, uint16_t startAddr, uint8_t *rxData, 
 	I2C_SendData(I2C3, (uint8_t)(startAddr & 0x00FF));
 	// Wait until transmit event occurred.
 	while(!I2C_CheckEvent(I2C3, I2C_EVENT_MASTER_BYTE_TRANSMITTING));
-	
+
 	// Wait until byte transmission finished
 	while(I2C_GetFlagStatus(I2C3, I2C_FLAG_BTF) == RESET);
-	
-	
+
+
 	// Now read data starting from address that was sent
-	
+
 	// Since no one is using the I2C bus, take control
 	I2C_GenerateSTART(I2C3, ENABLE);
 	// Wait until start edge event occurred
 	while(!I2C_CheckEvent(I2C3, I2C_EVENT_MASTER_MODE_SELECT));
-	
+
 	// Select device to talk to
 	I2C_Send7bitAddress(I2C3, deviceAddr, I2C_Direction_Receiver);		// Sets RW bit to 1
 	// Wait until finished sending
 	while(!I2C_CheckEvent(I2C3, I2C_EVENT_MASTER_RECEIVER_MODE_SELECTED));
-	
+
 	while(rxSize > 0){
-		if(rxSize > 3){
+		if(rxSize > 1){
 			// Wait until byte transmission finished
 			while(I2C_GetFlagStatus(I2C3, I2C_FLAG_BTF) == RESET);
 			*rxData = I2C_ReceiveData(I2C3);
 			rxData++;
 			rxSize--;
-		}
-		
-		if(rxSize == 3){
-			// Wait until byte transmission finished
-			while(I2C_GetFlagStatus(I2C3, I2C_FLAG_BTF) == RESET);
-			
-			// Disable ack
+		} else {
+			// Disable ack, since this is the last byte
 			I2C_AcknowledgeConfig(I2C3, DISABLE);
-			
-			*rxData = I2C_ReceiveData(I2C3);
-			rxData++;
-			
-			I2C_GenerateSTOP(I2C3, ENABLE);
-			*rxData = I2C_ReceiveData(I2C3);
-			rxData++;
-			
-			while(I2C_GetFlagStatus(I2C3, I2C_FLAG_RXNE) == RESET);
-			*rxData = I2C_ReceiveData(I2C3);
-			rxData++;
-			
-			rxSize = 0;
 
-		}else if(rxSize == 2){
-			// Wait until byte transmission finished
-			while(I2C_GetFlagStatus(I2C3, I2C_FLAG_BTF) == RESET);
-			
-			I2C_GenerateSTOP(I2C3, ENABLE);
-			*rxData = I2C_ReceiveData(I2C3);
-			rxData++;
-			
-			*rxData = I2C_ReceiveData(I2C3);
-			rxData++;
-			
-			rxSize = 0;
-			
-		}else if(rxSize == 1){
 			while(I2C_GetFlagStatus(I2C3, I2C_FLAG_RXNE) == RESET);
+
 			*rxData = I2C_ReceiveData(I2C3);
 			rxData++;
 			rxSize = 0;
 		}
 	}
+
+	// Generate the stop
+	I2C_GenerateSTOP(I2C3, ENABLE);
 }
 
 void I2C3_Write(uint8_t deviceAddr, uint16_t regAddr, uint8_t data){
@@ -151,19 +132,29 @@ void I2C3_WriteMultiple(uint8_t deviceAddr, uint16_t startAddr, uint8_t *txData,
 		// Add timeout later. Since this is not a safety critical part of the system, a timeout would be okay.
 		// The next time this is called, the I2C bus should not be busy.
 	}
-	
+
+	I2C_AcknowledgeConfig(I2C3, ENABLE);
+
 	// First write address that you want to read from
-	
+
+	writePoll:
 	// Since no one is using the I2C bus, take control
 	I2C_GenerateSTART(I2C3, ENABLE);
 	// Wait until start edge event occurred
 	while(!I2C_CheckEvent(I2C3, I2C_EVENT_MASTER_MODE_SELECT));
-	
+
 	// Select device to talk to
 	I2C_Send7bitAddress(I2C3, deviceAddr, I2C_Direction_Transmitter);		// Sets RW bit to 0
-	// Wait until finished sending
-	while(!I2C_CheckEvent(I2C3, I2C_EVENT_MASTER_TRANSMITTER_MODE_SELECTED));
 	
+	// THIS IS WHERE WE GOT STUCK
+	while(!I2C_CheckEvent(I2C3, I2C_EVENT_MASTER_TRANSMITTER_MODE_SELECTED)) {
+		if(I2C3->SR1 & 0x0400) {
+			I2C3->SR1 &= ~0x0400;
+			I2C_GenerateSTOP(I2C3, ENABLE);
+			goto writePoll;
+		}
+	}
+
 	// Send start address (MSB first)
 	I2C_SendData(I2C3, (uint8_t)((startAddr & 0xFF00) >> 8));
 	// Wait until transmit event occurred.
@@ -172,19 +163,19 @@ void I2C3_WriteMultiple(uint8_t deviceAddr, uint16_t startAddr, uint8_t *txData,
 	I2C_SendData(I2C3, (uint8_t)(startAddr & 0x00FF));
 	// Wait until transmit event occurred.
 	while(!I2C_CheckEvent(I2C3, I2C_EVENT_MASTER_BYTE_TRANSMITTING));
-	
+
 	// Wait until byte transmission finished
 	while(I2C_GetFlagStatus(I2C3, I2C_FLAG_BTF) == RESET);
-	
+
 	// Start writing data sequentially
 	while(txSize > 0){
+
 		// Wait until BTF flag is set
 		while(I2C_GetFlagStatus(I2C3, I2C_FLAG_BTF) == RESET);
 		I2C_SendData(I2C3, *txData);
 		txData++;
 		txSize--;
 	}
-	
+
 	I2C_GenerateSTOP(I2C3, ENABLE);
 }
-

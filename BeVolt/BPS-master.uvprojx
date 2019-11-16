@@ -336,7 +336,7 @@
             <v6Rtti>0</v6Rtti>
             <VariousControls>
               <MiscControls></MiscControls>
-              <Define>USE_STDPERIPH_DRIVER</Define>
+              <Define>USE_STDPERIPH_DRIVER __FPU_PRESENT</Define>
               <Undefine></Undefine>
               <IncludePath>..\;.\STM32F4xx_StdPeriph_Driver;.\STM32F4xx_StdPeriph_Driver\inc;.\STM32F4xx_StdPeriph_Driver\src;.\CMSIS\Device\ST\STM32F4xx\Include;.\CMSIS;.\CMSIS\Include;.\App;.\App\inc;.\App\src;.\Drivers;.\Drivers\inc;.\Drivers\src;.\Periphs;.\Periphs\inc;.\Periphs\src</IncludePath>
             </VariousControls>
@@ -423,6 +423,11 @@
               <FilePath>.\App\inc\config.h</FilePath>
             </File>
             <File>
+              <FileName>common.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\App\inc\common.h</FilePath>
+            </File>
+            <File>
               <FileName>Current.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\App\inc\Current.h</FilePath>
@@ -463,14 +468,14 @@
               <FilePath>.\Drivers\src\LTC681x.c</FilePath>
             </File>
             <File>
-              <FileName>LTC2983.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\Drivers\src\LTC2983.c</FilePath>
-            </File>
-            <File>
               <FileName>LTC6811.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\Drivers\src\LTC6811.c</FilePath>
+            </File>
+            <File>
+              <FileName>LED.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Drivers\src\LED.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -488,14 +493,14 @@
               <FilePath>.\Drivers\inc\LTC681x.h</FilePath>
             </File>
             <File>
-              <FileName>LTC2983.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\Drivers\inc\LTC2983.h</FilePath>
-            </File>
-            <File>
               <FileName>LTC6811.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\Drivers\inc\LTC6811.h</FilePath>
+            </File>
+            <File>
+              <FileName>LED.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Drivers\inc\LED.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -516,11 +521,6 @@
               <FileName>I2C.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\Periphs\src\I2C.c</FilePath>
-            </File>
-            <File>
-              <FileName>LED.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\Periphs\src\LED.c</FilePath>
             </File>
             <File>
               <FileName>SPI.c</FileName>
@@ -561,11 +561,6 @@
               <FileName>I2C.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\Periphs\inc\I2C.h</FilePath>
-            </File>
-            <File>
-              <FileName>LED.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\Periphs\inc\LED.h</FilePath>
             </File>
             <File>
               <FileName>SPI.h</FileName>
@@ -646,6 +641,11 @@
               <FileName>stm32f4xx_can.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_can.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f4xx_dma.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_dma.c</FilePath>
             </File>
           </Files>
         </Group>

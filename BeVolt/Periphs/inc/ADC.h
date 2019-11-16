@@ -1,7 +1,7 @@
 /** ADC.c
  * Program for UTSVT BeVolt's Battery Protection System ADC initialization
  */
- 
+
 #ifndef ADC_H
 #define ADC_H
 #include <stdint.h>

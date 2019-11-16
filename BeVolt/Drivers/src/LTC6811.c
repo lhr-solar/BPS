@@ -89,9 +89,10 @@ void LTC6811_Init(cell_asic *battMod){
 	GPIO_Init(GPIOB, &GPIO_InitStruct);
 	GPIO_SetBits(GPIOB, GPIO_Pin_6);
 	
-	LTC681x_init_cfg(NUM_VOLTAGE_BOARDS, battMod);
-	LTC6811_reset_crc_count(NUM_VOLTAGE_BOARDS, battMod);
-	LTC6811_init_reg_limits(NUM_VOLTAGE_BOARDS, battMod);
+	
+	LTC681x_init_cfg(NUM_MINIONS, battMod);
+	LTC6811_reset_crc_count(NUM_MINIONS, battMod);
+	LTC6811_init_reg_limits(NUM_MINIONS, battMod);
 }
 
 /********************************************************

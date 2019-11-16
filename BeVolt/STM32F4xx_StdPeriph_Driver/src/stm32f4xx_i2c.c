@@ -290,7 +290,7 @@ void I2C_StructInit(I2C_InitTypeDef* I2C_InitStruct)
 {
 /*---------------- Reset I2C init structure parameters values ----------------*/
   /* initialize the I2C_ClockSpeed member */
-  I2C_InitStruct->I2C_ClockSpeed = 5000;
+  I2C_InitStruct->I2C_ClockSpeed = 100000;
   /* Initialize the I2C_Mode member */
   I2C_InitStruct->I2C_Mode = I2C_Mode_I2C;
   /* Initialize the I2C_DutyCycle member */
