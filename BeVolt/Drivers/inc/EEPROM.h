@@ -19,6 +19,7 @@
 #define FAULT_HIGH_CURRENT	0x08
 #define FAULT_WATCHDOG			0x10
 #define FAULT_CAN_BUS				0x20
+#define FAULT_VOLT_MISC			0x40
 
 #define EEPROM_TERMINATOR		0xFF
 

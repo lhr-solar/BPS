@@ -90,11 +90,8 @@ void EEPROM_LogData(uint8_t logType, uint8_t data) {
 		EEPROM_WriteByte(EEPROM_TEMP_PTR_LOC, tempFaultPtr);
 		break;
 	case FAULT_HIGH_VOLT:
-		EEPROM_WriteByte(voltFaultPtr++, data);
-		EEPROM_WriteByte(voltFaultPtr, EEPROM_TERMINATOR);
-		EEPROM_WriteByte(EEPROM_VOLT_PTR_LOC, voltFaultPtr);
-		break;
 	case FAULT_LOW_VOLT:
+	case FAULT_VOLT_MISC:
 		EEPROM_WriteByte(voltFaultPtr++, data);
 		EEPROM_WriteByte(voltFaultPtr, EEPROM_TERMINATOR);
 		EEPROM_WriteByte(EEPROM_VOLT_PTR_LOC, voltFaultPtr);
