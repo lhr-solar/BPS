@@ -27,19 +27,22 @@ int realmainmain(){
 	__enable_irq();			// Enable interrupts
 
 	WDTimer_Start();
-	
+
+	bool override = false;		// This will be changed by user via CLI	
 	while(1){
-		bool contactorOverride = false;		// This will be changed by user via CLI
 		// First update the measurements.
 		Voltage_UpdateMeasurements();
 		Current_UpdateMeasurements();
 		Temperature_UpdateMeasurements();
+		
+		SafetyStatus condition = !Current_IsSafe() && !Temperature_IsSafe(Current_IsCharging());
+		SafetyStatus voltage = Voltage_IsSafe();
 
 		// Check if everything is safe (all return SAFE = 0)
-		if(!Current_IsSafe() && !Temperature_IsSafe(Current_IsCharging()) && !Voltage_IsSafe() && !contactorOverride) {
+		if(condition && !voltage && !override) {
 			Contactor_On();
 		}
-		else if(!Current_IsSafe() && !Temperature_IsSafe(Current_IsCharging()) && Voltage_IsSafe()==UNDERVOLTAGE && contactorOverride) {
+		else if(condition && voltage==UNDERVOLTAGE && override) {
 			Contactor_On();
 			continue;
 		} else {
