@@ -35,14 +35,15 @@ int realmainmain(){
 		Current_UpdateMeasurements();
 		Temperature_UpdateMeasurements();
 		
-		SafetyStatus condition = !Current_IsSafe() && !Temperature_IsSafe(Current_IsCharging());
+		SafetyStatus current = !Current_IsSafe();
+		SafetyStatus temp = !Temperature_IsSafe(Current_IsCharging());
 		SafetyStatus voltage = Voltage_IsSafe();
 
 		// Check if everything is safe (all return SAFE = 0)
-		if(condition && !voltage && !override) {
+		if(current && temp && !voltage && !override) {
 			Contactor_On();
 		}
-		else if(condition && voltage==UNDERVOLTAGE && override) {
+		else if(current && temp && voltage==UNDERVOLTAGE && override) {
 			Contactor_On();
 			continue;
 		} else {
