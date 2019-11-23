@@ -113,4 +113,34 @@ unsigned short NAME ## Fifo_Size (void){\
 // SIZE can be any size
 // creates RxFifo_Init() RxFifo_Get() and RxFifo_Put()
 
+
+//fifo implementation by Clark Poon and Siobhan Madden
+#include <stdint.h>
+#include <stdbool.h>
+#include "config.h"
+
+//struct definition of fifo
+#define size 32
+typedef struct Fifo {
+	char queue[size];
+	uint8_t head;
+	uint8_t tail;
+	}Fifo;
+
+//set up empty fifo
+void fifoInit(Fifo *fifo);
+
+//checks to see if fifo is empty	
+bool fifoIsEmpty(Fifo fifo);
+	
+//checks to see if fifo is full
+bool fifoIsFull(Fifo fifo);
+	
+//put a character into the fifo
+void fifoPut(Fifo *fifo, char newChar);
+	
+//return a character from fifo
+//return DANGER if empty
+char fifoGet(Fifo *fifo);
+
 #endif //  __FIFO_H__
