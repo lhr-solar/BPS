@@ -5,3 +5,4 @@
 *DebugConfig
 *.uvoptx
 .vscode
+RTE_Components.h
