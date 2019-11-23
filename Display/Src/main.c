@@ -126,6 +126,7 @@ int main(void)
   Paint_DrawStringAt(&paint, 94, 130, voltage, &Font20, COLORED);
   Paint_DrawStringAt(&paint, 190, 130, temperature, &Font20, COLORED);
 	Paint_DrawStringAt(&paint, 176, 40, SoC, &Font24, COLORED);
+	Paint_DrawStringAt(&paint, 5, 5, "ok boomer", &Font20, COLORED);
   Paint_DrawVerticalLine(&paint, 132, 0, 100 , COLORED);	// Top Vertical Line
 	Paint_DrawVerticalLine(&paint, 80, 100, 76 , COLORED);	// b/w current & Voltage
 	Paint_DrawVerticalLine(&paint, 180, 100, 76 , COLORED);	// b/w voltage & temp

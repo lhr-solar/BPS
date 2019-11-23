@@ -1117,11 +1117,11 @@ Image Symbol Table
     _printf_core                             0x08001613   Thumb Code    34  printfb.o(i._printf_core)
     i.fputc                                  0x08001634   Section        0  fputc.o(i.fputc)
     i.main                                   0x08001648   Section        0  main.o(i.main)
-    .constdata                               0x08001790   Section        5  main.o(.constdata)
-    .constdata                               0x08001795   Section      212  epd2in7.o(.constdata)
-    .constdata                               0x08001869   Section       16  system_stm32f4xx.o(.constdata)
-    .constdata                               0x08001879   Section     3800  font20.o(.constdata)
-    .constdata                               0x08002751   Section     6840  font24.o(.constdata)
+    .constdata                               0x080017ac   Section        5  main.o(.constdata)
+    .constdata                               0x080017b1   Section      212  epd2in7.o(.constdata)
+    .constdata                               0x08001885   Section       16  system_stm32f4xx.o(.constdata)
+    .constdata                               0x08001895   Section     3800  font20.o(.constdata)
+    .constdata                               0x0800276d   Section     6840  font24.o(.constdata)
     .data                                    0x20000000   Section       32  epdif.o(.data)
     .data                                    0x20000020   Section       12  stm32f4xx_hal.o(.data)
     .data                                    0x2000002c   Section        4  system_stm32f4xx.o(.data)
@@ -1327,17 +1327,17 @@ Image Symbol Table
     __scatterload_null                       0x08001603   Thumb Code     2  handlers.o(i.__scatterload_null)
     __scatterload_zeroinit                   0x08001605   Thumb Code    14  handlers.o(i.__scatterload_zeroinit)
     fputc                                    0x08001635   Thumb Code    18  fputc.o(i.fputc)
-    main                                     0x08001649   Thumb Code   262  main.o(i.main)
-    lut_vcom_dc                              0x08001795   Data          44  epd2in7.o(.constdata)
-    lut_ww                                   0x080017c1   Data          42  epd2in7.o(.constdata)
-    lut_bw                                   0x080017eb   Data          42  epd2in7.o(.constdata)
-    lut_bb                                   0x08001815   Data          42  epd2in7.o(.constdata)
-    lut_wb                                   0x0800183f   Data          42  epd2in7.o(.constdata)
-    AHBPrescTable                            0x08001869   Data          16  system_stm32f4xx.o(.constdata)
-    Font20_Table                             0x08001879   Data        3800  font20.o(.constdata)
-    Font24_Table                             0x08002751   Data        6840  font24.o(.constdata)
-    Region$$Table$$Base                      0x0800420c   Number         0  anon$$obj.o(Region$$Table)
-    Region$$Table$$Limit                     0x0800422c   Number         0  anon$$obj.o(Region$$Table)
+    main                                     0x08001649   Thumb Code   278  main.o(i.main)
+    lut_vcom_dc                              0x080017b1   Data          44  epd2in7.o(.constdata)
+    lut_ww                                   0x080017dd   Data          42  epd2in7.o(.constdata)
+    lut_bw                                   0x08001807   Data          42  epd2in7.o(.constdata)
+    lut_bb                                   0x08001831   Data          42  epd2in7.o(.constdata)
+    lut_wb                                   0x0800185b   Data          42  epd2in7.o(.constdata)
+    AHBPrescTable                            0x08001885   Data          16  system_stm32f4xx.o(.constdata)
+    Font20_Table                             0x08001895   Data        3800  font20.o(.constdata)
+    Font24_Table                             0x0800276d   Data        6840  font24.o(.constdata)
+    Region$$Table$$Base                      0x08004228   Number         0  anon$$obj.o(Region$$Table)
+    Region$$Table$$Limit                     0x08004248   Number         0  anon$$obj.o(Region$$Table)
     epd_cs_pin                               0x20000000   Data           8  epdif.o(.data)
     epd_rst_pin                              0x20000008   Data           8  epdif.o(.data)
     epd_dc_pin                               0x20000010   Data           8  epdif.o(.data)
@@ -1361,9 +1361,9 @@ Memory Map of the image
 
   Image Entry point : 0x080001d9
 
-  Load Region LR_IROM1 (Base: 0x08000000, Size: 0x00004270, Max: 0x00180000, ABSOLUTE)
+  Load Region LR_IROM1 (Base: 0x08000000, Size: 0x0000428c, Max: 0x00180000, ABSOLUTE)
 
-    Execution Region ER_IROM1 (Exec base: 0x08000000, Load base: 0x08000000, Size: 0x0000422c, Max: 0x00180000, ABSOLUTE)
+    Execution Region ER_IROM1 (Exec base: 0x08000000, Load base: 0x08000000, Size: 0x00004248, Max: 0x00180000, ABSOLUTE)
 
     Exec Addr    Load Addr    Size         Type   Attr      Idx    E Section Name        Object
 
@@ -1453,29 +1453,29 @@ Memory Map of the image
     0x08001612   0x08001612   0x00000022   Code   RO         2502    i._printf_core      mc_w.l(printfb.o)
     0x08001634   0x08001634   0x00000012   Code   RO         2768    i.fputc             mc_w.l(fputc.o)
     0x08001646   0x08001646   0x00000002   PAD
-    0x08001648   0x08001648   0x00000148   Code   RO          149    i.main              main.o
-    0x08001790   0x08001790   0x00000005   Data   RO          151    .constdata          main.o
-    0x08001795   0x08001795   0x000000d4   Data   RO          317    .constdata          epd2in7.o
-    0x08001869   0x08001869   0x00000010   Data   RO         2384    .constdata          system_stm32f4xx.o
-    0x08001879   0x08001879   0x00000ed8   Data   RO         2459    .constdata          font20.o
-    0x08002751   0x08002751   0x00001ab8   Data   RO         2473    .constdata          font24.o
-    0x08004209   0x08004209   0x00000003   PAD
-    0x0800420c   0x0800420c   0x00000020   Data   RO         2796    Region$$Table       anon$$obj.o
+    0x08001648   0x08001648   0x00000164   Code   RO          149    i.main              main.o
+    0x080017ac   0x080017ac   0x00000005   Data   RO          151    .constdata          main.o
+    0x080017b1   0x080017b1   0x000000d4   Data   RO          317    .constdata          epd2in7.o
+    0x08001885   0x08001885   0x00000010   Data   RO         2384    .constdata          system_stm32f4xx.o
+    0x08001895   0x08001895   0x00000ed8   Data   RO         2459    .constdata          font20.o
+    0x0800276d   0x0800276d   0x00001ab8   Data   RO         2473    .constdata          font24.o
+    0x08004225   0x08004225   0x00000003   PAD
+    0x08004228   0x08004228   0x00000020   Data   RO         2796    Region$$Table       anon$$obj.o
 
 
-    Execution Region RW_IRAM1 (Exec base: 0x20000000, Load base: 0x0800422c, Size: 0x00001b70, Max: 0x00050000, ABSOLUTE)
+    Execution Region RW_IRAM1 (Exec base: 0x20000000, Load base: 0x08004248, Size: 0x00001b70, Max: 0x00050000, ABSOLUTE)
 
     Exec Addr    Load Addr    Size         Type   Attr      Idx    E Section Name        Object
 
-    0x20000000   0x0800422c   0x00000020   Data   RW          407    .data               epdif.o
-    0x20000020   0x0800424c   0x0000000c   Data   RW         1598    .data               stm32f4xx_hal.o
-    0x2000002c   0x08004258   0x00000004   Data   RW         2386    .data               system_stm32f4xx.o
-    0x20000030   0x0800425c   0x00000008   Data   RW         2460    .data               font20.o
-    0x20000038   0x08004264   0x00000008   Data   RW         2474    .data               font24.o
-    0x20000040   0x0800426c   0x00000004   Data   RW         2770    .data               mc_w.l(stdout.o)
+    0x20000000   0x08004248   0x00000020   Data   RW          407    .data               epdif.o
+    0x20000020   0x08004268   0x0000000c   Data   RW         1598    .data               stm32f4xx_hal.o
+    0x2000002c   0x08004274   0x00000004   Data   RW         2386    .data               system_stm32f4xx.o
+    0x20000030   0x08004278   0x00000008   Data   RW         2460    .data               font20.o
+    0x20000038   0x08004280   0x00000008   Data   RW         2474    .data               font24.o
+    0x20000040   0x08004288   0x00000004   Data   RW         2770    .data               mc_w.l(stdout.o)
     0x20000044        -       0x000016b0   Zero   RW          150    .bss                main.o
     0x200016f4        -       0x00000078   Zero   RW          406    .bss                epdif.o
-    0x2000176c   0x08004270   0x00000004   PAD
+    0x2000176c   0x0800428c   0x00000004   PAD
     0x20001770        -       0x00000400   Zero   RW            1    STACK               startup_stm32f413xx.o
 
 
@@ -1492,7 +1492,7 @@ Image component sizes
        706          4          0          0          0       8308   epdpaint.o
          0          0       3800          8          0        995   font20.o
          0          0       6840          8          0        995   font24.o
-       644        100          5          0       5808       4746   main.o
+       672        112          5          0       5808       4750   main.o
         36          8        472          0       1024        820   startup_stm32f413xx.o
        180         28          0         12          0       4461   stm32f4xx_hal.o
        172         14          0          0          0      33178   stm32f4xx_hal_cortex.o
@@ -1505,7 +1505,7 @@ Image component sizes
         84         18         16          4          0       1111   system_stm32f4xx.o
 
     ----------------------------------------------------------------------
-      5208        312      11380         64       6956     751317   Object Totals
+      5236        324      11380         64       6956     751321   Object Totals
          0          0         32          0          0          0   (incl. Generated)
          8          0          3          0          4          0   (incl. Padding)
 
@@ -1553,15 +1553,15 @@ Image component sizes
 
       Code (inc. data)   RO Data    RW Data    ZI Data      Debug   
 
-      5560        336      11380         68       6956     746797   Grand Totals
-      5560        336      11380         68       6956     746797   ELF Image Totals
-      5560        336      11380         68          0          0   ROM Totals
+      5588        348      11380         68       6956     746801   Grand Totals
+      5588        348      11380         68       6956     746801   ELF Image Totals
+      5588        348      11380         68          0          0   ROM Totals
 
 ==============================================================================
 
-    Total RO  Size (Code + RO Data)                16940 (  16.54kB)
+    Total RO  Size (Code + RO Data)                16968 (  16.57kB)
     Total RW  Size (RW Data + ZI Data)              7024 (   6.86kB)
-    Total ROM Size (Code + RO Data + RW Data)      17008 (  16.61kB)
+    Total ROM Size (Code + RO Data + RW Data)      17036 (  16.64kB)
 
 ==============================================================================
 
