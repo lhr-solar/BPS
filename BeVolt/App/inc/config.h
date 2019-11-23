@@ -16,7 +16,7 @@ typedef enum {SAFE = 0, DANGER = 1, OVERVOLTAGE = 2, UNDERVOLTAGE = 3} SafetySta
 
 //--------------------------------------------------------------------------------
 // Basic Parameters of BPS layout
-#define NUM_MINIONS						4		// Number of minion boards
+#define NUM_MINIONS						1		// Number of minion boards
 												//
 
 //--------------------------------------------------------------------------------
@@ -38,7 +38,7 @@ typedef enum {SAFE = 0, DANGER = 1, OVERVOLTAGE = 2, UNDERVOLTAGE = 3} SafetySta
 
 //--------------------------------------------------------------------------------
 // Helpers
-#define LTC6811_SCALING_FACTOR			10000
+#define MILLI_SCALING_FACTOR			1000
 
 //--------------------------------------------------------------------------------
 // Voltage Sensor Configurations
