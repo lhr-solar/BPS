@@ -45,6 +45,7 @@
 #include "epdpaint.h"
 #include "imagedata.h"
 #include <stdlib.h>
+#include <stdio.h>
 /* USER CODE END Includes */
 
 /* Private variables ---------------------------------------------------------*/
@@ -53,11 +54,21 @@
 /* Private variables ---------------------------------------------------------*/
 #define COLORED      0
 #define UNCOLORED    1
+#define CURRENT_X    4
+#define CURRENT_Y		 130
+#define TEMPERATURE_X    190
+#define TEMPERATURE_Y		 130
+#define VOLTAGE_X    94
+#define VOLTAGE_Y		 130
+#define SOC_X   176
+#define SOC_Y		 40
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
+void updateFrame(Paint);
 //static void MX_USART1_UART_Init(void);
 static void MX_SPI1_Init(void);
 
@@ -72,12 +83,6 @@ static void MX_SPI1_Init(void);
 
 int main(void)
 {
-
-	char current[5] = "6.9 A";
-	char voltage[5] = "4.2 V";
-	char temperature[5] = "24 F";
-	char SoC[5] = "25%";
-
   /* USER CODE BEGIN 1 */
   /* you have to edit the startup_stm32fxxx.s file and set a big enough heap size */
 	
@@ -121,22 +126,16 @@ int main(void)
   /* Draw something to the frame buffer */
   /* For simplicity, the arguments are explicit numerical coordinates */
 
-  Paint_SetRotate(&paint, ROTATE_90);
-	Paint_DrawStringAt(&paint, 4, 130, current, &Font20, COLORED);
-  Paint_DrawStringAt(&paint, 94, 130, voltage, &Font20, COLORED);
-  Paint_DrawStringAt(&paint, 190, 130, temperature, &Font20, COLORED);
-	Paint_DrawStringAt(&paint, 176, 40, SoC, &Font24, COLORED);
-	Paint_DrawStringAt(&paint, 5, 5, "ok boomer", &Font20, COLORED);
+  Paint_SetRotate(&paint, ROTATE_90); // Set rotation
+	Paint_DrawStringAt(&paint, 5, 5, "ok boomer", &Font20, COLORED); // Ok boomer
   Paint_DrawVerticalLine(&paint, 132, 0, 100 , COLORED);	// Top Vertical Line
 	Paint_DrawVerticalLine(&paint, 80, 100, 76 , COLORED);	// b/w current & Voltage
 	Paint_DrawVerticalLine(&paint, 180, 100, 76 , COLORED);	// b/w voltage & temp
-
-	Paint_DrawHorizontalLine(&paint, 0, 100, 264 , COLORED); // main line across
-  Paint_DrawFilledCircle(&paint, 65, 50, 30, COLORED);
+	Paint_DrawHorizontalLine(&paint, 0, 100, 264 , COLORED); // main line across	
  
 
   /* Display the frame_buffer */
-  EPD_DisplayFrame(&epd, frame_buffer);
+  EPD_DisplayFrame(&epd, frame_buffer); // Inside interrupt
 	
 	
   /* Display the image buffer */
@@ -146,12 +145,55 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+	uint32_t count = 30000000;
+	
   while (1)
-  {
-		
+  {		
+		if( count == 0 ){
+			updateFrame(paint);
+			EPD_DisplayFrame(&epd, frame_buffer); // Inside interrupt
+			count = 45000000;
+		}
+		count--;
   }
   /* USER CODE END 3 */
 
+}
+
+void updateFrame(Paint paint){
+		
+	char current[6];
+	char voltage[6];
+	char temperature[6];
+	char SoC[6];
+	
+	float fc = 6.9f;
+	float fv = 2.4f;
+	float ft = 3.1f;
+	float fs = 2.5f;
+
+	sprintf(current, "%f", fc);
+	sprintf(voltage, "%f", fv);
+	sprintf(temperature, "%f", ft);
+	sprintf(SoC, "%f", fs);
+	
+	current[3] = ' ';
+	current[4] = 'A';
+	current[5] = '\0';
+	voltage[3] = ' ';
+	voltage[4] = 'V';
+	voltage[5] = '\0';
+	temperature[3] = ' ';
+	temperature[4] = 'F';
+	temperature[5] = '\0';
+	SoC[3] = ' ';
+	SoC[4] = '%';
+	SoC[5] = '\0';
+
+	Paint_DrawStringAt(&paint, CURRENT_X, CURRENT_Y, current, &Font20, COLORED);
+	Paint_DrawStringAt(&paint, VOLTAGE_X, VOLTAGE_Y, voltage, &Font20, COLORED);
+	Paint_DrawStringAt(&paint, TEMPERATURE_X, TEMPERATURE_Y, temperature, &Font20, COLORED);
+	Paint_DrawStringAt(&paint, SOC_X, SOC_Y, SoC, &Font24, COLORED);
 }
 
 /**
@@ -169,12 +211,12 @@ void SystemClock_Config(void)
   __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE1);
   /** Initializes the CPU, AHB and APB busses clocks 
   */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
-  RCC_OscInitStruct.HSEState = RCC_HSE_ON;
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
+  RCC_OscInitStruct.HSEState = RCC_HSE_OFF;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
-  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
-  RCC_OscInitStruct.PLL.PLLM = 4;
-  RCC_OscInitStruct.PLL.PLLN = 50;
+  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSI;
+  RCC_OscInitStruct.PLL.PLLM = 10;
+  RCC_OscInitStruct.PLL.PLLN = 200;
   RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;
   RCC_OscInitStruct.PLL.PLLQ = 2;
   RCC_OscInitStruct.PLL.PLLR = 2;
@@ -211,7 +253,7 @@ static void MX_SPI1_Init(void)
   hspi1.Init.CLKPolarity = SPI_POLARITY_LOW;
   hspi1.Init.CLKPhase = SPI_PHASE_1EDGE;
   hspi1.Init.NSS = SPI_NSS_SOFT;
-  hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_128;
+  hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_2;
   hspi1.Init.FirstBit = SPI_FIRSTBIT_MSB;
   hspi1.Init.TIMode = SPI_TIMODE_DISABLE;
   hspi1.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;

@@ -37,3 +37,4 @@ display\main.o: ../BSP/epdif.h
 display\main.o: ../BSP/epdpaint.h
 display\main.o: ../BSP/imagedata.h
 display\main.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h
+display\main.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
