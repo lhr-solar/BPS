@@ -53,7 +53,7 @@ ErrorStatus Temperature_UpdateMeasurements(void);
 /** Temperature_IsSafe
  * Checks if all modules are safe
  * @param 1 if pack is charging, 0 if discharging
- * @return SUCCESS or ERROR
+ * @return SAFE or DANGER
  */
 SafetyStatus Temperature_IsSafe(uint8_t isCharging);
 

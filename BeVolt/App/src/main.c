@@ -29,13 +29,14 @@ int realmainmain(){
 	WDTimer_Start();
 	
 	while(1){
+		// check var
 		// First update the measurements.
 		Voltage_UpdateMeasurements();
 		Current_UpdateMeasurements();
 		Temperature_UpdateMeasurements();
 
-		// Check if everything is safe
-		if(Current_IsSafe() && Temperature_IsSafe(Current_IsCharging()) && Voltage_IsSafe()){
+		// Check if everything is safe (all return SAFE = 0)
+		if(!Current_IsSafe() && !Temperature_IsSafe(Current_IsCharging()) && !Voltage_IsSafe()){
 			Contactor_On();
 		}else{
 			break;
