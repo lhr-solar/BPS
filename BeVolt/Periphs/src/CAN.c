@@ -57,8 +57,8 @@ void CAN1_Init(int CAN_Mode){
 	 * 1/(prescalar + (prescalar*(BS1+1)) + (prescalar*(BS2+1))) * Clk = CAN Baudrate
 	 * The clk is currently set to 16Mhz
 	*/
-  CAN_InitStructure.CAN_BS1 = CAN_BS1_3tq;
-  CAN_InitStructure.CAN_BS2 = CAN_BS2_4tq; 
+  CAN_InitStructure.CAN_BS1 = CAN_BS1_4tq;
+  CAN_InitStructure.CAN_BS2 = CAN_BS2_5tq; 
   CAN_InitStructure.CAN_Prescaler = 16; 
   CAN_Init(CAN1, &CAN_InitStructure);
 

@@ -475,8 +475,6 @@ void DischargingSoCTest(void) {
 #include "CAN.h"
 #include "UART.h"
 
-#define CAN_ID_TEST (0x770)
-
 // Define this if listening to yourself
 //#define CAN_SELF_TEST
 
@@ -493,8 +491,8 @@ int main(){
 	#endif
 
 	// Data to transmit
-	uint8_t data[8] = {0xDE, 0xAD, 0xBE, 0xEF, 0xAE, 0xAE, 0xAE, 0xAE};
-	uint32_t id = BPS_ALLCLEAR;
+	uint8_t data[8] = {0x1, 0xAD, 0xBE, 0xEF, 0xAE, 0xAE, 0xAE, 0xAE};
+	uint32_t id = CAN_ID_BPS_ALL_CLEAR;
 
 	uint8_t RxData[8];
 
@@ -506,7 +504,7 @@ int main(){
 
 		// Transmit the data
 		do {
-			int box = CAN1_Write(id, data, 8);
+			int box = CAN1_Write(id, data, 1);
 		} while (box == CAN_TxStatus_NoMailBox);
 		int status;
 
@@ -515,10 +513,10 @@ int main(){
 			status = CAN_TransmitStatus(CAN1, box);
 		} while( status == CAN_TxStatus_Pending);
 		if(status != CAN_TxStatus_Ok) {
-			while(1);
+			//while(1);
 		}
 
-		// #ifdef CAN_SELF_TEST
+		#ifdef CAN_SELF_TEST
 		// Read all the data
 		while(1) {
 		while(CAN1_Read(RxData) == false);
@@ -530,7 +528,7 @@ int main(){
 		}
 		printf("\n");
 		}
-		// #endif
+		#endif
 	}
 }
 

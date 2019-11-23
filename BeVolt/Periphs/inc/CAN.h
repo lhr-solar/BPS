@@ -10,7 +10,7 @@
 #include "stm32f4xx.h"
 
 // Generic BPS ID
-#define CAN_ID_BPS										(0x01 << 7)
+#define CAN_ID_BPS										(0x01 << 8)
 // Specific BPS IDs
 #define CAN_ID_BPS_TRIP								0x002
 #define CAN_ID_BPS_ALL_CLEAR					(CAN_ID_BPS | 0x01)
