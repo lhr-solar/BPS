@@ -13,6 +13,7 @@
 #include "WDTimer.h"
 #include "SoC.h"
 #include "LED.h"
+#include "SysTick.h"
 
 cell_asic Minions[NUM_MINIONS];
 
