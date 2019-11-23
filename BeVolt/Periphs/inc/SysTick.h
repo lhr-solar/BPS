@@ -4,23 +4,24 @@
  */
 
 #include <stdint.h>
+#include "config.h"
 
-/* SysTick_Handler
+/** SysTick_Handler
  * Called every us; updates the usTicks counter
  */
-void SysTick_Handler();
+void SysTick_Handler(void);
 
-/* DelayInit
+/** DelayInit
  * Initializes the core clock configuration
  */
-void DelayInit();
+void DelayInit(void);
 
-/* DelayUs
+/** DelayUs
  * Delays 'us' amount of us and then continues
  */
 void DelayUs(uint32_t us);
 
-/* DelayMs
+/** DelayMs
  * Delay 'ms' amount of ms and then continues
  */
 void DelayMs(uint32_t ms);
