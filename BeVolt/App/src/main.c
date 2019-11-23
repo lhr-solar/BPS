@@ -40,7 +40,7 @@ int realmainmain(){
 		SafetyStatus voltage = Voltage_IsSafe();
 
 		// Check if everything is safe (all return SAFE = 0)
-		if(current && temp && !voltage && !override) {
+		if((current == SAFE) && (temp == SAFE) && (voltage == SAFE) && !override) {
 			Contactor_On();
 		}
 		else if(current && temp && voltage==UNDERVOLTAGE && override) {
