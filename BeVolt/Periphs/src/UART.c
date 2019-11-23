@@ -15,8 +15,10 @@
 
 #include <stdint.h>
 #include <stdio.h>
+#include <stdbool.h>
 #include "stm32f4xx.h"
 #include "config.h"
+
 
 // This is required to use printf
 struct __FILE{
@@ -176,7 +178,81 @@ int fputc(int ch, FILE *f){
 
 int fgetc(FILE *f){
 	char letter;
-	//UART3_Read(&letter, 1);
+	//UART1_Read(&letter, 1);
 	UART1_Read(&letter, 1);
 	return (int)letter;
 }
+
+/**
+* @brief Configures the USART1 Peripheral for interrupts.
+* @param None
+* @retval None
+*/
+void USART1_Config(void){
+ GPIO_InitTypeDef GPIO_InitStructure;
+ USART_InitTypeDef USART_InitStructure;
+ /* USART IOs configuration ***********************************/
+ /* Enable GPIOA clock */
+ RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
+ /* Connect PA9 to USART1_Tx */
+ GPIO_PinAFConfig(GPIOA, GPIO_PinSource9, GPIO_AF_USART1);
+ /* Connect PA10 to USART1_Rx*/
+    GPIO_PinAFConfig(GPIOA, GPIO_PinSource10, GPIO_AF_USART1);
+     /* Configure USART1_Tx and USART1_Rx as alternate function */
+     GPIO_InitStructure.GPIO_Pin = GPIO_Pin_9 | GPIO_Pin_10;
+     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
+     GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+     GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+     GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
+     GPIO_Init(GPIOA, &GPIO_InitStructure);
+     /* USART configuration ***************************************/
+     /* USART1 configured as follow:
+     - BaudRate = 115200 baud
+     - Word Length = 8 Bits
+     - One Stop Bit
+     - No parity
+     - Hardware flow control disabled (RTS and CTS signals)
+     - Receive and transmit enabled
+     */
+     /* Enable USART1 clock */
+     RCC_APB2PeriphClockCmd(RCC_APB2Periph_USART1, ENABLE);
+
+     USART_InitStructure.USART_BaudRate = 115200;
+     USART_InitStructure.USART_WordLength = USART_WordLength_8b;
+     USART_InitStructure.USART_StopBits = USART_StopBits_1;
+     USART_InitStructure.USART_Parity = USART_Parity_No;
+     USART_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
+     USART_InitStructure.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;
+     USART_Init(USART1, &USART_InitStructure);
+     /* Enable USART1 */
+     USART_Cmd(USART1, ENABLE);
+
+     /* Enable USART1 Receive interrupt */
+     USART_ITConfig(USART1, USART_IT_RXNE, ENABLE);
+		 
+		 NVIC_InitTypeDef NVIC_InitStructure;
+		 /* Enable USART1 IRQ channel in the NVIC controller.
+      When the USART1 interrupt is generated (in this example when
+      data is received) the USART1_IRQHandler will be served */
+      NVIC_InitStructure.NVIC_IRQChannel = USART1_IRQn;
+      NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
+      NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
+      NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+      NVIC_Init(&NVIC_InitStructure);
+}
+
+/**
+* @brief This function handles USART1 global interrupt request.
+* @param None
+* @retval None
+*/
+uint8_t RxData = 0;//data received flag
+void USART1_IRQHandler(void){
+	if(USART_GetITStatus(USART1, USART_IT_RXNE) != RESET){
+	/* Read one byte from the receive data register */
+		RxData = USART_ReceiveData(USART1);
+  }
+}
+
+
+

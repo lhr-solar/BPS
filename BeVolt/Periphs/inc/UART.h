@@ -53,4 +53,18 @@ void UART3_Write(char *txBuf, uint32_t txSize);
  */
 void UART3_Read(char *rxBuf, uint32_t rxSize);
 
+/**
+* @brief Configures the USART1 Peripheral for interrupts.
+* @param None
+* @retval None
+*/
+void USART1_Config(void);
+
+/**
+* @brief This function handles USART1 global interrupt request.
+* @param None
+* @retval None
+*/
+void USART1_IRQHandler(void);
+
 #endif

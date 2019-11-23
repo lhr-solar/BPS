@@ -23,7 +23,7 @@ bool fifoIsEmpty(Fifo fifo){
 }
 
 bool fifoIsFull(Fifo fifo){
-	return (((fifo.head + 1) % size) != fifo.tail);
+	return (((fifo.head + 1) % size) == fifo.tail);
 }
 
 //put a character into the fifo

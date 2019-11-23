@@ -764,14 +764,15 @@ int main() {
 
 #endif
 
-#ifdef UART_INTERRUPT
+#ifdef UART_INTERRUPT2
     /* Includes ---------------------------------------------------*/
     //#include "stm32f2xx.h"
+		#include "uart.h"
 		
 		uint8_t RxData;//data received flag
 				
     /* Private function prototypes --------------------------------*/
-    void USART3_Config(void);
+    void USART1_Config(void);
 
     /* Private functions ------------------------------------------*/
 		
@@ -780,10 +781,10 @@ int main() {
      * @param None
      * @retval None
      */
-    void USART3_IRQHandler(void){
-			if(USART_GetITStatus(USART3, USART_IT_RXNE) != RESET){
+    void USART1_IRQHandler(void){
+			if(USART_GetITStatus(USART1, USART_IT_RXNE) != RESET){
      /* Read one byte from the receive data register */
-          RxData = USART_ReceiveData(USART3);
+          RxData = USART_ReceiveData(USART1);
       }
     }
 		
@@ -792,7 +793,7 @@ int main() {
      * @param None
      * @retval None
      * */
-		#define size 20
+		#define size 32
      int main(void)
      {
 			 char fifo[size];
@@ -807,7 +808,7 @@ int main() {
      ****************************************************************/
       /* Configure USART3 with receive interrupt enabled (generated
       when the receive data register is not empty) */
-      USART3_Config();
+      USART1_Config();
      /****************************************************************
       -Step2-
       Enable peripheral IRQ channel in the NVIC controller
@@ -816,7 +817,7 @@ int main() {
       /* Enable USART3 IRQ channel in the NVIC controller.
       When the USART3 interrupt is generated (in this example when
       data is received) the USART3_IRQHandler will be served */
-      NVIC_InitStructure.NVIC_IRQChannel = USART3_IRQn;
+      NVIC_InitStructure.NVIC_IRQChannel = USART1_IRQn;
       NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
       NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
       NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
@@ -833,14 +834,20 @@ int main() {
 				//do something important
 				if ((RxData) && (((head + 1) % size) != tail)){
 					//insert data
+						
 					fifo[head] = (char) RxData;
 					head = ((head + 1) % size);
+					if ((RxData == 0x0d) && ((head + 1) % size) != tail){//if carriage return and space in queue
+						fifo[head] = 0x0a;//put line feed in
+						head = ((head + 1) % size);
+					}
+					RxData = 0;
 				}
 				if (head != tail) {
 					printf("%c", fifo[tail]);
 					tail = (tail +1) % size;
 				}else{
-					printf(".");
+					//printf(".");
 				}
       }
      }
@@ -850,18 +857,18 @@ int main() {
       * @param None
       * @retval None
       */
-     void USART3_Config(void)
+     void USART1_Config(void)
      {
       GPIO_InitTypeDef GPIO_InitStructure;
       USART_InitTypeDef USART_InitStructure;
       /* USART IOs configuration ***********************************/
-      /* Enable GPIOC clock */
+      /* Enable GPIOA clock */
       RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
-      /* Connect PC10 to USART3_Tx */
+      /* Connect PA9 to USART1_Tx */
       GPIO_PinAFConfig(GPIOA, GPIO_PinSource9, GPIO_AF_USART3);
-      /* Connect PC11 to USART3_Rx*/
+      /* Connect PA10 to USART1_Rx*/
          GPIO_PinAFConfig(GPIOA, GPIO_PinSource10, GPIO_AF_USART3);
-          /* Configure USART3_Tx and USART3_Rx as alternate function */
+          /* Configure USART1_Tx and USART3_Rx as alternate function */
           GPIO_InitStructure.GPIO_Pin = GPIO_Pin_9 | GPIO_Pin_10;
           GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
           GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
@@ -877,8 +884,8 @@ int main() {
           - Hardware flow control disabled (RTS and CTS signals)
           - Receive and transmit enabled
           */
-          /* Enable USART3 clock */
-          RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART3, ENABLE);
+          /* Enable USART1 clock */
+          RCC_APB2PeriphClockCmd(RCC_APB2Periph_USART1, ENABLE);
 
           USART_InitStructure.USART_BaudRate = 115200;
           USART_InitStructure.USART_WordLength = USART_WordLength_8b;
@@ -886,11 +893,38 @@ int main() {
           USART_InitStructure.USART_Parity = USART_Parity_No;
           USART_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
           USART_InitStructure.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;
-          USART_Init(USART3, &USART_InitStructure);
-          /* Enable USART3 */
-          USART_Cmd(USART3, ENABLE);
+          USART_Init(USART1, &USART_InitStructure);
+          /* Enable USART1 */
+          USART_Cmd(USART1, ENABLE);
 
-          /* Enable USART3 Receive interrupt */
-          USART_ITConfig(USART3, USART_IT_RXNE, ENABLE);
+          /* Enable USART1 Receive interrupt */
+          USART_ITConfig(USART1, USART_IT_RXNE, ENABLE);
       }
+#endif
+			
+#ifdef UART_INTERRUPT
+#include "uart.h"
+#include "fifo.h"
+int main(void){
+	USART1_Config();
+	Fifo uartFifo;
+	fifoInit(&uartFifo);
+	__enable_irq();
+	extern uint8_t RxData;
+	while(1){
+		if (~fifoIsFull(uartFifo) && RxData){
+			fifoPut(&uartFifo, (char) RxData);
+			if ((RxData == 0x0d) && ~fifoIsFull(uartFifo)){//if carriage return was last, add line feed
+				RxData = 0x0a;
+			}else{
+				RxData = 0;
+			}
+		}
+		if (~fifoIsEmpty(uartFifo)){
+			printf("%c", fifoGet(&uartFifo));
+		}
+	}
+}
+	
+			
 #endif
