@@ -43,7 +43,7 @@ int realmainmain(){
 		if((current == SAFE) && (temp == SAFE) && (voltage == SAFE) && !override) {
 			Contactor_On();
 		}
-		else if(current && temp && voltage==UNDERVOLTAGE && override) {
+		else if((current == SAFE) && (temp == SAFE) && (voltage == UNDERVOLTAGE) && override) {
 			Contactor_On();
 			continue;
 		} else {
