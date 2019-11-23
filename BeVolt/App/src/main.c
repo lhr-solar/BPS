@@ -35,7 +35,7 @@ int realmainmain(){
 		Current_UpdateMeasurements();
 		Temperature_UpdateMeasurements();
 		
-		SafetyStatus current = !Current_IsSafe();
+		SafetyStatus current = Current_IsSafe();
 		SafetyStatus temp = !Temperature_IsSafe(Current_IsCharging());
 		SafetyStatus voltage = Voltage_IsSafe();
 
