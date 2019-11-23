@@ -20,7 +20,7 @@ void initialize(void);
 void preliminaryCheck(void);
 void faultCondition(void);
 
-int realmainmain(){
+int main(){
 	__disable_irq();		// Disable all interrupts until initialization is done
 	initialize();			// Initialize codes/pins
 	preliminaryCheck();		// Wait until all boards are powered on
@@ -33,7 +33,8 @@ int realmainmain(){
 		Voltage_UpdateMeasurements();
 		Current_UpdateMeasurements();
 		Temperature_UpdateMeasurements();
-
+		SoC_Calculate(Current_GetHighPrecReading());
+		
 		// Check if everything is safe
 		if(Current_IsSafe() && Temperature_IsSafe(Current_IsCharging()) && Voltage_IsSafe()){
 			Contactor_On();
@@ -65,6 +66,7 @@ void initialize(void){
 	Contactor_Off();
 	WDTimer_Init();
 	EEPROM_Init();
+	SoC_Init();
 
 	Current_Init();
 	Voltage_Init(Minions);
@@ -108,11 +110,13 @@ void faultCondition(void){
 			case OVERVOLTAGE:
 				error |= FAULT_HIGH_VOLT;
 				LED_On(OVOLT);
+				SoC_Calibrate(1);	 // recalibrate. 1 means over voltage
 				break;
 				
 			case UNDERVOLTAGE:
 				error |= FAULT_LOW_VOLT;
 				LED_On(UVOLT);
+				SoC_Calibrate(0); 	// recalibrate. 0 means under voltage
 				break;
 
 			default:
