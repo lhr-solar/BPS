@@ -1,119 +1,152 @@
-#include <stdint.h>
-#include <stdio.h>
-#include <string.h>
-#include "Voltage.h"
-#include "Current.h"
-#include "Temperature.h"
+/* CLI.c
+ * Command Line Interface wrapper to 
+ * define and route commands
+ */
+
 #include "CLI.h"
-#include "config.h"
 
-void CLI_InputReturn(char *input){	
+/** CLI_Commands
+ * Routes the command given to the proper
+ * measurement method to check the desired values
+ * @param input command
+ */
+void CLI_Commands(char *input){	
   char* split = strtok(input, " ");
-
-	char* first;
-  char* second;
-  char* third;
-	third = NULL;
-	char i = 0;
-	int num = 0;
-	while(split != NULL)
-	{
-    if (i == 0){
-      first = split;
-    }else if (i == 1){
-      second = split;
-    }else if (i == 2){
-      third = split;
-    }
-    split=strtok(NULL," ");
-    i++;
-	};
+	char* measurement;
+  char* function;
+  char* parameter;
+	parameter = NULL;
+	uint8_t word = 0;
 	
-	if (strcmp(first,"voltage") == 0){
-		if (strcmp(second,"check") == 0){
-			if (third == NULL){
-				for (num = 0;num<12;num++){
-					printf("\n\r%d",num);
-					printf("# board: ");
-					printf("%d",Voltage_GetModuleVoltage(num));
+	// Parsing the input string and tokenizing into the variables
+	while(split != NULL) {
+    if (word == 0){
+      measurement = split;
+    }
+		else if (word == 1){
+      function = split;
+    }
+		else if (word == 2){
+      parameter = split;
+    }
+    split = strtok(NULL," ");
+    word++;
+	}
+	// Voltage commands
+	if(strcmp(measurement, "voltage") == 0){
+		if(strcmp(function, "check") == 0){
+			if(parameter == NULL){			// All modules
+				for(int i = 0; i<12; i++){
+					printf("\n\r%d", i);
+					printf("th module: ");
+					printf("%d",Voltage_GetModuleMillivoltage(i));
 				}
 				printf("\n\r");
-			}else{	
-				printf("\n\r%c",*third);
-				printf("# board: ");
-				printf("%d",Voltage_GetModuleVoltage(*third));
+			}else{			// Specific module
+				printf("\n\r%c", *parameter);
+				printf("th module: ");
+				printf("%d",Voltage_GetModuleMillivoltage(*parameter));
 				printf("\n\r");
 			}
-		
 		}
-		else if (strcmp(second,"safe") == 0) {
+		else if (strcmp(function,"safe") == 0){		// Check SafetyStatus
 			printf("\n\r");
-			int check = Voltage_IsSafe();
-			if (check == 0){
-				printf("SAFE");
-			}else if (check == 1){
-				printf("DANGER");
-			}else if (check == 2){
-				printf("OVERVOLTAGE");
-			}else {
-				printf("UNDERVOLTAGE");
+			SafetyStatus voltage = Voltage_IsSafe();
+			switch(voltage) {
+				case SAFE: 
+					printf("SAFE");
+					break;
+				case DANGER: 
+					printf("DANGER");
+					break;
+				case OVERVOLTAGE:
+					printf("OVERVOLTAGE");
+					break;
+				case UNDERVOLTAGE: 
+					printf("UNDERVOLTAGE");
+					break;
+				default:
+					break;
 			}
 			printf("\n\r");
 		}
-		else if (strcmp(second,"total") == 0) {
+		else if (strcmp(function,"total") == 0) {			// Total pack voltage
 			printf("\n\rTotal voltage: ");
 			printf("%d",Voltage_GetTotalPackVoltage());
 			printf("\n\r");
-		}			
-		
+		}					
   }
-	else if (strcmp(first,"current") == 0){
-		if (strcmp(second,"safe") == 0) {
+	// Current commands
+	else if (strcmp(measurement,"current") == 0){
+		if (strcmp(function,"safe") == 0) {		// Check SafetyStatus
 			printf("\n\r");
-			printf("%d",Current_IsSafe());
+			SafetyStatus current = Current_IsSafe();
+			switch(current){
+				case SAFE:
+					printf("SAFE");
+					break;
+				case DANGER: 
+					printf("DANGER");
+					break;
+				default:
+					break;
+			}
 			printf("\n\r");			
 		}
-		else if (strcmp(second,"charging") == 0){
+		else if (strcmp(function,"charging") == 0){
 			printf("\n\r");
-			printf("%d",Current_IsCharging());
+			uint8_t charge = Current_IsCharging();
+			switch(charge){
+				case 0: 
+					printf("DISCHARGING");
+					break;
+				case 1:
+					printf("CHARGING");
+					break;
+				default:
+					break;
+			}
 			printf("\n\r");			
 		}
-		else if (strcmp(second,"high") == 0){
+		else if (strcmp(function,"high") == 0){			// High precision current reading
 			printf("\n\r");		
 			printf("%d",Current_GetHighPrecReading());
 			printf("\n\r");			
 		}
-		else if (strcmp(second,"low") == 0){
+		else if (strcmp(function,"low") == 0){		// Low precision current reading
 			printf("\n\r");	
 			printf("%d",Current_GetLowPrecReading());
 			printf("\n\r");			
 		}
-   
   }
-	else if (strcmp(first,"temp") == 0){
-		if (strcmp(second,"average") == 0) {
+	// Temperature commands
+	else if (strcmp(measurement,"temp") == 0){
+		if (strcmp(function,"average") == 0){		// Average pack temperature
 			printf("\n\r");		
 			printf("%d",Temperature_GetTotalPackAvgTemperature());
 			printf("\n\r");			
 		}
-		else if (strcmp(second,"charge") == 0){ 
-				Temperature_SetChargeState(*third);
-				printf("%d",*third);	
-				printf("\n\r");			
+		else if (strcmp(function,"charge") == 0){		// Set charge state
+			if(parameter != NULL){
+				Temperature_SetChargeState(*parameter);
+				printf("%d",*parameter);	
+				printf("\n\r");
+			}else{
+				printf("Please provide a charge state (1 for charging, 0 for discharging)");
+			}
 		}
-		else if (strcmp(second,"check") == 0){
-			if (third == NULL){			
-				for (num = 0;num<12;num++){
-					printf("%d",Temperature_GetModuleTemperature(num));
+		else if (strcmp(function,"check") == 0){		// Get module temperatures
+			if (parameter == NULL){			
+				for (int i = 0; i<12; i++){
+					printf("%d",Temperature_GetModuleTemperature(i));
 					printf("\n\r");
 					}
 				}else { 
-					printf("%d",Temperature_GetModuleTemperature(*third));
+					printf("%d",Temperature_GetModuleTemperature(*parameter));
 					printf("\n\r");		
 				}
 		}
-	}
-	else {
-		printf("Wrong label");
+	}else{
+		printf("Invalid measurement. Enter a valid measurement and function");
 	}
 }
