@@ -130,7 +130,7 @@ void faultCondition(void){
 // E.g. If you want to run a LTC6811 test, change "#define CHANGE_THIS_TO_TEST_NAME" to the
 //		following:
 //		#define LTC6811_TEST
-#define EEPROM_RESET
+#define UART_INTERRUPT
 
 
 #ifdef LED_TEST
@@ -593,7 +593,7 @@ int SPITestmain(){
 // Debug UART Test
 #include "UART.h"
 int main(){
-	UART3_Init(115200);
+	UART1_Init(115200);
 	while(1){
 		printf("Die world\r\n");
 		for(uint32_t i = 0; i < 100000; i++);
@@ -766,31 +766,40 @@ int main() {
 
 #ifdef UART_INTERRUPT
     /* Includes ---------------------------------------------------*/
-    #include "stm32f2xx.h"
-     * @brief This function handles USART3 global interrupt request.
-     * @param None
-     * @retval None
-     */
-    void USART3_IRQHandler(void)
-    {
-
-     if(USART_GetITStatus(USART3, USART_IT_RXNE) != RESET)
-     {
-     /* Read one byte from the receive data register */
-          RxData = USART_ReceiveData(USART3);
-          }
-     }
+    //#include "stm32f2xx.h"
+		
+		uint8_t RxData;//data received flag
+				
     /* Private function prototypes --------------------------------*/
     void USART3_Config(void);
 
     /* Private functions ------------------------------------------*/
+		
+		/**
+		 * @brief This function handles USART3 global interrupt request.
+     * @param None
+     * @retval None
+     */
+    void USART3_IRQHandler(void){
+			if(USART_GetITStatus(USART3, USART_IT_RXNE) != RESET){
+     /* Read one byte from the receive data register */
+          RxData = USART_ReceiveData(USART3);
+      }
+    }
+		
     /**
      * @brief Main program
      * @param None
      * @retval None
      * */
+		#define size 20
      int main(void)
      {
+			 char fifo[size];
+			 uint8_t head = 0;
+			 uint8_t tail = 0;
+			 __enable_irq();
+			 
       NVIC_InitTypeDef NVIC_InitStructure;
      /****************************************************************
       -Step1-
@@ -821,8 +830,21 @@ int main() {
 
       while (1)
       {
+				//do something important
+				if ((RxData) && (((head + 1) % size) != tail)){
+					//insert data
+					fifo[head] = (char) RxData;
+					head = ((head + 1) % size);
+				}
+				if (head != tail) {
+					printf("%c", fifo[tail]);
+					tail = (tail +1) % size;
+				}else{
+					printf(".");
+				}
       }
      }
+	 
      /**
       * @brief Configures the USART3 Peripheral.
       * @param None
@@ -834,18 +856,18 @@ int main() {
       USART_InitTypeDef USART_InitStructure;
       /* USART IOs configuration ***********************************/
       /* Enable GPIOC clock */
-      RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC, ENABLE);
+      RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
       /* Connect PC10 to USART3_Tx */
-      GPIO_PinAFConfig(GPIOC, GPIO_PinSource10, GPIO_AF_USART3);
+      GPIO_PinAFConfig(GPIOA, GPIO_PinSource9, GPIO_AF_USART3);
       /* Connect PC11 to USART3_Rx*/
-         GPIO_PinAFConfig(GPIOC, GPIO_PinSource11, GPIO_AF_USART3);
+         GPIO_PinAFConfig(GPIOA, GPIO_PinSource10, GPIO_AF_USART3);
           /* Configure USART3_Tx and USART3_Rx as alternate function */
-          GPIO_InitStructure.GPIO_Pin = GPIO_Pin_10 | GPIO_Pin_11;
+          GPIO_InitStructure.GPIO_Pin = GPIO_Pin_9 | GPIO_Pin_10;
           GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
           GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
           GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
           GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
-          GPIO_Init(GPIOC, &GPIO_InitStructure);
+          GPIO_Init(GPIOA, &GPIO_InitStructure);
           /* USART configuration ***************************************/
           /* USART3 configured as follow:
           - BaudRate = 115200 baud
@@ -862,8 +884,7 @@ int main() {
           USART_InitStructure.USART_WordLength = USART_WordLength_8b;
           USART_InitStructure.USART_StopBits = USART_StopBits_1;
           USART_InitStructure.USART_Parity = USART_Parity_No;
-          USART_InitStructure.USART_HardwareFlowControl =
-         USART_HardwareFlowControl_None;
+          USART_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
           USART_InitStructure.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;
           USART_Init(USART3, &USART_InitStructure);
           /* Enable USART3 */
@@ -871,5 +892,5 @@ int main() {
 
           /* Enable USART3 Receive interrupt */
           USART_ITConfig(USART3, USART_IT_RXNE, ENABLE);
-         }
-
+      }
+#endif

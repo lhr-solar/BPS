@@ -169,12 +169,14 @@ void UART3_OutChar(char data){
 
 // this is used for printf to output to the usb uart
 int fputc(int ch, FILE *f){
-	UART3_Write((char *)&ch, 1);
-  return 1;
+	//UART3_Write((char *)&ch, 1);
+  UART1_Write((char *)&ch, 1);
+	return 1;
 }
 
 int fgetc(FILE *f){
 	char letter;
-	UART3_Read(&letter, 1);
+	//UART3_Read(&letter, 1);
+	UART1_Read(&letter, 1);
 	return (int)letter;
 }
