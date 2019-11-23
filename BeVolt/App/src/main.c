@@ -27,17 +27,26 @@ int realmainmain(){
 	__enable_irq();			// Enable interrupts
 
 	WDTimer_Start();
-	
+
+	bool override = false;		// This will be changed by user via CLI	
 	while(1){
 		// First update the measurements.
 		Voltage_UpdateMeasurements();
 		Current_UpdateMeasurements();
 		Temperature_UpdateMeasurements();
+		
+		SafetyStatus current = Current_IsSafe();
+		SafetyStatus temp = Temperature_IsSafe(Current_IsCharging());
+		SafetyStatus voltage = Voltage_IsSafe();
 
-		// Check if everything is safe
-		if(Current_IsSafe() && Temperature_IsSafe(Current_IsCharging()) && Voltage_IsSafe()){
+		// Check if everything is safe (all return SAFE = 0)
+		if((current == SAFE) && (temp == SAFE) && (voltage == SAFE) && !override) {
 			Contactor_On();
-		}else{
+		}
+		else if((current == SAFE) && (temp == SAFE) && (voltage == UNDERVOLTAGE) && override) {
+			Contactor_On();
+			continue;
+		} else {
 			break;
 		}
 
@@ -137,23 +146,24 @@ void faultCondition(void){
 	for(int i = 1; i < 0x00FF; i <<= 1) {
 		if((error & i) == 0) continue;
 		
-		uint8_t *modules;
+		SafetyStatus *voltage_modules;
+		uint8_t *temp_modules;
 		uint16_t curr;
 		switch(i) {
 		// Temperature fault handling
 		case FAULT_HIGH_TEMP:
-			modules = Temperature_GetModulesInDanger();
+			temp_modules = Temperature_GetModulesInDanger();
 			for(int j = 0; j < NUM_BATTERY_MODULES; ++j)
-				if(modules[j]) EEPROM_LogData(FAULT_HIGH_TEMP, j);
+				if(temp_modules[j]) EEPROM_LogData(FAULT_HIGH_TEMP, j);
 			break;
 		
 		// Voltage fault handling
 		case FAULT_HIGH_VOLT:
 		case FAULT_LOW_VOLT:
 		case FAULT_VOLT_MISC:
-			modules = Voltage_GetModulesInDanger();
+			voltage_modules = Voltage_GetModulesInDanger();
 			for(int j = 0; j < NUM_BATTERY_MODULES; ++j)
-				if(modules[j]) EEPROM_LogData(i, j);
+				if(voltage_modules[j]) EEPROM_LogData(i, j);
 			break;
 		
 		// Current fault handling
