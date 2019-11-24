@@ -480,9 +480,11 @@ void DischargingSoCTest(void) {
 
 int main(){
 	// Start UART comms
-	UART3_Init(115200);
-	printf("start\n");
+	//UART3_Init(115200);
+	//printf("start\n");
 
+	LED_Init();
+	
 	// Start CAN comms
 	#ifdef CAN_SELF_TEST
 	CAN1_Init(CAN_Mode_LoopBack);
@@ -498,23 +500,28 @@ int main(){
 
 	while(1)
 	{
-		printf("start1\n");
+		//printf("start1\n");
 
 		int box;
 
 		// Transmit the data
 		do {
-			int box = CAN1_Write(id, data, 1);
+			static int box = 0;
+			box = CAN1_Write(id, data, 1);
 		} while (box == CAN_TxStatus_NoMailBox);
 		int status;
 
 		// Wait for the data to transmit
-		do {
-			status = CAN_TransmitStatus(CAN1, box);
-		} while( status == CAN_TxStatus_Pending);
-		if(status != CAN_TxStatus_Ok) {
-			//while(1);
-		}
+//		do {
+//			status = CAN_TransmitStatus(CAN1, box);
+//		} while( status == CAN_TxStatus_Pending);
+//		if(status != CAN_TxStatus_Ok) {
+//			LED_On(CAN);
+//		}
+		
+		LED_Toggle(RUN);
+		
+		for(int i = 0; i < 100000; i++);
 
 		#ifdef CAN_SELF_TEST
 		// Read all the data
