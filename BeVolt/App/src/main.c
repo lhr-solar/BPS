@@ -131,7 +131,7 @@ void faultCondition(void){
 // E.g. If you want to run a LTC6811 test, change "#define CHANGE_THIS_TO_TEST_NAME" to the
 //		following:
 //		#define LTC6811_TEST
-#define EEPROM_RESET
+#define PLL_TEST
 
 
 #ifdef LED_TEST
@@ -563,6 +563,19 @@ int main() {
 	EEPROM_Reset();
 	printf("EEPROM has been reset\n\r");\
 	while(1);
+}
+
+#endif
+
+#ifdef PLL_TEST
+
+int main(){
+	PLL_Init80MHz();		// Uncomment to compare speed
+	LED_Init();
+	while(1){
+		for(int i = 0; i < 1000000; i++);
+		LED_Toggle(RUN);
+	}
 }
 
 #endif
