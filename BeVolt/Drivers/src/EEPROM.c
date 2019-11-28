@@ -19,13 +19,15 @@ const uint16_t EEPROM_VOLT_FAULT		  = 0x0400;
 const uint16_t EEPROM_CURRENT_FAULT	  = 0x0600;
 const uint16_t EEPROM_WWDG_FAULT		  = 0x0700;
 const uint16_t EEPROM_CAN_FAULT			  = 0x0800;
+const uint16_t EEPROM_SOC_DATA				= 0x0900;
 
 static uint16_t faultCodePtr,
 								tempFaultPtr,
 								voltFaultPtr,
 								currentFaultPtr,
 								watchdogFaultPtr,
-								canFaultPtr;
+								canFaultPtr,
+								socDataPtr;
 
 /** EEPROM_Init
  * Initializes I2C to communicate with EEPROM (M24128)
@@ -47,6 +49,7 @@ void EEPROM_Load(void) {
 	EEPROM_ReadMultipleBytes(EEPROM_CURRENT_PTR_LOC, 2, (uint8_t*)&currentFaultPtr);
 	EEPROM_ReadMultipleBytes(EEPROM_WATCHDOG_PTR_LOC,2, (uint8_t*)&watchdogFaultPtr);
 	EEPROM_ReadMultipleBytes(EEPROM_CAN_PTR_LOC,     2, (uint8_t*)&canFaultPtr);
+	EEPROM_ReadMultipleBytes(EEPROM_SOC_PTR_LOC,		 2, (uint8_t*)&socDataPtr);
 }
 
 /** EEPROM_Reset
@@ -62,6 +65,7 @@ void EEPROM_Reset(void) {
 	EEPROM_WriteMultipleBytes(EEPROM_CURRENT_PTR_LOC, 2, (uint8_t*)&EEPROM_CURRENT_FAULT);
 	EEPROM_WriteMultipleBytes(EEPROM_WATCHDOG_PTR_LOC,2, (uint8_t*)&EEPROM_WWDG_FAULT);
 	EEPROM_WriteMultipleBytes(EEPROM_CAN_PTR_LOC,     2, (uint8_t*)&EEPROM_CAN_FAULT);
+	EEPROM_WriteMultipleBytes(EEPROM_SOC_PTR_LOC,			2, (uint8_t*)&EEPROM_SOC_DATA);
 	
 	// Reintialize pointers in the program, etc.
 	EEPROM_Load();
@@ -73,6 +77,7 @@ void EEPROM_Reset(void) {
 	EEPROM_WriteByte(currentFaultPtr, EEPROM_TERMINATOR);
 	EEPROM_WriteByte(watchdogFaultPtr,EEPROM_TERMINATOR);
 	EEPROM_WriteByte(canFaultPtr,     EEPROM_TERMINATOR);
+	EEPROM_WriteByte(socDataPtr, 			EEPROM_TERMINATOR);
 }
 
 /*
@@ -110,6 +115,11 @@ void EEPROM_LogData(uint8_t logType, uint8_t data) {
 		EEPROM_WriteByte(canFaultPtr++, data);
 		EEPROM_WriteByte(canFaultPtr, EEPROM_TERMINATOR);
 		EEPROM_WriteByte(EEPROM_CAN_PTR_LOC, canFaultPtr);
+		break;
+	case DATA_SOC:
+		EEPROM_WriteByte(socDataPtr++, data);
+		EEPROM_WriteByte(socDataPtr, EEPROM_TERMINATOR);
+		EEPROM_WriteByte(EEPROM_CAN_PTR_LOC, socDataPtr);
 		break;
 	}
 }
