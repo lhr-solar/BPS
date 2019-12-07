@@ -138,21 +138,21 @@ void CLI_Voltage(char *input) {
  */
 void CLI_Current(char *input) {
 	switch (CLI_GetToken(1)[0]) {
-		case NULL : 
+		case NULL : // both precision readings
 			printf("High: %4fA\n\r", Current_GetHighPrecReading()/1000.0);//prints 4 digits, number, and A
 			printf("Low: %4fA\n\r", Current_GetLowPrecReading()/1000.0);
-		case 'h' : 
+		case 'h' : //high precision reading
 			printf("High: %4fA\n\r", Current_GetHighPrecReading()/1000.0);
-		case 'l' : 
+		case 'l' : //low precision reading
 			printf("Low: %4fA\n\r", Current_GetLowPrecReading()/1000.0);
-		case 's' : 
+		case 's' : //safety status
 			if (Current_IsSafe() == 0) {
 				printf("Safety Status: SAFE\n\r");
 			}
 			else {
 				printf("Safety Status: DANGER\n\r");
 			}
-		case 'c' : 
+		case 'c' : //whether battery is charging
 			if (Current_IsCharging() == 0) {
 				printf("Charging State: CHARGING\n\r");
 			}
@@ -168,7 +168,9 @@ void CLI_Current(char *input) {
  * temperature parameter(s)
  * @param input command
  */
-void CLI_Temperature(char *input) {}
+void CLI_Temperature(char *input) {
+
+}
 
 /** CLI_Contactor
  * Interacts with contactor status
@@ -195,7 +197,20 @@ void CLI_Contactor(char *input) {
  * state of charge parameter(s)
  * @param input command
  */
-void CLI_Charge(char *input) {}
+void CLI_Charge(char *input) {
+	int value;
+	switch(CLI_GetToken(1)[0]) {
+		case NULL : 
+			printf("The battery is at: %d\n\r", SoC_GetPercent());
+		case 'r' : 
+			SoC_SetAccum(0);//resets accumulator
+		case 's' : 
+			//converts string to integer and passes value to accumulator function
+			SoC_SetAccum(sscanf(CLI_GetToken(2), "%d", &value)); 
+		default: 
+			printf("Invalid Charge Command");
+	}
+}
 
 /** CLI_ErrorLight
  * Interacts with the error light
