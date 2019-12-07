@@ -6,6 +6,7 @@
 #include "CLI.h"
 #include <ctype.h>
 #include "String.h"
+#include "stm32f4xx.h"
 
 #define MAX_TOKEN_SIZE 4
 
@@ -148,7 +149,21 @@ void CLI_Temperature(char *input) {}
  * Interacts with contactor status
  * @param input command
  */
-void CLI_Contactor(char *input) {}
+void CLI_Contactor(char *input) {
+	switch(CLI_GetToken(1)[0]) {
+		FunctionalState contactor = Contactor_Flag();
+		case 's':
+			if(contactor == ENABLE) {
+				printf("The contactor is Enabled");
+			} else {
+				printf("The contactor is Disabled");
+			break;
+		default:
+			printf("Invalid contactor command\r\n");
+			break;
+		}
+	}
+}
 
 /** CLI_Charge
  * Checks and displays the desired
@@ -191,7 +206,7 @@ void CLI_EEPROM(char *input) {}
  * Interacts with the peripherals
  * @param input command
  */
-void CLI_Peripherals(char *input);
+void CLI_Peripherals(char *input) {}
 
 /** CLI_Critical
  * Checks and displays the desired
