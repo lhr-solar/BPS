@@ -44,7 +44,71 @@ void CLI_Help(char *input) {
  * voltage parameter(s)
  * @param input command
  */
-void CLI_Voltage(char *input) {}
+void CLI_Voltage(char *input) {
+	switch(CLI_GetToken(1)[0]){
+		// All modules
+		case NULL:
+				for(int i = 0; i < NUM_BATTERY_MODULES; i++){
+					printf("\n\rModule Number ");
+					printf("%d", i+1);
+					printf(": ");
+					printf("%d",Voltage_GetModuleMillivoltage(i));
+					printf("\n\r");
+				}
+				break;
+		
+		// Specific module
+		char modNum = CLI_GetToken(2)[0]-1;
+		case 'm':
+		case 'M':
+			if (modNum == NULL || modNum > NUM_BATTERY_MODULES || modNum < 0){
+				printf("Invalid Module Number");
+			}
+			else {
+				printf("\n\rModule Number ");
+				printf("%c", modNum+1);
+				printf(": ");
+				printf("%c",Voltage_GetModuleMillivoltage(modNum));
+				printf("\n\r");
+			}
+			break;
+		
+		// Total
+		case 't':
+		case 'T':
+			printf("\n\rTotal voltage: ");
+			printf("%d",Voltage_GetTotalPackVoltage());
+			printf("\n\r");
+			break;
+		
+		// Safety Status
+		case 's':
+		case 'S':		
+			printf("\n\r");
+				SafetyStatus voltage = Voltage_IsSafe();
+				switch(voltage) {
+					case SAFE: 
+						printf("SAFE");
+						break;
+					case DANGER: 
+						printf("DANGER");
+						break;
+					case OVERVOLTAGE:
+						printf("OVERVOLTAGE");
+						break;
+					case UNDERVOLTAGE: 
+						printf("UNDERVOLTAGE");
+						break;
+					default:
+						break;
+			break;
+			}
+				
+		default:
+			printf("Invalid voltage command.");
+			break;
+		}
+	}
 
 /** CLI_Current
  * Checks and displays the desired
