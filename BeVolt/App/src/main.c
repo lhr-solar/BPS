@@ -13,6 +13,7 @@
 #include "WDTimer.h"
 #include "SoC.h"
 #include "LED.h"
+#include "SysTick.h"
 
 cell_asic Minions[NUM_MINIONS];
 
@@ -27,18 +28,26 @@ int main(){
 	__enable_irq();			// Enable interrupts
 
 	WDTimer_Start();
-	
+
+	bool override = false;		// This will be changed by user via CLI
 	while(1){
 		// First update the measurements.
 		Voltage_UpdateMeasurements();
 		Current_UpdateMeasurements();
 		Temperature_UpdateMeasurements();
-		SoC_Calculate(Current_GetHighPrecReading());
-		
-		// Check if everything is safe
-		if(Current_IsSafe() && Temperature_IsSafe(Current_IsCharging()) && Voltage_IsSafe()){
+
+		SafetyStatus current = Current_IsSafe();
+		SafetyStatus temp = Temperature_IsSafe(Current_IsCharging());
+		SafetyStatus voltage = Voltage_IsSafe();
+
+		// Check if everything is safe (all return SAFE = 0)
+		if((current == SAFE) && (temp == SAFE) && (voltage == SAFE) && !override) {
 			Contactor_On();
-		}else{
+		}
+		else if((current == SAFE) && (temp == SAFE) && (voltage == UNDERVOLTAGE) && override) {
+			Contactor_On();
+			continue;
+		} else {
 			break;
 		}
 
@@ -96,7 +105,7 @@ void faultCondition(void){
 	Contactor_Off();
 	LED_Off(RUN);
   LED_On(FAULT);
-  
+
 	uint8_t error = 0;
 
 	if(!Current_IsSafe()){
@@ -112,7 +121,7 @@ void faultCondition(void){
 				LED_On(OVOLT);
 				SoC_Calibrate(1);	 // recalibrate. 1 means over voltage
 				break;
-				
+
 			case UNDERVOLTAGE:
 				error |= FAULT_LOW_VOLT;
 				LED_On(UVOLT);
@@ -131,35 +140,36 @@ void faultCondition(void){
 		error |= FAULT_HIGH_TEMP;
 		LED_On(OCURR);
 	}
-	
+
 	// Log all the errors that we have
 	for(int i = 1; i < 0x00FF; i <<= 1) {
 		if(error & i) EEPROM_LogError(i);
 	}
-	
+
 	// Log all the relevant data for each error
 	for(int i = 1; i < 0x00FF; i <<= 1) {
 		if((error & i) == 0) continue;
-		
-		uint8_t *modules;
+
+		SafetyStatus *voltage_modules;
+		uint8_t *temp_modules;
 		uint16_t curr;
 		switch(i) {
 		// Temperature fault handling
 		case FAULT_HIGH_TEMP:
-			modules = Temperature_GetModulesInDanger();
+			temp_modules = Temperature_GetModulesInDanger();
 			for(int j = 0; j < NUM_BATTERY_MODULES; ++j)
-				if(modules[j]) EEPROM_LogData(FAULT_HIGH_TEMP, j);
+				if(temp_modules[j]) EEPROM_LogData(FAULT_HIGH_TEMP, j);
 			break;
-		
+
 		// Voltage fault handling
 		case FAULT_HIGH_VOLT:
 		case FAULT_LOW_VOLT:
 		case FAULT_VOLT_MISC:
-			modules = Voltage_GetModulesInDanger();
+			voltage_modules = Voltage_GetModulesInDanger();
 			for(int j = 0; j < NUM_BATTERY_MODULES; ++j)
-				if(modules[j]) EEPROM_LogData(i, j);
+				if(voltage_modules[j]) EEPROM_LogData(i, j);
 			break;
-		
+
 		// Current fault handling
 		case FAULT_HIGH_CURRENT:
 			curr = Current_GetLowPrecReading();
@@ -171,7 +181,7 @@ void faultCondition(void){
 			break;
 		}
 	}
-	
+
 	while(1) {
 		WDTimer_Reset();	// Even though faulted, WDTimer needs to be updated or else system will reset
 					// causing WDOG error. WDTimer can't be stopped after it starts.
@@ -358,7 +368,7 @@ int main(){
 #include "UART.h"
 #include "Temperature.h"
 
-void singleSensorTest(void);												// Prints out a single sensor 
+void singleSensorTest(void);												// Prints out a single sensor
 void individualSensorDumpTest(void);                 // Prints out each individual sensor temperature on all boards
 void batteryModuleTemperatureTest(void);      			// Prints out every battery modules temperature average with their 2 sensors
 void checkDangerTest(void);													// checks for danger
