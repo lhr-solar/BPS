@@ -17,7 +17,7 @@ void SoC_Init(void);
  * Calculates new SoC depending on the current reading
  * @param current reading from hall effect sensors. Fixed point of 0.0001 (1.500 Amps = 15000)
  */
-void SoC_Calculate(int32_t amps);
+void SoC_Calculate(int16_t amps);
 
 /** SoC_Calibrate
  * Calibrates the SoC. Whenever the BPS trips, the SoC should recalibrate. If an undervoltage
@@ -25,7 +25,7 @@ void SoC_Calculate(int32_t amps);
  * to 100%.
  * @param voltage fault type. 0 if under voltage, 1 if over voltage
  */
-void SoC_Calibrate(int32_t faultType);
+void SoC_Calibrate(int8_t faultType);
 
 /** SoC_GetPercent
  * Gets the percentage of charge left in the battery pack

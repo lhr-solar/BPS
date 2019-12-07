@@ -36,6 +36,9 @@ int main(){
 		Current_UpdateMeasurements();
 		Temperature_UpdateMeasurements();
 
+		// Update battery percentage
+		SoC_Calculate(Current_GetLowPrecReading());
+		
 		SafetyStatus current = Current_IsSafe();
 		SafetyStatus temp = Temperature_IsSafe(Current_IsCharging());
 		SafetyStatus voltage = Voltage_IsSafe();

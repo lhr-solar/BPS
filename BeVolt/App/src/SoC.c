@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include "stm32f4xx.h"
 #include "ADC.h"
+#include "EEPROM.h"
 
 #define MAX_CHARGE 1000*1000																								// In amp-hours (Ah), for now it is a dummy value
 uint32_t fixedPoint_SoC;																										// % of how much charge is left in battery with .01 resolution
@@ -28,9 +29,9 @@ void SoC_Init(void){
 	TIM_TimeBaseInit(TIM2, &Init_TIM2);										
 	TIM_Cmd(TIM2,ENABLE);																	
 	
-	// Grab from EEPROM what is the current SoC; For now, going to set it to 100.00% for testing purposes
-	fixedPoint_SoC = 10000;
-	float_SoC = 100.00;
+	// Grab from EEPROM what is the current SoC
+	EEPROM_ReadMultipleBytes(EEPROM_SOC_PTR_LOC, 4, (uint8_t*)&fixedPoint_SoC);
+	float_SoC = fixedPoint_SoC * .01;
 }
 
 /** SoC_Calculate
@@ -38,7 +39,7 @@ void SoC_Init(void){
  * @param current reading from hall effect sensors. Fixed point of 0.0001 (1.500 Amps = 15000)
  * not a constant samping. Add on however much from the previous
  */
-void SoC_Calculate(int32_t amps){ 
+void SoC_Calculate(int16_t amps){ 
 	
 	/* Get system clocks */
 	RCC_ClocksTypeDef RCC_Clocks;
@@ -67,13 +68,12 @@ void SoC_Calculate(int32_t amps){
  * to 100%.
  * @param voltage fault type. 0 if under voltage, 1 if over voltage
  */
-void SoC_Calibrate(int32_t faultType){
-	if (!(faultType == 0 || faultType == 1)) // ERROR
+void SoC_Calibrate(int8_t faultType){
 	if (faultType == 0) {
 		fixedPoint_SoC = 0;
 		float_SoC = 0;
 	}
-	if (faultType == 1) {
+	else if (faultType == 1) {
 		fixedPoint_SoC = 10000;
 		float_SoC = 100.00;
 	}
