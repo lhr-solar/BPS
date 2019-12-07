@@ -36,7 +36,10 @@ char* CLI_GetToken(uint8_t idx) {
  * @param input command
  */
 void CLI_Help(char *input) {
-	
+	printf("-------------------Help Menu-------------------\r\n");
+	printf("The available commands are: \r\n");
+	printf("Voltage (v)\tCurrent (i)\tTemperature (t)\r\n");
+	printf("LTC (ltc)\t
 }
 
 /** CLI_Voltage
@@ -114,16 +117,16 @@ void CLI_Peripherals(char *input);
  * voltage parameter(s)
  * @param input command
  */
-void CLI_Critical(char *input) {}
+void CLI_Critical() {}
 	
 /** CLI_Commands
  * Routes the command given to the proper
  * measurement method to check the desired values
- * @param input command
  */
 void CLI_Commands(char *input){	
-	char* saveptr;
-  //char* split = strtok_r(input," ", &saveptr);
+	CLI_InputParse(input);
+	printf("Hello! Welcome to the BPS System! I am your worst nightmare...\r\n");
+	printf("Please enter a command (Type 'h', 'm', or '?' to see a list of commands) \r\n");
 	switch(input[0]) {
 		// Help menu
 		case 'h':
@@ -134,52 +137,76 @@ void CLI_Commands(char *input){
 			CLI_Help(input);
 			break;
 		
+		// Voltage commands
 		case 'v':
 		case 'V':
-			break;		// voltage commands
+			CLI_Voltage(input);
+			break;
 		
+		// Current commands
 		case 'i':
 		case 'I':
-			break;		// current commands
+			CLI_Current(input);
+			break;
 		
+		// Temperature commands
 		case 't':
 		case 'T':
-			break;		// temp commands
+			CLI_Temperature(input);
+			break;
 		
+		// Contactor/Switch commands
 		case 's':
 		case 'S':
-			break;		// contactor/switch commands
+			CLI_Contactor(input);
+			break;
 		
+		// State of Charge commands
 		case 'q':
 		case 'Q':
 		case '%':
-			break;		// SoC commands
+			CLI_Charge(input);
+			break;
 		
+		// Error light commands
 		case 'l':
 		case 'L':
-			break;		// error light commands
+			CLI_ErrorLight(input);
+			break;
 		
+		// CAN commands
 		case 'c':
 		case 'C':
-			break;		// CAN commands
+			CLI_CAN(input);
+			break;
 		
+		// Display commands
 		case 'd':
 		case 'D':
-			break;		// display commands
+			CLI_Display(input);
+			break;
 		
+		// Watchdog commands
 		case 'w':
 		case 'W':
-			break;		// watchdog commands
+			CLI_Watchdog(input);
+			break;
 		
+		// EEPROM commands
 		case 'e':
 		case 'E':
-			break;		// EEPROM commands
+			CLI_EEPROM(input);
+			break;
 		
+		// Peripheral commands
 		case 'p':
 		case 'P':
-			break;		// peripheral commands
+			CLI_Peripherals(input);
+			break;
 		
+		// Emergency Abort
 		case '!':
+			CLI_Critical();
 			break;		// ABORT
 		
 		default:
