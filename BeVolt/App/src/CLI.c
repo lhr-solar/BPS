@@ -256,7 +256,11 @@ void CLI_ErrorLight(char *input) {}
  * Interacts with CAN
  * @param input command
  */
-void CLI_CAN(char *input) {}
+void CLI_CAN(char *input) {
+	if (CLI_GetToken(1)[0] == NULL){
+		
+	}
+}
 
 /** CLI_Display
  * Interacts with the display
