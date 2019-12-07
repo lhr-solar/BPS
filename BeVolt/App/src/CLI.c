@@ -7,6 +7,7 @@
 #include <ctype.h>
 #include "String.h"
 #include "stm32f4xx.h"
+#include "stm32f4xx_gpio.h"
 
 #define MAX_TOKEN_SIZE 4
 
@@ -40,7 +41,7 @@ char* CLI_GetToken(uint8_t idx) {
  * Asks if batteries needs to be charged
  * @return true or false
  */
-bool CLI_Startup() {
+bool CLI_Startup(void) {
 	printf("Do you need to charge the batteries? (y/n)\r\n");
 	//TODO: Fill in UART input
 }
@@ -70,10 +71,10 @@ void CLI_Voltage(char *input) {
 		// All modules
 		case NULL:
 				for(int i = 0; i < NUM_BATTERY_MODULES; i++){
-					printf("\n\rModule Number ");
+					printf("Module number ");
 					printf("%d", i+1);
 					printf(": ");
-					printf("%d",Voltage_GetModuleMillivoltage(i));
+					printf("%.3fV",Voltage_GetModuleMillivoltage(i)/1000.0);
 					printf("\n\r");
 				}
 				break;
@@ -81,44 +82,45 @@ void CLI_Voltage(char *input) {
 		// Specific module
 		char modNum = CLI_GetToken(2)[0]-1;
 		case 'm':
-		case 'M':
 			if (modNum == NULL || modNum > NUM_BATTERY_MODULES || modNum < 0){
-				printf("Invalid Module Number");
+				printf("Invalid module number");
 			}
 			else {
-				printf("\n\rModule Number ");
+				printf("Module number ");
 				printf("%c", modNum+1);
 				printf(": ");
-				printf("%c",Voltage_GetModuleMillivoltage(modNum));
+				printf("%.3fV",Voltage_GetModuleMillivoltage(modNum)/1000.0);
 				printf("\n\r");
 			}
 			break;
 		
 		// Total
 		case 't':
-		case 'T':
-			printf("\n\rTotal voltage: ");
-			printf("%d",Voltage_GetTotalPackVoltage());
+			printf("Total voltage: ");
+			printf("%.3fV",Voltage_GetTotalPackVoltage()/1000.0);
 			printf("\n\r");
 			break;
 		
 		// Safety Status
-		case 's':
-		case 'S':		
-			printf("\n\r");
+		case 's':	
+			printf("Safety Status: ");
 				SafetyStatus voltage = Voltage_IsSafe();
 				switch(voltage) {
 					case SAFE: 
 						printf("SAFE");
+						printf("\n\r");
 						break;
 					case DANGER: 
 						printf("DANGER");
+						printf("\n\r");
 						break;
 					case OVERVOLTAGE:
 						printf("OVERVOLTAGE");
+						printf("\n\r");
 						break;
 					case UNDERVOLTAGE: 
 						printf("UNDERVOLTAGE");
+						printf("\n\r");
 						break;
 					default:
 						break;
@@ -126,7 +128,8 @@ void CLI_Voltage(char *input) {
 			}
 				
 		default:
-			printf("Invalid voltage command.");
+			printf("Invalid voltage command");
+			printf("\n\r");
 			break;
 		}
 	}
@@ -145,9 +148,9 @@ void CLI_Current(char *input) {
 			printf("High: %4fA\n\r", Current_GetHighPrecReading()/1000.0);
 		case 'l' : //low precision reading
 			printf("Low: %4fA\n\r", Current_GetLowPrecReading()/1000.0);
-		case 's' : //safety status
-			if (Current_IsSafe() == 0) {
-				printf("Safety Status: SAFE\n\r");
+		case 's' : 
+			if (Current_IsSafe() == SAFE) {
+				printf("\n\rCurrentState: SAFE\n\r");
 			}
 			else {
 				printf("Safety Status: DANGER\n\r");
@@ -169,7 +172,52 @@ void CLI_Current(char *input) {
  * @param input command
  */
 void CLI_Temperature(char *input) {
-
+	switch(CLI_GetToken(1)[0]){
+		// Average temperature of modules
+		case NULL:
+			for(int i = 0; i < NUM_BATTERY_MODULES; i++){
+					printf("Module number ");
+					printf("%d", i+1);
+					printf(": ");
+					printf("%.3f°C",Temperature_GetModuleTemperature(i)/1000.0);
+					printf("\n\r");
+			}
+			break;
+			
+		// All temperature sensors
+		case 'a':
+			// Print out temperature of all the temperatures sensors on every module 
+			break;
+			
+		// Temperature of specific module
+		char modNum = CLI_GetToken(2)[0]-1;
+		char sensNum = CLI_GetToken(3)[0]-1;
+		case 'm':
+			if (modNum == NULL || modNum > NUM_BATTERY_MODULES || modNum < 0){
+				printf("Invalid module number");
+			}
+			else {
+				printf("Module number ");
+				printf("%c", modNum+1);
+				printf(": ");
+				printf("%.3f°C",Temperature_GetModuleTemperature(modNum)/1000.0);
+				printf("\n\r");
+				// Should also print out temperature of sensor if specified
+			}
+			break;
+			
+		// Average temperature of the whole pack
+		case 't':
+			printf("Total average temperature: ");
+			printf("%.3f°C", Temperature_GetTotalPackAvgTemperature()/1000.0); 
+			printf("\n\r");
+			break;
+			
+		default:
+			printf("Invalid temperature command");
+			printf("\n\r");
+			break;
+	}
 }
 
 /** CLI_Contactor
@@ -181,9 +229,9 @@ void CLI_Contactor(char *input) {
 		FunctionalState contactor = Contactor_Flag();
 		case 's':
 			if(contactor == ENABLE) {
-				printf("The contactor is Enabled");
+				printf("Contactor is Enabled");
 			} else {
-				printf("The contactor is Disabled");
+				printf("Contactor is Disabled");
 			break;
 		default:
 			printf("Invalid contactor command\r\n");
@@ -212,17 +260,78 @@ void CLI_Charge(char *input) {
 	}
 }
 
-/** CLI_ErrorLight
- * Interacts with the error light
+/** CLI_LED
+ * Interacts with the LEDs
  * @param input command
  */
-void CLI_ErrorLight(char *input) {}
+	
+void toggleLED(led input) {
+	if(strcmp("1", CLI_GetToken(3)) == 0 || strcmp("on", CLI_GetToken(3)) == 0) {
+		LED_On(input);
+	}
+	else if(strcmp("0", CLI_GetToken(3)) == 0 || strcmp("off", CLI_GetToken(3)) == 0) {
+		LED_Off(input);
+	} else {
+		printf("Invalid LED command");
+	}
+}
+void CLI_LED(char *input) {
+	LED_Init();
+	switch(CLI_GetToken(1)[0]) {
+		uint8_t error = (GPIOB->ODR) & GPIO_Pin_12;
+		case NULL:
+			if(error) {
+				printf("Error light is On\r\n");
+			} else {
+				printf("Error light is Off\r\n");
+			}
+			break;
+		case 't':
+				for(int i = 0; i < 100000000; i++) {
+					// TODO: Implement delays between all with SysTick
+					LED_Toggle(FAULT);
+					LED_Toggle(RUN);
+					LED_Toggle(UVOLT);
+					LED_Toggle(OVOLT);
+					LED_Toggle(OTEMP);
+					LED_Toggle(OCURR);
+					LED_Toggle(WDOG);
+					LED_Toggle(CAN);
+					LED_Toggle(EXTRA);
+				}
+			break;
+		default:
+			if(strcmp("fault", CLI_GetToken(2)) == 0) {
+				toggleLED(FAULT);
+			}
+			else if(strcmp("run", CLI_GetToken(2)) == 0) {
+				toggleLED(RUN);
+			}	// TODO: Add the rest of the lights
+			break;
+	}
+}
 
 /** CLI_CAN
  * Interacts with CAN
  * @param input command
  */
-void CLI_CAN(char *input) {}
+void CLI_CAN(char *input) {
+	uint8_t data[8];
+	switch(CLI_GetToken(1)[0]){
+		case 'r':
+			CAN1_Read(data);
+			printf("CAN message: %s\n\r", data);  // 1 if data was read, 0 if data wasn't read
+			break;
+		
+		case 'w':
+			CAN1_Write(CLI_GetToken(2)[0],(uint8_t*)CLI_GetToken(3));
+			break;
+		
+		default:
+			printf("Invalid CAN command\n\r");
+			break;
+	}
+}
 
 /** CLI_Display
  * Interacts with the display
@@ -234,7 +343,22 @@ void CLI_Display(char *input) {}
  * Interacts with the watchdog timer
  * @param input command
  */
-void CLI_Watchdog(char *input) {}
+void CLI_Watchdog(char *input) {
+	switch(CLI_GetToken(1)[0]){
+		case NULL: 
+			printf("Safety Status: ");
+				if (WDTimer_DidSystemReset() == 0){
+					printf("SAFE");
+				} else if (WDTimer_DidSystemReset() == 1){
+					printf("DANGER");
+				}
+			printf("\n\r");
+			break;
+		
+		default:
+			printf("Invalid watchdog command\n\r");
+	}
+}
 
 /** CLI_EEPROM
  * Interacts with EEPROM
@@ -299,7 +423,7 @@ void CLI_Commands(char *input){
 		
 		// Error light commands
 		case 'l':
-			CLI_ErrorLight(input);
+			CLI_LED(input);
 			break;
 		
 		// CAN commands

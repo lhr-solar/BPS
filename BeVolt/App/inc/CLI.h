@@ -13,6 +13,9 @@
 #include "Current.h"
 #include "Temperature.h"
 #include "Contactor.h"
+#include "LED.h"
+#include "CAN.h"
+#include "WDTimer.h"
 #include "config.h"
 #include "SoC.h"
 #include "CAN.h"
@@ -29,6 +32,6 @@ void CLI_Commands(char *input);
  * Asks if batteries needs to be charged
  * @return true or false
  */
-bool CLI_Startup();
+bool CLI_Startup(void);
 
 #endif
