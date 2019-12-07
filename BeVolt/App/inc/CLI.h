@@ -13,6 +13,8 @@
 #include "Current.h"
 #include "Temperature.h"
 #include "Contactor.h"
+#include "CAN.h"
+#include "WDTimer.h"
 #include "config.h"
 #include "SoC.h"
 #include "CAN.h"

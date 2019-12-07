@@ -280,8 +280,20 @@ void CLI_ErrorLight(char *input) {}
  * @param input command
  */
 void CLI_CAN(char *input) {
-	if (CLI_GetToken(1)[0] == NULL){
+	uint8_t data[8];
+	switch(CLI_GetToken(1)[0]){
+		case 'r':
+			CAN1_Read(data);
+			printf("CAN message: %s\n\r", data);  // 1 if data was read, 0 if data wasn't read
+			break;
 		
+		case 'w':
+			CAN1_Write(CLI_GetToken(2)[0],(uint8_t*)CLI_GetToken(3));
+			break;
+		
+		default:
+			printf("Invalid CAN command\n\r");
+			break;
 	}
 }
 
@@ -295,7 +307,22 @@ void CLI_Display(char *input) {}
  * Interacts with the watchdog timer
  * @param input command
  */
-void CLI_Watchdog(char *input) {}
+void CLI_Watchdog(char *input) {
+	switch(CLI_GetToken(1)[0]){
+		case NULL: 
+			printf("Safety Status: ");
+				if (WDTimer_DidSystemReset() == 0){
+					printf("SAFE");
+				} else if (WDTimer_DidSystemReset() == 1){
+					printf("DANGER");
+				}
+			printf("\n\r");
+			break;
+		
+		default:
+			printf("Invalid watchdog command\n\r");
+	}
+}
 
 /** CLI_EEPROM
  * Interacts with EEPROM
