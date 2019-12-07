@@ -5,6 +5,7 @@
 
 #include "CLI.h"
 #include <ctype.h>
+#include "String.h"
 
 #define MAX_TOKEN_SIZE 4
 
@@ -18,6 +19,9 @@ void CLI_InputParse(char *input) {
 	char *tokenized;
 	char *split = strtok_r(input, " ", &tokenized);
 	for(int i = 0; i < MAX_TOKEN_SIZE && split != NULL; i++) {
+		for(int j = 0; j < strlen(split); j++) {
+			split[j] = tolower(split[j]);
+		}
 		tokens[i] = split;
 		split = strtok_r(NULL, " ", &tokenized);
 	}
@@ -39,7 +43,12 @@ void CLI_Help(char *input) {
 	printf("-------------------Help Menu-------------------\r\n");
 	printf("The available commands are: \r\n");
 	printf("Voltage (v)\tCurrent (i)\tTemperature (t)\r\n");
-	printf("LTC (ltc)\t
+	printf("Contactor/Switch (sw)\tCharge (q)\tError Light (l)\r\n");
+	printf("CAN (c)\tEEPROM (ee)\tDisplay(d)\r\n");
+	printf("LTC (ltc)\tWatchdog(w)\tADC(adc)\r\n");
+	printf("Critical/Abort (!)\tAll(a)\r\n");
+	printf("Keep in mind: all values are 1-indexed\r\n");
+	printf("-----------------------------------------------\r\n");
 }
 
 /** CLI_Voltage
@@ -213,77 +222,64 @@ void CLI_Commands(char *input){
 	switch(input[0]) {
 		// Help menu
 		case 'h':
-		case 'H':
 		case 'm':
-		case 'M':
 		case '?':
 			CLI_Help(input);
 			break;
 		
 		// Voltage commands
 		case 'v':
-		case 'V':
 			CLI_Voltage(input);
 			break;
 		
 		// Current commands
 		case 'i':
-		case 'I':
 			CLI_Current(input);
 			break;
 		
 		// Temperature commands
 		case 't':
-		case 'T':
 			CLI_Temperature(input);
 			break;
 		
 		// Contactor/Switch commands
 		case 's':
-		case 'S':
 			CLI_Contactor(input);
 			break;
 		
 		// State of Charge commands
 		case 'q':
-		case 'Q':
 		case '%':
 			CLI_Charge(input);
 			break;
 		
 		// Error light commands
 		case 'l':
-		case 'L':
 			CLI_ErrorLight(input);
 			break;
 		
 		// CAN commands
 		case 'c':
-		case 'C':
 			CLI_CAN(input);
 			break;
 		
 		// Display commands
 		case 'd':
-		case 'D':
 			CLI_Display(input);
 			break;
 		
 		// Watchdog commands
 		case 'w':
-		case 'W':
 			CLI_Watchdog(input);
 			break;
 		
 		// EEPROM commands
 		case 'e':
-		case 'E':
 			CLI_EEPROM(input);
 			break;
 		
 		// Peripheral commands
 		case 'p':
-		case 'P':
 			CLI_Peripherals(input);
 			break;
 		
