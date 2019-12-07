@@ -61,10 +61,10 @@ void CLI_Voltage(char *input) {
 		// All modules
 		case NULL:
 				for(int i = 0; i < NUM_BATTERY_MODULES; i++){
-					printf("\n\rModule Number ");
+					printf("Module number ");
 					printf("%d", i+1);
 					printf(": ");
-					printf("%d",Voltage_GetModuleMillivoltage(i));
+					printf("%.3fV",Voltage_GetModuleMillivoltage(i)/1000.0);
 					printf("\n\r");
 				}
 				break;
@@ -73,40 +73,44 @@ void CLI_Voltage(char *input) {
 		char modNum = CLI_GetToken(2)[0]-1;
 		case 'm':
 			if (modNum == NULL || modNum > NUM_BATTERY_MODULES || modNum < 0){
-				printf("Invalid Module Number");
+				printf("Invalid module number");
 			}
 			else {
-				printf("\n\rModule Number ");
+				printf("Module number ");
 				printf("%c", modNum+1);
 				printf(": ");
-				printf("%c",Voltage_GetModuleMillivoltage(modNum));
+				printf("%.3fV",Voltage_GetModuleMillivoltage(modNum)/1000.0);
 				printf("\n\r");
 			}
 			break;
 		
 		// Total
 		case 't':
-			printf("\n\rTotal voltage: ");
-			printf("%d",Voltage_GetTotalPackVoltage());
+			printf("Total voltage: ");
+			printf("%.3fV",Voltage_GetTotalPackVoltage()/1000.0);
 			printf("\n\r");
 			break;
 		
 		// Safety Status
 		case 's':	
-			printf("\n\r");
+			printf("Safety Status: ");
 				SafetyStatus voltage = Voltage_IsSafe();
 				switch(voltage) {
 					case SAFE: 
 						printf("SAFE");
+						printf("\n\r");
 						break;
 					case DANGER: 
 						printf("DANGER");
+						printf("\n\r");
 						break;
 					case OVERVOLTAGE:
 						printf("OVERVOLTAGE");
+						printf("\n\r");
 						break;
 					case UNDERVOLTAGE: 
 						printf("UNDERVOLTAGE");
+						printf("\n\r");
 						break;
 					default:
 						break;
@@ -114,7 +118,8 @@ void CLI_Voltage(char *input) {
 			}
 				
 		default:
-			printf("Invalid voltage command.");
+			printf("Invalid voltage command");
+			printf("\n\r");
 			break;
 		}
 	}
@@ -136,29 +141,47 @@ void CLI_Temperature(char *input) {
 		// Average temperature of modules
 		case NULL:
 			for(int i = 0; i < NUM_BATTERY_MODULES; i++){
-					printf("\n\rModule Number ");
+					printf("Module number ");
 					printf("%d", i+1);
 					printf(": ");
-					printf("%d",Temperature_GetModuleTemperature(i));
+					printf("%.3f°C",Temperature_GetModuleTemperature(i)/1000.0);
 					printf("\n\r");
+			}
 			break;
 			
 		// All temperature sensors
 		case 'a':
+			// Print out temperature of all the temperatures sensors on every module 
 			break;
 			
 		// Temperature of specific module
+		char modNum = CLI_GetToken(2)[0]-1;
+		char sensNum = CLI_GetToken(3)[0]-1;
 		case 'm':
+			if (modNum == NULL || modNum > NUM_BATTERY_MODULES || modNum < 0){
+				printf("Invalid module number");
+			}
+			else {
+				printf("Module number ");
+				printf("%c", modNum+1);
+				printf(": ");
+				printf("%.3f°C",Temperature_GetModuleTemperature(modNum)/1000.0);
+				printf("\n\r");
+				// Should also print out temperature of sensor if specified
+			}
 			break;
 			
 		// Average temperature of the whole pack
 		case 't':
+			printf("Total average temperature: ");
+			printf("%.3f°C", Temperature_GetTotalPackAvgTemperature()/1000.0); 
+			printf("\n\r");
 			break;
 			
 		default:
-			printf("Invalid temperature command.");
+			printf("Invalid temperature command");
+			printf("\n\r");
 			break;
-		}
 	}
 }
 
