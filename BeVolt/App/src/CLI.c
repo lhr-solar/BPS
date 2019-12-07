@@ -51,7 +51,26 @@ void CLI_Voltage(char *input) {}
  * current parameter(s)
  * @param input command
  */
-void CLI_Current(char *input) {}
+void CLI_Current(char *input) {
+	char* command = tokens[1];
+	//c = 99, h = 104, l = 108, s = 115
+	if (command - 99 == 0) {
+	
+	}
+	else if (command - 104 == 0) {
+	
+	}
+	else if (command - 108 == 0) {
+	
+	}
+	else if (command - 115 == 0) {
+	
+	}
+	else {
+	printf("Invalid command");
+		
+	}
+}
 
 /** CLI_Temperature
  * Checks and displays the desired
