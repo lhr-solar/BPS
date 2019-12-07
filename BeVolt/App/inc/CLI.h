@@ -22,4 +22,10 @@
  */
 void CLI_Commands(char *input);
 
+/** CLI_GetToken
+ * @param index of desired token
+ * @return token at desired index
+ */
+char* CLI_GetToken(uint8_t idx);
+
 #endif
