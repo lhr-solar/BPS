@@ -12,6 +12,7 @@
 #include "Voltage.h"
 #include "Current.h"
 #include "Temperature.h"
+#include "Contactor.h"
 #include "config.h"
 
 
@@ -22,10 +23,10 @@
  */
 void CLI_Commands(char *input);
 
-/** CLI_GetToken
- * @param index of desired token
- * @return token at desired index
+/** CLI_Startup
+ * Asks if batteries needs to be charged
+ * @return true or false
  */
-char* CLI_GetToken(uint8_t idx);
+bool CLI_Startup();
 
 #endif
