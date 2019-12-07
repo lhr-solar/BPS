@@ -391,7 +391,7 @@ void singleSensorTest(void) {
 	int sensorIndex = 0; // <-- replace this with which sensor you want to test
 	Temperature_ChannelConfig(sensorIndex);
 	while(1) {
-		Temperature_GetRawADC(MD_422HZ_1KHZ);
+		Temperature_SampleADC(MD_422HZ_1KHZ);
 		for (int i = 0; i < NUM_MINIONS; i++) {
 			int temp = milliVoltToCelsius(Minions[i].aux.a_codes[0]*0.1);
 			printf("Board %d Sensor %d : %d", i, sensorIndex, temp);
@@ -416,7 +416,7 @@ void batteryModuleTemperatureTest (void) {
 		Temperature_UpdateMeasurements();
 		for (int i = 0; i < NUM_MINIONS; i++) {
 		    for (int j = 0; j < MAX_TEMP_SENSORS_PER_MINION_BOARD/2; j++) {
-			int moduleNum =  i * MAX_TEMP_SENSORS_PER_MINION_BOARD/2 + j;
+						int moduleNum =  i * MAX_TEMP_SENSORS_PER_MINION_BOARD/2 + j;
 		        printf("Board %d Battery Module %d Temp: %d Celsius\r\n", i,  moduleNum, Temperature_GetModuleTemperature(moduleNum));
 		        for(int delay = 0; delay < 800000; delay++){}
 		    }
