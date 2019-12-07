@@ -6,6 +6,11 @@
 #define __UART_H__
 
 #include <stdint.h>
+#include <stdio.h>
+#include <stdbool.h>
+#include "stm32f4xx.h"
+#include "config.h"
+#include "FIFO.h"
 
 /***** Unlike SPI, UART cannot have multiple modules connected to the same tx/rx line *****/
 
@@ -66,5 +71,21 @@ void USART1_Config(void);
 * @retval None
 */
 void USART1_IRQHandler(void);
+
+//use when fifo is storing commands received over uart
+//returns if fifo has a command in it by checking for carriage return
+bool hasCommand(Fifo *fifo);
+
+//for using fifo to store commands received from UART
+//fails if multiple commands are stored in queue
+//preconditions: fifo has a command stored in it, buffer is large enough to hold command
+//parameters: fifo with command stored in it, buffer to receive stored command
+//fills buffer with received command
+void getCommand(Fifo *fifo, char buffer[]);
+
+//checks if new data has been received from UART interrupts
+//if so, it echoes the new character to Putty and adds the character to the passed fifo
+//backspace is supported
+void checkUARTandEcho(Fifo *uartFifo);
 
 #endif

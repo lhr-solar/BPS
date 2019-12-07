@@ -13,12 +13,9 @@
  *		rx : PC5
  */
 
-#include <stdint.h>
-#include <stdio.h>
-#include <stdbool.h>
-#include "stm32f4xx.h"
-#include "config.h"
+#include "UART.h"
 
+Fifo RxFifo;//fifo to store data from uart interrupt handler
 
 // This is required to use printf
 struct __FILE{
@@ -239,6 +236,10 @@ void USART1_Config(void){
       NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
       NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
       NVIC_Init(&NVIC_InitStructure);
+			
+			//initialize RxFifo
+			RxFifo.head = 0;
+			RxFifo.tail = 0;
 }
 
 /**
@@ -246,13 +247,60 @@ void USART1_Config(void){
 * @param None
 * @retval None
 */
-uint8_t RxData = 0;//data received flag
 void USART1_IRQHandler(void){
 	if(USART_GetITStatus(USART1, USART_IT_RXNE) != RESET){
 	/* Read one byte from the receive data register */
-		RxData = USART_ReceiveData(USART1);
+		fifoPut(&RxFifo, USART_ReceiveData(USART1));
   }
 }
 
+//use when fifo is storing commands received over uart
+//returns if fifo has a command in it by checking for carriage return
+bool hasCommand(Fifo *fifo){
+	for (int i = fifo->tail; i != fifo->head; i = (i + 1) % fifo_size){
+		if (fifo->queue[i] == 0x0d)
+			return true;
+	}
+	return false;
+}
+//for using fifo to store commands received from UART
+//fails if multiple commands are stored in queue
+//preconditions: fifo has a command stored in it, buffer is large enough to hold command
+//parameters: fifo with command stored in it, buffer to receive stored command
+//fills buffer with received command
+void getCommand(Fifo *fifo, char buffer[]){
+	if (hasCommand(fifo)){
+		int i = 0;
+		while(fifo->queue[fifo->tail] != '\r'){
+			buffer[i] = fifoGet(fifo);
+			i++;
+		}
+		fifoGet(fifo);//get rid of carriage return
+		buffer[i] = 0;
+	}
+}
 
-
+//checks if new data has been received from UART interrupts
+//if so, it echoes the new character to Putty and adds the character to the passed fifo
+//backspace is supported
+void checkUARTandEcho(Fifo *uartFifo) {
+		if (!fifoIsFull(*uartFifo) && !fifoIsEmpty(RxFifo)){//put new characters into fifo
+			//throw out bad characters
+			if ((RxFifo.queue[RxFifo.tail] != '\r') && ((RxFifo.queue[RxFifo.tail]  < 0x20) || (RxFifo.queue[RxFifo.tail]  > 0x7f))){
+				fifoGet(&RxFifo);
+				return;
+			}
+			//only let enter or backspace get into last valid spot in fifo so it does not freeze when it fills up
+			if (((uartFifo->head + 2) % fifo_size == uartFifo->tail) && ((RxFifo.queue[RxFifo.tail] != '\r') && (RxFifo.queue[RxFifo.tail] != 0x7f))){
+				fifoGet(&RxFifo);
+				return;
+			}
+			if (RxFifo.queue[RxFifo.tail] != 0x7f)
+				fifoPut(uartFifo, (char) RxFifo.queue[RxFifo.tail]);
+			printf("%c", RxFifo.queue[RxFifo.tail]);
+			if (RxFifo.queue[RxFifo.tail] == 0x7f){
+				removeLastElement(uartFifo);
+			}
+			fifoGet(&RxFifo);
+		}
+	}

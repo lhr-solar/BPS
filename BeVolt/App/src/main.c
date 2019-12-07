@@ -911,17 +911,12 @@ int main(void){
 	fifoInit(&uartFifo);
 	__enable_irq();
 	extern uint8_t RxData;
+	char buffer[fifo_size];
 	while(1){
-		if (~fifoIsFull(uartFifo) && RxData){
-			fifoPut(&uartFifo, (char) RxData);
-			if ((RxData == 0x0d) && ~fifoIsFull(uartFifo)){//if carriage return was last, add line feed
-				RxData = 0x0a;
-			}else{
-				RxData = 0;
-			}
-		}
-		if (~fifoIsEmpty(uartFifo)){
-			printf("%c", fifoGet(&uartFifo));
+		checkUARTandEcho(&uartFifo);
+		if (hasCommand(&uartFifo)){
+			getCommand(&uartFifo, buffer);
+			printf("\n\r%s\n\r", buffer);
 		}
 	}
 }
