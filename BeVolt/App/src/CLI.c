@@ -116,24 +116,30 @@ void CLI_Voltage(char *input) {
  * @param input command
  */
 void CLI_Current(char *input) {
-	char* command = tokens[1];
-	//c = 99, h = 104, l = 108, s = 115
-	if (command - 99 == 0) {
-	
-	}
-	else if (command - 104 == 0) {
-	
-	}
-	else if (command - 108 == 0) {
-	
-	}
-	else if (command - 115 == 0) {
-	
-	}
-	else {
-	printf("Invalid command");
-		
-	}
+	switch (CLI_GetToken(1)[0]) {
+		case NULL : 
+			printf("\n\rHigh: %4fA\n\r", Current_GetHighPrecReading()/1000.0);//prints 4 digits, number, and A
+			printf("\n\rLow: %4fA\n\r", Current_GetLowPrecReading()/1000.0);
+		case 'h' : 
+			printf("\n\rHigh: %4fA\n\r", Current_GetHighPrecReading()/1000.0);
+		case 'l' : 
+			printf("\n\rLow: %4fA\n\r", Current_GetLowPrecReading()/1000.0);
+		case 's' : 
+			if (Current_IsSafe() == 0) {
+				printf("\n\rCurrentState: SAFE\n\r");
+			}
+			else {
+				printf("\n\rCurrentState: DANGER\n\r");
+			}
+		case 'c' : 
+			if (Current_IsCharging() == 0) {
+				printf("\n\rBatteryState: CHARGING\n\r");
+			}
+			else {
+				printf("\n\rBatteryState: NOT CHARGING\n\r");
+			}
+		default: printf("\n\rInvalid Command\n\r");
+		}
 }
 
 /** CLI_Temperature
