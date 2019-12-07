@@ -72,7 +72,6 @@ void CLI_Voltage(char *input) {
 		// Specific module
 		char modNum = CLI_GetToken(2)[0]-1;
 		case 'm':
-		case 'M':
 			if (modNum == NULL || modNum > NUM_BATTERY_MODULES || modNum < 0){
 				printf("Invalid Module Number");
 			}
@@ -87,15 +86,13 @@ void CLI_Voltage(char *input) {
 		
 		// Total
 		case 't':
-		case 'T':
 			printf("\n\rTotal voltage: ");
 			printf("%d",Voltage_GetTotalPackVoltage());
 			printf("\n\r");
 			break;
 		
 		// Safety Status
-		case 's':
-		case 'S':		
+		case 's':	
 			printf("\n\r");
 				SafetyStatus voltage = Voltage_IsSafe();
 				switch(voltage) {
@@ -153,7 +150,36 @@ void CLI_Current(char *input) {
  * temperature parameter(s)
  * @param input command
  */
-void CLI_Temperature(char *input) {}
+void CLI_Temperature(char *input) {
+	switch(CLI_GetToken(1)[0]){
+		// Average temperature of modules
+		case NULL:
+			for(int i = 0; i < NUM_BATTERY_MODULES; i++){
+					printf("\n\rModule Number ");
+					printf("%d", i+1);
+					printf(": ");
+					printf("%d",Temperature_GetModuleTemperature(i));
+					printf("\n\r");
+			break;
+			
+		// All temperature sensors
+		case 'a':
+			break;
+			
+		// Temperature of specific module
+		case 'm':
+			break;
+			
+		// Average temperature of the whole pack
+		case 't':
+			break;
+			
+		default:
+			printf("Invalid temperature command.");
+			break;
+		}
+	}
+}
 
 /** CLI_Contactor
  * Interacts with contactor status
