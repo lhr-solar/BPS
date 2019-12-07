@@ -14,6 +14,8 @@
 #include "Temperature.h"
 #include "Contactor.h"
 #include "LED.h"
+#include "CAN.h"
+#include "WDTimer.h"
 #include "config.h"
 
 

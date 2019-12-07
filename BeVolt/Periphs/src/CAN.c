@@ -97,7 +97,7 @@ void CAN1_Write(uint32_t id, uint8_t data[8]){
 	CAN_Transmit(CAN1, &TxMessage);
 }
 
-bool CAN1_Read(uint8_t *data){
+bool CAN1_Read(uint8_t data[]){
 	if(RxFlag){
 		for(int i = 0; i < 8; i++){
 			data[i] = RxMessage.Data[i];
