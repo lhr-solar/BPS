@@ -133,28 +133,37 @@ int milliVoltToCelsius(float milliVolt){
 	return retVal * 1000;
 }
 
-/** Temperature_UpdateMeasurements
+/** Temperature_UpdateSingleChannel
+ * Stores and updates the new measurements received on one particular temperature sensor
+ * @param channel < MAX_TEMP_SENSORS_PER_MINION_BOARD, 0-indexed
+ * @return SUCCESS or ERROR
+ */
+ErrorStatus Temperature_UpdateSingleChannel(uint8_t channel){
+	// Configure correct channel
+	if (ERROR == Temperature_ChannelConfig(channel)) {
+		return ERROR;
+	}
+	
+	// Sample ADC channel
+	Temperature_SampleADC(MD_422HZ_1KHZ);
+	
+	// Convert to Celsius
+	for(int board = 0; board < NUM_MINIONS; board++) {
+		
+		// update adc value from GPIO1 stored in a_codes[0]; 
+		// a_codes[0] is fixed point with .001 resolution in volts -> multiply by .001 * 1000 to get mV in double form
+		ModuleTemperatures[board][channel] = milliVoltToCelsius(Minions[board].aux.a_codes[0]*0.1);
+	}
+	return SUCCESS;
+}
+
+/** Temperature_UpdateAllMeasurements
  * Stores and updates the new measurements received on all temperature sensors
  * @return SUCCESS or ERROR
  */
-ErrorStatus Temperature_UpdateMeasurements(){
+ErrorStatus Temperature_UpdateAllMeasurements(){
 	for (int sensorCh = 0; sensorCh < MAX_TEMP_SENSORS_PER_MINION_BOARD; sensorCh++) {
-		
-		// Configure correct channel
-		if (ERROR == Temperature_ChannelConfig(sensorCh)) {
-			return ERROR;
-		}
-		
-		// Sample ADC channel
-		Temperature_SampleADC(MD_422HZ_1KHZ);
-		
-		// Convert to Celsius
-		for(int board = 0; board < NUM_MINIONS; board++) {
-			
-			// update adc value from GPIO1 stored in a_codes[0]; 
-			// a_codes[0] is fixed point with .001 resolution in volts -> multiply by .001 * 1000 to get mV in double form
-			ModuleTemperatures[board][sensorCh] = milliVoltToCelsius(Minions[board].aux.a_codes[0]*0.1);
-		}
+		Temperature_UpdateSingleChannel(sensorCh);
 	}
 	return SUCCESS;
 }

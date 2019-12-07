@@ -34,7 +34,7 @@ int main(){
 		// First update the measurements.
 		Voltage_UpdateMeasurements();
 		Current_UpdateMeasurements();
-		Temperature_UpdateMeasurements();
+		Temperature_UpdateAllMeasurements();
 		
 		SafetyStatus current = Current_IsSafe();
 		SafetyStatus temp = Temperature_IsSafe(Current_IsCharging());
@@ -389,22 +389,20 @@ int main(){
 
 void singleSensorTest(void) {
 	int sensorIndex = 0; // <-- replace this with which sensor you want to test
-	Temperature_ChannelConfig(sensorIndex);
 	while(1) {
-		Temperature_SampleADC(MD_422HZ_1KHZ);
-		for (int i = 0; i < NUM_MINIONS; i++) {
-			int temp = milliVoltToCelsius(Minions[i].aux.a_codes[0]*0.1);
-			printf("Board %d Sensor %d : %d", i, sensorIndex, temp);
+		Temperature_UpdateSingleChannel(sensorIndex);
+		for (int board = 0; board < NUM_MINIONS; board++) {
+			printf("Board %d Sensor %d : %d", board, sensorIndex, Temperature_GetSingleTempSensor(board, sensorIndex));
 		}
 	}
 }
 
 void individualSensorDumpTest(void) {
 	while (1) {
-		Temperature_UpdateMeasurements();
-		for (int i = 0; i < NUM_MINIONS; i++) {
-			for (int j = 0; j < MAX_TEMP_SENSORS_PER_MINION_BOARD; j++) {
-				printf("Board %d, Sensor %d: %d Celsius\r\n", i, j, ModuleTemperatures[i][j]);
+		Temperature_UpdateAllMeasurements();
+		for (int board = 0; board < NUM_MINIONS; board++) {
+			for (int sensor = 0; sensor < MAX_TEMP_SENSORS_PER_MINION_BOARD; sensor++) {
+				printf("Board %d, Sensor %d: %d Celsius\r\n", board, sensor, Temperature_GetSingleTempSensor(board, sensor));
 				for(int delay = 0; delay < 800000; delay++){}
 			}
 		}
@@ -413,11 +411,11 @@ void individualSensorDumpTest(void) {
 
 void batteryModuleTemperatureTest (void) {
 	while (1) {
-		Temperature_UpdateMeasurements();
-		for (int i = 0; i < NUM_MINIONS; i++) {
+		Temperature_UpdateAllMeasurements();
+		for (int board = 0; board < NUM_MINIONS; board++) {
 		    for (int j = 0; j < MAX_TEMP_SENSORS_PER_MINION_BOARD/2; j++) {
-						int moduleNum =  i * MAX_TEMP_SENSORS_PER_MINION_BOARD/2 + j;
-		        printf("Board %d Battery Module %d Temp: %d Celsius\r\n", i,  moduleNum, Temperature_GetModuleTemperature(moduleNum));
+						int moduleNum =  board * MAX_TEMP_SENSORS_PER_MINION_BOARD/2 + j;
+		        printf("Board %d Battery Module %d Temp: %d Celsius\r\n", board,  moduleNum, Temperature_GetModuleTemperature(moduleNum));
 		        for(int delay = 0; delay < 800000; delay++){}
 		    }
 		}
@@ -430,7 +428,7 @@ void checkDangerTest(void) {
 	int isCharging = 1;  // 1 if pack is charging, 0 if discharging
 	printf("Danger Test\r\n");
 	while (1) {
-		Temperature_UpdateMeasurements();
+		Temperature_UpdateAllMeasurements();
 		if (Temperature_IsSafe(isCharging) == ERROR) {
 			printf("SOMETHINGS WRONG! AHHH\r\n");
 			printf("----------Dumping Sensor data----------\r\n");

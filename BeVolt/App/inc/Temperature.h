@@ -44,11 +44,18 @@ ErrorStatus Temperature_ChannelConfig(uint8_t tempChannel);
  */
 int milliVoltToCelsius(float milliVolt);
 
-/** Temperature_UpdateMeasurements
+/** Temperature_UpdateSingleChannel
+ * Stores and updates the new measurements received on one particular temperature sensor
+ * @param channel < MAX_TEMP_SENSORS_PER_MINION_BOARD, 0-indexed
+ * @return SUCCESS or ERROR
+ */
+ErrorStatus Temperature_UpdateSingleChannel(uint8_t channel);
+
+/** Temperature_UpdateAllMeasurements
  * Stores and updates the new measurements received on all temperature sensors
  * @return SUCCESS or ERROR
  */
-ErrorStatus Temperature_UpdateMeasurements(void);
+ErrorStatus Temperature_UpdateAllMeasurements(void);
 
 /** Temperature_IsSafe
  * Checks if all modules are safe
