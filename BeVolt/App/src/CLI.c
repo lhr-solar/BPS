@@ -7,6 +7,7 @@
 #include <ctype.h>
 #include "String.h"
 #include "stm32f4xx.h"
+#include "stm32f4xx_gpio.h"
 
 #define MAX_TOKEN_SIZE 4
 
@@ -40,7 +41,7 @@ char* CLI_GetToken(uint8_t idx) {
  * Asks if batteries needs to be charged
  * @return true or false
  */
-bool CLI_Startup() {
+bool CLI_Startup(void) {
 	printf("Do you need to charge the batteries? (y/n)\r\n");
 	//TODO: Fill in UART input
 }
@@ -179,9 +180,9 @@ void CLI_Contactor(char *input) {
 		FunctionalState contactor = Contactor_Flag();
 		case 's':
 			if(contactor == ENABLE) {
-				printf("The contactor is Enabled");
+				printf("Contactor is Enabled");
 			} else {
-				printf("The contactor is Disabled");
+				printf("Contactor is Disabled");
 			break;
 		default:
 			printf("Invalid contactor command\r\n");
@@ -197,11 +198,56 @@ void CLI_Contactor(char *input) {
  */
 void CLI_Charge(char *input) {}
 
-/** CLI_ErrorLight
- * Interacts with the error light
+/** CLI_LED
+ * Interacts with the LEDs
  * @param input command
  */
-void CLI_ErrorLight(char *input) {}
+	
+void toggleLED(led input) {
+	if(strcmp("1", CLI_GetToken(3)) == 0 || strcmp("on", CLI_GetToken(3)) == 0) {
+		LED_On(input);
+	}
+	else if(strcmp("0", CLI_GetToken(3)) == 0 || strcmp("off", CLI_GetToken(3)) == 0) {
+		LED_Off(input);
+	} else {
+		printf("Invalid LED command");
+	}
+}
+void CLI_LED(char *input) {
+	LED_Init();
+	switch(CLI_GetToken(1)[0]) {
+		uint8_t error = (GPIOB->ODR) & GPIO_Pin_12;
+		case NULL:
+			if(error) {
+				printf("Error light is On\r\n");
+			} else {
+				printf("Error light is Off\r\n");
+			}
+			break;
+		case 't':
+				for(int i = 0; i < 100000000; i++) {
+					// TODO: Implement delays between all with SysTick
+					LED_Toggle(FAULT);
+					LED_Toggle(RUN);
+					LED_Toggle(UVOLT);
+					LED_Toggle(OVOLT);
+					LED_Toggle(OTEMP);
+					LED_Toggle(OCURR);
+					LED_Toggle(WDOG);
+					LED_Toggle(CAN);
+					LED_Toggle(EXTRA);
+				}
+			break;
+		default:
+			if(strcmp("fault", CLI_GetToken(2)) == 0) {
+				toggleLED(FAULT);
+			}
+			else if(strcmp("run", CLI_GetToken(2)) == 0) {
+				toggleLED(RUN);
+			}	// TODO: Add the rest of the lights
+			break;
+	}
+}
 
 /** CLI_CAN
  * Interacts with CAN
@@ -284,7 +330,7 @@ void CLI_Commands(char *input){
 		
 		// Error light commands
 		case 'l':
-			CLI_ErrorLight(input);
+			CLI_LED(input);
 			break;
 		
 		// CAN commands
