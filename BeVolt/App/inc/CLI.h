@@ -12,6 +12,7 @@
 #include "Voltage.h"
 #include "Current.h"
 #include "Temperature.h"
+#include "Contactor.h"
 #include "config.h"
 
 
@@ -21,5 +22,11 @@
  * @param input command
  */
 void CLI_Commands(char *input);
+
+/** CLI_Startup
+ * Asks if batteries needs to be charged
+ * @return true or false
+ */
+bool CLI_Startup();
 
 #endif

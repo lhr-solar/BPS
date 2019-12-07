@@ -6,6 +6,7 @@
 #include "CLI.h"
 #include <ctype.h>
 #include "String.h"
+#include "stm32f4xx.h"
 
 #define MAX_TOKEN_SIZE 4
 
@@ -35,6 +36,14 @@ char* CLI_GetToken(uint8_t idx) {
 	return tokens[idx];
 }
 
+/** CLI_Startup
+ * Asks if batteries needs to be charged
+ * @return true or false
+ */
+bool CLI_Startup() {
+	printf("Do you need to charge the batteries? (y/n)\r\n");
+	//TODO: Fill in UART input
+}
 /** CLI_Help
  * Displays the help menu
  * @param input command
@@ -129,7 +138,32 @@ void CLI_Voltage(char *input) {
  * current parameter(s)
  * @param input command
  */
-void CLI_Current(char *input) {}
+void CLI_Current(char *input) {
+	switch (CLI_GetToken(1)[0]) {
+		case NULL : 
+			printf("High: %4fA\n\r", Current_GetHighPrecReading()/1000.0);//prints 4 digits, number, and A
+			printf("Low: %4fA\n\r", Current_GetLowPrecReading()/1000.0);
+		case 'h' : 
+			printf("High: %4fA\n\r", Current_GetHighPrecReading()/1000.0);
+		case 'l' : 
+			printf("Low: %4fA\n\r", Current_GetLowPrecReading()/1000.0);
+		case 's' : 
+			if (Current_IsSafe() == SAFE) {
+				printf("\n\rCurrentState: SAFE\n\r");
+			}
+			else {
+				printf("Safety Status: DANGER\n\r");
+			}
+		case 'c' : 
+			if (Current_IsCharging() == 0) {
+				printf("Charging State: CHARGING\n\r");
+			}
+			else {
+				printf("Charging State: DISCHARGING\n\r");
+			}
+		default: printf("Invalid Current Command\n\r");
+		}
+}
 
 /** CLI_Temperature
  * Checks and displays the desired
@@ -189,7 +223,21 @@ void CLI_Temperature(char *input) {
  * Interacts with contactor status
  * @param input command
  */
-void CLI_Contactor(char *input) {}
+void CLI_Contactor(char *input) {
+	switch(CLI_GetToken(1)[0]) {
+		FunctionalState contactor = Contactor_Flag();
+		case 's':
+			if(contactor == ENABLE) {
+				printf("The contactor is Enabled");
+			} else {
+				printf("The contactor is Disabled");
+			break;
+		default:
+			printf("Invalid contactor command\r\n");
+			break;
+		}
+	}
+}
 
 /** CLI_Charge
  * Checks and displays the desired
@@ -232,7 +280,7 @@ void CLI_EEPROM(char *input) {}
  * Interacts with the peripherals
  * @param input command
  */
-void CLI_Peripherals(char *input);
+void CLI_Peripherals(char *input) {}
 
 /** CLI_Critical
  * Checks and displays the desired
