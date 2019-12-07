@@ -68,7 +68,8 @@
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
-void updateFrame(Paint);
+void updateFrame(Paint, float, float, float, float);
+float getCAN(void);
 //static void MX_USART1_UART_Init(void);
 static void MX_SPI1_Init(void);
 
@@ -145,32 +146,41 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-	uint32_t count = 30000000;
-	
-  while (1)
-  {		
-		if( count == 0 ){
-			updateFrame(paint);
-			EPD_DisplayFrame(&epd, frame_buffer); // Inside interrupt
-			count = 45000000;
-		}
-		count--;
-  }
-  /* USER CODE END 3 */
-
-}
-
-void updateFrame(Paint paint){
-		
-	char current[6];
-	char voltage[6];
-	char temperature[6];
-	char SoC[6];
 	
 	float fc = 6.9f;
 	float fv = 2.4f;
 	float ft = 3.1f;
 	float fs = 2.5f;
+	float message;
+	
+  while (1)
+  {		
+			message = getCAN(); 
+		// split up the message into fc, fv, ft, and fs.
+			updateFrame(paint, fc, fv, ft, fs);
+			EPD_DisplayFrame(&epd, frame_buffer); // Inside interrupt
+  }
+  /* USER CODE END 3 */
+
+}
+
+float getCAN(void){
+	float message;
+	return message;
+}
+
+/**
+	* fc = float current
+	* fv = float voltage
+	* ft = float temperature
+	* fs = float SoC
+	*/
+void updateFrame(Paint paint, float fc, float fv, float ft, float fs){
+		
+	char current[6];
+	char voltage[6];
+	char temperature[6];
+	char SoC[6];
 
 	sprintf(current, "%f", fc);
 	sprintf(voltage, "%f", fv);
