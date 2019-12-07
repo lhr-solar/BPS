@@ -89,11 +89,11 @@ int16_t Temperature_GetModuleTemperature(uint8_t moduleIdx);
  */
 int16_t Temperature_GetTotalPackAvgTemperature(void);
 
-/** Temperature_GetRawADC
+/** Temperature_SampleADC
  * Starts ADC conversion on GPIO1 on LTC6811's auxiliary registers on all boards
  * @param sets the sampling rate
  * @return SUCCESS or ERROR
  */
-ErrorStatus Temperature_GetRawADC(uint8_t ADCMode);
+ErrorStatus Temperature_SampleADC(uint8_t ADCMode);
 
 #endif
