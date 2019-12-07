@@ -4,20 +4,194 @@
  */
 
 #include "CLI.h"
+#include <ctype.h>
 
+#define MAX_TOKEN_SIZE 4
+
+char* tokens[MAX_TOKEN_SIZE];
+
+/** CLI_InputParse
+ * Parses the input string
+ * @return ptr to token
+ */
+void CLI_InputParse(char *input) {
+	char *tokenized;
+	char *split = strtok_r(input, " ", &tokenized);
+	for(int i = 0; i < MAX_TOKEN_SIZE && split != NULL; i++) {
+		tokens[i] = split;
+		split = strtok_r(NULL, " ", &tokenized);
+	}
+}
+
+/** CLI_GetToken
+ * @param index of desired token
+ * @return token at desired index
+ */
+char* CLI_GetToken(uint8_t idx) {
+	return tokens[idx];
+}
+
+/** CLI_Help
+ * Displays the help menu
+ * @param input command
+ */
+void CLI_Help(char *input) {
+	
+}
+
+/** CLI_Voltage
+ * Checks and displays the desired
+ * voltage parameter(s)
+ * @param input command
+ */
+void CLI_Voltage(char *input) {}
+
+/** CLI_Current
+ * Checks and displays the desired
+ * current parameter(s)
+ * @param input command
+ */
+void CLI_Current(char *input) {}
+
+/** CLI_Temperature
+ * Checks and displays the desired
+ * temperature parameter(s)
+ * @param input command
+ */
+void CLI_Temperature(char *input) {}
+
+/** CLI_Contactor
+ * Interacts with contactor status
+ * @param input command
+ */
+void CLI_Contactor(char *input) {}
+
+/** CLI_Charge
+ * Checks and displays the desired
+ * state of charge parameter(s)
+ * @param input command
+ */
+void CLI_Charge(char *input) {}
+
+/** CLI_ErrorLight
+ * Interacts with the error light
+ * @param input command
+ */
+void CLI_ErrorLight(char *input) {}
+
+/** CLI_CAN
+ * Interacts with CAN
+ * @param input command
+ */
+void CLI_CAN(char *input) {}
+
+/** CLI_Display
+ * Interacts with the display
+ * @param input command
+ */
+void CLI_Display(char *input) {}
+
+/** CLI_Watchdog
+ * Interacts with the watchdog timer
+ * @param input command
+ */
+void CLI_Watchdog(char *input) {}
+
+/** CLI_EEPROM
+ * Interacts with EEPROM
+ * @param input command
+ */
+void CLI_EEPROM(char *input) {}
+
+/** CLI_Peripherals
+ * Interacts with the peripherals
+ * @param input command
+ */
+void CLI_Peripherals(char *input);
+
+/** CLI_Critical
+ * Checks and displays the desired
+ * voltage parameter(s)
+ * @param input command
+ */
+void CLI_Critical(char *input) {}
+	
 /** CLI_Commands
  * Routes the command given to the proper
  * measurement method to check the desired values
  * @param input command
  */
 void CLI_Commands(char *input){	
-  char* split = strtok(input, " ");
-	char* measurement;
-  char* function;
-  char* parameter;
-	parameter = NULL;
-	uint8_t word = 0;
-	
+	char* saveptr;
+  //char* split = strtok_r(input," ", &saveptr);
+	switch(input[0]) {
+		// Help menu
+		case 'h':
+		case 'H':
+		case 'm':
+		case 'M':
+		case '?':
+			CLI_Help(input);
+			break;
+		
+		case 'v':
+		case 'V':
+			break;		// voltage commands
+		
+		case 'i':
+		case 'I':
+			break;		// current commands
+		
+		case 't':
+		case 'T':
+			break;		// temp commands
+		
+		case 's':
+		case 'S':
+			break;		// contactor/switch commands
+		
+		case 'q':
+		case 'Q':
+		case '%':
+			break;		// SoC commands
+		
+		case 'l':
+		case 'L':
+			break;		// error light commands
+		
+		case 'c':
+		case 'C':
+			break;		// CAN commands
+		
+		case 'd':
+		case 'D':
+			break;		// display commands
+		
+		case 'w':
+		case 'W':
+			break;		// watchdog commands
+		
+		case 'e':
+		case 'E':
+			break;		// EEPROM commands
+		
+		case 'p':
+		case 'P':
+			break;		// peripheral commands
+		
+		case '!':
+			break;		// ABORT
+		
+		default:
+			printf("Invalid command. Type 'h' or 'm' or '?' for the help menu");
+			break;
+	}
+	//char* measurement;
+  //char* function;
+  //char* parameter;
+	//parameter = NULL;
+	//uint8_t word = 0;
+/*
 	// Parsing the input string and tokenizing into the variables
 	while(split != NULL) {
     if (word == 0){
@@ -29,7 +203,7 @@ void CLI_Commands(char *input){
 		else if (word == 2){
       parameter = split;
     }
-    split = strtok(NULL," ");
+    split = strtok_r(NULL, " ", &saveptr);
     word++;
 	}
 	// Voltage commands
@@ -149,4 +323,5 @@ void CLI_Commands(char *input){
 	}else{
 		printf("Invalid measurement. Enter a valid measurement and function");
 	}
+	*/
 }
