@@ -1,10 +1,7 @@
 /** main.c
  * Program for UTSVT BeVolt's Battery Protection System SOC
  */
-#include <stdint.h>
-#include "stm32f4xx.h"
-#include "ADC.h"
-#include "EEPROM.h"
+#include "SoC.h"
 
 #define MAX_CHARGE 1000*1000																								// In amp-hours (Ah), for now it is a dummy value
 uint32_t fixedPoint_SoC;																										// % of how much charge is left in battery with .01 resolution
@@ -69,11 +66,11 @@ void SoC_Calculate(int16_t amps){
  * @param voltage fault type. 0 if under voltage, 1 if over voltage
  */
 void SoC_Calibrate(int8_t faultType){
-	if (faultType == 0) {
+	if (faultType == UNDERVOLTAGE) {
 		fixedPoint_SoC = 0;
 		float_SoC = 0;
 	}
-	else if (faultType == 1) {
+	else if (faultType == OVERVOLTAGE) {
 		fixedPoint_SoC = 10000;
 		float_SoC = 100.00;
 	}

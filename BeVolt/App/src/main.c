@@ -122,13 +122,13 @@ void faultCondition(void){
 			case OVERVOLTAGE:
 				error |= FAULT_HIGH_VOLT;
 				LED_On(OVOLT);
-				SoC_Calibrate(1);	 // recalibrate. 1 means over voltage
+				SoC_Calibrate(OVERVOLTAGE);
 				break;
 
 			case UNDERVOLTAGE:
 				error |= FAULT_LOW_VOLT;
 				LED_On(UVOLT);
-				SoC_Calibrate(0); 	// recalibrate. 0 means under voltage
+				SoC_Calibrate(UNDERVOLTAGE);
 				break;
 
 			default:

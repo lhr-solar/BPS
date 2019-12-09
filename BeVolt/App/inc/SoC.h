@@ -6,6 +6,10 @@
 #define SOC_H
 
 #include <stdint.h>
+#include "config.h"
+#include "stm32f4xx.h"
+#include "ADC.h"
+#include "EEPROM.h"
 
 /** Soc_Init
  * Initializes necessary timer and values to begin state of charge
