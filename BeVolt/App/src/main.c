@@ -194,7 +194,7 @@ void faultCondition(void){
 // E.g. If you want to run a LTC6811 test, change "#define CHANGE_THIS_TO_TEST_NAME" to the
 //		following:
 //		#define LTC6811_TEST
-#define CAN_TEST
+#define CAN_TEST_2
 
 
 #ifdef LED_TEST
@@ -760,10 +760,10 @@ int main(){
 	#endif
 
 	// Data to transmit
-	uint8_t data[8] = {0x1, 0xAD, 0xBE, 0xEF, 0xAE, 0xAE, 0xAE, 0xAE};
+//	uint8_t data[8] = {0x1, 0xAD, 0xBE, 0xEF, 0xAE, 0xAE, 0xAE, 0xAE};
 	uint32_t id = CAN_ID_BPS_ALL_CLEAR;
 
-	uint8_t RxData[8];
+//	uint8_t RxData[8];
 
 	while(1)
 	{
@@ -773,10 +773,11 @@ int main(){
 
 		// Transmit the data
 		do {
-			static int box = 0;
-			box = CAN1_Write(id, data, 1);
+//			static int box = 0;
+			float data = 0.5;
+			box = CAN1_Write(id, (uint8_t*)&data, 4);
 		} while (box == CAN_TxStatus_NoMailBox);
-		int status;
+//		int status;
 
 		// Wait for the data to transmit
 //		do {
@@ -806,4 +807,48 @@ int main(){
 	}
 }
 
+#endif
+
+#ifdef CAN_TEST_2
+#include "CAN.h"
+/*message:
+typedef enum {
+	TRIP = 0x02,
+	ALL_CLEAR = 0x101,
+	CONTACTOR_STATE = 0x102,
+	CURRENT_DATA = 0x103,
+	VOLT_DATA = 0x104,
+	TEMP_DATA = 0x105,
+	SOC_DATA = 0x106,
+	WDOG_TRIGGERED = 0x107,
+	CAN_ERROR = 0x108,
+} CANMessage_t;
+
+data: 
+typedef union {
+	uint8_t b;
+	uint16_t h;
+	uint32_t w;
+	float f;
+} CANData_t;
+
+data is either a float, uint32_t, or uint8_t
+*/
+
+int main(void){
+	uint8_t a = 0;
+	uint32_t b = 30000;
+	uint16_t d = 30000;
+	float c = 80.00;
+	CAN1_Init();
+	CAN1_Send(TRIP, (CANData_t) a);
+	CAN1_Send(ALL_CLEAR, (CANData_t) a);
+	CAN1_Send(CONTACTOR_STATE, (CANData_t) a);
+	CAN1_Send(CURRENT_DATA, (CANData_t) b);
+	CAN1_Send(VOLT_DATA, (CANData_t) d);
+	CAN1_Send(TEMP_DATA, (CANData_t) b);
+	CAN1_Send(SOC_DATA, (CANData_t) c);
+	CAN1_Send(WDOG_TRIGGERED, (CANData_t) a);
+	CAN1_Send(CAN_ERROR, (CANData_t) a);
+}
 #endif

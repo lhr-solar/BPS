@@ -3,6 +3,7 @@
  */
 #include <stdint.h>
 #include <stdbool.h>
+#include "CAN.h"
 #include "stm32f4xx.h"
 
 CanTxMsg TxMessage;
@@ -136,4 +137,38 @@ void CAN1_RX0_IRQHandler(void)
     // Do stuff
 		RxFlag = true;
   }
+}
+
+//sends a message over CAN
+//returns the same thing as CAN1_Write
+int CAN1_Send(CANMessage_t message, CANData_t data){
+	switch (message) {
+		case TRIP:
+			return CAN1_Write(message, &data.b, 1);
+
+		case ALL_CLEAR:
+			return CAN1_Write(message, &data.b, 1);
+
+		case CONTACTOR_STATE:
+			return CAN1_Write(message, &data.b, 1);
+
+		case CURRENT_DATA:
+			return CAN1_Write(message, &data.b, 4);
+
+		case VOLT_DATA:
+			return CAN1_Write(message, &data.b, 2);
+
+		case TEMP_DATA:
+			return CAN1_Write(message, &data.b, 4);
+
+		case SOC_DATA:
+			return CAN1_Write(message, &data.b, 4);
+
+		case WDOG_TRIGGERED:
+			return CAN1_Write(message, &data.b, 1);
+
+		case CAN_ERROR:
+			return CAN1_Write(message, &data.b, 1);
+	}
+	return DANGER;
 }
