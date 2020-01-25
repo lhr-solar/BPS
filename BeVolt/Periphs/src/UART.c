@@ -68,7 +68,7 @@ int fgetc(FILE *f){
 * @param None
 * @retval None
 */
-void UART1_Config(void){
+void UART1_Init(void){
 	GPIO_InitTypeDef GPIO_InitStructure;
 	USART_InitTypeDef USART_InitStructure;
 	/* USART IOs configuration ***********************************/
