@@ -9,6 +9,7 @@
 #define CURRENT_H__
 
 #include <stdint.h>
+#include "ADC.h"
 #include "config.h"
  
 /** Current_Init
@@ -39,12 +40,12 @@ int8_t Current_IsCharging(void);
  * Gets the Ampere measurement the high precision hall effect sensor recorded
  * @return Amperes value
  */
-uint16_t Current_GetHighPrecReading(void);
+int16_t Current_GetHighPrecReading(void);
 
 /** Current_GetLowPrecReading
  * Gets the Ampere measurement the low precision hall effect sensor recorded
  * @return Amperes value
  */
-uint16_t Current_GetLowPrecReading(void);
+int16_t Current_GetLowPrecReading(void);
 
 #endif

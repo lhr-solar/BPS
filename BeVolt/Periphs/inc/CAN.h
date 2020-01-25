@@ -8,9 +8,14 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include "stm32f4xx.h"
+#include "config.h"
 
 // Generic BPS ID
+<<<<<<< HEAD
 #define CAN_ID_BPS										(0x100)
+=======
+#define CAN_ID_BPS										(0x01 << 8)
+>>>>>>> 74f5a2d9b98e205f2e143384cfd50398810466f6
 // Specific BPS IDs
 #define CAN_ID_BPS_TRIP								(0x002)
 #define CAN_ID_BPS_ALL_CLEAR					(CAN_ID_BPS | 0x01)
@@ -21,6 +26,25 @@
 #define CAN_ID_SOC_DATA								(CAN_ID_BPS | 0x06)
 #define CAN_ID_WDOG_TRIGGERED					(CAN_ID_BPS | 0x07)
 #define CAN_ID_ERROR									(CAN_ID_BPS | 0x08)
+
+typedef enum {
+	TRIP = 0x02,
+	ALL_CLEAR = 0x101,
+	CONTACTOR_STATE = 0x102,
+	CURRENT_DATA = 0x103,
+	VOLT_DATA = 0x104,
+	TEMP_DATA = 0x105,
+	SOC_DATA = 0x106,
+	WDOG_TRIGGERED = 0x107,
+	CAN_ERROR = 0x108,
+} CANMessage_t;
+
+typedef union {
+	uint8_t b;
+	uint16_t h;
+	uint32_t w;
+	float f;
+} CANData_t;
 
 /** CAN1_Init
  * Initializes CAN bus for pins:
@@ -33,5 +57,9 @@ void CAN1_Init(int CAN_Mode);
 int CAN1_Write(uint32_t id, uint8_t data[8], uint8_t length);
 
 bool CAN1_Read(uint8_t *data);
+
+//sends a message over CAN
+//returns the same thing as CAN1_Write
+int CAN1_Send(CANMessage_t message, CANData_t data);
 
 #endif

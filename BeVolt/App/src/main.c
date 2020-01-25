@@ -2,9 +2,7 @@
  * Program for UTSVT BeVolt's Battery Protection System
  */
 
-#include <stdint.h>
-#include <stdio.h>
-#include <string.h>
+#include "common.h"
 #include "stm32f4xx.h"
 #include "config.h"
 #include "Voltage.h"
@@ -15,58 +13,72 @@
 #include "WDTimer.h"
 #include "SoC.h"
 #include "LED.h"
+#include "SysTick.h"
+
+cell_asic Minions[NUM_MINIONS];
 
 void initialize(void);
 void preliminaryCheck(void);
 void faultCondition(void);
 
-int mainmain(){
-	__disable_irq();			// Disable all interrupts until initialization is done
-	initialize();					// Initialize codes/pins
+int realmainmain(){
+	__disable_irq();		// Disable all interrupts until initialization is done
+	initialize();			// Initialize codes/pins
 	preliminaryCheck();		// Wait until all boards are powered on
-	__enable_irq();				// Enable interrupts
+	__enable_irq();			// Enable interrupts
 
+	WDTimer_Start();
+
+	bool override = false;		// This will be changed by user via CLI	
 	while(1){
 		// First update the measurements.
 		Voltage_UpdateMeasurements();
 		Current_UpdateMeasurements();
 		Temperature_UpdateMeasurements();
+		
+		SafetyStatus current = Current_IsSafe();
+		SafetyStatus temp = Temperature_IsSafe(Current_IsCharging());
+		SafetyStatus voltage = Voltage_IsSafe();
 
-		// Check if everything is safe
-		if(Current_IsSafe() && Temperature_IsSafe(Current_IsCharging()) && Voltage_IsSafe()){
+		// Check if everything is safe (all return SAFE = 0)
+		if((current == SAFE) && (temp == SAFE) && (voltage == SAFE) && !override) {
 			Contactor_On();
-		}else{
+		}
+		else if((current == SAFE) && (temp == SAFE) && (voltage == UNDERVOLTAGE) && override) {
+			Contactor_On();
+			continue;
+		} else {
 			break;
 		}
 
 		// Update necessary
 		// CAN_SendMessageStatus()	// Most likely need to put this on a timer if sending too frequently
 
+		WDTimer_Reset();
 	}
 
 	// BPS has tripped if this line is reached
 	faultCondition();
+	return 0;
 }
 
 /**
  * Initialize system.
  *	1. Initialize device drivers.
- *			- This includes communication protocols, GPIO pins, timers
- *	2. Get EEPROM data that holds all fault conditions.
- *			- By regulations, we are not allowed to be able to set the voltage, current, temperature
- *				limits while the car is moving. To make sure this doesn't happen, the EEPROM needs to be
- *				written and cannot be modified (locked) once programmed.
- *	3. Set the current, voltage, and temperature limits.
- *			- Give wrappers (Voltage, Current, Temperature) the limits
+ *		- This includes communication protocols, GPIO pins, timers
+ *	2. Set the current, voltage, and temperature limits.
+ *		- Give wrappers (Voltage, Current, Temperature) the limits
  */
 void initialize(void){
+	LED_Init();
 	Contactor_Init();
 	Contactor_Off();
+	WDTimer_Init();
 	EEPROM_Init();
 
 	Current_Init();
-	Voltage_Init();
-	Temperature_Init();
+	Voltage_Init(Minions);
+	Temperature_Init(Minions);
 }
 
 /** preliminaryCheck
@@ -76,6 +88,11 @@ void initialize(void){
  */
 void preliminaryCheck(void){
 	// Check if Watch dog timer was triggered previously
+	if (WDTimer_DidSystemReset() == DANGER) {
+		LED_On(FAULT);
+		LED_On(WDOG);
+		while(1);		// Spin
+	}
 }
 
 /** faultCondition
@@ -85,26 +102,88 @@ void preliminaryCheck(void){
  */
 void faultCondition(void){
 	Contactor_Off();
-	while(1){
-		// CAN_SendMessageStatus()
-		if(!Current_IsSafe()){
-			// Toggle Current fault LED
-		}
+	LED_Off(RUN);
+  LED_On(FAULT);
+  
+	uint8_t error = 0;
 
-		if(!Voltage_IsSafe()){
-			// Toggle Voltage fault LED
-		}
+	if(!Current_IsSafe()){
+		error |= FAULT_HIGH_CURRENT;
+		LED_On(OCURR);
+	}
 
-		if(!Temperature_IsSafe(Current_IsCharging())){
-			// Toggle Temperature fault LED
+	if(!Voltage_IsSafe()){
+		// Toggle Voltage fault LED
+		switch(Voltage_IsSafe()){
+			case OVERVOLTAGE:
+				error |= FAULT_HIGH_VOLT;
+				LED_On(OVOLT);
+				break;
+				
+			case UNDERVOLTAGE:
+				error |= FAULT_LOW_VOLT;
+				LED_On(UVOLT);
+				break;
+
+			default:
+				error |= FAULT_VOLT_MISC;
+				LED_On(OVOLT);
+				LED_On(UVOLT);
+				break;
 		}
 	}
+
+	if(!Temperature_IsSafe(Current_IsCharging())){
+		error |= FAULT_HIGH_TEMP;
+		LED_On(OCURR);
+	}
+	
+	// Log all the errors that we have
+	for(int i = 1; i < 0x00FF; i <<= 1) {
+		if(error & i) EEPROM_LogError(i);
+	}
+	
+	// Log all the relevant data for each error
+	for(int i = 1; i < 0x00FF; i <<= 1) {
+		if((error & i) == 0) continue;
+		
+		SafetyStatus *voltage_modules;
+		uint8_t *temp_modules;
+		uint16_t curr;
+		switch(i) {
+		// Temperature fault handling
+		case FAULT_HIGH_TEMP:
+			temp_modules = Temperature_GetModulesInDanger();
+			for(int j = 0; j < NUM_BATTERY_MODULES; ++j)
+				if(temp_modules[j]) EEPROM_LogData(FAULT_HIGH_TEMP, j);
+			break;
+		
+		// Voltage fault handling
+		case FAULT_HIGH_VOLT:
+		case FAULT_LOW_VOLT:
+		case FAULT_VOLT_MISC:
+			voltage_modules = Voltage_GetModulesInDanger();
+			for(int j = 0; j < NUM_BATTERY_MODULES; ++j)
+				if(voltage_modules[j]) EEPROM_LogData(i, j);
+			break;
+		
+		// Current fault handling
+		case FAULT_HIGH_CURRENT:
+			curr = Current_GetLowPrecReading();
+			EEPROM_LogData(FAULT_HIGH_CURRENT, 0x00FF & curr);
+			EEPROM_LogData(FAULT_HIGH_CURRENT, 0x00FF & (curr >> 8));
+			curr = Current_GetHighPrecReading();
+			EEPROM_LogData(FAULT_HIGH_CURRENT, 0x00FF & curr);
+			EEPROM_LogData(FAULT_HIGH_CURRENT, 0x00FF & (curr >> 8));
+			break;
+		}
+	}
+	
+	while(1) {
+		WDTimer_Reset();	// Even though faulted, WDTimer needs to be updated or else system will reset
+					// causing WDOG error. WDTimer can't be stopped after it starts.
+	}
 }
-
-
-
-
-
 
 //****************************************************************************************
 // The following code is for testing individual pieces of code.
@@ -115,8 +194,7 @@ void faultCondition(void){
 // E.g. If you want to run a LTC6811 test, change "#define CHANGE_THIS_TO_TEST_NAME" to the
 //		following:
 //		#define LTC6811_TEST
-#define CAN_TEST
-
+#define CAN_TEST_2
 
 
 #ifdef LED_TEST
@@ -229,9 +307,14 @@ void print_config(cell_asic *bms_ic)
 #include "UART.h"
 
 int main(){
-	UART1_Init(115200);
-	//printf("Are you alive?");
-	while(Voltage_Init()) {
+	UART3_Init(115200);
+	LED_Init();
+	Contactor_Init();
+
+	// delay for UART to USB IC to bootup
+	for(int i = 0; i < 1000000; i++);
+
+	while(Voltage_Init(Minions) != SUCCESS) {
 		printf("Communication Failed.\n\r");
 	}
 	printf("Writing and Reading to Configuration Register Successful. Initialization Complete\n\r");
@@ -245,50 +328,133 @@ int main(){
 		printf("%d : %f\n\r", i, (float)(Voltage_GetModuleVoltage(i)*0.0001));  // Place decimal point.
 	}
 	while(1){
-//		for(int32_t i = 0; i < NUM_BATTERY_MODULES; i++){
-//			printf("%d : %d\n\r", i, Voltage_GetModuleVoltage(i));
-//		}
+		Voltage_UpdateMeasurements();
+		if(Voltage_IsSafe() != SAFE){
+			break;
+		}
+
+		Contactor_On();
+		LED_Toggle(RUN);
 	}
+
+	for(int i = 0; i < NUM_BATTERY_MODULES; i++){
+		printf("Battery module %d voltage is %d \r\n", i, Voltage_GetModuleVoltage(i));
+	}
+
+	faultCondition();
 }
 #endif
 
 #ifdef CURRENT_TEST
+#include "UART.h"
+#include "ADC.h"
 int main(){
 	UART3_Init(9600);
-	Current_Init();
-	Current_UpdateMeasurements();
-	printf("\n\rCurrent Test:\n\r");
-	printf("Is it safe? %d\n\r", Current_IsSafe());
-	printf("Is the battery charging? %d\n\r\n\r", Current_IsCharging());
-	printf("Low Precision: %d\n\r", Current_GetLowPrecReading());
-	printf("High Precision: %d\n\r", Current_GetHighPrecReading());
-	while(1){
+	Current_Init();	// Initialize the driver
 
+	// Loop over the tests
+	while(true) {
+		Current_UpdateMeasurements();	// Get the most recent readings
+
+		printf("\n\r==============================\n\rCurrent Test:\n\r");
+		printf("ADC High: %d\n\r", ADC_ReadHigh());
+		printf("ADC Low: %d\n\r", ADC_ReadLow());
+		printf("Is the battery safe? %d\n\r", Current_IsSafe());
+		printf("Is the battery charging? %d\n\r", Current_IsCharging());
+		printf("High: %d\n\r", Current_GetHighPrecReading());
+		printf("Low: %d\n\r", Current_GetLowPrecReading());
+
+		for(int i = 0; i < 10000000; ++i);
 	}
 }
 #endif
 
 #ifdef TEMPERATURE_TEST
 #include "UART.h"
-#include "LTC2983.h"
-#include "SPI.h"
-#include "stm32f4xx.h"
+#include "Temperature.h"
 
+void singleSensorTest(void);												// Prints out a single sensor 
+void individualSensorDumpTest(void);                 // Prints out each individual sensor temperature on all boards
+void batteryModuleTemperatureTest(void);      			// Prints out every battery modules temperature average with their 2 sensors
+void checkDangerTest(void);													// checks for danger
 
-
+extern int16_t ModuleTemperatures[NUM_MINIONS][MAX_TEMP_SENSORS_PER_MINION_BOARD];
 
 int main(){
 	UART3_Init(9600);
 	printf("I'm alive\n\r");
-	int32_t buffer[20];
+	while(Temperature_Init(Minions) != SUCCESS) {
+		printf("Communication Failed.\n\r");
+	}
+	printf("Writing and Reading to Configuration Register Successful. Initialization Complete\n\r");
 
-	Temperature_Init();
+//  singleSensorTest();
+//	individualSensorDumpTest();
+//	moduleTemperatureDumpTest();
+//	checkDangerTest();
+	while(1){}
+}
 
-	LTC2983_ReadConversions(buffer, BOARD_CS1, 20);
-	while(1){
-		int32_t buf[20] = {0};
-		LTC2983_StartMeasuringADC(BOARD_CS1);
-		LTC2983_ReadConversions(buf, BOARD_CS1, 20);
+void singleSensorTest(void) {
+	int sensorIndex = 0; // <-- replace this with which sensor you want to test
+	Temperature_ChannelConfig(sensorIndex);
+	while(1) {
+		Temperature_GetRawADC(MD_422HZ_1KHZ);
+		for (int i = 0; i < NUM_MINIONS; i++) {
+			int temp = milliVoltToCelsius(Minions[i].aux.a_codes[0]*0.1);
+			printf("Board %d Sensor %d : %d", i, sensorIndex, temp);
+		}
+	}
+}
+
+void individualSensorDumpTest(void) {
+	while (1) {
+		Temperature_UpdateMeasurements();
+		for (int i = 0; i < NUM_MINIONS; i++) {
+			for (int j = 0; j < MAX_TEMP_SENSORS_PER_MINION_BOARD; j++) {
+				printf("Board %d, Sensor %d: %d Celsius\r\n", i, j, ModuleTemperatures[i][j]);
+				for(int delay = 0; delay < 800000; delay++){}
+			}
+		}
+	}
+}
+
+void batteryModuleTemperatureTest (void) {
+	while (1) {
+		Temperature_UpdateMeasurements();
+		for (int i = 0; i < NUM_MINIONS; i++) {
+		    for (int j = 0; j < MAX_TEMP_SENSORS_PER_MINION_BOARD/2; j++) {
+			int moduleNum =  i * MAX_TEMP_SENSORS_PER_MINION_BOARD/2 + j;
+		        printf("Board %d Battery Module %d Temp: %d Celsius\r\n", i,  moduleNum, Temperature_GetModuleTemperature(moduleNum));
+		        for(int delay = 0; delay < 800000; delay++){}
+		    }
+		}
+		printf("Total Average is %d\r\n", Temperature_GetTotalPackAvgTemperature());
+		for(int delay = 0; delay < 800000; delay++){}
+	}
+}
+
+void checkDangerTest(void) {
+	int isCharging = 1;  // 1 if pack is charging, 0 if discharging
+	printf("Danger Test\r\n");
+	while (1) {
+		Temperature_UpdateMeasurements();
+		if (Temperature_IsSafe(isCharging) == ERROR) {
+			printf("SOMETHINGS WRONG! AHHH\r\n");
+			printf("----------Dumping Sensor data----------\r\n");
+			uint8_t* dangerList = Temperature_GetModulesInDanger();
+			for (int i = 0; i < NUM_MINIONS; i++) {
+				if (dangerList[i] == 1) {
+					printf("Board %d is in danger\r\n", i);
+					for (int j = 0; j < MAX_TEMP_SENSORS_PER_MINION_BOARD; j++) {
+						printf("Board %d Sensor %d : %d Celsius\r\n", i, j, ModuleTemperatures[i][j]);
+					}
+				}
+			}
+			while (1){}
+		} else {
+			printf("we good.. \r\n");
+		}
 	}
 }
 #endif
@@ -296,14 +462,17 @@ int main(){
 #ifdef CONTACTOR_TEST
 int main(){
 	Contactor_Init();
+	static uint32_t contactor_status = -1;
 	Contactor_Off();
-	//for(int32_t i = 0; i < 1000000; i++);	// delay
-	//Contactor_On();
-	//for(int32_t i = 0; i < 5000000; i++);	// delay
-	//Contactor_Off();
-	while(1){
+	for(int32_t i = 0; i < 1000000; i++);	// delay
+	Contactor_On();
+	contactor_status = Contactor_Flag();
+	for(int32_t i = 0; i < 5000000; i++);	// delay
+	Contactor_Off();
+	contactor_status = Contactor_Flag();
+	//while(1){
 		//Contactor_On();
-	}
+	//}
 }
 #endif
 
@@ -405,16 +574,21 @@ int gyroTestmain(){
 #ifdef ADC_TEST
 //****************************************************************************************
 #include "ADC.h"
-#include <stdio.h>
-#include <UART.h>
-int ADCmain(){
-	char str[50];
-	UART3_Init(9600);
+int main(){
+
 	ADC_InitHilo();
+
+	volatile int result = 0;
+	volatile int delay = 0;
+
 	while(1){
-		//sprintf(str,"%d\n",ADC_ChooseHiLo(ADC_ReadHigh(),ADC_ReadLow()));
-		sprintf(str,"%d\r\n",ADC_Conversion(ADC_ReadLow()));
-		UART3_Write(str,strlen(str));
+		result = ADC_ReadHigh();	// PA2
+		delay = 0;
+		result = ADC_ReadLow(); // PA3
+		delay = 0;
+
+		// Delay
+		for(int i = 0; i < 1000; ++i);
 	}
 }
 #endif
@@ -468,6 +642,99 @@ void DischargingSoCTest(void) {
 /** Tests
  * 	TODO: Need to test SetAccumulator, GetPercent and Calibrate on faults
  */
+
+#endif
+
+#ifdef EEPROM_WRITE_TEST
+//******************************************************************************************
+#include "UART.h"
+
+int main(){
+	//initialize stuff
+	UART3_Init(115200);
+	__disable_irq();
+	EEPROM_Init();
+	__enable_irq();
+	printf("initialized\n");
+
+	EEPROM_Tester();		//write test codes
+	printf("done");
+	while(1){
+		printf("done\n\r");
+	};		//get stuck in loop
+
+}
+
+#endif
+
+#ifdef EEPROM_READ_TEST
+#include "UART.h"
+
+int main(){
+	UART1_Init(115200);
+
+	printf("starting\n\r");
+	__disable_irq();
+	EEPROM_Init();
+	__enable_irq();
+	printf("initialized\n\r");
+	EEPROM_Tester();
+	printf("written\n\r");
+	EEPROM_SerialPrintData();
+	printf("done\n\r");
+	while(1){};
+}
+
+#endif
+
+#ifdef EEPROM_RESET
+#include "UART.h"
+
+int main() {
+	UART1_Init(115200);
+
+	printf("Starting reset\n\r");
+	__disable_irq();
+	EEPROM_Init();
+	__enable_irq();
+	printf("Initialized\n\r");
+	//EEPROM_Load();
+	//printf("Loaded\n\r");
+	EEPROM_Reset();
+	printf("EEPROM has been reset\n\r");\
+	while(1);
+}
+
+#endif
+
+#ifdef OPEN_WIRE_TEST
+//******************************************************************************************
+#include "Voltage.h"
+#include <stdio.h>
+#include "UART.h"
+int main(){
+	UART3_Init(115200);
+	Voltage_Init(Minions);
+	/*
+	//printf("%x", Voltage_GetOpenWire());
+	//printf("\n\r");
+	static uint32_t open_wires = 0;
+	open_wires = Voltage_GetOpenWire();
+	if(Voltage_OpenWire() == DANGER){
+		printf("return = DANGER\n\r");
+		Voltage_OpenWireSummary();
+		printf("\n\r");
+	}
+	else if(Voltage_OpenWire() == SAFE){
+		printf("return = SAFE\n\r");
+	}
+	*/
+	static uint16_t voltage = 0;
+	Voltage_UpdateMeasurements();
+	for(int i = 0; i < NUM_BATTERY_MODULES; i++) {
+		voltage = Voltage_GetModuleMillivoltage(i);
+	}
+}
 #endif
 
 #ifdef CAN_TEST
@@ -485,8 +752,15 @@ int CAN_send(uint32_t id)
 
 int main() {
 	// Start UART comms
+<<<<<<< HEAD
 	UART3_Init(115200);
+=======
+	//UART3_Init(115200);
+	//printf("start\n");
+>>>>>>> 74f5a2d9b98e205f2e143384cfd50398810466f6
 
+	LED_Init();
+	
 	// Start CAN comms
 	#ifdef CAN_SELF_TEST
 	CAN1_Init(CAN_Mode_LoopBack);
@@ -495,6 +769,7 @@ int main() {
 	#endif
 
 	// Data to transmit
+<<<<<<< HEAD
 	uint8_t data[8] = {0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10};
 	uint32_t id = CAN_ID_BPS_ALL_CLEAR;
 	uint8_t d2 = 0x80;
@@ -502,8 +777,20 @@ int main() {
 
 	while(1)
 	{
+=======
+//	uint8_t data[8] = {0x1, 0xAD, 0xBE, 0xEF, 0xAE, 0xAE, 0xAE, 0xAE};
+	uint32_t id = CAN_ID_BPS_ALL_CLEAR;
+
+//	uint8_t RxData[8];
+
+	while(1)
+	{
+		//printf("start1\n");
+
+>>>>>>> 74f5a2d9b98e205f2e143384cfd50398810466f6
 		int box;
 		// Transmit the data
+<<<<<<< HEAD
 		do 
 		{
 			int box = CAN1_Write(id, &d2, 1);
@@ -520,8 +807,28 @@ int main() {
 		
 		if(status != CAN_TxStatus_Ok) 
 			while(1);
+=======
+		do {
+//			static int box = 0;
+			float data = 0.5;
+			box = CAN1_Write(id, (uint8_t*)&data, 4);
+		} while (box == CAN_TxStatus_NoMailBox);
+//		int status;
 
-		// #ifdef CAN_SELF_TEST
+		// Wait for the data to transmit
+//		do {
+//			status = CAN_TransmitStatus(CAN1, box);
+//		} while( status == CAN_TxStatus_Pending);
+//		if(status != CAN_TxStatus_Ok) {
+//			LED_On(CAN);
+//		}
+		
+		LED_Toggle(RUN);
+		
+		for(int i = 0; i < 100000; i++);
+>>>>>>> 74f5a2d9b98e205f2e143384cfd50398810466f6
+
+		#ifdef CAN_SELF_TEST
 		// Read all the data
 		while(1) 
 		{
@@ -534,8 +841,52 @@ int main() {
 			}
 			printf("\n");
 		}
-		// #endif
+		#endif
 	}
 }
 
+#endif
+
+#ifdef CAN_TEST_2
+#include "CAN.h"
+/*message:
+typedef enum {
+	TRIP = 0x02,
+	ALL_CLEAR = 0x101,
+	CONTACTOR_STATE = 0x102,
+	CURRENT_DATA = 0x103,
+	VOLT_DATA = 0x104,
+	TEMP_DATA = 0x105,
+	SOC_DATA = 0x106,
+	WDOG_TRIGGERED = 0x107,
+	CAN_ERROR = 0x108,
+} CANMessage_t;
+
+data: 
+typedef union {
+	uint8_t b;
+	uint16_t h;
+	uint32_t w;
+	float f;
+} CANData_t;
+
+data is either a float, uint32_t, or uint8_t
+*/
+
+int main(void){
+	uint8_t a = 0;
+	uint32_t b = 30000;
+	uint16_t d = 30000;
+	float c = 80.00;
+	CAN1_Init();
+	CAN1_Send(TRIP, (CANData_t) a);
+	CAN1_Send(ALL_CLEAR, (CANData_t) a);
+	CAN1_Send(CONTACTOR_STATE, (CANData_t) a);
+	CAN1_Send(CURRENT_DATA, (CANData_t) b);
+	CAN1_Send(VOLT_DATA, (CANData_t) d);
+	CAN1_Send(TEMP_DATA, (CANData_t) b);
+	CAN1_Send(SOC_DATA, (CANData_t) c);
+	CAN1_Send(WDOG_TRIGGERED, (CANData_t) a);
+	CAN1_Send(CAN_ERROR, (CANData_t) a);
+}
 #endif
