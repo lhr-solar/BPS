@@ -37,7 +37,7 @@ char fifoGet(Fifo *fifo){
 }
 
 //removes last element in fifo
-void removeLastElement(Fifo *fifo){
+void fifoRemoveLastElement(Fifo *fifo){
 	if (fifoIsEmpty(*fifo))
 		return;
 	fifo->head = fifo->head - 1;
