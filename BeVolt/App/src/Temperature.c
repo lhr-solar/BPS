@@ -168,12 +168,12 @@ ErrorStatus Temperature_UpdateAllMeasurements(){
 	return SUCCESS;
 }
 
-/** Temperature_IsSafe
+/** Temperature_CheckStatus
  * Checks if all modules are safe
  * @param 1 if pack is charging, 0 if discharging
  * @return SAFE or DANGER
  */
-SafetyStatus Temperature_IsSafe(uint8_t isCharging){
+SafetyStatus Temperature_CheckStatus(uint8_t isCharging){
 	int16_t temperatureLimit = isCharging == 1 ? MAX_CHARGE_TEMPERATURE_LIMIT : MAX_DISCHARGE_TEMPERATURE_LIMIT;
 	temperatureLimit *= MILLI_SCALING_FACTOR;
 

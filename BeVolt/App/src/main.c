@@ -14,6 +14,7 @@
 #include "SoC.h"
 #include "LED.h"
 #include "SysTick.h"
+#include "PLL.h"
 
 cell_asic Minions[NUM_MINIONS];
 
@@ -21,7 +22,7 @@ void initialize(void);
 void preliminaryCheck(void);
 void faultCondition(void);
 
-int main(){
+int realmain(){
 	__disable_irq();		// Disable all interrupts until initialization is done
 	initialize();			// Initialize codes/pins
 	preliminaryCheck();		// Wait until all boards are powered on
@@ -36,9 +37,9 @@ int main(){
 		Current_UpdateMeasurements();
 		Temperature_UpdateAllMeasurements();
 		
-		SafetyStatus current = Current_IsSafe();
-		SafetyStatus temp = Temperature_IsSafe(Current_IsCharging());
-		SafetyStatus voltage = Voltage_IsSafe();
+		SafetyStatus current = Current_CheckStatus();
+		SafetyStatus temp = Temperature_CheckStatus(Current_IsCharging());
+		SafetyStatus voltage = Voltage_CheckStatus();
 
 		// Check if everything is safe (all return SAFE = 0)
 		if((current == SAFE) && (temp == SAFE) && (voltage == SAFE) && !override) {
@@ -70,6 +71,7 @@ int main(){
  *		- Give wrappers (Voltage, Current, Temperature) the limits
  */
 void initialize(void){
+	PLL_Init80MHz();
 	LED_Init();
 	Contactor_Init();
 	Contactor_Off();
@@ -107,14 +109,14 @@ void faultCondition(void){
   
 	uint8_t error = 0;
 
-	if(!Current_IsSafe()){
+	if(!Current_CheckStatus()){
 		error |= FAULT_HIGH_CURRENT;
 		LED_On(OCURR);
 	}
 
-	if(!Voltage_IsSafe()){
+	if(!Voltage_CheckStatus()){
 		// Toggle Voltage fault LED
-		switch(Voltage_IsSafe()){
+		switch(Voltage_CheckStatus()){
 			case OVERVOLTAGE:
 				error |= FAULT_HIGH_VOLT;
 				LED_On(OVOLT);
@@ -133,7 +135,7 @@ void faultCondition(void){
 		}
 	}
 
-	if(!Temperature_IsSafe(Current_IsCharging())){
+	if(!Temperature_CheckStatus(Current_IsCharging())){
 		error |= FAULT_HIGH_TEMP;
 		LED_On(OCURR);
 	}
@@ -194,7 +196,7 @@ void faultCondition(void){
 // E.g. If you want to run a LTC6811 test, change "#define CHANGE_THIS_TO_TEST_NAME" to the
 //		following:
 //		#define LTC6811_TEST
-#define NO_TEST
+#define FULL_TEST
 
 
 #ifdef LED_TEST
@@ -321,7 +323,7 @@ int main(){
 
 	while(1){
 		Voltage_UpdateMeasurements();
-		if(Voltage_IsSafe() != SAFE){
+		if(Voltage_CheckStatus() != SAFE){
 			break;
 		}
 
@@ -351,7 +353,7 @@ int main(){
 		printf("\n\r==============================\n\rCurrent Test:\n\r");
 		printf("ADC High: %d\n\r", ADC_ReadHigh());
 		printf("ADC Low: %d\n\r", ADC_ReadLow());
-		printf("Is the battery safe? %d\n\r", Current_IsSafe());
+		printf("Is the battery safe? %d\n\r", Current_CheckStatus());
 		printf("Is the battery charging? %d\n\r", Current_IsCharging());
 		printf("High: %d\n\r", Current_GetHighPrecReading());
 		printf("Low: %d\n\r", Current_GetLowPrecReading());
@@ -429,7 +431,7 @@ void checkDangerTest(void) {
 	printf("Danger Test\r\n");
 	while (1) {
 		Temperature_UpdateAllMeasurements();
-		if (Temperature_IsSafe(isCharging) == ERROR) {
+		if (Temperature_CheckStatus(isCharging) == ERROR) {
 			printf("SOMETHINGS WRONG! AHHH\r\n");
 			printf("----------Dumping Sensor data----------\r\n");
 			uint8_t* dangerList = Temperature_GetModulesInDanger();
@@ -853,6 +855,7 @@ int main(void){
 		}
 	}
 }
+#endif
 	
 #ifdef OPEN_WIRE_TEST
 //******************************************************************************************
@@ -885,5 +888,105 @@ int main(){
 		voltage = Voltage_GetModuleMillivoltage(i);
 	}
 }
+
+#endif
+
+#ifdef FULL_TEST
+#include "UART.h"
+//tests the BPS functions
+int main(void) {
+	__disable_irq();		// Disable all interrupts until initialization is done
+	initialize();			// Initialize codes/pins
+	preliminaryCheck();		// Wait until all boards are powered on
+	__enable_irq();			// Enable interrupts
+
+	//WDTimer_Start();
+	UART3_Init();
+
+	bool override = false;		// This will be changed by user via CLI	
+	printf("initialized\n\r");
+	// First update the measurements.
+	Voltage_UpdateMeasurements();
+	SafetyStatus *voltageModulesInDanger;
+	voltageModulesInDanger = Voltage_GetModulesInDanger();
+	printf("Voltage modules in danger: ");
+	for (uint8_t i = 0; i < NUM_BATTERY_MODULES; i++) {
+		if (voltageModulesInDanger[i] != SAFE){
+			printf("%d ", i);
+		}
+	}
+	printf("\n\r");
+	
+	for (uint8_t i = 0; i < NUM_BATTERY_MODULES; i++){
+		uint16_t voltage = Voltage_GetModuleMillivoltage(i);
+		//print fixed point millivoltage of module
+		printf("module %d millivolts: %d.%d%d%d%d%dV\n\r", i, voltage/100000, (Voltage_GetModuleMillivoltage(i)%100000)/10000, (Voltage_GetModuleMillivoltage(i)%1000000)/1000, (Voltage_GetModuleMillivoltage(i)%1000000)/100, (Voltage_GetModuleMillivoltage(i)%10000000)/10, (Voltage_GetModuleMillivoltage(i)%100000000)); 
+	}
+	
+	Current_UpdateMeasurements();
+	
+	if (Current_CheckStatus() == SAFE){
+		printf("current is safe\n\r");
+	}else{
+		printf("current is not safe\n\r");
+	}
+	
+	printf("current high precision: %d\n\r", Current_GetHighPrecReading());
+	printf("current low precision: %d\n\r", Current_GetLowPrecReading());
+	
+	Temperature_UpdateAllMeasurements();
+	
+	uint8_t *tempModulesInDanger;
+	tempModulesInDanger = Temperature_GetModulesInDanger();
+	printf("Temperature modules in danger: ");
+	for (uint8_t i = 0; i < NUM_BATTERY_MODULES; i++) {
+		if (tempModulesInDanger[i] == DANGER){
+			printf("%d ", i);
+		}
+	}
+	printf("\n\r");
+	
+	for (uint8_t i = 0; i < NUM_TEMPERATURE_SENSORS; i++){
+		uint16_t temperature = Temperature_GetSingleTempSensor(i/2, i%2);
+		printf("temperature sensor %d: %d*C\n\r", i, temperature);
+	}
+		
+	SafetyStatus current = Current_CheckStatus();
+	SafetyStatus temp = Temperature_CheckStatus(Current_IsCharging());
+	SafetyStatus voltage = Voltage_CheckStatus();
+
+	// Check if everything is safe (all return SAFE = 0)
+	if((current == SAFE) && (temp == SAFE) && (voltage == SAFE) && !override) {
+		Contactor_On();
+		printf("everything is safe\n\r");
+	}
+	else if((current == SAFE) && (temp == SAFE) && (voltage == UNDERVOLTAGE) && override) {
+		Contactor_On();
+		printf("contactor on (override on)\n\r");
+	} else {
+		printf("not safe!\n\r");
+	}
+
+	Contactor_On();
+	for (led signal = FAULT; signal <= EXTRA; signal++){
+		LED_On(signal);
+	}
+	for (volatile int i = 0; i < 1000000; i++){}
+	Contactor_Off();
+	for (led signal = FAULT; signal <= EXTRA; signal++){
+		LED_Off(signal);
+	}
+	
+	// Update necessary
+	// CAN_SendMessageStatus()	// Most likely need to put this on a timer if sending too frequently
+
+	WDTimer_Reset();
+
+	// BPS has tripped if this line is reached
+	faultCondition();
+	while(1){};
+	return 0;
+}
+
 
 #endif

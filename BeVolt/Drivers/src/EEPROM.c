@@ -148,7 +148,7 @@ void EEPROM_LogError(uint8_t logType){
  * Prints saved data from EEPROM to serial terminal (putty)
  */
 void EEPROM_SerialPrintData(void){
-	UART1_Init(115200);
+	UART3_Init();
 	uint8_t fault_code;
 	uint8_t data;
 	uint16_t fault_ptr = EEPROM_FAULT_CODE_ADDR;

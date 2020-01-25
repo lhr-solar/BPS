@@ -25,11 +25,11 @@ ErrorStatus Voltage_Init(cell_asic *boards);
  */
 ErrorStatus Voltage_UpdateMeasurements(void);
 
-/** Voltage_IsSafe
+/** Voltage_CheckStatus
  * Checks if all modules are safe
  * @return SAFE or danger: UNDERVOLTAGE or OVERVOLTAGE
  */
-SafetyStatus Voltage_IsSafe(void);
+SafetyStatus Voltage_CheckStatus(void);
 
 /** Voltage_GetModulesInDanger
  * Finds all battery modules that in danger and stores them into a list.
