@@ -34,6 +34,6 @@ void fifoPut(Fifo *fifo, char newChar);
 char fifoGet(Fifo *fifo);
 	
 //removes last element in fifo
-void removeLastElement(Fifo *fifo);
+void fifoRemoveLastElement(Fifo *fifo);
 
 #endif //  __FIFO_H__
