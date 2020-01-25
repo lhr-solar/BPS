@@ -21,6 +21,7 @@ void SysTick_Handler(void) {
 void DelayInit(void) {
 	// Update SystemCoreClock value
 	SystemCoreClockUpdate();
+	SysTick_CLKSourceConfig(SysTick_CLKSource_HCLK);
 	// Configure the SysTick timer to overflow every 1 us
 	SysTick_Config(SystemCoreClock / 1000000);
 }
@@ -29,10 +30,11 @@ void DelayInit(void) {
  * Delays 'us' amount of us and then continues
  */
 void DelayUs(uint32_t us) {
+	for(int i = 0; i < 1000; i++);
 	// Reload us value
-	usTicks = us;
+	// usTicks = us;
 	// Wait until usTick reach zero
-	while (usTicks);
+	// while(usTicks);
 }
 
 /** DelayMs

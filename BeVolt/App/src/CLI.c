@@ -12,6 +12,17 @@
 #define MAX_TOKEN_SIZE 4
 
 char* tokens[MAX_TOKEN_SIZE];
+char buffer[100];
+// Fifo CLI_Fifo
+
+void CLI_Init(void) {
+	UART3_Init(115200);
+}
+
+void CLI_Handler(void) {
+	static char command[128] = "led ovolt on";
+	CLI_Commands(command);
+}
 
 /** CLI_InputParse
  * Parses the input string
@@ -47,9 +58,8 @@ bool CLI_Startup(void) {
 }
 /** CLI_Help
  * Displays the help menu
- * @param input command
  */
-void CLI_Help(char *input) {
+void CLI_Help() {
 	printf("-------------------Help Menu-------------------\r\n");
 	printf("The available commands are: \r\n");
 	printf("Voltage (v)\tCurrent (i)\tTemperature (t)\r\n");
@@ -59,7 +69,7 @@ void CLI_Help(char *input) {
 	printf("Critical/Abort (!)\tAll(a)\r\n");
 	printf("Keep in mind: all values are 1-indexed\r\n");
 	printf("-----------------------------------------------\r\n");
-}
+}	// TODO: Put a logo into ASCII as part of the help menu
 
 /** CLI_Voltage
  * Checks and displays the desired
@@ -67,38 +77,32 @@ void CLI_Help(char *input) {
  * @param input command
  */
 void CLI_Voltage(char *input) {
-	switch(CLI_GetToken(1)[0]){
-		// All modules
-		case NULL:
-				for(int i = 0; i < NUM_BATTERY_MODULES; i++){
-					printf("Module number ");
-					printf("%d", i+1);
-					printf(": ");
-					printf("%.3fV",Voltage_GetModuleMillivoltage(i)/1000.0);
-					printf("\n\r");
-				}
-				break;
-		
+	if(tokens[1] == NULL) {
+		for(int i = 0; i < NUM_BATTERY_MODULES; i++){
+			printf("Module number ");
+			printf("%d", i+1);
+			printf(": ");
+			printf("%.3fV",Voltage_GetModuleMillivoltage(i)/1000.0);
+			printf("\n\r");
+		}
+		return;
+	}
+	int modNum = 0;
+	sscanf(tokens[2], "%d", &modNum);		// Converts the string number to int
+	switch(tokens[1][0]){		
 		// Specific module
-		char modNum = CLI_GetToken(2)[0]-1;
 		case 'm':
 			if (modNum == NULL || modNum > NUM_BATTERY_MODULES || modNum < 0){
 				printf("Invalid module number");
 			}
 			else {
-				printf("Module number ");
-				printf("%c", modNum+1);
-				printf(": ");
-				printf("%.3fV",Voltage_GetModuleMillivoltage(modNum)/1000.0);
-				printf("\n\r");
+				printf("Module number %d: %.3fV\n\r", modNum, (Voltage_GetModuleMillivoltage(modNum-1)/1000.0));
 			}
 			break;
 		
 		// Total
 		case 't':
-			printf("Total voltage: ");
-			printf("%.3fV",Voltage_GetTotalPackVoltage()/1000.0);
-			printf("\n\r");
+			printf("Total voltage: %.3fV\n\r",Voltage_GetTotalPackVoltage()/1000.0);
 			break;
 		
 		// Safety Status
@@ -107,32 +111,27 @@ void CLI_Voltage(char *input) {
 				SafetyStatus voltage = Voltage_IsSafe();
 				switch(voltage) {
 					case SAFE: 
-						printf("SAFE");
-						printf("\n\r");
+						printf("SAFE\n\r");
 						break;
 					case DANGER: 
-						printf("DANGER");
-						printf("\n\r");
+						printf("DANGER\n\r");
 						break;
 					case OVERVOLTAGE:
-						printf("OVERVOLTAGE");
-						printf("\n\r");
+						printf("OVERVOLTAGE\n\r");
 						break;
 					case UNDERVOLTAGE: 
-						printf("UNDERVOLTAGE");
-						printf("\n\r");
+						printf("UNDERVOLTAGE\n\r");
 						break;
 					default:
 						break;
-			break;
-			}
-				
+				}		
+				break;
 		default:
 			printf("Invalid voltage command");
 			printf("\n\r");
 			break;
-		}
 	}
+}
 
 /** CLI_Current
  * Checks and displays the desired
@@ -140,50 +139,58 @@ void CLI_Voltage(char *input) {
  * @param input command
  */
 void CLI_Current(char *input) {
-	switch (CLI_GetToken(1)[0]) {
-		case NULL : // both precision readings
-			printf("High: %4fA\n\r", Current_GetHighPrecReading()/1000.0);//prints 4 digits, number, and A
-			printf("Low: %4fA\n\r", Current_GetLowPrecReading()/1000.0);
-		case 'h' : //high precision reading
-			printf("High: %4fA\n\r", Current_GetHighPrecReading()/1000.0);
-		case 'l' : //low precision reading
-			printf("Low: %4fA\n\r", Current_GetLowPrecReading()/1000.0);
+	if(tokens[1] == NULL) {
+		printf("High: %.3fA\n\r", Current_GetHighPrecReading()/1000.0);	// Prints 4 digits, number, and A
+		printf("Low: %.3fA\n\r", Current_GetLowPrecReading()/1000.0);
+		return;
+	}
+	switch (tokens[1][0]) {
+		case 'h' : // High precision reading
+			printf("High: %.3fA\n\r", Current_GetHighPrecReading()/1000.0);
+			break;
+		case 'l' : // Low precision reading
+			printf("Low: %.3fA\n\r", Current_GetLowPrecReading()/1000.0);
+			break;
 		case 's' : 
 			if (Current_IsSafe() == SAFE) {
-				printf("\n\rCurrentState: SAFE\n\r");
+				printf("Safety Status: SAFE\n\r");
 			}
 			else {
 				printf("Safety Status: DANGER\n\r");
 			}
-		case 'c' : //whether battery is charging
+			break;
+		case 'c' : // Whether battery is charging
 			if (Current_IsCharging() == 0) {
 				printf("Charging State: CHARGING\n\r");
 			}
 			else {
 				printf("Charging State: DISCHARGING\n\r");
 			}
-		default: printf("Invalid Current Command\n\r");
+			break;
+		default:
+			printf("Invalid Current Command\n\r");
+			break;
 		}
 }
 
+
+// TODO: Reconfigure the temperature CLI functions
 /** CLI_Temperature
  * Checks and displays the desired
  * temperature parameter(s)
  * @param input command
  */
 void CLI_Temperature(char *input) {
-	switch(CLI_GetToken(1)[0]){
-		// Average temperature of modules
-		case NULL:
-			for(int i = 0; i < NUM_BATTERY_MODULES; i++){
-					printf("Module number ");
-					printf("%d", i+1);
-					printf(": ");
-					printf("%.3f°C",Temperature_GetModuleTemperature(i)/1000.0);
-					printf("\n\r");
-			}
-			break;
-			
+	if(tokens[1] == NULL) {
+		for(int i = 0; i < NUM_BATTERY_MODULES; i++){
+			printf("Module number ");
+			printf("%d", i+1);
+			printf(": ");
+			printf("%.3f°C",Temperature_GetModuleTemperature(i)/1000.0);
+			printf("\n\r");
+		}
+	}
+	switch(CLI_GetToken(1)[0]){			
 		// All temperature sensors
 		case 'a':
 			// Print out temperature of all the temperatures sensors on every module 
@@ -225,7 +232,7 @@ void CLI_Temperature(char *input) {
  * @param input command
  */
 void CLI_Contactor(char *input) {
-	switch(CLI_GetToken(1)[0]) {
+	switch(tokens[1][0]) {
 		FunctionalState contactor = Contactor_Flag();
 		case 's':
 			if(contactor == ENABLE) {
@@ -266,47 +273,74 @@ void CLI_Charge(char *input) {
  */
 	
 void toggleLED(led input) {
-	if(strcmp("1", CLI_GetToken(3)) == 0 || strcmp("on", CLI_GetToken(3)) == 0) {
+	if(strcmp("1", tokens[2]) == 0 || strcmp("on", tokens[2]) == 0) {
 		LED_On(input);
 	}
-	else if(strcmp("0", CLI_GetToken(3)) == 0 || strcmp("off", CLI_GetToken(3)) == 0) {
+	else if(strcmp("0", tokens[2]) == 0 || strcmp("off", tokens[2]) == 0) {
 		LED_Off(input);
 	} else {
 		printf("Invalid LED command");
 	}
 }
-void CLI_LED(char *input) {
+void CLI_LED() {
 	LED_Init();
-	switch(CLI_GetToken(1)[0]) {
-		uint8_t error = (GPIOB->ODR) & GPIO_Pin_12;
-		case NULL:
-			if(error) {
-				printf("Error light is On\r\n");
-			} else {
-				printf("Error light is Off\r\n");
-			}
-			break;
+	// DelayInit();
+	uint8_t error = (GPIOB->ODR) & GPIO_Pin_12;
+	if(tokens[1] == NULL) {
+		if(error) {
+			printf("Error light is On\r\n");
+		} else {
+			printf("Error light is Off\r\n");
+		}
+	}
+	switch(tokens[1][0]) {
 		case 't':
 				for(int i = 0; i < 100000000; i++) {
-					// TODO: Implement delays between all with SysTick
 					LED_Toggle(FAULT);
+					DelayMs(100);
 					LED_Toggle(RUN);
+					DelayMs(100);
 					LED_Toggle(UVOLT);
+					DelayMs(100);
 					LED_Toggle(OVOLT);
+					DelayMs(100);
 					LED_Toggle(OTEMP);
+					DelayMs(100);
 					LED_Toggle(OCURR);
+					DelayMs(100);
 					LED_Toggle(WDOG);
+					DelayMs(100);
 					LED_Toggle(CAN);
+					DelayMs(100);
 					LED_Toggle(EXTRA);
+					DelayMs(100);
 				}
 			break;
 		default:
-			if(strcmp("fault", CLI_GetToken(2)) == 0) {
+			if(strcmp("fault", tokens[1]) == 0) {
 				toggleLED(FAULT);
 			}
-			else if(strcmp("run", CLI_GetToken(2)) == 0) {
+			else if(strcmp("run", tokens[1]) == 0) {
 				toggleLED(RUN);
-			}	// TODO: Add the rest of the lights
+			}
+			else if(strcmp("ocurr", tokens[1]) == 0) {
+				toggleLED(OCURR);
+			}
+			else if(strcmp("otemp", tokens[1]) == 0) {
+				toggleLED(OTEMP);
+			}
+			else if(strcmp("ovolt", tokens[1]) == 0) {
+				toggleLED(OVOLT);
+			}
+			else if(strcmp("wdog", tokens[1]) == 0) {
+				toggleLED(WDOG);
+			}
+			else if(strcmp("can", tokens[1]) == 0) {
+				toggleLED(CAN);
+			}
+			else if(strcmp("extra", tokens[1]) == 0) {
+				toggleLED(EXTRA);
+			}
 			break;
 	}
 }
@@ -392,7 +426,7 @@ void CLI_Commands(char *input){
 		case 'h':
 		case 'm':
 		case '?':
-			CLI_Help(input);
+			CLI_Help();
 			break;
 		
 		// Voltage commands
@@ -423,7 +457,7 @@ void CLI_Commands(char *input){
 		
 		// Error light commands
 		case 'l':
-			CLI_LED(input);
+			CLI_LED();
 			break;
 		
 		// CAN commands
