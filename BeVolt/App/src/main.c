@@ -14,6 +14,7 @@
 #include "SoC.h"
 #include "LED.h"
 #include "SysTick.h"
+#include "PLL.h"
 
 cell_asic Minions[NUM_MINIONS];
 
@@ -21,7 +22,7 @@ void initialize(void);
 void preliminaryCheck(void);
 void faultCondition(void);
 
-int main(){
+int realmain(){
 	__disable_irq();		// Disable all interrupts until initialization is done
 	initialize();			// Initialize codes/pins
 	preliminaryCheck();		// Wait until all boards are powered on
@@ -34,14 +35,14 @@ int main(){
 		// First update the measurements.
 		Voltage_UpdateMeasurements();
 		Current_UpdateMeasurements();
-		Temperature_UpdateMeasurements();
+    Temperature_UpdateAllMeasurements();
 
 		// Update battery percentage
 		SoC_Calculate(Current_GetLowPrecReading());
 		
-		SafetyStatus current = Current_IsSafe();
-		SafetyStatus temp = Temperature_IsSafe(Current_IsCharging());
-		SafetyStatus voltage = Voltage_IsSafe();
+		SafetyStatus current = Current_CheckStatus();
+		SafetyStatus temp = Temperature_CheckStatus(Current_IsCharging());
+		SafetyStatus voltage = Voltage_CheckStatus();
 
 		// Check if everything is safe (all return SAFE = 0)
 		if((current == SAFE) && (temp == SAFE) && (voltage == SAFE) && !override) {
@@ -73,6 +74,7 @@ int main(){
  *		- Give wrappers (Voltage, Current, Temperature) the limits
  */
 void initialize(void){
+	PLL_Init80MHz();
 	LED_Init();
 	Contactor_Init();
 	Contactor_Off();
@@ -111,14 +113,14 @@ void faultCondition(void){
 
 	uint8_t error = 0;
 
-	if(!Current_IsSafe()){
+	if(!Current_CheckStatus()){
 		error |= FAULT_HIGH_CURRENT;
 		LED_On(OCURR);
 	}
 
-	if(!Voltage_IsSafe()){
+	if(!Voltage_CheckStatus()){
 		// Toggle Voltage fault LED
-		switch(Voltage_IsSafe()){
+		switch(Voltage_CheckStatus()){
 			case OVERVOLTAGE:
 				error |= FAULT_HIGH_VOLT;
 				LED_On(OVOLT);
@@ -139,7 +141,7 @@ void faultCondition(void){
 		}
 	}
 
-	if(!Temperature_IsSafe(Current_IsCharging())){
+	if(!Temperature_CheckStatus(Current_IsCharging())){
 		error |= FAULT_HIGH_TEMP;
 		LED_On(OCURR);
 	}
@@ -200,7 +202,7 @@ void faultCondition(void){
 // E.g. If you want to run a LTC6811 test, change "#define CHANGE_THIS_TO_TEST_NAME" to the
 //		following:
 //		#define LTC6811_TEST
-#define NO_TEST
+#define FULL_TEST
 
 
 #ifdef LED_TEST
@@ -327,7 +329,7 @@ int main(){
 
 	while(1){
 		Voltage_UpdateMeasurements();
-		if(Voltage_IsSafe() != SAFE){
+		if(Voltage_CheckStatus() != SAFE){
 			break;
 		}
 
@@ -357,7 +359,7 @@ int main(){
 		printf("\n\r==============================\n\rCurrent Test:\n\r");
 		printf("ADC High: %d\n\r", ADC_ReadHigh());
 		printf("ADC Low: %d\n\r", ADC_ReadLow());
-		printf("Is the battery safe? %d\n\r", Current_IsSafe());
+		printf("Is the battery safe? %d\n\r", Current_CheckStatus());
 		printf("Is the battery charging? %d\n\r", Current_IsCharging());
 		printf("High: %d\n\r", Current_GetHighPrecReading());
 		printf("Low: %d\n\r", Current_GetLowPrecReading());
@@ -395,22 +397,20 @@ int main(){
 
 void singleSensorTest(void) {
 	int sensorIndex = 0; // <-- replace this with which sensor you want to test
-	Temperature_ChannelConfig(sensorIndex);
 	while(1) {
-		Temperature_GetRawADC(MD_422HZ_1KHZ);
-		for (int i = 0; i < NUM_MINIONS; i++) {
-			int temp = milliVoltToCelsius(Minions[i].aux.a_codes[0]*0.1);
-			printf("Board %d Sensor %d : %d", i, sensorIndex, temp);
+		Temperature_UpdateSingleChannel(sensorIndex);
+		for (int board = 0; board < NUM_MINIONS; board++) {
+			printf("Board %d Sensor %d : %d", board, sensorIndex, Temperature_GetSingleTempSensor(board, sensorIndex));
 		}
 	}
 }
 
 void individualSensorDumpTest(void) {
 	while (1) {
-		Temperature_UpdateMeasurements();
-		for (int i = 0; i < NUM_MINIONS; i++) {
-			for (int j = 0; j < MAX_TEMP_SENSORS_PER_MINION_BOARD; j++) {
-				printf("Board %d, Sensor %d: %d Celsius\r\n", i, j, ModuleTemperatures[i][j]);
+		Temperature_UpdateAllMeasurements();
+		for (int board = 0; board < NUM_MINIONS; board++) {
+			for (int sensor = 0; sensor < MAX_TEMP_SENSORS_PER_MINION_BOARD; sensor++) {
+				printf("Board %d, Sensor %d: %d Celsius\r\n", board, sensor, Temperature_GetSingleTempSensor(board, sensor));
 				for(int delay = 0; delay < 800000; delay++){}
 			}
 		}
@@ -419,11 +419,11 @@ void individualSensorDumpTest(void) {
 
 void batteryModuleTemperatureTest (void) {
 	while (1) {
-		Temperature_UpdateMeasurements();
-		for (int i = 0; i < NUM_MINIONS; i++) {
+		Temperature_UpdateAllMeasurements();
+		for (int board = 0; board < NUM_MINIONS; board++) {
 		    for (int j = 0; j < MAX_TEMP_SENSORS_PER_MINION_BOARD/2; j++) {
-			int moduleNum =  i * MAX_TEMP_SENSORS_PER_MINION_BOARD/2 + j;
-		        printf("Board %d Battery Module %d Temp: %d Celsius\r\n", i,  moduleNum, Temperature_GetModuleTemperature(moduleNum));
+						int moduleNum =  board * MAX_TEMP_SENSORS_PER_MINION_BOARD/2 + j;
+		        printf("Board %d Battery Module %d Temp: %d Celsius\r\n", board,  moduleNum, Temperature_GetModuleTemperature(moduleNum));
 		        for(int delay = 0; delay < 800000; delay++){}
 		    }
 		}
@@ -436,8 +436,8 @@ void checkDangerTest(void) {
 	int isCharging = 1;  // 1 if pack is charging, 0 if discharging
 	printf("Danger Test\r\n");
 	while (1) {
-		Temperature_UpdateMeasurements();
-		if (Temperature_IsSafe(isCharging) == ERROR) {
+		Temperature_UpdateAllMeasurements();
+		if (Temperature_CheckStatus(isCharging) == ERROR) {
 			printf("SOMETHINGS WRONG! AHHH\r\n");
 			printf("----------Dumping Sensor data----------\r\n");
 			uint8_t* dangerList = Temperature_GetModulesInDanger();
@@ -534,7 +534,7 @@ int SPITestmain(){
 // Debug UART Test
 #include "UART.h"
 int main(){
-	UART3_Init(115200);
+	UART1_Init(115200);
 	while(1){
 		printf("Die world\r\n");
 		for(uint32_t i = 0; i < 100000; i++);
@@ -705,6 +705,164 @@ int main() {
 
 #endif
 
+#ifdef UART_INTERRUPT2
+    /* Includes ---------------------------------------------------*/
+    //#include "stm32f2xx.h"
+		#include "uart.h"
+		
+		uint8_t RxData;//data received flag
+				
+    /* Private function prototypes --------------------------------*/
+    void USART1_Config(void);
+
+    /* Private functions ------------------------------------------*/
+		
+		/**
+		 * @brief This function handles USART3 global interrupt request.
+     * @param None
+     * @retval None
+     */
+    void USART1_IRQHandler(void){
+			if(USART_GetITStatus(USART1, USART_IT_RXNE) != RESET){
+     /* Read one byte from the receive data register */
+          RxData = USART_ReceiveData(USART1);
+      }
+    }
+		
+    /**
+     * @brief Main program
+     * @param None
+     * @retval None
+     * */
+		#define size 32
+     int main(void)
+     {
+			 char fifo[size];
+			 uint8_t head = 0;
+			 uint8_t tail = 0;
+			 __enable_irq();
+			 
+      NVIC_InitTypeDef NVIC_InitStructure;
+     /****************************************************************
+      -Step1-
+      Configure the peripheral and enable the interrupt generation
+     ****************************************************************/
+      /* Configure USART3 with receive interrupt enabled (generated
+      when the receive data register is not empty) */
+      USART1_Config();
+     /****************************************************************
+      -Step2-
+      Enable peripheral IRQ channel in the NVIC controller
+     ****************************************************************/
+
+      /* Enable USART3 IRQ channel in the NVIC controller.
+      When the USART3 interrupt is generated (in this example when
+      data is received) the USART3_IRQHandler will be served */
+      NVIC_InitStructure.NVIC_IRQChannel = USART1_IRQn;
+      NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
+      NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
+      NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+      NVIC_Init(&NVIC_InitStructure);
+     /****************************************************************
+      -Step3-
+      Implement the peripheral interrupt handler (PPP_IRQHandler)
+      in stm32f2xx_it.c file.
+     ****************************************************************/
+      /* Refer to next section "stm32f2xx_it.c" */
+
+      while (1)
+      {
+				//do something important
+				if ((RxData) && (((head + 1) % size) != tail)){
+					//insert data
+						
+					fifo[head] = (char) RxData;
+					head = ((head + 1) % size);
+					if ((RxData == 0x0d) && ((head + 1) % size) != tail){//if carriage return and space in queue
+						fifo[head] = 0x0a;//put line feed in
+						head = ((head + 1) % size);
+					}
+					RxData = 0;
+				}
+				if (head != tail) {
+					printf("%c", fifo[tail]);
+					tail = (tail +1) % size;
+				}else{
+					//printf(".");
+				}
+      }
+     }
+	 
+     /**
+      * @brief Configures the USART3 Peripheral.
+      * @param None
+      * @retval None
+      */
+     void USART1_Config(void)
+     {
+      GPIO_InitTypeDef GPIO_InitStructure;
+      USART_InitTypeDef USART_InitStructure;
+      /* USART IOs configuration ***********************************/
+      /* Enable GPIOA clock */
+      RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
+      /* Connect PA9 to USART1_Tx */
+      GPIO_PinAFConfig(GPIOA, GPIO_PinSource9, GPIO_AF_USART3);
+      /* Connect PA10 to USART1_Rx*/
+         GPIO_PinAFConfig(GPIOA, GPIO_PinSource10, GPIO_AF_USART3);
+          /* Configure USART1_Tx and USART3_Rx as alternate function */
+          GPIO_InitStructure.GPIO_Pin = GPIO_Pin_9 | GPIO_Pin_10;
+          GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
+          GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+          GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+          GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
+          GPIO_Init(GPIOA, &GPIO_InitStructure);
+          /* USART configuration ***************************************/
+          /* USART3 configured as follow:
+          - BaudRate = 115200 baud
+          - Word Length = 8 Bits
+          - One Stop Bit
+          - No parity
+          - Hardware flow control disabled (RTS and CTS signals)
+          - Receive and transmit enabled
+          */
+          /* Enable USART1 clock */
+          RCC_APB2PeriphClockCmd(RCC_APB2Periph_USART1, ENABLE);
+
+          USART_InitStructure.USART_BaudRate = 115200;
+          USART_InitStructure.USART_WordLength = USART_WordLength_8b;
+          USART_InitStructure.USART_StopBits = USART_StopBits_1;
+          USART_InitStructure.USART_Parity = USART_Parity_No;
+          USART_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
+          USART_InitStructure.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;
+          USART_Init(USART1, &USART_InitStructure);
+          /* Enable USART1 */
+          USART_Cmd(USART1, ENABLE);
+
+          /* Enable USART1 Receive interrupt */
+          USART_ITConfig(USART1, USART_IT_RXNE, ENABLE);
+      }
+#endif
+			
+#ifdef UART_INTERRUPT
+#include "uart.h"
+#include "fifo.h"
+int main(void){
+	USART1_Config();
+	Fifo uartFifo;
+	fifoInit(&uartFifo);
+	__enable_irq();
+	extern uint8_t RxData;
+	char buffer[fifo_size];
+	while(1){
+		checkUARTandEcho(&uartFifo);
+		if (hasCommand(&uartFifo)){
+			getCommand(&uartFifo, buffer);
+			printf("\n\r%s\n\r", buffer);
+		}
+	}
+}
+#endif
+	
 #ifdef OPEN_WIRE_TEST
 //******************************************************************************************
 #include "Voltage.h"
@@ -714,7 +872,10 @@ int main(){
 	UART3_Init(115200);
 	Voltage_Init(Minions);
 	/*
-	//printf("%x", Voltage_GetOpenWire());
+	//printf("%x", Voltage_Get
+  
+  
+  ());
 	//printf("\n\r");
 	static uint32_t open_wires = 0;
 	open_wires = Voltage_GetOpenWire();
@@ -733,4 +894,105 @@ int main(){
 		voltage = Voltage_GetModuleMillivoltage(i);
 	}
 }
+
+#endif
+
+#ifdef FULL_TEST
+#include "UART.h"
+//tests the BPS functions
+int main(void) {
+	__disable_irq();		// Disable all interrupts until initialization is done
+	initialize();			// Initialize codes/pins
+	preliminaryCheck();		// Wait until all boards are powered on
+	__enable_irq();			// Enable interrupts
+
+	//WDTimer_Start();
+	UART3_Init();
+
+	bool override = false;		// This will be changed by user via CLI	
+	printf("initialized\n\r");
+	// First update the measurements.
+	Voltage_UpdateMeasurements();
+	SafetyStatus *voltageModulesInDanger;
+	voltageModulesInDanger = Voltage_GetModulesInDanger();
+	printf("Voltage modules in danger: ");
+	for (uint8_t i = 0; i < NUM_BATTERY_MODULES; i++) {
+		if (voltageModulesInDanger[i] != SAFE){
+			printf("%d ", i);
+		}
+	}
+	printf("\n\r");
+	
+	for (uint8_t i = 0; i < NUM_BATTERY_MODULES; i++){
+		uint16_t voltage = Voltage_GetModuleMillivoltage(i);
+		//print fixed point millivoltage of module
+		printf("module %d millivolts: %d.%d%d%d%d%dV\n\r", i, voltage/100000, (Voltage_GetModuleMillivoltage(i)%100000)/10000, (Voltage_GetModuleMillivoltage(i)%1000000)/1000, (Voltage_GetModuleMillivoltage(i)%1000000)/100, (Voltage_GetModuleMillivoltage(i)%10000000)/10, (Voltage_GetModuleMillivoltage(i)%100000000)); 
+	}
+	
+	Current_UpdateMeasurements();
+	
+	if (Current_CheckStatus() == SAFE){
+		printf("current is safe\n\r");
+	}else{
+		printf("current is not safe\n\r");
+	}
+	
+	printf("current high precision: %d\n\r", Current_GetHighPrecReading());
+	printf("current low precision: %d\n\r", Current_GetLowPrecReading());
+	
+	Temperature_UpdateAllMeasurements();
+	
+	uint8_t *tempModulesInDanger;
+	tempModulesInDanger = Temperature_GetModulesInDanger();
+	printf("Temperature modules in danger: ");
+	for (uint8_t i = 0; i < NUM_BATTERY_MODULES; i++) {
+		if (tempModulesInDanger[i] == DANGER){
+			printf("%d ", i);
+		}
+	}
+	printf("\n\r");
+	
+	for (uint8_t i = 0; i < NUM_TEMPERATURE_SENSORS; i++){
+		uint16_t temperature = Temperature_GetSingleTempSensor(i/2, i%2);
+		printf("temperature sensor %d: %d*C\n\r", i, temperature);
+	}
+		
+	SafetyStatus current = Current_CheckStatus();
+	SafetyStatus temp = Temperature_CheckStatus(Current_IsCharging());
+	SafetyStatus voltage = Voltage_CheckStatus();
+
+	// Check if everything is safe (all return SAFE = 0)
+	if((current == SAFE) && (temp == SAFE) && (voltage == SAFE) && !override) {
+		Contactor_On();
+		printf("everything is safe\n\r");
+	}
+	else if((current == SAFE) && (temp == SAFE) && (voltage == UNDERVOLTAGE) && override) {
+		Contactor_On();
+		printf("contactor on (override on)\n\r");
+	} else {
+		printf("not safe!\n\r");
+	}
+
+	Contactor_On();
+	for (led signal = FAULT; signal <= EXTRA; signal++){
+		LED_On(signal);
+	}
+	for (volatile int i = 0; i < 1000000; i++){}
+	Contactor_Off();
+	for (led signal = FAULT; signal <= EXTRA; signal++){
+		LED_Off(signal);
+	}
+	
+	// Update necessary
+	// CAN_SendMessageStatus()	// Most likely need to put this on a timer if sending too frequently
+
+	WDTimer_Reset();
+
+	// BPS has tripped if this line is reached
+	faultCondition();
+	while(1){};
+	return 0;
+}
+
+
 #endif

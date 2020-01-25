@@ -23,11 +23,11 @@ void Current_Init(void);
  */
 ErrorStatus Current_UpdateMeasurements(void);
 
-/** Current_IsSafe
+/** Current_CheckStatus
  * Checks if pack does not have a short circuit
  * @return SAFE or DANGER
  */
-SafetyStatus Current_IsSafe(void);
+SafetyStatus Current_CheckStatus(void);
 
 /** Current_IsCharging
  * Determines if the the battery pack is being charged or discharged depending on
