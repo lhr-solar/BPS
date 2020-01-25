@@ -4,8 +4,8 @@
  */
 #include "Temperature.h"
 
-// Holds the temperatures in Celsius for each sensor on each board
-static int16_t ModuleTemperatures[NUM_MINIONS][MAX_TEMP_SENSORS_PER_MINION_BOARD];
+// Holds the temperatures in Celsius (Fixed Point with .001 resolution) for each sensor on each board
+int16_t ModuleTemperatures[NUM_MINIONS][MAX_TEMP_SENSORS_PER_MINION_BOARD];
 
 // 0 if discharging 1 if charging
 static uint8_t ChargingState;
@@ -37,7 +37,7 @@ ErrorStatus Temperature_Init(cell_asic *boards){
 }
 
 /** Temperature_ChannelConfig
- * Configures which temperature channel you're sampling from
+ * Configures which temperature channel you're sampling from in every board
  * Assumes there are only 2 muxes; 0 index based - 0 is sensor 1
  * @precondition tempChannel should be < MAX_TEMP_SENSORS_PER_MINION_BOARD
  * @param channel number (0-indexed based)
@@ -45,14 +45,8 @@ ErrorStatus Temperature_Init(cell_asic *boards){
  * @note we clear the otherMux every time a channel is switched even on the same mux; Maybe change depending on speed/optimization
  */
 ErrorStatus Temperature_ChannelConfig(uint8_t tempChannel) {
-	cell_asic temp;
 	uint8_t muxAddress;
 	uint8_t otherMux;
-
-	temp.isospi_reverse = false;
-	
-	// For safety, in case a number >= MAX_TEMP_SENSORS_PER_MINION_BOARD is passed in.
-	tempChannel %= MAX_TEMP_SENSORS_PER_MINION_BOARD;
 	
 	if (tempChannel > 7) {
 		muxAddress = MUX2;
@@ -62,66 +56,114 @@ ErrorStatus Temperature_ChannelConfig(uint8_t tempChannel) {
 		muxAddress = MUX1;
 		otherMux = MUX2;
 	}
+	
+	// need to make 0 to 7 since each mux only sees those channels
+	tempChannel %= MAX_TEMP_SENSORS_PER_MINION_BOARD/2;
 
-	// 0110 is start code, must be the 4 msb's then the 4 msb's of the data (addr of mux)
-	// remaind of otherMux, then 0000 for just an acknowledge signal at 9th cycle
+	// MESSAGE FORMAT FOR MUX:
+	// 8 bytes needed in total
+	// First 2 bytes: START_CODE + 4 MSB of Mux Address
+	// Second 2 bytes: 4 LSB of Mux Address + END_CODE
+	// Third 2 bytes: START_CODE + 4 MSB of data
+	// Fourth 2 bytes: 4 LSB of data + END_CODE
+	
+	for (int board = 0; board < NUM_MINIONS; board++) {
+		/* Clear other mux */
+		
+		// Send Address
+		Minions[board].com.tx_data[0] = (AUX_I2C_START << 4) + ((otherMux & 0xF0)>>4); 				
+		Minions[board].com.tx_data[1] = ((otherMux & 0x0F) << 4) + AUX_I2C_NACK;
+		
+		// Sends what channel to open. 4th bit is the enable bit, the 4MSB bits will be by default high
+		// Turn all channels off
+		Minions[board].com.tx_data[2] = (AUX_I2C_BLANK << 4) + 0xF;
+		Minions[board].com.tx_data[3] = (0 << 4) + AUX_I2C_NACK_STOP;
 
-	/* Clear other mux */
-	temp.com.tx_data[0] = (AUX_I2C_START << 4) + ((otherMux & 0xF0)>>4); 				// 0110 START CODE
-	temp.com.tx_data[1] = ((otherMux & 0x0F) << 4) + AUX_I2C_ACK;								// Acknowledge signal at 9th cycle
+		// Rest is no transmit with all data bits set to high, makes sure there's nothing else we're sending
+		Minions[board].com.tx_data[4] = (AUX_I2C_NO_TRANSMIT << 4) + 0xF;
+		Minions[board].com.tx_data[5] = (0xF << 4) + AUX_I2C_NACK_STOP;
+
+		// Send data
+		wakeup_sleep(NUM_MINIONS);
+		LTC6811_wrcomm(NUM_MINIONS, Minions);
+		LTC6811_stcomm();
+			
+		
+		/* Open channel on mux */
+		
+		// Send Address for a particular mux
+		Minions[board].com.tx_data[0] = (AUX_I2C_START << 4) + (muxAddress >> 4); 				
+		Minions[board].com.tx_data[1] = (muxAddress << 4) + AUX_I2C_NACK;
 
 
-	// Sends what channel to open. 4th bit is the enable bit
-	// Turn all channels off
-	temp.com.tx_data[2] = (AUX_I2C_START << 4) + (0);
-	temp.com.tx_data[3] = ((0) << 4) + AUX_I2C_NACK_STOP;
+		
+		// Sends what channel to open. 8 is the enable bit
+		// 8 + temp_channel
+		Minions[board].com.tx_data[2] = (AUX_I2C_BLANK << 4) + 0xF; 				// set dont cares high
+		Minions[board].com.tx_data[3] = ((8 + tempChannel) << 4) + AUX_I2C_NACK_STOP;
+			
+		// Rest is no transmit with all data bits set to high, makes sure there's nothing else we're sending
+		Minions[board].com.tx_data[4] = (AUX_I2C_NO_TRANSMIT << 4) + 0xF;
+		Minions[board].com.tx_data[5] = (0xF << 4) + AUX_I2C_NACK_STOP;
 
-	LTC6811_wrcomm(1, &temp);
-	LTC6811_stcomm();
-
-
-	// Send Address for a particular mux
-	temp.com.tx_data[0] = (AUX_I2C_START << 4) + ((muxAddress & 0xF0)>>4); 				// 0110 START CODE
-	temp.com.tx_data[1] = ((muxAddress & 0x0F) << 4) + AUX_I2C_ACK;								// Acknowledge signal at 9th cycle
-
-
-	// Sends what channel to open. 8 is the enable bit
-	// 8 + temp_channel
-	temp.com.tx_data[2] = (AUX_I2C_START << 4) + (0);
-	temp.com.tx_data[3] = ((8 + tempChannel) << 4) + AUX_I2C_NACK_STOP;
-
-
-	LTC6811_wrcomm(1, &temp);
-	LTC6811_stcomm();
+		// Send data
+		wakeup_sleep(NUM_MINIONS);
+		LTC6811_wrcomm(NUM_MINIONS, Minions);
+		LTC6811_stcomm();
+	}
 
 	return SUCCESS;
 }
 
 /** convertVoltageToTemperature
  * Converts mv to temperature based on the temperature sensor equation
+ * Equation : T(in C) = (((13.582 - sqrt((-13.582)*(-13.582) + 4 * 0.00433 * (2230.8 - milliVolt)))/ (2.0 * -0.00433)) + 30)
  * @param mV from ADC
- * @return temperature in Celsius
+ * @return temperature in Celsius (Fixed Point with .001 resolution) 
  */
-static int16_t milliVoltToCelsius(double milliVolt){
-	return (13.582 - sqrt((-13.582)*(-13.582) + 4 * 0.00433 * (2230.8 - milliVolt))/ (2.0 * -0.00433)) + 30;
+int milliVoltToCelsius(float milliVolt){
+	// Typecasting to get rid of warnings
+	float sumInRt = (float)(-13.582)*(float)(-13.582) + (float)4.0 * (float)0.00433 * ((float)2230.8 - milliVolt);
+	float rt = sqrt(sumInRt);				
+	float numerator = (float)13.582 - rt;
+	float denom = (2.0 * - 0.00433);		
+	float frac = numerator/denom;			
+	float retVal = frac + 30;			
+	
+	return retVal * 1000;
 }
 
-/** Temperature_UpdateMeasurements
+/** Temperature_UpdateSingleChannel
+ * Stores and updates the new measurements received on one particular temperature sensor
+ * @param channel < MAX_TEMP_SENSORS_PER_MINION_BOARD, 0-indexed
+ * @return SUCCESS or ERROR
+ */
+ErrorStatus Temperature_UpdateSingleChannel(uint8_t channel){
+	// Configure correct channel
+	if (ERROR == Temperature_ChannelConfig(channel)) {
+		return ERROR;
+	}
+	
+	// Sample ADC channel
+	Temperature_SampleADC(MD_422HZ_1KHZ);
+	
+	// Convert to Celsius
+	for(int board = 0; board < NUM_MINIONS; board++) {
+		
+		// update adc value from GPIO1 stored in a_codes[0]; 
+		// a_codes[0] is fixed point with .001 resolution in volts -> multiply by .001 * 1000 to get mV in double form
+		ModuleTemperatures[board][channel] = milliVoltToCelsius(Minions[board].aux.a_codes[0]*0.1);
+	}
+	return SUCCESS;
+}
+
+/** Temperature_UpdateAllMeasurements
  * Stores and updates the new measurements received on all temperature sensors
  * @return SUCCESS or ERROR
  */
-ErrorStatus Temperature_UpdateMeasurements(){
+ErrorStatus Temperature_UpdateAllMeasurements(){
 	for (int sensorCh = 0; sensorCh < MAX_TEMP_SENSORS_PER_MINION_BOARD; sensorCh++) {
-		if (ERROR == Temperature_ChannelConfig(sensorCh)) {
-			return ERROR;
-		}
-		Temperature_GetRawADC(MD_422HZ_1KHZ);
-		for(int board = 0; board < NUM_MINIONS; board++) {
-			
-			// update adc value from GPIO1 stored in a_codes[0]; 
-			// a_codes[0] is fixed point with .0001 resolution in volts -> multiply by .0001 * 1000 to get mV in double form
-			ModuleTemperatures[board][sensorCh] = milliVoltToCelsius(Minions[board].aux.a_codes[0]*0.01);
-		}
+		Temperature_UpdateSingleChannel(sensorCh);
 	}
 	return SUCCESS;
 }
@@ -129,10 +171,11 @@ ErrorStatus Temperature_UpdateMeasurements(){
 /** Temperature_IsSafe
  * Checks if all modules are safe
  * @param 1 if pack is charging, 0 if discharging
- * @return SUCCESS or ERROR
+ * @return SAFE or DANGER
  */
 SafetyStatus Temperature_IsSafe(uint8_t isCharging){
 	int16_t temperatureLimit = isCharging == 1 ? MAX_CHARGE_TEMPERATURE_LIMIT : MAX_DISCHARGE_TEMPERATURE_LIMIT;
+	temperatureLimit *= MILLI_SCALING_FACTOR;
 
 	for (int i = 0; i < NUM_MINIONS; i++) {
 		for (int j = 0; j < MAX_TEMP_SENSORS_PER_MINION_BOARD; j++) {
@@ -175,13 +218,22 @@ uint8_t *Temperature_GetModulesInDanger(void){
 	}
 	return ModuleTempStatus;
 }
+/** Temperature_GetSingleTempSensor
+ * Gets the single sensor from a particular board
+ * @precondition: board must be < NUM_MINIONS, sensorIdx < MAX_TEMP_SENSORS_PER_MINION_BOARD
+ * @param index of board (0-indexed based)
+ * @param index of sensor (0-indexed based)
+ * @return temperature of the battery module at specified index
+ */
+int16_t Temperature_GetSingleTempSensor(uint8_t board, uint8_t sensorIdx) {
+	return ModuleTemperatures[board][sensorIdx];
+}
 
 /** Temperature_GetModuleTemperature
  * Gets the avg temperature of a certain battery module in the battery pack. Since there
  * are 2 sensors per module, the return value is the average
  * @precondition: moduleIdx must be < NUM_BATTERY_MODULE
- * @param index of board (0-indexed based)
- * @param index of battery (0-indexed based)
+ * @param index of module (0-indexed based)
  * @return temperature of the battery module at specified index
  */
 int16_t Temperature_GetModuleTemperature(uint8_t moduleIdx){
@@ -209,12 +261,12 @@ int16_t Temperature_GetTotalPackAvgTemperature(void){
 	return total /= NUM_BATTERY_MODULES;
 }
 
-/** Temperature_GetRawADC
+/** Temperature_SampleADC
  * Starts ADC conversion on GPIO1 on LTC6811's auxiliary registers on all boards
  * @param sets the sampling rate
  * @return SUCCESS or ERROR
  */
-ErrorStatus Temperature_GetRawADC(uint8_t ADCMode) {
+ErrorStatus Temperature_SampleADC(uint8_t ADCMode) {
 	wakeup_sleep(NUM_MINIONS);
 	LTC6811_adax(ADCMode, AUX_CH_GPIO1);							// Start ADC conversion on GPIO1
 	LTC6811_pollAdc();

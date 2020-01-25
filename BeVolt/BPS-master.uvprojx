@@ -537,6 +537,11 @@
               <FileType>1</FileType>
               <FilePath>.\Periphs\src\WDTimer.c</FilePath>
             </File>
+            <File>
+              <FileName>SysTick.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Periphs\src\SysTick.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -576,6 +581,11 @@
               <FileName>WDTimer.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\Periphs\inc\WDTimer.h</FilePath>
+            </File>
+            <File>
+              <FileName>SysTick.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Periphs\inc\SysTick.h</FilePath>
             </File>
           </Files>
         </Group>

@@ -10,6 +10,11 @@
 
 static cell_asic *Minions;
 
+/** LTC ADC measures with resolution of 4 decimal places, 
+ * But we standardized to have 3 decimal places to work with
+ * millivolts
+ */
+
 /** Voltage_Init
  * Initializes all device drivers including LTC6811 and GPIO to begin Voltage Monitoring
  * @param boards LTC6811 data structure that contains the values of each register
@@ -68,43 +73,72 @@ ErrorStatus Voltage_UpdateMeasurements(void){
  */
 SafetyStatus Voltage_IsSafe(void){
 	for(int i = 0; i < NUM_BATTERY_MODULES; i++){
-		uint16_t voltage = Voltage_GetModuleVoltage(i);
+		uint16_t voltage = Voltage_GetModuleMillivoltage(i);
 			
 		// VOLTAGE_LIMITS are in floating point. The LTC6811 sends the voltage data
 		// as unsigned 16-bit fixed point integers with a resolution of 0.00001
-		if(voltage > MAX_VOLTAGE_LIMIT * LTC6811_SCALING_FACTOR){
+		if(voltage > MAX_VOLTAGE_LIMIT * MILLI_SCALING_FACTOR){
 			return OVERVOLTAGE;
 		}
 		
-		else if(voltage < MIN_VOLTAGE_LIMIT * LTC6811_SCALING_FACTOR){
+		else if(voltage < MIN_VOLTAGE_LIMIT * MILLI_SCALING_FACTOR){
 			return UNDERVOLTAGE;
 		}
 	}
-	
 	return SAFE;
 }
 
 /** Voltage_GetModulesInDanger
  * Finds all modules that in danger and stores them into a list.
- * Each module corresponds to and index of the array. If the element in the
- * array is 1, then it means that module in the index is in danger.
+ * Each module corresponds to an index of the array of SafetyStatus
  * @return pointer to index of modules that are in danger
  */
-uint8_t *Voltage_GetModulesInDanger(void){
-	static uint8_t checks[NUM_BATTERY_MODULES];
+SafetyStatus *Voltage_GetModulesInDanger(void){
+	static SafetyStatus checks[NUM_BATTERY_MODULES];
+	uint32_t open_wires = Voltage_GetOpenWire();
 	
-	for (int i = 0; i < NUM_BATTERY_MODULES; i++) {
-		
+	for (int i = 0; i < NUM_BATTERY_MODULES; i++) {	
 		// Check if battery is in range of voltage limit
-		if (Voltage_GetModuleVoltage(i) > MAX_VOLTAGE_LIMIT || Voltage_GetModuleVoltage(i) < MIN_VOLTAGE_LIMIT) {
-			checks[i] = 1;	// 1 shows that the unit is in danger
-			
+		if (Voltage_GetModuleMillivoltage(i) > MAX_VOLTAGE_LIMIT * MILLI_SCALING_FACTOR || Voltage_GetModuleMillivoltage(i) < MIN_VOLTAGE_LIMIT * MILLI_SCALING_FACTOR) {
+			checks[i] = DANGER;
+		}
+		else if((open_wires >> i) & 1) {
+			checks[i] = DANGER;
 		} else {
-			checks[i] = 0;	// 0 shows that the unit is not in danger
+			checks[i] = SAFE;
 		}
 	}
-	
 	return checks;
+}
+/** Voltage_OpenWireSummary
+ * Runs the open wire method with print=true
+ */
+void Voltage_OpenWireSummary(void){
+	wakeup_idle(NUM_MINIONS);
+	LTC6811_run_openwire_multi(NUM_MINIONS, Minions, true);
+}
+
+/** Voltage_OpenWire
+ * Uses the LTC6811_run_openwire_multi() function to check for open wires
+ * @return SafetyStatus
+ */
+SafetyStatus Voltage_OpenWire(void){
+	wakeup_idle(NUM_MINIONS);
+	long openwires = LTC6811_run_openwire_multi(NUM_MINIONS, Minions, false);
+	if(openwires != 0){
+		return DANGER;
+	} else {
+		return SAFE;
+	}
+}
+
+/** Voltage_GetOpenWire
+ * Finds the pin locations of the open wires
+ * @return hexadecimal string (1 means open wire, 0 means closed)
+ */
+uint32_t Voltage_GetOpenWire(void){
+	wakeup_idle(NUM_MINIONS);
+	return LTC6811_run_openwire_multi(NUM_MINIONS, Minions, false);
 }
 
 /** Voltage_GetModuleVoltage
@@ -113,8 +147,8 @@ uint8_t *Voltage_GetModulesInDanger(void){
  * @param index of battery (0-indexed)
  * @return voltage of module at specified index
  */
-uint16_t Voltage_GetModuleVoltage(uint8_t moduleIdx){
-	return Minions[moduleIdx / MAX_VOLT_SENSORS_PER_MINION_BOARD].cells.c_codes[moduleIdx % MAX_VOLT_SENSORS_PER_MINION_BOARD];
+uint16_t Voltage_GetModuleMillivoltage(uint8_t moduleIdx){
+	return Minions[moduleIdx / MAX_VOLT_SENSORS_PER_MINION_BOARD].cells.c_codes[moduleIdx % MAX_VOLT_SENSORS_PER_MINION_BOARD] / 10;
 }
 
 /** Voltage_GetTotalPackVoltage
@@ -124,7 +158,7 @@ uint16_t Voltage_GetModuleVoltage(uint8_t moduleIdx){
 uint32_t Voltage_GetTotalPackVoltage(void){
 	int sum = 0;
 	for (int i = 0; i < NUM_BATTERY_MODULES; i++) {
-		sum += Voltage_GetModuleVoltage(i);
+		sum += Voltage_GetModuleMillivoltage(i);
 	}
 	return sum;
 }

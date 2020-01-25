@@ -243,8 +243,14 @@ void LTC681x_adol(
 /*!  Start an open wire Conversion
 */
 void LTC681x_adow(
+	/*
   uint8_t MD, //!< ADC Conversion Mode
   uint8_t PUP //!< Controls if Discharge is permitted during conversion
+	*/
+uint8_t MD, //ADC Mode
+				  uint8_t PUP,//Pull up/Pull down current
+				  uint8_t CH, //Channels
+				  uint8_t DCP//Discharge Permit
 );
 
 
@@ -485,8 +491,9 @@ int16_t LTC681x_run_adc_redundancy_st(uint8_t adc_mode,
                                       cell_asic ic[]);
 
 /*! Helper function that runs the datasheet open wire algorithm*/
-void LTC681x_run_openwire(uint8_t total_ic,
-                          cell_asic ic[]);
+uint32_t LTC681x_run_openwire_multi(uint8_t total_ic,
+                          cell_asic ic[],
+													bool print);
 
 /*! Helper Function that runs the ADC Overlap test*/
 uint16_t LTC681x_run_adc_overlap(uint8_t total_ic,
