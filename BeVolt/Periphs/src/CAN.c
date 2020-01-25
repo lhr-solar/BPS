@@ -95,7 +95,7 @@ void CAN1_Init(int CAN_Mode){
 }
 
 
-int CAN1_Write(uint32_t id, uint8_t data[8], uint8_t length){
+int CAN1_Write(uint32_t id, uint8_t* data, uint8_t length){
 	TxMessage.StdId = id;
 	TxMessage.DLC = length;
 	for(int i = 0; i < 8; i++){
