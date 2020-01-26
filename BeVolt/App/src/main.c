@@ -983,6 +983,10 @@ int main(void) {
 		LED_Off(signal);
 	}
 	
+	EEPROM_Reset();
+	EEPROM_Tester();
+	EEPROM_SerialPrintData();
+	
 	// Update necessary
 	// CAN_SendMessageStatus()	// Most likely need to put this on a timer if sending too frequently
 
