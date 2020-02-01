@@ -5,9 +5,5 @@
 *DebugConfig
 *.uvoptx
 .vscode
-<<<<<<< HEAD
 *.uvprojx
 RTE_Components.h
-=======
-BeVolt/RTE/_Target_1/RTE_Components.h
->>>>>>> Ignore RTE_Components.h file
