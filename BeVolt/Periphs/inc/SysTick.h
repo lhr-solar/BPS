@@ -27,5 +27,8 @@ void DelayUs(uint32_t us);
  * Delay 'ms' amount of ms and then continues
  */
 void DelayMs(uint32_t ms);
+<<<<<<< HEAD
 
 #endif 
+=======
+>>>>>>> Updated CLI with more explicit variables and documentation

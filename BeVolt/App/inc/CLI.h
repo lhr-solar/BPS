@@ -1,9 +1,9 @@
-<<<<<<< HEAD
 /* CLI.c
  * Command Line Interface file to 
  * define and route commands
  */
 
+<<<<<<< HEAD
 #ifndef CLI_H__
 #define CLI_H__
 
@@ -50,11 +50,3 @@ void CLI_Help();
 void CLI_LED();
 
 #endif
-=======
-#ifndef CLI_H__
-#define CLI_H__
-
-void CLI_InputReturn(char *input);
-
-#endif
->>>>>>> Basic CLI functionality

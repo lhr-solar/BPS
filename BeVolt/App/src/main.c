@@ -204,15 +204,7 @@ void faultCondition(void){
 // E.g. If you want to run a LTC6811 test, change "#define CHANGE_THIS_TO_TEST_NAME" to the
 //		following:
 //		#define LTC6811_TEST
-<<<<<<< HEAD
-#define FULL_TEST
-=======
 #define CLI_TEST
->>>>>>> Tested Voltage, Current, LED. All functions work properly within those. Need to complete the rest of the functions and test. FYI: SysTick functionality doesn't update the ticks properly -- need to look at that.
-
-
-#ifdef LED_TEST
-#include "LED.h"
 void LEDdelay(int time){
 	for(int i = 0; i < time; i++);
 }

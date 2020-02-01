@@ -5,7 +5,7 @@
 
 #include "CLI.h"
 #include <ctype.h>
-#include "String.h"
+#include <string.h>
 #include "stm32f4xx.h"
 #include "stm32f4xx_gpio.h"
 
