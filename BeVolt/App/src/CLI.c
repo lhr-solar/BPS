@@ -185,11 +185,7 @@ void CLI_Temperature() {
 			printf(": ");
 			printf("%.3f°C",Temperature_GetModuleTemperature(i)/1000.0);
 			printf("\n\r");
-		}
 	}
-	switch(CLI_GetToken(1)[0]){			
-		// All temperature sensors
-		case 'a':
 			// Print out temperature of all the temperatures sensors on every module 
 			break;
 			
