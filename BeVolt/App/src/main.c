@@ -22,7 +22,7 @@ void initialize(void);
 void preliminaryCheck(void);
 void faultCondition(void);
 
-int main(){
+int mainmain(){
 	__disable_irq();		// Disable all interrupts until initialization is done
 	initialize();			// Initialize codes/pins
 	preliminaryCheck();		// Wait until all boards are powered on
@@ -195,7 +195,7 @@ void faultCondition(void){
 // E.g. If you want to run a LTC6811 test, change "#define CHANGE_THIS_TO_TEST_NAME" to the
 //		following:
 //		#define LTC6811_TEST
-#define NO_TEST
+#define CLI_TEST
 
 
 #ifdef LED_TEST
@@ -727,5 +727,15 @@ int main(){
 	for(int i = 0; i < NUM_BATTERY_MODULES; i++) {
 		voltage = Voltage_GetModuleMillivoltage(i);
 	}
+}
+#endif
+
+#ifdef CLI_TEST
+int main(){
+	__disable_irq();
+	CLI_Init();
+	__enable_irq();
+	CLI_Handler();
+	while(1);
 }
 #endif
