@@ -32,10 +32,6 @@ int realmain(){
 
 	WDTimer_Start();
 
-<<<<<<< HEAD
-	bool override = false;		// This will be changed by user via CLI
-=======
->>>>>>> Contactor startup function created; need to implement UART input
 	while(1){
 		// First update the measurements.
 		Voltage_UpdateMeasurements();
@@ -208,7 +204,11 @@ void faultCondition(void){
 // E.g. If you want to run a LTC6811 test, change "#define CHANGE_THIS_TO_TEST_NAME" to the
 //		following:
 //		#define LTC6811_TEST
+<<<<<<< HEAD
 #define FULL_TEST
+=======
+#define CLI_TEST
+>>>>>>> Tested Voltage, Current, LED. All functions work properly within those. Need to complete the rest of the functions and test. FYI: SysTick functionality doesn't update the ticks properly -- need to look at that.
 
 
 #ifdef LED_TEST
@@ -1005,4 +1005,14 @@ int main(void) {
 }
 
 
+#endif
+
+#ifdef CLI_TEST
+int main(){
+	__disable_irq();
+	CLI_Init();
+	__enable_irq();
+	CLI_Handler();
+	while(1);
+}
 #endif
