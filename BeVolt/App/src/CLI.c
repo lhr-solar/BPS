@@ -143,8 +143,8 @@ void CLI_Current(char *input) {
 		case 'l' : 
 			printf("Low: %4fA\n\r", Current_GetLowPrecReading()/1000.0);
 		case 's' : 
-			if (Current_IsSafe() == 0) {
-				printf("Safety Status: SAFE\n\r");
+			if (Current_IsSafe() == SAFE) {
+				printf("CurrentState: SAFE\n\r");
 			}
 			else {
 				printf("Safety Status: DANGER\n\r");
