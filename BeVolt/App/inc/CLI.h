@@ -21,7 +21,7 @@
 #include "SysTick.h"
 #include "UART.h"
 
-void CLI_Init(void);
+void CLI_Init(cell_asic* minions);
 
 void CLI_Handler(void);
 

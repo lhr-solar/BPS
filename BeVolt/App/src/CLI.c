@@ -11,11 +11,12 @@
 
 #define MAX_TOKEN_SIZE 4
 
+static cell_asic* Minions;
 char* tokens[MAX_TOKEN_SIZE];
-char buffer[100];
 // Fifo CLI_Fifo
 
-void CLI_Init(void) {
+void CLI_Init(cell_asic* minions) {
+	Minions = minions;
 	UART3_Init();
 }
 
@@ -75,7 +76,7 @@ void CLI_Help() {
  * Checks and displays the desired
  * voltage parameter(s)
  */
-void CLI_Voltage() {
+void CLI_Voltage(void) {
 	if(tokens[1] == NULL) {
 		for(int i = 0; i < NUM_BATTERY_MODULES; i++){
 			printf("Module number %d: %.3fV\n\r", i+1, Voltage_GetModuleMillivoltage(i)/1000.0);
@@ -129,7 +130,7 @@ void CLI_Voltage() {
  * Checks and displays the desired
  * current parameter(s)
  */
-void CLI_Current() {
+void CLI_Current(void) {
 	if(tokens[1] == NULL) {
 		printf("High: %.3fA\n\r", Current_GetHighPrecReading()/1000.0);	// Prints 4 digits, number, and A
 		printf("Low: %.3fA\n\r", Current_GetLowPrecReading()/1000.0);
@@ -168,7 +169,7 @@ void CLI_Current() {
  * Checks and displays the desired
  * temperature parameter(s)
  */
-void CLI_Temperature() {
+void CLI_Temperature(void) {
 	if(tokens[1] == NULL) {
 		for(int i = 0; i < NUM_BATTERY_MODULES; i++) {
 			printf("Module number %d: %.3f C\n\r", i+1, Temperature_GetModuleTemperature(i)/1000.0);
@@ -221,10 +222,17 @@ void CLI_Temperature() {
 	}
 }
 
+/** CLI_LTC6811
+ * Interacts with LTC6811 registers
+ */
+void CLI_LTC6811(void) {
+	printf("Config: ");
+}
+
 /** CLI_Contactor
  * Interacts with contactor status
  */
-void CLI_Contactor() {
+void CLI_Contactor(void) {
 	switch(tokens[1][0]) {
 		FunctionalState contactor = Contactor_Flag();
 		case 's':
@@ -244,16 +252,17 @@ void CLI_Contactor() {
  * Checks and displays the desired
  * state of charge parameter(s)
  */
-void CLI_Charge() {
-	int value;
-	switch(CLI_GetToken(1)[0]) {
-		case NULL : 
-			printf("The battery is at: %d\n\r", SoC_GetPercent());
-		case 'r' : 
-			SoC_SetAccum(0);//resets accumulator
-		case 's' : 
+void CLI_Charge(void) {
+	int accumVal;
+	if(tokens[1] == NULL) {
+		printf("The battery percentage is %.2f%%\n\r", SoC_GetPercent()/100.0);
+	}
+	switch(tokens[1][0]) {
+		case 'r':
+			SoC_SetAccum(0);	//resets accumulator
+		case 's':
 			//converts string to integer and passes value to accumulator function
-			SoC_SetAccum(sscanf(CLI_GetToken(2), "%d", &value)); 
+			SoC_SetAccum(sscanf(tokens[2], "%d", &accumVal));
 		default: 
 			printf("Invalid Charge Command");
 	}
@@ -273,7 +282,7 @@ void toggleLED(led input) {
 		printf("Invalid LED command");
 	}
 }
-void CLI_LED() {
+void CLI_LED(void) {
 	LED_Init();
 	// DelayInit();
 	uint8_t error = (GPIOB->ODR) & GPIO_Pin_12;
@@ -338,72 +347,116 @@ void CLI_LED() {
 
 /** CLI_CAN
  * Interacts with CAN
- * @param input command
  */
-void CLI_CAN(char *input) {
-	uint8_t data[8];
-	switch(CLI_GetToken(1)[0]){
-		case 'r':
-			CAN1_Read(data);
-			printf("CAN message: %s\n\r", data);  // 1 if data was read, 0 if data wasn't read
-			break;
-		
-		case 'w':
-			CAN1_Write(CLI_GetToken(2)[0],(uint8_t*)CLI_GetToken(3));
-			break;
-		
-		default:
-			printf("Invalid CAN command\n\r");
-			break;
-	}
-}
+void CLI_CAN(void) {}
 
 /** CLI_Display
  * Interacts with the display
- * @param input command
  */
-void CLI_Display(char *input) {}
+void CLI_Display(void) {}
 
 /** CLI_Watchdog
  * Interacts with the watchdog timer
- * @param input command
  */
-void CLI_Watchdog(char *input) {
-	switch(CLI_GetToken(1)[0]){
-		case NULL: 
-			printf("Safety Status: ");
-				if (WDTimer_DidSystemReset() == 0){
-					printf("SAFE");
-				} else if (WDTimer_DidSystemReset() == 1){
-					printf("DANGER");
-				}
-			printf("\n\r");
+void CLI_Watchdog(void) {
+	if(tokens[1] == NULL) {
+		printf("Safety Status: ");
+		if (WDTimer_DidSystemReset() == SAFE){
+			printf("SAFE\n\r");
+		} else if (WDTimer_DidSystemReset() == DANGER){
+			printf("DANGER\n\r");
+		}
+	}
+	uint8_t errorAddrArray[2];
+	EEPROM_ReadMultipleBytes(EEPROM_WATCHDOG_PTR_LOC, 2, errorAddrArray);
+	uint16_t errorAddr = (errorAddrArray[0] << 2) + errorAddrArray[1];
+	switch(tokens[1][0]) {
+		case 'e':
+			printf("Most recent Watchdog error: %d", EEPROM_ReadByte(errorAddr-1));
 			break;
-		
 		default:
-			printf("Invalid watchdog command\n\r");
+			printf("Invalid Watchdog command");
+			break;
 	}
 }
 
 /** CLI_EEPROM
  * Interacts with EEPROM
- * @param input command
  */
-void CLI_EEPROM(char *input) {}
+void CLI_EEPROM(void) {
+	if(tokens[1] == NULL) {
+		EEPROM_SerialPrintData();
+	}
+	uint8_t errorAddrArray[2];
+	uint16_t errorAddr = 0;
+	switch(tokens[1][0]) {
+		case 'r':
+			EEPROM_Reset();
+			printf("EEPROM has been reset");
+			break;
+		case 'e':
+			switch(tokens[2][0]) {
+				case 'f':
+					EEPROM_ReadMultipleBytes(EEPROM_FAULT_PTR_LOC, 2, errorAddrArray);
+					errorAddr = (errorAddrArray[0] << 2) + errorAddrArray[1];
+					printf("Fault error: %d", EEPROM_ReadByte(errorAddr-1));
+					break;
+				case 't':
+					EEPROM_ReadMultipleBytes(EEPROM_TEMP_PTR_LOC, 2, errorAddrArray);
+					errorAddr = (errorAddrArray[0] << 2) + errorAddrArray[1];
+					printf("Temperature error: %d", EEPROM_ReadByte(errorAddr-1));
+					break;
+				case 'v':
+					EEPROM_ReadMultipleBytes(EEPROM_VOLT_PTR_LOC, 2, errorAddrArray);
+					errorAddr = (errorAddrArray[0] << 2) + errorAddrArray[1];
+					printf("Voltage error: %d", EEPROM_ReadByte(errorAddr-1));
+					break;
+				case 'i':
+					EEPROM_ReadMultipleBytes(EEPROM_CURRENT_PTR_LOC, 2, errorAddrArray);
+					errorAddr = (errorAddrArray[0] << 2) + errorAddrArray[1];
+					printf("Current error: %d", EEPROM_ReadByte(errorAddr-1));
+					break;
+				case 'w':
+					EEPROM_ReadMultipleBytes(EEPROM_WATCHDOG_PTR_LOC, 2, errorAddrArray);
+					errorAddr = (errorAddrArray[0] << 2) + errorAddrArray[1];
+					printf("Watchdog error: %d", EEPROM_ReadByte(errorAddr-1));
+					break;
+				case 'c':
+					EEPROM_ReadMultipleBytes(EEPROM_CAN_PTR_LOC, 2, errorAddrArray);
+					errorAddr = (errorAddrArray[0] << 2) + errorAddrArray[1];
+					printf("CAN error: %d", EEPROM_ReadByte(errorAddr-1));
+					break;
+				case 's':
+					EEPROM_ReadMultipleBytes(EEPROM_SOC_PTR_LOC, 2, errorAddrArray);
+					errorAddr = (errorAddrArray[0] << 2) + errorAddrArray[1];
+					printf("SoC error: %d", EEPROM_ReadByte(errorAddr-1));
+					break;
+				default:
+					break;
+			}
+			break;
+		default:
+			break;
+	}
+}
 
 /** CLI_Peripherals
- * Interacts with the peripherals
- * @param input command
+ * Interacts with the ADC
  */
-void CLI_Peripherals(char *input) {}
+void CLI_ADC(void) {
+	printf("High precision ADC: %d\n\r", ADC_ReadHigh());
+	printf("Low precision ADC: %d\n\r", ADC_ReadLow());
+}
 
 /** CLI_Critical
  * Checks and displays the desired
  * voltage parameter(s)
- * @param input command
  */
-void CLI_Critical() {}
-	
+void CLI_Critical(void) {
+	Contactor_Off();
+	printf("Contactor is off");
+}
+
 /** CLI_Commands
  * Routes the command given to the proper
  * measurement method to check the desired values
@@ -411,7 +464,7 @@ void CLI_Critical() {}
 void CLI_Commands(char *input){	
 	CLI_InputParse(input);
 	printf("Hello! Welcome to the BPS System! I am your worst nightmare...\n\r");
-	printf("Please enter a command (Type 'h', 'm', or '?' to see a list of commands) \n\r");
+	printf("Please enter a command (Type 'h', 'm', or '?' to see a list of commands)\n\r");
 	switch(input[0]) {
 		// Help menu
 		case 'h':
@@ -435,6 +488,11 @@ void CLI_Commands(char *input){
 			CLI_Temperature();
 			break;
 		
+		// LTC6811 register commands
+		case 'r':
+			CLI_LTC6811();
+			break;
+		
 		// Contactor/Switch commands
 		case 's':
 			CLI_Contactor();
@@ -453,27 +511,27 @@ void CLI_Commands(char *input){
 		
 		// CAN commands
 		case 'c':
-			CLI_CAN(input);
+			CLI_CAN();
 			break;
 		
 		// Display commands
 		case 'd':
-			CLI_Display(input);
+			CLI_Display();
 			break;
 		
 		// Watchdog commands
 		case 'w':
-			CLI_Watchdog(input);
+			CLI_Watchdog();
 			break;
 		
 		// EEPROM commands
 		case 'e':
-			CLI_EEPROM(input);
+			CLI_EEPROM();
 			break;
 		
 		// Peripheral commands
-		case 'p':
-			CLI_Peripherals(input);
+		case 'a':
+			CLI_ADC();
 			break;
 		
 		// Emergency Abort
