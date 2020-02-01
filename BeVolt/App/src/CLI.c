@@ -74,9 +74,8 @@ void CLI_Help() {
 /** CLI_Voltage
  * Checks and displays the desired
  * voltage parameter(s)
- * @param input command
  */
-void CLI_Voltage(char *input) {
+void CLI_Voltage() {
 	if(tokens[1] == NULL) {
 		for(int i = 0; i < NUM_BATTERY_MODULES; i++){
 			printf("Module number ");
@@ -136,9 +135,8 @@ void CLI_Voltage(char *input) {
 /** CLI_Current
  * Checks and displays the desired
  * current parameter(s)
- * @param input command
  */
-void CLI_Current(char *input) {
+void CLI_Current() {
 	if(tokens[1] == NULL) {
 		printf("High: %.3fA\n\r", Current_GetHighPrecReading()/1000.0);	// Prints 4 digits, number, and A
 		printf("Low: %.3fA\n\r", Current_GetLowPrecReading()/1000.0);
@@ -178,15 +176,14 @@ void CLI_Current(char *input) {
 /** CLI_Temperature
  * Checks and displays the desired
  * temperature parameter(s)
- * @param input command
  */
-void CLI_Temperature(char *input) {
+void CLI_Temperature() {
 	if(tokens[1] == NULL) {
 		for(int i = 0; i < NUM_BATTERY_MODULES; i++){
 			printf("Module number ");
 			printf("%d", i+1);
 			printf(": ");
-			printf("%.3f�C",Temperature_GetModuleTemperature(i)/1000.0);
+			printf("%.3f°C",Temperature_GetModuleTemperature(i)/1000.0);
 			printf("\n\r");
 	}
 	switch(CLI_GetToken(1)[0]){			
