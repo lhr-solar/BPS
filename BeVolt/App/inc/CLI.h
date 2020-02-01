@@ -35,6 +35,7 @@ void CLI_Handler(void);
  */
 void CLI_Commands(char *input);
 
+<<<<<<< HEAD
 /** CLI_Startup
  * Asks if batteries needs to be charged
  * @return true or false
