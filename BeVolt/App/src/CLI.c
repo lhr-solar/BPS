@@ -16,11 +16,11 @@ char buffer[100];
 // Fifo CLI_Fifo
 
 void CLI_Init(void) {
-	UART3_Init(115200);
+	UART3_Init();
 }
 
 void CLI_Handler(void) {
-	static char command[128] = "led ovolt on";
+	static char command[128] = "temperature total";
 	CLI_Commands(command);
 }
 
@@ -53,22 +53,22 @@ char* CLI_GetToken(uint8_t idx) {
  * @return true or false
  */
 bool CLI_Startup(void) {
-	printf("Do you need to charge the batteries? (y/n)\r\n");
+	printf("Do you need to charge the batteries? (y/n)\n\r");
 	//TODO: Fill in UART input
 }
 /** CLI_Help
  * Displays the help menu
  */
 void CLI_Help() {
-	printf("-------------------Help Menu-------------------\r\n");
-	printf("The available commands are: \r\n");
-	printf("Voltage (v)\tCurrent (i)\tTemperature (t)\r\n");
-	printf("Contactor/Switch (sw)\tCharge (q)\tError Light (l)\r\n");
-	printf("CAN (c)\tEEPROM (ee)\tDisplay(d)\r\n");
-	printf("LTC (ltc)\tWatchdog(w)\tADC(adc)\r\n");
-	printf("Critical/Abort (!)\tAll(a)\r\n");
-	printf("Keep in mind: all values are 1-indexed\r\n");
-	printf("-----------------------------------------------\r\n");
+	printf("-------------------Help Menu-------------------\n\r");
+	printf("The available commands are: \n\r");
+	printf("Voltage (v)\tCurrent (i)\tTemperature (t)\n\r");
+	printf("Contactor/Switch (sw)\tCharge (q)\tError Light (l)\n\r");
+	printf("CAN (c)\tEEPROM (ee)\tDisplay(d)\n\r");
+	printf("LTC (ltc)\tWatchdog(w)\tADC(adc)\n\r");
+	printf("Critical/Abort (!)\tAll(a)\n\r");
+	printf("Keep in mind: all values are 1-indexed\n\r");
+	printf("-----------------------------------------------\n\r");
 }	// TODO: Put a logo into ASCII as part of the help menu
 
 /** CLI_Voltage
@@ -78,11 +78,7 @@ void CLI_Help() {
 void CLI_Voltage() {
 	if(tokens[1] == NULL) {
 		for(int i = 0; i < NUM_BATTERY_MODULES; i++){
-			printf("Module number ");
-			printf("%d", i+1);
-			printf(": ");
-			printf("%.3fV",Voltage_GetModuleMillivoltage(i)/1000.0);
-			printf("\n\r");
+			printf("Module number %d: %.3fV\n\r", i+1, Voltage_GetModuleMillivoltage(i)/1000.0);
 		}
 		return;
 	}
@@ -95,19 +91,17 @@ void CLI_Voltage() {
 				printf("Invalid module number");
 			}
 			else {
-				printf("Module number %d: %.3fV\n\r", modNum, (Voltage_GetModuleMillivoltage(modNum-1)/1000.0));
+				printf("Module number %d: %.3fV\n\r", modNum, Voltage_GetModuleMillivoltage(modNum-1)/1000.0);
 			}
 			break;
-		
 		// Total
 		case 't':
-			printf("Total voltage: %.3fV\n\r",Voltage_GetTotalPackVoltage()/1000.0);
+			printf("Total voltage: %.3fV\n\r", Voltage_GetTotalPackVoltage()/1000.0);
 			break;
-		
 		// Safety Status
 		case 's':	
 			printf("Safety Status: ");
-				SafetyStatus voltage = Voltage_IsSafe();
+				SafetyStatus voltage = Voltage_CheckStatus();
 				switch(voltage) {
 					case SAFE: 
 						printf("SAFE\n\r");
@@ -126,8 +120,7 @@ void CLI_Voltage() {
 				}		
 				break;
 		default:
-			printf("Invalid voltage command");
-			printf("\n\r");
+			printf("Invalid voltage command\n\r");
 			break;
 	}
 }
@@ -150,7 +143,7 @@ void CLI_Current() {
 			printf("Low: %.3fA\n\r", Current_GetLowPrecReading()/1000.0);
 			break;
 		case 's' : 
-			if (Current_IsSafe() == SAFE) {
+			if (Current_CheckStatus() == SAFE) {
 				printf("Safety Status: SAFE\n\r");
 			}
 			else {
@@ -171,63 +164,67 @@ void CLI_Current() {
 		}
 }
 
-
-// TODO: Reconfigure the temperature CLI functions
 /** CLI_Temperature
  * Checks and displays the desired
  * temperature parameter(s)
  */
 void CLI_Temperature() {
 	if(tokens[1] == NULL) {
-		for(int i = 0; i < NUM_BATTERY_MODULES; i++){
-			printf("Module number ");
-			printf("%d", i+1);
-			printf(": ");
-			printf("%.3f°C",Temperature_GetModuleTemperature(i)/1000.0);
-			printf("\n\r");
+		for(int i = 0; i < NUM_BATTERY_MODULES; i++) {
+			printf("Module number %d: %.3f C\n\r", i+1, Temperature_GetModuleTemperature(i)/1000.0);
+		}
+		return;
 	}
-	switch(CLI_GetToken(1)[0]){			
+	uint16_t modNum = 0;
+	uint16_t sensNum = 0;
+	sscanf(tokens[2], "%d", (int*) &modNum);
+	sscanf(tokens[3], "%d", (int*) &sensNum);
+	modNum--;
+	sensNum--;
+	switch(tokens[1][0]){			
 		// All temperature sensors
 		case 'a':
-			// Print out temperature of all the temperatures sensors on every module 
+			for(int i = 0; i < NUM_MINIONS; i++) {		// last minion only has 14 sensors
+				for(int j = 0; j < MAX_TEMP_SENSORS_PER_MINION_BOARD; j++) {
+					if(i == 3 && j > 13) {
+						break;
+					}
+					printf("Sensor number %d: %.3f C\n\r",(i*MAX_TEMP_SENSORS_PER_MINION_BOARD)+j+1, Temperature_GetSingleTempSensor(i, j)/1000.0);
+				}
+			}
 			break;
-			
 		// Temperature of specific module
-		char modNum = CLI_GetToken(2)[0]-1;
-		char sensNum = CLI_GetToken(3)[0]-1;
 		case 'm':
-			if (modNum == NULL || modNum > NUM_BATTERY_MODULES || modNum < 0){
+			if (tokens[2] == NULL || modNum > NUM_BATTERY_MODULES || modNum < 0){
 				printf("Invalid module number");
 			}
 			else {
-				printf("Module number ");
-				printf("%c", modNum+1);
-				printf(": ");
-				printf("%.3f�C",Temperature_GetModuleTemperature(modNum)/1000.0);
-				printf("\n\r");
-				// Should also print out temperature of sensor if specified
+				if(tokens[3] == NULL) {
+					printf("Module number %d: %.3f C\n\r", modNum+1, Temperature_GetModuleTemperature(modNum)/1000.0);
+				} else if(tokens[3] != NULL && (sensNum == 0 || sensNum == 1)) {
+					uint16_t boardNum = modNum/MAX_VOLT_SENSORS_PER_MINION_BOARD;
+					uint16_t absSensNum = modNum/(2*MAX_TEMP_SENSORS_PER_MINION_BOARD) + sensNum;
+					printf("Sensor %d on module %d: %.3f C\n\r", sensNum+1, modNum+1, 
+							Temperature_GetSingleTempSensor(boardNum, sensNum)/1000.0);
+				} else {
+					printf("Invalid sensor number");
+				}
 			}
 			break;
-			
 		// Average temperature of the whole pack
 		case 't':
-			printf("Total average temperature: ");
-			printf("%.3f�C", Temperature_GetTotalPackAvgTemperature()/1000.0); 
-			printf("\n\r");
+			printf("Total average temperature: %.3f C\n\r", Temperature_GetTotalPackAvgTemperature()/1000.0);
 			break;
-			
 		default:
-			printf("Invalid temperature command");
-			printf("\n\r");
+			printf("Invalid temperature command\n\r");
 			break;
 	}
 }
 
 /** CLI_Contactor
  * Interacts with contactor status
- * @param input command
  */
-void CLI_Contactor(char *input) {
+void CLI_Contactor() {
 	switch(tokens[1][0]) {
 		FunctionalState contactor = Contactor_Flag();
 		case 's':
@@ -237,7 +234,7 @@ void CLI_Contactor(char *input) {
 				printf("Contactor is Disabled");
 			break;
 		default:
-			printf("Invalid contactor command\r\n");
+			printf("Invalid contactor command\n\r");
 			break;
 		}
 	}
@@ -246,9 +243,8 @@ void CLI_Contactor(char *input) {
 /** CLI_Charge
  * Checks and displays the desired
  * state of charge parameter(s)
- * @param input command
  */
-void CLI_Charge(char *input) {
+void CLI_Charge() {
 	int value;
 	switch(CLI_GetToken(1)[0]) {
 		case NULL : 
@@ -265,7 +261,6 @@ void CLI_Charge(char *input) {
 
 /** CLI_LED
  * Interacts with the LEDs
- * @param input command
  */
 	
 void toggleLED(led input) {
@@ -284,9 +279,9 @@ void CLI_LED() {
 	uint8_t error = (GPIOB->ODR) & GPIO_Pin_12;
 	if(tokens[1] == NULL) {
 		if(error) {
-			printf("Error light is On\r\n");
+			printf("Error light is On\n\r");
 		} else {
-			printf("Error light is Off\r\n");
+			printf("Error light is Off\n\r");
 		}
 	}
 	switch(tokens[1][0]) {
@@ -415,8 +410,8 @@ void CLI_Critical() {}
  */
 void CLI_Commands(char *input){	
 	CLI_InputParse(input);
-	printf("Hello! Welcome to the BPS System! I am your worst nightmare...\r\n");
-	printf("Please enter a command (Type 'h', 'm', or '?' to see a list of commands) \r\n");
+	printf("Hello! Welcome to the BPS System! I am your worst nightmare...\n\r");
+	printf("Please enter a command (Type 'h', 'm', or '?' to see a list of commands) \n\r");
 	switch(input[0]) {
 		// Help menu
 		case 'h':
@@ -427,28 +422,28 @@ void CLI_Commands(char *input){
 		
 		// Voltage commands
 		case 'v':
-			CLI_Voltage(input);
+			CLI_Voltage();
 			break;
 		
 		// Current commands
 		case 'i':
-			CLI_Current(input);
+			CLI_Current();
 			break;
 		
 		// Temperature commands
 		case 't':
-			CLI_Temperature(input);
+			CLI_Temperature();
 			break;
 		
 		// Contactor/Switch commands
 		case 's':
-			CLI_Contactor(input);
+			CLI_Contactor();
 			break;
 		
 		// State of Charge commands
 		case 'q':
 		case '%':
-			CLI_Charge(input);
+			CLI_Charge();
 			break;
 		
 		// Error light commands
@@ -490,142 +485,4 @@ void CLI_Commands(char *input){
 			printf("Invalid command. Type 'h' or 'm' or '?' for the help menu");
 			break;
 	}
-	//char* measurement;
-  //char* function;
-  //char* parameter;
-	//parameter = NULL;
-	//uint8_t word = 0;
-/*
-	// Parsing the input string and tokenizing into the variables
-	while(split != NULL) {
-    if (word == 0){
-      measurement = split;
-    }
-		else if (word == 1){
-      function = split;
-    }
-		else if (word == 2){
-      parameter = split;
-    }
-    split = strtok_r(NULL, " ", &saveptr);
-    word++;
-	}
-	// Voltage commands
-	if(strcmp(measurement, "voltage") == 0){
-		if(strcmp(function, "check") == 0){
-			if(parameter == NULL){			// All modules
-				for(int i = 0; i<12; i++){
-					printf("\n\r%d", i);
-					printf("th module: ");
-					printf("%d",Voltage_GetModuleMillivoltage(i));
-				}
-				printf("\n\r");
-			}else{			// Specific module
-				printf("\n\r%c", *parameter);
-				printf("th module: ");
-				printf("%d",Voltage_GetModuleMillivoltage(*parameter));
-				printf("\n\r");
-			}
-		}
-		else if (strcmp(function,"safe") == 0){		// Check SafetyStatus
-			printf("\n\r");
-			SafetyStatus voltage = Voltage_IsSafe();
-			switch(voltage) {
-				case SAFE: 
-					printf("SAFE");
-					break;
-				case DANGER: 
-					printf("DANGER");
-					break;
-				case OVERVOLTAGE:
-					printf("OVERVOLTAGE");
-					break;
-				case UNDERVOLTAGE: 
-					printf("UNDERVOLTAGE");
-					break;
-				default:
-					break;
-			}
-			printf("\n\r");
-		}
-		else if (strcmp(function,"total") == 0) {			// Total pack voltage
-			printf("\n\rTotal voltage: ");
-			printf("%d",Voltage_GetTotalPackVoltage());
-			printf("\n\r");
-		}					
-  }
-	// Current commands
-	else if (strcmp(measurement,"current") == 0){
-		if (strcmp(function,"safe") == 0) {		// Check SafetyStatus
-			printf("\n\r");
-			SafetyStatus current = Current_IsSafe();
-			switch(current){
-				case SAFE:
-					printf("SAFE");
-					break;
-				case DANGER: 
-					printf("DANGER");
-					break;
-				default:
-					break;
-			}
-			printf("\n\r");			
-		}
-		else if (strcmp(function,"charging") == 0){
-			printf("\n\r");
-			uint8_t charge = Current_IsCharging();
-			switch(charge){
-				case 0: 
-					printf("DISCHARGING");
-					break;
-				case 1:
-					printf("CHARGING");
-					break;
-				default:
-					break;
-			}
-			printf("\n\r");			
-		}
-		else if (strcmp(function,"high") == 0){			// High precision current reading
-			printf("\n\r");		
-			printf("%d",Current_GetHighPrecReading());
-			printf("\n\r");			
-		}
-		else if (strcmp(function,"low") == 0){		// Low precision current reading
-			printf("\n\r");	
-			printf("%d",Current_GetLowPrecReading());
-			printf("\n\r");			
-		}
-  }
-	// Temperature commands
-	else if (strcmp(measurement,"temp") == 0){
-		if (strcmp(function,"average") == 0){		// Average pack temperature
-			printf("\n\r");		
-			printf("%d",Temperature_GetTotalPackAvgTemperature());
-			printf("\n\r");			
-		}
-		else if (strcmp(function,"charge") == 0){		// Set charge state
-			if(parameter != NULL){
-				Temperature_SetChargeState(*parameter);
-				printf("%d",*parameter);	
-				printf("\n\r");
-			}else{
-				printf("Please provide a charge state (1 for charging, 0 for discharging)");
-			}
-		}
-		else if (strcmp(function,"check") == 0){		// Get module temperatures
-			if (parameter == NULL){			
-				for (int i = 0; i<12; i++){
-					printf("%d",Temperature_GetModuleTemperature(i));
-					printf("\n\r");
-					}
-				}else { 
-					printf("%d",Temperature_GetModuleTemperature(*parameter));
-					printf("\n\r");		
-				}
-		}
-	}else{
-		printf("Invalid measurement. Enter a valid measurement and function");
-	}
-	*/
 }

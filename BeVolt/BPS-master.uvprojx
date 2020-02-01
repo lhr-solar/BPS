@@ -552,6 +552,16 @@
               <FileType>1</FileType>
               <FilePath>.\Periphs\src\SysTick.c</FilePath>
             </File>
+            <File>
+              <FileName>PLL.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Periphs\src\PLL.c</FilePath>
+            </File>
+            <File>
+              <FileName>fifo.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Periphs\src\fifo.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -596,6 +606,11 @@
               <FileName>SysTick.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\Periphs\inc\SysTick.h</FilePath>
+            </File>
+            <File>
+              <FileName>PLL.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Periphs\inc\PLL.h</FilePath>
             </File>
           </Files>
         </Group>

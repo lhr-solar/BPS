@@ -75,7 +75,6 @@ int realmain(){
  *		- Give wrappers (Voltage, Current, Temperature) the limits
  */
 void initialize(void){
-	PLL_Init80MHz();
 	LED_Init();
 	Contactor_Init();
 	Contactor_Off();
