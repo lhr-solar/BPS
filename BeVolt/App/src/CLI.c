@@ -230,6 +230,7 @@ void CLI_Temperature() {
 void CLI_Contactor(char *input) {
 	switch(tokens[1][0]) {
 		FunctionalState contactor = Contactor_Flag();
+		case 's':
 			if(contactor == ENABLE) {
 				printf("Contactor is Enabled");
 			} else {
@@ -241,7 +242,10 @@ void CLI_Contactor(char *input) {
 		}
 	}
 }
-/**
+
+/** CLI_Charge
+ * Checks and displays the desired
+ * state of charge parameter(s)
  * @param input command
  */
 void CLI_Charge(char *input) {
@@ -337,7 +341,9 @@ void CLI_LED() {
 	}
 }
 
-/** CLI_ErrorLight
+/** CLI_CAN
+ * Interacts with CAN
+ * @param input command
  */
 void CLI_CAN(char *input) {
 	uint8_t data[8];

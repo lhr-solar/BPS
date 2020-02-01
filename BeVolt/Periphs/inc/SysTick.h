@@ -28,7 +28,10 @@ void DelayUs(uint32_t us);
  */
 void DelayMs(uint32_t ms);
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 #endif 
 =======
 >>>>>>> Updated CLI with more explicit variables and documentation
+=======
+>>>>>>> 1348864e8fe5fd3561749cb6c0087fd5f40756db

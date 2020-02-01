@@ -25,10 +25,6 @@ void CLI_Init(void);
 
 void CLI_Handler(void);
 
-void CLI_Init(void);
-
-void CLI_Handler(void);
-
 /** CLI_Commands
  * Routes the command given to the proper
  * measurement method to check the desired values
