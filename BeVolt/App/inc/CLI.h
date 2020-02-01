@@ -14,6 +14,8 @@
 #include "Temperature.h"
 #include "Contactor.h"
 #include "config.h"
+#include "SoC.h"
+#include "CAN.h"
 
 
 /** CLI_Commands
