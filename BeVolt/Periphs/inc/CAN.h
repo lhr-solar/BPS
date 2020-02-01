@@ -11,11 +11,8 @@
 #include "config.h"
 
 // Generic BPS ID
-<<<<<<< HEAD
 #define CAN_ID_BPS										(0x100)
-=======
-#define CAN_ID_BPS										(0x01 << 8)
->>>>>>> 74f5a2d9b98e205f2e143384cfd50398810466f6
+
 // Specific BPS IDs
 #define CAN_ID_BPS_TRIP								(0x002)
 #define CAN_ID_BPS_ALL_CLEAR					(CAN_ID_BPS | 0x01)
