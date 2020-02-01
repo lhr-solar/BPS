@@ -139,29 +139,37 @@ void CLI_Voltage(char *input) {
  * @param input command
  */
 void CLI_Current(char *input) {
-	switch (CLI_GetToken(1)[0]) {
-		case NULL : // both precision readings
-			printf("High: %4fA\n\r", Current_GetHighPrecReading()/1000.0);//prints 4 digits, number, and A
-			printf("Low: %4fA\n\r", Current_GetLowPrecReading()/1000.0);
-		case 'h' : //high precision reading
-			printf("High: %4fA\n\r", Current_GetHighPrecReading()/1000.0);
-		case 'l' : //low precision reading
-			printf("Low: %4fA\n\r", Current_GetLowPrecReading()/1000.0);
-		case 's' : //safety status
-			if (Current_IsSafe() == 0) {
+	if(tokens[1] == NULL) {
+		printf("High: %.3fA\n\r", Current_GetHighPrecReading()/1000.0);	// Prints 4 digits, number, and A
+		printf("Low: %.3fA\n\r", Current_GetLowPrecReading()/1000.0);
+		return;
+	}
+	switch (tokens[1][0]) {
+		case 'h' : // High precision reading
+			printf("High: %.3fA\n\r", Current_GetHighPrecReading()/1000.0);
+			break;
+		case 'l' : // Low precision reading
+			printf("Low: %.3fA\n\r", Current_GetLowPrecReading()/1000.0);
+			break;
+		case 's' : 
+			if (Current_IsSafe() == SAFE) {
 				printf("Safety Status: SAFE\n\r");
 			}
 			else {
 				printf("Safety Status: DANGER\n\r");
 			}
-		case 'c' : //whether battery is charging
+			break;
+		case 'c' : // Whether battery is charging
 			if (Current_IsCharging() == 0) {
 				printf("Charging State: CHARGING\n\r");
 			}
 			else {
 				printf("Charging State: DISCHARGING\n\r");
 			}
-		default: printf("Invalid Current Command\n\r");
+			break;
+		default:
+			printf("Invalid Current Command\n\r");
+			break;
 		}
 }
 
@@ -181,18 +189,7 @@ void CLI_Temperature(char *input) {
 			printf("%.3f�C",Temperature_GetModuleTemperature(i)/1000.0);
 			printf("\n\r");
 	}
-	switch(CLI_GetToken(1)[0]){
-		// Average temperature of modules
-		case NULL:
-			for(int i = 0; i < NUM_BATTERY_MODULES; i++){
-					printf("Module number ");
-					printf("%d", i+1);
-					printf(": ");
-					printf("%.3f�C",Temperature_GetModuleTemperature(i)/1000.0);
-					printf("\n\r");
-			}
-			break;
-			
+	switch(CLI_GetToken(1)[0]){			
 		// All temperature sensors
 		case 'a':
 			// Print out temperature of all the temperatures sensors on every module 

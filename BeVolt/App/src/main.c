@@ -205,6 +205,9 @@ void faultCondition(void){
 //		following:
 //		#define LTC6811_TEST
 #define CLI_TEST
+
+#ifdef LED_TEST
+#include "LED.h"
 void LEDdelay(int time){
 	for(int i = 0; i < time; i++);
 }

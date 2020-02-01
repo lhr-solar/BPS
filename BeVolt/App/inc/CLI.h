@@ -21,6 +21,9 @@
 #include "SysTick.h"
 #include "UART.h"
 
+void CLI_Init(void);
+
+void CLI_Handler(void);
 
 void CLI_Init(void);
 
