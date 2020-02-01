@@ -15,8 +15,10 @@
 #include "LED.h"
 #include "SysTick.h"
 #include "PLL.h"
+#include "CLI.h"
 
 cell_asic Minions[NUM_MINIONS];
+bool override = false;		// This will be changed by user via CLI	
 
 void initialize(void);
 void preliminaryCheck(void);
@@ -30,7 +32,10 @@ int realmain(){
 
 	WDTimer_Start();
 
+<<<<<<< HEAD
 	bool override = false;		// This will be changed by user via CLI
+=======
+>>>>>>> Contactor startup function created; need to implement UART input
 	while(1){
 		// First update the measurements.
 		Voltage_UpdateMeasurements();
@@ -99,6 +104,7 @@ void preliminaryCheck(void){
 		LED_On(WDOG);
 		while(1);		// Spin
 	}
+	override = CLI_Startup();			// Ask if need to charge the batteries
 }
 
 /** faultCondition

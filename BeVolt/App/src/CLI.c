@@ -35,6 +35,14 @@ char* CLI_GetToken(uint8_t idx) {
 	return tokens[idx];
 }
 
+/** CLI_Startup
+ * Asks if batteries needs to be charged
+ * @return true or false
+ */
+bool CLI_Startup() {
+	printf("Do you need to charge the batteries? (y/n)\r\n");
+	//TODO: Fill in UART input
+}
 /** CLI_Help
  * Displays the help menu
  * @param input command
