@@ -342,8 +342,6 @@ void CLI_LED() {
 			break;
 	}
 }
-=======
-void CLI_Charge(char *input) {}
 
 /** CLI_ErrorLight
  */
