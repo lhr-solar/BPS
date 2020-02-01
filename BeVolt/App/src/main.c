@@ -202,7 +202,7 @@ void faultCondition(void){
 // E.g. If you want to run a LTC6811 test, change "#define CHANGE_THIS_TO_TEST_NAME" to the
 //		following:
 //		#define LTC6811_TEST
-#define FULL_TEST
+#define VOLTAGE_TEST
 
 
 #ifdef LED_TEST
@@ -315,7 +315,7 @@ void print_config(cell_asic *bms_ic)
 #include "UART.h"
 
 int main(){
-	UART3_Init(115200);
+	UART3_Init();
 	LED_Init();
 	Contactor_Init();
 
@@ -338,7 +338,7 @@ int main(){
 	}
 
 	for(int i = 0; i < NUM_BATTERY_MODULES; i++){
-		printf("Battery module %d voltage is %d \r\n", i, Voltage_GetModuleVoltage(i));
+		printf("Battery module %d voltage is %d \r\n", i, Voltage_GetModuleMillivoltage(i));
 	}
 
 	faultCondition();
@@ -999,4 +999,47 @@ int main(void) {
 }
 
 
+#endif
+
+#ifdef CAN_TEST_2
+#include "CAN.h"
+/*message:
+typedef enum {
+	TRIP = 0x02,
+	ALL_CLEAR = 0x101,
+	CONTACTOR_STATE = 0x102,
+	CURRENT_DATA = 0x103,
+	VOLT_DATA = 0x104,
+	TEMP_DATA = 0x105,
+	SOC_DATA = 0x106,
+	WDOG_TRIGGERED = 0x107,
+	CAN_ERROR = 0x108,
+} CANMessage_t;
+data: 
+typedef union {
+	uint8_t b;
+	uint16_t h;
+	uint32_t w;
+	float f;
+} CANData_t;
+data is either a float, uint32_t, or uint8_t
+*/
+
+int main(void){
+	PLL_Init80MHz();
+	uint8_t a = 0;
+	uint32_t b = 30000;
+	uint16_t d = 30000;
+	float c = 80.00;
+	CAN1_Init(CAN_Mode_Normal);
+	CAN1_Send(TRIP, (CANData_t) a);
+	CAN1_Send(ALL_CLEAR, (CANData_t) a);
+	CAN1_Send(CONTACTOR_STATE, (CANData_t) a);
+	CAN1_Send(CURRENT_DATA, (CANData_t) b);
+	CAN1_Send(VOLT_DATA, (CANData_t) d);
+	CAN1_Send(TEMP_DATA, (CANData_t) b);
+	CAN1_Send(SOC_DATA, (CANData_t) c);
+	CAN1_Send(WDOG_TRIGGERED, (CANData_t) a);
+	CAN1_Send(CAN_ERROR, (CANData_t) a);
+}
 #endif
