@@ -129,37 +129,35 @@ void CLI_Voltage(char *input) {
 		default:
 			printf("Invalid voltage command");
 			printf("\n\r");
-			break;
 	}
 }
-
-/** CLI_Current
- * Checks and displays the desired
- * current parameter(s)
- * @param input command
- */
-void CLI_Current(char *input) {
-	if(tokens[1] == NULL) {
-		printf("High: %.3fA\n\r", Current_GetHighPrecReading()/1000.0);	// Prints 4 digits, number, and A
-		printf("Low: %.3fA\n\r", Current_GetLowPrecReading()/1000.0);
-		return;
-	}
-	switch (tokens[1][0]) {
-		case 'h' : // High precision reading
-			printf("High: %.3fA\n\r", Current_GetHighPrecReading()/1000.0);
+		case 'T':
+			printf("\n\rTotal voltage: ");
+			printf("%d",Voltage_GetTotalPackVoltage());
+			printf("\n\r");
 			break;
-		case 'l' : // Low precision reading
-			printf("Low: %.3fA\n\r", Current_GetLowPrecReading()/1000.0);
+		
+		// Safety Status
+		case 's':
+		case 'S':		
+			printf("\n\r");
+				SafetyStatus voltage = Voltage_IsSafe();
+				switch(voltage) {
+					case SAFE: 
+						printf("SAFE");
+						break;
+					case DANGER: 
+						printf("DANGER");
+						break;
+					case OVERVOLTAGE:
+						printf("OVERVOLTAGE");
+						break;
+					case UNDERVOLTAGE: 
+						printf("UNDERVOLTAGE");
+						break;
+					default:
+						break;
 			break;
-		case 's' : 
-			if (Current_IsSafe() == SAFE) {
-				printf("Safety Status: SAFE\n\r");
-			}
-			else {
-				printf("Safety Status: DANGER\n\r");
-			}
-			break;
-		case 'c' : // Whether battery is charging
 			if (Current_IsCharging() == 0) {
 				printf("Charging State: CHARGING\n\r");
 			}
