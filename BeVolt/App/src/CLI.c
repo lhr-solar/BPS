@@ -138,8 +138,7 @@ void CLI_Voltage(char *input) {
 			break;
 		
 		// Safety Status
-		case 's':
-		case 'S':		
+		case 's':	
 			printf("\n\r");
 				SafetyStatus voltage = Voltage_IsSafe();
 				switch(voltage) {
