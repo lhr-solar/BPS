@@ -140,21 +140,21 @@ void CLI_Voltage(char *input) {
  */
 void CLI_Current(char *input) {
 	switch (CLI_GetToken(1)[0]) {
-		case NULL : 
+		case NULL : // both precision readings
 			printf("High: %4fA\n\r", Current_GetHighPrecReading()/1000.0);//prints 4 digits, number, and A
 			printf("Low: %4fA\n\r", Current_GetLowPrecReading()/1000.0);
-		case 'h' : 
+		case 'h' : //high precision reading
 			printf("High: %4fA\n\r", Current_GetHighPrecReading()/1000.0);
-		case 'l' : 
+		case 'l' : //low precision reading
 			printf("Low: %4fA\n\r", Current_GetLowPrecReading()/1000.0);
-		case 's' : 
+		case 's' : //safety status
 			if (Current_IsSafe() == 0) {
 				printf("Safety Status: SAFE\n\r");
 			}
 			else {
 				printf("Safety Status: DANGER\n\r");
 			}
-		case 'c' : 
+		case 'c' : //whether battery is charging
 			if (Current_IsCharging() == 0) {
 				printf("Charging State: CHARGING\n\r");
 			}
@@ -178,7 +178,7 @@ void CLI_Temperature(char *input) {
 					printf("Module number ");
 					printf("%d", i+1);
 					printf(": ");
-					printf("%.3f°C",Temperature_GetModuleTemperature(i)/1000.0);
+					printf("%.3fï¿½C",Temperature_GetModuleTemperature(i)/1000.0);
 					printf("\n\r");
 			}
 			break;
@@ -199,7 +199,7 @@ void CLI_Temperature(char *input) {
 				printf("Module number ");
 				printf("%c", modNum+1);
 				printf(": ");
-				printf("%.3f°C",Temperature_GetModuleTemperature(modNum)/1000.0);
+				printf("%.3fï¿½C",Temperature_GetModuleTemperature(modNum)/1000.0);
 				printf("\n\r");
 				// Should also print out temperature of sensor if specified
 			}
@@ -208,7 +208,7 @@ void CLI_Temperature(char *input) {
 		// Average temperature of the whole pack
 		case 't':
 			printf("Total average temperature: ");
-			printf("%.3f°C", Temperature_GetTotalPackAvgTemperature()/1000.0); 
+			printf("%.3fï¿½C", Temperature_GetTotalPackAvgTemperature()/1000.0); 
 			printf("\n\r");
 			break;
 			
@@ -244,7 +244,20 @@ void CLI_Contactor(char *input) {
  * state of charge parameter(s)
  * @param input command
  */
-void CLI_Charge(char *input) {}
+void CLI_Charge(char *input) {
+	int value;
+	switch(CLI_GetToken(1)[0]) {
+		case NULL : 
+			printf("The battery is at: %d\n\r", SoC_GetPercent());
+		case 'r' : 
+			SoC_SetAccum(0);//resets accumulator
+		case 's' : 
+			//converts string to integer and passes value to accumulator function
+			SoC_SetAccum(sscanf(CLI_GetToken(2), "%d", &value)); 
+		default: 
+			printf("Invalid Charge Command");
+	}
+}
 
 /** CLI_ErrorLight
  * Interacts with the error light
