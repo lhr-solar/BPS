@@ -129,6 +129,7 @@ void CLI_Voltage(char *input) {
 		default:
 			printf("Invalid voltage command");
 			printf("\n\r");
+			break;
 	}
 }
 
@@ -179,25 +180,19 @@ void CLI_Temperature(char *input) {
 			printf(": ");
 			printf("%.3f�C",Temperature_GetModuleTemperature(i)/1000.0);
 			printf("\n\r");
-		}
 	}
-	switch(CLI_GetToken(1)[0]){			
-		// All temperature sensors
-		case 'a':
-			// Print out temperature of all the temperatures sensors on every module 
-			break;
-			
-		// Temperature of specific module
-		char modNum = CLI_GetToken(2)[0]-1;
-		char sensNum = CLI_GetToken(3)[0]-1;
+	switch(CLI_GetToken(1)[0]){
+		// Average temperature of modules
+		case NULL:
+			for(int i = 0; i < NUM_BATTERY_MODULES; i++){
+					printf("Module number ");
+					printf("%d", i+1);
+					printf(": ");
 		case 'm':
 			if (modNum == NULL || modNum > NUM_BATTERY_MODULES || modNum < 0){
 				printf("Invalid module number");
 			}
 			else {
-				printf("Module number ");
-				printf("%c", modNum+1);
-				printf(": ");
 				printf("%.3f�C",Temperature_GetModuleTemperature(modNum)/1000.0);
 				printf("\n\r");
 				// Should also print out temperature of sensor if specified
