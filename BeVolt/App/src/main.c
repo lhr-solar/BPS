@@ -878,7 +878,7 @@ int main(void){
 	uint32_t b = 30000;
 	uint16_t d = 30000;
 	float c = 80.00;
-	CAN1_Init();
+	CAN1_Init(CAN_Mode_Normal);
 	CAN1_Send(TRIP, (CANData_t) a);
 	CAN1_Send(ALL_CLEAR, (CANData_t) a);
 	CAN1_Send(CONTACTOR_STATE, (CANData_t) a);
