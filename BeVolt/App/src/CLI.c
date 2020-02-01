@@ -234,7 +234,6 @@ void CLI_Temperature(char *input) {
 void CLI_Contactor(char *input) {
 	switch(tokens[1][0]) {
 		FunctionalState contactor = Contactor_Flag();
-		case 's':
 			if(contactor == ENABLE) {
 				printf("Contactor is Enabled");
 			} else {
@@ -246,16 +245,12 @@ void CLI_Contactor(char *input) {
 		}
 	}
 }
-
-/** CLI_Charge
- * Checks and displays the desired
- * state of charge parameter(s)
+/**
  * @param input command
  */
 void CLI_Charge(char *input) {
 	int value;
 	switch(CLI_GetToken(1)[0]) {
-		case NULL : 
 			printf("The battery is at: %d\n\r", SoC_GetPercent());
 		case 'r' : 
 			SoC_SetAccum(0);//resets accumulator
@@ -344,10 +339,10 @@ void CLI_LED() {
 			break;
 	}
 }
+=======
+void CLI_Charge(char *input) {}
 
-/** CLI_CAN
- * Interacts with CAN
- * @param input command
+/** CLI_ErrorLight
  */
 void CLI_CAN(char *input) {
 	uint8_t data[8];
