@@ -3,7 +3,6 @@
  * define and route commands
  */
 
-<<<<<<< HEAD
 #ifndef CLI_H__
 #define CLI_H__
 
@@ -14,7 +13,6 @@
 #include "Current.h"
 #include "Temperature.h"
 #include "Contactor.h"
-#include "CAN.h"
 #include "WDTimer.h"
 #include "LED.h"
 #include "config.h"
@@ -35,7 +33,6 @@ void CLI_Handler(void);
  */
 void CLI_Commands(char *input);
 
-<<<<<<< HEAD
 /** CLI_Startup
  * Asks if batteries needs to be charged
  * @return true or false
