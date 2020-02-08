@@ -13,16 +13,18 @@
 
 static cell_asic* Minions;
 char* tokens[MAX_TOKEN_SIZE];
-// Fifo CLI_Fifo
 
+/** CLI_Init
+ * Initializes the CLI with the values it needs
+ * @param minions is a cell_asic struct describing the LTC6811
+ */
 void CLI_Init(cell_asic* minions) {
 	Minions = minions;
-	UART3_Init();
 }
 
 /** CLI_InputParse
- * Parses the input string
- * @return ptr to token
+ * Parses the input string and stores in tokens[]
+ * @param input is a pointer to the input string
  */
 void CLI_InputParse(char *input) {
 	char *tokenized;
@@ -37,7 +39,8 @@ void CLI_InputParse(char *input) {
 }
 
 /** CLI_Startup
- * Asks if batteries needs to be charged
+ * Prints the welcome messages and
+ * asks for the override command
  * @return true or false
  */
 bool CLI_Startup() {
@@ -62,7 +65,7 @@ void CLI_Help() {
 	printf("Critical/Abort (!)\tAll(a)\n\r");
 	printf("Keep in mind: all values are 1-indexed\n\r");
 	printf("-----------------------------------------------\n\r");
-}	// TODO: Put a logo into ASCII as part of the help menu
+}
 
 /** CLI_Voltage
  * Checks and displays the desired
@@ -222,7 +225,8 @@ void CLI_LTC6811(void) {
 }
 
 /** CLI_Contactor
- * Interacts with contactor status
+ * Interacts with contactor status by
+ * printing the status of the contactor
  */
 void CLI_Contactor(void) {
 	switch(tokens[1][0]) {
@@ -267,10 +271,11 @@ void CLI_Charge(void) {
 	}
 }
 
-/** CLI_LED
- * Interacts with the LEDs
+/** toggleLED
+ * Helper function for CLI_LED
+ * that toggles a given led
+ * @param led is the led to toggle
  */
-	
 void toggleLED(led input) {
 	if(strcmp("1", tokens[2]) == 0 || strcmp("on", tokens[2]) == 0) {
 		LED_On(input);
@@ -281,9 +286,15 @@ void toggleLED(led input) {
 		printf("Invalid LED command\n\r");
 	}
 }
+
+/** CLI_LED
+ * Interacts with the LEDs by 
+ * checking error light status
+ * running a full LED test
+ * and turning a specific LED on/off
+ */
 void CLI_LED(void) {
 	LED_Init();
-	// DelayInit();
 	uint8_t error = (GPIOB->ODR) & GPIO_Pin_12;
 	if(tokens[1] == NULL) {
 		if(error) {
