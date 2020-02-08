@@ -32,7 +32,7 @@ void CLI_Init(cell_asic* minions);
  * Parses the input string and stores in tokens[]
  * @param input is a pointer to the input string
  */
-void CLI_InputParse(char *input);
+void CLI_InputParse(char *input); 
 
 /** CLI_Startup
  * Prints the welcome messages and
@@ -105,5 +105,34 @@ void CLI_CAN(void);
  * Interacts with the display
  */
 void CLI_Display(void);
+
+/** CLI_Watchdog
+ * Shows whether watchdog was tripped
+ */
+void CLI_Watchdog(void);
+
+/** CLI_EEPROM
+ * Interacts with EEPROM
+ * by reading and writing to the EEPROM
+ */
+void CLI_EEPROM(void);
+
+/** CLI_ADC
+ * Prints the high precision and
+ * low precision readings
+ */
+void CLI_ADC(void);
+
+/** CLI_Critical
+ * Shuts off contactor manually
+ */  
+void CLI_Critical(void);
+
+/** CLI_Commands
+ * Routes the command given to the proper
+ * measurement method to check the desired values
+ * @param input is a command string
+ */
+void CLI_Commands(char *input);
 
 #endif
