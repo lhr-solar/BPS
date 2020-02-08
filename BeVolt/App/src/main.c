@@ -202,7 +202,7 @@ void faultCondition(void){
 // E.g. If you want to run a LTC6811 test, change "#define CHANGE_THIS_TO_TEST_NAME" to the
 //		following:
 //		#define LTC6811_TEST
-#define NO_TEST
+#define EEPROM_READ_TEST
 
 #ifdef Systick_TEST
 
@@ -668,6 +668,7 @@ int main(){
 	__disable_irq();
 	EEPROM_Init();
 	__enable_irq();
+	EEPROM_Reset();
 	printf("initialized\n");
 
 	EEPROM_Tester();		//write test codes
@@ -690,6 +691,7 @@ int main(){
 	__disable_irq();
 	EEPROM_Init();
 	__enable_irq();
+	EEPROM_Reset();
 	printf("initialized\n\r");
 	EEPROM_Tester();
 	printf("written\n\r");

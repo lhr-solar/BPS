@@ -248,7 +248,7 @@ void EEPROM_Tester(void){
  */
 void EEPROM_WriteByte(uint16_t address, uint8_t data){
 	I2C3_Write(EEPROM_ADDRESS, address, data);
-	DelayMs(100);
+	DelayMs(5);
 }
 
 void EEPROM_WriteMultipleBytes(uint16_t address, uint32_t bytes, uint8_t* buffer){
