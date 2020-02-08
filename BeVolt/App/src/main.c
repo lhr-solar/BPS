@@ -202,8 +202,7 @@ void faultCondition(void){
 // E.g. If you want to run a LTC6811 test, change "#define CHANGE_THIS_TO_TEST_NAME" to the
 //		following:
 //		#define LTC6811_TEST
-#define UART_INTERRUPT
-
+#define LED_TEST
 
 #ifdef LED_TEST
 #include "LED.h"
