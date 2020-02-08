@@ -172,8 +172,11 @@ int CAN1_Send(CANMessage_t message, CANData_t data){
 		case CONTACTOR_STATE:
 			return CAN1_Write(message, &data.b, 1);
 
-		case CURRENT_DATA:
-			return CAN1_Write(message, &data.b, 4);
+		case CURRENT_DATA:{
+			uint8_t payload[4];
+			floatTo4Bytes(data.f, &payload[0]);
+			return CAN1_Write(message, payload, 4);
+		}
 
 		case VOLT_DATA:{
 			uint8_t payload[5];
@@ -189,8 +192,11 @@ int CAN1_Send(CANMessage_t message, CANData_t data){
 			return CAN1_Write(message, payload, 5);
 		}
 
-		case SOC_DATA:
-			return CAN1_Write(message, &data.b, 4);
+		case SOC_DATA:{
+			uint8_t payload[4];
+			floatTo4Bytes(data.f, &payload[0]);
+			return CAN1_Write(message, payload, 4);
+		}
 
 		case WDOG_TRIGGERED:
 			return CAN1_Write(message, &data.b, 1);
