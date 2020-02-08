@@ -18,7 +18,9 @@
 #include "CLI.h"
 
 cell_asic Minions[NUM_MINIONS];
-bool override = false;		// This will be changed by user via CLI	
+bool override = false;		// This will be changed by user via CLI
+Fifo CLIFifo;
+char command[fifo_size];
 
 void initialize(void);
 void preliminaryCheck(void);
@@ -32,7 +34,7 @@ int realmain(){
 
 	WDTimer_Start();
 
-	while(1){
+	while(1) {
 		// First update the measurements.
 		Voltage_UpdateMeasurements();
 		Current_UpdateMeasurements();
@@ -40,18 +42,24 @@ int realmain(){
 
 		// Update battery percentage
 		SoC_Calculate(Current_GetLowPrecReading());
+
+		// Checks for user input to send to CLI
+		UART3_CheckAndEcho(&CLIFifo);
+		if (UART3_HasCommand(&CLIFifo)) {
+			UART3_GetCommand(&CLIFifo, command);
+			CLI_Handler(command);
+		}
 		
 		SafetyStatus current = Current_CheckStatus();
 		SafetyStatus temp = Temperature_CheckStatus(Current_IsCharging());
 		SafetyStatus voltage = Voltage_CheckStatus();
 
 		// Check if everything is safe (all return SAFE = 0)
-		if((current == SAFE) && (temp == SAFE) && (voltage == SAFE) && !override) {
+		if((current == SAFE) && (temp == SAFE) && (voltage == SAFE)) {
 			Contactor_On();
 		}
 		else if((current == SAFE) && (temp == SAFE) && (voltage == UNDERVOLTAGE) && override) {
 			Contactor_On();
-			continue;
 		} else {
 			break;
 		}
@@ -81,10 +89,25 @@ void initialize(void){
 	WDTimer_Init();
 	EEPROM_Init();
 	SoC_Init();
-
 	Current_Init();
 	Voltage_Init(Minions);
 	Temperature_Init(Minions);
+	CLI_Init(Minions);
+	UART3_Init();
+
+	fifoInit(&CLIFifo);
+	__enable_irq();
+	CLI_Startup();
+
+	// Checks to see if the batteries need to be charged
+	Voltage_UpdateMeasurements();
+	SafetyStatus voltage = Voltage_CheckStatus();
+	if(voltage == UNDERVOLTAGE) {
+		char over = 'n';
+		printf("Do you need to charge the batteries? (y/n)\n\r>> ");
+		scanf("%c", &over);
+		override = over == 'y' ? true : false;
+	}
 }
 
 /** preliminaryCheck
@@ -110,7 +133,7 @@ void preliminaryCheck(void){
 void faultCondition(void){
 	Contactor_Off();
 	LED_Off(RUN);
-  LED_On(FAULT);
+  	LED_On(FAULT);
 
 	uint8_t error = 0;
 
@@ -593,7 +616,7 @@ int main(){
 
 #ifdef SOC_TEST
 // *****************************************************************************************
-#include "SOC.h"
+#include "SoC.h"
 #include <stdio.h>
 #include <UART.h>
 void ChargingSoCTest(void);
@@ -708,7 +731,7 @@ int main() {
 #ifdef UART_INTERRUPT2
     /* Includes ---------------------------------------------------*/
     //#include "stm32f2xx.h"
-		#include "uart.h"
+		#include "UART.h"
 		
 		uint8_t RxData;//data received flag
 				
@@ -844,8 +867,8 @@ int main() {
 #endif
 			
 #ifdef UART_INTERRUPT
-#include "uart.h"
-#include "fifo.h"
+#include "UART.h"
+#include "FIFO.h"
 int main(void){
 	UART3_Init();
 	Fifo uartFifo;

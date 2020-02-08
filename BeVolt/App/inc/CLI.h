@@ -39,12 +39,12 @@ void CLI_InputParse(char *input);
  * asks for the override command
  * @return true or false
  */
-bool CLI_Startup();
+bool CLI_Startup(void);
 
 /** CLI_Help
  * Displays the help menu
  */
-void CLI_Help();
+void CLI_Help(void);
 
 /** CLI_Voltage
  * Checks and displays the desired
@@ -128,11 +128,11 @@ void CLI_ADC(void);
  */  
 void CLI_Critical(void);
 
-/** CLI_Commands
+/** CLI_Handler
  * Routes the command given to the proper
  * measurement method to check the desired values
  * @param input is a command string
  */
-void CLI_Commands(char *input);
+void CLI_Handler(char *input);
 
 #endif

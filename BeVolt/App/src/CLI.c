@@ -44,8 +44,6 @@ void CLI_InputParse(char *input) {
  * @return true or false
  */
 bool CLI_Startup() {
-	// printf("Do you need to charge the batteries? (y/n)\n\r");
-	// TODO: Fill in UART input
 	printf("\n\r\n\r%s\n\r\n\r", utsvt_logo);
 	printf("Hello! Welcome to the BPS System! I am your worst nightmare...\n\r");
 	printf("Please enter a command (Type 'h', 'm', or '?' to see a list of commands)\n\r");
@@ -471,12 +469,12 @@ void CLI_Critical(void) {
 	printf("Contactor is off");
 }
 
-/** CLI_Commands
+/** CLI_Handler
  * Routes the command given to the proper
  * measurement method to check the desired values
  * @param input is a command string
  */
-void CLI_Commands(char *input) {	
+void CLI_Handler(char *input) {
 	CLI_InputParse(input);
 	if(!strcmp(tokens[0], "partytime")) {
 		printf("\n\r");
