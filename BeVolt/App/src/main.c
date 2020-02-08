@@ -1004,8 +1004,10 @@ int main(void) {
 #ifdef CLI_TEST
 int main(){
 	__disable_irq();
-	CLI_Init();
+	CLI_Init(Minions);
+	Contactor_Init();
 	__enable_irq();
+	EEPROM_Init();
 	CLI_Handler();
 	while(1);
 }

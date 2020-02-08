@@ -21,7 +21,7 @@ void CLI_Init(cell_asic* minions) {
 }
 
 void CLI_Handler(void) {
-	static char command[128] = "temperature total";
+	static char command[128] = "!";
 	CLI_Commands(command);
 }
 
@@ -208,7 +208,7 @@ void CLI_Temperature(void) {
 					printf("Sensor %d on module %d: %.3f C\n\r", sensNum+1, modNum+1, 
 							Temperature_GetSingleTempSensor(boardNum, sensNum)/1000.0);
 				} else {
-					printf("Invalid sensor number");
+					printf("Invalid sensor number\n\r");
 				}
 			}
 			break;
@@ -237,9 +237,9 @@ void CLI_Contactor(void) {
 		FunctionalState contactor = Contactor_Flag();
 		case 's':
 			if(contactor == ENABLE) {
-				printf("Contactor is Enabled");
+				printf("Contactor is Enabled\n\r");
 			} else {
-				printf("Contactor is Disabled");
+				printf("Contactor is Disabled\n\r");
 			break;
 		default:
 			printf("Invalid contactor command\n\r");
@@ -256,15 +256,22 @@ void CLI_Charge(void) {
 	int accumVal;
 	if(tokens[1] == NULL) {
 		printf("The battery percentage is %.2f%%\n\r", SoC_GetPercent()/100.0);
+		return;
 	}
 	switch(tokens[1][0]) {
 		case 'r':
 			SoC_SetAccum(0);	//resets accumulator
+			printf("Accumulator has been reset\n\r");
+			break;
 		case 's':
 			//converts string to integer and passes value to accumulator function
-			SoC_SetAccum(sscanf(tokens[2], "%d", &accumVal));
+			sscanf(tokens[2], "%d", &accumVal);
+			SoC_SetAccum(accumVal);
+			printf("Accumulator has been set to %d%%\n\r", accumVal);
+			break;
 		default: 
-			printf("Invalid Charge Command");
+			printf("Invalid Charge Command\n\r");
+			break;
 	}
 }
 
@@ -279,7 +286,7 @@ void toggleLED(led input) {
 	else if(strcmp("0", tokens[2]) == 0 || strcmp("off", tokens[2]) == 0) {
 		LED_Off(input);
 	} else {
-		printf("Invalid LED command");
+		printf("Invalid LED command\n\r");
 	}
 }
 void CLI_LED(void) {
@@ -386,6 +393,7 @@ void CLI_Watchdog(void) {
 void CLI_EEPROM(void) {
 	if(tokens[1] == NULL) {
 		EEPROM_SerialPrintData();
+		return;
 	}
 	uint8_t errorAddrArray[2];
 	uint16_t errorAddr = 0;
@@ -436,6 +444,7 @@ void CLI_EEPROM(void) {
 			}
 			break;
 		default:
+			printf("Invalid EEPROM command\n\r");
 			break;
 	}
 }
