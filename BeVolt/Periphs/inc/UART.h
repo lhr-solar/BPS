@@ -6,39 +6,13 @@
 #define __UART_H__
 
 #include <stdint.h>
+#include <stdio.h>
+#include <stdbool.h>
+#include "stm32f4xx.h"
+#include "config.h"
+#include "FIFO.h"
 
 /***** Unlike SPI, UART cannot have multiple modules connected to the same tx/rx line *****/
-
-/** UART1_Init
- * Initializes UART1 Module
- * Pins: 
- *		tx : PA9
- *		rx : PA10
- * @param baud rate: 9600, 115200, 500000
- */
-void UART1_Init(uint32_t baud);
-
-/** UART1_Write
- * Sends data through tx pin for UART1
- * @param ptr to char buffer, size of buffer
- */
-void UART1_Write(char *txBuf, uint32_t txSize);
-
-/** UART1_Read
- * Sends data through tx pin for UART1
- * The data received will be stored in rxBuf
- * @param ptr to char buffer, size of buffer
- */
-void UART1_Read(char *rxBuf, uint32_t rxSize);
-
-/** UART3_Init
- * Initializes UART1 Module
- * Pins: 
- *		tx : PB10
- *		rx : PC5
- * @param baud rate: 9600, 115200, 500000
- */
-void UART3_Init(uint32_t baud);
 
 /** UART3_Write
  * Sends data through tx pin for UART3
@@ -47,10 +21,33 @@ void UART3_Init(uint32_t baud);
 void UART3_Write(char *txBuf, uint32_t txSize);
 
 /** UART3_Read
- * Reads data from rx pin for UART3
+ * Sends data through tx pin for UART3
  * The data received will be stored in rxBuf
  * @param ptr to char buffer, size of buffer
  */
 void UART3_Read(char *rxBuf, uint32_t rxSize);
+
+/**
+* @brief Configures the UART3 Peripheral for interrupts.
+* @param None
+* @retval None
+*/
+void UART3_Init(void);
+
+//use when fifo is storing commands received over uart
+//returns if fifo has a command in it by checking for carriage return
+bool UART3_HasCommand(Fifo *fifo);
+
+//for using fifo to store commands received from UART
+//fails if multiple commands are stored in queue
+//preconditions: fifo has a command stored in it, buffer is large enough to hold command
+//parameters: fifo with command stored in it, buffer to receive stored command
+//fills buffer with received command
+void UART3_GetCommand(Fifo *fifo, char buffer[]);
+
+//checks if new data has been received from UART interrupts
+//if so, it echoes the new character to Putty and adds the character to the passed fifo
+//backspace is supported
+void UART3_CheckAndEcho(Fifo *uartFifo);
 
 #endif

@@ -37,11 +37,11 @@ ErrorStatus Current_UpdateMeasurements(void){
 	return SUCCESS;	// TODO: Once this has been tested, stop returning errors
 }
 
-/** Current_IsSafe
+/** Current_CheckStatus
  * Checks if pack does not have a short circuit
  * @return SAFE or DANGER
  */
-SafetyStatus Current_IsSafe(void){
+SafetyStatus Current_CheckStatus(void){
 
 	if(HighPrecisionCurrent > MAX_HIGH_PRECISION_CURRENT) {
 		return (LowPrecisionCurrent < MAX_CURRENT_LIMIT)

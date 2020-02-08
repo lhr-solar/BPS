@@ -67,11 +67,11 @@ ErrorStatus Voltage_UpdateMeasurements(void){
 	}
 }
 
-/** Voltage_IsSafe
+/** Voltage_CheckStatus
  * Checks if all battery modules are safe
  * @return SAFE or danger: UNDERVOLTAGE or OVERVOLTAGE
  */
-SafetyStatus Voltage_IsSafe(void){
+SafetyStatus Voltage_CheckStatus(void){
 	for(int i = 0; i < NUM_BATTERY_MODULES; i++){
 		uint16_t voltage = Voltage_GetModuleMillivoltage(i);
 			

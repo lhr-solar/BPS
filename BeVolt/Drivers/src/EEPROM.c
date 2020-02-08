@@ -10,6 +10,7 @@
 #include "Voltage.h"
 #include "Temperature.h"
 #include "UART.h"
+#include "Systick.h"
 #include <stdio.h>
 
 //starting addresses for errors
@@ -148,7 +149,7 @@ void EEPROM_LogError(uint8_t logType){
  * Prints saved data from EEPROM to serial terminal (putty)
  */
 void EEPROM_SerialPrintData(void){
-	UART1_Init(115200);
+	UART3_Init();
 	uint8_t fault_code;
 	uint8_t data;
 	uint16_t fault_ptr = EEPROM_FAULT_CODE_ADDR;
@@ -247,7 +248,7 @@ void EEPROM_Tester(void){
  */
 void EEPROM_WriteByte(uint16_t address, uint8_t data){
 	I2C3_Write(EEPROM_ADDRESS, address, data);
-	for(uint32_t delay = 0; delay < 50000; delay++){};
+	DelayMs(5);
 }
 
 void EEPROM_WriteMultipleBytes(uint16_t address, uint32_t bytes, uint8_t* buffer){
