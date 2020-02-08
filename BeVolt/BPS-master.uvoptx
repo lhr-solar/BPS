@@ -153,17 +153,17 @@
         <Ww>
           <count>0</count>
           <WinNumber>1</WinNumber>
-          <ItemText>voltage,0x0A</ItemText>
+          <ItemText>usTicks</ItemText>
         </Ww>
         <Ww>
           <count>1</count>
           <WinNumber>1</WinNumber>
-          <ItemText>Minions[0].cells,0x0A</ItemText>
+          <ItemText>us</ItemText>
         </Ww>
         <Ww>
           <count>2</count>
           <WinNumber>1</WinNumber>
-          <ItemText>contactor_status</ItemText>
+          <ItemText>ms</ItemText>
         </Ww>
       </WatchWindow1>
       <Tracepoint>

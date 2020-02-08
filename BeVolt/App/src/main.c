@@ -202,7 +202,22 @@ void faultCondition(void){
 // E.g. If you want to run a LTC6811 test, change "#define CHANGE_THIS_TO_TEST_NAME" to the
 //		following:
 //		#define LTC6811_TEST
-#define LED_TEST
+#define EEPROM_READ_TEST
+
+#ifdef Systick_TEST
+
+int main(){
+		__enable_irq();
+		while(1){
+		DelayMs(1000);
+		Contactor_On();
+		DelayMs(1000);
+		Contactor_Off();
+	}
+}
+
+#endif
+
 
 #ifdef LED_TEST
 #include "LED.h"
@@ -648,10 +663,11 @@ void DischargingSoCTest(void) {
 
 int main(){
 	//initialize stuff
-	UART3_Init(115200);
+	UART3_Init();
 	__disable_irq();
 	EEPROM_Init();
 	__enable_irq();
+	EEPROM_Reset();
 	printf("initialized\n");
 
 	EEPROM_Tester();		//write test codes
@@ -668,12 +684,13 @@ int main(){
 #include "UART.h"
 
 int main(){
-	UART1_Init(115200);
+	UART3_Init();
 
 	printf("starting\n\r");
 	__disable_irq();
 	EEPROM_Init();
 	__enable_irq();
+	EEPROM_Reset();
 	printf("initialized\n\r");
 	EEPROM_Tester();
 	printf("written\n\r");
