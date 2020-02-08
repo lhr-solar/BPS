@@ -43,6 +43,11 @@ typedef union {
 	float f;
 } CANData_t;
 
+typedef struct {
+	uint8_t idx : 8;
+	CANData_t data;
+} CANPayload_t;
+
 /** CAN1_Init
  * Initializes CAN bus for pins:
  *		PB8 : RX
@@ -57,6 +62,6 @@ bool CAN1_Read(uint8_t *data);
 
 //sends a message over CAN
 //returns the same thing as CAN1_Write
-int CAN1_Send(CANMessage_t message, CANData_t data);
+int CAN1_Send(CANMessage_t message, CANPayload_t data);
 
 #endif

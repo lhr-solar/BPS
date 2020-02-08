@@ -202,7 +202,7 @@ void faultCondition(void){
 // E.g. If you want to run a LTC6811 test, change "#define CHANGE_THIS_TO_TEST_NAME" to the
 //		following:
 //		#define LTC6811_TEST
-#define EEPROM_READ_TEST
+#define CAN_TEST_2
 
 #ifdef Systick_TEST
 
@@ -341,6 +341,14 @@ int main(){
 	}
 	printf("Writing and Reading to Configuration Register Successful. Initialization Complete\n\r");
 
+	Voltage_UpdateMeasurements();
+	printf("Successfully Updated Voltages.\n\r");
+	printf("\n\rVoltage Test:\n\r");
+	printf("Is it safe? %d\n\r\n\r", Voltage_IsSafe());
+	printf("Voltages of all modules:\n\r");
+	for(int32_t i = 0; i < NUM_BATTERY_MODULES; i++){
+		printf("%d : %f\n\r", i, (float)(Voltage_GetModuleVoltage(i)*0.0001));  // Place decimal point.
+	}
 	while(1){
 		Voltage_UpdateMeasurements();
 		if(Voltage_CheckStatus() != SAFE){
@@ -1056,5 +1064,253 @@ int main(void){
 	CAN1_Send(SOC_DATA, (CANData_t) c);
 	CAN1_Send(WDOG_TRIGGERED, (CANData_t) a);
 	CAN1_Send(CAN_ERROR, (CANData_t) a);
+}
+#endif
+
+#ifdef CAN_TEST
+// ************************************
+#include "CAN.h"
+#include "UART.h"
+#include "Voltage.h"
+#include "Temperature.h"
+#include "Current.h"
+#include "SoC.h"
+
+// Define this if listening to yourself
+//#define CAN_SELF_TEST
+
+int CAN_send(uint32_t id)
+{
+	uint8_t length;
+	uint8_t data[32];
+
+	switch(id)
+	{
+		case CAN_ID_BPS_TRIP:
+			length = 1;
+			// b1 1-trip, 0-not
+			data[0] = 0;
+		break;
+
+		case CAN_ID_BPS_ALL_CLEAR:
+			length = 1;
+			// b1 1-clear, 0-not
+			// Check if everything is safe (all return SAFE = 0)
+			if((Current_IsSafe() == SAFE) && (Temperature_IsSafe(Current_IsCharging()) == SAFE) && (Voltage_IsSafe() == SAFE))
+				data[0] = 1;
+			else 
+				data[0] = 0;
+		break;
+
+		case CAN_ID_BPS_CONTACTOR: // contactor state
+			length = 1;
+			if (Contactor_Flag() == ENABLE)
+				data[0] = 1;
+			else
+				data[0] = 0;
+		break;
+
+		case CAN_ID_CURRENT_DATA:
+			length = 4;
+			uint32_t* temp = Current_GetHighPrecReading();
+
+
+			for (int i = 0; i < 4; i++)
+			{
+				data[i] = *temp;
+				*temp = *temp>>8;
+			}
+		break;
+
+		case CAN_ID_TOTAL_VOLTAGE_DATA:
+			length = 2;
+			// TODO : FIX THIS
+		break;
+
+		case CAN_ID_AVG_TEMPERATURE_DATA:
+			length = 4;
+			// TODO : FIX THIS
+		break;
+
+		case CAN_ID_SOC_DATA:
+			length = 4;
+			uint32_t *temp = SoC_GetPercent();
+
+			for (int i = 0; i < 4; i++)
+			{
+				data[i] = *temp;
+				*temp = *temp>>8;
+			}
+		break;
+
+		case CAN_ID_WDOG_TRIGGERED: // only sent if happens
+			length = 1;
+			// 1-trip, 0-not
+			data[0] = 1;
+		break;
+
+		case CAN_ID_ERROR: // only sent if happens
+			length = 1;
+			// 1-error, 0-not
+			data[0] = 1;
+		break;
+	}
+
+	int box;
+	// Transmit the data
+	do 
+	{
+		int box = CAN1_Write(id, &d2, 1);
+	} 
+	while (box == CAN_TxStatus_NoMailBox);
+	
+	int status;
+	// Wait for the data to transmit
+	do 
+	{
+		status = CAN_TransmitStatus(CAN1, box);
+	} 
+	while( status == CAN_TxStatus_Pending);
+	
+	if(status != CAN_TxStatus_Ok) 
+		while(1);
+
+	return 1;
+}
+
+int main() {
+	// Start UART comms
+	UART3_Init(115200);
+
+	// Start CAN comms
+	#ifdef CAN_SELF_TEST
+	CAN1_Init(CAN_Mode_LoopBack);
+	#else
+	CAN1_Init(CAN_Mode_Normal);
+	#endif
+
+	// Data to transmit
+	uint8_t data[8] = {0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10};
+	uint32_t id = CAN_ID_BPS_ALL_CLEAR;
+	uint8_t d2 = 0x80;
+	uint8_t RxData[8];
+
+	while(1)
+	{
+		int box;
+		// Transmit the data
+		do 
+		{
+			int box = CAN1_Write(id, &d2, 1);
+		} 
+		while (box == CAN_TxStatus_NoMailBox);
+		
+		int status;
+		// Wait for the data to transmit
+		do 
+		{
+			status = CAN_TransmitStatus(CAN1, box);
+		} 
+		while( status == CAN_TxStatus_Pending);
+		
+		if(status != CAN_TxStatus_Ok) 
+			while(1);
+
+		// #ifdef CAN_SELF_TEST
+		// Read all the data
+		while(1) 
+		{
+			while(CAN1_Read(RxData) == false);
+
+			printf("CAN RxMessage: ");
+			for(int i = 0; i < 8; i++)
+			{
+				printf("%d", RxData[i]);
+			}
+			printf("\n");
+		}
+		// #endif
+	}
+}
+
+#endif
+
+#ifdef CAN_TEST_2
+#include "CAN.h"
+/*message:
+typedef enum {
+	TRIP = 0x02,
+	ALL_CLEAR = 0x101,
+	CONTACTOR_STATE = 0x102,
+	CURRENT_DATA = 0x103,
+	VOLT_DATA = 0x104,
+	TEMP_DATA = 0x105,
+	SOC_DATA = 0x106,
+	WDOG_TRIGGERED = 0x107,
+	CAN_ERROR = 0x108,
+} CANMessage_t;
+
+data: 
+typedef union {
+	uint8_t b;
+	uint16_t h;
+	uint32_t w;
+	float f;
+} CANData_t;
+
+data is either a float, uint32_t, or uint8_t
+*/
+
+int main(void){
+	uint8_t trip = 0;
+	uint8_t contact = 1;
+	uint8_t clear = 1;
+	float voltage = 3.400;
+	float temperature = 25.00;
+	float current = 50.00;
+	float soc = 80.00;
+	
+	CANPayload_t payload;
+	payload.idx = 1;
+	
+	CAN1_Init(CAN_Mode_Normal);
+	
+	payload.data.b = trip;
+	CAN1_Send(TRIP, payload);
+	
+	payload.data.b = clear;
+	CAN1_Send(ALL_CLEAR, payload);
+	
+	payload.data.b = contact;
+	CAN1_Send(CONTACTOR_STATE, payload);
+	
+	for(uint32_t i = 0; i < 1000; i++){
+		for(uint32_t j = 0; j < 1000; j++){
+		}
+	}
+	
+	payload.data.f = current;
+	CAN1_Send(CURRENT_DATA, payload);
+	
+	payload.data.f = voltage;
+	CAN1_Send(VOLT_DATA, payload);
+	
+	payload.data.f = temperature;
+	CAN1_Send(TEMP_DATA, payload);
+	
+	for(uint32_t i = 0; i < 1000; i++){
+		for(uint32_t j = 0; j < 1000; j++){
+		}
+	}
+	
+	payload.data.f = soc;
+	CAN1_Send(SOC_DATA, payload);
+	
+	payload.data.b = 0;
+	CAN1_Send(WDOG_TRIGGERED, payload);
+	
+	payload.data.b = 0;
+	CAN1_Send(CAN_ERROR, payload);
+	while(1){}
 }
 #endif
