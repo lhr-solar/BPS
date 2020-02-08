@@ -22,28 +22,34 @@
 #include "UART.h"
 #include "Images.h"
 
-void CLI_Init(cell_asic* minions);
+/** CLI_Watchdog
+ * Determines whether system had previously
+ * reset on startup and if so outputs the
+ * most recent Watchdog error
+ */
+void CLI_Watchdog(void);
 
+/** CLI_EEPROM
+ * Interacts with EEPROM
+ */
+void CLI_EEPROM(void);
+
+/** CLI_Peripherals
+ * Interacts with the ADC
+ */
+void CLI_ADC(void);
+
+/** CLI_Critical
+ * Shuts off contactor if battery sensors
+ * detect unsafe levels
+ */  
+void CLI_Critical(void);
 
 /** CLI_Commands
  * Routes the command given to the proper
  * measurement method to check the desired values
- * @param input command
+ * @param input is a command string
  */
 void CLI_Commands(char *input);
-
-/** CLI_Startup
- * Asks if batteries needs to be charged
- * @return true or false
- */
-bool CLI_Startup();
-
-void CLI_InputParse(char *input);
-
-char* CLI_GetToken(uint8_t idx);
-
-void CLI_Help();
-
-void CLI_LED();
 
 #endif

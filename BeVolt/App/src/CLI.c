@@ -356,7 +356,9 @@ void CLI_CAN(void) {}
 void CLI_Display(void) {}
 
 /** CLI_Watchdog
- * Interacts with the watchdog timer
+ * Determines whether system had previously
+ * reset on startup and if so outputs the
+ * most recent Watchdog error
  */
 void CLI_Watchdog(void) {
 	if(tokens[1] == NULL) {
@@ -451,9 +453,9 @@ void CLI_ADC(void) {
 }
 
 /** CLI_Critical
- * Checks and displays the desired
- * voltage parameter(s)
- */
+ * Shuts off contactor if battery sensors 
+ * detect unsafe levels
+ */  
 void CLI_Critical(void) {
 	Contactor_Off();
 	printf("Contactor is off");
@@ -462,8 +464,9 @@ void CLI_Critical(void) {
 /** CLI_Commands
  * Routes the command given to the proper
  * measurement method to check the desired values
+ * @param input is a command string
  */
-void CLI_Commands(char *input){	
+void CLI_Commands(char *input) {	
 	CLI_InputParse(input);
 	if(!strcmp(tokens[0], "partytime")) {
 		printf("\n\r");
