@@ -3,7 +3,6 @@
  * clock and delay funcitonality
  */
 #include "SysTick.h"
-#include "stdio.h"
 
 static volatile uint32_t usTicks;
 
