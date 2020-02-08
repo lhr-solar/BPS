@@ -934,17 +934,38 @@ data is either a float, uint32_t, or uint8_t
 int main(void){
 	uint8_t a = 0;
 	uint32_t b = 30000;
-	uint16_t d = 30000;
+	uint16_t d = 0x00;
+	float voltage = 3.400;
+	float temperature = 25.00;
 	float c = 80.00;
-	CAN1_Init(CAN_Mode_Normal);
+	
+	CANData_t data;
+	data.f = voltage;
+	data.idx = 0;
+	
+	CAN1_Init(CAN_Mode_LoopBack);
 	CAN1_Send(TRIP, (CANData_t) a);
 	CAN1_Send(ALL_CLEAR, (CANData_t) a);
 	CAN1_Send(CONTACTOR_STATE, (CANData_t) a);
+	
+	for(uint32_t i = 0; i < 1000; i++){
+		for(uint32_t j = 0; j < 1000; j++){
+		}
+	}
+	
 	CAN1_Send(CURRENT_DATA, (CANData_t) b);
-	CAN1_Send(VOLT_DATA, (CANData_t) d);
-	CAN1_Send(TEMP_DATA, (CANData_t) b);
+	CAN1_Send(VOLT_DATA, data);
+	
+	data.f = temperature;
+	CAN1_Send(TEMP_DATA, data);
+	
+	for(uint32_t i = 0; i < 1000; i++){
+		for(uint32_t j = 0; j < 1000; j++){
+		}
+	}
 	CAN1_Send(SOC_DATA, (CANData_t) c);
 	CAN1_Send(WDOG_TRIGGERED, (CANData_t) a);
 	CAN1_Send(CAN_ERROR, (CANData_t) a);
+	while(1){}
 }
 #endif

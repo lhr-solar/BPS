@@ -41,6 +41,7 @@ typedef union {
 	uint16_t h;
 	uint32_t w;
 	float f;
+	uint8_t idx;	// Only use for Voltage and Temperature array
 } CANData_t;
 
 /** CAN1_Init

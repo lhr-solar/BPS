@@ -3,6 +3,7 @@
  */
 #include <stdint.h>
 #include <stdbool.h>
+#include <stdlib.h>
 #include "CAN.h"
 #include "stm32f4xx.h"
 
@@ -13,6 +14,8 @@ static void Init_RxMes(CanRxMsg *RxMessage);
 static bool RxFlag = false;
 
 static const int CAN1_AF_CONFIG89 = 8;
+
+static void floatTo4Bytes(uint8_t f, uint8_t bytes[4]);
 
 void CAN1_Init(int CAN_Mode){
 	GPIO_InitTypeDef GPIO_InitStructure;
@@ -60,7 +63,7 @@ void CAN1_Init(int CAN_Mode){
 	*/
   CAN_InitStructure.CAN_BS1 = CAN_BS1_3tq;
   CAN_InitStructure.CAN_BS2 = CAN_BS2_4tq; 
-  CAN_InitStructure.CAN_Prescaler = 20;
+  CAN_InitStructure.CAN_Prescaler = 16;
   CAN_Init(CAN1, &CAN_InitStructure);
 
 	/* CAN filter init */
@@ -139,6 +142,23 @@ void CAN1_RX0_IRQHandler(void)
   }
 }
 
+static void floatTo4Bytes(uint8_t f, uint8_t bytes[4]) {
+	uint8_t tmp;
+	union {
+		float float_var;
+		uint8_t bytes[4];
+	}u;
+	
+	u.float_var = f;
+	memcpy(bytes, u.bytes, 4);
+	tmp = bytes[3];
+	bytes[3] = bytes[0];
+	bytes[0] = tmp;
+	tmp = bytes[2];
+	bytes[2] = bytes[1];
+	bytes[1] = tmp;	
+}
+
 //sends a message over CAN
 //returns the same thing as CAN1_Write
 int CAN1_Send(CANMessage_t message, CANData_t data){
@@ -155,11 +175,19 @@ int CAN1_Send(CANMessage_t message, CANData_t data){
 		case CURRENT_DATA:
 			return CAN1_Write(message, &data.b, 4);
 
-		case VOLT_DATA:
-			return CAN1_Write(message, &data.b, 2);
-
-		case TEMP_DATA:
-			return CAN1_Write(message, &data.b, 4);
+		case VOLT_DATA:{
+			uint8_t payload[5];
+			payload[0] = data.idx;
+			floatTo4Bytes(data.f, &payload[1]);
+			return CAN1_Write(message, payload, 5);
+		}
+			
+		case TEMP_DATA:{
+			uint8_t payload[5];
+			payload[0] = data.idx;
+			floatTo4Bytes(data.f, &payload[1]);
+			return CAN1_Write(message, payload, 5);
+		}
 
 		case SOC_DATA:
 			return CAN1_Write(message, &data.b, 4);
