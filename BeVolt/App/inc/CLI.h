@@ -20,10 +20,10 @@
 #include "CAN.h"
 #include "SysTick.h"
 #include "UART.h"
+#include "Images.h"
 
 void CLI_Init(cell_asic* minions);
 
-void CLI_Handler(void);
 
 /** CLI_Commands
  * Routes the command given to the proper
@@ -36,7 +36,7 @@ void CLI_Commands(char *input);
  * Asks if batteries needs to be charged
  * @return true or false
  */
-bool CLI_Startup(void);
+bool CLI_Startup();
 
 void CLI_InputParse(char *input);
 

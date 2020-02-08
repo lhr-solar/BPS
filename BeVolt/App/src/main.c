@@ -1010,6 +1010,7 @@ int main(){
 	fifoInit(&CLIFifo);
 	__enable_irq();
 	char command[fifo_size];
+	CLI_Startup();
 	while(1) {
 		UART3_CheckAndEcho(&CLIFifo);
 		if (UART3_HasCommand(&CLIFifo)) {

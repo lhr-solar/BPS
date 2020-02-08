@@ -40,10 +40,15 @@ void CLI_InputParse(char *input) {
  * Asks if batteries needs to be charged
  * @return true or false
  */
-bool CLI_Startup(void) {
-	printf("Do you need to charge the batteries? (y/n)\n\r");
-	//TODO: Fill in UART input
+bool CLI_Startup() {
+	// printf("Do you need to charge the batteries? (y/n)\n\r");
+	// TODO: Fill in UART input
+	printf("\n\r\n\r%s\n\r\n\r", utsvt_logo);
+	printf("Hello! Welcome to the BPS System! I am your worst nightmare...\n\r");
+	printf("Please enter a command (Type 'h', 'm', or '?' to see a list of commands)\n\r");
+	printf(">> ");
 }
+
 /** CLI_Help
  * Displays the help menu
  */
@@ -289,7 +294,8 @@ void CLI_LED(void) {
 	}
 	switch(tokens[1][0]) {
 		case 't':
-				for(int i = 0; i < 100000000; i++) {
+				printf("\n\r");
+				for(int i = 0; i < 10; i++) {
 					LED_Toggle(FAULT);
 					DelayMs(100);
 					LED_Toggle(RUN);
@@ -459,8 +465,17 @@ void CLI_Critical(void) {
  */
 void CLI_Commands(char *input){	
 	CLI_InputParse(input);
-	printf("Hello! Welcome to the BPS System! I am your worst nightmare...\n\r");
-	printf("Please enter a command (Type 'h', 'm', or '?' to see a list of commands)\n\r");
+	if(!strcmp(tokens[0], "partytime")) {
+		printf("\n\r");
+		for(int i = 0; i < 100; i++) {
+			printf("%s", party_parrot_frames[i%10]);
+			for(int j = 0; j < 18 && i < 99; j++) {
+					printf("\033[A\r");
+			}
+		}
+		printf("\r\n");
+	return;
+	}
 	switch(input[0]) {
 		// Help menu
 		case 'h':
@@ -536,7 +551,8 @@ void CLI_Commands(char *input){
 			break;		// ABORT
 		
 		default:
-			printf("Invalid command. Type 'h' or 'm' or '?' for the help menu");
+			printf("Invalid command. Type 'h' or 'm' or '?' for the help menu\n\r");
 			break;
 	}
+	printf(">> ");
 }
