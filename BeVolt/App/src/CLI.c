@@ -20,11 +20,6 @@ void CLI_Init(cell_asic* minions) {
 	UART3_Init();
 }
 
-void CLI_Handler(void) {
-	static char command[128] = "!";
-	CLI_Commands(command);
-}
-
 /** CLI_InputParse
  * Parses the input string
  * @return ptr to token
@@ -39,14 +34,6 @@ void CLI_InputParse(char *input) {
 		tokens[i] = split;
 		split = strtok_r(NULL, " ", &tokenized);
 	}
-}
-
-/** CLI_GetToken
- * @param index of desired token
- * @return token at desired index
- */
-char* CLI_GetToken(uint8_t idx) {
-	return tokens[idx];
 }
 
 /** CLI_Startup

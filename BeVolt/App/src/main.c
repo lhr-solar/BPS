@@ -847,17 +847,16 @@ int main() {
 #include "uart.h"
 #include "fifo.h"
 int main(void){
-	USART1_Config();
+	UART3_Init();
 	Fifo uartFifo;
 	fifoInit(&uartFifo);
 	__enable_irq();
-	extern uint8_t RxData;
 	char buffer[fifo_size];
 	while(1){
-		checkUARTandEcho(&uartFifo);
-		if (hasCommand(&uartFifo)){
-			getCommand(&uartFifo, buffer);
-			printf("\n\r%s\n\r", buffer);
+		UART3_CheckAndEcho(&uartFifo);
+		if (UART3_HasCommand(&uartFifo)){
+			UART3_GetCommand(&uartFifo, buffer);
+			printf("\n\r%s\n\r", buffer);//service command
 		}
 	}
 }
@@ -1003,12 +1002,20 @@ int main(void) {
 
 #ifdef CLI_TEST
 int main(){
-	__disable_irq();
-	CLI_Init(Minions);
 	Contactor_Init();
-	__enable_irq();
 	EEPROM_Init();
-	CLI_Handler();
-	while(1);
+	CLI_Init(Minions);
+	UART3_Init();
+	Fifo CLIFifo;
+	fifoInit(&CLIFifo);
+	__enable_irq();
+	char command[fifo_size];
+	while(1) {
+		UART3_CheckAndEcho(&CLIFifo);
+		if (UART3_HasCommand(&CLIFifo)) {
+			UART3_GetCommand(&CLIFifo, command);
+			CLI_Commands(command);
+		}
+	}
 }
 #endif
