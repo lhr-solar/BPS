@@ -202,7 +202,7 @@ void faultCondition(void){
 // E.g. If you want to run a LTC6811 test, change "#define CHANGE_THIS_TO_TEST_NAME" to the
 //		following:
 //		#define LTC6811_TEST
-#define VOLTAGE_TEST
+#define UART_INTERRUPT
 
 
 #ifdef LED_TEST
@@ -847,16 +847,15 @@ int main() {
 #include "uart.h"
 #include "fifo.h"
 int main(void){
-	USART1_Config();
+	UART3_Init();
 	Fifo uartFifo;
 	fifoInit(&uartFifo);
 	__enable_irq();
-	extern uint8_t RxData;
 	char buffer[fifo_size];
 	while(1){
-		checkUARTandEcho(&uartFifo);
-		if (hasCommand(&uartFifo)){
-			getCommand(&uartFifo, buffer);
+		UART3_CheckAndEcho(&uartFifo);
+		if (UART3_HasCommand(&uartFifo)){
+			UART3_GetCommand(&uartFifo, buffer);
 			printf("\n\r%s\n\r", buffer);
 		}
 	}

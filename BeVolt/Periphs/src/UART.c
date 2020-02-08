@@ -136,7 +136,7 @@ void UART3_Init(void){
 void USART3_IRQHandler(void){
 	if(USART_GetITStatus(USART3, USART_IT_RXNE) != RESET){
 	/* Read one byte from the receive data register */
-		fifoPut(&RxFifo, USART_ReceiveData(USART1));
+		fifoPut(&RxFifo, USART_ReceiveData(USART3));
   }
 }
 
