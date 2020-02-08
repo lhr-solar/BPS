@@ -56,11 +56,11 @@ void CAN1_Init(int CAN_Mode){
     
 	/* CAN Baudrate = 125 KBps
 	 * 1/(prescalar + (prescalar*(BS1+1)) + (prescalar*(BS2+1))) * Clk = CAN Baudrate
-	 * The clk is currently set to 16Mhz
+	 * The clk is currently set to 80MHz
 	*/
   CAN_InitStructure.CAN_BS1 = CAN_BS1_3tq;
   CAN_InitStructure.CAN_BS2 = CAN_BS2_4tq; 
-  CAN_InitStructure.CAN_Prescaler = 16; 
+  CAN_InitStructure.CAN_Prescaler = 20;
   CAN_Init(CAN1, &CAN_InitStructure);
 
 	/* CAN filter init */
