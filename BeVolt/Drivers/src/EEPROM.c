@@ -10,6 +10,7 @@
 #include "Voltage.h"
 #include "Temperature.h"
 #include "UART.h"
+#include "Systick.h"
 #include <stdio.h>
 
 //starting addresses for errors
@@ -247,7 +248,7 @@ void EEPROM_Tester(void){
  */
 void EEPROM_WriteByte(uint16_t address, uint8_t data){
 	I2C3_Write(EEPROM_ADDRESS, address, data);
-	for(uint32_t delay = 0; delay < 50000; delay++){};
+	DelayMs(100);
 }
 
 void EEPROM_WriteMultipleBytes(uint16_t address, uint32_t bytes, uint8_t* buffer){
