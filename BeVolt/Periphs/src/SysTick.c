@@ -13,37 +13,20 @@ void SysTick_Handler(void) {
 	if (usTicks != 0) {
 		usTicks--;
 	}
+	else {
+		SysTick->CTRL &= ~SysTick_CTRL_ENABLE_Msk; // disable system clock if tick reaches 0
+	}
 }
-
-/** DelayInit
- * Initializes the core clock configuration
+/* DelayMs
+ * Delay 'ms' amount of ms and then continues
  */
-void DelayInit(void) {
+void DelayMs(uint32_t ms) {
+	usTicks = ms * 500; //convert to microseconds, used 500 because 1000 was double in time
+	//Initializing core clock configuration
 	// Update SystemCoreClock value
 	SystemCoreClockUpdate();
 	SysTick_CLKSourceConfig(SysTick_CLKSource_HCLK);
 	// Configure the SysTick timer to overflow every 1 us
 	SysTick_Config(SystemCoreClock / 1000000);
-}
-
-/** DelayUs
- * Delays 'us' amount of us and then continues
- */
-void DelayUs(uint32_t us) {
-	for(int i = 0; i < 1000; i++);
-	// Reload us value
-	// usTicks = us;
-	// Wait until usTick reach zero
-	// while(usTicks);
-}
-
-/** DelayMs
- * Delay 'ms' amount of ms and then continues
- */
-void DelayMs(uint32_t ms) {
-	// Wait until ms reach zero
-	while (ms--) {
-		// Delay 1 ms using DelayUs
-		DelayUs(1000);
-	}
+	while(usTicks); //wait for interrupts to reach 0
 }

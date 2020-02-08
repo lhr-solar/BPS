@@ -3,6 +3,7 @@
  */
 #include <stdint.h>
 #include <stdbool.h>
+#include "CAN.h"
 #include "stm32f4xx.h"
 
 CanTxMsg TxMessage;
@@ -11,7 +12,9 @@ CanRxMsg RxMessage;
 static void Init_RxMes(CanRxMsg *RxMessage);
 static bool RxFlag = false;
 
-void CAN1_Init(void){
+static const int CAN1_AF_CONFIG89 = 8;
+
+void CAN1_Init(int CAN_Mode){
 	GPIO_InitTypeDef GPIO_InitStructure;
 	CAN_InitTypeDef CAN_InitStructure;
 	NVIC_InitTypeDef NVIC_InitStructure;
@@ -23,8 +26,8 @@ void CAN1_Init(void){
   RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
 
   /* Connect CAN pins to AF9 */
-  GPIO_PinAFConfig(GPIOB, GPIO_PinSource8, GPIO_AF_CAN1);
-  GPIO_PinAFConfig(GPIOB, GPIO_PinSource9, GPIO_AF_CAN1); 
+  GPIO_PinAFConfig(GPIOB, GPIO_PinSource8, CAN1_AF_CONFIG89);
+  GPIO_PinAFConfig(GPIOB, GPIO_PinSource9, CAN1_AF_CONFIG89); 
   
   /* Configure CAN RX and TX pins */
   GPIO_InitStructure.GPIO_Pin = GPIO_Pin_8 | GPIO_Pin_9;
@@ -32,14 +35,14 @@ void CAN1_Init(void){
   GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
   GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
   GPIO_InitStructure.GPIO_PuPd  = GPIO_PuPd_UP;
-  GPIO_Init(GPIOB, &GPIO_InitStructure);
+	GPIO_Init(GPIOB, &GPIO_InitStructure);
 
   /* CAN configuration ********************************************************/  
   /* Enable CAN clock */
   RCC_APB1PeriphClockCmd(RCC_APB1Periph_CAN1, ENABLE);
   
   /* CAN register init */
-  CAN_DeInit(CAN1);
+  //CAN_DeInit(CAN1);
 
   /* CAN cell init */
   CAN_InitStructure.CAN_TTCM = DISABLE;
@@ -48,16 +51,19 @@ void CAN1_Init(void){
   CAN_InitStructure.CAN_NART = DISABLE;
   CAN_InitStructure.CAN_RFLM = DISABLE;
   CAN_InitStructure.CAN_TXFP = DISABLE;
-  CAN_InitStructure.CAN_Mode = CAN_Mode_Normal;
-  CAN_InitStructure.CAN_SJW = CAN_SJW_1tq;
+  CAN_InitStructure.CAN_Mode = CAN_Mode;
+  CAN_InitStructure.CAN_SJW  = CAN_SJW_1tq;
     
-  /* CAN Baudrate = 1 MBps (CAN clocked at 30 MHz) */
-  CAN_InitStructure.CAN_BS1 = CAN_BS1_6tq;
-  CAN_InitStructure.CAN_BS2 = CAN_BS2_8tq;
-  CAN_InitStructure.CAN_Prescaler = 2;
+	/* CAN Baudrate = 125 KBps
+	 * 1/(prescalar + (prescalar*(BS1+1)) + (prescalar*(BS2+1))) * Clk = CAN Baudrate
+	 * The clk is currently set to 80Mhz
+	*/
+  CAN_InitStructure.CAN_BS1 = CAN_BS1_3tq;
+  CAN_InitStructure.CAN_BS2 = CAN_BS2_4tq; 
+  CAN_InitStructure.CAN_Prescaler = 20; 
   CAN_Init(CAN1, &CAN_InitStructure);
 
-  /* CAN filter init */
+	/* CAN filter init */
   CAN_FilterInitStructure.CAN_FilterNumber = 0;
   CAN_FilterInitStructure.CAN_FilterMode = CAN_FilterMode_IdMask;
   CAN_FilterInitStructure.CAN_FilterScale = CAN_FilterScale_32bit;
@@ -68,9 +74,9 @@ void CAN1_Init(void){
   CAN_FilterInitStructure.CAN_FilterFIFOAssignment = 0;
   CAN_FilterInitStructure.CAN_FilterActivation = ENABLE;
   CAN_FilterInit(CAN1, &CAN_FilterInitStructure);
-  
+
   /* Transmit Structure preparation */
-  TxMessage.ExtId = 0x0;
+  TxMessage.ExtId = 0x1;
   TxMessage.RTR = CAN_RTR_DATA;
   TxMessage.IDE = CAN_ID_STD;
   TxMessage.DLC = 1;
@@ -85,19 +91,23 @@ void CAN1_Init(void){
   NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
   NVIC_Init(&NVIC_InitStructure);	
 	
-	
+	// TODO: why have a method for this, but not for the transmit?
 	Init_RxMes(&RxMessage);
 }
 
-void CAN1_Write(uint32_t id, uint8_t data[8]){
+
+int CAN1_Write(uint32_t id, uint8_t* data, uint8_t length){
 	TxMessage.StdId = id;
+	TxMessage.DLC = length;
 	for(int i = 0; i < 8; i++){
 		TxMessage.Data[i] = data[i];
 	}
-	CAN_Transmit(CAN1, &TxMessage);
+	return CAN_Transmit(CAN1, &TxMessage);
 }
 
-bool CAN1_Read(uint8_t data[]){
+// todo length
+bool CAN1_Read(uint8_t *data/*, uint8_t length*/){
+  // RxMessage.DLC = length;
 	if(RxFlag){
 		for(int i = 0; i < 8; i++){
 			data[i] = RxMessage.Data[i];
@@ -127,4 +137,38 @@ void CAN1_RX0_IRQHandler(void)
     // Do stuff
 		RxFlag = true;
   }
+}
+
+//sends a message over CAN
+//returns the same thing as CAN1_Write
+int CAN1_Send(CANMessage_t message, CANData_t data){
+	switch (message) {
+		case TRIP:
+			return CAN1_Write(message, &data.b, 1);
+
+		case ALL_CLEAR:
+			return CAN1_Write(message, &data.b, 1);
+
+		case CONTACTOR_STATE:
+			return CAN1_Write(message, &data.b, 1);
+
+		case CURRENT_DATA:
+			return CAN1_Write(message, &data.b, 4);
+
+		case VOLT_DATA:
+			return CAN1_Write(message, &data.b, 2);
+
+		case TEMP_DATA:
+			return CAN1_Write(message, &data.b, 4);
+
+		case SOC_DATA:
+			return CAN1_Write(message, &data.b, 4);
+
+		case WDOG_TRIGGERED:
+			return CAN1_Write(message, &data.b, 1);
+
+		case CAN_ERROR:
+			return CAN1_Write(message, &data.b, 1);
+	}
+	return DANGER;
 }

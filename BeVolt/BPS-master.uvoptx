@@ -153,7 +153,21 @@
         <Ww>
           <count>0</count>
           <WinNumber>1</WinNumber>
+<<<<<<< HEAD
           <ItemText>RxFifo</ItemText>
+=======
+          <ItemText>usTicks</ItemText>
+        </Ww>
+        <Ww>
+          <count>1</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>us</ItemText>
+        </Ww>
+        <Ww>
+          <count>2</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>ms</ItemText>
+>>>>>>> master
         </Ww>
       </WatchWindow1>
       <Tracepoint>
@@ -632,25 +646,43 @@
     </File>
     <File>
       <GroupNumber>5</GroupNumber>
+<<<<<<< HEAD
       <FileNumber>33</FileNumber>
+=======
+      <FileNumber>29</FileNumber>
+>>>>>>> master
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
+<<<<<<< HEAD
       <PathWithFileName>.\Periphs\src\PLL.c</PathWithFileName>
       <FilenameWithoutPath>PLL.c</FilenameWithoutPath>
+=======
+      <PathWithFileName>.\Periphs\src\fifo.c</PathWithFileName>
+      <FilenameWithoutPath>fifo.c</FilenameWithoutPath>
+>>>>>>> master
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>5</GroupNumber>
+<<<<<<< HEAD
       <FileNumber>34</FileNumber>
+=======
+      <FileNumber>30</FileNumber>
+>>>>>>> master
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
+<<<<<<< HEAD
       <PathWithFileName>.\Periphs\src\fifo.c</PathWithFileName>
       <FilenameWithoutPath>fifo.c</FilenameWithoutPath>
+=======
+      <PathWithFileName>.\Periphs\src\PLL.c</PathWithFileName>
+      <FilenameWithoutPath>PLL.c</FilenameWithoutPath>
+>>>>>>> master
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -664,7 +696,11 @@
     <RteFlg>0</RteFlg>
     <File>
       <GroupNumber>6</GroupNumber>
+<<<<<<< HEAD
       <FileNumber>35</FileNumber>
+=======
+      <FileNumber>31</FileNumber>
+>>>>>>> master
       <FileType>5</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -676,7 +712,11 @@
     </File>
     <File>
       <GroupNumber>6</GroupNumber>
+<<<<<<< HEAD
       <FileNumber>36</FileNumber>
+=======
+      <FileNumber>32</FileNumber>
+>>>>>>> master
       <FileType>5</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -688,7 +728,11 @@
     </File>
     <File>
       <GroupNumber>6</GroupNumber>
+<<<<<<< HEAD
       <FileNumber>37</FileNumber>
+=======
+      <FileNumber>33</FileNumber>
+>>>>>>> master
       <FileType>5</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -700,7 +744,11 @@
     </File>
     <File>
       <GroupNumber>6</GroupNumber>
+<<<<<<< HEAD
       <FileNumber>38</FileNumber>
+=======
+      <FileNumber>34</FileNumber>
+>>>>>>> master
       <FileType>5</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -712,7 +760,11 @@
     </File>
     <File>
       <GroupNumber>6</GroupNumber>
+<<<<<<< HEAD
       <FileNumber>39</FileNumber>
+=======
+      <FileNumber>35</FileNumber>
+>>>>>>> master
       <FileType>5</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -724,7 +776,11 @@
     </File>
     <File>
       <GroupNumber>6</GroupNumber>
+<<<<<<< HEAD
       <FileNumber>40</FileNumber>
+=======
+      <FileNumber>36</FileNumber>
+>>>>>>> master
       <FileType>5</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -736,7 +792,11 @@
     </File>
     <File>
       <GroupNumber>6</GroupNumber>
+<<<<<<< HEAD
       <FileNumber>41</FileNumber>
+=======
+      <FileNumber>37</FileNumber>
+>>>>>>> master
       <FileType>5</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -748,7 +808,11 @@
     </File>
     <File>
       <GroupNumber>6</GroupNumber>
+<<<<<<< HEAD
       <FileNumber>42</FileNumber>
+=======
+      <FileNumber>38</FileNumber>
+>>>>>>> master
       <FileType>5</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -760,7 +824,11 @@
     </File>
     <File>
       <GroupNumber>6</GroupNumber>
+<<<<<<< HEAD
       <FileNumber>43</FileNumber>
+=======
+      <FileNumber>39</FileNumber>
+>>>>>>> master
       <FileType>5</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -780,7 +848,11 @@
     <RteFlg>0</RteFlg>
     <File>
       <GroupNumber>7</GroupNumber>
+<<<<<<< HEAD
       <FileNumber>44</FileNumber>
+=======
+      <FileNumber>40</FileNumber>
+>>>>>>> master
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -792,7 +864,11 @@
     </File>
     <File>
       <GroupNumber>7</GroupNumber>
+<<<<<<< HEAD
       <FileNumber>45</FileNumber>
+=======
+      <FileNumber>41</FileNumber>
+>>>>>>> master
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -804,7 +880,11 @@
     </File>
     <File>
       <GroupNumber>7</GroupNumber>
+<<<<<<< HEAD
       <FileNumber>46</FileNumber>
+=======
+      <FileNumber>42</FileNumber>
+>>>>>>> master
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -816,7 +896,11 @@
     </File>
     <File>
       <GroupNumber>7</GroupNumber>
+<<<<<<< HEAD
       <FileNumber>47</FileNumber>
+=======
+      <FileNumber>43</FileNumber>
+>>>>>>> master
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -828,7 +912,11 @@
     </File>
     <File>
       <GroupNumber>7</GroupNumber>
+<<<<<<< HEAD
       <FileNumber>48</FileNumber>
+=======
+      <FileNumber>44</FileNumber>
+>>>>>>> master
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -840,7 +928,11 @@
     </File>
     <File>
       <GroupNumber>7</GroupNumber>
+<<<<<<< HEAD
       <FileNumber>49</FileNumber>
+=======
+      <FileNumber>45</FileNumber>
+>>>>>>> master
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -852,7 +944,11 @@
     </File>
     <File>
       <GroupNumber>7</GroupNumber>
+<<<<<<< HEAD
       <FileNumber>50</FileNumber>
+=======
+      <FileNumber>46</FileNumber>
+>>>>>>> master
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -864,7 +960,11 @@
     </File>
     <File>
       <GroupNumber>7</GroupNumber>
+<<<<<<< HEAD
       <FileNumber>51</FileNumber>
+=======
+      <FileNumber>47</FileNumber>
+>>>>>>> master
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -876,7 +976,11 @@
     </File>
     <File>
       <GroupNumber>7</GroupNumber>
+<<<<<<< HEAD
       <FileNumber>52</FileNumber>
+=======
+      <FileNumber>48</FileNumber>
+>>>>>>> master
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -888,7 +992,11 @@
     </File>
     <File>
       <GroupNumber>7</GroupNumber>
+<<<<<<< HEAD
       <FileNumber>53</FileNumber>
+=======
+      <FileNumber>49</FileNumber>
+>>>>>>> master
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -900,7 +1008,11 @@
     </File>
     <File>
       <GroupNumber>7</GroupNumber>
+<<<<<<< HEAD
       <FileNumber>54</FileNumber>
+=======
+      <FileNumber>50</FileNumber>
+>>>>>>> master
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -912,7 +1024,11 @@
     </File>
     <File>
       <GroupNumber>7</GroupNumber>
+<<<<<<< HEAD
       <FileNumber>55</FileNumber>
+=======
+      <FileNumber>51</FileNumber>
+>>>>>>> master
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -924,7 +1040,11 @@
     </File>
     <File>
       <GroupNumber>7</GroupNumber>
+<<<<<<< HEAD
       <FileNumber>56</FileNumber>
+=======
+      <FileNumber>52</FileNumber>
+>>>>>>> master
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
