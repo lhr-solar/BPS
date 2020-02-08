@@ -940,47 +940,47 @@ int main(void){
 	float current = 50.00;
 	float soc = 80.00;
 	
-	CANData_t data;
-	data.idx = 1;
+	CANPayload_t payload;
+	payload.idx = 1;
 	
 	CAN1_Init(CAN_Mode_Normal);
 	
-	data.b = trip;
-	CAN1_Send(TRIP, (CANData_t) data);
+	payload.data.b = trip;
+	CAN1_Send(TRIP, payload);
 	
-	data.b = clear;
-	CAN1_Send(ALL_CLEAR, (CANData_t) data);
+	payload.data.b = clear;
+	CAN1_Send(ALL_CLEAR, payload);
 	
-	data.b = contact;
-	CAN1_Send(CONTACTOR_STATE, (CANData_t) data);
-	
-	for(uint32_t i = 0; i < 1000; i++){
-		for(uint32_t j = 0; j < 1000; j++){
-		}
-	}
-	
-	data.f = current;
-	CAN1_Send(CURRENT_DATA, data);
-	
-	data.f = voltage;
-	CAN1_Send(VOLT_DATA, data);
-	
-	data.f = temperature;
-	CAN1_Send(TEMP_DATA, data);
+	payload.data.b = contact;
+	CAN1_Send(CONTACTOR_STATE, payload);
 	
 	for(uint32_t i = 0; i < 1000; i++){
 		for(uint32_t j = 0; j < 1000; j++){
 		}
 	}
 	
-	data.f = soc;
-	CAN1_Send(SOC_DATA, data);
+	payload.data.f = current;
+	CAN1_Send(CURRENT_DATA, payload);
 	
-	data.b = 0;
-	CAN1_Send(WDOG_TRIGGERED, data);
+	payload.data.f = voltage;
+	CAN1_Send(VOLT_DATA, payload);
 	
-	data.b = 0;
-	CAN1_Send(CAN_ERROR, data);
+	payload.data.f = temperature;
+	CAN1_Send(TEMP_DATA, payload);
+	
+	for(uint32_t i = 0; i < 1000; i++){
+		for(uint32_t j = 0; j < 1000; j++){
+		}
+	}
+	
+	payload.data.f = soc;
+	CAN1_Send(SOC_DATA, payload);
+	
+	payload.data.b = 0;
+	CAN1_Send(WDOG_TRIGGERED, payload);
+	
+	payload.data.b = 0;
+	CAN1_Send(CAN_ERROR, payload);
 	while(1){}
 }
 #endif
