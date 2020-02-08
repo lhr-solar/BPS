@@ -741,26 +741,117 @@ int main(){
 // ************************************
 #include "CAN.h"
 #include "UART.h"
+#include "Voltage.h"
+#include "Temperature.h"
+#include "Current.h"
+#include "SoC.h"
 
 // Define this if listening to yourself
 //#define CAN_SELF_TEST
 
 int CAN_send(uint32_t id)
 {
+	uint8_t length;
+	uint8_t data[32];
+
+	switch(id)
+	{
+		case CAN_ID_BPS_TRIP:
+			length = 1;
+			// b1 1-trip, 0-not
+			data[0] = 0;
+		break;
+
+		case CAN_ID_BPS_ALL_CLEAR:
+			length = 1;
+			// b1 1-clear, 0-not
+			// Check if everything is safe (all return SAFE = 0)
+			if((Current_IsSafe() == SAFE) && (Temperature_IsSafe(Current_IsCharging()) == SAFE) && (Voltage_IsSafe() == SAFE))
+				data[0] = 1;
+			else 
+				data[0] = 0;
+		break;
+
+		case CAN_ID_BPS_CONTACTOR: // contactor state
+			length = 1;
+			if (Contactor_Flag() == ENABLE)
+				data[0] = 1;
+			else
+				data[0] = 0;
+		break;
+
+		case CAN_ID_CURRENT_DATA:
+			length = 4;
+			uint32_t* temp = Current_GetHighPrecReading();
+
+
+			for (int i = 0; i < 4; i++)
+			{
+				data[i] = *temp;
+				*temp = *temp>>8;
+			}
+		break;
+
+		case CAN_ID_TOTAL_VOLTAGE_DATA:
+			length = 2;
+			// TODO : FIX THIS
+		break;
+
+		case CAN_ID_AVG_TEMPERATURE_DATA:
+			length = 4;
+			// TODO : FIX THIS
+		break;
+
+		case CAN_ID_SOC_DATA:
+			length = 4;
+			uint32_t *temp = SoC_GetPercent();
+
+			for (int i = 0; i < 4; i++)
+			{
+				data[i] = *temp;
+				*temp = *temp>>8;
+			}
+		break;
+
+		case CAN_ID_WDOG_TRIGGERED: // only sent if happens
+			length = 1;
+			// 1-trip, 0-not
+			data[0] = 1;
+		break;
+
+		case CAN_ID_ERROR: // only sent if happens
+			length = 1;
+			// 1-error, 0-not
+			data[0] = 1;
+		break;
+	}
+
+	int box;
+	// Transmit the data
+	do 
+	{
+		int box = CAN1_Write(id, &d2, 1);
+	} 
+	while (box == CAN_TxStatus_NoMailBox);
 	
+	int status;
+	// Wait for the data to transmit
+	do 
+	{
+		status = CAN_TransmitStatus(CAN1, box);
+	} 
+	while( status == CAN_TxStatus_Pending);
+	
+	if(status != CAN_TxStatus_Ok) 
+		while(1);
+
+	return 1;
 }
 
 int main() {
 	// Start UART comms
-<<<<<<< HEAD
 	UART3_Init(115200);
-=======
-	//UART3_Init(115200);
-	//printf("start\n");
->>>>>>> 74f5a2d9b98e205f2e143384cfd50398810466f6
 
-	LED_Init();
-	
 	// Start CAN comms
 	#ifdef CAN_SELF_TEST
 	CAN1_Init(CAN_Mode_LoopBack);
@@ -769,7 +860,6 @@ int main() {
 	#endif
 
 	// Data to transmit
-<<<<<<< HEAD
 	uint8_t data[8] = {0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10};
 	uint32_t id = CAN_ID_BPS_ALL_CLEAR;
 	uint8_t d2 = 0x80;
@@ -777,20 +867,8 @@ int main() {
 
 	while(1)
 	{
-=======
-//	uint8_t data[8] = {0x1, 0xAD, 0xBE, 0xEF, 0xAE, 0xAE, 0xAE, 0xAE};
-	uint32_t id = CAN_ID_BPS_ALL_CLEAR;
-
-//	uint8_t RxData[8];
-
-	while(1)
-	{
-		//printf("start1\n");
-
->>>>>>> 74f5a2d9b98e205f2e143384cfd50398810466f6
 		int box;
 		// Transmit the data
-<<<<<<< HEAD
 		do 
 		{
 			int box = CAN1_Write(id, &d2, 1);
@@ -807,28 +885,8 @@ int main() {
 		
 		if(status != CAN_TxStatus_Ok) 
 			while(1);
-=======
-		do {
-//			static int box = 0;
-			float data = 0.5;
-			box = CAN1_Write(id, (uint8_t*)&data, 4);
-		} while (box == CAN_TxStatus_NoMailBox);
-//		int status;
 
-		// Wait for the data to transmit
-//		do {
-//			status = CAN_TransmitStatus(CAN1, box);
-//		} while( status == CAN_TxStatus_Pending);
-//		if(status != CAN_TxStatus_Ok) {
-//			LED_On(CAN);
-//		}
-		
-		LED_Toggle(RUN);
-		
-		for(int i = 0; i < 100000; i++);
->>>>>>> 74f5a2d9b98e205f2e143384cfd50398810466f6
-
-		#ifdef CAN_SELF_TEST
+		// #ifdef CAN_SELF_TEST
 		// Read all the data
 		while(1) 
 		{
@@ -841,7 +899,7 @@ int main() {
 			}
 			printf("\n");
 		}
-		#endif
+		// #endif
 	}
 }
 
