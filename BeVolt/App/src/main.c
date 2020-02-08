@@ -202,7 +202,21 @@ void faultCondition(void){
 // E.g. If you want to run a LTC6811 test, change "#define CHANGE_THIS_TO_TEST_NAME" to the
 //		following:
 //		#define LTC6811_TEST
-#define FULL_TEST
+#define Systick_TEST
+
+#ifdef Systick_TEST
+
+int main(){
+		__enable_irq();
+		while(1){
+		DelayMs(1000);
+		Contactor_On();
+		DelayMs(1000);
+		Contactor_Off();
+	}
+}
+
+#endif
 
 
 #ifdef LED_TEST
