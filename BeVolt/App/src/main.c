@@ -216,10 +216,8 @@ int main(){
 	}
 }
 
-#endif
+#elif defined LED_TEST
 
-
-#ifdef LED_TEST
 #include "LED.h"
 void LEDdelay(int time){
 	for(int i = 0; i < time; i++);
@@ -248,9 +246,9 @@ int main(){
 		LEDdelay(100000);
 	}
 }
-#endif
 
-#ifdef LTC6811_TEST
+#elif defined LTC6811_TEST
+
 // LTC6811 Test
 #include "SPI.h"
 #include "LTC6811.h"
@@ -323,9 +321,9 @@ void print_config(cell_asic *bms_ic)
     printf("\n\r");
   }
 }
-#endif
 
-#ifdef VOLTAGE_TEST
+#elif defined VOLTAGE_TEST
+
 #include "UART.h"
 
 int main(){
@@ -365,9 +363,9 @@ int main(){
 
 	faultCondition();
 }
-#endif
 
-#ifdef CURRENT_TEST
+#elif defined CURRENT_TEST
+
 #include "UART.h"
 #include "ADC.h"
 int main(){
@@ -389,9 +387,9 @@ int main(){
 		for(int i = 0; i < 10000000; ++i);
 	}
 }
-#endif
 
-#ifdef TEMPERATURE_TEST
+#elif defined TEMPERATURE_TEST
+
 #include "UART.h"
 #include "Temperature.h"
 
@@ -477,9 +475,9 @@ void checkDangerTest(void) {
 		}
 	}
 }
-#endif
 
-#ifdef CONTACTOR_TEST
+#elif defined CONTACTOR_TEST
+
 int main(){
 	Contactor_Init();
 	static uint32_t contactor_status = -1;
@@ -494,9 +492,9 @@ int main(){
 		//Contactor_On();
 	//}
 }
-#endif
 
-#ifdef WATCHDOG_TEST
+#elif defined WATCHDOG_TEST
+
 int main(){
 	WDTimer_Init();
 	LED_Init();
@@ -518,9 +516,9 @@ int main(){
 
 	}
 }
-#endif
 
-#ifdef SPI_TEST
+#elif defined SPI_TEST
+
 //****************************************************************************************
 // SPI Test
 #include "SPI.h"
@@ -549,9 +547,9 @@ int SPITestmain(){
 
 	}
 }
-#endif
 
-#ifdef UART_TEST
+#elif defined UART_TEST
+
 //****************************************************************************************
 // Debug UART Test
 #include "UART.h"
@@ -562,9 +560,9 @@ int main(){
 		for(uint32_t i = 0; i < 100000; i++);
 	}
 }
-#endif
 
-#ifdef I2C_TEST
+#elif defined I2C_TEST
+
 //****************************************************************************************
 // I2C test
 #include "I2C.h"
@@ -576,9 +574,9 @@ int main(){
 
 	}
 }
-#endif
 
-#ifdef GYRO_TEST
+#elif defined GYRO_TEST
+
 //****************************************************************************************
 // Gyro test
 int gyroTestmain(){
@@ -589,9 +587,9 @@ int gyroTestmain(){
 		// print or something
 	}
 }
-#endif
 
-#ifdef ADC_TEST
+#elif defined ADC_TEST
+
 //****************************************************************************************
 #include "ADC.h"
 int main(){
@@ -611,9 +609,9 @@ int main(){
 		for(int i = 0; i < 1000; ++i);
 	}
 }
-#endif
 
-#ifdef SOC_TEST
+#elif defined SOC_TEST
+
 // *****************************************************************************************
 #include "SOC.h"
 #include <stdio.h>
@@ -663,9 +661,8 @@ void DischargingSoCTest(void) {
  * 	TODO: Need to test SetAccumulator, GetPercent and Calibrate on faults
  */
 
-#endif
+#elif defined EEPROM_WRITE_TEST
 
-#ifdef EEPROM_WRITE_TEST
 //******************************************************************************************
 #include "UART.h"
 
@@ -686,9 +683,8 @@ int main(){
 
 }
 
-#endif
+#elif defined EEPROM_READ_TEST
 
-#ifdef EEPROM_READ_TEST
 #include "UART.h"
 
 int main(){
@@ -707,9 +703,8 @@ int main(){
 	while(1){};
 }
 
-#endif
+#elif defined EEPROM_RESET
 
-#ifdef EEPROM_RESET
 #include "UART.h"
 
 int main() {
@@ -727,9 +722,7 @@ int main() {
 	while(1);
 }
 
-#endif
-
-#ifdef UART_INTERRUPT2
+#elif defined UART_INTERRUPT2
     /* Includes ---------------------------------------------------*/
     //#include "stm32f2xx.h"
 		#include "uart.h"
@@ -865,9 +858,9 @@ int main() {
           /* Enable USART1 Receive interrupt */
           USART_ITConfig(USART1, USART_IT_RXNE, ENABLE);
       }
-#endif
-			
-#ifdef UART_INTERRUPT
+
+#elif defined  UART_INTERRUPT
+
 #include "uart.h"
 #include "fifo.h"
 int main(void){
@@ -884,9 +877,9 @@ int main(void){
 		}
 	}
 }
-#endif
-	
-#ifdef OPEN_WIRE_TEST
+
+#elif defined OPEN_WIRE_TEST
+
 //******************************************************************************************
 #include "Voltage.h"
 #include <stdio.h>
@@ -918,9 +911,8 @@ int main(){
 	}
 }
 
-#endif
+#elif defined FULL_TEST
 
-#ifdef FULL_TEST
 #include "UART.h"
 //tests the BPS functions
 int main(void) {
@@ -1022,9 +1014,8 @@ int main(void) {
 }
 
 
-#endif
+#elif define CAN_TEST_2
 
-#ifdef CAN_TEST_2
 #include "CAN.h"
 /*message:
 typedef enum {
@@ -1065,9 +1056,9 @@ int main(void){
 	CAN1_Send(WDOG_TRIGGERED, (CANData_t) a);
 	CAN1_Send(CAN_ERROR, (CANData_t) a);
 }
-#endif
 
-#ifdef CAN_TEST
+#elif defined CAN_TEST
+
 // ************************************
 #include "CAN.h"
 #include "UART.h"
@@ -1233,9 +1224,8 @@ int main() {
 	}
 }
 
-#endif
+#elif defined CAN_TEST_2
 
-#ifdef CAN_TEST_2
 #include "CAN.h"
 /*message:
 typedef enum {
@@ -1313,4 +1303,5 @@ int main(void){
 	CAN1_Send(CAN_ERROR, payload);
 	while(1){}
 }
+
 #endif
