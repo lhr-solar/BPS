@@ -1058,7 +1058,7 @@ int main(){
 			CLI_Commands(command);
 		}
 	}
-
+#endif
 
 #ifdef CAN_TEST_2
 #include "CAN.h"

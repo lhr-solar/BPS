@@ -563,16 +563,6 @@
               <FilePath>.\Periphs\src\SysTick.c</FilePath>
             </File>
             <File>
-<<<<<<< HEAD
-              <FileName>PLL.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\Periphs\src\PLL.c</FilePath>
-            </File>
-            <File>
-              <FileName>fifo.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\Periphs\src\fifo.c</FilePath>
-=======
               <FileName>fifo.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\Periphs\src\fifo.c</FilePath>
@@ -581,7 +571,6 @@
               <FileName>PLL.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\Periphs\src\PLL.c</FilePath>
->>>>>>> master
             </File>
           </Files>
         </Group>
