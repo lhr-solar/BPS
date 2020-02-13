@@ -69,7 +69,7 @@ endif
 HEX = $(CP) -O ihex
 BIN = $(CP) -O binary -S
 
-SF = st-flash
+SF = ./stlink/build/Release/st-flash
  
 #######################################
 # CFLAGS
@@ -170,7 +170,7 @@ $(BUILD_DIR):
 	mkdir $@		
 
 #######################################
-# clean up
+# clean up. Just the program files though
 #######################################
 clean:
 	-rm -fR $(BUILD_DIR)
@@ -180,7 +180,14 @@ clean:
 # flash
 #######################################
 flash: $(BUILD_DIR)/$(TARGET).bin
+	cd stlink && $(MAKE)
 	$(SF) write $(BUILD_DIR)/$(TARGET).bin 0x8000000
+
+#######################################
+# clean everything, including the stlink
+#######################################
+clean-all: clean
+	cd stlink && $(MAKE) clean
 
 #######################################
 # dependencies
