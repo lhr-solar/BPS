@@ -22,20 +22,37 @@ void initialize(void);
 void preliminaryCheck(void);
 void faultCondition(void);
 
-int realmain(){
-	__disable_irq();		// Disable all interrupts until initialization is done
-	initialize();			// Initialize codes/pins
-	preliminaryCheck();		// Wait until all boards are powered on
-	__enable_irq();			// Enable interrupts
+/**
+ * Initialize system.
+ *	1. Initialize device drivers.
+ *		- This includes communication protocols, GPIO pins, timers
+ *	2. Set the current, voltage, and temperature limits.
+ *		- Give wrappers (Voltage, Current, Temperature) the limits
+ */
+void initialize(void){
+	PLL_Init80MHz();
+	LED_Init();
+	Contactor_Init();
+	Contactor_Off();
+	WDTimer_Init();
+	EEPROM_Init();
+	SoC_Init();
 
-	WDTimer_Start();
+	Current_Init();
+	Voltage_Init(Minions);
+	Temperature_Init(Minions);
+}
 
+/*
+ * The main code to run during execution of the program.
+ */
+void systemLoop() {
 	bool override = false;		// This will be changed by user via CLI
 	while(1){
 		// First update the measurements.
 		Voltage_UpdateMeasurements();
 		Current_UpdateMeasurements();
-    Temperature_UpdateAllMeasurements();
+		Temperature_UpdateAllMeasurements();
 
 		// Update battery percentage
 		SoC_Calculate(Current_GetLowPrecReading());
@@ -63,28 +80,6 @@ int realmain(){
 
 	// BPS has tripped if this line is reached
 	faultCondition();
-	return 0;
-}
-
-/**
- * Initialize system.
- *	1. Initialize device drivers.
- *		- This includes communication protocols, GPIO pins, timers
- *	2. Set the current, voltage, and temperature limits.
- *		- Give wrappers (Voltage, Current, Temperature) the limits
- */
-void initialize(void){
-	PLL_Init80MHz();
-	LED_Init();
-	Contactor_Init();
-	Contactor_Off();
-	WDTimer_Init();
-	EEPROM_Init();
-	SoC_Init();
-
-	Current_Init();
-	Voltage_Init(Minions);
-	Temperature_Init(Minions);
 }
 
 /** preliminaryCheck
@@ -109,7 +104,7 @@ void preliminaryCheck(void){
 void faultCondition(void){
 	Contactor_Off();
 	LED_Off(RUN);
-  LED_On(FAULT);
+	LED_On(FAULT);
 
 	uint8_t error = 0;
 
@@ -196,13 +191,8 @@ void faultCondition(void){
 //****************************************************************************************
 // The following code is for testing individual pieces of code.
 //****************************************************************************************
-// If you want to test an individual module, change the #define NAME to what you want to
-// to use. This is used mainly to save memory for both the microcontroller and Keil.
-// Keil has a limit of how much memory you can compile.
-// E.g. If you want to run a LTC6811 test, change "#define CHANGE_THIS_TO_TEST_NAME" to the
-//		following:
-//		#define LTC6811_TEST
-#define CAN_TEST_2
+// If you want to test an individual module, run `./solar-build NAME_OF_TEST` where NAME_OF_TEST
+// is the name of the test you want to use (e.g. `./solar-build LED_TEST`).
 
 #ifdef Systick_TEST
 
@@ -1014,7 +1004,7 @@ int main(void) {
 }
 
 
-#elif define CAN_TEST_2
+#elif defined CAN_TEST_OLD
 
 #include "CAN.h"
 /*message:
@@ -1302,6 +1292,23 @@ int main(void){
 	payload.data.b = 0;
 	CAN1_Send(CAN_ERROR, payload);
 	while(1){}
+}
+
+#else
+
+// The real main
+int main() {
+	__disable_irq();		// Disable all interrupts until initialization is done
+	initialize();			// Initialize codes/pins
+	preliminaryCheck();		// Wait until all boards are powered on
+	__enable_irq();			// Enable interrupts
+
+	WDTimer_Start();
+
+	// Start the actual system
+	systemLoop();
+
+	return 1;	// We should never reach this line, so it makes sense to error.
 }
 
 #endif

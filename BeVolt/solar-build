@@ -1,0 +1,42 @@
+#!/bin/bash
+
+# This file is used to streamline the build of the BPS.
+# To use this file, call it via ./solar-build.sh from a
+# bash shell while in the same directory.
+
+# check for too many arguments
+if [ $# -gt 1 ] 
+  then
+    echo "Got more arguments than expected."
+    echo "Not doing anything."
+    
+    exit 1
+fi
+
+# Update the timestamp on the main.c file so that make
+# will rebuild that without needing to rebuild everything.
+touch $(find . -iname main.c)
+
+# inform if no arguments were provided
+if [ -z "$1" ] 
+  then
+    echo "No arguments were supplied."
+    echo "Building the default configuration"
+
+    # build without any arguments
+    make
+
+    exit 0
+fi
+
+if [ "$1" = "clean" ] 
+  then
+    echo "Cleaning..."
+
+    make clean
+
+    exit 0
+fi
+
+# make the stuff
+make USER_DEFS:="-D$1"
