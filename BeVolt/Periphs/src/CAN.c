@@ -3,6 +3,8 @@
  */
 #include <stdint.h>
 #include <stdbool.h>
+#include <stdlib.h>
+#include <string.h>
 #include "CAN.h"
 #include "stm32f4xx.h"
 
@@ -13,6 +15,8 @@ static void Init_RxMes(CanRxMsg *RxMessage);
 static bool RxFlag = false;
 
 static const int CAN1_AF_CONFIG89 = 8;
+
+static void floatTo4Bytes(uint8_t f, uint8_t bytes[4]);
 
 void CAN1_Init(int CAN_Mode){
 	GPIO_InitTypeDef GPIO_InitStructure;
@@ -56,11 +60,11 @@ void CAN1_Init(int CAN_Mode){
     
 	/* CAN Baudrate = 125 KBps
 	 * 1/(prescalar + (prescalar*(BS1+1)) + (prescalar*(BS2+1))) * Clk = CAN Baudrate
-	 * The clk is currently set to 80Mhz
+	 * The clk is currently set to 80MHz
 	*/
   CAN_InitStructure.CAN_BS1 = CAN_BS1_3tq;
   CAN_InitStructure.CAN_BS2 = CAN_BS2_4tq; 
-  CAN_InitStructure.CAN_Prescaler = 20; 
+  CAN_InitStructure.CAN_Prescaler = 16;
   CAN_Init(CAN1, &CAN_InitStructure);
 
 	/* CAN filter init */
@@ -139,36 +143,59 @@ void CAN1_RX0_IRQHandler(void)
   }
 }
 
+static void floatTo4Bytes(uint8_t val, uint8_t bytes_array[4]) {
+	uint8_t temp;
+	// Create union of shared memory space
+	union {
+			float float_variable;
+			uint8_t temp_array[4];
+	} u;
+	// Overite bytes of union with float variable
+	u.float_variable = val;
+	// Assign bytes to input array
+	memcpy(bytes_array, u.temp_array, 4);
+	temp = bytes_array[3];
+	bytes_array[3] = bytes_array[0];
+	bytes_array[0] = temp;
+	temp = bytes_array[2];
+	bytes_array[2] = bytes_array[1];
+	bytes_array[1] = temp;	
+}
+
 //sends a message over CAN
 //returns the same thing as CAN1_Write
-int CAN1_Send(CANMessage_t message, CANData_t data){
+int CAN1_Send(CANMessage_t message, CANPayload_t payload){
+	uint8_t txdata[5];
+	
 	switch (message) {
 		case TRIP:
-			return CAN1_Write(message, &data.b, 1);
+			return CAN1_Write(message, &payload.data.b, 1);
 
 		case ALL_CLEAR:
-			return CAN1_Write(message, &data.b, 1);
+			return CAN1_Write(message, &payload.data.b, 1);
 
 		case CONTACTOR_STATE:
-			return CAN1_Write(message, &data.b, 1);
+			return CAN1_Write(message, &payload.data.b, 1);
 
 		case CURRENT_DATA:
-			return CAN1_Write(message, &data.b, 4);
+			floatTo4Bytes(payload.data.f, &txdata[0]);
+			return CAN1_Write(message, txdata, 4);
 
 		case VOLT_DATA:
-			return CAN1_Write(message, &data.b, 2);
-
 		case TEMP_DATA:
-			return CAN1_Write(message, &data.b, 4);
+			txdata[0] = payload.idx;
+			floatTo4Bytes(payload.data.f, &txdata[1]);
+			return CAN1_Write(message, txdata, 5);
 
 		case SOC_DATA:
-			return CAN1_Write(message, &data.b, 4);
+			floatTo4Bytes(payload.data.f, &txdata[0]);
+			return CAN1_Write(message, txdata, 4);
 
 		case WDOG_TRIGGERED:
-			return CAN1_Write(message, &data.b, 1);
+			return CAN1_Write(message, &payload.data.b, 1);
 
 		case CAN_ERROR:
-			return CAN1_Write(message, &data.b, 1);
+			return CAN1_Write(message, &payload.data.b, 1);
 	}
 	return DANGER;
 }
