@@ -50,6 +50,7 @@ bool CLI_Startup() {
 	printf(">> ");
 }
 
+// TODO: Make the help menu look prettier?
 /** CLI_Help
  * Displays the help menu
  */
@@ -215,6 +216,9 @@ void CLI_Temperature(void) {
 	}
 }
 
+// TODO: display LTC register information (found in cell_asic struct);
+// 		 ask Sijin which registers are to be displayed;
+//		 should be passed/accessed in Minions variable (initialized in CLI_Init())
 /** CLI_LTC6811
  * Interacts with LTC6811 registers
  */
@@ -354,11 +358,15 @@ void CLI_LED(void) {
 	}
 }
 
+// TODO: Confirm status of CAN operation;
+//		 if functional, display CAN information (specifics found on Drive)
 /** CLI_CAN
  * Interacts with CAN
  */
 void CLI_CAN(void) {}
 
+// TODO: Confirm status of Display;
+//		 if operational, display proper information (specifics found on Drive)
 /** CLI_Display
  * Interacts with the display
  */
@@ -484,8 +492,11 @@ void CLI_Handler(char *input) {
 					printf("\033[A\r");
 			}
 		}
-		printf("\r\n");
+		printf("\n\r");
 	return;
+	}
+	if(!strcmp(tokens[0], "ping")) {
+		printf("pong\n\r");
 	}
 	switch(input[0]) {
 		// Help menu
@@ -494,73 +505,59 @@ void CLI_Handler(char *input) {
 		case '?':
 			CLI_Help();
 			break;
-		
 		// Voltage commands
 		case 'v':
 			CLI_Voltage();
 			break;
-		
 		// Current commands
 		case 'i':
 			CLI_Current();
 			break;
-		
 		// Temperature commands
 		case 't':
 			CLI_Temperature();
 			break;
-		
 		// LTC6811 register commands
 		case 'r':
 			CLI_LTC6811();
 			break;
-		
 		// Contactor/Switch commands
 		case 's':
 			CLI_Contactor();
 			break;
-		
 		// State of Charge commands
 		case 'q':
 		case '%':
 			CLI_Charge();
 			break;
-		
 		// Error light commands
 		case 'l':
 			CLI_LED();
 			break;
-		
 		// CAN commands
 		case 'c':
 			CLI_CAN();
 			break;
-		
 		// Display commands
 		case 'd':
 			CLI_Display();
 			break;
-		
 		// Watchdog commands
 		case 'w':
 			CLI_Watchdog();
 			break;
-		
 		// EEPROM commands
 		case 'e':
 			CLI_EEPROM();
 			break;
-		
 		// Peripheral commands
 		case 'a':
 			CLI_ADC();
 			break;
-		
 		// Emergency Abort
 		case '!':
 			CLI_Critical();
 			break;		// ABORT
-		
 		default:
 			printf("Invalid command. Type 'h' or 'm' or '?' for the help menu\n\r");
 			break;
