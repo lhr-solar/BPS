@@ -421,7 +421,7 @@ void CLI_LED(void) {
 	}
 }
 
-// TODO: Confirm status of CAN operation;
+// TODO: Confirm status of CAN;
 //		 if functional, display CAN information (specifics found on Drive)
 /** CLI_CAN
  * Interacts with CAN
@@ -531,6 +531,8 @@ void CLI_ADC(void) {
 	printf("High precision ADC: %d\n\r", ADC_ReadHigh());
 	printf("Low precision ADC: %d\n\r", ADC_ReadLow());
 }
+
+// TODO: Check if we want to add a 2FA to this?
 
 /** CLI_Critical
  * Shuts off contactor manually
