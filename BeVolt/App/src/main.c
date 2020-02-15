@@ -93,13 +93,14 @@ void initialize(void){
 	Voltage_Init(Minions);
 	Temperature_Init(Minions);
 	CLI_Init(Minions);
-	UART3_Init();
 
 	fifoInit(&CLIFifo);
 	__enable_irq();
 	CLI_Startup();
 
+	// TODO: Fix this CLI
 	// Checks to see if the batteries need to be charged
+	/*
 	Voltage_UpdateMeasurements();
 	SafetyStatus voltage = Voltage_CheckStatus();
 	if(voltage == UNDERVOLTAGE) {
@@ -108,6 +109,7 @@ void initialize(void){
 		scanf("%c", &over);
 		override = over == 'y' ? true : false;
 	}
+	*/
 }
 
 /** preliminaryCheck
@@ -1039,6 +1041,7 @@ int main(void) {
 
 #elif defined CLI_TEST
 int main(){
+	initialize();
 	Contactor_Init();
 	EEPROM_Init();
 	CLI_Init(Minions);

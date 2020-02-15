@@ -20,6 +20,7 @@ char* tokens[MAX_TOKEN_SIZE];
  */
 void CLI_Init(cell_asic* boards) {
 	Minions = boards;
+	UART3_Init();
 }
 
 /** CLI_InputParse
@@ -250,24 +251,6 @@ void CLI_LTC6811(void) {
 			printf("%d", Minions[current_ic].com.rx_data[i]);
 		}
 		printf("\n\rPEC: %d\n\r", Minions[current_ic].com.rx_pec_match);
-		printf("PWM: \n\rTX: ");
-		for(uint8_t i = 0; i < 6; i++) {
-			printf("%d", Minions[current_ic].pwm.tx_data[i]);
-		}
-		printf("\n\rRX: ");
-		for(uint8_t i = 0; i < 8; i++) {
-			printf("%d", Minions[current_ic].pwm.rx_data[i]);
-		}
-		printf("\n\rPEC: %d\n\r", Minions[current_ic].pwm.rx_pec_match);
-		printf("PWM B: \n\rTX: ");
-		for(uint8_t i = 0; i < 6; i++) {
-			printf("%d", Minions[current_ic].pwmb.tx_data[i]);
-		}
-		printf("\n\rRX: ");
-		for(uint8_t i = 0; i < 8; i++) {
-			printf("%d", Minions[current_ic].pwmb.rx_data[i]);
-		}
-		printf("\n\rPEC: %d\n\r", Minions[current_ic].pwmb.rx_pec_match);
 		printf("S Control: \n\rTX: ");
 		for(uint8_t i = 0; i < 6; i++) {
 			printf("%d", Minions[current_ic].sctrl.tx_data[i]);

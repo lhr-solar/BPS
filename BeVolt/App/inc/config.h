@@ -16,13 +16,13 @@ typedef enum {SAFE = 0, DANGER = 1, OVERVOLTAGE = 2, UNDERVOLTAGE = 3} SafetySta
 
 //--------------------------------------------------------------------------------
 // Basic Parameters of BPS layout
-#define NUM_MINIONS						4		// Number of minion boards
+#define NUM_MINIONS						1		// Number of minion boards
 												//
 
 //--------------------------------------------------------------------------------
 // Battery Pack layout
-#define NUM_BATTERY_MODULES				31		// Number of battery modules
-#define NUM_TEMPERATURE_SENSORS			62		// Number of temperature sensors
+#define NUM_BATTERY_MODULES				12		// Number of battery modules
+#define NUM_TEMPERATURE_SENSORS			24		// Number of temperature sensors
 #define NUM_TEMP_SENSORS_PER_MOD		2		// Number of temperature sensors per battery module
 
 //--------------------------------------------------------------------------------
