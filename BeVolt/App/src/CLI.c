@@ -16,10 +16,10 @@ char* tokens[MAX_TOKEN_SIZE];
 
 /** CLI_Init
  * Initializes the CLI with the values it needs
- * @param minions is a cell_asic struct describing the LTC6811
+ * @param boards is a cell_asic struct pointer to the minion boards
  */
-void CLI_Init(cell_asic* minions) {
-	Minions = minions;
+void CLI_Init(cell_asic* boards) {
+	Minions = boards;
 }
 
 /** CLI_InputParse
@@ -43,7 +43,7 @@ void CLI_InputParse(char *input) {
  * asks for the override command
  * @return true or false
  */
-bool CLI_Startup() {
+void CLI_Startup(void) {
 	printf("\n\r\n\r%s\n\r\n\r", utsvt_logo);
 	printf("Hello! Welcome to the BPS System! I am your worst nightmare...\n\r");
 	printf("Please enter a command (Type 'h', 'm', or '?' to see a list of commands)\n\r");
@@ -54,7 +54,7 @@ bool CLI_Startup() {
 /** CLI_Help
  * Displays the help menu
  */
-void CLI_Help() {
+void CLI_Help(void) {
 	printf("-------------------Help Menu-------------------\n\r");
 	printf("The available commands are: \n\r");
 	printf("Voltage (v)\tCurrent (i)\tTemperature (t)\n\r");
@@ -79,6 +79,7 @@ void CLI_Voltage(void) {
 	}
 	int modNum = 0;
 	sscanf(tokens[2], "%d", &modNum);		// Converts the string number to int
+	SafetyStatus voltage = Voltage_CheckStatus();
 	switch(tokens[1][0]){		
 		// Specific module
 		case 'm':
@@ -96,7 +97,6 @@ void CLI_Voltage(void) {
 		// Safety Status
 		case 's':	
 			printf("Safety Status: ");
-				SafetyStatus voltage = Voltage_CheckStatus();
 				switch(voltage) {
 					case SAFE: 
 						printf("SAFE\n\r");
@@ -170,7 +170,7 @@ void CLI_Temperature(void) {
 		}
 		return;
 	}
-	uint16_t modNum = 0;
+	int16_t modNum = 0;
 	uint16_t sensNum = 0;
 	sscanf(tokens[2], "%d", (int*) &modNum);
 	sscanf(tokens[3], "%d", (int*) &sensNum);
@@ -198,7 +198,6 @@ void CLI_Temperature(void) {
 					printf("Module number %d: %.3f C\n\r", modNum+1, Temperature_GetModuleTemperature(modNum)/1000.0);
 				} else if(tokens[3] != NULL && (sensNum == 0 || sensNum == 1)) {
 					uint16_t boardNum = modNum/MAX_VOLT_SENSORS_PER_MINION_BOARD;
-					uint16_t absSensNum = modNum/(2*MAX_TEMP_SENSORS_PER_MINION_BOARD) + sensNum;
 					printf("Sensor %d on module %d: %.3f C\n\r", sensNum+1, modNum+1, 
 							Temperature_GetSingleTempSensor(boardNum, sensNum)/1000.0);
 				} else {
@@ -216,14 +215,78 @@ void CLI_Temperature(void) {
 	}
 }
 
-// TODO: display LTC register information (found in cell_asic struct);
-// 		 ask Sijin which registers are to be displayed;
-//		 should be passed/accessed in Minions variable (initialized in CLI_Init())
+// TODO: Test function and verify it prints the correct information;
+//		 confirm with Sijin that these are the correct registers to display;
 /** CLI_LTC6811
  * Interacts with LTC6811 registers
  */
 void CLI_LTC6811(void) {
-	printf("Config: ");
+	for(uint8_t current_ic = 0; current_ic < NUM_MINIONS; current_ic++) {
+		printf("Minion board %d: ", current_ic);
+		printf("Config: \n\rTX: ");
+		for(uint8_t i = 0; i < 6; i++) {
+			printf("%d", Minions[current_ic].config.tx_data[i]);
+		}
+		printf("\n\rRX: ");
+		for(uint8_t i = 0; i < 8; i++) {
+			printf("%d", Minions[current_ic].config.rx_data[i]);
+		}
+		printf("\n\rPEC: %d\n\r", Minions[current_ic].config.rx_pec_match);
+		printf("Config B: \n\rTX: ");
+		for(uint8_t i = 0; i < 6; i++) {
+			printf("%d", Minions[current_ic].configb.tx_data[i]);
+		}
+		printf("\n\rRX: ");
+		for(uint8_t i = 0; i < 8; i++) {
+			printf("%d", Minions[current_ic].configb.rx_data[i]);
+		}
+		printf("\n\rPEC: %d\n\r", Minions[current_ic].configb.rx_pec_match);
+		printf("COM: \n\rTX: ");
+		for(uint8_t i = 0; i < 6; i++) {
+			printf("%d", Minions[current_ic].com.tx_data[i]);
+		}
+		printf("\n\rRX: ");
+		for(uint8_t i = 0; i < 8; i++) {
+			printf("%d", Minions[current_ic].com.rx_data[i]);
+		}
+		printf("\n\rPEC: %d\n\r", Minions[current_ic].com.rx_pec_match);
+		printf("PWM: \n\rTX: ");
+		for(uint8_t i = 0; i < 6; i++) {
+			printf("%d", Minions[current_ic].pwm.tx_data[i]);
+		}
+		printf("\n\rRX: ");
+		for(uint8_t i = 0; i < 8; i++) {
+			printf("%d", Minions[current_ic].pwm.rx_data[i]);
+		}
+		printf("\n\rPEC: %d\n\r", Minions[current_ic].pwm.rx_pec_match);
+		printf("PWM B: \n\rTX: ");
+		for(uint8_t i = 0; i < 6; i++) {
+			printf("%d", Minions[current_ic].pwmb.tx_data[i]);
+		}
+		printf("\n\rRX: ");
+		for(uint8_t i = 0; i < 8; i++) {
+			printf("%d", Minions[current_ic].pwmb.rx_data[i]);
+		}
+		printf("\n\rPEC: %d\n\r", Minions[current_ic].pwmb.rx_pec_match);
+		printf("S Control: \n\rTX: ");
+		for(uint8_t i = 0; i < 6; i++) {
+			printf("%d", Minions[current_ic].sctrl.tx_data[i]);
+		}
+		printf("\n\rRX: ");
+		for(uint8_t i = 0; i < 8; i++) {
+			printf("%d", Minions[current_ic].sctrl.rx_data[i]);
+		}
+		printf("\n\rPEC: %d\n\r", Minions[current_ic].sctrl.rx_pec_match);
+		printf("S Control B: \n\rTX: ");
+		for(uint8_t i = 0; i < 6; i++) {
+			printf("%d", Minions[current_ic].sctrlb.tx_data[i]);
+		}
+		printf("\n\rRX: ");
+		for(uint8_t i = 0; i < 8; i++) {
+			printf("%d", Minions[current_ic].sctrlb.rx_data[i]);
+		}
+		printf("\n\rPEC: %d\n\r", Minions[current_ic].sctrlb.rx_pec_match);
+	}
 }
 
 /** CLI_Contactor
@@ -231,8 +294,8 @@ void CLI_LTC6811(void) {
  * printing the status of the contactor
  */
 void CLI_Contactor(void) {
+	FunctionalState contactor = Contactor_Flag();
 	switch(tokens[1][0]) {
-		FunctionalState contactor = Contactor_Flag();
 		case 's':
 			if(contactor == ENABLE) {
 				printf("Contactor is Enabled\n\r");

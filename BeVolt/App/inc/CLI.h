@@ -39,7 +39,7 @@ void CLI_InputParse(char *input);
  * asks for the override command
  * @return true or false
  */
-bool CLI_Startup(void);
+void CLI_Startup(void);
 
 /** CLI_Help
  * Displays the help menu

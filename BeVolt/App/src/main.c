@@ -122,7 +122,6 @@ void preliminaryCheck(void){
 		LED_On(WDOG);
 		while(1);		// Spin
 	}
-	override = CLI_Startup();			// Ask if need to charge the batteries
 }
 
 /** faultCondition
@@ -226,7 +225,7 @@ void faultCondition(void){
 // E.g. If you want to run a LTC6811 test, change "#define CHANGE_THIS_TO_TEST_NAME" to the
 //		following:
 //		#define LTC6811_TEST
-#define CAN_TEST_2
+#define CLI_TEST
 
 #ifdef Systick_TEST
 
@@ -882,9 +881,8 @@ int main() {
           /* Enable USART1 Receive interrupt */
           USART_ITConfig(USART1, USART_IT_RXNE, ENABLE);
       }
-#endif
 			
-#ifdef UART_INTERRUPT
+#elif defined UART_INTERRUPT
 #include "UART.h"
 #include "FIFO.h"
 int main(void){
@@ -1038,9 +1036,8 @@ int main(void) {
 }
 
 
-#elif define CAN_TEST_2
 
-#ifdef CLI_TEST
+#elif defined CLI_TEST
 int main(){
 	Contactor_Init();
 	EEPROM_Init();
@@ -1055,12 +1052,12 @@ int main(){
 		UART3_CheckAndEcho(&CLIFifo);
 		if (UART3_HasCommand(&CLIFifo)) {
 			UART3_GetCommand(&CLIFifo, command);
-			CLI_Commands(command);
+			CLI_Handler(command);
 		}
 	}
-#endif
+}
 
-#ifdef CAN_TEST_2
+#elif defined CAN_TEST_2
 #include "CAN.h"
 /*message:
 typedef enum {
@@ -1224,7 +1221,6 @@ int main() {
 	#else
 	CAN1_Init(CAN_Mode_Normal);
 	#endif
-
 	// Data to transmit
 	uint8_t data[8] = {0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10};
 	uint32_t id = CAN_ID_BPS_ALL_CLEAR;
@@ -1265,7 +1261,6 @@ int main() {
 			}
 			printf("\n");
 		}
-		// #endif
 	}
 }
 
