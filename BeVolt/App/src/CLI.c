@@ -72,6 +72,7 @@ void CLI_Help(void) {
  * voltage parameter(s)
  */
 void CLI_Voltage(void) {
+	Voltage_UpdateMeasurements();
 	if(tokens[1] == NULL) {
 		for(int i = 0; i < NUM_BATTERY_MODULES; i++){
 			printf("Module number %d: %.3fV\n\r", i+1, Voltage_GetModuleMillivoltage(i)/1000.0);

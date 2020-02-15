@@ -25,7 +25,7 @@ char command[fifo_size];
 void initialize(void);
 void preliminaryCheck(void);
 void faultCondition(void);
-
+/*
 int realmain(){
 	__disable_irq();		// Disable all interrupts until initialization is done
 	initialize();			// Initialize codes/pins
@@ -74,7 +74,7 @@ int realmain(){
 	faultCondition();
 	return 0;
 }
-
+*/
 /**
  * Initialize system.
  *	1. Initialize device drivers.
@@ -1042,6 +1042,8 @@ int main(void) {
 #elif defined CLI_TEST
 int main(){
 	initialize();
+	Voltage_Init(Minions);
+	Temperature_Init(Minions);
 	Contactor_Init();
 	EEPROM_Init();
 	CLI_Init(Minions);
