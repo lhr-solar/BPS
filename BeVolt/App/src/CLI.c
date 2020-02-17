@@ -13,6 +13,7 @@
 
 static cell_asic* Minions;
 char* tokens[MAX_TOKEN_SIZE];
+uint32_t hash_tokens[MAX_TOKEN_SIZE];
 
 /** CLI_Init
  * Initializes the CLI with the values it needs
@@ -37,6 +38,16 @@ void CLI_InputParse(char *input) {
 		tokens[i] = split;
 		split = strtok_r(NULL, " ", &tokenized);
 	}
+}
+
+uint32_t CLI_StringHash(char* string) {
+	uint32_t hash = 0;
+	uint32_t m = 1000000009;
+	uint8_t p = 31;
+	for(uint8_t i = 0; string[i]; i++) {
+		hash += string[i] * pow(p, i);
+	}
+	return hash % m;
 }
 
 /** CLI_Startup
@@ -525,6 +536,29 @@ void CLI_Critical(void) {
 	Contactor_Off();
 	printf("Contactor is off");
 }
+
+/** CLI_All
+ * Displays all information about BPS modules
+ * (voltage, current, temperature, charge, contactor)
+ */
+// Update when hashing works
+// void CLI_All(void){ // this needs to be double checked to make sure we aren't messing anything up
+// 	printf("Voltage: \n\r");
+// 	tokens = "Voltage";
+// 	CLI_Voltage();
+// 	printf("Current: \n\r");
+// 	tokens = "Current";
+// 	CLI_Current();
+// 	printf("Temperature: \n\r");
+// 	tokens = "Temperature";
+// 	CLI_Temperature();
+// 	printf("State of Charge: \n\r");
+// 	tokens = "%%";
+// 	CLI_Charge();
+// 	printf("Contactor: \n\r");
+// 	tokens = "switch state";
+// 	CLI_Contactor();
+// }
 
 /** CLI_Handler
  * Routes the command given to the proper
