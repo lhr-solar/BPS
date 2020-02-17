@@ -547,24 +547,25 @@ void CLI_Critical(void) {
  * Displays all information about BPS modules
  * (voltage, current, temperature, charge, contactor)
  */
-// Update when hashing works
-// void CLI_All(void){ // this needs to be double checked to make sure we aren't messing anything up
-// 	printf("Voltage: \n\r");
-// 	tokens = "Voltage";
-// 	CLI_Voltage();
-// 	printf("Current: \n\r");
-// 	tokens = "Current";
-// 	CLI_Current();
-// 	printf("Temperature: \n\r");
-// 	tokens = "Temperature";
-// 	CLI_Temperature();
-// 	printf("State of Charge: \n\r");
-// 	tokens = "%%";
-// 	CLI_Charge();
-// 	printf("Contactor: \n\r");
-// 	tokens = "switch state";
-// 	CLI_Contactor();
-// }
+void CLI_All(void){
+	printf("Voltage: \n\r");
+	hash_tokens[0] = VOLTAGE;
+	hash_tokens[1] = 0;
+	CLI_Voltage();
+	printf("Current: \n\r");
+	hash_tokens[0] = CURRENT;
+	CLI_Current();
+	printf("Temperature: \n\r");
+	hash_tokens[0] = TEMPERATURE;
+	CLI_Temperature();
+	printf("State of Charge: \n\r");
+	hash_tokens[0] = CHARGE;
+	CLI_Charge();
+	printf("Contactor: \n\r");
+	hash_tokens[0] = CONTACTOR;
+	hash_tokens[1] = STATE;
+	CLI_Contactor();
+}
 
 /** CLI_Handler
  * Routes the command given to the proper
