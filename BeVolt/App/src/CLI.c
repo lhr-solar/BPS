@@ -109,7 +109,7 @@ void CLI_Voltage(void) {
 			printf("Total voltage: %.3fV\n\r", Voltage_GetTotalPackVoltage()/1000.0);
 			break;
 		// Safety Status
-		case SAFE:
+		case SAFE_HASH:
 		case SAFETY:	
 			printf("Safety Status: ");
 				switch(voltage) {
@@ -152,7 +152,7 @@ void CLI_Current(void) {
 		case LOW: // Low precision reading
 			printf("Low: %.3fA\n\r", Current_GetLowPrecReading()/1000.0);
 			break;
-		case SAFE: 
+		case SAFE_HASH: 
 		case SAFETY:
 			if (Current_CheckStatus() == SAFE) {
 				printf("Safety Status: SAFE\n\r");
@@ -392,28 +392,28 @@ void CLI_LED(void) {
 				}
 			break;
 		default:
-			if(strcmp("fault", tokens[1]) == 0) {
+			if(hash_tokens[1] == FAULT_HASH) {
 				toggleLED(FAULT);
 			}
-			else if(strcmp("run", tokens[1]) == 0) {
+			else if(hash_tokens[1] == RUN_HASH) {
 				toggleLED(RUN);
 			}
-			else if(strcmp("ocurr", tokens[1]) == 0) {
+			else if(hash_tokens[1] == OCURR_HASH) {
 				toggleLED(OCURR);
 			}
-			else if(strcmp("otemp", tokens[1]) == 0) {
+			else if(hash_tokens[1] == OTEMP_HASH) {
 				toggleLED(OTEMP);
 			}
-			else if(strcmp("ovolt", tokens[1]) == 0) {
+			else if(hash_tokens[1] == OVOLT_HASH) {
 				toggleLED(OVOLT);
 			}
-			else if(strcmp("wdog", tokens[1]) == 0) {
+			else if(hash_tokens[1] == WDOG_HASH) {
 				toggleLED(WDOG);
 			}
-			else if(strcmp("can", tokens[1]) == 0) {
+			else if(hash_tokens[1] == CAN_HASH) {
 				toggleLED(CAN);
 			}
-			else if(strcmp("extra", tokens[1]) == 0) {
+			else if(hash_tokens[1] == EXTRA_HASH) {
 				toggleLED(EXTRA);
 			} else {
 				printf("Invalid LED command\n\r");
@@ -584,7 +584,7 @@ void CLI_Handler(char *input) {
 		printf("\n\r");
 	return;
 	}
-	if(hash_tokens[0] == PING)) {
+	if(hash_tokens[0] == PING) {
 		printf("pong\n\r");
 	}
 	switch(hash_tokens[0]) {
@@ -625,7 +625,7 @@ void CLI_Handler(char *input) {
 			CLI_LED();
 			break;
 		// CAN commands
-		case CAN:
+		case CAN_HASH:
 		case CANBUS:
 			CLI_CAN();
 			break;

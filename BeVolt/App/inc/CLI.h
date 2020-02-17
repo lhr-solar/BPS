@@ -35,7 +35,7 @@
 #define CHARGE      990159610
 #define LED         99339
 #define LIGHTS      402681384
-#define CAN         108816
+#define CAN_HASH    108816
 #define CANBUS      403432629
 #define DISPLAY     893981360
 #define WATCHDOG    811524042
@@ -47,7 +47,7 @@
 
 #define MODULE      994869698
 #define TOTAL       102745028
-#define SAFE        3110035
+#define SAFE_HASH   3110035
 #define SAFETY      574365715
 #define HIGH        3200606
 #define LOW         117908
@@ -62,13 +62,14 @@
 #define WRITE       96835935
 #define ERROR       108701384
 
-#define FAULT       110461410
-#define UVOLT       110456310
-#define OVOLT       110456304
-#define OTEMP       106782339
-#define OCURR       108793185
-#define WDOG        3178363
-#define EXTRA       93093008
+#define FAULT_HASH  110461410
+#define RUN_HASH		109451
+#define UVOLT_HASH  110456310
+#define OVOLT_HASH  110456304
+#define OTEMP_HASH  106782339
+#define OCURR_HASH  108793185
+#define WDOG_HASH   3178363
+#define EXTRA_HASH  93093008
 
 #define PARTYTIME   958393139
 #define PING        3177550
@@ -84,6 +85,8 @@ void CLI_Init(cell_asic* minions);
  * @param input is a pointer to the input string
  */
 void CLI_InputParse(char *input); 
+
+uint32_t CLI_StringHash(char* string);
 
 /** CLI_Startup
  * Prints the welcome messages and
