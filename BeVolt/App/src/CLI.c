@@ -12,8 +12,7 @@
 #define MAX_TOKEN_SIZE 4
 
 static cell_asic* Minions;
-char* tokens[MAX_TOKEN_SIZE];
-uint32_t hash_tokens[MAX_TOKEN_SIZE];
+int32_t hashTokens[MAX_TOKEN_SIZE];
 
 /** CLI_Init
  * Initializes the CLI with the values it needs
@@ -25,7 +24,7 @@ void CLI_Init(cell_asic* boards) {
 }
 
 /** CLI_InputParse
- * Parses the input string and stores in tokens[]
+ * Parses the input string and stores in hashTokens[]
  * @param input is a pointer to the input string
  */
 void CLI_InputParse(char *input) {
@@ -35,8 +34,11 @@ void CLI_InputParse(char *input) {
 		for(int j = 0; j < strlen(split); j++) {
 			split[j] = tolower(split[j]);
 		}
-		tokens[i] = split;
-		hash_tokens[i] = CLI_StringHash(split);
+		if(!isalpha(split[0])) {
+			sscanf(split, "%d", &hashTokens[i]);
+		} else {
+			hashTokens[i] = CLI_StringHash(split);
+		}
 		split = strtok_r(NULL, " ", &tokenized);
 	}
 }
@@ -85,23 +87,21 @@ void CLI_Help(void) {
  */
 void CLI_Voltage(void) {
 	Voltage_UpdateMeasurements();
-	if(hash_tokens[1] == NULL) {
+	if(hashTokens[1] == NULL) {
 		for(int i = 0; i < NUM_BATTERY_MODULES; i++){
 			printf("Module number %d: %.3fV\n\r", i+1, Voltage_GetModuleMillivoltage(i)/1000.0);
 		}
 		return;
 	}
-	int modNum = 0;
-	sscanf(tokens[2], "%d", &modNum);		// TODO: convert hashed number to its integer
 	SafetyStatus voltage = Voltage_CheckStatus();
-	switch(hash_tokens[1]){		
+	switch(hashTokens[1]){		
 		// Specific module
 		case MODULE:
-			if (modNum == NULL || modNum > NUM_BATTERY_MODULES || modNum < 0){
+			if (hashTokens[2] == NULL || hashTokens[2] > NUM_BATTERY_MODULES || hashTokens[2] < 0){
 				printf("Invalid module number");
 			}
 			else {
-				printf("Module number %d: %.3fV\n\r", modNum, Voltage_GetModuleMillivoltage(modNum-1)/1000.0);
+				printf("Module number %d: %.3fV\n\r", hashTokens[2], Voltage_GetModuleMillivoltage(hashTokens[2]-1)/1000.0);
 			}
 			break;
 		// Total
@@ -140,12 +140,12 @@ void CLI_Voltage(void) {
  * current parameter(s)
  */
 void CLI_Current(void) {
-	if(hash_tokens[1] == NULL) {
+	if(hashTokens[1] == NULL) {
 		printf("High: %.3fA\n\r", Current_GetHighPrecReading()/1000.0);	// Prints 4 digits, number, and A
 		printf("Low: %.3fA\n\r", Current_GetLowPrecReading()/1000.0);
 		return;
 	}
-	switch (hash_tokens[1]) {
+	switch (hashTokens[1]) {
 		case HIGH: // High precision reading
 			printf("High: %.3fA\n\r", Current_GetHighPrecReading()/1000.0);
 			break;
@@ -181,19 +181,16 @@ void CLI_Current(void) {
  * temperature parameter(s)
  */
 void CLI_Temperature(void) {
-	if(hash_tokens[1] == NULL) {
+	if(hashTokens[1] == NULL) {
 		for(int i = 0; i < NUM_BATTERY_MODULES; i++) {
 			printf("Module number %d: %.3f C\n\r", i+1, Temperature_GetModuleTemperature(i)/1000.0);
 		}
 		return;
 	}
-	int16_t modNum = 0;
-	uint16_t sensNum = 0;
-	sscanf(tokens[2], "%d", (int*) &modNum);
-	sscanf(tokens[3], "%d", (int*) &sensNum);
-	modNum--;
-	sensNum--;
-	switch(hash_tokens[1]){			
+	// Account for 1-indexing
+	hashTokens[2]--;
+	hashTokens[3]--;
+	switch(hashTokens[1]){			
 		// All temperature sensors
 		case ALL:
 			for(int i = 0; i < NUM_MINIONS; i++) {		// last minion only has 14 sensors
@@ -207,16 +204,16 @@ void CLI_Temperature(void) {
 			break;
 		// Temperature of specific module
 		case MODULE:
-			if (tokens[2] == NULL || modNum > NUM_BATTERY_MODULES || modNum < 0){
+			if (hashTokens[2] == NULL || hashTokens[2] > NUM_BATTERY_MODULES || hashTokens[2] < 0){
 				printf("Invalid module number");
 			}
 			else {
-				if(tokens[3] == NULL) {
-					printf("Module number %d: %.3f C\n\r", modNum+1, Temperature_GetModuleTemperature(modNum)/1000.0);
-				} else if(tokens[3] != NULL && (sensNum == 0 || sensNum == 1)) {
-					uint16_t boardNum = modNum/MAX_VOLT_SENSORS_PER_MINION_BOARD;
-					printf("Sensor %d on module %d: %.3f C\n\r", sensNum+1, modNum+1, 
-							Temperature_GetSingleTempSensor(boardNum, sensNum)/1000.0);
+				if(hashTokens[3] == NULL) {
+					printf("Module number %d: %.3f C\n\r", hashTokens[2]+1, Temperature_GetModuleTemperature(hashTokens[2])/1000.0);
+				} else if(hashTokens[3] != NULL && (hashTokens[3] == 0 || hashTokens[3] == 1)) {
+					uint16_t boardNum = hashTokens[2]/MAX_VOLT_SENSORS_PER_MINION_BOARD;
+					printf("Sensor %d on module %d: %.3f C\n\r", hashTokens[3]+1, hashTokens[2]+1, 
+							Temperature_GetSingleTempSensor(boardNum, hashTokens[3])/1000.0);
 				} else {
 					printf("Invalid sensor number\n\r");
 				}
@@ -294,7 +291,7 @@ void CLI_LTC6811(void) {
  */
 void CLI_Contactor(void) {
 	FunctionalState contactor = Contactor_Flag();
-	switch(hash_tokens[1]) {
+	switch(hashTokens[1]) {
 		case STATE:
 			if(contactor == ENABLE) {
 				printf("Contactor is Enabled\n\r");
@@ -313,21 +310,18 @@ void CLI_Contactor(void) {
  * state of charge parameter(s)
  */
 void CLI_Charge(void) {
-	int accumVal;
-	if(hash_tokens[1] == NULL) {
+	if(hashTokens[1] == NULL) {
 		printf("The battery percentage is %.2f%%\n\r", SoC_GetPercent()/100.0);
 		return;
 	}
-	switch(hash_tokens[1]) {
+	switch(hashTokens[1]) {
 		case RESET:
 			SoC_SetAccum(0);	//resets accumulator
 			printf("Accumulator has been reset\n\r");
 			break;
 		case SET:
-			//converts string to integer and passes value to accumulator function
-			sscanf(tokens[2], "%d", &accumVal);
-			SoC_SetAccum(accumVal);
-			printf("Accumulator has been set to %d%%\n\r", accumVal);
+			SoC_SetAccum(hashTokens[2]);
+			printf("Accumulator has been set to %d%%\n\r", hashTokens[2]);
 			break;
 		default: 
 			printf("Invalid Charge Command\n\r");
@@ -341,10 +335,10 @@ void CLI_Charge(void) {
  * @param led is the led to toggle
  */
 void toggleLED(led input) {
-	if(strcmp("1", tokens[2]) == 0 || strcmp("on", tokens[2]) == 0) {
+	if(hashTokens[2] == 1 || hashTokens[2] == ON) {
 		LED_On(input);
 	}
-	else if(strcmp("0", tokens[2]) == 0 || strcmp("off", tokens[2]) == 0) {
+	else if(hashTokens[2] == 0 || hashTokens[2] == OFF) {
 		LED_Off(input);
 	} else {
 		printf("Invalid LED command\n\r");
@@ -360,14 +354,14 @@ void toggleLED(led input) {
 void CLI_LED(void) {
 	LED_Init();
 	uint8_t error = (GPIOB->ODR) & GPIO_Pin_12;
-	if(hash_tokens[1] == NULL) {
+	if(hashTokens[1] == NULL) {
 		if(error) {
 			printf("Error light is On\n\r");
 		} else {
 			printf("Error light is Off\n\r");
 		}
 	}
-	switch(hash_tokens[1]) {
+	switch(hashTokens[1]) {
 		case TEST:
 				printf("\n\r");
 				for(int i = 0; i < 10; i++) {
@@ -392,28 +386,28 @@ void CLI_LED(void) {
 				}
 			break;
 		default:
-			if(hash_tokens[1] == FAULT_HASH) {
+			if(hashTokens[1] == FAULT_HASH) {
 				toggleLED(FAULT);
 			}
-			else if(hash_tokens[1] == RUN_HASH) {
+			else if(hashTokens[1] == RUN_HASH) {
 				toggleLED(RUN);
 			}
-			else if(hash_tokens[1] == OCURR_HASH) {
+			else if(hashTokens[1] == OCURR_HASH) {
 				toggleLED(OCURR);
 			}
-			else if(hash_tokens[1] == OTEMP_HASH) {
+			else if(hashTokens[1] == OTEMP_HASH) {
 				toggleLED(OTEMP);
 			}
-			else if(hash_tokens[1] == OVOLT_HASH) {
+			else if(hashTokens[1] == OVOLT_HASH) {
 				toggleLED(OVOLT);
 			}
-			else if(hash_tokens[1] == WDOG_HASH) {
+			else if(hashTokens[1] == WDOG_HASH) {
 				toggleLED(WDOG);
 			}
-			else if(hash_tokens[1] == CAN_HASH) {
+			else if(hashTokens[1] == CAN_HASH) {
 				toggleLED(CAN);
 			}
-			else if(hash_tokens[1] == EXTRA_HASH) {
+			else if(hashTokens[1] == EXTRA_HASH) {
 				toggleLED(EXTRA);
 			} else {
 				printf("Invalid LED command\n\r");
@@ -440,7 +434,7 @@ void CLI_Display(void) {}
  * Shows whether watchdog was tripped
  */
 void CLI_Watchdog(void) {
-	if(hash_tokens[1] == NULL) {
+	if(hashTokens[1] == NULL) {
 		printf("Safety Status: ");
 		if (WDTimer_DidSystemReset() == SAFE){
 			printf("SAFE\n\r");
@@ -451,7 +445,7 @@ void CLI_Watchdog(void) {
 	uint8_t errorAddrArray[2];
 	EEPROM_ReadMultipleBytes(EEPROM_WATCHDOG_PTR_LOC, 2, errorAddrArray);
 	uint16_t errorAddr = (errorAddrArray[0] << 2) + errorAddrArray[1];
-	switch(hash_tokens[1]) {
+	switch(hashTokens[1]) {
 		case ERROR:
 			printf("Most recent Watchdog error: %d", EEPROM_ReadByte(errorAddr-1));
 			break;
@@ -466,19 +460,19 @@ void CLI_Watchdog(void) {
  * by reading and writing to the EEPROM
  */
 void CLI_EEPROM(void) {
-	if(hash_tokens[1] == NULL) {
+	if(hashTokens[1] == NULL) {
 		EEPROM_SerialPrintData();
 		return;
 	}
 	uint8_t errorAddrArray[2];
 	uint16_t errorAddr = 0;
-	switch(hash_tokens[1]) {
+	switch(hashTokens[1]) {
 		case RESET:
 			EEPROM_Reset();
 			printf("EEPROM has been reset");
 			break;
 		case ERROR:
-			switch(hash_tokens[2]) {
+			switch(hashTokens[2]) {
 				case FAULT:
 					EEPROM_ReadMultipleBytes(EEPROM_FAULT_PTR_LOC, 2, errorAddrArray);
 					errorAddr = (errorAddrArray[0] << 2) + errorAddrArray[1];
@@ -549,21 +543,21 @@ void CLI_Critical(void) {
  */
 void CLI_All(void){
 	printf("Voltage: \n\r");
-	hash_tokens[0] = VOLTAGE;
-	hash_tokens[1] = 0;
+	hashTokens[0] = VOLTAGE;
+	hashTokens[1] = 0;
 	CLI_Voltage();
 	printf("Current: \n\r");
-	hash_tokens[0] = CURRENT;
+	hashTokens[0] = CURRENT;
 	CLI_Current();
 	printf("Temperature: \n\r");
-	hash_tokens[0] = TEMPERATURE;
+	hashTokens[0] = TEMPERATURE;
 	CLI_Temperature();
 	printf("State of Charge: \n\r");
-	hash_tokens[0] = CHARGE;
+	hashTokens[0] = CHARGE;
 	CLI_Charge();
 	printf("Contactor: \n\r");
-	hash_tokens[0] = CONTACTOR;
-	hash_tokens[1] = STATE;
+	hashTokens[0] = CONTACTOR;
+	hashTokens[1] = STATE;
 	CLI_Contactor();
 }
 
@@ -574,7 +568,7 @@ void CLI_All(void){
  */
 void CLI_Handler(char *input) {
 	CLI_InputParse(input);
-	if(hash_tokens[0] == PARTYTIME) {
+	if(hashTokens[0] == PARTYTIME) {
 		printf("\n\r");
 		for(int i = 0; i < 100; i++) {
 			printf("%s", party_parrot_frames[i%10]);
@@ -585,10 +579,10 @@ void CLI_Handler(char *input) {
 		printf("\n\r");
 	return;
 	}
-	if(hash_tokens[0] == PING) {
+	if(hashTokens[0] == PING) {
 		printf("pong\n\r");
 	}
-	switch(hash_tokens[0]) {
+	switch(hashTokens[0]) {
 		// Help menu
 		case MENU:
 		case HELP:
