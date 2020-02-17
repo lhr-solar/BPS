@@ -36,6 +36,7 @@ void CLI_InputParse(char *input) {
 			split[j] = tolower(split[j]);
 		}
 		tokens[i] = split;
+		hash_tokens[i] = CLI_StringHash(split);
 		split = strtok_r(NULL, " ", &tokenized);
 	}
 }
@@ -581,66 +582,72 @@ void CLI_Handler(char *input) {
 	if(!strcmp(tokens[0], "ping")) {
 		printf("pong\n\r");
 	}
-	switch(input[0]) {
+	switch(hash_tokens[0]) {
 		// Help menu
-		case 'h':
-		case 'm':
-		case '?':
+		case MENU:
+		case HELP:
 			CLI_Help();
 			break;
 		// Voltage commands
-		case 'v':
+		case VOLTAGE:
 			CLI_Voltage();
 			break;
 		// Current commands
-		case 'i':
+		case CURRENT:
 			CLI_Current();
 			break;
 		// Temperature commands
-		case 't':
+		case TEMPERATURE:
 			CLI_Temperature();
 			break;
 		// LTC6811 register commands
-		case 'r':
+		case REGISTER:
+		case LTC:
 			CLI_LTC6811();
 			break;
 		// Contactor/Switch commands
-		case 's':
+		case SWITCH:
+		case CONTACTOR:
 			CLI_Contactor();
 			break;
 		// State of Charge commands
-		case 'q':
-		case '%':
+		case CHARGE:
 			CLI_Charge();
 			break;
 		// Error light commands
-		case 'l':
+		case LED:
+		case LIGHTS:
 			CLI_LED();
 			break;
 		// CAN commands
-		case 'c':
+		case CAN:
+		case CANBUS:
 			CLI_CAN();
 			break;
 		// Display commands
-		case 'd':
+		case DISPLAY:
 			CLI_Display();
 			break;
 		// Watchdog commands
-		case 'w':
+		case WATCHDOG:
 			CLI_Watchdog();
 			break;
 		// EEPROM commands
-		case 'e':
+		case EEPROM:
 			CLI_EEPROM();
 			break;
 		// Peripheral commands
-		case 'a':
+		case ADC_HASH:
 			CLI_ADC();
 			break;
 		// Emergency Abort
-		case '!':
+		case CRITICAL:
+		case ABORT:
 			CLI_Critical();
 			break;		// ABORT
+		// All
+		case ALL:
+			break;
 		default:
 			printf("Invalid command. Type 'h' or 'm' or '?' for the help menu\n\r");
 			break;

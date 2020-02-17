@@ -22,6 +22,53 @@
 #include "UART.h"
 #include "Images.h"
 
+// String hash values
+#define HELP        3443615
+#define MENU        3594497
+#define VOLTAGE     485505740
+#define CURRENT     117203550
+#define TEMPERATURE 801551920
+#define LTC         98843
+#define REGISTER    985857826
+#define CONTACTOR   85684648
+#define SWITCH      72420721
+#define CHARGE      990159610
+#define LED         99339
+#define LIGHTS      402681384
+#define CAN         108816
+#define CANBUS      403432629
+#define DISPLAY     893981360
+#define WATCHDOG    811524042
+#define EEPROM      226595301
+#define ADC_HASH    98336
+#define CRITICAL    368282223
+#define ABORT       110634416
+#define ALL         107233
+
+#define MODULE      994869698
+#define TOTAL       102745028
+#define SAFE        3110035
+#define SAFETY      574365715
+#define HIGH        3200606
+#define LOW         117908
+#define STATE       96828305
+#define ON          3521
+#define OFF         101295
+#define SET         114722
+#define RESET       110251087
+#define TEST        3569518
+#define READ        3075562
+#define WRITE       96835935
+#define ERROR       108701384
+
+#define FAULT       110461410
+#define UVOLT       110456310
+#define OVOLT       110456304
+#define OTEMP       106782339
+#define OCURR       108793185
+#define WDOG        3178363
+#define EXTRA       93093008
+
 /** CLI_Init
  * Initializes the CLI with the values it needs
  * @param minions is a cell_asic struct describing the LTC6811
