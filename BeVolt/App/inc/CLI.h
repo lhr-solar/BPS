@@ -52,6 +52,7 @@
 #define HIGH        3200606
 #define LOW         117908
 #define STATE       96828305
+#define CHARGING    66671398
 #define ON          3521
 #define OFF         101295
 #define SET         114722
@@ -68,6 +69,9 @@
 #define OCURR       108793185
 #define WDOG        3178363
 #define EXTRA       93093008
+
+#define PARTYTIME   958393139
+#define PING        3177550
 
 /** CLI_Init
  * Initializes the CLI with the values it needs
