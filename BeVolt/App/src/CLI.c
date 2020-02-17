@@ -65,20 +65,19 @@ void CLI_Startup(void) {
 	printf(">> ");
 }
 
-// TODO: Make the help menu look prettier?
 /** CLI_Help
  * Displays the help menu
  */
 void CLI_Help(void) {
-	printf("-------------------Help Menu-------------------\n\r");
+	printf("-------------------------Help Menu-------------------------\n\r");
 	printf("The available commands are: \n\r");
-	printf("Voltage (v)\tCurrent (i)\tTemperature (t)\n\r");
-	printf("Contactor/Switch (sw)\tCharge (q)\tError Light (l)\n\r");
-	printf("CAN (c)\tEEPROM (ee)\tDisplay(d)\n\r");
-	printf("LTC (ltc)\tWatchdog(w)\tADC(adc)\n\r");
-	printf("Critical/Abort (!)\tAll(a)\n\r");
+	printf("Voltage\t\t\tCurrent\t\t\tTemperature\n\r");
+	printf("Contactor/Switch\tCharge\t\t\tLights/LED\n\r");
+	printf("CAN\t\t\tEEPROM\t\t\tDisplay\n\r");
+	printf("LTC/Register\t\tWatchdog\t\tADC\n\r");
+	printf("Critical/Abort\t\tAll\n\r");
 	printf("Keep in mind: all values are 1-indexed\n\r");
-	printf("-----------------------------------------------\n\r");
+	printf("-----------------------------------------------------------\n\r");
 }
 
 /** CLI_Voltage
