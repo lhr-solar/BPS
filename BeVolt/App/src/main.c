@@ -98,18 +98,22 @@ void initialize(void){
 	__enable_irq();
 	CLI_Startup();
 
-	// TODO: Fix this CLI
 	// Checks to see if the batteries need to be charged
-	/*
 	Voltage_UpdateMeasurements();
 	SafetyStatus voltage = Voltage_CheckStatus();
 	if(voltage == UNDERVOLTAGE) {
-		char over = 'n';
 		printf("Do you need to charge the batteries? (y/n)\n\r>> ");
-		scanf("%c", &over);
-		override = over == 'y' ? true : false;
+		uint32_t wait = 0;
+		while(wait < 1000000) {
+			UART3_CheckAndEcho(&CLIFifo);
+			if(UART3_HasCommand(&CLIFifo)) {
+				UART3_GetCommand(&CLIFifo, command);
+				override = command[0] == 'y' ? true : false;
+				break;
+			}
+			wait++;
+		}
 	}
-	*/
 }
 
 /** preliminaryCheck
