@@ -228,8 +228,6 @@ void CLI_Temperature(void) {
 	}
 }
 
-// TODO: Test function and verify it prints the correct information;
-//		 confirm with Sijin that these are the correct registers to display;
 /** CLI_LTC6811
  * Interacts with LTC6811 registers
  */
@@ -526,14 +524,28 @@ void CLI_ADC(void) {
 	printf("Low precision ADC: %d\n\r", ADC_ReadLow());
 }
 
-// TODO: Check if we want to add a 2FA to this?
 
 /** CLI_Critical
  * Shuts off contactor manually
  */  
 void CLI_Critical(void) {
-	Contactor_Off();
-	printf("Contactor is off");
+	Fifo criticalFifo;
+	char response[fifo_size];
+	printf("Please type 'shutdown' to turn the contactor off");
+	while(1) {
+		UART3_CheckAndEcho(&criticalFifo);
+		if(UART3_HasCommand(&criticalFifo)) {
+			UART3_GetCommand(&criticalFifo, response);
+			if(CLI_StringHash(response) == SHUTDOWN) {
+				Contactor_Off();
+				printf("Contactor is off\n\r");
+				break;
+			} else {
+				printf("Contactor is still on");
+				break;
+			}
+		}
+	}
 }
 
 /** CLI_All

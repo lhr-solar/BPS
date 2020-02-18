@@ -71,6 +71,7 @@
 #define WDOG_HASH   3178363
 #define EXTRA_HASH  93093008
 
+#define SHUTDOWN    243090822
 #define PARTYTIME   958393139
 #define PING        3177550
 

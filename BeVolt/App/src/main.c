@@ -25,7 +25,7 @@ char command[fifo_size];
 void initialize(void);
 void preliminaryCheck(void);
 void faultCondition(void);
-/*
+
 int realmain(){
 	__disable_irq();		// Disable all interrupts until initialization is done
 	initialize();			// Initialize codes/pins
@@ -38,14 +38,14 @@ int realmain(){
 		// First update the measurements.
 		Voltage_UpdateMeasurements();
 		Current_UpdateMeasurements();
-    Temperature_UpdateAllMeasurements();
+    	Temperature_UpdateAllMeasurements();
 
 		// Update battery percentage
 		SoC_Calculate(Current_GetLowPrecReading());
 
 		// Checks for user input to send to CLI
 		UART3_CheckAndEcho(&CLIFifo);
-		if (UART3_HasCommand(&CLIFifo)) {
+		if(UART3_HasCommand(&CLIFifo)) {
 			UART3_GetCommand(&CLIFifo, command);
 			CLI_Handler(command);
 		}
@@ -74,7 +74,7 @@ int realmain(){
 	faultCondition();
 	return 0;
 }
-*/
+
 /**
  * Initialize system.
  *	1. Initialize device drivers.
