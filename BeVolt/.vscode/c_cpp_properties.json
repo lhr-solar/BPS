@@ -1,0 +1,30 @@
+{
+    "configurations": [
+        {
+            "name": "Linux",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "${workspaceFolder}/App/inc",
+                "${workspaceFolder}/App/src",
+                "${workspaceFolder}/Drivers/inc",
+                "${workspaceFolder}/Drivers/src",
+                "${workspaceFolder}/Periphs/inc",
+                "${workspaceFolder}/Periphs/src",
+                "${workspaceFolder}/CMSIS/Include",
+                "${workspaceFolder}/CMSIS/Device/Include",
+                "${workspaceFolder}/STM32F4xx_StdPeriph_Driver",
+                "${workspaceFolder}/STM32F4xx_StdPeriph_Driver/inc",
+                "${workspaceFolder}/STM32F4xx_StdPeriph_Driver/src"
+            ],
+            "defines": [
+                "USE_STDPERIPH_DRIVER",
+                "STM32F413_423xx"
+            ],
+            "compilerPath": "/usr/bin/gcc",
+            "cStandard": "c11",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "clang-x64"
+        }
+    ],
+    "version": 4
+}
