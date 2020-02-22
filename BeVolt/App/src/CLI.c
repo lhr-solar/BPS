@@ -35,7 +35,7 @@ void CLI_InputParse(char *input) {
 		for(int j = 0; j < strlen(split); j++) {
 			split[j] = tolower(split[j]);
 		}
-		if(i == 3) {
+		if(i == 3) {//CAN requires argument #3 to be in hex
 			strcpy(hexString, split);
 		}
 		if(!isalpha(split[0])) {
