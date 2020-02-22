@@ -208,9 +208,9 @@ void CLI_Temperature(void) {
 				printf("Invalid module number\n\r");
 			}
 			else {
-				if(hashTokens[3] == NULL) {
+				if(hashTokens[3] == NULL) {//temperature of module
 					printf("Module number %d: %.3f C\n\r", hashTokens[2], Temperature_GetModuleTemperature(hashTokens[2]-1)/1000.0);
-				} else if(hashTokens[3]-1 == 0 || hashTokens[3]-1 == 1) {
+				} else if(hashTokens[3]-1 == 0 || hashTokens[3]-1 == 1) {//temperature of specific sensor in module
 					uint16_t boardNum = (hashTokens[2]-1)/MAX_VOLT_SENSORS_PER_MINION_BOARD;
 					printf("Sensor %d on module %d: %.3f C\n\r", hashTokens[3], hashTokens[2], 
 							Temperature_GetSingleTempSensor(boardNum, hashTokens[3]-1)/1000.0);
