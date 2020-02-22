@@ -155,7 +155,8 @@ void toggleLED(led input);
 void CLI_LED(void);
 
 /** CLI_CAN
- * Interacts with CAN
+ * Interacts with CAN by
+ * reading and writing to bus
  */
 void CLI_CAN(void);
 

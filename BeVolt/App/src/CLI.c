@@ -413,7 +413,8 @@ void CLI_LED(void) {
 }
 
 /** CLI_CAN
- * Interacts with CAN
+ * Interacts with CAN by
+ * reading and writing to bus
  */
 void CLI_CAN(void) {
 	uint8_t readData;
@@ -431,31 +432,31 @@ void CLI_CAN(void) {
 		case WRITE: 
 			switch(hashTokens[2]) {
 				case CAN_TRIP:
-					CAN1_Write(CAN_ID_BPS_TRIP, writeData, strlen(hexString)/2);
+					CAN1_Write(CAN_ID_BPS_TRIP, writeData, (strlen(hexString)/2)+(strlen(hexString)%2));
 					break;
 				case CLEAR:
-					CAN1_Write(CAN_ID_BPS_ALL_CLEAR, writeData, strlen(hexString)/2);
+					CAN1_Write(CAN_ID_BPS_ALL_CLEAR, writeData, (strlen(hexString)/2)+(strlen(hexString)%2));
 					break;
 				case OFF:
-					CAN1_Write(CAN_ID_BPS_OFF, writeData, strlen(hexString)/2);
+					CAN1_Write(CAN_ID_BPS_OFF, writeData, (strlen(hexString)/2)+(strlen(hexString)%2));
 					break;
 				case CURRENT:
-					CAN1_Write(CAN_ID_CURRENT_DATA, writeData, strlen(hexString)/2);
+					CAN1_Write(CAN_ID_CURRENT_DATA, writeData, (strlen(hexString)/2)+(strlen(hexString)%2));
 					break;
 				case VOLTAGE:
-					CAN1_Write(CAN_ID_TOTAL_VOLTAGE_DATA, writeData, strlen(hexString)/2);
+					CAN1_Write(CAN_ID_TOTAL_VOLTAGE_DATA, writeData, (strlen(hexString)/2)+(strlen(hexString)%2));
 					break;
 				case TEMPERATURE:
-					CAN1_Write(CAN_ID_AVG_TEMPERATURE_DATA, writeData, strlen(hexString)/2);
+					CAN1_Write(CAN_ID_AVG_TEMPERATURE_DATA, writeData, (strlen(hexString)/2)+(strlen(hexString)%2));
 					break;
 				case CHARGE:
-					CAN1_Write(CAN_ID_SOC_DATA, writeData, strlen(hexString)/2);
+					CAN1_Write(CAN_ID_SOC_DATA, writeData, (strlen(hexString)/2)+(strlen(hexString)%2));
 					break;
 				case WATCHDOG:
-					CAN1_Write(CAN_ID_WDOG_TRIGGERED, writeData, strlen(hexString)/2);
+					CAN1_Write(CAN_ID_WDOG_TRIGGERED, writeData, (strlen(hexString)/2)+(strlen(hexString)%2));
 					break;
 				case ERROR:
-					CAN1_Write(CAN_ID_ERROR, writeData, strlen(hexString)/2);
+					CAN1_Write(CAN_ID_ERROR, writeData, (strlen(hexString)/2)+(strlen(hexString)%2));
 					break;
 				default:
 					printf("Invalid ID\n\r");
