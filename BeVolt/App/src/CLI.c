@@ -35,7 +35,7 @@ void CLI_InputParse(char *input) {
 		for(int j = 0; j < strlen(split); j++) {
 			split[j] = tolower(split[j]);
 		}
-		if(i == 3) {
+		if(i == 3) {//CAN requires argument #3 to be in hex
 			strcpy(hexString, split);
 		}
 		if(!isalpha(split[0])) {
@@ -100,7 +100,7 @@ void CLI_Voltage(void) {
 	switch(hashTokens[1]){		
 		// Specific module
 		case MODULE:
-			if (hashTokens[2] == NULL || hashTokens[2] > NUM_BATTERY_MODULES || hashTokens[2] < 0){
+			if (hashTokens[2] == NULL || hashTokens[2] > NUM_BATTERY_MODULES || hashTokens[2] < 1){
 				printf("Invalid module number");
 			}
 			else {
