@@ -100,7 +100,7 @@ void CLI_Voltage(void) {
 	switch(hashTokens[1]){		
 		// Specific module
 		case MODULE:
-			if (hashTokens[2] == NULL || hashTokens[2] > NUM_BATTERY_MODULES || hashTokens[2] < 0){
+			if (hashTokens[2] == NULL || hashTokens[2] > NUM_BATTERY_MODULES || hashTokens[2] < 1){
 				printf("Invalid module number");
 			}
 			else {
