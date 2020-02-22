@@ -413,8 +413,64 @@ void CLI_LED(void) {
 /** CLI_CAN
  * Interacts with CAN
  */
-void CLI_CAN(void) {}
+void CLI_CAN(void) {
+	uint8_t readData;
+	uint32_t writeData = (uint32_t) strtol(hexString, NULL, 16);
+	
+	switch(hashTokens[1]){
+		case READ: 
+			while(CAN1_Read(&readData)){
+				printf("%d\n\r ", readData);
+		}
+		break;
+		case WRITE: 
+			switch(hashTokens[2]){
+				case TRIP:
+					CAN1_Write(CAN_ID_BPS_TRIP, &writeData, strlen(hexString)/2);
+					
+					break;
+				case CLEAR:
+					CAN1_Write(CAN_ID_BPS_ALL_CLEAR, &writeData, strlen(hexString)/2);
+					break;
+				case OFF:
+					CAN1_Write(CAN_ID_BPS_OFF, &writeData, strlen(hexString)/2);
+					break;
+				case CURRENT:
+					CAN1_Write(CAN_ID_CURRENT_DATA, &writeData, strlen(hexString)/2);
+					break;
+				case VOLTAGE:
+					CAN1_Write(CAN_ID_TOTAL_VOLTAGE_DATA, &writeData, strlen(hexString)/2);
+					break;
+				case TEMPERATURE:
+					CAN1_Write(CAN_ID_AVG_TEMPERATURE_DATA, &writeData, strlen(hexString)/2);
+					break;
+				case CHARGE:
+					CAN1_Write(CAN_ID_SOC_DATA, &writeData, strlen(hexString)/2);
+					break;
+				case WATCHDOG:
+					CAN1_Write(CAN_ID_WDOG_TRIGGERED, &writeData, strlen(hexString)/2);
+					break;
+				case ERROR:
+					CAN1_Write(CAN_ID_ERROR, &writeData, strlen(hexString)/2);
+					break;
+				default:
+					printf("Invalid ID\n\r");
+					break;
+			}
+		default:
+			printf("Invalid CAN command\n\r");
+			break;
+					
+	
+	}
+	
+	
+	
 
+
+
+}
+	
 // TODO: Confirm status of Display;
 //		 if operational, display proper information (specifics found on Drive)
 /** CLI_Display
