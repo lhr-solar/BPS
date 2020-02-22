@@ -61,7 +61,7 @@ uint32_t CLI_StringHash(char* string) {
 void CLI_Startup(void) {
 	printf("\n\r\n\r%s\n\r\n\r", utsvt_logo);
 	printf("Hello! Welcome to the BPS System! I am your worst nightmare...\n\r");
-	printf("Please enter a command (Type 'h', 'm', or '?' to see a list of commands)\n\r");
+	printf("Please enter a command (Type 'help' to see a list of commands)\n\r");
 	printf(">> ");
 }
 
@@ -146,10 +146,10 @@ void CLI_Current(void) {
 	}
 	switch (hashTokens[1]) {
 		case HIGH: // High precision reading
-			printf("High: %.3fA\n\r", Current_GetHighPrecReading()/1000.0);
+			printf("High: %.3fA     \n\r", Current_GetHighPrecReading()/1000.0);
 			break;
 		case LOW: // Low precision reading
-			printf("Low: %.3fA\n\r", Current_GetLowPrecReading()/1000.0);
+			printf("Low: %.3fA     \n\r", Current_GetLowPrecReading()/1000.0);
 			break;
 		case SAFE_HASH: 
 		case SAFETY:
@@ -186,10 +186,7 @@ void CLI_Temperature(void) {
 		}
 		return;
 	}
-	// Account for 1-indexing
-	hashTokens[2]--;
-	hashTokens[3]--;
-	switch(hashTokens[1]){			
+	switch(hashTokens[1]) {			
 		// All temperature sensors
 		case ALL:
 			for(int i = 0; i < NUM_MINIONS; i++) {		// last minion only has 14 sensors
@@ -203,16 +200,16 @@ void CLI_Temperature(void) {
 			break;
 		// Temperature of specific module
 		case MODULE:
-			if (hashTokens[2] == NULL || hashTokens[2] > NUM_BATTERY_MODULES || hashTokens[2] < 0){
-				printf("Invalid module number");
+			if (hashTokens[2] == NULL || hashTokens[2]-1 > NUM_BATTERY_MODULES || hashTokens[2]-1 < 0){
+				printf("Invalid module number\n\r");
 			}
 			else {
 				if(hashTokens[3] == NULL) {
-					printf("Module number %d: %.3f C\n\r", hashTokens[2]+1, Temperature_GetModuleTemperature(hashTokens[2])/1000.0);
-				} else if(hashTokens[3] != NULL && (hashTokens[3] == 0 || hashTokens[3] == 1)) {
-					uint16_t boardNum = hashTokens[2]/MAX_VOLT_SENSORS_PER_MINION_BOARD;
-					printf("Sensor %d on module %d: %.3f C\n\r", hashTokens[3]+1, hashTokens[2]+1, 
-							Temperature_GetSingleTempSensor(boardNum, hashTokens[3])/1000.0);
+					printf("Module number %d: %.3f C\n\r", hashTokens[2], Temperature_GetModuleTemperature(hashTokens[2]-1)/1000.0);
+				} else if(hashTokens[3]-1 == 0 || hashTokens[3]-1 == 1) {
+					uint16_t boardNum = (hashTokens[2]-1)/MAX_VOLT_SENSORS_PER_MINION_BOARD;
+					printf("Sensor %d on module %d: %.3f C\n\r", hashTokens[3], hashTokens[2], 
+							Temperature_GetSingleTempSensor(boardNum, hashTokens[3]-1)/1000.0);
 				} else {
 					printf("Invalid sensor number\n\r");
 				}
@@ -288,17 +285,14 @@ void CLI_LTC6811(void) {
  */
 void CLI_Contactor(void) {
 	FunctionalState contactor = Contactor_Flag();
-	switch(hashTokens[1]) {
-		case STATE:
-			if(contactor == ENABLE) {
-				printf("Contactor is Enabled\n\r");
-			} else {
-				printf("Contactor is Disabled\n\r");
-			break;
-		default:
-			printf("Invalid contactor command\n\r");
-			break;
+	if(hashTokens[1] == NULL) {
+		if(contactor == ENABLE) {
+			printf("Contactor is Enabled\n\r");
+		} else {
+			printf("Contactor is Disabled\n\r");
 		}
+	} else {
+		printf("Invalid contactor command\n\r");
 	}
 }
 
@@ -357,6 +351,7 @@ void CLI_LED(void) {
 		} else {
 			printf("Error light is Off\n\r");
 		}
+		return;
 	}
 	switch(hashTokens[1]) {
 		case TEST:
@@ -531,7 +526,8 @@ void CLI_ADC(void) {
 void CLI_Critical(void) {
 	Fifo criticalFifo;
 	char response[fifo_size];
-	printf("Please type 'shutdown' to turn the contactor off");
+	printf("Please type 'shutdown' to turn the contactor off\n\r");
+	printf(">> ");
 	while(1) {
 		UART3_CheckAndEcho(&criticalFifo);
 		if(UART3_HasCommand(&criticalFifo)) {
@@ -541,7 +537,7 @@ void CLI_Critical(void) {
 				printf("Contactor is off\n\r");
 				break;
 			} else {
-				printf("Contactor is still on");
+				printf("Contactor is still on\n\r");
 				break;
 			}
 		}
@@ -568,7 +564,6 @@ void CLI_All(void){
 	CLI_Charge();
 	printf("Contactor: \n\r");
 	hashTokens[0] = CONTACTOR;
-	hashTokens[1] = STATE;
 	CLI_Contactor();
 }
 
@@ -588,10 +583,13 @@ void CLI_Handler(char *input) {
 			}
 		}
 		printf("\n\r");
+		printf(">> ");
 	return;
 	}
 	if(hashTokens[0] == PING) {
 		printf("pong\n\r");
+		printf(">> ");
+		return;
 	}
 	switch(hashTokens[0]) {
 		// Help menu
@@ -658,10 +656,15 @@ void CLI_Handler(char *input) {
 			break;		// ABORT
 		// All
 		case ALL:
+			CLI_All();
 			break;
 		default:
 			printf("Invalid command. Type 'h' or 'm' or '?' for the help menu\n\r");
 			break;
 	}
+	hashTokens[0] = NULL;
+	hashTokens[1] = NULL;
+	hashTokens[2] = NULL;
+	hashTokens[3] = NULL;
 	printf(">> ");
 }

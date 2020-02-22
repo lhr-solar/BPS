@@ -138,7 +138,7 @@ void preliminaryCheck(void){
 void faultCondition(void){
 	Contactor_Off();
 	LED_Off(RUN);
-  	LED_On(FAULT);
+  LED_On(FAULT);
 
 	uint8_t error = 0;
 
@@ -1055,6 +1055,7 @@ int main(){
 	Fifo CLIFifo;
 	fifoInit(&CLIFifo);
 	__enable_irq();
+	Contactor_On();
 	char command[fifo_size];
 	CLI_Startup();
 	while(1) {

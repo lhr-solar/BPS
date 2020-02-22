@@ -172,12 +172,12 @@ void UART3_GetCommand(Fifo *fifo, char buffer[]){
 void UART3_CheckAndEcho(Fifo *uartFifo) {
 		if (!fifoIsFull(*uartFifo) && !fifoIsEmpty(RxFifo)){//put new characters into fifo
 			//throw out bad characters
-			if (((RxFifo.queue[RxFifo.tail] != '\r') && (RxFifo.queue[RxFifo.tail] != 0x08)) && ((RxFifo.queue[RxFifo.tail]  < 0x20) || (RxFifo.queue[RxFifo.tail]  > 0x7f))){
+			if (((RxFifo.queue[RxFifo.tail] != '\n') && (RxFifo.queue[RxFifo.tail] != '\r') && (RxFifo.queue[RxFifo.tail] != 0x08)) && ((RxFifo.queue[RxFifo.tail]  < 0x20) || (RxFifo.queue[RxFifo.tail]  > 0x7f))){
 				fifoGet(&RxFifo);
 				return;
 			}
 			//only let enter or backspace get into last valid spot in fifo so it does not freeze when it fills up
-			if (((uartFifo->head + 2) % fifo_size == uartFifo->tail) && ((RxFifo.queue[RxFifo.tail] != '\r') && (RxFifo.queue[RxFifo.tail] != 0x7f) && (RxFifo.queue[RxFifo.tail] != 0x08))){
+			if (((uartFifo->head + 2) % fifo_size == uartFifo->tail) && ((RxFifo.queue[RxFifo.tail] != '\r') && (RxFifo.queue[RxFifo.tail] != '\n') && (RxFifo.queue[RxFifo.tail] != 0x7f) && (RxFifo.queue[RxFifo.tail] != 0x08))){
 				fifoGet(&RxFifo);
 				return;
 			}
@@ -185,6 +185,9 @@ void UART3_CheckAndEcho(Fifo *uartFifo) {
 				fifoPut(uartFifo, (char) RxFifo.queue[RxFifo.tail]);
 			}
 			printf("%c", RxFifo.queue[RxFifo.tail]);
+			if(RxFifo.queue[RxFifo.tail] == '\r') {
+				printf("\n");
+			}
 			if (RxFifo.queue[RxFifo.tail] == 0x7f || RxFifo.queue[RxFifo.tail] == 0x08){
 				fifoRemoveLastElement(uartFifo);
 			}
