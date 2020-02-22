@@ -152,30 +152,35 @@
         <Bp>
           <Number>0</Number>
           <Type>0</Type>
-          <LineNumber>157</LineNumber>
+          <LineNumber>432</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>134237180</Address>
+          <Address>134223678</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>1</BreakIfRCount>
-          <Filename>.\Periphs\src\UART.c</Filename>
+          <Filename>.\App\src\CLI.c</Filename>
           <ExecCommand></ExecCommand>
-          <Expression>\\BPS_master\Periphs/src/UART.c\157</Expression>
+          <Expression>\\BPS_master\App/src/CLI.c\432</Expression>
         </Bp>
       </Breakpoint>
       <WatchWindow1>
         <Ww>
           <count>0</count>
           <WinNumber>1</WinNumber>
-          <ItemText>hashTokens</ItemText>
+          <ItemText>hashTokens,0x0A</ItemText>
         </Ww>
         <Ww>
           <count>1</count>
           <WinNumber>1</WinNumber>
-          <ItemText>RxFifo</ItemText>
+          <ItemText>hexString</ItemText>
+        </Ww>
+        <Ww>
+          <count>2</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>split</ItemText>
         </Ww>
       </WatchWindow1>
       <Tracepoint>
@@ -680,7 +685,7 @@
 
   <Group>
     <GroupName>Periphs/inc</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>

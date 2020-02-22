@@ -13,7 +13,7 @@
 
 static cell_asic* Minions;
 int32_t hashTokens[MAX_TOKEN_SIZE];
-char* hexString;
+char hexString[8];
 
 /** CLI_Init
  * Initializes the CLI with the values it needs
@@ -412,67 +412,60 @@ void CLI_LED(void) {
 	}
 }
 
-// TODO: Confirm status of CAN;
-//		 if functional, display CAN information (specifics found on Drive)
 /** CLI_CAN
  * Interacts with CAN
  */
 void CLI_CAN(void) {
 	uint8_t readData;
-	uint32_t writeData = (uint32_t) strtol(hexString, NULL, 16);
-	
-	switch(hashTokens[1]){
+	uint8_t writeData[8];
+	for(uint8_t i = 0; i < 7; i+= 2) {
+		char tempData[2] = {hexString[i], hexString[i+1]};
+		writeData[i/2] = strtol(tempData, NULL, 16);
+	}
+	switch(hashTokens[1]) {
 		case READ: 
 			while(CAN1_Read(&readData)){
 				printf("%d\n\r ", readData);
-		}
+			}
 		break;
 		case WRITE: 
-			switch(hashTokens[2]){
-				case TRIP:
-					CAN1_Write(CAN_ID_BPS_TRIP, &writeData, strlen(hexString)/2);
-					
+			switch(hashTokens[2]) {
+				case CAN_TRIP:
+					CAN1_Write(CAN_ID_BPS_TRIP, writeData, strlen(hexString)/2);
 					break;
 				case CLEAR:
-					CAN1_Write(CAN_ID_BPS_ALL_CLEAR, &writeData, strlen(hexString)/2);
+					CAN1_Write(CAN_ID_BPS_ALL_CLEAR, writeData, strlen(hexString)/2);
 					break;
 				case OFF:
-					CAN1_Write(CAN_ID_BPS_OFF, &writeData, strlen(hexString)/2);
+					CAN1_Write(CAN_ID_BPS_OFF, writeData, strlen(hexString)/2);
 					break;
 				case CURRENT:
-					CAN1_Write(CAN_ID_CURRENT_DATA, &writeData, strlen(hexString)/2);
+					CAN1_Write(CAN_ID_CURRENT_DATA, writeData, strlen(hexString)/2);
 					break;
 				case VOLTAGE:
-					CAN1_Write(CAN_ID_TOTAL_VOLTAGE_DATA, &writeData, strlen(hexString)/2);
+					CAN1_Write(CAN_ID_TOTAL_VOLTAGE_DATA, writeData, strlen(hexString)/2);
 					break;
 				case TEMPERATURE:
-					CAN1_Write(CAN_ID_AVG_TEMPERATURE_DATA, &writeData, strlen(hexString)/2);
+					CAN1_Write(CAN_ID_AVG_TEMPERATURE_DATA, writeData, strlen(hexString)/2);
 					break;
 				case CHARGE:
-					CAN1_Write(CAN_ID_SOC_DATA, &writeData, strlen(hexString)/2);
+					CAN1_Write(CAN_ID_SOC_DATA, writeData, strlen(hexString)/2);
 					break;
 				case WATCHDOG:
-					CAN1_Write(CAN_ID_WDOG_TRIGGERED, &writeData, strlen(hexString)/2);
+					CAN1_Write(CAN_ID_WDOG_TRIGGERED, writeData, strlen(hexString)/2);
 					break;
 				case ERROR:
-					CAN1_Write(CAN_ID_ERROR, &writeData, strlen(hexString)/2);
+					CAN1_Write(CAN_ID_ERROR, writeData, strlen(hexString)/2);
 					break;
 				default:
 					printf("Invalid ID\n\r");
 					break;
 			}
+			break;
 		default:
 			printf("Invalid CAN command\n\r");
 			break;
-					
-	
 	}
-	
-	
-	
-
-
-
 }
 	
 // TODO: Confirm status of Display;
