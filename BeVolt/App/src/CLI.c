@@ -359,55 +359,54 @@ void CLI_LED(void) {
 	}
 	switch(hashTokens[1]) {
 		case TEST:
-				printf("\n\r");
-				for(int i = 0; i < 10; i++) {
-					LED_Toggle(FAULT);
-					DelayMs(100);
-					LED_Toggle(RUN);
-					DelayMs(100);
-					LED_Toggle(UVOLT);
-					DelayMs(100);
-					LED_Toggle(OVOLT);
-					DelayMs(100);
-					LED_Toggle(OTEMP);
-					DelayMs(100);
-					LED_Toggle(OCURR);
-					DelayMs(100);
-					LED_Toggle(WDOG);
-					DelayMs(100);
-					LED_Toggle(CAN);
-					DelayMs(100);
-					LED_Toggle(EXTRA);
-					DelayMs(100);
-				}
+			printf("\n\r");
+			for(int i = 0; i < 10; i++) {
+				LED_Toggle(FAULT);
+				DelayMs(100);
+				LED_Toggle(RUN);
+				DelayMs(100);
+				LED_Toggle(UVOLT);
+				DelayMs(100);
+				LED_Toggle(OVOLT);
+				DelayMs(100);
+				LED_Toggle(OTEMP);
+				DelayMs(100);
+				LED_Toggle(OCURR);
+				DelayMs(100);
+				LED_Toggle(WDOG);
+				DelayMs(100);
+				LED_Toggle(CAN);
+				DelayMs(100);
+				LED_Toggle(EXTRA);
+				DelayMs(100);
+			}
+			break;
+		case FAULT_HASH:
+			toggleLED(FAULT);
+			break;
+		case RUN_HASH:
+			toggleLED(RUN);
+			break;
+		case OCURR_HASH:
+			toggleLED(OCURR);
+			break;
+		case OTEMP_HASH:
+			toggleLED(OTEMP);
+			break;
+		case OVOLT_HASH:
+			toggleLED(OVOLT);
+			break;
+		case WDOG_HASH:
+			toggleLED(WDOG);
+			break;
+		case CAN_HASH:
+			toggleLED(CAN);
+			break;
+		case EXTRA_HASH:
+			toggleLED(EXTRA);
 			break;
 		default:
-			if(hashTokens[1] == FAULT_HASH) {
-				toggleLED(FAULT);
-			}
-			else if(hashTokens[1] == RUN_HASH) {
-				toggleLED(RUN);
-			}
-			else if(hashTokens[1] == OCURR_HASH) {
-				toggleLED(OCURR);
-			}
-			else if(hashTokens[1] == OTEMP_HASH) {
-				toggleLED(OTEMP);
-			}
-			else if(hashTokens[1] == OVOLT_HASH) {
-				toggleLED(OVOLT);
-			}
-			else if(hashTokens[1] == WDOG_HASH) {
-				toggleLED(WDOG);
-			}
-			else if(hashTokens[1] == CAN_HASH) {
-				toggleLED(CAN);
-			}
-			else if(hashTokens[1] == EXTRA_HASH) {
-				toggleLED(EXTRA);
-			} else {
-				printf("Invalid LED command\n\r");
-			}
+			printf("Invalid LED command\n\r");
 			break;
 	}
 }
