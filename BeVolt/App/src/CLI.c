@@ -13,6 +13,7 @@
 
 static cell_asic* Minions;
 int32_t hashTokens[MAX_TOKEN_SIZE];
+char* hexString;
 
 /** CLI_Init
  * Initializes the CLI with the values it needs
@@ -33,6 +34,9 @@ void CLI_InputParse(char *input) {
 	for(int i = 0; i < MAX_TOKEN_SIZE && split != NULL; i++) {
 		for(int j = 0; j < strlen(split); j++) {
 			split[j] = tolower(split[j]);
+		}
+		if(i == 3) {
+			strcpy(hexString, split);
 		}
 		if(!isalpha(split[0])) {
 			sscanf(split, "%d", &hashTokens[i]);
