@@ -166,7 +166,7 @@ void CLI_Current(void) {
 			break;
 		case CHARGE: // Whether battery is charging
 		case CHARGING:
-			if (Current_IsCharging() == 0) {
+			if (Current_IsCharging()) {
 				printf("Charging State: CHARGING\n\r");
 			}
 			else {
