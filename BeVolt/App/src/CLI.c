@@ -47,6 +47,11 @@ void CLI_InputParse(char *input) {
 	}
 }
 
+/** CLI_StringHash
+ * Calculates the hashed value of the input
+ * @param string is the string to be hashed
+ * @return the integer hash value
+ */ 
 uint32_t CLI_StringHash(char* string) {
 	uint32_t hash = 0;
 	uint32_t m = 1000000009;
@@ -58,9 +63,7 @@ uint32_t CLI_StringHash(char* string) {
 }
 
 /** CLI_Startup
- * Prints the welcome messages and
- * asks for the override command
- * @return true or false
+ * Prints the welcome messages
  */
 void CLI_Startup(void) {
 	printf("\n\r\n\r%s\n\r\n\r", utsvt_logo);
@@ -99,7 +102,7 @@ void CLI_Voltage(void) {
 	SafetyStatus voltage = Voltage_CheckStatus();
 	switch(hashTokens[1]){		
 		// Specific module
-		case MODULE:
+		case CLI_MODULE_HASH:
 			if (hashTokens[2] == NULL || hashTokens[2] > NUM_BATTERY_MODULES || hashTokens[2] < 1){
 				printf("Invalid module number");
 			}
@@ -108,12 +111,12 @@ void CLI_Voltage(void) {
 			}
 			break;
 		// Total
-		case TOTAL:
+		case CLI_TOTAL_HASH:
 			printf("Total voltage: %.3fV\n\r", Voltage_GetTotalPackVoltage()/1000.0);
 			break;
 		// Safety Status
-		case SAFE_HASH:
-		case SAFETY:	
+		case CLI_SAFE_HASH:
+		case CLI_SAFETY_HASH:	
 			printf("Safety Status: ");
 				switch(voltage) {
 					case SAFE: 
@@ -149,14 +152,14 @@ void CLI_Current(void) {
 		return;
 	}
 	switch (hashTokens[1]) {
-		case HIGH: // High precision reading
+		case CLI_HIGH_HASH: // High precision reading
 			printf("High: %.3fA     \n\r", Current_GetHighPrecReading()/1000.0);
 			break;
-		case LOW: // Low precision reading
+		case CLI_LOW_HASH: // Low precision reading
 			printf("Low: %.3fA     \n\r", Current_GetLowPrecReading()/1000.0);
 			break;
-		case SAFE_HASH: 
-		case SAFETY:
+		case CLI_SAFE_HASH: 
+		case CLI_SAFETY_HASH:
 			if (Current_CheckStatus() == SAFE) {
 				printf("Safety Status: SAFE\n\r");
 			}
@@ -164,8 +167,8 @@ void CLI_Current(void) {
 				printf("Safety Status: DANGER\n\r");
 			}
 			break;
-		case CHARGE: // Whether battery is charging
-		case CHARGING:
+		case CLI_CHARGE_HASH: // Whether battery is charging
+		case CLI_CHARGING_STATE:
 			if (Current_IsCharging()) {
 				printf("Charging State: CHARGING\n\r");
 			}
@@ -192,7 +195,7 @@ void CLI_Temperature(void) {
 	}
 	switch(hashTokens[1]) {			
 		// All temperature sensors
-		case ALL:
+		case CLI_ALL_HASH:
 			for(int i = 0; i < NUM_MINIONS; i++) {		// last minion only has 14 sensors
 				for(int j = 0; j < MAX_TEMP_SENSORS_PER_MINION_BOARD; j++) {
 					if(i == 3 && j > 13) {
@@ -203,7 +206,7 @@ void CLI_Temperature(void) {
 			}
 			break;
 		// Temperature of specific module
-		case MODULE:
+		case CLI_MODULE_HASH:
 			if (hashTokens[2] == NULL || hashTokens[2]-1 > NUM_BATTERY_MODULES || hashTokens[2]-1 < 0){
 				printf("Invalid module number\n\r");
 			}
@@ -220,7 +223,7 @@ void CLI_Temperature(void) {
 			}
 			break;
 		// Average temperature of the whole pack
-		case TOTAL:
+		case CLI_TOTAL_HASH:
 			printf("Total average temperature: %.3f C\n\r", Temperature_GetTotalPackAvgTemperature()/1000.0);
 			break;
 		default:
@@ -310,11 +313,11 @@ void CLI_Charge(void) {
 		return;
 	}
 	switch(hashTokens[1]) {
-		case RESET:
+		case CLI_RESET_HASH:
 			SoC_SetAccum(0);	//resets accumulator
 			printf("Accumulator has been reset\n\r");
 			break;
-		case SET:
+		case CLI_SET_HASH:
 			SoC_SetAccum(hashTokens[2]);
 			printf("Accumulator has been set to %d%%\n\r", hashTokens[2]);
 			break;
@@ -330,10 +333,10 @@ void CLI_Charge(void) {
  * @param led is the led to toggle
  */
 void toggleLED(led input) {
-	if(hashTokens[2] == 1 || hashTokens[2] == ON) {
+	if(hashTokens[2] == 1 || hashTokens[2] == CLI_ON_HASH) {
 		LED_On(input);
 	}
-	else if(hashTokens[2] == 0 || hashTokens[2] == OFF) {
+	else if(hashTokens[2] == 0 || hashTokens[2] == CLI_OFF_HASH) {
 		LED_Off(input);
 	} else {
 		printf("Invalid LED command\n\r");
@@ -358,7 +361,7 @@ void CLI_LED(void) {
 		return;
 	}
 	switch(hashTokens[1]) {
-		case TEST:
+		case CLI_TEST_HASH:
 			printf("\n\r");
 			for(int i = 0; i < 10; i++) {
 				LED_Toggle(FAULT);
@@ -381,28 +384,28 @@ void CLI_LED(void) {
 				DelayMs(100);
 			}
 			break;
-		case FAULT_HASH:
+		case CLI_FAULT_HASH:
 			toggleLED(FAULT);
 			break;
-		case RUN_HASH:
+		case CLI_RUN_HASH:
 			toggleLED(RUN);
 			break;
-		case OCURR_HASH:
+		case CLI_OCURR_HASH:
 			toggleLED(OCURR);
 			break;
-		case OTEMP_HASH:
+		case CLI_OTEMP_HASH:
 			toggleLED(OTEMP);
 			break;
-		case OVOLT_HASH:
+		case CLI_OVOLT_HASH:
 			toggleLED(OVOLT);
 			break;
-		case WDOG_HASH:
+		case CLI_WDOG_HASH:
 			toggleLED(WDOG);
 			break;
-		case CAN_HASH:
+		case CLI_CAN_HASH:
 			toggleLED(CAN);
 			break;
-		case EXTRA_HASH:
+		case CLI_EXTRA_HASH:
 			toggleLED(EXTRA);
 			break;
 		default:
@@ -423,38 +426,38 @@ void CLI_CAN(void) {
 		writeData[i/2] = strtol(tempData, NULL, 16);
 	}
 	switch(hashTokens[1]) {
-		case READ: 
+		case CLI_READ_HASH: 
 			while(CAN1_Read(&readData)){
 				printf("%d\n\r ", readData);
 			}
 		break;
-		case WRITE: 
+		case CLI_WRITE_HASH: 
 			switch(hashTokens[2]) {
-				case CAN_TRIP:
+				case CLI_TRIP_HASH:
 					CAN1_Write(CAN_ID_BPS_TRIP, writeData, (strlen(hexString)/2)+(strlen(hexString)%2));
 					break;
-				case CLEAR:
+				case CLI_CLEAR_HASH:
 					CAN1_Write(CAN_ID_BPS_ALL_CLEAR, writeData, (strlen(hexString)/2)+(strlen(hexString)%2));
 					break;
-				case OFF:
+				case CLI_OFF_HASH:
 					CAN1_Write(CAN_ID_BPS_OFF, writeData, (strlen(hexString)/2)+(strlen(hexString)%2));
 					break;
-				case CURRENT:
+				case CLI_CURRENT_HASH:
 					CAN1_Write(CAN_ID_CURRENT_DATA, writeData, (strlen(hexString)/2)+(strlen(hexString)%2));
 					break;
-				case VOLTAGE:
+				case CLI_VOLTAGE_HASH:
 					CAN1_Write(CAN_ID_TOTAL_VOLTAGE_DATA, writeData, (strlen(hexString)/2)+(strlen(hexString)%2));
 					break;
-				case TEMPERATURE:
+				case CLI_TEMPERATURE_HASH:
 					CAN1_Write(CAN_ID_AVG_TEMPERATURE_DATA, writeData, (strlen(hexString)/2)+(strlen(hexString)%2));
 					break;
-				case CHARGE:
+				case CLI_CHARGE_HASH:
 					CAN1_Write(CAN_ID_SOC_DATA, writeData, (strlen(hexString)/2)+(strlen(hexString)%2));
 					break;
-				case WATCHDOG:
+				case CLI_WATCHDOG_HASH:
 					CAN1_Write(CAN_ID_WDOG_TRIGGERED, writeData, (strlen(hexString)/2)+(strlen(hexString)%2));
 					break;
-				case ERROR:
+				case CLI_ERROR_HASH:
 					CAN1_Write(CAN_ID_ERROR, writeData, (strlen(hexString)/2)+(strlen(hexString)%2));
 					break;
 				default:
@@ -523,22 +526,22 @@ void CLI_EEPROM(void) {
 					errorAddr = (errorAddrArray[0] << 2) + errorAddrArray[1];
 					printf("Fault error: %d", EEPROM_ReadByte(errorAddr-1));
 					break;
-				case TEMPERATURE:
+				case CLI_TEMPERATURE_HASH:
 					EEPROM_ReadMultipleBytes(EEPROM_TEMP_PTR_LOC, 2, errorAddrArray);
 					errorAddr = (errorAddrArray[0] << 2) + errorAddrArray[1];
 					printf("Temperature error: %d", EEPROM_ReadByte(errorAddr-1));
 					break;
-				case VOLTAGE:
+				case CLI_VOLTAGE_HASH:
 					EEPROM_ReadMultipleBytes(EEPROM_VOLT_PTR_LOC, 2, errorAddrArray);
 					errorAddr = (errorAddrArray[0] << 2) + errorAddrArray[1];
 					printf("Voltage error: %d", EEPROM_ReadByte(errorAddr-1));
 					break;
-				case CURRENT:
+				case CLI_CURRENT_HASH:
 					EEPROM_ReadMultipleBytes(EEPROM_CURRENT_PTR_LOC, 2, errorAddrArray);
 					errorAddr = (errorAddrArray[0] << 2) + errorAddrArray[1];
 					printf("Current error: %d", EEPROM_ReadByte(errorAddr-1));
 					break;
-				case WATCHDOG:
+				case CLI_WATCHDOG_HASH:
 					EEPROM_ReadMultipleBytes(EEPROM_WATCHDOG_PTR_LOC, 2, errorAddrArray);
 					errorAddr = (errorAddrArray[0] << 2) + errorAddrArray[1];
 					printf("Watchdog error: %d", EEPROM_ReadByte(errorAddr-1));
@@ -548,7 +551,7 @@ void CLI_EEPROM(void) {
 					errorAddr = (errorAddrArray[0] << 2) + errorAddrArray[1];
 					printf("CAN error: %d", EEPROM_ReadByte(errorAddr-1));
 					break;
-				case CHARGE:
+				case CLI_CHARGE_HASH:
 					EEPROM_ReadMultipleBytes(EEPROM_SOC_PTR_LOC, 2, errorAddrArray);
 					errorAddr = (errorAddrArray[0] << 2) + errorAddrArray[1];
 					printf("SoC error: %d", EEPROM_ReadByte(errorAddr-1));
@@ -585,7 +588,7 @@ void CLI_Critical(void) {
 		UART3_CheckAndEcho(&criticalFifo);
 		if(UART3_HasCommand(&criticalFifo)) {
 			UART3_GetCommand(&criticalFifo, response);
-			if(CLI_StringHash(response) == SHUTDOWN) {
+			if(CLI_StringHash(response) == CLI_SHUTDOWN_HASH) {
 				Contactor_Off();
 				printf("Contactor is off\n\r");
 				break;
@@ -603,20 +606,20 @@ void CLI_Critical(void) {
  */
 void CLI_All(void){
 	printf("Voltage: \n\r");
-	hashTokens[0] = VOLTAGE;
+	hashTokens[0] = CLI_VOLTAGE_HASH;
 	hashTokens[1] = 0;
 	CLI_Voltage();
 	printf("Current: \n\r");
-	hashTokens[0] = CURRENT;
+	hashTokens[0] = CLI_CURRENT_HASH;
 	CLI_Current();
 	printf("Temperature: \n\r");
-	hashTokens[0] = TEMPERATURE;
+	hashTokens[0] = CLI_TEMPERATURE_HASH;
 	CLI_Temperature();
 	printf("State of Charge: \n\r");
-	hashTokens[0] = CHARGE;
+	hashTokens[0] = CLI_CHARGE_HASH;
 	CLI_Charge();
 	printf("Contactor: \n\r");
-	hashTokens[0] = CONTACTOR;
+	hashTokens[0] = CLI_CONTACTOR_HASH;
 	CLI_Contactor();
 }
 
@@ -627,7 +630,7 @@ void CLI_All(void){
  */
 void CLI_Handler(char *input) {
 	CLI_InputParse(input);
-	if(hashTokens[0] == PARTYTIME) {
+	if(hashTokens[0] == CLI_PARTYTIME_HASH) {
 		printf("\n\r");
 		for(int i = 0; i < 100; i++) {
 			printf("%s", party_parrot_frames[i%10]);
@@ -639,76 +642,76 @@ void CLI_Handler(char *input) {
 		printf(">> ");
 	return;
 	}
-	if(hashTokens[0] == PING) {
+	if(hashTokens[0] == CLI_PING_HASH) {
 		printf("pong\n\r");
 		printf(">> ");
 		return;
 	}
 	switch(hashTokens[0]) {
 		// Help menu
-		case MENU:
-		case HELP:
+		case CLI_MENU_HASH:
+		case CLI_HELP_HASH:
 			CLI_Help();
 			break;
 		// Voltage commands
-		case VOLTAGE:
+		case CLI_VOLTAGE_HASH:
 			CLI_Voltage();
 			break;
 		// Current commands
-		case CURRENT:
+		case CLI_CURRENT_HASH:
 			CLI_Current();
 			break;
 		// Temperature commands
-		case TEMPERATURE:
+		case CLI_TEMPERATURE_HASH:
 			CLI_Temperature();
 			break;
 		// LTC6811 register commands
-		case REGISTER:
-		case LTC:
+		case CLI_REGISTER_HASH:
+		case CLI_LTC_HASH:
 			CLI_LTC6811();
 			break;
 		// Contactor/Switch commands
-		case SWITCH:
-		case CONTACTOR:
+		case CLI_SWITCH_HASH:
+		case CLI_CONTACTOR_HASH:
 			CLI_Contactor();
 			break;
 		// State of Charge commands
-		case CHARGE:
+		case CLI_CHARGE_HASH:
 			CLI_Charge();
 			break;
 		// Error light commands
-		case LED:
-		case LIGHTS:
+		case CLI_LED_HASH:
+		case CLI_LIGHTS_HASH:
 			CLI_LED();
 			break;
 		// CAN commands
-		case CAN_HASH:
-		case CANBUS:
+		case CLI_CAN_HASH:
+		case CLI_CANBUS_HASH:
 			CLI_CAN();
 			break;
 		// Display commands
-		case DISPLAY:
+		case CLI_DISPLAY_HASH:
 			CLI_Display();
 			break;
 		// Watchdog commands
-		case WATCHDOG:
+		case CLI_WATCHDOG_HASH:
 			CLI_Watchdog();
 			break;
 		// EEPROM commands
-		case EEPROM:
+		case CLI_EEPROM_HASH:
 			CLI_EEPROM();
 			break;
 		// Peripheral commands
-		case ADC_HASH:
+		case CLI_ADC_HASH:
 			CLI_ADC();
 			break;
 		// Emergency Abort
-		case CRITICAL:
-		case ABORT:
+		case CLI_CRITICAL_HASH:
+		case CLI_ABORT_HASH:
 			CLI_Critical();
 			break;		// ABORT
 		// All
-		case ALL:
+		case CLI_ALL_HASH:
 			CLI_All();
 			break;
 		default:

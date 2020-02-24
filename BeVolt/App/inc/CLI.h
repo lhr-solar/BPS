@@ -23,60 +23,59 @@
 #include "Images.h"
 
 // String hash values
-#define HELP        3443615
-#define MENU        3594497
-#define VOLTAGE     485505740
-#define CURRENT     117203550
-#define TEMPERATURE 801551920
-#define LTC         98843
-#define REGISTER    985857826
-#define CONTACTOR   85684648
-#define SWITCH      72420721
-#define CHARGE      990159610
-#define LED         99339
-#define LIGHTS      402681384
-#define CAN_HASH    108816
-#define CANBUS      403432629
-#define DISPLAY     893981360
-#define WATCHDOG    811524042
-#define EEPROM      226595301
-#define ADC_HASH    98336
-#define CRITICAL    368282223
-#define ABORT       110634416
-#define ALL         107233
+#define CLI_HELP_HASH           0x348B9F‬
+#define CLI_MENU_HASH           0x36D901
+#define CLI_VOLTAGE_HASH        0x1CF03ACC
+#define CLI_CURRENT_HASH        0x6FC625E
+#define CLI_TEMPERATURE_HASH    0x2FC6B630
+#define CLI_LTC_HASH            0x1821B
+#define CLI_REGISTER_HASH       0x3AC2FF22
+#define CLI_CONTACTOR_HASH      0x51B71A8
+#define CLI_SWITCH_HASH         0x4510D71
+#define CLI_CHARGE_HASH         0x3B04A2FA
+#define CLI_LED_HASH            0x1840B
+#define CLI_LIGHTS_HASH         0x18006E28
+#define CLI_CAN_HASH            0x1A910
+#define CLI_CANBUS_HASH         0x180BE4B5
+#define CLI_DISPLAY_HASH        0x354912B0
+#define CLI_WATCHDOG_HASH       0x305EDFCA
+#define CLI_EEPROM_HASH         0xD8191E5
+#define CLI_ADC_HASH            0x18020
+#define CLI_CRITICAL_HASH       0x15F38A6F
+#define CLI_ABORT_HASH          0x69825B0
+#define CLI_ALL_HASH            0x1A2E1
 
-#define MODULE      994869698
-#define TOTAL       102745028
-#define SAFE_HASH   3110035
-#define SAFETY      574365715
-#define HIGH        3200606
-#define LOW         117908
-#define STATE       96828305
-#define CHARGING    66671398
-#define ON          3521
-#define OFF         101295
-#define SET         114722
-#define RESET       110251087
-#define TEST        3569518
-#define READ        3075562
-#define WRITE       96835935
-#define ERROR       108701384
+#define CLI_MODULE_HASH         0x3B4C81C2
+#define CLI_TOTAL_HASH          0x61FC3C4
+#define CLI_SAFE_HASH           0x2F7493
+#define CLI_SAFETY_HASH         0x223C2013
+#define CLI_HIGH_HASH           0x30D65E
+#define CLI_LOW_HASH            0x1CC94
+#define CLI_CHARGING_STATE      0x3F95326
+#define CLI_ON_HASH             0xDC1
+#define CLI_OFF_HASH            0x18BAF
+#define CLI_SET_HASH            0x1C022
+#define CLI_RESET_HASH          0x6924C4F
+#define CLI_TEST_HASH           0x36776E
+#define CLI_READ_HASH           0x2EEDEA
+#define CLI_WRITE_HASH          0x5C5995F
+#define CLI_ERROR_HASH          0x67AA6C8
 
-#define FAULT_HASH  110461410
-#define RUN_HASH		109451
-#define UVOLT_HASH  110456310
-#define OVOLT_HASH  110456304
-#define OTEMP_HASH  106782339
-#define OCURR_HASH  108793185
-#define WDOG_HASH   3178363
-#define EXTRA_HASH  93093008
+#define CLI_FAULT_HASH          0x69581E2
+#define CLI_RUN_HASH		    0x1AB8B
+#define CLI_UVOLT_HASH          0x6956DF6
+#define CLI_OVOLT_HASH          0x6956DF0
+#define CLI_OTEMP_HASH          0x65D5E83
+#define CLI_OCURR_HASH          0x67C0D61
+#define CLI_WDOG_HASH           0x307F7B
+#define CLI_EXTRA_HASH          0x58C7C90
 
-#define CAN_TRIP		3441147
-#define CLEAR				108271629
+#define CLI_TRIP_HASH   		0x3481FB
+#define CLI_CLEAR_HASH			0x674180D
 
-#define SHUTDOWN    243090822
-#define PARTYTIME   958393139
-#define PING        3177550
+#define CLI_SHUTDOWN_HASH       0xE7D4586
+#define CLI_PARTYTIME_HASH      0x391FEB33
+#define CLI_PING_HASH           0x307C4E
 
 /** CLI_Init
  * Initializes the CLI with the values it needs
@@ -90,12 +89,15 @@ void CLI_Init(cell_asic* minions);
  */
 void CLI_InputParse(char *input); 
 
+/** CLI_StringHash
+ * Calculates the hashed value of the input
+ * @param string is the string to be hashed
+ * @return the integer hash value
+ */ 
 uint32_t CLI_StringHash(char* string);
 
 /** CLI_Startup
- * Prints the welcome messages and
- * asks for the override command
- * @return true or false
+ * Prints the welcome messages
  */
 void CLI_Startup(void);
 
