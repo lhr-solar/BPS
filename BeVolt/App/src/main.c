@@ -754,17 +754,17 @@ int main() {
 #elif defined UART_INTERRUPT2
     /* Includes ---------------------------------------------------*/
     //#include "stm32f2xx.h"
-		#include "UART.h"
+	#include "UART.h"
 		
-		uint8_t RxData;//data received flag
+	uint8_t RxData;//data received flag
 				
     /* Private function prototypes --------------------------------*/
     void USART1_Config(void);
 
     /* Private functions ------------------------------------------*/
 		
-		/**
-		 * @brief This function handles USART3 global interrupt request.
+	/**
+	 * @brief This function handles USART3 global interrupt request.
      * @param None
      * @retval None
      */
@@ -1041,19 +1041,9 @@ int main(void) {
 	return 0;
 }
 
-
-
 #elif defined CLI_TEST
 int main(){
 	initialize();
-	Voltage_Init(Minions);
-	Temperature_Init(Minions);
-	Contactor_Init();
-	EEPROM_Init();
-	CLI_Init(Minions);
-	UART3_Init();
-	Fifo CLIFifo;
-	fifoInit(&CLIFifo);
 	__enable_irq();
 	Contactor_On();
 	char command[fifo_size];

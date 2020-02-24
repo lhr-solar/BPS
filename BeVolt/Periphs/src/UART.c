@@ -172,7 +172,7 @@ void UART3_GetCommand(Fifo *fifo, char buffer[]){
 void UART3_CheckAndEcho(Fifo *uartFifo) {
 		if (!fifoIsFull(*uartFifo) && !fifoIsEmpty(RxFifo)){//put new characters into fifo
 			//throw out bad characters
-			if (((RxFifo.queue[RxFifo.tail] != '\n') && (RxFifo.queue[RxFifo.tail] != '\r') && (RxFifo.queue[RxFifo.tail] != 0x08)) && ((RxFifo.queue[RxFifo.tail]  < 0x20) || (RxFifo.queue[RxFifo.tail]  > 0x7f))){
+			if (((RxFifo.queue[RxFifo.tail] != '\n') && (RxFifo.queue[RxFifo.tail] != '\r') && (RxFifo.queue[RxFifo.tail] != '\b')) && ((RxFifo.queue[RxFifo.tail]  < 0x20) || (RxFifo.queue[RxFifo.tail]  > 0x7f))){
 				fifoGet(&RxFifo);
 				return;
 			}
@@ -181,14 +181,14 @@ void UART3_CheckAndEcho(Fifo *uartFifo) {
 				fifoGet(&RxFifo);
 				return;
 			}
-			if (RxFifo.queue[RxFifo.tail] != 0x7f && RxFifo.queue[RxFifo.tail] != 0x08) {
+			if (RxFifo.queue[RxFifo.tail] != 0x7f && RxFifo.queue[RxFifo.tail] != '\b') {
 				fifoPut(uartFifo, (char) RxFifo.queue[RxFifo.tail]);
 			}
 			printf("%c", RxFifo.queue[RxFifo.tail]);
 			if(RxFifo.queue[RxFifo.tail] == '\r') {
 				printf("\n");
 			}
-			if (RxFifo.queue[RxFifo.tail] == 0x7f || RxFifo.queue[RxFifo.tail] == 0x08){
+			if (RxFifo.queue[RxFifo.tail] == 0x7f || RxFifo.queue[RxFifo.tail] == '\b'){
 				fifoRemoveLastElement(uartFifo);
 			}
 			fifoGet(&RxFifo);

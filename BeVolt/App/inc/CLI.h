@@ -23,7 +23,7 @@
 #include "Images.h"
 
 // String hash values
-#define CLI_HELP_HASH           0x348B9F‬
+#define CLI_HELP_HASH						0x348B9F
 #define CLI_MENU_HASH           0x36D901
 #define CLI_VOLTAGE_HASH        0x1CF03ACC
 #define CLI_CURRENT_HASH        0x6FC625E
@@ -76,6 +76,7 @@
 #define CLI_SHUTDOWN_HASH       0xE7D4586
 #define CLI_PARTYTIME_HASH      0x391FEB33
 #define CLI_PING_HASH           0x307C4E
+
 
 /** CLI_Init
  * Initializes the CLI with the values it needs

@@ -14,6 +14,7 @@
 static cell_asic* Minions;
 int32_t hashTokens[MAX_TOKEN_SIZE];
 char hexString[8];
+const float MILLI_UNIT_CONVERSION = 1000;
 
 /** CLI_Init
  * Initializes the CLI with the values it needs
@@ -95,7 +96,7 @@ void CLI_Voltage(void) {
 	Voltage_UpdateMeasurements();
 	if(hashTokens[1] == NULL) {
 		for(int i = 0; i < NUM_BATTERY_MODULES; i++){
-			printf("Module number %d: %.3fV\n\r", i+1, Voltage_GetModuleMillivoltage(i)/1000.0);
+			printf("Module number %d: %.3fV\n\r", i+1, Voltage_GetModuleMillivoltage(i)/MILLI_UNIT_CONVERSION);
 		}
 		return;
 	}
@@ -107,12 +108,12 @@ void CLI_Voltage(void) {
 				printf("Invalid module number");
 			}
 			else {
-				printf("Module number %d: %.3fV\n\r", hashTokens[2], Voltage_GetModuleMillivoltage(hashTokens[2]-1)/1000.0);
+				printf("Module number %d: %.3fV\n\r", hashTokens[2], Voltage_GetModuleMillivoltage(hashTokens[2]-1)/MILLI_UNIT_CONVERSION);
 			}
 			break;
 		// Total
 		case CLI_TOTAL_HASH:
-			printf("Total voltage: %.3fV\n\r", Voltage_GetTotalPackVoltage()/1000.0);
+			printf("Total voltage: %.3fV\n\r", Voltage_GetTotalPackVoltage()/MILLI_UNIT_CONVERSION);
 			break;
 		// Safety Status
 		case CLI_SAFE_HASH:
@@ -147,16 +148,16 @@ void CLI_Voltage(void) {
  */
 void CLI_Current(void) {
 	if(hashTokens[1] == NULL) {
-		printf("High: %.3fA\n\r", Current_GetHighPrecReading()/1000.0);	// Prints 4 digits, number, and A
-		printf("Low: %.3fA\n\r", Current_GetLowPrecReading()/1000.0);
+		printf("High: %.3fA\n\r", Current_GetHighPrecReading()/MILLI_UNIT_CONVERSION);	// Prints 4 digits, number, and A
+		printf("Low: %.3fA\n\r", Current_GetLowPrecReading()/MILLI_UNIT_CONVERSION);
 		return;
 	}
 	switch (hashTokens[1]) {
 		case CLI_HIGH_HASH: // High precision reading
-			printf("High: %.3fA     \n\r", Current_GetHighPrecReading()/1000.0);
+			printf("High: %.3fA     \n\r", Current_GetHighPrecReading()/MILLI_UNIT_CONVERSION);
 			break;
 		case CLI_LOW_HASH: // Low precision reading
-			printf("Low: %.3fA     \n\r", Current_GetLowPrecReading()/1000.0);
+			printf("Low: %.3fA     \n\r", Current_GetLowPrecReading()/MILLI_UNIT_CONVERSION);
 			break;
 		case CLI_SAFE_HASH: 
 		case CLI_SAFETY_HASH:
@@ -189,7 +190,7 @@ void CLI_Current(void) {
 void CLI_Temperature(void) {
 	if(hashTokens[1] == NULL) {
 		for(int i = 0; i < NUM_BATTERY_MODULES; i++) {
-			printf("Module number %d: %.3f C\n\r", i+1, Temperature_GetModuleTemperature(i)/1000.0);
+			printf("Module number %d: %.3f C\n\r", i+1, Temperature_GetModuleTemperature(i)/MILLI_UNIT_CONVERSION);
 		}
 		return;
 	}
@@ -201,7 +202,7 @@ void CLI_Temperature(void) {
 					if(i == 3 && j > 13) {
 						break;
 					}
-					printf("Sensor number %d: %.3f C\n\r",(i*MAX_TEMP_SENSORS_PER_MINION_BOARD)+j+1, Temperature_GetSingleTempSensor(i, j)/1000.0);
+					printf("Sensor number %d: %.3f C\n\r",(i*MAX_TEMP_SENSORS_PER_MINION_BOARD)+j+1, Temperature_GetSingleTempSensor(i, j)/MILLI_UNIT_CONVERSION);
 				}
 			}
 			break;
@@ -212,11 +213,11 @@ void CLI_Temperature(void) {
 			}
 			else {
 				if(hashTokens[3] == NULL) {//temperature of module
-					printf("Module number %d: %.3f C\n\r", hashTokens[2], Temperature_GetModuleTemperature(hashTokens[2]-1)/1000.0);
+					printf("Module number %d: %.3f C\n\r", hashTokens[2], Temperature_GetModuleTemperature(hashTokens[2]-1)/MILLI_UNIT_CONVERSION);
 				} else if(hashTokens[3]-1 == 0 || hashTokens[3]-1 == 1) {//temperature of specific sensor in module
 					uint16_t boardNum = (hashTokens[2]-1)/MAX_VOLT_SENSORS_PER_MINION_BOARD;
 					printf("Sensor %d on module %d: %.3f C\n\r", hashTokens[3], hashTokens[2], 
-							Temperature_GetSingleTempSensor(boardNum, hashTokens[3]-1)/1000.0);
+							Temperature_GetSingleTempSensor(boardNum, hashTokens[3]-1)/MILLI_UNIT_CONVERSION);
 				} else {
 					printf("Invalid sensor number\n\r");
 				}
@@ -224,7 +225,7 @@ void CLI_Temperature(void) {
 			break;
 		// Average temperature of the whole pack
 		case CLI_TOTAL_HASH:
-			printf("Total average temperature: %.3f C\n\r", Temperature_GetTotalPackAvgTemperature()/1000.0);
+			printf("Total average temperature: %.3f C\n\r", Temperature_GetTotalPackAvgTemperature()/MILLI_UNIT_CONVERSION);
 			break;
 		default:
 			printf("Invalid temperature command\n\r");
@@ -519,7 +520,7 @@ void CLI_EEPROM(void) {
 			EEPROM_Reset();
 			printf("EEPROM has been reset");
 			break;
-		case ERROR:
+		case CLI_ERROR_HASH:
 			switch(hashTokens[2]) {
 				case FAULT:
 					EEPROM_ReadMultipleBytes(EEPROM_FAULT_PTR_LOC, 2, errorAddrArray);
