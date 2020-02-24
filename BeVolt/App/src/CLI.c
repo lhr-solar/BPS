@@ -15,6 +15,7 @@ static cell_asic* Minions;
 int32_t hashTokens[MAX_TOKEN_SIZE];
 char hexString[8];
 const float MILLI_UNIT_CONVERSION = 1000;
+const float PERCENT_CONVERSION = 100;
 
 /** CLI_Init
  * Initializes the CLI with the values it needs
@@ -199,7 +200,7 @@ void CLI_Temperature(void) {
 		case CLI_ALL_HASH:
 			for(int i = 0; i < NUM_MINIONS; i++) {		// last minion only has 14 sensors
 				for(int j = 0; j < MAX_TEMP_SENSORS_PER_MINION_BOARD; j++) {
-					if(i == 3 && j > 13) {
+					if(i == NUM_MINIONS-1 && j > NUM_TEMP_SENSORS_LAST_MINION-1) {	// -1 for 0-index
 						break;
 					}
 					printf("Sensor number %d: %.3f C\n\r",(i*MAX_TEMP_SENSORS_PER_MINION_BOARD)+j+1, Temperature_GetSingleTempSensor(i, j)/MILLI_UNIT_CONVERSION);
@@ -234,7 +235,10 @@ void CLI_Temperature(void) {
 }
 
 /** CLI_LTC6811
- * Interacts with LTC6811 registers
+ * Prints register information
+ * All registers are of the same type
+ * Prints each register's respective three registers
+ * (tx_data, rx_date, and rx_pec_match)
  */
 void CLI_LTC6811(void) {
 	for(uint8_t current_ic = 0; current_ic < NUM_MINIONS; current_ic++) {
@@ -310,7 +314,7 @@ void CLI_Contactor(void) {
  */
 void CLI_Charge(void) {
 	if(hashTokens[1] == NULL) {
-		printf("The battery percentage is %.2f%%\n\r", SoC_GetPercent()/100.0);
+		printf("The battery percentage is %.2f%%\n\r", SoC_GetPercent()/PERCENT_CONVERSION);
 		return;
 	}
 	switch(hashTokens[1]) {

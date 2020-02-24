@@ -77,6 +77,8 @@
 #define CLI_PARTYTIME_HASH      0x391FEB33
 #define CLI_PING_HASH           0x307C4E
 
+// Useful values
+#define NUM_TEMP_SENSORS_LAST_MINION    14
 
 /** CLI_Init
  * Initializes the CLI with the values it needs
@@ -126,7 +128,10 @@ void CLI_Current(void);
 void CLI_Temperature(void);
 
 /** CLI_LTC6811
- * Interacts with LTC6811 registers
+ * Prints register information
+ * All registers are of the same type
+ * Prints each register's respective three registers
+ * (tx_data, rx_date, and rx_pec_match)
  */
 void CLI_LTC6811(void);
 
