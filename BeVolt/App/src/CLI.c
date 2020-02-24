@@ -424,46 +424,47 @@ void CLI_LED(void) {
  * reading and writing to bus
  */
 void CLI_CAN(void) {
-	uint8_t readData;
-	uint8_t writeData[8];
+	uint8_t rxData;
+	uint8_t txData[8];
+	uint8_t dataLength = (strlen(hexString)/2) + (strlen(hexString)%2);	// Ceiling of length
 	for(uint8_t i = 0; i < 7; i+= 2) {
 		char tempData[2] = {hexString[i], hexString[i+1]};
-		writeData[i/2] = strtol(tempData, NULL, 16);
+		txData[i/2] = strtol(tempData, NULL, 16);
 	}
 	switch(hashTokens[1]) {
 		case CLI_READ_HASH: 
-			while(CAN1_Read(&readData)){
-				printf("%d\n\r ", readData);
+			while(CAN1_Read(&rxData)){
+				printf("%d\n\r ", rxData);
 			}
 		break;
 		case CLI_WRITE_HASH: 
 			switch(hashTokens[2]) {
 				case CLI_TRIP_HASH:
-					CAN1_Write(CAN_ID_BPS_TRIP, writeData, (strlen(hexString)/2)+(strlen(hexString)%2));
+					CAN1_Write(CAN_ID_BPS_TRIP, txData, dataLength);
 					break;
 				case CLI_CLEAR_HASH:
-					CAN1_Write(CAN_ID_BPS_ALL_CLEAR, writeData, (strlen(hexString)/2)+(strlen(hexString)%2));
+					CAN1_Write(CAN_ID_BPS_ALL_CLEAR, txData, dataLength);
 					break;
 				case CLI_OFF_HASH:
-					CAN1_Write(CAN_ID_BPS_OFF, writeData, (strlen(hexString)/2)+(strlen(hexString)%2));
+					CAN1_Write(CAN_ID_BPS_OFF, txData, dataLength);
 					break;
 				case CLI_CURRENT_HASH:
-					CAN1_Write(CAN_ID_CURRENT_DATA, writeData, (strlen(hexString)/2)+(strlen(hexString)%2));
+					CAN1_Write(CAN_ID_CURRENT_DATA, txData, dataLength);
 					break;
 				case CLI_VOLTAGE_HASH:
-					CAN1_Write(CAN_ID_TOTAL_VOLTAGE_DATA, writeData, (strlen(hexString)/2)+(strlen(hexString)%2));
+					CAN1_Write(CAN_ID_TOTAL_VOLTAGE_DATA, txData, dataLength);
 					break;
 				case CLI_TEMPERATURE_HASH:
-					CAN1_Write(CAN_ID_AVG_TEMPERATURE_DATA, writeData, (strlen(hexString)/2)+(strlen(hexString)%2));
+					CAN1_Write(CAN_ID_AVG_TEMPERATURE_DATA, txData, dataLength);
 					break;
 				case CLI_CHARGE_HASH:
-					CAN1_Write(CAN_ID_SOC_DATA, writeData, (strlen(hexString)/2)+(strlen(hexString)%2));
+					CAN1_Write(CAN_ID_SOC_DATA, txData, dataLength);
 					break;
 				case CLI_WATCHDOG_HASH:
-					CAN1_Write(CAN_ID_WDOG_TRIGGERED, writeData, (strlen(hexString)/2)+(strlen(hexString)%2));
+					CAN1_Write(CAN_ID_WDOG_TRIGGERED, txData, dataLength);
 					break;
 				case CLI_ERROR_HASH:
-					CAN1_Write(CAN_ID_ERROR, writeData, (strlen(hexString)/2)+(strlen(hexString)%2));
+					CAN1_Write(CAN_ID_ERROR, txData, dataLength);
 					break;
 				default:
 					printf("Invalid ID\n\r");
@@ -481,7 +482,9 @@ void CLI_CAN(void) {
 /** CLI_Display
  * Interacts with the display
  */
-void CLI_Display(void) {}
+void CLI_Display(void) {
+	printf("Display has not been implemented yet\n\r");
+}
 
 /** CLI_Watchdog
  * Shows whether watchdog was tripped
@@ -496,11 +499,11 @@ void CLI_Watchdog(void) {
 		}
 	}
 	uint8_t errorAddrArray[2];
-	EEPROM_ReadMultipleBytes(EEPROM_WATCHDOG_PTR_LOC, 2, errorAddrArray);
-	uint16_t errorAddr = (errorAddrArray[0] << 2) + errorAddrArray[1];
+	EEPROM_ReadMultipleBytes(EEPROM_WATCHDOG_PTR_LOC, 2, errorAddrArray);	// Need to get address where the error is stored
+	uint16_t errorAddr = (errorAddrArray[0] << 2) + errorAddrArray[1];		// Turn address into one number (not an array)
 	switch(hashTokens[1]) {
 		case ERROR:
-			printf("Most recent Watchdog error: %d", EEPROM_ReadByte(errorAddr-1));
+			printf("Most recent Watchdog error: %d", EEPROM_ReadByte(errorAddr-1));	// Use the address to get the error	
 			break;
 		default:
 			printf("Invalid Watchdog command");
@@ -517,7 +520,7 @@ void CLI_EEPROM(void) {
 		EEPROM_SerialPrintData();
 		return;
 	}
-	uint8_t errorAddrArray[2];
+	uint8_t errorAddrArray[2];	// Need to get address where the error is stored
 	uint16_t errorAddr = 0;
 	switch(hashTokens[1]) {
 		case RESET:
@@ -528,8 +531,8 @@ void CLI_EEPROM(void) {
 			switch(hashTokens[2]) {
 				case FAULT:
 					EEPROM_ReadMultipleBytes(EEPROM_FAULT_PTR_LOC, 2, errorAddrArray);
-					errorAddr = (errorAddrArray[0] << 2) + errorAddrArray[1];
-					printf("Fault error: %d", EEPROM_ReadByte(errorAddr-1));
+					errorAddr = (errorAddrArray[0] << 2) + errorAddrArray[1];	// Turn address into one number (not an array)
+					printf("Fault error: %d", EEPROM_ReadByte(errorAddr-1));	// Use the address to get the error
 					break;
 				case CLI_TEMPERATURE_HASH:
 					EEPROM_ReadMultipleBytes(EEPROM_TEMP_PTR_LOC, 2, errorAddrArray);
