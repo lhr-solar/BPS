@@ -104,7 +104,7 @@ void initialize(void){
 	if(voltage == UNDERVOLTAGE) {
 		printf("Do you need to charge the batteries? (y/n)\n\r>> ");
 		uint32_t wait = 0;
-		while(wait < 1000000) {
+		while(wait < STARTUP_WAIT_TIME) {
 			UART3_CheckAndEcho(&CLIFifo);
 			if(UART3_HasCommand(&CLIFifo)) {
 				UART3_GetCommand(&CLIFifo, command);

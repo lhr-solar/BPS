@@ -28,6 +28,7 @@ void CLI_Init(cell_asic* boards) {
 /** CLI_InputParse
  * Parses the input string and stores in hashTokens[]
  * @param input is a pointer to the input string
+ * @param parsedTokens is an array to pass the parsed words back
  */
 void CLI_InputParse(char* input, int* parsedTokens) {
 	char *tokenized;
@@ -36,7 +37,7 @@ void CLI_InputParse(char* input, int* parsedTokens) {
 		for(int j = 0; j < strlen(split); j++) {
 			split[j] = tolower(split[j]);
 		}
-		if(i == 3) { //CAN requires argument #3 to be in hex
+		if(i == 3) { // CAN requires argument #3 to be in hex
 			strcpy(hexString, split);
 		}
 		if(!isalpha(split[0])) {
@@ -91,6 +92,7 @@ void CLI_Help(void) {
 /** CLI_Voltage
  * Checks and displays the desired
  * voltage parameter(s)
+ * @param hashTokens is the array of hashed tokens
  */
 void CLI_Voltage(int* hashTokens) {
 	Voltage_UpdateMeasurements();
@@ -145,6 +147,7 @@ void CLI_Voltage(int* hashTokens) {
 /** CLI_Current
  * Checks and displays the desired
  * current parameter(s)
+ * @param hashTokens is the array of hashed tokens
  */
 void CLI_Current(int* hashTokens) {
 	if(hashTokens[1] == NULL) {
@@ -186,6 +189,7 @@ void CLI_Current(int* hashTokens) {
 /** CLI_Temperature
  * Checks and displays the desired
  * temperature parameter(s)
+ * @param hashTokens is the array of hashed tokens
  */
 void CLI_Temperature(int* hashTokens) {
 	if(hashTokens[1] == NULL) {
@@ -293,6 +297,7 @@ void CLI_LTC6811(void) {
 /** CLI_Contactor
  * Interacts with contactor status by
  * printing the status of the contactor
+ * @param hashTokens is the array of hashed tokens
  */
 void CLI_Contactor(int* hashTokens) {
 	FunctionalState contactor = Contactor_Flag();
@@ -310,6 +315,7 @@ void CLI_Contactor(int* hashTokens) {
 /** CLI_Charge
  * Checks and displays the desired
  * state of charge parameter(s)
+ * @param hashTokens is the array of hashed tokens
  */
 void CLI_Charge(int* hashTokens) {
 	if(hashTokens[1] == NULL) {
@@ -354,6 +360,7 @@ void setLED(led input, int state) {
  * checking error light status
  * running a full LED test
  * and turning a specific LED on/off
+ * @param hashTokens is the array of hashed tokens
  */
 void CLI_LED(int* hashTokens) {
 	LED_Init();
@@ -423,6 +430,7 @@ void CLI_LED(int* hashTokens) {
 /** CLI_CAN
  * Interacts with CAN by
  * reading and writing to bus
+ * @param hashTokens is the array of hashed tokens
  */
 void CLI_CAN(int* hashTokens) {
 	uint8_t rxData;
@@ -489,6 +497,7 @@ void CLI_Display(void) {
 
 /** CLI_Watchdog
  * Shows whether watchdog was tripped
+ * @param hashTokens is the array of hashed tokens
  */
 void CLI_Watchdog(int* hashTokens) {
 	if(hashTokens[1] == NULL) {
@@ -515,6 +524,7 @@ void CLI_Watchdog(int* hashTokens) {
 /** CLI_EEPROM
  * Interacts with EEPROM
  * by reading and writing to the EEPROM
+ * @param hashTokens is the array of hashed tokens
  */
 void CLI_EEPROM(int* hashTokens) {
 	if(hashTokens[1] == NULL) {
@@ -612,6 +622,7 @@ void CLI_Critical(void) {
 /** CLI_All
  * Displays all information about BPS modules
  * (voltage, current, temperature, charge, contactor)
+ * @param hashTokens is the array of hashed tokens
  */
 void CLI_All(int* hashTokens){
 	printf("Voltage: \n\r");

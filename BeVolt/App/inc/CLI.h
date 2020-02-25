@@ -87,8 +87,9 @@
 void CLI_Init(cell_asic* minions);
 
 /** CLI_InputParse
- * Parses the input string and stores in tokens[]
+ * Parses the input string and stores in hashTokens[]
  * @param input is a pointer to the input string
+ * @param parsedTokens is an array to pass the parsed words back
  */
 void CLI_InputParse(char* input, int* parsedTokens); 
 
@@ -112,18 +113,21 @@ void CLI_Help(void);
 /** CLI_Voltage
  * Checks and displays the desired
  * voltage parameter(s)
+ * @param hashTokens is the array of hashed tokens
  */
 void CLI_Voltage(int* hashTokens);
 
 /** CLI_Current
  * Checks and displays the desired
  * current parameter(s)
+ * @param hashTokens is the array of hashed tokens
  */
 void CLI_Current(int* hashTokens);
 
 /** CLI_Temperature
  * Checks and displays the desired
  * temperature parameter(s)
+ * @param hashTokens is the array of hashed tokens
  */
 void CLI_Temperature(int* hashTokens);
 
@@ -138,12 +142,14 @@ void CLI_LTC6811(void);
 /** CLI_Contactor
  * Interacts with contactor status by
  * printing the status of the contactor
+ * @param hashTokens is the array of hashed tokens
  */
 void CLI_Contactor(int* hashTokens);
 
 /** CLI_Charge
  * Checks and displays the desired
  * state of charge parameter(s)
+ * @param hashTokens is the array of hashed tokens
  */
 void CLI_Charge(int* hashTokens);
 
@@ -161,12 +167,14 @@ void setLED(led input, int state);
  * checking error light status
  * running a full LED test
  * and turning a specific LED on/off
+ * @param hashTokens is the array of hashed tokens
  */
 void CLI_LED(int* hashTokens);
 
 /** CLI_CAN
  * Interacts with CAN by
  * reading and writing to bus
+ * @param hashTokens is the array of hashed tokens
  */
 void CLI_CAN(int* hashTokens);
 
@@ -177,12 +185,14 @@ void CLI_Display(void);
 
 /** CLI_Watchdog
  * Shows whether watchdog was tripped
+ * @param hashTokens is the array of hashed tokens
  */
 void CLI_Watchdog(int* hashTokens);
 
 /** CLI_EEPROM
  * Interacts with EEPROM
  * by reading and writing to the EEPROM
+ * @param hashTokens is the array of hashed tokens
  */
 void CLI_EEPROM(int* hashTokens);
 
