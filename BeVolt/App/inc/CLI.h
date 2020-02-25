@@ -62,7 +62,7 @@
 #define CLI_ERROR_HASH          0x67AA6C8
 
 #define CLI_FAULT_HASH          0x69581E2
-#define CLI_RUN_HASH		    0x1AB8B
+#define CLI_RUN_HASH		    		0x1AB8B
 #define CLI_UVOLT_HASH          0x6956DF6
 #define CLI_OVOLT_HASH          0x6956DF0
 #define CLI_OTEMP_HASH          0x65D5E83
@@ -70,8 +70,8 @@
 #define CLI_WDOG_HASH           0x307F7B
 #define CLI_EXTRA_HASH          0x58C7C90
 
-#define CLI_TRIP_HASH   		0x3481FB
-#define CLI_CLEAR_HASH			0x674180D
+#define CLI_TRIP_HASH   				0x3481FB
+#define CLI_CLEAR_HASH					0x674180D
 
 #define CLI_SHUTDOWN_HASH       0xE7D4586
 #define CLI_PARTYTIME_HASH      0x391FEB33
@@ -90,7 +90,7 @@ void CLI_Init(cell_asic* minions);
  * Parses the input string and stores in tokens[]
  * @param input is a pointer to the input string
  */
-void CLI_InputParse(char *input); 
+void CLI_InputParse(char* input, int* parsedTokens); 
 
 /** CLI_StringHash
  * Calculates the hashed value of the input
@@ -113,19 +113,19 @@ void CLI_Help(void);
  * Checks and displays the desired
  * voltage parameter(s)
  */
-void CLI_Voltage(void);
+void CLI_Voltage(int* hashTokens);
 
 /** CLI_Current
  * Checks and displays the desired
  * current parameter(s)
  */
-void CLI_Current(void);
+void CLI_Current(int* hashTokens);
 
 /** CLI_Temperature
  * Checks and displays the desired
  * temperature parameter(s)
  */
-void CLI_Temperature(void);
+void CLI_Temperature(int* hashTokens);
 
 /** CLI_LTC6811
  * Prints register information
@@ -139,20 +139,22 @@ void CLI_LTC6811(void);
  * Interacts with contactor status by
  * printing the status of the contactor
  */
-void CLI_Contactor(void);
+void CLI_Contactor(int* hashTokens);
 
 /** CLI_Charge
  * Checks and displays the desired
  * state of charge parameter(s)
  */
-void CLI_Charge(void);
+void CLI_Charge(int* hashTokens);
 
-/** toggleLED
+/** setLED
  * Helper function for CLI_LED
- * that toggles a given led
- * @param led is the led to toggle
+ * that sets a given LED to a state
+ * @param led is the LED to toggle
+ * @param state is the 'on' of 'off' state
+ * 				represented by a 1/0 or hashes
  */
-void toggleLED(led input);
+void setLED(led input, int state);
 
 /** CLI_LED
  * Interacts with the LEDs by 
@@ -160,13 +162,13 @@ void toggleLED(led input);
  * running a full LED test
  * and turning a specific LED on/off
  */
-void CLI_LED(void);
+void CLI_LED(int* hashTokens);
 
 /** CLI_CAN
  * Interacts with CAN by
  * reading and writing to bus
  */
-void CLI_CAN(void);
+void CLI_CAN(int* hashTokens);
 
 /** CLI_Display
  * Interacts with the display
@@ -176,13 +178,13 @@ void CLI_Display(void);
 /** CLI_Watchdog
  * Shows whether watchdog was tripped
  */
-void CLI_Watchdog(void);
+void CLI_Watchdog(int* hashTokens);
 
 /** CLI_EEPROM
  * Interacts with EEPROM
  * by reading and writing to the EEPROM
  */
-void CLI_EEPROM(void);
+void CLI_EEPROM(int* hashTokens);
 
 /** CLI_ADC
  * Prints the high precision and
@@ -195,11 +197,17 @@ void CLI_ADC(void);
  */  
 void CLI_Critical(void);
 
+/** CLI_All
+ * Displays all information about BPS modules
+ * (voltage, current, temperature, charge, contactor)
+ */
+void CLI_All(int* hashTokens);
+
 /** CLI_Handler
  * Routes the command given to the proper
  * measurement method to check the desired values
  * @param input is a command string
  */
-void CLI_Handler(char *input);
+void CLI_Handler(char* input);
 
 #endif

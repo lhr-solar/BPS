@@ -12,7 +12,6 @@
 #define MAX_TOKEN_SIZE 4
 
 static cell_asic* Minions;
-int32_t hashTokens[MAX_TOKEN_SIZE];
 char hexString[8];
 const float MILLI_UNIT_CONVERSION = 1000;
 const float PERCENT_CONVERSION = 100;
@@ -30,20 +29,20 @@ void CLI_Init(cell_asic* boards) {
  * Parses the input string and stores in hashTokens[]
  * @param input is a pointer to the input string
  */
-void CLI_InputParse(char *input) {
+void CLI_InputParse(char* input, int* parsedTokens) {
 	char *tokenized;
 	char *split = strtok_r(input, " ", &tokenized);
 	for(int i = 0; i < MAX_TOKEN_SIZE && split != NULL; i++) {
 		for(int j = 0; j < strlen(split); j++) {
 			split[j] = tolower(split[j]);
 		}
-		if(i == 3) {//CAN requires argument #3 to be in hex
+		if(i == 3) { //CAN requires argument #3 to be in hex
 			strcpy(hexString, split);
 		}
 		if(!isalpha(split[0])) {
-			sscanf(split, "%d", &hashTokens[i]);
+			sscanf(split, "%d", &parsedTokens[i]);
 		} else {
-			hashTokens[i] = CLI_StringHash(split);
+			parsedTokens[i] = CLI_StringHash(split);
 		}
 		split = strtok_r(NULL, " ", &tokenized);
 	}
@@ -93,7 +92,7 @@ void CLI_Help(void) {
  * Checks and displays the desired
  * voltage parameter(s)
  */
-void CLI_Voltage(void) {
+void CLI_Voltage(int* hashTokens) {
 	Voltage_UpdateMeasurements();
 	if(hashTokens[1] == NULL) {
 		for(int i = 0; i < NUM_BATTERY_MODULES; i++){
@@ -147,7 +146,7 @@ void CLI_Voltage(void) {
  * Checks and displays the desired
  * current parameter(s)
  */
-void CLI_Current(void) {
+void CLI_Current(int* hashTokens) {
 	if(hashTokens[1] == NULL) {
 		printf("High: %.3fA\n\r", Current_GetHighPrecReading()/MILLI_UNIT_CONVERSION);	// Prints 4 digits, number, and A
 		printf("Low: %.3fA\n\r", Current_GetLowPrecReading()/MILLI_UNIT_CONVERSION);
@@ -188,7 +187,7 @@ void CLI_Current(void) {
  * Checks and displays the desired
  * temperature parameter(s)
  */
-void CLI_Temperature(void) {
+void CLI_Temperature(int* hashTokens) {
 	if(hashTokens[1] == NULL) {
 		for(int i = 0; i < NUM_BATTERY_MODULES; i++) {
 			printf("Module number %d: %.3f C\n\r", i+1, Temperature_GetModuleTemperature(i)/MILLI_UNIT_CONVERSION);
@@ -295,7 +294,7 @@ void CLI_LTC6811(void) {
  * Interacts with contactor status by
  * printing the status of the contactor
  */
-void CLI_Contactor(void) {
+void CLI_Contactor(int* hashTokens) {
 	FunctionalState contactor = Contactor_Flag();
 	if(hashTokens[1] == NULL) {
 		if(contactor == ENABLE) {
@@ -312,7 +311,7 @@ void CLI_Contactor(void) {
  * Checks and displays the desired
  * state of charge parameter(s)
  */
-void CLI_Charge(void) {
+void CLI_Charge(int* hashTokens) {
 	if(hashTokens[1] == NULL) {
 		printf("The battery percentage is %.2f%%\n\r", SoC_GetPercent()/PERCENT_CONVERSION);
 		return;
@@ -332,16 +331,18 @@ void CLI_Charge(void) {
 	}
 }
 
-/** toggleLED
+/** setLED
  * Helper function for CLI_LED
- * that toggles a given led
- * @param led is the led to toggle
+ * that sets a given LED to a state
+ * @param led is the LED to toggle
+ * @param state is the 'on' of 'off' state
+ * 				represented by a 1/0 or hashes
  */
-void toggleLED(led input) {
-	if(hashTokens[2] == 1 || hashTokens[2] == CLI_ON_HASH) {
+void setLED(led input, int state) {
+	if(state == 1 || state == CLI_ON_HASH) {
 		LED_On(input);
 	}
-	else if(hashTokens[2] == 0 || hashTokens[2] == CLI_OFF_HASH) {
+	else if(state == 0 || state == CLI_OFF_HASH) {
 		LED_Off(input);
 	} else {
 		printf("Invalid LED command\n\r");
@@ -354,7 +355,7 @@ void toggleLED(led input) {
  * running a full LED test
  * and turning a specific LED on/off
  */
-void CLI_LED(void) {
+void CLI_LED(int* hashTokens) {
 	LED_Init();
 	uint8_t error = (GPIOB->ODR) & GPIO_Pin_12;
 	if(hashTokens[1] == NULL) {
@@ -390,28 +391,28 @@ void CLI_LED(void) {
 			}
 			break;
 		case CLI_FAULT_HASH:
-			toggleLED(FAULT);
+			setLED(FAULT, hashTokens[2]);
 			break;
 		case CLI_RUN_HASH:
-			toggleLED(RUN);
+			setLED(RUN, hashTokens[2]);
 			break;
 		case CLI_OCURR_HASH:
-			toggleLED(OCURR);
+			setLED(OCURR, hashTokens[2]);
 			break;
 		case CLI_OTEMP_HASH:
-			toggleLED(OTEMP);
+			setLED(OTEMP, hashTokens[2]);
 			break;
 		case CLI_OVOLT_HASH:
-			toggleLED(OVOLT);
+			setLED(OVOLT, hashTokens[2]);
 			break;
 		case CLI_WDOG_HASH:
-			toggleLED(WDOG);
+			setLED(WDOG, hashTokens[2]);
 			break;
 		case CLI_CAN_HASH:
-			toggleLED(CAN);
+			setLED(CAN, hashTokens[2]);
 			break;
 		case CLI_EXTRA_HASH:
-			toggleLED(EXTRA);
+			setLED(EXTRA, hashTokens[2]);
 			break;
 		default:
 			printf("Invalid LED command\n\r");
@@ -423,7 +424,7 @@ void CLI_LED(void) {
  * Interacts with CAN by
  * reading and writing to bus
  */
-void CLI_CAN(void) {
+void CLI_CAN(int* hashTokens) {
 	uint8_t rxData;
 	uint8_t txData[8];
 	uint8_t dataLength = (strlen(hexString)/2) + (strlen(hexString)%2);	// Ceiling of length
@@ -489,7 +490,7 @@ void CLI_Display(void) {
 /** CLI_Watchdog
  * Shows whether watchdog was tripped
  */
-void CLI_Watchdog(void) {
+void CLI_Watchdog(int* hashTokens) {
 	if(hashTokens[1] == NULL) {
 		printf("Safety Status: ");
 		if (WDTimer_DidSystemReset() == SAFE){
@@ -515,7 +516,7 @@ void CLI_Watchdog(void) {
  * Interacts with EEPROM
  * by reading and writing to the EEPROM
  */
-void CLI_EEPROM(void) {
+void CLI_EEPROM(int* hashTokens) {
 	if(hashTokens[1] == NULL) {
 		EEPROM_SerialPrintData();
 		return;
@@ -612,23 +613,23 @@ void CLI_Critical(void) {
  * Displays all information about BPS modules
  * (voltage, current, temperature, charge, contactor)
  */
-void CLI_All(void){
+void CLI_All(int* hashTokens){
 	printf("Voltage: \n\r");
 	hashTokens[0] = CLI_VOLTAGE_HASH;
 	hashTokens[1] = 0;
-	CLI_Voltage();
+	CLI_Voltage(hashTokens);
 	printf("Current: \n\r");
 	hashTokens[0] = CLI_CURRENT_HASH;
-	CLI_Current();
+	CLI_Current(hashTokens);
 	printf("Temperature: \n\r");
 	hashTokens[0] = CLI_TEMPERATURE_HASH;
-	CLI_Temperature();
+	CLI_Temperature(hashTokens);
 	printf("State of Charge: \n\r");
 	hashTokens[0] = CLI_CHARGE_HASH;
-	CLI_Charge();
+	CLI_Charge(hashTokens);
 	printf("Contactor: \n\r");
 	hashTokens[0] = CLI_CONTACTOR_HASH;
-	CLI_Contactor();
+	CLI_Contactor(hashTokens);
 }
 
 /** CLI_Handler
@@ -636,8 +637,9 @@ void CLI_All(void){
  * measurement method to check the desired values
  * @param input is a command string
  */
-void CLI_Handler(char *input) {
-	CLI_InputParse(input);
+void CLI_Handler(char* input) {
+	int hashTokens[MAX_TOKEN_SIZE] = {0};
+	CLI_InputParse(input, hashTokens);
 	if(hashTokens[0] == CLI_PARTYTIME_HASH) {
 		printf("\n\r");
 		for(int i = 0; i < 100; i++) {
@@ -663,15 +665,15 @@ void CLI_Handler(char *input) {
 			break;
 		// Voltage commands
 		case CLI_VOLTAGE_HASH:
-			CLI_Voltage();
+			CLI_Voltage(hashTokens);
 			break;
 		// Current commands
 		case CLI_CURRENT_HASH:
-			CLI_Current();
+			CLI_Current(hashTokens);
 			break;
 		// Temperature commands
 		case CLI_TEMPERATURE_HASH:
-			CLI_Temperature();
+			CLI_Temperature(hashTokens);
 			break;
 		// LTC6811 register commands
 		case CLI_REGISTER_HASH:
@@ -681,21 +683,21 @@ void CLI_Handler(char *input) {
 		// Contactor/Switch commands
 		case CLI_SWITCH_HASH:
 		case CLI_CONTACTOR_HASH:
-			CLI_Contactor();
+			CLI_Contactor(hashTokens);
 			break;
 		// State of Charge commands
 		case CLI_CHARGE_HASH:
-			CLI_Charge();
+			CLI_Charge(hashTokens);
 			break;
 		// Error light commands
 		case CLI_LED_HASH:
 		case CLI_LIGHTS_HASH:
-			CLI_LED();
+			CLI_LED(hashTokens);
 			break;
 		// CAN commands
 		case CLI_CAN_HASH:
 		case CLI_CANBUS_HASH:
-			CLI_CAN();
+			CLI_CAN(hashTokens);
 			break;
 		// Display commands
 		case CLI_DISPLAY_HASH:
@@ -703,11 +705,11 @@ void CLI_Handler(char *input) {
 			break;
 		// Watchdog commands
 		case CLI_WATCHDOG_HASH:
-			CLI_Watchdog();
+			CLI_Watchdog(hashTokens);
 			break;
 		// EEPROM commands
 		case CLI_EEPROM_HASH:
-			CLI_EEPROM();
+			CLI_EEPROM(hashTokens);
 			break;
 		// Peripheral commands
 		case CLI_ADC_HASH:
@@ -717,18 +719,14 @@ void CLI_Handler(char *input) {
 		case CLI_CRITICAL_HASH:
 		case CLI_ABORT_HASH:
 			CLI_Critical();
-			break;		// ABORT
+			break;
 		// All
 		case CLI_ALL_HASH:
-			CLI_All();
+			CLI_All(hashTokens);
 			break;
 		default:
 			printf("Invalid command. Type 'h' or 'm' or '?' for the help menu\n\r");
 			break;
 	}
-	hashTokens[0] = NULL;
-	hashTokens[1] = NULL;
-	hashTokens[2] = NULL;
-	hashTokens[3] = NULL;
 	printf(">> ");
 }
