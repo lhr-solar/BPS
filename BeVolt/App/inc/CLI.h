@@ -211,7 +211,7 @@ void CLI_Critical(void);
  * Displays all information about BPS modules
  * (voltage, current, temperature, charge, contactor)
  */
-void CLI_All(int* hashTokens);
+void CLI_All();
 
 /** CLI_Handler
  * Routes the command given to the proper

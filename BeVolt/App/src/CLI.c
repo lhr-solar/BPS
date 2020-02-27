@@ -622,9 +622,10 @@ void CLI_Critical(void) {
 /** CLI_All
  * Displays all information about BPS modules
  * (voltage, current, temperature, charge, contactor)
- * @param hashTokens is the array of hashed tokens
  */
-void CLI_All(int* hashTokens){
+void CLI_All(){
+	int hashTokens[2];
+	
 	printf("Voltage: \n\r");
 	hashTokens[0] = CLI_VOLTAGE_HASH;
 	hashTokens[1] = 0;
@@ -651,6 +652,8 @@ void CLI_All(int* hashTokens){
 void CLI_Handler(char* input) {
 	int hashTokens[MAX_TOKEN_SIZE] = {0};
 	CLI_InputParse(input, hashTokens);
+
+	#ifdef PARTY_PARROT
 	if(hashTokens[0] == CLI_PARTYTIME_HASH) {
 		printf("\n\r");
 		for(int i = 0; i < 100; i++) {
@@ -663,6 +666,8 @@ void CLI_Handler(char* input) {
 		printf(">> ");
 	return;
 	}
+	#endif
+
 	if(hashTokens[0] == CLI_PING_HASH) {
 		printf("pong\n\r");
 		printf(">> ");

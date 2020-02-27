@@ -14,6 +14,7 @@ const char *utsvt_logo = "                                                ,,qp@@
                    \"0E&&&&&&0RM\"`                      `\"*PRRB0bbBRRM\"`\n\r\
 ";
 
+#ifdef PARTY_PARROT
 const char *party_parrot_frames[10] = {
 "                         .cccc;;cc;';c.          \r\n\
                       .,:dkdc:;;:c:,:d:.          \r\n\
@@ -205,3 +206,4 @@ Ol;......................................;l'      \r\n",
 ,xl::,..,cccccccccccccccccccccccccccccccc:;':xx,  \r\n\
 cNd.........................................;lOc  \r\n"
 };
+#endif
