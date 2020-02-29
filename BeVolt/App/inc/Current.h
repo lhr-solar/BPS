@@ -11,6 +11,7 @@
 #include <stdint.h>
 #include "ADC.h"
 #include "config.h"
+#include <stdbool.h>
  
 /** Current_Init
  * Initializes two ADCs to begin current monitoring.
@@ -27,7 +28,7 @@ ErrorStatus Current_UpdateMeasurements(void);
  * Checks if pack does not have a short circuit
  * @return SAFE or DANGER
  */
-SafetyStatus Current_CheckStatus(void);
+SafetyStatus Current_CheckStatus(bool override);
 
 /** Current_IsCharging
  * Determines if the the battery pack is being charged or discharged depending on

@@ -50,7 +50,7 @@ int realmain(){
 			CLI_Handler(command);
 		}
 		
-		SafetyStatus current = Current_CheckStatus();
+		SafetyStatus current = Current_CheckStatus(override);
 		SafetyStatus temp = Temperature_CheckStatus(Current_IsCharging());
 		SafetyStatus voltage = Voltage_CheckStatus();
 
@@ -142,7 +142,7 @@ void faultCondition(void){
 
 	uint8_t error = 0;
 
-	if(!Current_CheckStatus()){
+	if(!Current_CheckStatus(false)){
 		error |= FAULT_HIGH_CURRENT;
 		LED_On(OCURR);
 	}
@@ -408,7 +408,7 @@ int main(){
 		printf("\n\r==============================\n\rCurrent Test:\n\r");
 		printf("ADC High: %d\n\r", ADC_ReadHigh());
 		printf("ADC Low: %d\n\r", ADC_ReadLow());
-		printf("Is the battery safe? %d\n\r", Current_CheckStatus());
+		printf("Is the battery safe? %d\n\r", Current_CheckStatus(false));
 		printf("Is the battery charging? %d\n\r", Current_IsCharging());
 		printf("High: %d\n\r", Current_GetHighPrecReading());
 		printf("Low: %d\n\r", Current_GetLowPrecReading());
@@ -689,6 +689,27 @@ void DischargingSoCTest(void) {
 /** Tests
  * 	TODO: Need to test SetAccumulator, GetPercent and Calibrate on faults
  */
+
+#elif defined Current_CheckStatus_Test
+#include "uart.h"
+extern int32_t LowPrecisionCurrent;
+
+int main() {
+	int32_t LowPrecisionTestValue = -60;
+	int8_t LoopNum = 20;
+	UART3_Init();
+	printf("0 means SAFE, 1 means DANGER\n\r\n\r");
+	while(LoopNum>0){
+		LowPrecisionTestValue+=10;
+		LoopNum-=1;
+		//Current_UpdateMeasurements();
+		LowPrecisionCurrent = LowPrecisionTestValue;
+		printf("TestCurrent = %d \n\r", LowPrecisionCurrent);
+		printf("Override Off yields %d \n\r", Current_CheckStatus(false));
+		printf("Override Set yields %d \n\r", Current_CheckStatus(true));
+		printf("\n\r");
+}
+}
 
 #elif defined EEPROM_WRITE_TEST
 
@@ -974,7 +995,7 @@ int main(void) {
 	
 	Current_UpdateMeasurements();
 	
-	if (Current_CheckStatus() == SAFE){
+	if (Current_CheckStatus(override) == SAFE){
 		printf("current is safe\n\r");
 	}else{
 		printf("current is not safe\n\r");
