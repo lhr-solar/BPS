@@ -740,7 +740,7 @@ void CLI_Handler(char* input) {
 			CLI_All();
 			break;
 		default:
-			printf("Invalid command. Type 'h' or 'm' or '?' for the help menu\n\r");
+			printf("Invalid command. Type 'help' or 'menu' for the help menu\n\r");
 			break;
 	}
 	printf(">> ");
