@@ -41,17 +41,16 @@ ErrorStatus Current_UpdateMeasurements(void){
  * Checks if pack does not have a short circuit
  * @return SAFE or DANGER
  */
-SafetyStatus Current_CheckStatus(void){
+SafetyStatus Current_CheckStatus(bool override){
 
-	if(HighPrecisionCurrent > MAX_HIGH_PRECISION_CURRENT) {
-		return (LowPrecisionCurrent < MAX_CURRENT_LIMIT)
-			? SAFE
-			: DANGER;
-	} else {
+	//if((LowPrecisionCurrent < MAX_CURRENT_LIMIT)&&(!override))
+	if((LowPrecisionCurrent > MAX_CHARGING_CURRENT)&&(LowPrecisionCurrent < MAX_CURRENT_LIMIT)&&(!override))
 		return SAFE;
-	}
+	else if((LowPrecisionCurrent <= 0)&&(LowPrecisionCurrent > MAX_CHARGING_CURRENT)&&override)
+		return SAFE;
+	else
+		return DANGER;
 }
-
 /** Current_IsCharging
  * Determines if the the battery pack is being charged or discharged depending on
  * the sign of the current
@@ -59,7 +58,7 @@ SafetyStatus Current_CheckStatus(void){
  */
 int8_t Current_IsCharging(void){
 	// TODO: Make sure that the current board is installed in such a way that negative => charging
-	return HighPrecisionCurrent < 0;
+	return LowPrecisionCurrent < 0;
 }
 
 /** Current_GetHighPrecReading
