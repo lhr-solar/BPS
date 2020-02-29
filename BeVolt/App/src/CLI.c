@@ -651,6 +651,8 @@ void CLI_All(void) {
 void CLI_Handler(char* input) {
 	int hashTokens[MAX_TOKEN_SIZE] = {0};
 	CLI_InputParse(input, hashTokens);
+
+	#ifdef PARTY_PARROT
 	if(hashTokens[0] == CLI_PARTYTIME_HASH) {
 		printf("\n\r");
 		for(int i = 0; i < 100; i++) {
@@ -663,6 +665,8 @@ void CLI_Handler(char* input) {
 		printf(">> ");
 	return;
 	}
+	#endif
+
 	if(hashTokens[0] == CLI_PING_HASH) {
 		printf("pong\n\r");
 		printf(">> ");
