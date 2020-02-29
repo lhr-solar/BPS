@@ -6,9 +6,9 @@
 #define SYSTICK_H_
 
 #include <stdint.h>
-#include "stm32f4xx.h"
+#include "config.h"
 
-/* SysTick_Handler
+/** SysTick_Handler
  * Called every us; updates the usTicks counter
  */
 void SysTick_Handler(void);
@@ -18,4 +18,4 @@ void SysTick_Handler(void);
  */
 void DelayMs(uint32_t ms);
 
-#endif 
+#endif

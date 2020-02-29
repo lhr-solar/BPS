@@ -6,11 +6,10 @@
 
 static volatile uint32_t usTicks;
 
-/* SysTick_Handler
+/** SysTick_Handler
  * Called every us; updates the usTicks counter
  */
- //SystemCoreClock 
-void SysTick_Handler() {
+void SysTick_Handler(void) {
 	if (usTicks != 0) {
 		usTicks--;
 	}
@@ -26,7 +25,8 @@ void DelayMs(uint32_t ms) {
 	//Initializing core clock configuration
 	// Update SystemCoreClock value
 	SystemCoreClockUpdate();
+	SysTick_CLKSourceConfig(SysTick_CLKSource_HCLK);
 	// Configure the SysTick timer to overflow every 1 us
 	SysTick_Config(SystemCoreClock / 1000000);
 	while(usTicks); //wait for interrupts to reach 0
-	}
+}

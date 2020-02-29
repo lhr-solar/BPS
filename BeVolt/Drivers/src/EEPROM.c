@@ -10,7 +10,7 @@
 #include "Voltage.h"
 #include "Temperature.h"
 #include "UART.h"
-#include "Systick.h"
+#include "SysTick.h"
 #include <stdio.h>
 
 //starting addresses for errors

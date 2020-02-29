@@ -15,8 +15,12 @@
 #include "LED.h"
 #include "SysTick.h"
 #include "PLL.h"
+#include "CLI.h"
 
 cell_asic Minions[NUM_MINIONS];
+bool override = false;		// This will be changed by user via CLI
+Fifo CLIFifo;
+char command[fifo_size];
 
 void initialize(void);
 void preliminaryCheck(void);
@@ -30,27 +34,32 @@ int realmain(){
 
 	WDTimer_Start();
 
-	bool override = false;		// This will be changed by user via CLI
-	while(1){
+	while(1) {
 		// First update the measurements.
 		Voltage_UpdateMeasurements();
 		Current_UpdateMeasurements();
-    Temperature_UpdateAllMeasurements();
+    	Temperature_UpdateAllMeasurements();
 
 		// Update battery percentage
 		SoC_Calculate(Current_GetLowPrecReading());
+
+		// Checks for user input to send to CLI
+		UART3_CheckAndEcho(&CLIFifo);
+		if(UART3_HasCommand(&CLIFifo)) {
+			UART3_GetCommand(&CLIFifo, command);
+			CLI_Handler(command);
+		}
 		
 		SafetyStatus current = Current_CheckStatus(override);
 		SafetyStatus temp = Temperature_CheckStatus(Current_IsCharging());
 		SafetyStatus voltage = Voltage_CheckStatus();
 
 		// Check if everything is safe (all return SAFE = 0)
-		if((current == SAFE) && (temp == SAFE) && (voltage == SAFE) && !override) {
+		if((current == SAFE) && (temp == SAFE) && (voltage == SAFE)) {
 			Contactor_On();
 		}
 		else if((current == SAFE) && (temp == SAFE) && (voltage == UNDERVOLTAGE) && override) {
 			Contactor_On();
-			continue;
 		} else {
 			break;
 		}
@@ -74,17 +83,37 @@ int realmain(){
  *		- Give wrappers (Voltage, Current, Temperature) the limits
  */
 void initialize(void){
-	PLL_Init80MHz();
 	LED_Init();
 	Contactor_Init();
 	Contactor_Off();
 	WDTimer_Init();
 	EEPROM_Init();
 	SoC_Init();
-
 	Current_Init();
 	Voltage_Init(Minions);
 	Temperature_Init(Minions);
+	CLI_Init(Minions);
+
+	fifoInit(&CLIFifo);
+	__enable_irq();
+	CLI_Startup();
+
+	// Checks to see if the batteries need to be charged
+	Voltage_UpdateMeasurements();
+	SafetyStatus voltage = Voltage_CheckStatus();
+	if(voltage == UNDERVOLTAGE) {
+		printf("Do you need to charge the batteries? (y/n)\n\r>> ");
+		uint32_t wait = 0;
+		while(wait < STARTUP_WAIT_TIME) {
+			UART3_CheckAndEcho(&CLIFifo);
+			if(UART3_HasCommand(&CLIFifo)) {
+				UART3_GetCommand(&CLIFifo, command);
+				override = command[0] == 'y' ? true : false;
+				break;
+			}
+			wait++;
+		}
+	}
 }
 
 /** preliminaryCheck
@@ -202,8 +231,7 @@ void faultCondition(void){
 // E.g. If you want to run a LTC6811 test, change "#define CHANGE_THIS_TO_TEST_NAME" to the
 //		following:
 //		#define LTC6811_TEST
-#define CAN_TEST_2
-#define Current_CheckStatus_Test
+#define CLI_TEST
 
 #ifdef Systick_TEST
 
@@ -614,7 +642,7 @@ int main(){
 #elif defined SOC_TEST
 
 // *****************************************************************************************
-#include "SOC.h"
+#include "SoC.h"
 #include <stdio.h>
 #include <UART.h>
 void ChargingSoCTest(void);
@@ -747,17 +775,17 @@ int main() {
 #elif defined UART_INTERRUPT2
     /* Includes ---------------------------------------------------*/
     //#include "stm32f2xx.h"
-		#include "uart.h"
+	#include "UART.h"
 		
-		uint8_t RxData;//data received flag
+	uint8_t RxData;//data received flag
 				
     /* Private function prototypes --------------------------------*/
     void USART1_Config(void);
 
     /* Private functions ------------------------------------------*/
 		
-		/**
-		 * @brief This function handles USART3 global interrupt request.
+	/**
+	 * @brief This function handles USART3 global interrupt request.
      * @param None
      * @retval None
      */
@@ -880,11 +908,10 @@ int main() {
           /* Enable USART1 Receive interrupt */
           USART_ITConfig(USART1, USART_IT_RXNE, ENABLE);
       }
-
-#elif defined  UART_INTERRUPT
-
-#include "uart.h"
-#include "fifo.h"
+			
+#elif defined UART_INTERRUPT
+#include "UART.h"
+#include "FIFO.h"
 int main(void){
 	UART3_Init();
 	Fifo uartFifo;
@@ -895,7 +922,7 @@ int main(void){
 		UART3_CheckAndEcho(&uartFifo);
 		if (UART3_HasCommand(&uartFifo)){
 			UART3_GetCommand(&uartFifo, buffer);
-			printf("\n\r%s\n\r", buffer);
+			printf("\n\r%s\n\r", buffer);//service command
 		}
 	}
 }
@@ -1035,9 +1062,23 @@ int main(void) {
 	return 0;
 }
 
+#elif defined CLI_TEST
+int main(){
+	initialize();
+	__enable_irq();
+	Contactor_On();
+	char command[fifo_size];
+	CLI_Startup();
+	while(1) {
+		UART3_CheckAndEcho(&CLIFifo);
+		if (UART3_HasCommand(&CLIFifo)) {
+			UART3_GetCommand(&CLIFifo, command);
+			CLI_Handler(command);
+		}
+	}
+}
 
-#elif define CAN_TEST_2
-
+#elif defined CAN_TEST_2
 #include "CAN.h"
 /*message:
 typedef enum {
@@ -1201,7 +1242,6 @@ int main() {
 	#else
 	CAN1_Init(CAN_Mode_Normal);
 	#endif
-
 	// Data to transmit
 	uint8_t data[8] = {0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10};
 	uint32_t id = CAN_ID_BPS_ALL_CLEAR;
@@ -1242,7 +1282,6 @@ int main() {
 			}
 			printf("\n");
 		}
-		// #endif
 	}
 }
 

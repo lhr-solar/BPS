@@ -412,6 +412,16 @@
               <FileType>1</FileType>
               <FilePath>.\App\src\SoC.c</FilePath>
             </File>
+            <File>
+              <FileName>CLI.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\App\src\CLI.c</FilePath>
+            </File>
+            <File>
+              <FileName>Images.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\App\src\Images.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -451,6 +461,16 @@
               <FileName>SoC.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\App\inc\SoC.h</FilePath>
+            </File>
+            <File>
+              <FileName>CLI.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\App\inc\CLI.h</FilePath>
+            </File>
+            <File>
+              <FileName>Images.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\App\inc\Images.h</FilePath>
             </File>
           </Files>
         </Group>

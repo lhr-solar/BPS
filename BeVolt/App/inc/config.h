@@ -16,7 +16,7 @@ typedef enum {SAFE = 0, DANGER = 1, OVERVOLTAGE = 2, UNDERVOLTAGE = 3} SafetySta
 
 //--------------------------------------------------------------------------------
 // Basic Parameters of BPS layout
-#define NUM_MINIONS						4		// Number of minion boards
+#define NUM_MINIONS	4					 // Number of minion boards
 												//
 
 //--------------------------------------------------------------------------------
@@ -40,6 +40,7 @@ typedef enum {SAFE = 0, DANGER = 1, OVERVOLTAGE = 2, UNDERVOLTAGE = 3} SafetySta
 //--------------------------------------------------------------------------------
 // Helpers
 #define MILLI_SCALING_FACTOR			1000
+#define STARTUP_WAIT_TIME					100000 // Number of iterations to wait for battery charging instructions on startup
 
 //--------------------------------------------------------------------------------
 // Voltage Sensor Configurations
