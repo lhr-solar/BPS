@@ -50,6 +50,16 @@ void CLI_InputParse(char* input, int* parsedTokens) {
 }
 
 // TODO: Create our own pow() function to exponentiate
+uint32_t CLI_Pow(uint32_t base, uint8_t power) {
+	uint32_t ans = 1;
+	if(!base && !power) {
+		return 0;
+	}
+	for(int i = 0; i < power; i++) {
+		ans *= base;
+	}
+	return ans;
+}
 
 /** CLI_StringHash
  * Calculates the hashed value of the input
@@ -61,7 +71,7 @@ uint32_t CLI_StringHash(char* string) {
 	uint32_t m = 1000000009;
 	uint8_t p = 31;
 	for(uint8_t i = 0; string[i]; i++) {
-		hash += string[i] * pow(p, i);
+		hash += string[i] * CLI_Pow(p, i);
 	}
 	return hash % m;
 }
@@ -375,7 +385,6 @@ void CLI_LED(int* hashTokens) {
 	}
 	switch(hashTokens[1]) {
 		case CLI_TEST_HASH:
-			printf("\n\r");
 			for(int i = 0; i < 10; i++) {
 				LED_Toggle(FAULT);
 				DelayMs(100);
@@ -408,6 +417,9 @@ void CLI_LED(int* hashTokens) {
 			break;
 		case CLI_OTEMP_HASH:
 			setLED(OTEMP, hashTokens[2]);
+			break;
+		case CLI_UVOLT_HASH:
+			setLED(UVOLT, hashTokens[2]);
 			break;
 		case CLI_OVOLT_HASH:
 			setLED(OVOLT, hashTokens[2]);
@@ -540,7 +552,7 @@ void CLI_EEPROM(int* hashTokens) {
 			break;
 		case CLI_ERROR_HASH:
 			switch(hashTokens[2]) {
-				case FAULT:
+				case CLI_FAULT_HASH:
 					EEPROM_ReadMultipleBytes(EEPROM_FAULT_PTR_LOC, 2, errorAddrArray);
 					errorAddr = (errorAddrArray[0] << 2) + errorAddrArray[1];	// Turn address into one number (not an array)
 					printf("Fault error: %d", EEPROM_ReadByte(errorAddr-1));	// Use the address to get the error
@@ -565,7 +577,7 @@ void CLI_EEPROM(int* hashTokens) {
 					errorAddr = (errorAddrArray[0] << 2) + errorAddrArray[1];
 					printf("Watchdog error: %d", EEPROM_ReadByte(errorAddr-1));
 					break;
-				case CAN:
+				case CLI_CAN_HASH:
 					EEPROM_ReadMultipleBytes(EEPROM_CAN_PTR_LOC, 2, errorAddrArray);
 					errorAddr = (errorAddrArray[0] << 2) + errorAddrArray[1];
 					printf("CAN error: %d", EEPROM_ReadByte(errorAddr-1));
@@ -743,5 +755,6 @@ void CLI_Handler(char* input) {
 			printf("Invalid command. Type 'help' or 'menu' for the help menu\n\r");
 			break;
 	}
+	printf("%d\n\r", hashTokens[0]);
 	printf(">> ");
 }
