@@ -49,6 +49,8 @@ void CLI_InputParse(char* input, int* parsedTokens) {
 	}
 }
 
+// TODO: Create our own pow() function to exponentiate
+
 /** CLI_StringHash
  * Calculates the hashed value of the input
  * @param string is the string to be hashed
@@ -95,7 +97,6 @@ void CLI_Help(void) {
  * @param hashTokens is the array of hashed tokens
  */
 void CLI_Voltage(int* hashTokens) {
-	Voltage_UpdateMeasurements();
 	if(hashTokens[1] == NULL) {
 		for(int i = 0; i < NUM_BATTERY_MODULES; i++){
 			printf("Module number %d: %.3fV\n\r", i+1, Voltage_GetModuleMillivoltage(i)/MILLI_UNIT_CONVERSION);
@@ -363,7 +364,6 @@ void setLED(led input, int state) {
  * @param hashTokens is the array of hashed tokens
  */
 void CLI_LED(int* hashTokens) {
-	LED_Init();
 	uint8_t error = (GPIOB->ODR) & GPIO_Pin_12;
 	if(hashTokens[1] == NULL) {
 		if(error) {
@@ -622,9 +622,9 @@ void CLI_Critical(void) {
 /** CLI_All
  * Displays all information about BPS modules
  * (voltage, current, temperature, charge, contactor)
- * @param hashTokens is the array of hashed tokens
  */
-void CLI_All(int* hashTokens){
+void CLI_All(void) {
+	int hashTokens[MAX_TOKEN_SIZE];
 	printf("Voltage: \n\r");
 	hashTokens[0] = CLI_VOLTAGE_HASH;
 	hashTokens[1] = 0;
@@ -733,7 +733,7 @@ void CLI_Handler(char* input) {
 			break;
 		// All
 		case CLI_ALL_HASH:
-			CLI_All(hashTokens);
+			CLI_All();
 			break;
 		default:
 			printf("Invalid command. Type 'h' or 'm' or '?' for the help menu\n\r");
