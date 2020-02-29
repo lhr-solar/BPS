@@ -4,4 +4,6 @@
 *Listings
 *DebugConfig
 *.uvoptx
+.vscode
 *.uvprojx
+RTE_Components.h
