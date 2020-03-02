@@ -175,7 +175,7 @@ void CLI_Current(int* hashTokens) {
 			break;
 		case CLI_SAFE_HASH: 
 		case CLI_SAFETY_HASH:
-			if (Current_CheckStatus() == SAFE) {
+			if (Current_CheckStatus(false) == SAFE) {
 				printf("Safety Status: SAFE\n\r");
 			}
 			else {
