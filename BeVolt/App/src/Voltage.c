@@ -148,6 +148,20 @@ uint32_t Voltage_GetOpenWire(void){
  * @return voltage of module at specified index
  */
 uint16_t Voltage_GetModuleMillivoltage(uint8_t moduleIdx){
+    // These if statements prevents a hardfault.
+    if(moduleIdx >= NUM_BATTERY_MODULES) {
+        return 0xFFFF;  // return -1 which indicates error voltage
+    }
+
+    // Each board will measure the same number of modules except for the last board in the daisy chain.
+    // To find which minion board the battery module (moduleIdx) is assigned to, we need to
+    // divide the moduleIdx by how many battery modules are assigned to each minion board
+    // (indicated by MAX_VOLT_SENSORS_PER_MINION_BOARD). If the minion idx exceeds how many minion
+    // boards are currently present, then return an error voltage.
+    if((moduleIdx / MAX_VOLT_SENSORS_PER_MINION_BOARD) >= NUM_MINIONS) {
+        return 0xFFFF;  // return -1 which indicates error voltage
+    }
+
 	return Minions[moduleIdx / MAX_VOLT_SENSORS_PER_MINION_BOARD].cells.c_codes[moduleIdx % MAX_VOLT_SENSORS_PER_MINION_BOARD] / 10;
 }
 
