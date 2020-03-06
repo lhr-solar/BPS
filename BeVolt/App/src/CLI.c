@@ -162,16 +162,16 @@ void CLI_Voltage(int* hashTokens) {
  */
 void CLI_Current(int* hashTokens) {
 	if(hashTokens[1] == NULL) {
-		printf("High: %.3fA\n\r", Current_GetHighPrecReading()/MILLI_UNIT_CONVERSION);	// Prints 4 digits, number, and A
-		printf("Low: %.3fA\n\r", Current_GetLowPrecReading()/MILLI_UNIT_CONVERSION);
+		printf("High: %.3fA\n\r", Current_GetHighPrecReading());	// Prints 4 digits, number, and A
+		printf("Low: %.3fA\n\r", Current_GetLowPrecReading());
 		return;
 	}
 	switch (hashTokens[1]) {
 		case CLI_HIGH_HASH: // High precision reading
-			printf("High: %.3fA     \n\r", Current_GetHighPrecReading()/MILLI_UNIT_CONVERSION);
+			printf("High: %.3fA\n\r", Current_GetHighPrecReading());
 			break;
 		case CLI_LOW_HASH: // Low precision reading
-			printf("Low: %.3fA     \n\r", Current_GetLowPrecReading()/MILLI_UNIT_CONVERSION);
+			printf("Low: %.3fA\n\r", Current_GetLowPrecReading());
 			break;
 		case CLI_SAFE_HASH: 
 		case CLI_SAFETY_HASH:
