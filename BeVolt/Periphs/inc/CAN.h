@@ -23,6 +23,8 @@
 #define CAN_ID_SOC_DATA								(CAN_ID_BPS | 0x06)
 #define CAN_ID_WDOG_TRIGGERED					(CAN_ID_BPS | 0x07)
 #define CAN_ID_ERROR									(CAN_ID_BPS | 0x08)
+#define CAN_ID_MOTORON								(CAN_ID_BPS | 0x09)
+#define CAN_ID_MOTOROFF								(CAN_ID_BPS | 0x0A)
 
 typedef enum {
 	TRIP = 0x02,
@@ -34,6 +36,7 @@ typedef enum {
 	SOC_DATA = 0x106,
 	WDOG_TRIGGERED = 0x107,
 	CAN_ERROR = 0x108,
+	CAN_MOTOROFF = 0x10A,
 } CANMessage_t;
 
 typedef union {

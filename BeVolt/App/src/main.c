@@ -14,8 +14,10 @@
 #include "SoC.h"
 #include "LED.h"
 #include "SysTick.h"
+#include "TIM2.h"
 #include "PLL.h"
 #include "CLI.h"
+#include "CAN.h"
 
 cell_asic Minions[NUM_MINIONS];
 bool override = false;		// This will be changed by user via CLI
@@ -93,6 +95,7 @@ void initialize(void){
 	Voltage_Init(Minions);
 	Temperature_Init(Minions);
 	CLI_Init(Minions);
+	CAN1_Init(CAN_Mode_Normal);
 
 	fifoInit(&CLIFifo);
 	__enable_irq();
@@ -231,7 +234,7 @@ void faultCondition(void){
 // E.g. If you want to run a LTC6811 test, change "#define CHANGE_THIS_TO_TEST_NAME" to the
 //		following:
 //		#define LTC6811_TEST
-#define CLI_TEST
+#define DashboardMessage
 
 #ifdef Systick_TEST
 
@@ -1344,4 +1347,32 @@ int main(void){
 	while(1){}
 }
 
+#elif defined DashboardMessage
+
+void DashboardMessageTest(){
+	if(DashboardMessageFlag == 1){
+		if(override == false){    //the motor can be running
+		CANData_t data = {1};
+		CANPayload_t payload = {.idx = 0, .data = data};
+		CAN1_Send(CAN_MOTOROFF, payload);
+		}
+		else{ // danger; the motor should NOT be running
+			CANData_t data = {0};
+			CANPayload_t payload = {.idx = 0, .data = data};
+			CAN1_Send(CAN_MOTOROFF, payload);
+		}
+	}
+	
+	
+}
+
+int main(){
+	initialize();
+	
+	TIM2Init();
+	EnableTIM2Interrupt();
+	
+	while(1) DashboardMessageTest();
+	
+}
 #endif

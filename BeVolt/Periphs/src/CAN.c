@@ -196,6 +196,9 @@ int CAN1_Send(CANMessage_t message, CANPayload_t payload){
 
 		case CAN_ERROR:
 			return CAN1_Write(message, &payload.data.b, 1);
+		
+		case CAN_MOTOROFF:
+			return CAN1_Write(message, &payload.data.b, 1);
 	}
 	return DANGER;
 }
