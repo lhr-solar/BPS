@@ -2,6 +2,8 @@
  * Program for UTSVT BeVolt's Battery Protection System
  */
 
+
+#include "StatusSync.h"
 #include "common.h"
 #include "stm32f4xx.h"
 #include "config.h"
@@ -14,7 +16,6 @@
 #include "SoC.h"
 #include "LED.h"
 #include "SysTick.h"
-#include "TIM2.h"
 #include "PLL.h"
 #include "CLI.h"
 #include "CAN.h"
@@ -234,7 +235,7 @@ void faultCondition(void){
 // E.g. If you want to run a LTC6811 test, change "#define CHANGE_THIS_TO_TEST_NAME" to the
 //		following:
 //		#define LTC6811_TEST
-#define DashboardMessage
+#define DASHBOARD_MSG
 
 #ifdef Systick_TEST
 
@@ -1347,24 +1348,12 @@ int main(void){
 	while(1){}
 }
 
-#elif defined DashboardMessage
+#elif defined DASHBOARD_MSG
 
-void DashboardMessageTest(){
-	if(DashboardMessageFlag == 1){
-		if(override == false){    //the motor can be running
-		CANData_t data = {1};
-		CANPayload_t payload = {.idx = 0, .data = data};
-		CAN1_Send(CAN_MOTOROFF, payload);
-		}
-		else{ // danger; the motor should NOT be running
-			CANData_t data = {0};
-			CANPayload_t payload = {.idx = 0, .data = data};
-			CAN1_Send(CAN_MOTOROFF, payload);
-		}
-	}
+
 	
-	
-}
+void DashMessage(bool flag);
+
 
 int main(){
 	initialize();
@@ -1372,7 +1361,9 @@ int main(){
 	TIM2Init();
 	EnableTIM2Interrupt();
 	
-	while(1) DashboardMessageTest();
+	while(1){
+		DashMessage(override);
+	} 
 	
 }
 #endif

@@ -23,7 +23,6 @@
 #define CAN_ID_SOC_DATA								(CAN_ID_BPS | 0x06)
 #define CAN_ID_WDOG_TRIGGERED					(CAN_ID_BPS | 0x07)
 #define CAN_ID_ERROR									(CAN_ID_BPS | 0x08)
-#define CAN_ID_MOTORON								(CAN_ID_BPS | 0x09)
 #define CAN_ID_MOTOROFF								(CAN_ID_BPS | 0x0A)
 
 typedef enum {

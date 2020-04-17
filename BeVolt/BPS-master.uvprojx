@@ -422,6 +422,11 @@
               <FileType>1</FileType>
               <FilePath>.\App\src\Images.c</FilePath>
             </File>
+            <File>
+              <FileName>StatusSync.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\StatusSync.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -471,6 +476,11 @@
               <FileName>Images.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\App\inc\Images.h</FilePath>
+            </File>
+            <File>
+              <FileName>StatusSync.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\StatusSync.h</FilePath>
             </File>
           </Files>
         </Group>
