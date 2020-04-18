@@ -28,7 +28,7 @@ char command[fifo_size];
 void initialize(void);
 void preliminaryCheck(void);
 void faultCondition(void);
-void DashMessage(bool flag);
+
 
 int realmain(){
 	__disable_irq();		// Disable all interrupts until initialization is done
