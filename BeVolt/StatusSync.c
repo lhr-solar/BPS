@@ -82,7 +82,7 @@ void TIM2Init(){
 	
 	TIM_TimeBaseInit(TIM2, &timerInitStruct);
 	TIM_Cmd(TIM2, ENABLE);
-	TIM_ITConfig(TIM2, TIM_IT_Update, ENABLE); // timer will generate "update" events when period value is reached
+	TIM_ITConfig(TIM2, TIM_IT_Update, ENABLE);	// timer will generate "update" events when period value is reached
 	
-	
+	EnableTIM2Interrupt();
 }

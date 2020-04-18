@@ -1,5 +1,5 @@
-#ifndef StatusSync_H_
-#define StatusSync_H_
+#ifndef STATUSSYNC_H__
+#define STATUSSYNC_H__
 
 #include <stdint.h>
 #include "config.h"

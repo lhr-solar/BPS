@@ -28,6 +28,7 @@ char command[fifo_size];
 void initialize(void);
 void preliminaryCheck(void);
 void faultCondition(void);
+void DashMessage(bool flag);
 
 int realmain(){
 	__disable_irq();		// Disable all interrupts until initialization is done
@@ -42,7 +43,7 @@ int realmain(){
 		Voltage_UpdateMeasurements();
 		Current_UpdateMeasurements();
     	Temperature_UpdateAllMeasurements();
-
+		DashMessage(override);
 		// Update battery percentage
 		SoC_Calculate(Current_GetLowPrecReading());
 
@@ -97,6 +98,7 @@ void initialize(void){
 	Temperature_Init(Minions);
 	CLI_Init(Minions);
 	CAN1_Init(CAN_Mode_Normal);
+	TIM2Init();
 
 	fifoInit(&CLIFifo);
 	__enable_irq();
@@ -1352,7 +1354,7 @@ int main(void){
 
 
 	
-void DashMessage(bool flag);
+
 
 
 int main(){
