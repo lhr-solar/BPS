@@ -2,33 +2,30 @@
  * Driver for EEPROM
  */
 
+#include "common.h"
 #include "EEPROM.h"
-#include "stm32f4xx.h"
-#include "I2C.h"
-#include <stdlib.h>
+#include "BSP_I2C.h"
 #include "config.h"
 #include "Voltage.h"
 #include "Temperature.h"
 #include "UART.h"
-#include "SysTick.h"
-#include <stdio.h>
 
 //starting addresses for errors
-const uint16_t EEPROM_FAULT_CODE_ADDR = 0x0000;
-const uint16_t EEPROM_TEMP_FAULT  		= 0x0100;
-const uint16_t EEPROM_VOLT_FAULT		  = 0x0400;
-const uint16_t EEPROM_CURRENT_FAULT	  = 0x0600;
-const uint16_t EEPROM_WWDG_FAULT		  = 0x0700;
-const uint16_t EEPROM_CAN_FAULT			  = 0x0800;
-const uint16_t EEPROM_SOC_DATA				= 0x0900;
+const uint16_t EEPROM_FAULT_CODE_ADDR   = 0x0000;
+const uint16_t EEPROM_TEMP_FAULT        = 0x0100;
+const uint16_t EEPROM_VOLT_FAULT        = 0x0400;
+const uint16_t EEPROM_CURRENT_FAULT     = 0x0600;
+const uint16_t EEPROM_WWDG_FAULT        = 0x0700;
+const uint16_t EEPROM_CAN_FAULT         = 0x0800;
+const uint16_t EEPROM_SOC_DATA          = 0x0900;
 
 static uint16_t faultCodePtr,
-								tempFaultPtr,
-								voltFaultPtr,
-								currentFaultPtr,
-								watchdogFaultPtr,
-								canFaultPtr,
-								socDataPtr;
+                tempFaultPtr,
+                voltFaultPtr,
+                currentFaultPtr,
+                watchdogFaultPtr,
+                canFaultPtr,
+                socDataPtr;
 
 /** EEPROM_Init
  * Initializes I2C to communicate with EEPROM (M24128)
@@ -37,7 +34,7 @@ static uint16_t faultCodePtr,
  */
 void EEPROM_Init(void){
 	// Initialize the I2C driver
-	I2C3_Init();
+	BSP_I2C_Init();
 	
 	EEPROM_Load();
 }
@@ -247,12 +244,12 @@ void EEPROM_Tester(void){
  * @param unsigned byte of data
  */
 void EEPROM_WriteByte(uint16_t address, uint8_t data){
-	I2C3_Write(EEPROM_ADDRESS, address, data);
+	BSP_I2C_Write(EEPROM_ADDRESS, address, data, 1);
 	DelayMs(5);
 }
 
 void EEPROM_WriteMultipleBytes(uint16_t address, uint32_t bytes, uint8_t* buffer){
-	I2C3_WriteMultiple(EEPROM_ADDRESS, address, buffer, bytes);
+	BSP_I2C_Write(EEPROM_ADDRESS, address, buffer, bytes);
 }
 
 /** EEPROM_ReadMultipleBytes
@@ -262,7 +259,7 @@ void EEPROM_WriteMultipleBytes(uint16_t address, uint32_t bytes, uint8_t* buffer
  * @return unsigned 8-bit list of data
  */
 void EEPROM_ReadMultipleBytes(uint16_t address, uint32_t bytes, uint8_t* buffer){
-	I2C3_ReadMultiple(EEPROM_ADDRESS, address, buffer, bytes);
+	BSP_I2C_Read(EEPROM_ADDRESS, address, buffer, bytes);
 }
 
 /** EEPROM_ReadByte
@@ -271,7 +268,8 @@ void EEPROM_ReadMultipleBytes(uint16_t address, uint32_t bytes, uint8_t* buffer)
  * @return unsigned 8-bit data
  */
 uint8_t EEPROM_ReadByte(uint16_t address){
-	uint8_t result = I2C3_Read(EEPROM_ADDRESS, address);
+	uint8_t result;
+    BSP_I2C_Read(EEPROM_ADDRESS, address, &result, 1);
 	//printf("read %d from %x\n\r", result, address);
 	return result;
 	//return I2C3_Read(EEPROM_ADDRESS, address);
