@@ -4,21 +4,21 @@
             "name": "Linux",
             "includePath": [
                 "${workspaceFolder}/**",
-                "${workspaceFolder}/App/inc",
-                "${workspaceFolder}/App/src",
-                "${workspaceFolder}/Drivers/inc",
-                "${workspaceFolder}/Drivers/src",
-                "${workspaceFolder}/Periphs/inc",
-                "${workspaceFolder}/Periphs/src",
+                "${workspaceFolder}/Apps/Inc",
+                "${workspaceFolder}/Apps/Src",
+                "${workspaceFolder}/Drivers/Inc",
+                "${workspaceFolder}/Drivers/Src",
+                "${workspaceFolder}/Config/Src",
+                "${workspaceFolder}/Config/Inc",
+                "${workspaceFolder}/BSP/STM32F413/Inc",
+                "${workspaceFolder}/BSP/STM32F413/Src",
+                "${workspaceFolder}/BSP/Template/Inc",
+                "${workspaceFolder}/BSP/Template/Src",
                 "${workspaceFolder}/CMSIS/Include",
-                "${workspaceFolder}/CMSIS/Device/Include",
-                "${workspaceFolder}/STM32F4xx_StdPeriph_Driver",
-                "${workspaceFolder}/STM32F4xx_StdPeriph_Driver/inc",
-                "${workspaceFolder}/STM32F4xx_StdPeriph_Driver/src"
+                "${workspaceFolder}/CMSIS/Device/ST/STM32F4xx/Include"
             ],
             "defines": [
-                "USE_STDPERIPH_DRIVER",
-                "STM32F413_423xx"
+
             ],
             "compilerPath": "/usr/bin/gcc",
             "cStandard": "c11",
