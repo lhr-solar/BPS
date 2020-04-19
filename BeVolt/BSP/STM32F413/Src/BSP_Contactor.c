@@ -1,4 +1,5 @@
 #include "BSP_Contactor.h"
+#include "stm32f4xx.h"
 
 /**
  * @brief   Initializes the GPIO pins that interfaces with the Contactor.
@@ -9,8 +10,21 @@
  * @return  None
  */
 void BSP_Contactor_Init(void) {
-    // TODO: Initialize two pins that will be connected to the Contactor. One must be configued as an input
-    //      and the other must be configued as an output.
+    GPIO_InitTypeDef GPIO_InitStruct;
+	
+	// Initialize clock
+	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
+	
+	// Initialize PB0 as output
+	GPIO_InitStruct.GPIO_Pin = GPIO_Pin_0;			// Pin 0 is output
+	GPIO_InitStruct.GPIO_Mode = GPIO_Mode_OUT;
+	GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
+	GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
+	GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_DOWN;
+	GPIO_Init(GPIOB, &GPIO_InitStruct);
+	GPIO_InitStruct.GPIO_Pin = GPIO_Pin_1;			// Pin 1 is input
+	GPIO_InitStruct.GPIO_Mode = GPIO_Mode_IN;
+	GPIO_Init(GPIOB, &GPIO_InitStruct);
 }
 
 /**
@@ -20,8 +34,7 @@ void BSP_Contactor_Init(void) {
  * @return  None
  */
 void BSP_Contactor_On(void) {
-    // TODO: Set the state to high for the output pin.
-    //      Use Positive Logic.
+    GPIO_WriteBit(GPIOB, GPIO_Pin_0, Bit_SET);      // Set pin 0 high
 }
 
 /**
@@ -31,7 +44,7 @@ void BSP_Contactor_On(void) {
  * @return  None
  */
 void BSP_Contactor_Off(void) {
-    // TODO: Set the state to low for the output pin.
+    GPIO_WriteBit(GPIOB, GPIO_Pin_0, Bit_RESET);	// Set pin 0 low
 }
 
 /**
@@ -40,8 +53,10 @@ void BSP_Contactor_Off(void) {
  * @return  0 if contactor is off/open, 1 if on/closed
  */
 bool BSP_Contactor_GetState(void) {
-    // TODO: Return if the Contactor is on or off.
-    //      Check for negative logic. The gpio input pin can read low but the contactor could be on. Just make sure
-    //      you check that your return value is the same value of what the contactor is irl.
-    return 0;
+    // The AUX pin we have connected to is negative logic
+    if((GPIOB->IDR & GPIO_Pin_1) >> 1) {
+		return 0;
+	} else {
+		return 1;
+	}
 }
