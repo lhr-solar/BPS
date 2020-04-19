@@ -2,6 +2,6 @@
     "files.associations": {
         "current.h": "c",
         "stdbool.h": "c",
-        "bsp_gpio.h": "c"
+        "bsp_gpio.h": "c",
     }
 }

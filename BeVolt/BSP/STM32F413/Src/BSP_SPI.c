@@ -1,4 +1,20 @@
 #include "BSP_SPI.h"
+#include "stm32f4xx.h"
+
+// Use this macro function to wait until SPI communication is complete
+#define SPI_Wait(SPIx)		while(((SPIx)->SR & (SPI_SR_TXE | SPI_SR_RXNE)) == 0 || ((SPIx)->SR & SPI_SR_BSY))
+
+/** SPI1_WriteRead
+ * @brief   Sends and receives a byte of data on the SPI line.
+ * @param   txData single byte that will be sent to the device.
+ * @return  rxData single byte that was read from the device.
+ */
+static uint8_t SPI_WriteRead(uint8_t txData){
+	SPI_Wait(SPI1);
+	SPI1->DR = txData & 0x00FF;
+	SPI_Wait(SPI1);
+	return SPI1->DR & 0x00FF;
+}
 
 /**
  * @brief   Initializes the SPI port connected to the LTC6820. This port communicates with the LTC6811
@@ -8,11 +24,56 @@
  * @return  None
  */
 void BSP_SPI_Init(void) {
-    // TODO: Initialize the SPI port and a digital output pin for the chip select
     //      SPI configuration:
     //          speed : 125kbps
     //          CPOL : 1 (polarity of clock during idle is high)
     //          CPHA : 1 (tx recorded during 2nd edge)
+    // Pins:
+    //      SPI1:
+    //          PB3 : SCK
+    //          PB4 : MISO
+    //          PB5 : MOSI 
+    //          PB6 : CS
+
+    GPIO_InitTypeDef GPIO_InitStruct;
+	SPI_InitTypeDef SPI_InitStruct;
+	
+	// Initialize clocks
+	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_SPI1, ENABLE);
+	
+	// Initialize pins
+	GPIO_InitStruct.GPIO_Pin = GPIO_Pin_3 | GPIO_Pin_4 | GPIO_Pin_5;
+	GPIO_InitStruct.GPIO_Mode = GPIO_Mode_AF;
+	GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_UP;
+	GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
+	GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
+	GPIO_Init(GPIOB, &GPIO_InitStruct);
+	
+	GPIO_PinAFConfig(GPIOB, GPIO_PinSource3, GPIO_AF_SPI1);
+	GPIO_PinAFConfig(GPIOB, GPIO_PinSource4, GPIO_AF_SPI1);
+	GPIO_PinAFConfig(GPIOB, GPIO_PinSource5, GPIO_AF_SPI1);
+	
+	// Initialize SPI port
+	SPI_InitStruct.SPI_Direction = SPI_Direction_2Lines_FullDuplex;
+	SPI_InitStruct.SPI_Mode = SPI_Mode_Master;
+	SPI_InitStruct.SPI_DataSize = SPI_DataSize_8b;
+	SPI_InitStruct.SPI_CPOL = SPI_CPOL_High;
+	SPI_InitStruct.SPI_CPHA = SPI_CPHA_2Edge;
+	SPI_InitStruct.SPI_NSS = SPI_NSS_Soft;
+	SPI_InitStruct.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_64;
+	SPI_InitStruct.SPI_FirstBit = SPI_FirstBit_MSB;
+	SPI_InitStruct.SPI_CRCPolynomial = 0;	
+	SPI_Init(SPI1, &SPI_InitStruct);
+	SPI_Cmd(SPI1, ENABLE);
+
+    // Initialize CS pin
+    GPIO_InitStruct.GPIO_Pin = GPIO_Pin_6;
+    GPIO_InitStruct.GPIO_Mode = GPIO_Mode_OUT;
+    GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_UP;
+	GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
+	GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
+    GPIO_Init(GPIOB, &GPIO_InitStruct);
 }
 
 /**
@@ -25,8 +86,9 @@ void BSP_SPI_Init(void) {
  * @return  None
  */
 void BSP_SPI_Write(uint8_t *txBuf, uint32_t txLen) {
-    // TODO: Transmit data through SPI.
-    //      Any data the uC receives during this process should just be thrown away.
+    for(uint32_t i = 0; i < txLen; i++){
+		SPI1_WriteRead(txBuf[i]);
+	}
 }
 
 /**
@@ -39,8 +101,9 @@ void BSP_SPI_Write(uint8_t *txBuf, uint32_t txLen) {
  * @return  None
  */
 void BSP_SPI_Read(uint8_t *rxBuf, uint32_t rxLen) {
-    // TODO: Read data from SPI.
-    //      Send 0x00 in order to get data
+    for(uint32_t i = 0; i < rxLen; i++){
+		rxBuf[i] = SPI1_WriteRead(0x00);
+	}
 }
 
 /**
@@ -50,5 +113,10 @@ void BSP_SPI_Read(uint8_t *rxBuf, uint32_t rxLen) {
  * @return  None
  */
 void BSP_SPI_SetStateCS(uint8_t state) {
-    // TODO: Set CS pin to high or low depending on state
+    // PB6 is the Chip Select pin for the LTC6811
+    if(state) {
+        GPIO_SetBits(GPIOB, GPIO_Pin_6);
+    } else {
+        GPIO_ResetBits(GPIOB, GPIO_Pin_6);
+    }
 }
