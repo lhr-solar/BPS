@@ -38,10 +38,9 @@ BUILD_DIR = Objects
 C_SOURCES =  \
 $(wildcard Apps/Src/*.c) \
 $(wildcard Drivers/Src/*.c)	\
-$(wildcard BSP/Template/Src/*.c)	\
 $(wildcard BSP/STM32F413/Src/*.c)	\
-$(wildcard CMSIS/DSP_Lib/Source/*.c)	
-#$(wildcard STM32F4xx_StdPeriph_Driver/src/*.c)	
+$(wildcard CMSIS/DSP_Lib/Source/*.c)	\
+$(wildcard BSP/STM32f413/STM32F4xx_StdPeriph_Driver/Src/*.c)	
 
 
 # ASM sources
@@ -106,7 +105,6 @@ C_INCLUDES =  \
 -IDrivers/Inc	\
 -IConfig/Inc	\
 -IBSP/STM32F413/Inc	\
--IBSP/Template/Inc	\
 -ICMSIS/Device/ST/STM32F4xx/Include	\
 -ICMSIS/Include	\
 -IBSP/STM32F413/STM32F4xx_StdPeriph_Driver
