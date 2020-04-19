@@ -36,17 +36,17 @@ BUILD_DIR = Objects
 ######################################
 # C sources
 C_SOURCES =  \
-$(wildcard App/src/*.c) \
-$(wildcard Drivers/src/*.c)	\
-$(wildcard Periphs/src/*.c)	\
-$(wildcard STM32F4xx_StdPeriph_Driver/src/*.c)	\
-$(wildcard CMSIS/DSP_Lib/Source/*.c)	\
-$(wildcard GCC/*.c)
+$(wildcard Apps/Src/*.c) \
+$(wildcard Drivers/Src/*.c)	\
+$(wildcard BSP/Template/Src/*.c)	\
+$(wildcard BSP/STM32F413/Src/*.c)	\
+$(wildcard CMSIS/DSP_Lib/Source/*.c)	
+#$(wildcard STM32F4xx_StdPeriph_Driver/src/*.c)	
 
 
 # ASM sources
 ASM_SOURCES =  \
-GCC/startup_stm32f413xx.s
+BSP/STM32F413/Src/startup_stm32f413xx.s
 
 
 #######################################
@@ -102,13 +102,15 @@ AS_INCLUDES =
 
 # C includes
 C_INCLUDES =  \
--IApp/inc	\
--IDrivers/inc	\
--IPeriphs/inc	\
--ISTM32F4xx_StdPeriph_Driver/inc	\
--ISTM32F4xx_StdPeriph_Driver/	\
+-IApps/Inc	\
+-IDrivers/Inc	\
+-IConfig/Inc	\
+-IBSP/STM32F413/Inc	\
+-IBSP/Template/Inc	\
 -ICMSIS/Device/ST/STM32F4xx/Include	\
--ICMSIS/Include
+-ICMSIS/Include	\
+-IBSP/STM32F413/STM32F4xx_StdPeriph_Driver
+#-ISTM32F4xx_StdPeriph_Driver/x
 
 
 # compile gcc flags
@@ -129,7 +131,7 @@ CFLAGS += -MMD -MP -MF"$(@:%.o=%.d)"
 # LDFLAGS
 #######################################
 # link script
-LDSCRIPT = ./GCC/STM32F413RHTx_FLASH.ld
+LDSCRIPT = ./BSP/STM32F413/GCC/STM32F413RHTx_FLASH.ld
 
 # libraries
 LIBS = -lc -lm -lnosys 
