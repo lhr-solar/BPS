@@ -17,13 +17,13 @@ typedef enum {
 	LOW_PRECISION
 } CurrentSensor;
 
-static int32_t Current_Conversion(uint32_t ADC_Reading, CurrentSensor s);
+static int32_t Current_Conversion(uint32_t milliVolts, CurrentSensor s);
 
 /** Current_Init
  * Initializes two ADCs to begin current monitoring.
  */
 void Current_Init(void){
-	ADC_InitHilo();	// Initialize the ADCs
+	BSP_ADC_Init();	// Initialize the ADCs
 }
 
 /** Current_UpdateMeasurements
@@ -31,8 +31,8 @@ void Current_Init(void){
  * @return SUCCESS or ERROR
  */
 ErrorStatus Current_UpdateMeasurements(void){
-	HighPrecisionCurrent = Current_Conversion(ADC_ReadHigh(), HIGH_PRECISION);
-	LowPrecisionCurrent  = Current_Conversion(ADC_ReadLow(), LOW_PRECISION);
+	HighPrecisionCurrent = Current_Conversion(BSP_ADC_High_GetMilliVoltage(), HIGH_PRECISION);
+	LowPrecisionCurrent  = Current_Conversion(BSP_ADC_Low_GetMilliVoltage(), LOW_PRECISION);
 
 	return SUCCESS;	// TODO: Once this has been tested, stop returning errors
 }
@@ -80,15 +80,10 @@ int16_t Current_GetLowPrecReading(void){
  * Returns the converted value of the current read by the sensor
  * @returns converted voltage - fixed point notation of 0.001
  */
-static int32_t Current_Conversion (uint32_t ADC_Reading, CurrentSensor s){
+static int32_t Current_Conversion (uint32_t milliVolts, CurrentSensor s){
 	// These are the ideal values that we should expect
-	const int maxReading = 0x0FFF; // 12-bit value
-	const int operationMilliVoltage = 3300; // 3.3V
 	const int opAmpOffset = 4096;  // The offset in millivolts for the op-amp stage
 	const int opAmpGain = 3;       // Gain applied after the offset
-
-	// The actual reading on the ADC pin
-	int32_t milliVolts = ADC_Reading * operationMilliVoltage / maxReading;
 
 	// The output of the hall sensor (prior to the op-amp stage)
 	int32_t sensorOutput = milliVolts * opAmpGain - opAmpOffset;

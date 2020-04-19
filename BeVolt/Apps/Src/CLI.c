@@ -4,10 +4,6 @@
  */
 
 #include "CLI.h"
-#include <ctype.h>
-#include <string.h>
-#include "stm32f4xx.h"
-#include "stm32f4xx_gpio.h"
 
 #define MAX_TOKEN_SIZE 4
 
@@ -15,6 +11,12 @@ static cell_asic* Minions;
 char hexString[8];
 const float MILLI_UNIT_CONVERSION = 1000;
 const float PERCENT_CONVERSION = 100;
+
+void DelayMs(uint32_t ms) {
+    for(int i = 0; i < ms; i++) {
+        for(int j = 0; j < 50000; j++);
+    }
+}
 
 /** CLI_Init
  * Initializes the CLI with the values it needs
@@ -461,31 +463,31 @@ void CLI_CAN(int* hashTokens) {
 		case CLI_WRITE_HASH: 
 			switch(hashTokens[2]) {
 				case CLI_TRIP_HASH:
-					CAN1_Write(CAN_ID_BPS_TRIP, txData, dataLength);
+					CAN1_Write(TRIP, txData, dataLength);
 					break;
 				case CLI_CLEAR_HASH:
-					CAN1_Write(CAN_ID_BPS_ALL_CLEAR, txData, dataLength);
+					CAN1_Write(ALL_CLEAR, txData, dataLength);
 					break;
 				case CLI_OFF_HASH:
-					CAN1_Write(CAN_ID_BPS_OFF, txData, dataLength);
+					CAN1_Write(CONTACTOR_STATE, txData, dataLength);
 					break;
 				case CLI_CURRENT_HASH:
-					CAN1_Write(CAN_ID_CURRENT_DATA, txData, dataLength);
+					CAN1_Write(CURRENT_DATA, txData, dataLength);
 					break;
 				case CLI_VOLTAGE_HASH:
-					CAN1_Write(CAN_ID_TOTAL_VOLTAGE_DATA, txData, dataLength);
+					CAN1_Write(VOLT_DATA, txData, dataLength);
 					break;
 				case CLI_TEMPERATURE_HASH:
-					CAN1_Write(CAN_ID_AVG_TEMPERATURE_DATA, txData, dataLength);
+					CAN1_Write(TEMP_DATA, txData, dataLength);
 					break;
 				case CLI_CHARGE_HASH:
-					CAN1_Write(CAN_ID_SOC_DATA, txData, dataLength);
+					CAN1_Write(SOC_DATA, txData, dataLength);
 					break;
 				case CLI_WATCHDOG_HASH:
-					CAN1_Write(CAN_ID_WDOG_TRIGGERED, txData, dataLength);
+					CAN1_Write(WDOG_TRIGGERED, txData, dataLength);
 					break;
 				case CLI_ERROR_HASH:
-					CAN1_Write(CAN_ID_ERROR, txData, dataLength);
+					CAN1_Write(CAN_ERROR, txData, dataLength);
 					break;
 				default:
 					printf("Invalid ID\n\r");
@@ -546,7 +548,7 @@ void CLI_EEPROM(int* hashTokens) {
 	uint8_t errorAddrArray[2];	// Need to get address where the error is stored
 	uint16_t errorAddr = 0;
 	switch(hashTokens[1]) {
-		case RESET:
+		case 0:
 			EEPROM_Reset();
 			printf("EEPROM has been reset");
 			break;
@@ -602,8 +604,8 @@ void CLI_EEPROM(int* hashTokens) {
  * low precision readings
  */
 void CLI_ADC(void) {
-	printf("High precision ADC: %d\n\r", ADC_ReadHigh());
-	printf("Low precision ADC: %d\n\r", ADC_ReadLow());
+	printf("High precision ADC: %d mV\n\r", BSP_ADC_High_GetMilliVoltage());
+	printf("Low precision ADC: %d mV\n\r", BSP_ADC_Low_GetMilliVoltage());
 }
 
 
@@ -620,7 +622,7 @@ void CLI_Critical(void) {
 		if(UART3_HasCommand(&criticalFifo)) {
 			UART3_GetCommand(&criticalFifo, response);
 			if(CLI_StringHash(response) == CLI_SHUTDOWN_HASH) {
-				Contactor_Off();
+				BSP_Contactor_Off();
 				printf("Contactor is off\n\r");
 				break;
 			} else {

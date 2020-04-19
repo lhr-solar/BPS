@@ -16,6 +16,13 @@ void BSP_ADC_Init(void);
  * @param   None
  * @return  millivoltage value ADC measurement
  */
-uint16_t BSP_ADC_GetMilliVoltage(void);
+uint16_t BSP_ADC_High_GetMilliVoltage(void);
+
+/**
+ * @brief   Gets converted ADC value in units of mV.
+ * @param   None
+ * @return  millivoltage value ADC measurement
+ */
+uint16_t BSP_ADC_Low_GetMilliVoltage(void);
 
 #endif

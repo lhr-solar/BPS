@@ -3,6 +3,8 @@
 
 static volatile uint16_t ADCresults[2];
 
+static uint16_t ConvertBitsToMilliVoltage(uint16_t data);
+
 static void ADC_InitDMA(void) {
 	// Start the clock for the DMA
 	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_DMA2, ENABLE);
@@ -90,14 +92,36 @@ void BSP_ADC_Init(void) {
  * @param   None
  * @return  millivoltage value ADC measurement
  */
-uint16_t BSP_ADC_GetMilliVoltage(void) {
+uint16_t BSP_ADC_High_GetMilliVoltage(void) {
 
     // TODO: Get ADC value and convert
     // Get ADC raw data
     uint16_t data = ADCresults[0];
     
     // Convert to millivoltage
-    uint16_t mV = (data * 3300) >> 12;   // For 12-bit ADCs
+    uint16_t mV = ConvertBitsToMilliVoltage(data);
 
     return mV;
+}
+
+/**
+ * @brief   Gets converted ADC value in units of mV.
+ * @param   None
+ * @return  millivoltage value ADC measurement
+ */
+uint16_t BSP_ADC_Low_GetMilliVoltage(void) {
+
+    // TODO: Get ADC value and convert
+    // Get ADC raw data
+    uint16_t data = ADCresults[1];
+    
+    // Convert to millivoltage
+    uint16_t mV = ConvertBitsToMilliVoltage(data);
+
+    return mV;
+}
+
+static uint16_t ConvertBitsToMilliVoltage(uint16_t data) {
+    // Convert to millivoltage
+    return (data * 3300) >> 12;   // For 12-bit ADCs
 }

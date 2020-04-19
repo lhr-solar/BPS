@@ -6,20 +6,16 @@
 #ifndef CLI_H__
 #define CLI_H__
 
-#include <stdint.h>
-#include <stdio.h>
-#include <string.h>
+#include "common.h"
 #include "Voltage.h"
 #include "Current.h"
 #include "Temperature.h"
-#include "Contactor.h"
-#include "WDTimer.h"
-#include "LED.h"
+#include "BSP_Contactor.h"
+#include "BSP_WDTimer.h"
+#include "BSP_Lights.h"
 #include "config.h"
 #include "SoC.h"
-#include "CAN.h"
-#include "SysTick.h"
-#include "UART.h"
+#include "CANbus.h"
 #include "Images.h"
 
 // String hash values
@@ -160,7 +156,7 @@ void CLI_Charge(int* hashTokens);
  * @param state is the 'on' of 'off' state
  * 				represented by a 1/0 or hashes
  */
-void setLED(led input, int state);
+void setLED(Led input, int state);
 
 /** CLI_LED
  * Interacts with the LEDs by 

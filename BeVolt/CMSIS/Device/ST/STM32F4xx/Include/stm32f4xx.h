@@ -859,7 +859,7 @@ typedef enum {RESET = 0, SET = !RESET} FlagStatus, ITStatus;
 typedef enum {DISABLE = 0, ENABLE = !DISABLE} FunctionalState;
 #define IS_FUNCTIONAL_STATE(STATE) (((STATE) == DISABLE) || ((STATE) == ENABLE))
 
-typedef enum {ERROR = 0, SUCCESS = !ERROR} ErrorStatus;
+//typedef enum {ERROR = 0, SUCCESS = !ERROR} ErrorStatus;
 
 /**
   * @}

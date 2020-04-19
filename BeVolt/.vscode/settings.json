@@ -3,5 +3,7 @@
         "current.h": "c",
         "stdbool.h": "c",
         "bsp_gpio.h": "c",
+        "common.h": "c",
+        "cli.h": "c"
     }
 }

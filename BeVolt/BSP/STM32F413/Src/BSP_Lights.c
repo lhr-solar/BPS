@@ -1,4 +1,4 @@
-#include "BSP_LED.h"
+#include "BSP_Lights.h"
 #include "stm32f4xx.h"
 
 /**
@@ -6,7 +6,7 @@
  * @param   None
  * @return  None
  */
-void BSP_LEDs_Init(void) {
+void BSP_Lights_Init(void) {
     GPIO_InitTypeDef GPIO_InitStruct;
 	
 	// PC0 : Over current
@@ -38,14 +38,14 @@ void BSP_LEDs_Init(void) {
 }
 
 /**
- * @brief   Toggles a certain LED
+ * @brief   Toggles a certain LED/Light
  * @param   signal : choose one of the Led enums to control that specific LED.
  * @return  None
  */
-void BSP_LED_Toggle(Led signal) {
+void BSP_Light_Toggle(Led signal) {
     switch(signal){
 		// PB12
-		case ERROR:
+		case FAULT:
 			GPIOB->ODR ^= GPIO_Pin_12;
 			break;
 			
@@ -88,18 +88,21 @@ void BSP_LED_Toggle(Led signal) {
 		case EXTRA:
 			GPIOA->ODR ^= GPIO_Pin_5;
 			break;
+
+        default:
+            break;
 	}
 }
 
 /**
- * @brief   Turns on a certain LED
+ * @brief   Turns on a certain LED/Light
  * @param   signal : choose one of the Led enums to control that specific LED.
  * @return  None
  */
-void BSP_LED_On(Led signal) {
+void BSP_Light_On(Led signal) {
     switch(signal){
 		// PB12
-		case ERROR:
+		case FAULT:
 			GPIOB->ODR |= GPIO_Pin_12;
 			break;
 			
@@ -142,18 +145,21 @@ void BSP_LED_On(Led signal) {
 		case EXTRA:
 			GPIOA->ODR |= GPIO_Pin_5;
 			break;
+
+        default:
+            break;
 	}
 }
 
 /**
- * @brief   Turns off a certain LED
+ * @brief   Turns off a certain LED/Light
  * @param   signal : choose one of the Led enums to control that specific LED.
  * @return  None
  */
-void BSP_LED_Off(Led signal) {
+void BSP_Light_Off(Led signal) {
     switch(signal){
 		// PB12
-		case ERROR:
+		case FAULT:
 			GPIOB->ODR &= ~GPIO_Pin_12;
 			break;
 			
@@ -196,5 +202,64 @@ void BSP_LED_Off(Led signal) {
 		case EXTRA:
 			GPIOA->ODR &= ~GPIO_Pin_5;
 			break;
+
+        default:
+            break;
 	}
+}
+
+/**
+ * @brief   Gets the state of the LED/Light
+ * @param   signal : choose one of the Led enums to control that specific LED.
+ * @return  None
+ */
+State BSP_Light_GetState(Led signal) {
+    State state = OFF;
+    switch(signal){
+		// PB12
+		case FAULT:
+			state = (GPIOB->ODR & GPIO_Pin_12) ? ON : OFF;
+			
+		// PA0
+		case RUN:
+			state = (GPIOA->ODR & GPIO_Pin_0) ? ON : OFF;
+			break;
+			
+		// PC0
+		case OCURR:
+			state = (GPIOC->ODR & GPIO_Pin_0) ? ON : OFF;
+			break;
+			
+		// PC1
+		case OTEMP:
+			state = (GPIOC->ODR & GPIO_Pin_1) ? ON : OFF;
+			break;
+			
+		// PC2
+		case OVOLT:
+			state = (GPIOC->ODR & GPIO_Pin_2) ? ON : OFF;
+			break;
+			
+		// PC3;
+		case UVOLT:
+			state = (GPIOC->ODR & GPIO_Pin_3) ? ON : OFF;
+			break;
+			
+		// PA7
+		case WDOG:
+			state = (GPIOA->ODR & GPIO_Pin_7) ? ON : OFF;
+			break;
+			
+		// PA6
+		case CAN:
+			state = (GPIOA->ODR & GPIO_Pin_6) ? ON : OFF;
+			break;
+			
+		// PA5
+		case EXTRA:
+			state = (GPIOA->ODR & GPIO_Pin_5) ? ON : OFF;
+			break;
+	}
+
+    return state;
 }

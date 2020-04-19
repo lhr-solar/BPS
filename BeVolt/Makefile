@@ -107,7 +107,7 @@ C_INCLUDES =  \
 -IBSP/STM32F413/Inc	\
 -ICMSIS/Device/ST/STM32F4xx/Include	\
 -ICMSIS/Include	\
--IBSP/STM32F413/STM32F4xx_StdPeriph_Driver
+-IBSP/STM32F413/STM32F4xx_StdPeriph_Driver/Inc
 #-ISTM32F4xx_StdPeriph_Driver/x
 
 
