@@ -6,7 +6,8 @@
  * @return  None
  */
 void BSP_I2C_Init(void) {
-    
+    // TODO: Initialize the I2C pins connected to the EEPROM.
+    //      By default, the code assumes the I2C bus is running at 100kHz
 }
 
 /**
@@ -18,7 +19,7 @@ void BSP_I2C_Init(void) {
  * @return  None
  */
 void BSP_I2C_Write(uint8_t deviceAddr, uint16_t regAddr, uint8_t *txData, uint32_t txLen) {
-
+    // TODO: Transmit the data onto the I2C bus. Packet the data as needed.
 }
 
 /**
@@ -30,5 +31,7 @@ void BSP_I2C_Write(uint8_t deviceAddr, uint16_t regAddr, uint8_t *txData, uint32
  * @return  None
  */
 void BSP_I2C_Read(uint8_t deviceAddr, uint16_t regAddr, uint8_t *rxData, uint32_t rxLen) {
-
+    // TODO: Get the data from the other device/IC.
+    //      The I2C bus has only two lines, the Clock and Data pins. The process for reading data
+    //      is to first transmit the regAddr then immediately read.
 }

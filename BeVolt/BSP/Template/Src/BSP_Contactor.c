@@ -9,7 +9,8 @@
  * @return  None
  */
 void BSP_Contactor_Init(void) {
-    
+    // TODO: Initialize two pins that will be connected to the Contactor. One must be configued as an input
+    //      and the other must be configued as an output.
 }
 
 /**
@@ -19,7 +20,8 @@ void BSP_Contactor_Init(void) {
  * @return  None
  */
 void BSP_Contactor_On(void) {
-
+    // TODO: Set the state to high for the output pin.
+    //      Use Positive Logic.
 }
 
 /**
@@ -29,7 +31,7 @@ void BSP_Contactor_On(void) {
  * @return  None
  */
 void BSP_Contactor_Off(void) {
-
+    // TODO: Set the state to low for the output pin.
 }
 
 /**
@@ -38,5 +40,8 @@ void BSP_Contactor_Off(void) {
  * @return  0 if contactor is off/open, 1 if on/closed
  */
 bool BSP_Contactor_GetState(void) {
-
+    // TODO: Return if the Contactor is on or off.
+    //      Check for negative logic. The gpio input pin can read low but the contactor could be on. Just make sure
+    //      you check that your return value is the same value of what the contactor is irl.
+    return 0;
 }
