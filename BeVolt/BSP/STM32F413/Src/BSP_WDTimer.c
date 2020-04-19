@@ -1,4 +1,5 @@
 #include "BSP_WDTimer.h"
+#include "stm32f4xx.h"
 
 /**
  * @brief   Initialize the watch dog timer.
@@ -6,8 +7,11 @@
  * @return  None
  */
 void BSP_WDTimer_Init(void) {
-    // TODO: Initialize the watchdog timer but do not start it.
-    //      Make the watchdog timer duration to be 1 seconds. (May change later)
+    // Independent Watchdog Init
+    // IWDG has a timeout value of 4.096 seconds.
+	IWDG_WriteAccessCmd(IWDG_WriteAccess_Enable);       // Enable access to the IWDG_PR and IWDG_RLR registers
+	IWDG_SetPrescaler(IWDG_Prescaler_32);               // Prescaler divider feeding the counter clock
+	IWDG_SetReload(IWDG_RLR_RL);                        // Reload value set to 0xFFF
 }
 
 /**
@@ -16,8 +20,10 @@ void BSP_WDTimer_Init(void) {
  * @return  true if a reset occurred previously, false if system started up normally.
  */
 bool BSP_WDTimer_DidSystemReset(void) {
-    // TODO: Check if the watchdog timer made the uC reset previously.
-
+    if (RCC_GetFlagStatus(RCC_FLAG_IWDGRST) != RESET) {
+        RCC_ClearFlag();		// Clear reset flags. May be optional
+        return true;
+    }
     return false;
 }
 
@@ -28,7 +34,8 @@ bool BSP_WDTimer_DidSystemReset(void) {
  * @return  None
  */
 void BSP_WDTimer_Start(void) {
-    // TODO: Start the watchdog countodwn
+    IWDG_ReloadCounter();       // Reloads the Independent Watchdog Timer
+    IWDG_Enable();              // Starts the watchdog
 }
 
 /**
@@ -38,5 +45,5 @@ void BSP_WDTimer_Start(void) {
  * @return  None
  */
 void BSP_WDTimer_Reset(void) {
-    // TODO: Reset the watchdog countdown
+    IWDG_ReloadCounter();       // Reloads the Independent Watchdog Timer
 }
