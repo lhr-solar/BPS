@@ -12,6 +12,8 @@
                 "${workspaceFolder}/Config/Inc",
                 "${workspaceFolder}/BSP/STM32F413/Inc",
                 "${workspaceFolder}/BSP/STM32F413/Src",
+                "${workspaceFolder}/BSP/STM32F413/STM32f4xx_StdPeriphDriver/Src",
+                "${workspaceFolder}/BSP/STM32F413/STM32f4xx_StdPeriphDriver/Inc",
                 "${workspaceFolder}/BSP/Template/Inc",
                 "${workspaceFolder}/BSP/Template/Src",
                 "${workspaceFolder}/CMSIS/Include",
