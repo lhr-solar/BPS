@@ -1,40 +1,27 @@
-TARGET = bps-simulator.out
+# COLORS
+RED=\033[0;31m
+GREEN=\033[0;32m
+ORANGE=\033[0;33m
+BLUE=\033[0;34m
+PURPLE=\033[0;35m
+CYAN=\033[0;36m
+LIGHTGRAY=\033[0;37m
+DARKGRAY=\033[1;30m
+YELLOW=\033[0;33m
+NC=\033[0m # No Color
 
-CC = gcc
+all:
+	@echo "${RED}Not enough arguments.${NC}"
+	@echo "	make ${CYAN}<BSP type>${NC}"
+	@echo "Options:"
+	@echo "	${CYAN}simulator${NC}"
+	@echo "	${CYAN}stm32f413${NC}"
 
-SRC = \
-$(wildcard Apps/Src/*.c) \
-$(wildcard BSP/Simulator/Src/*.c) \
-$(wildcard Drivers/Src/*.c) \
-$(wildcard Config/Src/*.c)
+simulator:
+	$(MAKE) -C BSP -C Simulator
 
-INC_DIR = \
--IApps/Inc \
--IBSP/Inc \
--IDrivers/Inc \
--IConfig/Inc
-
-LIB = \
--lm
-
-FLAGS = -Wall -g -std=c11 $(INC_DIR)
-
-BUILD_DIR = Objects
-OBJ = $(addprefix $(BUILD_DIR)/,$(notdir $(SRC:.c=.o)))
-vpath %.c $(sort $(dir $(SRC)))
-
-all: $(TARGET)
-
-$(BUILD_DIR)/%.o: %.c $(BUILD_DIR)
-	$(CC) -c -o $@ $< $(FLAGS)
-
-$(TARGET): $(OBJ) $(BUILD_DIR)
-	$(CC) -o $@ $(OBJ) $(FLAGS) $(LIB)
-
-$(BUILD_DIR):
-	mkdir $@
-
-.PHONY: clean
+stm32f413:
+	$(MAKE) -C BSP -C STM32F413
 
 clean:
-	rm -fR $(BUILD_DIR)
+	rm -fR Objects

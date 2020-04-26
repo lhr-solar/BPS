@@ -17,23 +17,24 @@ OPT = -Og
 # paths
 #######################################
 # Build path
-BUILD_DIR = Objects
+BUILD_DIR = ../../Objects
 
 ######################################
 # source
 ######################################
 # C sources
+# since current path is in the BSP folder, go to the top level with ../../
 C_SOURCES =  \
-$(wildcard Apps/Src/*.c) \
-$(wildcard Drivers/Src/*.c)	\
-$(wildcard BSP/STM32F413/Src/*.c)	\
-$(wildcard CMSIS/DSP_Lib/Source/*.c)	\
-$(wildcard BSP/STM32F413/STM32F4xx_StdPeriph_Driver/Src/*.c)	
+$(wildcard ../../Apps/Src/*.c) \
+$(wildcard ../../Drivers/Src/*.c)	\
+$(wildcard ../../BSP/STM32F413/Src/*.c)	\
+$(wildcard ../../CMSIS/DSP_Lib/Source/*.c)	\
+$(wildcard ../../BSP/STM32F413/STM32F4xx_StdPeriph_Driver/Src/*.c)	
 
 
 # ASM sources
 ASM_SOURCES =  \
-BSP/STM32F413/Src/startup_stm32f413xx.s
+../../BSP/STM32F413/Src/startup_stm32f413xx.s
 
 
 #######################################
@@ -88,14 +89,15 @@ C_DEFS =  \
 AS_INCLUDES = 
 
 # C includes
+# since current path is in the BSP folder, go to the top level with ../../
 C_INCLUDES =  \
--IApps/Inc	\
--IDrivers/Inc	\
--IConfig/Inc	\
--IBSP/Inc	\
--ICMSIS/Device/ST/STM32F4xx/Include	\
--ICMSIS/Include	\
--IBSP/STM32F413/STM32F4xx_StdPeriph_Driver/Inc
+-I../../Apps/Inc	\
+-I../../Drivers/Inc	\
+-I../../Config/Inc	\
+-I../../BSP/Inc	\
+-I../../CMSIS/Device/ST/STM32F4xx/Include	\
+-I../../CMSIS/Include	\
+-I../../BSP/STM32F413/STM32F4xx_StdPeriph_Driver/Inc
 #-ISTM32F4xx_StdPeriph_Driver/x
 
 
@@ -117,7 +119,7 @@ CFLAGS += -MMD -MP -MF"$(@:%.o=%.d)"
 # LDFLAGS
 #######################################
 # link script
-LDSCRIPT = ./BSP/STM32F413/GCC/STM32F413RHTx_FLASH.ld
+LDSCRIPT = ./GCC/STM32F413RHTx_FLASH.ld
 
 # libraries
 LIBS = -lc -lm -lnosys 
