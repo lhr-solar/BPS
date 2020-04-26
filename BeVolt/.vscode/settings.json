@@ -5,6 +5,10 @@
         "bsp_gpio.h": "c",
         "common.h": "c",
         "cli.h": "c",
-        "bsp_uart.h": "c"
+        "bsp_uart.h": "c",
+        "soc.h": "c",
+        "config.h": "c",
+        "stm32f4xx.h": "c",
+        "bsp_timer.h": "c"
     }
 }

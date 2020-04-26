@@ -23,33 +23,33 @@ int CANbus_Send(CANId_t id, CANPayload_t payload) {
 	
 	switch (id) {
 		case TRIP:
-			return CAN1_Write(id, &payload.data.b, 1);
+			return BSP_CAN_Write(id, &payload.data.b, 1);
 
 		case ALL_CLEAR:
-			return CAN1_Write(id, &payload.data.b, 1);
+			return BSP_CAN_Write(id, &payload.data.b, 1);
 
 		case CONTACTOR_STATE:
-			return CAN1_Write(id, &payload.data.b, 1);
+			return BSP_CAN_Write(id, &payload.data.b, 1);
 
 		case CURRENT_DATA:
 			floatTo4Bytes(payload.data.f, &txdata[0]);
-			return CAN1_Write(id, txdata, 4);
+			return BSP_CAN_Write(id, txdata, 4);
 
 		case VOLT_DATA:
 		case TEMP_DATA:
 			txdata[0] = payload.idx;
 			floatTo4Bytes(payload.data.f, &txdata[1]);
-			return CAN1_Write(id, txdata, 5);
+			return BSP_CAN_Write(id, txdata, 5);
 
 		case SOC_DATA:
 			floatTo4Bytes(payload.data.f, &txdata[0]);
-			return CAN1_Write(id, txdata, 4);
+			return BSP_CAN_Write(id, txdata, 4);
 
 		case WDOG_TRIGGERED:
-			return CAN1_Write(id, &payload.data.b, 1);
+			return BSP_CAN_Write(id, &payload.data.b, 1);
 
 		case CAN_ERROR:
-			return CAN1_Write(id, &payload.data.b, 1);
+			return BSP_CAN_Write(id, &payload.data.b, 1);
 	}
 	return 0;
 }

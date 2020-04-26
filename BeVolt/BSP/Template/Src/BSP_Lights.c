@@ -12,10 +12,10 @@ void BSP_Lights_Init(void) {
 
 /**
  * @brief   Toggles a certain LED/Light
- * @param   signal : choose one of the Led enums to control that specific LED.
+ * @param   signal : choose one of the Light enums to control that specific Light.
  * @return  None
  */
-void BSP_Light_Toggle(Led signal) {
+void BSP_Light_Toggle(Light signal) {
     // TODO: Toggle the state for each pin
     switch(signal){
 		case FAULT:
@@ -61,10 +61,10 @@ void BSP_Light_Toggle(Led signal) {
 
 /**
  * @brief   Turns on a certain LED/Light
- * @param   signal : choose one of the Led enums to control that specific LED.
+ * @param   signal : choose one of the Light enums to control that specific Light.
  * @return  None
  */
-void BSP_Light_On(Led signal) {
+void BSP_Light_On(Light signal) {
     // TODO: Set the state to highs for each pin
     switch(signal){
 		case FAULT:
@@ -110,10 +110,10 @@ void BSP_Light_On(Led signal) {
 
 /**
  * @brief   Turns off a certain LED/Light
- * @param   signal : choose one of the Led enums to control that specific LED.
+ * @param   signal : choose one of the Light enums to control that specific Light.
  * @return  None
  */
-void BSP_Light_Off(Led signal) {
+void BSP_Light_Off(Light signal) {
     // TODO: Clear the state for each pin
     switch(signal){
 		case FAULT:
@@ -159,10 +159,10 @@ void BSP_Light_Off(Led signal) {
 
 /**
  * @brief   Gets the state of the LED/Light
- * @param   signal : choose one of the Led enums to control that specific LED.
+ * @param   signal : choose one of the Light enums to control that specific Light.
  * @return  None
  */
-State BSP_Light_GetState(Led signal) {
+State BSP_Light_GetState(Light signal) {
     // TODO: return the state of the output pin corresponding to the led/light
     switch(signal){
 		case FAULT:

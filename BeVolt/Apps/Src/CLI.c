@@ -4,6 +4,18 @@
  */
 
 #include "CLI.h"
+#include "Voltage.h"
+#include "Current.h"
+#include "Temperature.h"
+#include "BSP_Contactor.h"
+#include "BSP_WDTimer.h"
+#include "BSP_Lights.h"
+#include "config.h"
+#include "SoC.h"
+#include "CANbus.h"
+#include "BSP_CAN.h"
+#include "BSP_UART.h"
+#include "Images.h"
 
 #define MAX_TOKEN_SIZE 4
 
@@ -357,7 +369,7 @@ void CLI_Charge(int* hashTokens) {
  * @param state is the 'on' of 'off' state
  * 				represented by a 1/0 or hashes
  */
-void setLED(Led input, int state) {
+void setLED(Light input, int state) {
 	if(state == 1 || state == CLI_ON_HASH) {
 		BSP_Light_On(input);
 	}
@@ -621,7 +633,7 @@ void CLI_Critical(void) {
 	printf("Please type 'shutdown' to turn the contactor off\n\r");
 	printf(">> ");
 	while(1) {
-		if(BSP_UART_ReadLine(response)) {
+		if(BSP_UART_ReadLine(response) > 0) {
 			if(CLI_StringHash(response) == CLI_SHUTDOWN_HASH) {
 				BSP_Contactor_Off();
 				printf("Contactor is off\n\r");

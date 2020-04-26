@@ -8,7 +8,7 @@
 #include "config.h"
 #include "Voltage.h"
 #include "Temperature.h"
-#include "UART.h"
+#include "BSP_UART.h"
 
 //starting addresses for errors
 const uint16_t EEPROM_FAULT_CODE_ADDR   = 0x0000;
@@ -26,6 +26,10 @@ static uint16_t faultCodePtr,
                 watchdogFaultPtr,
                 canFaultPtr,
                 socDataPtr;
+
+// void DelayMs(uint32_t ms) {
+//     for(int i = 0; i < 1000000; i++);
+// }
 
 /** EEPROM_Init
  * Initializes I2C to communicate with EEPROM (M24128)
@@ -146,7 +150,7 @@ void EEPROM_LogError(uint8_t logType){
  * Prints saved data from EEPROM to serial terminal (putty)
  */
 void EEPROM_SerialPrintData(void){
-	UART3_Init();
+	BSP_UART_Init();
 	uint8_t fault_code;
 	uint8_t data;
 	uint16_t fault_ptr = EEPROM_FAULT_CODE_ADDR;
@@ -244,7 +248,7 @@ void EEPROM_Tester(void){
  * @param unsigned byte of data
  */
 void EEPROM_WriteByte(uint16_t address, uint8_t data){
-	BSP_I2C_Write(EEPROM_ADDRESS, address, data, 1);
+	BSP_I2C_Write(EEPROM_ADDRESS, address, &data, 1);
 	DelayMs(5);
 }
 

@@ -70,25 +70,13 @@ Copyright 2017 Linear Technology Corp. (LTC)
 #include "LTC6811.h"
 #include "config.h"
 #include "stm32f4xx.h"
-#include "SPI.h"
+#include "BSP_SPI.h"
 
 /*********************************************************/
 /*** Code that was added by UTSVT. ***/
 /*********************************************************/
 void LTC6811_Init(cell_asic *battMod){	
-	SPI1_Init();				// Initialize SPI1 for voltage board
-	
-	// Initialize GPIO PB6 pin for LTC6820 CS pin
-	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
-	GPIO_InitTypeDef GPIO_InitStruct;
-	GPIO_InitStruct.GPIO_Pin = GPIO_Pin_6;
-	GPIO_InitStruct.GPIO_Mode = GPIO_Mode_OUT;
-	GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_UP;
-	GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
-	GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
-	GPIO_Init(GPIOB, &GPIO_InitStruct);
-	GPIO_SetBits(GPIOB, GPIO_Pin_6);
-	
+	BSP_SPI_Init();				// Initialize SPI1 for voltage board	
 	
 	LTC681x_init_cfg(NUM_MINIONS, battMod);
 	LTC6811_reset_crc_count(NUM_MINIONS, battMod);

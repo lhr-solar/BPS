@@ -87,7 +87,7 @@ void BSP_SPI_Init(void) {
  */
 void BSP_SPI_Write(uint8_t *txBuf, uint32_t txLen) {
     for(uint32_t i = 0; i < txLen; i++){
-		SPI1_WriteRead(txBuf[i]);
+		SPI_WriteRead(txBuf[i]);
 	}
 }
 
@@ -102,7 +102,7 @@ void BSP_SPI_Write(uint8_t *txBuf, uint32_t txLen) {
  */
 void BSP_SPI_Read(uint8_t *rxBuf, uint32_t rxLen) {
     for(uint32_t i = 0; i < rxLen; i++){
-		rxBuf[i] = SPI1_WriteRead(0x00);
+		rxBuf[i] = SPI_WriteRead(0x00);
 	}
 }
 

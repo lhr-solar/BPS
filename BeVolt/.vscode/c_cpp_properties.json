@@ -10,11 +10,9 @@
                 "${workspaceFolder}/Drivers/Src",
                 "${workspaceFolder}/Config/Src",
                 "${workspaceFolder}/Config/Inc",
-                "${workspaceFolder}/BSP/STM32F413/Inc",
                 "${workspaceFolder}/BSP/STM32F413/Src",
                 "${workspaceFolder}/BSP/STM32F413/STM32F4xx_StdPeriph_Driver/Src",
                 "${workspaceFolder}/BSP/STM32F413/STM32F4xx_StdPeriph_Driver/Inc",
-                "${workspaceFolder}/BSP/Template/Inc",
                 "${workspaceFolder}/BSP/Template/Src",
                 "${workspaceFolder}/CMSIS/Include",
                 "${workspaceFolder}/CMSIS/Device/ST/STM32F4xx/Include"

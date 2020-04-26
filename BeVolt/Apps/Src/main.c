@@ -3,24 +3,35 @@
  */
 
 #include "common.h"
+#include "config.h"
+#include "LTC6811.h"
+#include "Voltage.h"
+#include "Current.h"
+#include "Temperature.h"
+#include "EEPROM.h"
+#include "SoC.h"
+#include "CLI.h"
+#include "BSP_UART.h"
+#include "BSP_Contactor.h"
+#include "BSP_Lights.h"
+#include "BSP_WDTimer.h"
 
 
 cell_asic Minions[NUM_MINIONS];
 bool override = false;		// This will be changed by user via CLI
-Fifo CLIFifo;
-char command[fifo_size];
+char command[128];
 
 void initialize(void);
 void preliminaryCheck(void);
 void faultCondition(void);
 
 int main(){
-	__disable_irq();		// Disable all interrupts until initialization is done
+	// __disable_irq();		// Disable all interrupts until initialization is done
 	initialize();			// Initialize codes/pins
 	preliminaryCheck();		// Wait until all boards are powered on
-	__enable_irq();			// Enable interrupts
+	// __enable_irq();			// Enable interrupts
 
-	WDTimer_Start();
+	BSP_WDTimer_Start();
 
 	while(1) {
 		// First update the measurements.
@@ -32,9 +43,7 @@ int main(){
 		SoC_Calculate(Current_GetLowPrecReading());
 
 		// Checks for user input to send to CLI
-		UART3_CheckAndEcho(&CLIFifo);
-		if(UART3_HasCommand(&CLIFifo)) {
-			UART3_GetCommand(&CLIFifo, command);
+		if(BSP_UART_ReadLine(command)) {
 			CLI_Handler(command);
 		}
 		
@@ -44,10 +53,10 @@ int main(){
 
 		// Check if everything is safe (all return SAFE = 0)
 		if((current == SAFE) && (temp == SAFE) && (voltage == SAFE)) {
-			Contactor_On();
+			BSP_Contactor_On();
 		}
 		else if((current == SAFE) && (temp == SAFE) && (voltage == UNDERVOLTAGE) && override) {
-			Contactor_On();
+			BSP_Contactor_On();
 		} else {
 			break;
 		}
@@ -55,7 +64,7 @@ int main(){
 		// Update necessary
 		// CAN_SendMessageStatus()	// Most likely need to put this on a timer if sending too frequently
 
-		WDTimer_Reset();
+		BSP_WDTimer_Reset();
 	}
 
 	// BPS has tripped if this line is reached
@@ -71,10 +80,10 @@ int main(){
  *		- Give wrappers (Voltage, Current, Temperature) the limits
  */
 void initialize(void){
-	LED_Init();
-	Contactor_Init();
-	Contactor_Off();
-	WDTimer_Init();
+	BSP_Lights_Init();
+	BSP_Contactor_Init();
+	BSP_Contactor_Off();
+	BSP_WDTimer_Init();
 	EEPROM_Init();
 	SoC_Init();
 	Current_Init();
@@ -82,8 +91,7 @@ void initialize(void){
 	Temperature_Init(Minions);
 	CLI_Init(Minions);
 
-	fifoInit(&CLIFifo);
-	__enable_irq();
+	// __enable_irq();
 	CLI_Startup();
 
 	// Checks to see if the batteries need to be charged
@@ -93,9 +101,7 @@ void initialize(void){
 		printf("Do you need to charge the batteries? (y/n)\n\r>> ");
 		uint32_t wait = 0;
 		while(wait < STARTUP_WAIT_TIME) {
-			UART3_CheckAndEcho(&CLIFifo);
-			if(UART3_HasCommand(&CLIFifo)) {
-				UART3_GetCommand(&CLIFifo, command);
+			if(BSP_UART_ReadLine(command)) {
 				override = command[0] == 'y' ? true : false;
 				break;
 			}
@@ -111,9 +117,9 @@ void initialize(void){
  */
 void preliminaryCheck(void){
 	// Check if Watch dog timer was triggered previously
-	if (WDTimer_DidSystemReset() == DANGER) {
-		LED_On(FAULT);
-		LED_On(WDOG);
+	if (BSP_WDTimer_DidSystemReset() == DANGER) {
+		BSP_Light_On(FAULT);
+		BSP_Light_On(WDOG);
 		while(1);		// Spin
 	}
 }
@@ -124,15 +130,15 @@ void preliminaryCheck(void){
  * until complete reboot is done.
  */
 void faultCondition(void){
-	Contactor_Off();
-	LED_Off(RUN);
-  LED_On(FAULT);
+	BSP_Contactor_Off();
+	BSP_Light_Off(RUN);
+    BSP_Light_On(FAULT);
 
 	uint8_t error = 0;
 
 	if(!Current_CheckStatus(false)){
 		error |= FAULT_HIGH_CURRENT;
-		LED_On(OCURR);
+		BSP_Light_On(OCURR);
 	}
 
 	if(!Voltage_CheckStatus()){
@@ -140,27 +146,27 @@ void faultCondition(void){
 		switch(Voltage_CheckStatus()){
 			case OVERVOLTAGE:
 				error |= FAULT_HIGH_VOLT;
-				LED_On(OVOLT);
+				BSP_Light_On(OVOLT);
 				SoC_Calibrate(OVERVOLTAGE);
 				break;
 
 			case UNDERVOLTAGE:
 				error |= FAULT_LOW_VOLT;
-				LED_On(UVOLT);
+				BSP_Light_On(UVOLT);
 				SoC_Calibrate(UNDERVOLTAGE);
 				break;
 
 			default:
 				error |= FAULT_VOLT_MISC;
-				LED_On(OVOLT);
-				LED_On(UVOLT);
+				BSP_Light_On(OVOLT);
+				BSP_Light_On(UVOLT);
 				break;
 		}
 	}
 
 	if(!Temperature_CheckStatus(Current_IsCharging())){
 		error |= FAULT_HIGH_TEMP;
-		LED_On(OCURR);
+		BSP_Light_On(OCURR);
 	}
 
 	// Log all the errors that we have
@@ -205,7 +211,7 @@ void faultCondition(void){
 	}
 
 	while(1) {
-		WDTimer_Reset();	// Even though faulted, WDTimer needs to be updated or else system will reset
+		BSP_WDTimer_Reset();	// Even though faulted, WDTimer needs to be updated or else system will reset
 					// causing WDOG error. WDTimer can't be stopped after it starts.
 	}
 }

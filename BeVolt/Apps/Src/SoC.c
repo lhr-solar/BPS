@@ -2,6 +2,7 @@
  * Program for UTSVT BeVolt's Battery Protection System SOC
  */
 #include "SoC.h"
+#include "BSP_Timer.h"
 
 #define MAX_CHARGE 1000*1000																								// In amp-hours (Ah), for now it is a dummy value
 uint32_t fixedPoint_SoC;																										// % of how much charge is left in battery with .01 resolution
@@ -13,22 +14,13 @@ float float_SoC;																														// float vers of SoC
  * Info found on reference sheet stm32f413 page 535
  */
 void SoC_Init(void){ 
-	/* Timer is used to find the timeDelta */
-	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE); 					//Enable TIM clock	
-	TIM_TimeBaseInitTypeDef Init_TIM2;								 						//make struct
-	
-	Init_TIM2.TIM_Prescaler = 1;				
-	Init_TIM2.TIM_CounterMode = TIM_CounterMode_Down;
-	Init_TIM2.TIM_Period = 0xFFFF-1;									
-	Init_TIM2.TIM_ClockDivision = TIM_CKD_DIV1;	
-	Init_TIM2.TIM_RepetitionCounter = 0;
-	
-	TIM_TimeBaseInit(TIM2, &Init_TIM2);										
-	TIM_Cmd(TIM2,ENABLE);																	
+	BSP_Timer_Init();
 	
 	// Grab from EEPROM what is the current SoC
 	EEPROM_ReadMultipleBytes(EEPROM_SOC_PTR_LOC, 4, (uint8_t*)&fixedPoint_SoC);
 	float_SoC = fixedPoint_SoC * .01;
+
+    BSP_Timer_Start();
 }
 
 /** SoC_Calculate
@@ -38,19 +30,13 @@ void SoC_Init(void){
  */
 void SoC_Calculate(int16_t amps){ 
 	
-	/* Get system clocks */
-	RCC_ClocksTypeDef RCC_Clocks;
-	RCC_GetClocksFreq(&RCC_Clocks);
-	
-		
-	uint32_t counter = TIM2->CNT;											// find current value of up counter
-	TIM2->CNT = 0;																		// set counter to zero to count up again
+	uint32_t counter = BSP_Timer_GetTicksElapsed();
 	
 	float timeElapsed = (0xFFFF - counter)/60;
 	timeElapsed /= 60;
-	timeElapsed /= RCC_Clocks.SYSCLK_Frequency;  			// time in hours
+	timeElapsed /= BSP_Timer_GetRunFreq();  			// time in hours
 	
-	float float_amps = amps * .0001;									// Fixed point to floating point
+	float float_amps = amps * .0001;					// Fixed point to floating point
 	
 	float AhCollected = timeElapsed * float_amps;
 	

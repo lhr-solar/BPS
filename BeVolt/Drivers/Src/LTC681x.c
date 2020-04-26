@@ -43,27 +43,26 @@ Copyright 2017 Linear Technology Corp. (LTC)
 #include <stdio.h>
 #include "LTC681x.h"
 #include "LTC6811.h"
-#include "SPI.h"
+#include "BSP_SPI.h"
 #include "stm32f4xx.h"
 
 static uint8_t spi_read8(void){
-	return SPI1_Read();
+    uint8_t data = 0;
+    BSP_SPI_Read(&data, 1);
+	return data;
 }
 
 static void spi_write_multi8(uint8_t *txBuf, uint32_t txSize){
-	SPI1_WriteMulti(txBuf, txSize);
+	BSP_SPI_Write(txBuf, txSize);
 }
 
 static void spi_write_read_multi8(uint8_t *txBuf, uint32_t txSize, uint8_t *rxBuf, uint32_t rxSize){
-	SPI1_WriteReadMulti(txBuf, txSize, rxBuf, rxSize, true);
+    BSP_SPI_Write(txBuf, txSize);
+    BSP_SPI_Read(rxBuf, rxSize);
 }
 
 static void cs_set(uint8_t state){
-	if(state == 0){
-		GPIO_ResetBits(GPIOB, GPIO_Pin_6);
-	}else{
-		GPIO_SetBits(GPIOB, GPIO_Pin_6);
-	}
+	BSP_SPI_SetStateCS(state);
 }
 
 void delay_u(uint16_t micro)

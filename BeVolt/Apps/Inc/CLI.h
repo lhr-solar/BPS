@@ -7,18 +7,9 @@
 #define CLI_H__
 
 #include "common.h"
-#include "Voltage.h"
-#include "Current.h"
-#include "Temperature.h"
-#include "BSP_Contactor.h"
-#include "BSP_WDTimer.h"
-#include "BSP_Lights.h"
 #include "config.h"
-#include "SoC.h"
-#include "CANbus.h"
-#include "BSP_CAN.h"
-#include "BSP_UART.h"
-#include "Images.h"
+#include "BSP_Lights.h"
+#include "Voltage.h"
 
 // String hash values
 #define CLI_HELP_HASH						0x348B9F
@@ -158,7 +149,7 @@ void CLI_Charge(int* hashTokens);
  * @param state is the 'on' of 'off' state
  * 				represented by a 1/0 or hashes
  */
-void setLED(Led input, int state);
+void setLED(Light input, int state);
 
 /** CLI_LED
  * Interacts with the LEDs by 

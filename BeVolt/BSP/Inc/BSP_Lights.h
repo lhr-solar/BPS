@@ -8,7 +8,7 @@
  * @note    This library also controls the strobe light.
  */
 
-typedef enum {FAULT, RUN, UVOLT, OVOLT, OTEMP, OCURR, WDOG, CAN, EXTRA} Led;
+typedef enum {FAULT, RUN, UVOLT, OVOLT, OTEMP, OCURR, WDOG, CAN, EXTRA} Light;
 
 /**
  * @brief   Initialize all the GPIO pins connected to each LED/Light
@@ -19,30 +19,30 @@ void BSP_Lights_Init(void);
 
 /**
  * @brief   Toggles a certain LED/Light
- * @param   signal : choose one of the Led enums to control that specific LED.
+ * @param   signal : choose one of the Light enums to control that specific Light.
  * @return  None
  */
-void BSP_Light_Toggle(Led signal);
+void BSP_Light_Toggle(Light signal);
 
 /**
  * @brief   Turns on a certain LED/Light
- * @param   signal : choose one of the Led enums to control that specific LED.
+ * @param   signal : choose one of the Light enums to control that specific Light.
  * @return  None
  */
-void BSP_Light_On(Led signal);
+void BSP_Light_On(Light signal);
 
 /**
  * @brief   Turns off a certain LED/Light
- * @param   signal : choose one of the Led enums to control that specific LED.
+ * @param   signal : choose one of the Light enums to control that specific Light.
  * @return  None
  */
-void BSP_Light_Off(Led signal);
+void BSP_Light_Off(Light signal);
 
 /**
  * @brief   Gets the state of the LED/Light
- * @param   signal : choose one of the Led enums to control that specific LED.
+ * @param   signal : choose one of the Light enums to control that specific Light.
  * @return  None
  */
-State BSP_Light_GetState(Led signal);
+State BSP_Light_GetState(Light signal);
 
 #endif

@@ -40,7 +40,7 @@ $(wildcard Apps/Src/*.c) \
 $(wildcard Drivers/Src/*.c)	\
 $(wildcard BSP/STM32F413/Src/*.c)	\
 $(wildcard CMSIS/DSP_Lib/Source/*.c)	\
-$(wildcard BSP/STM32f413/STM32F4xx_StdPeriph_Driver/Src/*.c)	
+$(wildcard BSP/STM32F413/STM32F4xx_StdPeriph_Driver/Src/*.c)	
 
 
 # ASM sources
@@ -174,7 +174,6 @@ $(BUILD_DIR):
 #######################################
 clean:
 	-rm -fR $(BUILD_DIR)
-	-rm -fR Tests/$(BUILD_DIR)
 
 #######################################
 # flash

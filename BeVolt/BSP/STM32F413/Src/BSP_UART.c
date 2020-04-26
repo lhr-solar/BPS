@@ -78,13 +78,13 @@ void BSP_UART_Init(void) {
  *                  before hand.
  * @return  number of bytes that was read
  */
-bool CLI_UART_ReadLine(char *str) {
+uint32_t BSP_UART_ReadLine(char *str) {
     if(lineReceived) {
         USART_ITConfig(USART3, USART_IT_RXNE, RESET);
         uint8_t data = 0;
         RxFifo_Peek(&data);
         while(!RxFifo_IsEmpty() && data != '\r') {
-            RxFifo_Get(str++);
+            RxFifo_Get((uint8_t *)str++);
             RxFifo_Peek(&data);
         }
 
@@ -104,9 +104,9 @@ bool CLI_UART_ReadLine(char *str) {
  * @brief   Transmits data to through UART line
  * @param   str : pointer to buffer with data to send.
  * @param   len : size of buffer
- * @return  numer of bytes that were sent
+ * @return  number of bytes that were sent
  */
-bool BSP_UART_Write(char *str, int len) {
+uint32_t BSP_UART_Write(char *str, int len) {
     USART_ITConfig(USART3, USART_IT_TC, RESET);
     while(*str != '\0' && len > 0) {
         TxFifo_Put(*str);

@@ -21,8 +21,8 @@ uint32_t BSP_UART_ReadLine(char *str);
  * @brief   Transmits data to through UART line
  * @param   str : pointer to buffer with data to send.
  * @param   len : size of buffer
- * @return  numer of bytes that were sent
+ * @return  number of bytes that were sent
  */
-uint32_t BSP_UART_Write(char *buffstrer, uint32_t len);
+uint32_t BSP_UART_Write(char *str, int len);
 
 #endif
