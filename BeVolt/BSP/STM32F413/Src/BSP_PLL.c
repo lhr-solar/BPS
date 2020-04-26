@@ -53,3 +53,12 @@ void BSP_PLL_Init(void) {
 		while(1);	// Spin for error
 	}
 }
+
+/**
+ * @brief   Gets the system core clock frequency that was set by PLL_Init
+ * @param   None
+ * @return  System core clock frequency in Hz
+ */
+uint32_t BSP_PLL_GetSystemClock(void) {
+    return SystemCoreClock;    // PLL set to 80MHz
+}

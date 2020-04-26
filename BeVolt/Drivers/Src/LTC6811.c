@@ -69,7 +69,6 @@ Copyright 2017 Linear Technology Corp. (LTC)
 #include "LTC681x.h"
 #include "LTC6811.h"
 #include "config.h"
-#include "stm32f4xx.h"
 #include "BSP_SPI.h"
 
 /*********************************************************/

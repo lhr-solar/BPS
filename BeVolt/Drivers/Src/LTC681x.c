@@ -44,7 +44,7 @@ Copyright 2017 Linear Technology Corp. (LTC)
 #include "LTC681x.h"
 #include "LTC6811.h"
 #include "BSP_SPI.h"
-#include "stm32f4xx.h"
+#include "BSP_PLL.h"
 
 static uint8_t spi_read8(void){
     uint8_t data = 0;
@@ -67,7 +67,7 @@ static void cs_set(uint8_t state){
 
 void delay_u(uint16_t micro)
 {
-  uint32_t delay = SystemCoreClock / 1000000;
+  uint32_t delay = BSP_PLL_GetSystemClock() / 1000000;
 	for(int i = 0; i < micro; i++)
 	{
 		for(int j = 0; j < delay; j++);
@@ -76,7 +76,7 @@ void delay_u(uint16_t micro)
 
 void delay_m(uint16_t milli)
 {
-  uint32_t delay = SystemCoreClock / 1000;
+  uint32_t delay = BSP_PLL_GetSystemClock() / 1000;
 	for(int i = 0; i < milli; i++)
 	{
 		for(int j = 0; j < delay; j++);
