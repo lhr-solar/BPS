@@ -6,4 +6,5 @@
 *.uvoptx
 .vscode
 *.uvprojx
+*.out
 RTE_Components.h
