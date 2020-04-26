@@ -9,7 +9,6 @@
 #define CURRENT_H__
 
 #include "common.h"
-#include "BSP_ADC.h"
 #include "config.h"
  
 /** Current_Init

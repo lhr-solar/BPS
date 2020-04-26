@@ -9,6 +9,8 @@
         "soc.h": "c",
         "config.h": "c",
         "stm32f4xx.h": "c",
-        "bsp_timer.h": "c"
+        "bsp_timer.h": "c",
+        "temperature.h": "c",
+        "math.h": "c"
     }
 }

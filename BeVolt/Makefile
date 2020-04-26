@@ -1,4 +1,4 @@
-TARGET = bps-simulator
+TARGET = bps-simulator.out
 
 CC = gcc
 
@@ -14,17 +14,23 @@ INC_DIR = \
 -IDrivers/Inc \
 -IConfig/Inc
 
-FLAGS = -W -g -std=c11 $(INC_DIR)
+LIB = \
+-lm
+
+FLAGS = -Wall -g -std=c11 $(INC_DIR)
 
 BUILD_DIR = Objects
 OBJ = $(addprefix $(BUILD_DIR)/,$(notdir $(SRC:.c=.o)))
+#OBJ = $(patsubst %,$(BUILD_DIR)/%,$(SRC:.c=.o))
 vpath %.c $(sort $(dir $(SRC)))
 
-$(BUILD_DIR)/$(TARGET): $(OBJ) $(BUILD_DIR)
-	$(CC) -o $@ $< $(FLAGS)
+all: $(TARGET)
 
 $(BUILD_DIR)/%.o: %.c $(BUILD_DIR)
 	$(CC) -c -o $@ $< $(FLAGS)
+
+$(TARGET): $(OBJ) $(BUILD_DIR)
+	$(CC) -o $@ $(OBJ) $(FLAGS) $(LIB)
 
 $(BUILD_DIR):
 	mkdir $@

@@ -68,18 +68,18 @@ static void cs_set(uint8_t state){
 void delay_u(uint16_t micro)
 {
   uint32_t delay = BSP_PLL_GetSystemClock() / 1000000;
-	for(int i = 0; i < micro; i++)
+	for(uint32_t i = 0; i < micro; i++)
 	{
-		for(int j = 0; j < delay; j++);
+		for(uint32_t j = 0; j < delay; j++);
 	}
 }
 
 void delay_m(uint16_t milli)
 {
   uint32_t delay = BSP_PLL_GetSystemClock() / 1000;
-	for(int i = 0; i < milli; i++)
+	for(uint32_t i = 0; i < milli; i++)
 	{
-		for(int j = 0; j < delay; j++);
+		for(uint32_t j = 0; j < delay; j++);
 	}
 }
 
