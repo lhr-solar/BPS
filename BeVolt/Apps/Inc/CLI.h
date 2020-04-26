@@ -17,6 +17,7 @@
 #include "SoC.h"
 #include "CANbus.h"
 #include "BSP_CAN.h"
+#include "BSP_UART.h"
 #include "Images.h"
 
 // String hash values

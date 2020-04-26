@@ -617,14 +617,11 @@ void CLI_ADC(void) {
  * Shuts off contactor manually
  */  
 void CLI_Critical(void) {
-	Fifo criticalFifo;
-	char response[fifo_size];
+	static char response[128];
 	printf("Please type 'shutdown' to turn the contactor off\n\r");
 	printf(">> ");
 	while(1) {
-		UART3_CheckAndEcho(&criticalFifo);
-		if(UART3_HasCommand(&criticalFifo)) {
-			UART3_GetCommand(&criticalFifo, response);
+		if(BSP_UART_ReadLine(response)) {
 			if(CLI_StringHash(response) == CLI_SHUTDOWN_HASH) {
 				BSP_Contactor_Off();
 				printf("Contactor is off\n\r");
