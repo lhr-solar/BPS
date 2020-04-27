@@ -3,12 +3,16 @@ import random
 
 """
 This module will generate ADC data to simulate Current readings
+<<<<<<< HEAD
 and store the simulated data in ADC.csv to be read by BSP_ADC.c
+=======
+>>>>>>> Convert Amps to raw ADC data. Will be used to generate simulated ADC data
 """
 
 # path/name of file
 file = "Data/ADC.csv"
 
+<<<<<<< HEAD
 # randomized current value
 random_current = 0
 
@@ -19,17 +23,23 @@ def amps_to_adc(current, sensor):
     @param sensor : 'h' (high precision) or 'l' (low precision)
     @return 12-bit ADC value representative of the current
     """
+=======
+def amps_to_adc(current, sensor):
+>>>>>>> Convert Amps to raw ADC data. Will be used to generate simulated ADC data
     if sensor == 'h':
         # Map [-50A, 50A] -> [-4V, 4V]
         hall_effect = current * 4/50
     elif sensor == 'l':
         # Map [-100A, 100A] -> [-4V, 4V]
         hall_effect = current * 4/100
+<<<<<<< HEAD
     # Caps the values at +-4V
     if hall_effect > 4:
         hall_effect = 4
     elif hall_effect < -4:
         hall_effect = -4
+=======
+>>>>>>> Convert Amps to raw ADC data. Will be used to generate simulated ADC data
     # Map [-4V, 4V] -> [0V, 3.3V]
     opamp_gain = 3
     opamp_offset = 4.096
@@ -39,6 +49,7 @@ def amps_to_adc(current, sensor):
     adc_data = (int(adc_voltage) << 12) / 3300
     return int(adc_data)
 
+<<<<<<< HEAD
 
 def random_adc(state, mode):
     """
@@ -92,3 +103,10 @@ def read():
             values.append(row)
     values.append(random_current)
     return values
+=======
+def main():
+    print(amps_to_adc(50, 'l'))
+
+if __name__ == '__main__':
+    main()
+>>>>>>> Convert Amps to raw ADC data. Will be used to generate simulated ADC data
