@@ -7,4 +7,5 @@
 .vscode
 *.uvprojx
 *.out
+*.csv
 RTE_Components.h
