@@ -43,4 +43,3 @@ uint16_t BSP_ADC_Low_GetMilliVoltage(void) {
 
     return 0;
 }
-

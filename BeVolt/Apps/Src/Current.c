@@ -11,7 +11,7 @@
 #include "BSP_ADC.h"
 
 int32_t HighPrecisionCurrent;	// Amp measurement of hall effect sensor of high precision
-int32_t LowPrecisionCurrent;	// Amp measurement of hall effect sensor of high precision
+int32_t LowPrecisionCurrent;	// Amp measurement of hall effect sensor of low precision
 
 typedef enum {
 	HIGH_PRECISION,

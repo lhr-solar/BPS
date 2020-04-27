@@ -564,7 +564,7 @@ void CLI_EEPROM(int* hashTokens) {
 	uint8_t errorAddrArray[2];	// Need to get address where the error is stored
 	uint16_t errorAddr = 0;
 	switch(hashTokens[1]) {
-		case 0:
+		case CLI_RESET_HASH:
 			EEPROM_Reset();
 			printf("EEPROM has been reset");
 			break;
