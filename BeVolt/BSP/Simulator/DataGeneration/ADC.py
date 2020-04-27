@@ -3,6 +3,7 @@ import random
 
 """
 This module will generate ADC data to simulate Current readings
+and store the simulated data in ADC.csv to be read by BSP_ADC.c
 """
 
 # path/name of file
@@ -36,7 +37,7 @@ def amps_to_adc(current, sensor):
     return int(adc_data)
 
 
-def generate_adc(state, mode):
+def random_adc(state, mode):
     """
     @brief generates random ADC values
     @param state : either 'charge' or 'discharge'
@@ -59,8 +60,20 @@ def generate_adc(state, mode):
             return (amps_to_adc(random.randint(50, 100), 'l'), amps_to_adc(random.randint(50, 100), 'h'))
     
 
+def adc_generate(state, mode):
+    """
+    @brief create csv file with ADC data
+        Function called by simulate.py
+    @param state : either 'charge' or 'discharge'
+    @param mode : 'low', 'normal', or 'high' ranges respective to the state
+    """
+    with open(file, 'w') as csvfile:
+        csvwriter = csv.writer(csvfile)
+        csvwriter.writerow(list(random_adc(state, mode)))
+
+
 def main():
-    print(generate_adc('discharge', 'normal'))
+    adc_generate('discharge', 'normal')
 
 if __name__ == '__main__':
     main()
