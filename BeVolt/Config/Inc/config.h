@@ -34,9 +34,9 @@ typedef enum {SAFE = 0, DANGER = 1, OVERVOLTAGE = 2, UNDERVOLTAGE = 3} SafetySta
 #define MAX_DISCHARGE_TEMPERATURE_LIMIT	73.00	// Max temperature limit (Celcius)	(actual max: 75C)
 #define MAX_CHARGE_TEMPERATURE_LIMIT	48.00	// Max temperature limit (Celcius)	(actual max: 50C)
 
-#define MAX_CURRENT_LIMIT				100		// Max current limit (Amperes)		(Max continuous discharge is 15A per cell)
-#define MAX_HIGH_PRECISION_CURRENT 		50		// Max current detectable by the high-precision current sensor
-#define MAX_CHARGING_CURRENT -20		//Max current per cell is 1.5 Amps (Standard charge)
+#define MAX_CURRENT_LIMIT				100000		// Max current limit (Milliamperes)		(Max continuous discharge is 15A per cell)
+#define MAX_HIGH_PRECISION_CURRENT 		50000		// Max current detectable by the high-precision current sensor (mA)
+#define MAX_CHARGING_CURRENT 			-20000		// Max current per cell is 1.5 Amps (Standard charge)
 
 //--------------------------------------------------------------------------------
 // Helpers
