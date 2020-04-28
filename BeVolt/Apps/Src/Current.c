@@ -10,8 +10,8 @@
 #include "Current.h"
 #include "BSP_ADC.h"
 
-int32_t HighPrecisionCurrent;	// Amp measurement of hall effect sensor of high precision
-int32_t LowPrecisionCurrent;	// Amp measurement of hall effect sensor of low precision
+int32_t HighPrecisionCurrent;	// Milliamp measurement of hall effect sensor of high precision
+int32_t LowPrecisionCurrent;	// Milliamp measurement of hall effect sensor of low precision
 
 typedef enum {
 	HIGH_PRECISION,
@@ -42,46 +42,47 @@ ErrorStatus Current_UpdateMeasurements(void){
  * Checks if pack does not have a short circuit
  * @return SAFE or DANGER
  */
-SafetyStatus Current_CheckStatus(bool override){
+SafetyStatus Current_CheckStatus(bool override) {
 
-	if((LowPrecisionCurrent > MAX_CHARGING_CURRENT)&&(LowPrecisionCurrent < MAX_CURRENT_LIMIT)&&(!override))
+	if((LowPrecisionCurrent/MILLI_SCALING_FACTOR > MAX_CHARGING_CURRENT)&&(LowPrecisionCurrent/MILLI_SCALING_FACTOR < MAX_CURRENT_LIMIT)&&(!override))
 		return SAFE;
-	else if((LowPrecisionCurrent <= 0)&&(LowPrecisionCurrent > MAX_CHARGING_CURRENT)&&override)
+	else if((LowPrecisionCurrent/MILLI_SCALING_FACTOR <= 0)&&(LowPrecisionCurrent/MILLI_SCALING_FACTOR > MAX_CHARGING_CURRENT)&&override)
 		return SAFE;
 	else
 		return DANGER;
 }
+
 /** Current_IsCharging
  * Determines if the the battery pack is being charged or discharged depending on
  * the sign of the current
  * @return 1 if charge, 0 if discharge
  */
-int8_t Current_IsCharging(void){
+int8_t Current_IsCharging(void) {
 	// TODO: Make sure that the current board is installed in such a way that negative => charging
 	return LowPrecisionCurrent < 0;
 }
 
 /** Current_GetHighPrecReading
  * Gets the Ampere measurement the high precision hall effect sensor recorded
- * @return Amperes value
+ * @return milliamperes value
  */
-int16_t Current_GetHighPrecReading(void){
+int32_t Current_GetHighPrecReading(void) {
 	return HighPrecisionCurrent;
 }
 
 /** Current_GetLowPrecReading
  * Gets the Ampere measurement the low precision hall effect sensor recorded
- * @return Amperes value
+ * @return milliamperes value
  */
-int16_t Current_GetLowPrecReading(void){
+int32_t Current_GetLowPrecReading(void) {
 	return LowPrecisionCurrent;
 }
 
-/** ADC_Conversion
+/** Current_Conversion
  * Returns the converted value of the current read by the sensor
- * @returns converted voltage - fixed point notation of 0.001
+ * @returns current in mA
  */
-static int32_t Current_Conversion (uint32_t milliVolts, CurrentSensor s){
+static int32_t Current_Conversion (uint32_t milliVolts, CurrentSensor s) {
 	// These are the ideal values that we should expect
 	const int opAmpOffset = 4096;  // The offset in millivolts for the op-amp stage
 	const int opAmpGain = 3;       // Gain applied after the offset
