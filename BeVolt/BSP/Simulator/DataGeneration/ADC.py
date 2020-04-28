@@ -45,7 +45,7 @@ def random_adc(state, mode):
     @brief generates random ADC values
     @param state : either 'charging' or 'discharging'
     @param mode : 'low', 'normal', or 'high' ranges respective to the state
-    @return tuple (low_precision_adc, high_precision_adc)
+    @return tuple (low_precision_adc, high_precision_adc, current)
     """
     global current_value
     if state == 'charging':
@@ -80,6 +80,7 @@ def generate(state, mode, current=None):
         Function called by simulate.py
     @param state : either 'charging' or 'discharging'
     @param mode : 'low', 'normal', or 'high' ranges respective to the state
+    @return correct current value
     """
     global current_value
     if current is None:
@@ -91,7 +92,6 @@ def generate(state, mode, current=None):
             csvwriter = csv.writer(csvfile)
             csvwriter.writerow(list(specific_adc(current)))
         current_value = current
-
 
 def read():
     """
