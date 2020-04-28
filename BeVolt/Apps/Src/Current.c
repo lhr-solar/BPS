@@ -44,9 +44,9 @@ ErrorStatus Current_UpdateMeasurements(void){
  */
 SafetyStatus Current_CheckStatus(bool override) {
 
-	if((LowPrecisionCurrent/MILLI_SCALING_FACTOR > MAX_CHARGING_CURRENT)&&(LowPrecisionCurrent/MILLI_SCALING_FACTOR < MAX_CURRENT_LIMIT)&&(!override))
+	if((LowPrecisionCurrent > MAX_CHARGING_CURRENT)&&(LowPrecisionCurrent < MAX_CURRENT_LIMIT)&&(!override))
 		return SAFE;
-	else if((LowPrecisionCurrent/MILLI_SCALING_FACTOR <= 0)&&(LowPrecisionCurrent/MILLI_SCALING_FACTOR > MAX_CHARGING_CURRENT)&&override)
+	else if((LowPrecisionCurrent <= 0)&&(LowPrecisionCurrent > MAX_CHARGING_CURRENT)&&override)
 		return SAFE;
 	else
 		return DANGER;
