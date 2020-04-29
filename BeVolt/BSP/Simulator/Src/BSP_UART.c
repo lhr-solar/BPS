@@ -1,21 +1,12 @@
 #include "BSP_UART.h"
+#include <pthread.h>
 
-#define TX_SIZE     128
 #define RX_SIZE     64
-
-static char txBuffer[TX_SIZE];
-static uint32_t txPut = 0;
-static uint32_t txGet = 0;
 
 static char rxBuffer[RX_SIZE];
 static uint32_t rxPut = 0;
 static uint32_t rxGet = 0;
 static bool lineReceived = false;
-
-static bool TxFifo_Get(uint8_t *data);
-static bool TxFifo_Put(uint8_t data);
-static bool TxFifo_IsFull(void);
-static bool TxFifo_IsEmpty(void);
 
 static bool RxFifo_Get(uint8_t *data);
 static bool RxFifo_Put(uint8_t data);
@@ -67,20 +58,12 @@ uint32_t BSP_UART_ReadLine(char *str) {
  * @return  numer of bytes that were sent
  */
 uint32_t BSP_UART_Write(char *str, uint32_t len) {
-    // TODO: Disble UART Transmit interrupts HERE
-    while(*str != '\0' && len > 0) {
-        TxFifo_Put(*str);
-        str++;
-        len--;
-    }
-    // TODO: Enable UART Transmit interrupts HERE
+    printf("%.*s", len, str);
     return true;
 }
 
 
-void USART3_IRQHandler(void) {
-    // TODO: Check for Receive Interrupt
-    if(0) {
+void ScanThread(void) {
 
         // TODO: Set data to byte of data received on UART line
         uint8_t data = 0;
@@ -107,54 +90,7 @@ void USART3_IRQHandler(void) {
             // Delete the last entry!
             removeSuccess = RxFifo_RemoveLast(&junk);
         }
-
-        if(removeSuccess) {
-            // TODO: echo data. transmit data
-        }
-
     }
-
-    // TODO: Check for Transmit interrupt flag
-    if(0) {
-
-        // TODO: Set data to byte of data that will be transmitted
-        uint8_t data = 0;
-
-        // If getting data from fifo fails i.e. the tx fifo is empty, then turn off the TX interrupt
-        if(!TxFifo_Get(&data)) {
-            // TODO: Disable transmit interrupt flag
-        }
-
-    }
-
-}
-
-static bool TxFifo_Get(uint8_t *data) {
-    if(!TxFifo_IsEmpty()) {
-        *data = txBuffer[txGet];
-        txGet = (txGet + 1) % TX_SIZE;
-        return true;
-    }
-
-    return false;
-}
-
-static bool TxFifo_Put(uint8_t data) {
-    if(!TxFifo_IsFull()) {
-        txBuffer[txPut] = data;
-        txPut = (txPut + 1) % TX_SIZE;
-        return true;
-    }
-
-    return false;
-}
-
-static bool TxFifo_IsFull(void) {
-    return (txPut + 1) % TX_SIZE == txGet;
-}
-
-static bool TxFifo_IsEmpty(void) {
-    return txGet == txPut;
 }
 
 static bool RxFifo_Get(uint8_t *data) {
