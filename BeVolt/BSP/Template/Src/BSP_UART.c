@@ -78,7 +78,7 @@ uint32_t BSP_UART_Write(char *str, uint32_t len) {
 }
 
 
-void USART3_IRQHandler(void) {
+void Interrupt_Handler(void) {
     // TODO: Check for Receive Interrupt
     if(0) {
 
