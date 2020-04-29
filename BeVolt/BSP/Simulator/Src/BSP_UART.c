@@ -15,11 +15,48 @@ static bool RxFifo_Peek(uint8_t *data);
 static bool RxFifo_IsFull(void);
 static bool RxFifo_IsEmpty(void);
 
+static pthread_mutex_t rx_mutex = PTHREAD_MUTEX_INITIALIZER;
+
+void *ScanThread(void *arg);
+
 /**
  * @brief   Initializes the UART peripheral
  */
 void BSP_UART_Init(void) {
-    // TODO: Initialize the UART port with interrupts for transmit and receive
+    int err = 0;
+    int stack_size = 256;
+    int num_threads = 1;
+    struct thread_info *tinfo;
+    pthread_attr_t attr;
+
+    // Configure stdin to not use a buffer. May not be needed.
+    setvbuf(stdin, NULL, _IONBF, 0);
+
+    // Get thread attributes to create a thread
+    err = pthread_attr_init(&attr);
+    if(err != 0) {
+        perror("pthread_attr_init");
+        exit(EXIT_FAILURE);
+    }
+
+    err = pthread_attr_setstacksize(&attr, stack_size);
+    if(err != 0) {
+        perror("pthread_attr_setstacksize");
+        exit(EXIT_FAILURE);
+    }
+
+    tinfo = calloc(num_threads, sizof(struct thread_info));
+    tinfo[0].thread_num = 1;
+    tinfo[0].argv_string = NULL;
+
+    err = pthread_create(&tinfo[0].thread_id, &attr, &ScanThread, &tinfo[0]);
+    if(err != 0) {
+        perror("pthread_create");
+        free(tinfo);
+        exit(EXIT_FAILURE);
+    }
+    
+    free(tinfo);
 }
 
 /**
@@ -44,7 +81,7 @@ uint32_t BSP_UART_ReadLine(char *str) {
         *str = 0;
 
         lineReceived = false;
-        // TODO: Disble UART Receive interrupts HERE
+        // TODO: Enable UART Receive interrupts HERE
         return true;
     }
 
@@ -63,8 +100,9 @@ uint32_t BSP_UART_Write(char *str, uint32_t len) {
 }
 
 
-void ScanThread(void) {
+void *ScanThread(void *arg) {
 
+    do {
         // TODO: Set data to byte of data received on UART line
         uint8_t data = 0;
         bool removeSuccess = 1;
@@ -90,7 +128,12 @@ void ScanThread(void) {
             // Delete the last entry!
             removeSuccess = RxFifo_RemoveLast(&junk);
         }
-    }
+
+    } while (1);
+
+    // Should not get here
+    int retval = 1;
+    pthread_exit(&retval);
 }
 
 static bool RxFifo_Get(uint8_t *data) {
