@@ -10,7 +10,7 @@ and store the simulated data in ADC.csv to be read by BSP_ADC.c
 file = "Data/ADC.csv"
 
 # randomized current value
-random_current = 0
+current_value = 0
 
 def amps_to_adc(current, sensor):
     """
@@ -45,37 +45,52 @@ def random_adc(state, mode):
     @brief generates random ADC values
     @param state : either 'charging' or 'discharging'
     @param mode : 'low', 'normal', or 'high' ranges respective to the state
-    @return tuple (low_precision_adc, high_precision_adc, current)
+    @return tuple (low_precision_adc, high_precision_adc)
     """
-    global random_current
+    global current_value
     if state == 'charging':
         if mode == 'low':
-            random_current = random.randint(-20, -15)
+            current_value = random.randint(-20, -15)
         elif mode == 'normal':
-            random_current = random.randint(-15, -5)
+            current_value = random.randint(-15, -5)
         elif mode == 'high':
-            random_current = random.randint(-5, 0)
+            current_value = random.randint(-5, 0)
     elif state == 'discharging':
         if mode == 'low':
-            random_current = random.randint(0, 30)
+            current_value = random.randint(0, 30)
         elif mode == 'normal':
-            random_current = random.randint(30, 50)
+            current_value = random.randint(30, 50)
         elif mode == 'high':
-            random_current = random.randint(50, 100)
-    return (amps_to_adc(random_current, 'l'), amps_to_adc(random_current, 'h'))
+            current_value = random.randint(50, 100)
+    return (amps_to_adc(current_value, 'l'), amps_to_adc(current_value, 'h'))
     
 
-def generate(state, mode):
+def specific_adc(current):
     """
-    @brief create csv file with ADC data
+    @brief generates specific ADC values
+    @param current : current in Amperes to generate data for
+    @return tuple (low_precision_adc, high_precision_adc)
+    """
+    return (amps_to_adc(current, 'l'), amps_to_adc(current, 'h'))
+
+
+def generate(state, mode, current=None):
+    """
+    @brief create csv file with randomized ADC data
         Function called by simulate.py
     @param state : either 'charging' or 'discharging'
     @param mode : 'low', 'normal', or 'high' ranges respective to the state
-    @return correct current value
     """
-    with open(file, 'w') as csvfile:
-        csvwriter = csv.writer(csvfile)
-        csvwriter.writerow(list(random_adc(state, mode)))
+    global current_value
+    if current is None:
+        with open(file, 'w') as csvfile:
+            csvwriter = csv.writer(csvfile)
+            csvwriter.writerow(list(random_adc(state, mode)))
+    else:
+        with open(file, 'w') as csvfile:
+            csvwriter = csv.writer(csvfile)
+            csvwriter.writerow(list(specific_adc(current)))
+        current_value = current
 
 
 def read():
@@ -90,5 +105,5 @@ def read():
         csvreader = csv.reader(csvfile)
         for row in csvreader:
             values.append(row)
-    values.append(random_current)
+    values.append(current_value)
     return values
