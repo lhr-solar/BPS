@@ -40,7 +40,7 @@ void BSP_UART_Init(void) {
  */
 uint32_t BSP_UART_ReadLine(char *str) {
     if(lineReceived) {
-        // TODO: Disble UART Receive interrupts HERE
+        // TODO: Disable UART Receive interrupts HERE
         uint8_t data = 0;
         RxFifo_Peek(&data);
         while(!RxFifo_IsEmpty() && data != '\r') {
@@ -53,7 +53,7 @@ uint32_t BSP_UART_ReadLine(char *str) {
         *str = 0;
 
         lineReceived = false;
-        // TODO: Disble UART Receive interrupts HERE
+        // TODO: Enable UART Receive interrupts HERE
         return true;
     }
 
