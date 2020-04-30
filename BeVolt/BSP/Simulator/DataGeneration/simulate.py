@@ -1,15 +1,22 @@
 import time
+import battery
 import ADC
 
 # Global configurations
-state = ''
-mode = ''
+state = ''  # Charging/Discharging
+mode = ''   # Low, Normal, High
 
 
-def generate():
+def generate(battery=None):
     global state, mode
-    # Generate ADC values
-    ADC.generate(state, mode)
+    if battery is not None:
+        # Update battery's state
+        battery.update()
+        # Generate ADC values
+        ADC.generate(state, mode, battery.current)
+    else:
+        # Generate ADC values
+        ADC.generate(state, mode)
 
 
 def read():
@@ -37,14 +44,23 @@ def configure():
 
 
 def main():
-    configure()
+    print("Welcome to the BPS Simulator")
+    print("Type 'start' to start BeVolt. Otherwise, you can specify the types of data to simulate.")
+    if input() == 'start':
+        BeVolt = battery.Battery(30, 2950*434)
+    else:
+        BeVolt = None
+        configure()
     while True:
         try:
             # Generate all values
-            generate()
+            generate(BeVolt)
             read()
+            print(BeVolt)
             time.sleep(1)     # one second delay
         except KeyboardInterrupt:
+            if BeVolt is not None:
+                break
             print("\n\rWould you like to change 'config' or 'quit'?")
             choice = input()
             if choice == 'config':
