@@ -68,10 +68,12 @@ void BSP_UART_Init(void) {
  */
 uint32_t BSP_UART_ReadLine(char *str) {
     if(lineReceived) {
-        // TODO: Disble UART Receive interrupts HERE
+
+        pthread_mutex_lock(&rx_mutex);
+
         uint8_t data = 0;
         RxFifo_Peek(&data);
-        while(!RxFifo_IsEmpty() && data != '\r') {
+        while(!RxFifo_IsEmpty() && data != '\r' && data != '\n') {
             RxFifo_Get(str++);
             RxFifo_Peek(&data);
         }
@@ -81,7 +83,9 @@ uint32_t BSP_UART_ReadLine(char *str) {
         *str = 0;
 
         lineReceived = false;
-        // TODO: Enable UART Receive interrupts HERE
+
+        pthread_mutex_unlock(&rx_mutex);
+
         return true;
     }
 
@@ -103,11 +107,10 @@ uint32_t BSP_UART_Write(char *str, uint32_t len) {
 void *ScanThread(void *arg) {
 
     do {
-        // TODO: Set data to byte of data received on UART line
-        uint8_t data = 0;
+        uint8_t data = fgetc(stdin);
         bool removeSuccess = 1;
 
-        if(data == '\r') {
+        if(data == '\r' || data == '\n') {
             lineReceived = true;
         }
 
@@ -137,26 +140,33 @@ void *ScanThread(void *arg) {
 }
 
 static bool RxFifo_Get(uint8_t *data) {
+    pthread_mutex_lock(&rx_mutex);
     if(!RxFifo_IsEmpty()) {
         *data = rxBuffer[rxGet];
         rxGet = (rxGet + 1) % RX_SIZE;
+        pthread_mutex_unlock(&rx_mutex);
         return true;
     }
 
+    pthread_mutex_unlock(&rx_mutex);
     return false;
 }
 
 static bool RxFifo_Put(uint8_t data) {
+    pthread_mutex_lock(&rx_mutex);
     if(!RxFifo_IsFull()) {
         rxBuffer[rxPut] = data;
         rxPut = (rxPut + 1) % RX_SIZE;
+        pthread_mutex_unlock(&rx_mutex);
         return true;
     }
 
+    pthread_mutex_unlock(&rx_mutex);
     return false;
 }
 
 static bool RxFifo_RemoveLast(uint8_t *data) {
+    pthread_mutex_lock(&rx_mutex);
     if(!RxFifo_IsEmpty()) {
         *data = rxBuffer[rxPut - 1];
         
@@ -165,19 +175,23 @@ static bool RxFifo_RemoveLast(uint8_t *data) {
         }else {
             rxPut = RX_SIZE - 1;
         }
+        pthread_mutex_unlock(&rx_mutex);
 
         return true;
     }
-
+    pthread_mutex_unlock(&rx_mutex);
     return false;
 }
 
 static bool RxFifo_Peek(uint8_t *data) {
+    pthread_mutex_lock(&rx_mutex);
     if(!RxFifo_IsEmpty()) {
         *data = rxBuffer[rxGet];
+        pthread_mutex_unlock(&rx_mutex);
         return true;
     }
 
+    pthread_mutex_unlock(&rx_mutex);
     return false;
 }
 
