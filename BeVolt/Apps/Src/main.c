@@ -213,7 +213,6 @@ void faultCondition(void){
 	}
 
 	while(1) {
-		Current_UpdateMeasurements();
 		if(BSP_UART_ReadLine(command)) {
 			CLI_Handler(command);
 		}

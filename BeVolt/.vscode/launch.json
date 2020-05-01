@@ -21,9 +21,7 @@
                     "text": "-enable-pretty-printing",
                     "ignoreFailures": true
                 }
-            ],
-            "preLaunchTask": "make simulator",
-            "miDebuggerPath": "/usr/bin/gdb"
+            ]
         },
 
         {
