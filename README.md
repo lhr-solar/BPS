@@ -9,7 +9,7 @@ There is a tool called Keil that ARM produces for development on its microcontro
 
 ### Setup for Terminal Development
 The system can also be built and deployed from a terminal, allowing you to use different development tools than Keil.
-1. Ensure that you have some type of linux machine such as Ubuntu, MacOS, Windows Subsystem for Linux, etc. Windows will not work.
+1. Ensure that you have some type of linux machine such as Ubuntu, Windows Subsystem for Linux, etc. Windows will not work.
 2. The BPS code supports multiple microcontrollers and different architectures. Depending on which on you're using, make sure you have the correct toolchain.
     - STM32F413: Follow the instructions in this [repo](https://github.com/SijWoo/ARM-Toolchain-Setup) to setup the toolchains for the current BPS.
     - Simulator: Install gcc and gdb using the following lines
