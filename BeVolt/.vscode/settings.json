@@ -11,6 +11,7 @@
         "stm32f4xx.h": "c",
         "bsp_timer.h": "c",
         "temperature.h": "c",
-        "math.h": "c"
+        "math.h": "c",
+        "bsp_adc.h": "c"
     }
 }
