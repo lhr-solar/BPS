@@ -83,11 +83,11 @@ def generate(state, mode, current=None):
     """
     global current_value
     if current is None:
-        with open(file, 'w') as csvfile:
+        with open(file, 'w+') as csvfile:
             csvwriter = csv.writer(csvfile)
             csvwriter.writerow(list(random_adc(state, mode)))
     else:
-        with open(file, 'w') as csvfile:
+        with open(file, 'w+') as csvfile:
             csvwriter = csv.writer(csvfile)
             csvwriter.writerow(list(specific_adc(current)))
         current_value = current
