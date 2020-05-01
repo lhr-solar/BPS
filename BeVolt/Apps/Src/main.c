@@ -211,6 +211,9 @@ void faultCondition(void){
 	}
 
 	while(1) {
+		if(BSP_UART_ReadLine(command)) {
+			CLI_Handler(command);
+		}
 		BSP_WDTimer_Reset();	// Even though faulted, WDTimer needs to be updated or else system will reset
 					// causing WDOG error. WDTimer can't be stopped after it starts.
 	}

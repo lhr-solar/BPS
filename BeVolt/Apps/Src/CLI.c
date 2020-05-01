@@ -62,7 +62,7 @@ void CLI_InputParse(char* input, int* parsedTokens) {
 		} else {
 			parsedTokens[i] = CLI_StringHash(split);
 		}
-		split = strtok_r(NULL, " ", &tokenized);
+		split = __strtok_r(NULL, " ", &tokenized);
 	}
 }
 
@@ -774,6 +774,5 @@ void CLI_Handler(char* input) {
 			printf("Invalid command. Type 'help' or 'menu' for the help menu\n\r");
 			break;
 	}
-	printf("%d\n\r", hashTokens[0]);
 	printf(">> ");
 }
