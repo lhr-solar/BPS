@@ -1,4 +1,5 @@
 #include "BSP_UART.h"
+#include <stdint.h>
 #include <pthread.h>
 
 #define RX_SIZE     64
@@ -10,7 +11,6 @@ static bool lineReceived = false;
 
 static bool RxFifo_Get(uint8_t *data);
 static bool RxFifo_Put(uint8_t data);
-static bool RxFifo_RemoveLast(uint8_t *data);
 static bool RxFifo_Peek(uint8_t *data);
 static bool RxFifo_IsFull(void);
 static bool RxFifo_IsEmpty(void);
@@ -25,9 +25,8 @@ void *ScanThread(void *arg);
 void BSP_UART_Init(void) {
     int err = 0;
     int stack_size = 256;
-    int num_threads = 1;
-    struct thread_info *tinfo;
     pthread_attr_t attr;
+    pthread_t id;
 
     // Configure stdin to not use a buffer. May not be needed.
     setvbuf(stdin, NULL, _IONBF, 0);
@@ -45,18 +44,11 @@ void BSP_UART_Init(void) {
         exit(EXIT_FAILURE);
     }
 
-    tinfo = calloc(num_threads, sizof(struct thread_info));
-    tinfo[0].thread_num = 1;
-    tinfo[0].argv_string = NULL;
-
-    err = pthread_create(&tinfo[0].thread_id, &attr, &ScanThread, &tinfo[0]);
+    err = pthread_create(&id, &attr, &ScanThread, NULL);
     if(err != 0) {
         perror("pthread_create");
-        free(tinfo);
         exit(EXIT_FAILURE);
     }
-    
-    free(tinfo);
 }
 
 /**
@@ -74,7 +66,7 @@ uint32_t BSP_UART_ReadLine(char *str) {
         uint8_t data = 0;
         RxFifo_Peek(&data);
         while(!RxFifo_IsEmpty() && data != '\r' && data != '\n') {
-            RxFifo_Get(str++);
+            RxFifo_Get((uint8_t *)str++);
             RxFifo_Peek(&data);
         }
 
@@ -107,8 +99,7 @@ uint32_t BSP_UART_Write(char *str, uint32_t len) {
 void *ScanThread(void *arg) {
 
     do {
-        uint8_t data = fgetc(stdin);
-        bool removeSuccess = 1;
+        int data = fgetc(stdin);
 
         if(data == '\r' || data == '\n') {
             lineReceived = true;
@@ -117,19 +108,13 @@ void *ScanThread(void *arg) {
         // Check if it was a backspace.
         // '\b' for minicmom
         // '\177' for putty
-        if(data != '\b' && data != '\177') {
+        if(data != '\b' && data != '\177' && data != 0) {
 
             // Sweet, just a "regular" key. Put it into the fifo
             // Doesn't matter if it fails. If it fails, then the data gets thrown away
             // and the easiest solution for this is to increase RX_SIZE
-            RxFifo_Put(data);
+            RxFifo_Put((uint8_t)data);
 
-        } else {
-
-            uint8_t junk = 0;
-
-            // Delete the last entry!
-            removeSuccess = RxFifo_RemoveLast(&junk);
         }
 
     } while (1);
@@ -161,24 +146,6 @@ static bool RxFifo_Put(uint8_t data) {
         return true;
     }
 
-    pthread_mutex_unlock(&rx_mutex);
-    return false;
-}
-
-static bool RxFifo_RemoveLast(uint8_t *data) {
-    pthread_mutex_lock(&rx_mutex);
-    if(!RxFifo_IsEmpty()) {
-        *data = rxBuffer[rxPut - 1];
-        
-        if(rxPut > 0) {
-            rxPut = (rxPut - 1);
-        }else {
-            rxPut = RX_SIZE - 1;
-        }
-        pthread_mutex_unlock(&rx_mutex);
-
-        return true;
-    }
     pthread_mutex_unlock(&rx_mutex);
     return false;
 }
