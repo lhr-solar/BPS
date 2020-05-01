@@ -1,5 +1,6 @@
 import csv
 import random
+import os
 
 """
 This module will generate ADC data to simulate Current readings
@@ -82,6 +83,7 @@ def generate(state, mode, current=None):
     @param mode : 'low', 'normal', or 'high' ranges respective to the state
     """
     global current_value
+    os.makedirs(os.path.dirname(file), exist_ok=True)
     if current is None:
         with open(file, 'w+') as csvfile:
             csvwriter = csv.writer(csvfile)
@@ -101,6 +103,7 @@ def read():
         Format: [(low_precision_adc, high_precision_adc), current in Amps]
     """
     values = []
+    os.makedirs(os.path.dirname(file), exist_ok=True)
     with open(file, 'r') as csvfile:
         csvreader = csv.reader(csvfile)
         for row in csvreader:
