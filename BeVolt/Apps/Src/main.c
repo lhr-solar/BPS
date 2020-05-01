@@ -19,7 +19,7 @@
 
 cell_asic Minions[NUM_MINIONS];
 bool override = false;		// This will be changed by user via CLI
-char command[128];
+char command[COMMAND_SIZE];
 
 void initialize(void);
 void preliminaryCheck(void);
@@ -93,7 +93,7 @@ void initialize(void){
 
 	// __enable_irq();
 	CLI_Startup();
-    
+
 	// Checks to see if the batteries need to be charged
 	Voltage_UpdateMeasurements();
 	SafetyStatus voltage = Voltage_CheckStatus();
