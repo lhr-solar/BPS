@@ -1,3 +1,4 @@
+import curses
 import time
 import battery
 import ADC
@@ -5,6 +6,7 @@ import ADC
 # Global configurations
 state = ''  # Charging/Discharging
 mode = ''   # Low, Normal, High
+stdscr = None   # Output screen
 
 
 def generate(battery=None):
@@ -19,12 +21,21 @@ def generate(battery=None):
         ADC.generate(state, mode)
 
 
-def read():
+def read(battery=None):
+    global stdscr
+    if battery is not None:
+        stdscr.addstr(5, 0, battery.__str__())
     # Read ADC values
     adc_values = ADC.read()
-    print("=============================")
-    print(f"ADC:\tLow Precision: {adc_values[0][0]}\n\tHigh Precision: {adc_values[0][1]}")
-    print(f"Current: {adc_values[1]} A")
+    stdscr.addstr(0, 0, "Simulator")
+    stdscr.addstr(1, 0, "=============================")
+    stdscr.addstr(2, 0, f"ADC:")
+    stdscr.addstr(2, 10, f"Low Precision: {adc_values[0][0]}")
+    stdscr.addstr(3, 10, f"High Precision: {adc_values[0][1]}")
+    # Read Current values
+    stdscr.addstr(4, 0, f"Current:")
+    stdscr.addstr(4, 10, f"{adc_values[1]} A")
+    stdscr.refresh()
 
 
 def configure():
@@ -51,24 +62,32 @@ def main():
     else:
         BeVolt = None
         configure()
+    global stdscr
+    stdscr = curses.initscr()
+    curses.noecho()
+    curses.cbreak()
     while True:
         try:
             # Generate all values
             generate(BeVolt)
-            read()
-            print(BeVolt)
+            read(BeVolt)
             time.sleep(1)     # one second delay
         except KeyboardInterrupt:
+            curses.endwin()
             if BeVolt is not None:
                 break
             print("\n\rWould you like to change 'config' or 'quit'?")
             choice = input()
             if choice == 'config':
                 configure()
+                stdscr = curses.initscr()
             elif choice == 'quit':
                 break
             else:
                 print("That is not a valid option. Continuing simulation...")
+    curses.echo()
+    curses.nocbreak()
+    curses.endwin()
 
 
 if __name__ == '__main__':
