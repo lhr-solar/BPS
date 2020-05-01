@@ -1,6 +1,4 @@
 import time
-<<<<<<< HEAD
-<<<<<<< HEAD
 import battery
 import ADC
 
@@ -19,33 +17,6 @@ def generate(battery=None):
     else:
         # Generate ADC values
         ADC.generate(state, mode)
-=======
-=======
-import battery
->>>>>>> Create battery class to model Li-ion batteries
-import ADC
-
-# Global configurations
-state = ''  # Charging/Discharging
-mode = ''   # Low, Normal, High
-
-
-def generate(battery=None):
-    global state, mode
-<<<<<<< HEAD
-    # Generate ADC values
-    ADC.generate(state, mode)
->>>>>>> Create script to generate and display new data every second. Tested with BPS code for ADC (high/low precision current readings)
-=======
-    if battery is not None:
-        # Update battery's state
-        battery.update()
-        # Generate ADC values
-        ADC.generate(state, mode, battery.current)
-    else:
-        # Generate ADC values
-        ADC.generate(state, mode)
->>>>>>> Create battery class to model Li-ion batteries
 
 
 def read():
@@ -73,10 +44,6 @@ def configure():
 
 
 def main():
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> Create battery class to model Li-ion batteries
     print("Welcome to the BPS Simulator")
     print("Type 'start' to start BeVolt. Otherwise, you can specify the types of data to simulate.")
     if input() == 'start':
@@ -84,7 +51,6 @@ def main():
     else:
         BeVolt = None
         configure()
-<<<<<<< HEAD
     while True:
         try:
             # Generate all values
@@ -95,24 +61,6 @@ def main():
         except KeyboardInterrupt:
             if BeVolt is not None:
                 break
-=======
-    configure()
-=======
->>>>>>> Create battery class to model Li-ion batteries
-    while True:
-        try:
-            # Generate all values
-            generate(BeVolt)
-            read()
-            print(BeVolt)
-            time.sleep(1)     # one second delay
-        except KeyboardInterrupt:
-<<<<<<< HEAD
->>>>>>> Create script to generate and display new data every second. Tested with BPS code for ADC (high/low precision current readings)
-=======
-            if BeVolt is not None:
-                break
->>>>>>> Create battery class to model Li-ion batteries
             print("\n\rWould you like to change 'config' or 'quit'?")
             choice = input()
             if choice == 'config':
