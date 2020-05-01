@@ -93,7 +93,7 @@ void initialize(void){
 
 	// __enable_irq();
 	CLI_Startup();
-
+    
 	// Checks to see if the batteries need to be charged
 	Voltage_UpdateMeasurements();
 	SafetyStatus voltage = Voltage_CheckStatus();

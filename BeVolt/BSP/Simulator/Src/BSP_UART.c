@@ -30,17 +30,12 @@ void BSP_UART_Init(void) {
 
     // Configure stdin to not use a buffer. May not be needed.
     setvbuf(stdin, NULL, _IONBF, 0);
+    setvbuf(stdout, NULL, _IONBF, 0);
 
     // Get thread attributes to create a thread
     err = pthread_attr_init(&attr);
     if(err != 0) {
         perror("pthread_attr_init");
-        exit(EXIT_FAILURE);
-    }
-
-    err = pthread_attr_setstacksize(&attr, stack_size);
-    if(err != 0) {
-        perror("pthread_attr_setstacksize");
         exit(EXIT_FAILURE);
     }
 
@@ -110,11 +105,14 @@ void *ScanThread(void *arg) {
         // '\177' for putty
         if(data != '\b' && data != '\177' && data != 0) {
 
+            pthread_mutex_lock(&rx_mutex);
+
             // Sweet, just a "regular" key. Put it into the fifo
             // Doesn't matter if it fails. If it fails, then the data gets thrown away
             // and the easiest solution for this is to increase RX_SIZE
             RxFifo_Put((uint8_t)data);
 
+            pthread_mutex_unlock(&rx_mutex);
         }
 
     } while (1);
@@ -125,40 +123,28 @@ void *ScanThread(void *arg) {
 }
 
 static bool RxFifo_Get(uint8_t *data) {
-    pthread_mutex_lock(&rx_mutex);
     if(!RxFifo_IsEmpty()) {
         *data = rxBuffer[rxGet];
         rxGet = (rxGet + 1) % RX_SIZE;
-        pthread_mutex_unlock(&rx_mutex);
         return true;
     }
-
-    pthread_mutex_unlock(&rx_mutex);
     return false;
 }
 
 static bool RxFifo_Put(uint8_t data) {
-    pthread_mutex_lock(&rx_mutex);
     if(!RxFifo_IsFull()) {
         rxBuffer[rxPut] = data;
         rxPut = (rxPut + 1) % RX_SIZE;
-        pthread_mutex_unlock(&rx_mutex);
         return true;
     }
-
-    pthread_mutex_unlock(&rx_mutex);
     return false;
 }
 
 static bool RxFifo_Peek(uint8_t *data) {
-    pthread_mutex_lock(&rx_mutex);
     if(!RxFifo_IsEmpty()) {
         *data = rxBuffer[rxGet];
-        pthread_mutex_unlock(&rx_mutex);
         return true;
     }
-
-    pthread_mutex_unlock(&rx_mutex);
     return false;
 }
 
