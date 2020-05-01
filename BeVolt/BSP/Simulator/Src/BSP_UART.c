@@ -55,9 +55,7 @@ void BSP_UART_Init(void) {
  */
 uint32_t BSP_UART_ReadLine(char *str) {
     if(lineReceived) {
-
         pthread_mutex_lock(&rx_mutex);
-
         uint8_t data = 0;
         RxFifo_Peek(&data);
         while(!RxFifo_IsEmpty() && data != '\r' && data != '\n') {
@@ -72,7 +70,6 @@ uint32_t BSP_UART_ReadLine(char *str) {
         lineReceived = false;
 
         pthread_mutex_unlock(&rx_mutex);
-
         return true;
     }
 
