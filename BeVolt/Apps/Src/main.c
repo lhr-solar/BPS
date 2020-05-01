@@ -211,6 +211,7 @@ void faultCondition(void){
 	}
 
 	while(1) {
+		Current_UpdateMeasurements();
 		if(BSP_UART_ReadLine(command)) {
 			CLI_Handler(command);
 		}
@@ -218,3 +219,4 @@ void faultCondition(void){
 					// causing WDOG error. WDTimer can't be stopped after it starts.
 	}
 }
+	

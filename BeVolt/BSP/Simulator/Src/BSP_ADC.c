@@ -1,5 +1,8 @@
 #include "BSP_ADC.h"
 
+// Path relative to the executable
+const char* file = "BSP/Simulator/DataGeneration/Data/ADC.csv";
+
 /**
  * @brief   Initializes the ADC module. This is to measure the hall effect sensors
  *          on the Current Monitor Board.
@@ -7,7 +10,7 @@
  * @return  None
  */
 void BSP_ADC_Init(void) {
-    // TODO: Initialize the ADC port here
+    // No initialization for simulator
 }
 
 /**
@@ -16,15 +19,23 @@ void BSP_ADC_Init(void) {
  * @return  millivoltage value ADC measurement
  */
 uint16_t BSP_ADC_High_GetMilliVoltage(void) {
-
-    // TODO: Get ADC value and convert
-    // Get ADC raw data
-    // uint16_t data = ADC_Data();
-    
+    FILE* fp = fopen(file, "r");
+    if (!fp) {
+        printf("ADC not available\n\r");
+        return;
+    }
+    // Get raw CSV string
+    char csv[1024];
+    fgets(csv, 1024, fp);
+    // Get only 2nd (high precision) value
+    char* dataString = csv;
+    dataString += 5;
+    // Convert to int
+    uint16_t data = atoi(dataString);
     // Convert to millivoltage
-    // uint16_t mV = (data * 3300) >> 12;   // For 12-bit ADCs
-
-    return 0;
+    uint16_t mV = (data * 3300) >> 12;   // For 12-bit ADCs
+    fclose(fp);
+    return mV;
 }
 
 /**
@@ -33,14 +44,23 @@ uint16_t BSP_ADC_High_GetMilliVoltage(void) {
  * @return  millivoltage value ADC measurement
  */
 uint16_t BSP_ADC_Low_GetMilliVoltage(void) {
-
-    // TODO: Get ADC value and convert
-    // Get ADC raw data
-    // uint16_t data = ADC_Data();
-    
+    FILE* fp = fopen(file, "r");
+    if (!fp) {
+        printf("ADC not available\n\r");
+        return;
+    }
+    // Get raw CSV string
+    char csv[1024];
+    fgets(csv, 1024, fp);
+    // Get only 1st (low precision) value
+    char* dataString = csv;
+    *(dataString+5) = 0;
+    dataString = csv;
+    // Convert to int
+    uint16_t data = atoi(dataString);
     // Convert to millivoltage
-    // uint16_t mV = (data * 3300) >> 12;   // For 12-bit ADCs
-
-    return 0;
+    uint16_t mV = (data * 3300) >> 12;   // For 12-bit ADCs
+    fclose(fp);
+    return mV;
 }
 
