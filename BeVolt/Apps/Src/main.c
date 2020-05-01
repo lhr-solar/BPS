@@ -25,7 +25,7 @@ void initialize(void);
 void preliminaryCheck(void);
 void faultCondition(void);
 
-int realmain(){
+int main(){
 	// __disable_irq();		// Disable all interrupts until initialization is done
 	initialize();			// Initialize codes/pins
 	preliminaryCheck();		// Wait until all boards are powered on
@@ -216,20 +216,6 @@ void faultCondition(void){
 		}
 		BSP_WDTimer_Reset();	// Even though faulted, WDTimer needs to be updated or else system will reset
 					// causing WDOG error. WDTimer can't be stopped after it starts.
-	}
-}
-
-
-// DELETE ALL CODE BELOW THIS
-
-int main(void) {
-	Current_Init();
-	Current_UpdateMeasurements();
-	while (1) {
-		printf("=============================\n\r");
-		printf("Low Precision: %gA\n\r", Current_GetLowPrecReading()/1000.0);
-		printf("High Precision: %gA\n\r", Current_GetHighPrecReading()/1000.0);
-		for (int i = 0; i < 500000000; i++);
 	}
 }
 	
