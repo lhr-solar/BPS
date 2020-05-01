@@ -29,8 +29,7 @@ uint16_t BSP_ADC_High_GetMilliVoltage(void) {
     fgets(csv, 1024, fp);
     // Get only 2nd (high precision) value
     char* dataString = csv;
-    while (*dataString != ',') { dataString++; }
-    dataString++;
+    dataString += 5;
     // Convert to int
     uint16_t data = atoi(dataString);
     // Convert to millivoltage
@@ -55,8 +54,7 @@ uint16_t BSP_ADC_Low_GetMilliVoltage(void) {
     fgets(csv, 1024, fp);
     // Get only 1st (low precision) value
     char* dataString = csv;
-    while (*dataString != ',') { dataString++; }
-    *dataString = 0;
+    *(dataString+5) = 0;
     dataString = csv;
     // Convert to int
     uint16_t data = atoi(dataString);

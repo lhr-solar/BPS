@@ -5,12 +5,12 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Debug simulator",
+            "name": "Debug Simulator",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/bps-simulator.out",
             "args": [],
-            "stopAtEntry": false,
+            "stopAtEntry": true,
             "cwd": "${workspaceFolder}",
             "environment": [],
             "externalConsole": false,
@@ -21,7 +21,9 @@
                     "text": "-enable-pretty-printing",
                     "ignoreFailures": true
                 }
-            ]
+            ],
+            "preLaunchTask": "make simulator",
+            "miDebuggerPath": "/usr/bin/gdb"
         },
 
         {

@@ -4,10 +4,8 @@
 *Listings
 *DebugConfig
 *.uvoptx
-.vscode
 *.uvprojx
 *.out
 *.csv
-__pycache__
 RTE_Components.h
 __pycache__
