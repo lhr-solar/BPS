@@ -24,6 +24,7 @@ void *ScanThread(void *arg);
  */
 void BSP_UART_Init(void) {
     int err = 0;
+    int stack_size = 256;
     pthread_attr_t attr;
     pthread_t id;
 
@@ -59,7 +60,7 @@ uint32_t BSP_UART_ReadLine(char *str) {
         uint32_t recvd = 0;
         RxFifo_Peek(&data);
         while(!RxFifo_IsEmpty() && data != '\r' && data != '\n') {
-            recvd += RxFifo_Get((uint8_t *)str++);
+            RxFifo_Get((uint8_t *)str++);
             RxFifo_Peek(&data);
         }
 
