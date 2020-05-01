@@ -16,8 +16,7 @@ INC_DIR = \
 -I../../Drivers/Inc \
 -I../../Config/Inc
 
-LIB = \
--lm
+LIB = -lm -lpthread
 
 FLAGS = -Wall -g -std=c11 $(INC_DIR)
 
