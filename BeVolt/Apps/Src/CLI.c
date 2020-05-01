@@ -45,8 +45,11 @@ void CLI_Init(cell_asic* boards) {
  * @param parsedTokens is an array to pass the parsed words back
  */
 void CLI_InputParse(char* input, int* parsedTokens) {
+    static char inputCpy[COMMAND_SIZE];
+    strcpy(inputCpy, input);
+
 	char *tokenized;
-	char *split = strtok_r(input, " ", &tokenized);
+	char *split = __strtok_r(inputCpy, " ", &tokenized);
 	for(int i = 0; i < MAX_TOKEN_SIZE && split != NULL; i++) {
 		for(int j = 0; j < strlen(split); j++) {
 			split[j] = tolower(split[j]);
@@ -59,7 +62,7 @@ void CLI_InputParse(char* input, int* parsedTokens) {
 		} else {
 			parsedTokens[i] = CLI_StringHash(split);
 		}
-		split = strtok_r(NULL, " ", &tokenized);
+		split = __strtok_r(NULL, " ", &tokenized);
 	}
 }
 
@@ -677,6 +680,7 @@ void CLI_All(void) {
  */
 void CLI_Handler(char* input) {
 	int hashTokens[MAX_TOKEN_SIZE] = {0};
+
 	CLI_InputParse(input, hashTokens);
 
 	#ifdef PARTY_PARROT
@@ -770,6 +774,5 @@ void CLI_Handler(char* input) {
 			printf("Invalid command. Type 'help' or 'menu' for the help menu\n\r");
 			break;
 	}
-	printf("%d\n\r", hashTokens[0]);
 	printf(">> ");
 }
