@@ -19,7 +19,7 @@
 
 cell_asic Minions[NUM_MINIONS];
 bool override = false;		// This will be changed by user via CLI
-char command[128];
+char command[COMMAND_SIZE];
 
 void initialize(void);
 void preliminaryCheck(void);
@@ -213,6 +213,9 @@ void faultCondition(void){
 	}
 
 	while(1) {
+		if(BSP_UART_ReadLine(command)) {
+			CLI_Handler(command);
+		}
 		BSP_WDTimer_Reset();	// Even though faulted, WDTimer needs to be updated or else system will reset
 					// causing WDOG error. WDTimer can't be stopped after it starts.
 	}
