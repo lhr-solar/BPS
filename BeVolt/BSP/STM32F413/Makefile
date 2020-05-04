@@ -7,11 +7,8 @@ TARGET = bps-leader
 ######################################
 # building variables
 ######################################
-# debug build?
-DEBUG = 1
 # optimization
 OPT = -Og
-
 
 #######################################
 # paths
@@ -25,12 +22,20 @@ BUILD_DIR = ../../Objects
 # C sources
 # since current path is in the BSP folder, go to the top level with ../../
 C_SOURCES =  \
-$(wildcard ../../Apps/Src/*.c) \
 $(wildcard ../../Drivers/Src/*.c)	\
 $(wildcard ../../BSP/STM32F413/Src/*.c)	\
 $(wildcard ../../CMSIS/DSP_Lib/Source/*.c)	\
 $(wildcard ../../BSP/STM32F413/STM32F4xx_StdPeriph_Driver/Src/*.c)	
 
+
+ifneq ($(TEST), none)
+TEST_FILE := Test_$(TEST).c
+C_SOURCES += \
+$(filter-out ../../Apps/Src/main.c, $(wildcard ../../Apps/Src/*.c))	\
+$(wildcard ../../Tests/$(TEST_FILE))
+else
+C_SOURCES += $(wildcard ../../Apps/Src/*.c)
+endif
 
 # ASM sources
 ASM_SOURCES =  \
@@ -98,7 +103,6 @@ C_INCLUDES =  \
 -I../../CMSIS/Device/ST/STM32F4xx/Include	\
 -I../../CMSIS/Include	\
 -I../../BSP/STM32F413/STM32F4xx_StdPeriph_Driver/Inc
-#-ISTM32F4xx_StdPeriph_Driver/x
 
 
 # compile gcc flags
