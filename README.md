@@ -21,9 +21,15 @@ The system can also be built and deployed from a terminal, allowing you to use d
     - C/C++
     - ARM
     - cortex-debug
-5. Go the the directory with the Makefile via your terminal.
-6. Type make. If the thing does not compile, try a make clean and then repeat make.
-7. Celebrate your independence from Keil.
+
+## Building
+To compile the release version of the code call```make bsp_type``` where bsp_type is the system you want to compile for.
+
+Type ```make help``` for more information on how to build the project.
+
+Call ```make clean``` if the build fails for any reason other than syntax related.
+
+For testing, please read the Testing section.
 
 ## Testing
 The following testing information is speficially for terminal development.
