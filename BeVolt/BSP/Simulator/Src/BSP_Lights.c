@@ -1,13 +1,25 @@
 #include "BSP_Lights.h"
+#include <stdint.h>
+#include <stdlib.h>
 
+	uint16_t LEDReg[1] = 0; //global variable containing value of LED status
 /**
  * @brief   Initialize all the GPIO pins connected to each LED/Light
  * @param   None
  * @return  None
  */
 void BSP_Lights_Init(void) {
-    // TODO: Initialize all gpio output pins for each LED specified in the Led enum in the header file
-    //      Use Positive Logic
+    //Creates file if it doesn't exist and stores single 16 bit integer acting as register
+	//for which LED's are on or off
+	//bit 8: bit 7: bit 6: bit 5: bit 4: bit 3: bit 2: bit 1: bit 0
+	//FAULT:  RUN : OCURR: OTEMP: OVOLT: UVOLT: WDOG :  CAN : EXTRA
+	FILE *LightsFile;
+	if (LightsFile = fopen("Lights.csv", "r") fclose("Lights.csv"); //if it exists, don't do anything
+	else{
+		LightsFile = fopen("Lights.csv", "wb+"); //creates binary file allowing input and ouput
+		fwrite(&LEDReg, 2, 1, LightsFile); //Writes 16 bit number to file
+		fclose(LightsFile);
+	}
 }
 
 /**
@@ -16,47 +28,52 @@ void BSP_Lights_Init(void) {
  * @return  None
  */
 void BSP_Light_Toggle(Light signal) {
-    // TODO: Toggle the state for each pin
+	FILE *LightsFile;
+	LightsFile = fopen("Lights.csv", "wb+"); //open file for reading and writing
+	fseek(LightsFile, 0, SEEK_SET); //Go to beginning of file
+	fread(&LEDReg, 2, 1, LightsFile); //read data from file
     switch(signal){
 		case FAULT:
-			// ERRORpin ^= ERRORpin;
+			LEDReg[0] ^= 0x0100;
 			break;
 			
 		case RUN:
-			// RUNpin ^= RUNpin;
+			LEDReg[0] ^= 0x0080;
 			break;
 			
 		case OCURR:
-			// OCURRpin ^= OCURRpin;
+			LEDReg[0] ^= 0x0040;
 			break;
 			
 		case OTEMP:
-			// OTEMPpin ^= OTEMPpin;
+			LEDReg[0] ^= 0x0020;
 			break;
 			
 		case OVOLT:
-			// OVOLTpin ^= OVOLTpin;
+			LEDReg[0] ^= 0x0010;
 			break;
 			
 		case UVOLT:
-			// UVOLTpin ^= UVOLTpin;
+			LEDReg[0] ^= 0x0008;
 			break;
 			
 		case WDOG:
-			// WDOGpin ^= WDOGpin;
+			LEDReg[0] ^= 0x0004;
 			break;
 			
 		case CAN:
-			// CANpin ^= CANpin;
+			LEDReg[0] ^= 0x0002;
 			break;
 			
 		case EXTRA:
-			// EXTRApin ^= EXTRApin;
+			LEDReg[0] ^= 0x0001;
 			break;
 
         default:
             break;
 	}
+	fwrite(&LEDReg, 2, 1, LightsFile); //Writes 16 bit number to file
+	fclose(LightsFile);
 }
 
 /**
@@ -65,47 +82,52 @@ void BSP_Light_Toggle(Light signal) {
  * @return  None
  */
 void BSP_Light_On(Light signal) {
-    // TODO: Set the state to highs for each pin
+	FILE *LightsFile;
+	LightsFile = fopen("Lights.csv", "wb+"); //open file for reading and writing
+	fseek(LightsFile, 0, SEEK_SET); //Go to beginning of file
+	fread(&LEDReg, 2, 1, LightsFile); //read data from file
     switch(signal){
 		case FAULT:
-			// ERRORpin |= ERRORpin;
+			LEDReg[0] |= 0x0100;
 			break;
 			
 		case RUN:
-			// RUNpin |= RUNpin;
+			LEDReg[0] |= 0x0080;
 			break;
 			
 		case OCURR:
-			// OCURRpin |= OCURRpin;
+			LEDReg[0] |= 0x0040;
 			break;
 			
 		case OTEMP:
-			// OTEMPpin |= OTEMPpin;
+			LEDReg[0] |= 0x0020;
 			break;
 			
 		case OVOLT:
-			// OVOLTpin |= OVOLTpin;
+			LEDReg[0] |= 0x0010;
 			break;
 			
 		case UVOLT:
-			// UVOLTpin |= UVOLTpin;
+			LEDReg[0] |= 0x0008;
 			break;
 			
 		case WDOG:
-			// WDOGpin |= WDOGpin;
+			LEDReg[0] |= 0x0004;
 			break;
 			
 		case CAN:
-			// CANpin |= CANpin;
+			LEDReg[0] |= 0x0002;
 			break;
 			
 		case EXTRA:
-			// EXTRApin |= EXTRApin;
+			LEDReg[0] |= 0x0001;
 			break;
 
         default:
             break;
 	}
+	fwrite(&LEDReg, 2, 1, LightsFile); //Writes 16 bit number to file
+	fclose(LightsFile);
 }
 
 /**
@@ -114,47 +136,52 @@ void BSP_Light_On(Light signal) {
  * @return  None
  */
 void BSP_Light_Off(Light signal) {
-    // TODO: Clear the state for each pin
+	FILE *LightsFile;
+	LightsFile = fopen("Lights.csv", "wb+"); //open file for reading and writing
+	fseek(LightsFile, 0, SEEK_SET); //Go to beginning of file
+	fread(&LEDReg, 2, 1, LightsFile); //read data from file
     switch(signal){
 		case FAULT:
-			// ERRORpin &= ~ERRORpin;
+			LEDReg[0] &= ~0x0100;
 			break;
 			
 		case RUN:
-			// RUNpin &= ~RUNpin;
+			LEDReg[0] &= ~0x0080;
 			break;
 			
 		case OCURR:
-			// OCURRpin &= ~OCURRpin;
+			LEDReg[0] &= ~0x0040;
 			break;
 			
 		case OTEMP:
-			// OTEMPpin &= ~OTEMPpin;
+			LEDReg[0] &= ~0x0020;
 			break;
 			
 		case OVOLT:
-			// OVOLTpin &= ~OVOLTpin;
+			LEDReg[0] &= ~0x0010;
 			break;
 			
 		case UVOLT:
-			// UVOLTpin &= ~UVOLTpin;
+			LEDReg[0] &= ~0x0008;
 			break;
 			
 		case WDOG:
-			// WDOGpin &= ~WDOGpin;
+			LEDReg[0] &= ~0x0004;
 			break;
 			
 		case CAN:
-			// CANpin &= ~CANpin;
+			LEDReg[0] &= ~0x0002;
 			break;
 			
 		case EXTRA:
-			// EXTRApin &= ~EXTRApin;
+			LEDReg[0] &= ~0x0001;
 			break;
 
         default:
             break;
 	}
+	fwrite(&LEDReg, 2, 1, LightsFile); //Writes 16 bit number to file
+	fclose(LightsFile);
 }
 
 /**
@@ -163,34 +190,37 @@ void BSP_Light_Off(Light signal) {
  * @return  None
  */
 State BSP_Light_GetState(Light signal) {
-    // TODO: return the state of the output pin corresponding to the led/light
+	FILE *LightsFile;
+	LightsFile = fopen("Lights.csv", "wb+"); //open file for reading and writing
+	fseek(LightsFile, 0, SEEK_SET); //Go to beginning of file
+	fread(&LEDReg, 2, 1, LightsFile); //read data from file
     switch(signal){
 		case FAULT:
-			return OFF;
+			return LEDReg[0] >> 8;
 			
 		case RUN:
-			return OFF;
+			return LEDReg[0] >> 7;
 			
 		case OCURR:
-			return OFF;
+			return LEDReg[0] >> 6;
 			
 		case OTEMP:
-			return OFF;
+			return LEDReg[0] >> 5;
 			
 		case OVOLT:
-			return OFF;
+			return LEDReg[0] >> 4;
 			
 		case UVOLT:
-			return OFF;
+			return LEDReg[0] >> 3;
 			
 		case WDOG:
-			return OFF;
+			return LEDReg[0] >> 2;
 			
 		case CAN:
-			return OFF;
+			return LEDReg[0] >> 1;
 			
 		case EXTRA:
-			return OFF;
+			return LEDReg[0];
 
         default:
             return OFF;
