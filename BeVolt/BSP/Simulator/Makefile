@@ -5,10 +5,19 @@ CC = gcc
 
 # since current path is in the BSP folder, go to the top level with ../../
 SRC = \
-$(wildcard ../../Apps/Src/*.c) \
 $(wildcard ../../BSP/Simulator/Src/*.c) \
 $(wildcard ../../Drivers/Src/*.c) \
 $(wildcard ../../Config/Src/*.c)
+
+ifneq ($(TEST), none)
+TEST_FILE := Test_$(TEST).c
+# This line adds everything in Apps/Src/*.c except for main.c
+SRC += \
+$(filter-out ../../Apps/Src/main.c, $(wildcard ../../Apps/Src/*.c))	\
+$(wildcard ../../Tests/$(TEST_FILE))
+else
+SRC += $(wildcard ../../Apps/Src/*.c)
+endif
 
 INC_DIR = \
 -I../../Apps/Inc \
