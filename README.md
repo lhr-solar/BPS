@@ -25,7 +25,7 @@ The system can also be built and deployed from a terminal, allowing you to use d
 ## Building
 To compile the release version of the code call```make bsp_type``` where bsp_type is the system you want to compile for.
 
-Type ```make help``` for more information on how to build the project.
+Call ```make help``` for more information on how to build the project.
 
 Call ```make clean``` if the build fails for any reason other than syntax related.
 
