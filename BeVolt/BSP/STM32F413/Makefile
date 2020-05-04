@@ -31,7 +31,7 @@ $(wildcard ../../BSP/STM32F413/STM32F4xx_StdPeriph_Driver/Src/*.c)
 ifneq ($(TEST), none)
 TEST_FILE := Test_$(TEST).c
 C_SOURCES += \
-$(filter-out ../../Apps/Src/main.c, $(wildcard ../../Apps/Src/*.c))	\
+$(filter-out ../../Apps/Src/main.c, $(wildcard ../../Apps/Src/*.c))	\ # This line adds everything in Apps/Src/*.c except for main.c
 $(wildcard ../../Tests/$(TEST_FILE))
 else
 C_SOURCES += $(wildcard ../../Apps/Src/*.c)

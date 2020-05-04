@@ -38,3 +38,4 @@ help:
 
 clean:
 	rm -fR Objects
+	rm *.out
