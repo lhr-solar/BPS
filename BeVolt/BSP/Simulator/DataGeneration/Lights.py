@@ -6,8 +6,15 @@ import os
 #path name to file
 file = "Data/Lights.csv"
 
+#returns 
+def Read_Lights():
+    with open(file, 'rb') as csv: #read binary file
+        Lights_Read = csv.reader(csv)
+        return Lights_Read
+    
+
 
 
 if __name__ == '__main__':
-    Lights_Init()
+    Read_Lights()
     
