@@ -7,4 +7,6 @@
 .vscode
 *.uvprojx
 *.out
+*.csv
+__pycache__
 RTE_Components.h
