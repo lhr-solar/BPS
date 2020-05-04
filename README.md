@@ -25,6 +25,22 @@ The system can also be built and deployed from a terminal, allowing you to use d
 6. Type make. If the thing does not compile, try a make clean and then repeat make.
 7. Celebrate your independence from Keil.
 
+## Testing
+The following testing information is speficially for terminal development.
+
+### Rules for making a new test src file
+1. Test names: The formatting of the file names is crucial to have the makefile work properly. "Test_" should be the prefix and the src file name that is to be tested must follow i.e. if you want to test x.c, the test src file must be named Test_x.c or the makefile will not be able to find the file.
+    E.g. A test for Voltage.c should be Test_Voltage.c file, a test for BSP_SPI.c should be named Test_BSP_SPI.c
+2. All test files should be placed into the Tests folder.
+
+### How to build a test
+To build a new test, you need to use the following command:
+```make bsp_type TEST=x```
+
+- ```bsp_type``` specifies which system you want to compile the code for: ```stm32f413```, ```simulator```
+- ```x``` specifies which test you want to compile. TEST= is optional and only required if a test is to be compiled. Set TEST equal to the suffix of the Test_ src files i.e. if the test you want to run is in Test_x.c, set TEST=x.
+    E.g. Call ```make stm32f413 TEST=Voltage``` if you want to test Voltage.c with the Test_Voltage.c src file
+
 ## Rules
 Commit frequently into your own branches. Create a Pull Request whenever you are ready to add you working code to the master branch. You must select 1 reviewer for approval. Follow the coding guidelines in the Solar Google Drive. The reviewers will make sure everything is up to par with the coding standards.
 
