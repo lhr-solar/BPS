@@ -25,3 +25,4 @@ stm32f413:
 
 clean:
 	rm -fR Objects
+	rm *.out
