@@ -57,9 +57,10 @@ uint32_t BSP_UART_ReadLine(char *str) {
     if(lineReceived) {
         pthread_mutex_lock(&rx_mutex);
         uint8_t data = 0;
+        uint32_t recvd = 0;
         RxFifo_Peek(&data);
         while(!RxFifo_IsEmpty() && data != '\r' && data != '\n') {
-            RxFifo_Get((uint8_t *)str++);
+            recvd += RxFifo_Get((uint8_t *)str++);
             RxFifo_Peek(&data);
         }
 
@@ -70,21 +71,20 @@ uint32_t BSP_UART_ReadLine(char *str) {
         lineReceived = false;
 
         pthread_mutex_unlock(&rx_mutex);
-        return true;
+        return recvd;
     }
 
-    return false;
+    return 0;
 }
 
 /**
  * @brief   Transmits data to through UART line
  * @param   str : pointer to buffer with data to send.
  * @param   len : size of buffer
- * @return  numer of bytes that were sent
+ * @return  number of bytes that were sent
  */
 uint32_t BSP_UART_Write(char *str, uint32_t len) {
-    printf("%.*s", len, str);
-    return true;
+    return printf("%.*s", len, str);
 }
 
 
