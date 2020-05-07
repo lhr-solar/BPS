@@ -60,7 +60,7 @@ uint32_t BSP_UART_ReadLine(char *str) {
         uint32_t recvd = 0;
         RxFifo_Peek(&data);
         while(!RxFifo_IsEmpty() && data != '\r' && data != '\n') {
-            RxFifo_Get((uint8_t *)str++);
+            recvd += RxFifo_Get((uint8_t *)str++);
             RxFifo_Peek(&data);
         }
 
