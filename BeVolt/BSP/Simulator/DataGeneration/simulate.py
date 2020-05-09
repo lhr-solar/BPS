@@ -96,6 +96,8 @@ def main():
                 break
             else:
                 print("That is not a valid option. Continuing simulation...")
+        except Exception:
+            break
     curses.echo()
     curses.nocbreak()
     curses.endwin()
