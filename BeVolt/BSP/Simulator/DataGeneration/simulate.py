@@ -61,6 +61,7 @@ def display(battery=None):
     stdscr.refresh()
 
 
+
 def configure():
     # Get configuration settings
     global state, mode
