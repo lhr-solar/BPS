@@ -3,29 +3,54 @@
 #define CSV_SPI_BUFFER_SIZE     1024
 
 /**
- * @brief   Command Codes for the LTC6811
+ * @brief   10-bit Command Codes for the LTC6811
+ * @note    Some commands can have certain bits that can be either high or low. By default, the macro
+ *          definitions set these bits to lo e.g. check ADCV. Look at the LTC6811 datasheet for more info.
  */
-#define WRCFGA
-#define WRCFGB
-#define RDCFGA
-#define RDCFGB
-#define RDCVA
-#define RDCVB
-#define RDCVC
-#define RDCVD
-#define RDCVE
-#define RDCVF
-#define RDAUXA
-#define RDAUXB
-#define RDAUXC
-#define RDAUXD
-#define RDSTATA
-#define RDSTATB
-#define WRSCTRL
-#define WRPWM
-#define WRPSB
-#define RDSCTRL
-#define RDPWM
+#define WRCFGA      0x001
+#define WRCFGB      0x024
+#define RDCFGA      0x002
+#define RDCFGB      0x026
+#define RDCVA       0x004
+#define RDCVB       0x006
+#define RDCVC       0x008
+#define RDCVD       0x00A
+#define RDCVE       0x009
+#define RDCVF       0x00B
+#define RDAUXA      0x00C
+#define RDAUXB      0x00E
+#define RDAUXC      0x00D
+#define RDAUXD      0x00F
+#define RDSTATA     0x010
+#define RDSTATB     0x012
+#define WRSCTRL     0x014
+#define WRPWM       0x020
+#define WRPSB       0x01C
+#define RDSCTRL     0x016
+#define RDPWM       0x022
+#define RDPSB       0x01E
+#define STSCTRL     0x019
+#define CLRSCTRL    0x018
+#define ADCV        0x260       // 0 1 MD[1] MD[0] 1 1 DCP 0 CH[2] CH[1] CH[0]
+#define ADOW        0x268       // 0 1 MD[1] MD[0] 1 1 DCP 1 CH[2] CH[1] CH[0]
+#define CVST        0x207       // 0 1 MD[1] MD[0] ST[1] ST[0] 0 0 1 1 1
+#define ADOL        0x201       // 0 1 MD[1] MD[0] 0 0 DCP 0 0 0 1
+#define ADAX        0x460       // 1 0 MD[1] MD[0] 1 1 0 0 CHG[2] CHG[1] CHG[0]
+#define ADAXD       0x400       // 1 0 MD[1] MD[0] 0 0 0 0 CHG[2] CHG[1] CHG[0]
+#define AXST        0x407       // 1 0 MD[1] MD[0] ST[1] ST[0] 0 0 1 1 1
+#define ADSTAT      0x468       // 1 0 MD[1] MD[0] 1 1 0 1 CHST[2] CHST[1] CHST[0]
+#define ADSTATD     0x468       // 1 0 MD[1] MD[0] 0 0 0 1 CHST[2] CHST[1] CHST[0]
+#define STATST      0x40F       // 1 0 MD[1] MD[0] ST[1] ST[0] 0 1 1 1 1
+#define ADCVAX      0x46F       // 1 0 MD[1] MD[0] 1 1 DCP 1 1 1 1
+#define ADCVSC      0x467       // 1 0 MD[1] MD[0] 1 1 DCP 0 1 1 1
+#define CLRCELL     0x711
+#define CLRAUX      0x712
+#define CLRSTAT     0x713
+#define PLADC       0x714
+#define DIAGN       0x715
+#define WRCOMM      0x721
+#define RDCOMM      0x722
+#define STCOMM      0x723
 
 // Path relative to the executable
 const char* file = "BSP/Simulator/DataGeneration/Data/SPI.csv";
