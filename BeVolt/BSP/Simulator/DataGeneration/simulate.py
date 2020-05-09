@@ -2,11 +2,13 @@ import curses
 import time
 import battery
 import ADC
+import Lights
 
 # Global configurations
 state = ''  # Charging/Discharging
 mode = ''   # Low, Normal, High
 stdscr = None   # Output screen
+lights_names = ['EXTRA', 'CAN', 'WDOG', 'UVOLT', 'OVOLT', 'OTEMP', 'OCURR', 'RUN', 'FAULT']
 
 
 def generate(battery=None):
@@ -21,7 +23,7 @@ def generate(battery=None):
         ADC.generate(state, mode)
 
 
-def read(battery=None):
+def display(battery=None):
     global stdscr
     if battery is not None:
         stdscr.addstr(5, 0, battery.__str__())
@@ -34,8 +36,17 @@ def read(battery=None):
     stdscr.addstr(3, 10, f"High Precision: {adc_values[0][1]}")
     # Read Current values
     stdscr.addstr(4, 0, f"Current:")
-    stdscr.addstr(4, 10, f"{adc_values[1]} A")
+    stdscr.addstr(4, 10, f"{adc_values[1]} A ")
+    # Read LED values
+    lights = Lights.read()
+    for i in range(0, 9):
+        stdscr.addstr(i+2, 40, lights_names[i])
+        if lights & (0x1<<i):
+            stdscr.addstr(i+2, 50, "[X]")
+        else:
+            stdscr.addstr(i+2, 50, "[ ]")
     stdscr.refresh()
+
 
 
 def configure():
@@ -70,7 +81,7 @@ def main():
         try:
             # Generate all values
             generate(BeVolt)
-            read(BeVolt)
+            display(BeVolt)
             time.sleep(1)     # one second delay
         except KeyboardInterrupt:
             curses.endwin()
