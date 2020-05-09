@@ -150,9 +150,12 @@ static uint16_t PEC15_Calc(char *data , int len) {
     }
     return (remainder*2);//The CRC15 has a 0 in the LSB so the final value must be multiplied by 2
 }
+<<<<<<< HEAD
 
 
 
 /**
  * @brief   PRIVATE FUNCTIONS
  */
+=======
+>>>>>>> Adds PEC calculations and half of the command ltc6811 command codes
