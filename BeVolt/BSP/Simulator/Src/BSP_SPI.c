@@ -1,5 +1,15 @@
 #include "BSP_SPI.h"
 
+// Path relative to the executable
+const char* file = "BSP/Simulator/DataGeneration/Data/SPI.csv";
+
+static uint8_t chipSelectState = 1;     // During idle, the cs pin should be high.
+                                        // Knowing the cs pin's state is not needed for the simulator,
+                                        // but checking if the pin is low before any file read/writes
+                                        // will make sure the developer follows the correct SPI protocol.
+
+static char csv_
+
 /**
  * @brief   Initializes the SPI port connected to the LTC6820. This port communicates with the LTC6811
  *          voltage and temperature monitoring IC. The LTC6820 converts the SPI pins to 2-wire isolated SPI.
@@ -8,11 +18,7 @@
  * @return  None
  */
 void BSP_SPI_Init(void) {
-    // TODO: Initialize the SPI port and a digital output pin for the chip select
-    //      SPI configuration:
-    //          speed : 125kbps
-    //          CPOL : 1 (polarity of clock during idle is high)
-    //          CPHA : 1 (tx recorded during 2nd edge)
+    // No intialization required.
 }
 
 /**
@@ -25,8 +31,13 @@ void BSP_SPI_Init(void) {
  * @return  None
  */
 void BSP_SPI_Write(uint8_t *txBuf, uint32_t txLen) {
-    // TODO: Transmit data through SPI.
-    //      Any data the uC receives during this process should just be thrown away.
+    FILE* fp = fopen(file, "r");
+    if (!fp) {
+        printf("SPI not available\n\r");
+        return;
+    }
+
+
 }
 
 /**
@@ -39,8 +50,14 @@ void BSP_SPI_Write(uint8_t *txBuf, uint32_t txLen) {
  * @return  None
  */
 void BSP_SPI_Read(uint8_t *rxBuf, uint32_t rxLen) {
-    // TODO: Read data from SPI.
-    //      Send 0x00 in order to get data
+    FILE* fp = fopen(file, "r");
+    if (!fp) {
+        printf("SPI not available\n\r");
+        return;
+    }
+
+
+
 }
 
 /**
@@ -50,5 +67,11 @@ void BSP_SPI_Read(uint8_t *rxBuf, uint32_t rxLen) {
  * @return  None
  */
 void BSP_SPI_SetStateCS(uint8_t state) {
-    // TODO: Set CS pin to high or low depending on state
+    chipSelectState = state;
 }
+
+
+
+/**
+ * @brief   PRIVATE FUNCTIONS
+ */
