@@ -25,8 +25,8 @@ uint16_t BSP_ADC_High_GetMilliVoltage(void) {
         return;
     }
     // Get raw CSV string
-    char csv[1024];
-    fgets(csv, 1024, fp);
+    char csv[16];
+    fgets(csv, 16, fp);
     // Get only 2nd (high precision) value
     char* dataString = csv;
     dataString += 5;
@@ -50,8 +50,8 @@ uint16_t BSP_ADC_Low_GetMilliVoltage(void) {
         return;
     }
     // Get raw CSV string
-    char csv[1024];
-    fgets(csv, 1024, fp);
+    char csv[16];
+    fgets(csv, 16, fp);
     // Get only 1st (low precision) value
     char* dataString = csv;
     *(dataString+5) = 0;
