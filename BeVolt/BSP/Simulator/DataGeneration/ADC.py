@@ -8,7 +8,7 @@ and store the simulated data in ADC.csv to be read by BSP_ADC.c
 """
 
 # path/name of file
-file = "Data/ADC.csv"
+file = "BSP/Simulator/DataGeneration/Data/ADC.csv"
 
 # randomized current value
 current_value = 0

@@ -3,7 +3,7 @@ import csv
 #This module will hold the statuses of the LED's on the BPS. 
 
 #path name to file
-file = "Data/Lights.csv"
+file = "BSP/Simulator/DataGeneration/Data/Lights.csv"
 
 #returns integer where 9 LSB are status of 9 LED's
 def read():
