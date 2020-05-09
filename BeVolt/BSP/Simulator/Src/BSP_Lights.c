@@ -181,10 +181,10 @@ void BSP_Light_Off(Light signal) {
 /**
  * @brief   Gets the state of the LED/Light
  * @param   signal : choose one of the Light enums to control that specific Light.
- * @return  None
+ * @return  State of signal
  */
 State BSP_Light_GetState(Light signal) {
-	State returnVal;
+	int returnVal;
 	FILE *fp;
 	fp = fopen(file, "r"); //open file for reading
 	char csv[9]; //initialize 9 character array
