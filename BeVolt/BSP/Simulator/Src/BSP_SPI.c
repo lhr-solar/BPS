@@ -150,3 +150,9 @@ static uint16_t PEC15_Calc(char *data , int len) {
     }
     return (remainder*2);//The CRC15 has a 0 in the LSB so the final value must be multiplied by 2
 }
+
+
+
+/**
+ * @brief   PRIVATE FUNCTIONS
+ */
