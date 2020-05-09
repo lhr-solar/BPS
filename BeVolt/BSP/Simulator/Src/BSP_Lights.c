@@ -10,7 +10,9 @@ int LEDReg;
  * @return  None
  */
 void BSP_Lights_Init(void) {
-	//doesn't need to be written
+	// Creates file if none exists
+	FILE* fp = fopen(file, "a");
+	fclose(fp);
 }
 
 /**
@@ -19,11 +21,11 @@ void BSP_Lights_Init(void) {
  * @return  None
  */
 void BSP_Light_Toggle(Light signal) {
-	FILE *fp;
-	fp = fopen(file, "w+"); //open file for reading and writing
-	char csv[9]; //initialize 9 character array
-	fgets(csv, 9, fp); //get values and store them in array
-	LEDReg = atoi(csv); //convert values to integers
+	FILE* fp = fopen(file, "r");
+	char csv[4];
+	fgets(csv, 4, fp);
+	fclose(fp);
+	LEDReg = atoi(csv);
     switch(signal){
 		case FAULT:
 			LEDReg ^= 0x0100;
@@ -64,8 +66,9 @@ void BSP_Light_Toggle(Light signal) {
         default:
             break;
 	}
-	fprintf(fp, "%d", LEDReg);; //Write number to file
-	fclose(fp); //close file
+	fp = fopen(file, "w");
+	fprintf(fp, "%d", LEDReg);
+	fclose(fp);
 }
 
 /**
@@ -74,11 +77,11 @@ void BSP_Light_Toggle(Light signal) {
  * @return  None
  */
 void BSP_Light_On(Light signal) {
-	FILE *fp;
-	fp = fopen(file, "w+"); //open file for reading and writing
-	char csv[9]; //initialize 9 character array
-	fgets(csv, 9, fp); //get values and store them in array
-	LEDReg = atoi(csv); //convert values to integers
+	FILE* fp = fopen(file, "r");
+	char csv[4];
+	fgets(csv, 4, fp);
+	fclose(fp);
+	LEDReg = atoi(csv);
     switch(signal){
 		case FAULT:
 			LEDReg |= 0x0100;
@@ -119,8 +122,9 @@ void BSP_Light_On(Light signal) {
         default:
             break;
 	}
-	fprintf(fp, "%d", LEDReg);; //Write number to file
-	fclose(fp); //close file
+	fp = fopen(file, "w");
+	fprintf(fp, "%d", LEDReg);
+	fclose(fp);
 }
 
 /**
@@ -129,11 +133,11 @@ void BSP_Light_On(Light signal) {
  * @return  None
  */
 void BSP_Light_Off(Light signal) {
-	FILE *fp;
-	fp = fopen(file, "w+"); //open file for reading and writing
-	char csv[9]; //initialize 9 character array
-	fgets(csv, 9, fp); //get values and store them in array
-	LEDReg = atoi(csv); //convert values to integers
+	FILE* fp = fopen(file, "r");
+	char csv[4];
+	fgets(csv, 4, fp);
+	fclose(fp);
+	LEDReg = atoi(csv);
     switch(signal){
 		case FAULT:
 			LEDReg &= ~0x0100;
@@ -174,8 +178,9 @@ void BSP_Light_Off(Light signal) {
         default:
             break;
 	}
-	fprintf(fp, "%d", LEDReg);; //Write number to file
-	fclose(fp); //close file
+	fp = fopen(file, "w");
+	fprintf(fp, "%d", LEDReg);
+	fclose(fp);
 }
 
 /**
@@ -185,11 +190,10 @@ void BSP_Light_Off(Light signal) {
  */
 State BSP_Light_GetState(Light signal) {
 	State returnVal;
-	FILE *fp;
-	fp = fopen(file, "r"); //open file for reading
-	char csv[9]; //initialize 9 character array
-	fgets(csv, 9, fp); //get values and store them in array
-	LEDReg = atoi(csv); //convert values to integers
+	FILE* fp = fopen(file, "r");
+	char csv[4];
+	fgets(csv, 4, fp);
+	LEDReg = atoi(csv);
     switch(signal){
 		case FAULT:
 			returnVal = (LEDReg & ~0x0100) >> 8;
