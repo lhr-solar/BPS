@@ -1,4 +1,5 @@
 #include "BSP_SPI.h"
+#include "config.h"
 
 #define CSV_SPI_BUFFER_SIZE     1024
 
@@ -64,7 +65,8 @@ static char csvBuffer[CSV_SPI_BUFFER_SIZE];
 
 static void PEC15_Table_Init(void);
 static uint16_t PEC15_Calc(char *data , int len);
-static void GetLTC6811Command(void);
+static void ExtractCmdFromBuff(uint8_t *buf);
+static void CreatePacket(uint8_t *pkt, uint16_t cmdCode, uint8_t *data, uint32_t dataSize);
 
 /**
  * @brief   Initializes the SPI port connected to the LTC6820. This port communicates with the LTC6811
@@ -82,8 +84,8 @@ void BSP_SPI_Init(void) {
  *          the LTC6811 will not send anything during a transmit for uC to LTC6811. This is unlike what
  *          the SPI protocol expects where a transmit and receive happen simultaneously.
  * @note    Blocking statement
- * @param   txBuf : data array that contains the data to be sent.
- * @param   txLen : length of data array.
+ * @param   txBuf data array that contains the data to be sent.
+ * @param   txLen length of data array.
  * @return  None
  */
 void BSP_SPI_Write(uint8_t *txBuf, uint32_t txLen) {
@@ -102,8 +104,8 @@ void BSP_SPI_Write(uint8_t *txBuf, uint32_t txLen) {
  *          the LTC6811 will not be expecting anything from the uC. The SPI protocol requires the uC to
  *          transmit data in order to receive anything so the uC will send junk data.
  * @note    Blocking statement
- * @param   rxBuf : data array to store the data that is received.
- * @param   rxLen : length of data array.
+ * @param   rxBuf data array to store the data that is received.
+ * @param   rxLen length of data array.
  * @return  None
  */
 void BSP_SPI_Read(uint8_t *rxBuf, uint32_t rxLen) {
@@ -120,7 +122,7 @@ void BSP_SPI_Read(uint8_t *rxBuf, uint32_t rxLen) {
 /**
  * @brief   Sets the state of the chip select output pin. Set the state to low/0 to notify the LTC6811 that
  *          the data sent on the SPI lines are for it. Set the state to high/1 to make the LTC6811 go to standby.
- * @param   state : 0 for select, 1 to deselect
+ * @param   state 0 for select, 1 to deselect
  * @return  None
  */
 void BSP_SPI_SetStateCS(uint8_t state) {
@@ -133,7 +135,50 @@ void BSP_SPI_SetStateCS(uint8_t state) {
  * @brief   PRIVATE FUNCTIONS
  */
 
+/**
+ * @brief 
+ * 
+ * @param buf 
+ */
+static void ExtractCmdFromBuff(uint8_t *buf) {
 
+}
+
+/**
+ * @brief Create a Packet that the LTC6811 will usually send back
+ * 
+ * @param pkt
+ * @param cmdCode 
+ * @param data 
+ * @param dataSize 
+ */
+static void CreatePacket(uint8_t *pkt, uint16_t cmdCode, uint8_t *data, uint32_t dataSize) {
+    const uint8_t BYTES_IN_REG = 8;
+
+    // Format the first 4 bytes of the packet which is the cmd (2bytes) and pec of the cmd (2bytes)
+    pkt[0] = (cmdCode >> 8) & 0x00FF;
+    pkt[1] = cmdCode & 0x00FF;
+    uint16_t cmdPEC = PEC15_Calc(pkt, 2);
+    pkt[2] = (cmdPEC >> 8) & 0x00FF;
+    pkt[3] = cmdPEC & 0x00FF;
+
+    uint32_t pktIdx = 4;
+    for (uint8_t currIC = NUM_MINIONS; currIC > 0; currIC--) {
+        // executes for each LTC681x in daisy chain, this loops starts with
+        // the last IC on the stack. The first configuration written is
+        // received by the last IC in the daisy chain
+
+        for (uint8_t currByte = 0; currByte < BYTES_IN_REG; currByte++) {
+            pkt[pktIdx] = data[((currIC-1)*6)+currByte];
+            pktIdx = pktIdx + 1;
+        }
+
+        uint16_t dataPEC = PEC15_Calc(&data[(currIC-1)*6], BYTES_IN_REG);    // calculating the PEC for each Iss configuration register data
+        pkt[pktIdx] = (uint8_t)(dataPEC >> 8);
+        pkt[pktIdx + 1] = (uint8_t)dataPEC;
+        pktIdx = pktIdx + 2;
+    }
+}
 
 
 /************************************
@@ -157,7 +202,7 @@ static void PEC15_Table_Init(void) {
         for(int bit = 8; bit > 0; --bit) {
             if(remainder & 0x4000) {
                 remainder = ((remainder << 1));
-                remainder = (remainder ^ CRC15_POLY)
+                remainder = (remainder ^ CRC15_POLY);
             } else {
                 remainder = ((remainder << 1));
             }
