@@ -2,25 +2,15 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-	const char* Lights = "BSP/Simulator/DataGeneration/Data/Lights.csv";
-	uint16_t LEDReg = 0; //global variable containing value of LED status
+static const char* file = "BSP/Simulator/DataGeneration/Data/Lights.csv";
+int LEDReg;
 /**
  * @brief   Initialize all the GPIO pins connected to each LED/Light
  * @param   None
  * @return  None
  */
 void BSP_Lights_Init(void) {
-    //Creates file if it doesn't exist and stores single 16 bit integer acting as register
-	//for which LED's are on or off
-	//bit 8: bit 7: bit 6: bit 5: bit 4: bit 3: bit 2: bit 1: bit 0
-	//FAULT:  RUN : OCURR: OTEMP: OVOLT: UVOLT: WDOG :  CAN : EXTRA
-	FILE *LightsFile;
-	if (LightsFile = fopen(Lights, "r")) fclose(Lights); //if it exists, don't do anything
-	else{
-		LightsFile = fopen(Lights, "wb+"); //creates binary file allowing input and ouput
-		fwrite(&LEDReg, 2, 1, LightsFile); //Writes 16 bit number to file
-		fclose(LightsFile);
-	}
+	//doesn't need to be written
 }
 
 /**
@@ -29,10 +19,11 @@ void BSP_Lights_Init(void) {
  * @return  None
  */
 void BSP_Light_Toggle(Light signal) {
-	FILE *LightsFile;
-	LightsFile = fopen(Lights, "wb+"); //open file for reading and writing
-	fseek(LightsFile, 0, SEEK_SET); //Go to beginning of file
-	fread(&LEDReg, 2, 1, LightsFile); //read data from file
+	FILE *fp;
+	fp = fopen(file, "w+"); //open file for reading and writing
+	char csv[9]; //initialize 9 character array
+	fgets(csv, 9, fp); //get values and store them in array
+	LEDReg = atoi(csv); //convert values to integers
     switch(signal){
 		case FAULT:
 			LEDReg ^= 0x0100;
@@ -73,8 +64,8 @@ void BSP_Light_Toggle(Light signal) {
         default:
             break;
 	}
-	fwrite(&LEDReg, 2, 1, LightsFile); //Writes 16 bit number to file
-	fclose(LightsFile);
+	fprintf(fp, "%d", LEDReg);; //Write number to file
+	fclose(fp); //close file
 }
 
 /**
@@ -83,10 +74,11 @@ void BSP_Light_Toggle(Light signal) {
  * @return  None
  */
 void BSP_Light_On(Light signal) {
-	FILE *LightsFile;
-	LightsFile = fopen(Lights, "wb+"); //open file for reading and writing
-	fseek(LightsFile, 0, SEEK_SET); //Go to beginning of file
-	fread(&LEDReg, 2, 1, LightsFile); //read data from file
+	FILE *fp;
+	fp = fopen(file, "w+"); //open file for reading and writing
+	char csv[9]; //initialize 9 character array
+	fgets(csv, 9, fp); //get values and store them in array
+	LEDReg = atoi(csv); //convert values to integers
     switch(signal){
 		case FAULT:
 			LEDReg |= 0x0100;
@@ -127,8 +119,8 @@ void BSP_Light_On(Light signal) {
         default:
             break;
 	}
-	fwrite(&LEDReg, 2, 1, LightsFile); //Writes 16 bit number to file
-	fclose(LightsFile);
+	fprintf(fp, "%d", LEDReg);; //Write number to file
+	fclose(fp); //close file
 }
 
 /**
@@ -137,10 +129,11 @@ void BSP_Light_On(Light signal) {
  * @return  None
  */
 void BSP_Light_Off(Light signal) {
-	FILE *LightsFile;
-	LightsFile = fopen(Lights, "wb+"); //open file for reading and writing
-	fseek(LightsFile, 0, SEEK_SET); //Go to beginning of file
-	fread(&LEDReg, 2, 1, LightsFile); //read data from file
+	FILE *fp;
+	fp = fopen(file, "w+"); //open file for reading and writing
+	char csv[9]; //initialize 9 character array
+	fgets(csv, 9, fp); //get values and store them in array
+	LEDReg = atoi(csv); //convert values to integers
     switch(signal){
 		case FAULT:
 			LEDReg &= ~0x0100;
@@ -181,8 +174,8 @@ void BSP_Light_Off(Light signal) {
         default:
             break;
 	}
-	fwrite(&LEDReg, 2, 1, LightsFile); //Writes 16 bit number to file
-	fclose(LightsFile);
+	fprintf(fp, "%d", LEDReg);; //Write number to file
+	fclose(fp); //close file
 }
 
 /**
@@ -191,39 +184,43 @@ void BSP_Light_Off(Light signal) {
  * @return  None
  */
 State BSP_Light_GetState(Light signal) {
-	FILE *LightsFile;
-	LightsFile = fopen(Lights, "wb+"); //open file for reading and writing
-	fseek(LightsFile, 0, SEEK_SET); //Go to beginning of file
-	fread(&LEDReg, 2, 1, LightsFile); //read data from file
+	State returnVal;
+	FILE *fp;
+	fp = fopen(file, "r"); //open file for reading
+	char csv[9]; //initialize 9 character array
+	fgets(csv, 9, fp); //get values and store them in array
+	LEDReg = atoi(csv); //convert values to integers
     switch(signal){
 		case FAULT:
-			return LEDReg >> 8;
-			
+			returnVal = (LEDReg & ~0x0100) >> 8;
+			break;
 		case RUN:
-			return LEDReg >> 7;
-			
+			returnVal = (LEDReg & ~0x0080) >> 7;
+			break;
 		case OCURR:
-			return LEDReg >> 6;
-			
+			returnVal = (LEDReg & ~0x0040) >> 6;
+			break;
 		case OTEMP:
-			return LEDReg >> 5;
-			
+			returnVal = (LEDReg & ~0x0020) >> 5;
+			break;
 		case OVOLT:
-			return LEDReg >> 4;
-			
+			returnVal = (LEDReg & ~0x0010) >> 4;
+			break;
 		case UVOLT:
-			return LEDReg >> 3;
-			
+			returnVal = (LEDReg & ~0x0008) >> 3;
+			break;
 		case WDOG:
-			return LEDReg >> 2;
-			
+			returnVal = (LEDReg & ~0x0004) >> 2;
+			break;
 		case CAN:
-			return LEDReg >> 1;
-			
+			returnVal = (LEDReg & ~0x0002) >> 1;
+			break;
 		case EXTRA:
-			return LEDReg;
-
+			returnVal = (LEDReg & ~0x0001);
+			break;
         default:
-            return OFF;
+            returnVal = OFF;
 	}
+	fclose(fp); //close file
+	return returnVal;
 }

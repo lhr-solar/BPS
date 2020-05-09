@@ -1,20 +1,14 @@
 import csv
-import os
 
 #This module will hold the statuses of the LED's on the BPS. 
 
 #path name to file
 file = "Data/Lights.csv"
 
-#returns 
+#returns integer where 9 LSB are 
 def Read_Lights():
-    with open(file, 'rb') as csv: #read binary file
-        Lights_Read = csv.reader(csv)
-        return Lights_Read
-    
-
-
-
-if __name__ == '__main__':
-    Read_Lights()
+    with open(file, 'r') as csvfile: #read file
+        csvreader = csv.reader(csvfile)
+        return csvreader
+            
     

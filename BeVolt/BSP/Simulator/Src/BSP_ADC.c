@@ -1,7 +1,7 @@
 #include "BSP_ADC.h"
 
 // Path relative to the executable
-const char* file = "BSP/Simulator/DataGeneration/Data/ADC.csv";
+static const char* file = "BSP/Simulator/DataGeneration/Data/ADC.csv";
 
 /**
  * @brief   Initializes the ADC module. This is to measure the hall effect sensors
