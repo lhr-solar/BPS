@@ -186,7 +186,7 @@ void BSP_Light_Off(Light signal) {
 /**
  * @brief   Gets the state of the LED/Light
  * @param   signal : choose one of the Light enums to control that specific Light.
- * @return  None
+ * @return  State of signal
  */
 State BSP_Light_GetState(Light signal) {
 	State returnVal;
