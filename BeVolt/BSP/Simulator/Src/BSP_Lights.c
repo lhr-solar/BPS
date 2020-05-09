@@ -196,31 +196,31 @@ State BSP_Light_GetState(Light signal) {
 	LEDReg = atoi(csv);
     switch(signal){
 		case FAULT:
-			returnVal = (LEDReg & ~0x0100) >> 8;
+			returnVal = (LEDReg & 0x0100) >> 8;
 			break;
 		case RUN:
-			returnVal = (LEDReg & ~0x0080) >> 7;
+			returnVal = (LEDReg & 0x0080) >> 7;
 			break;
 		case OCURR:
-			returnVal = (LEDReg & ~0x0040) >> 6;
+			returnVal = (LEDReg & 0x0040) >> 6;
 			break;
 		case OTEMP:
-			returnVal = (LEDReg & ~0x0020) >> 5;
+			returnVal = (LEDReg & 0x0020) >> 5;
 			break;
 		case OVOLT:
-			returnVal = (LEDReg & ~0x0010) >> 4;
+			returnVal = (LEDReg & 0x0010) >> 4;
 			break;
 		case UVOLT:
-			returnVal = (LEDReg & ~0x0008) >> 3;
+			returnVal = (LEDReg & 0x0008) >> 3;
 			break;
 		case WDOG:
-			returnVal = (LEDReg & ~0x0004) >> 2;
+			returnVal = (LEDReg & 0x0004) >> 2;
 			break;
 		case CAN:
-			returnVal = (LEDReg & ~0x0002) >> 1;
+			returnVal = (LEDReg & 0x0002) >> 1;
 			break;
 		case EXTRA:
-			returnVal = (LEDReg & ~0x0001);
+			returnVal = (LEDReg & 0x0001);
 			break;
         default:
             returnVal = OFF;
