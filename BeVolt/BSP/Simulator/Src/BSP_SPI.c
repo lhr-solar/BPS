@@ -1,5 +1,7 @@
 #include "BSP_SPI.h"
 
+#define CSV_SPI_BUFFER_SIZE     1024
+
 // Path relative to the executable
 const char* file = "BSP/Simulator/DataGeneration/Data/SPI.csv";
 
@@ -8,7 +10,9 @@ static uint8_t chipSelectState = 1;     // During idle, the cs pin should be hig
                                         // but checking if the pin is low before any file read/writes
                                         // will make sure the developer follows the correct SPI protocol.
 
-static char csv_
+static char csvBuffer[CSV_SPI_BUFFER_SIZE];
+
+static void GetCommand(void);
 
 /**
  * @brief   Initializes the SPI port connected to the LTC6820. This port communicates with the LTC6811
@@ -37,6 +41,7 @@ void BSP_SPI_Write(uint8_t *txBuf, uint32_t txLen) {
         return;
     }
 
+    fgets(csvBuffer, 1024, fp);
 
 }
 
@@ -56,7 +61,7 @@ void BSP_SPI_Read(uint8_t *rxBuf, uint32_t rxLen) {
         return;
     }
 
-
+    fgets(csvBuffer, 1024, fp);
 
 }
 
