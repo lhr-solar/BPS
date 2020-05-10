@@ -53,6 +53,13 @@
 #define RDCOMM      0x722
 #define STCOMM      0x723
 
+typedef struct {
+    uint8_t config[6];              // Configuration data of the LTC6811
+    uint16_t voltage_data[12];      // Each board can support 12 battery modules
+    uint16_t temperature_data[18];  // Each board can support 18 temperature sensors
+    uint16_t open_wire;             // Each bit indicates a battery node wire
+} ltc6811_sim_t;
+
 // Path relative to the executable
 const char* file = "BSP/Simulator/DataGeneration/Data/SPI.csv";
 
@@ -61,68 +68,80 @@ static uint8_t chipSelectState = 1;     // During idle, the cs pin should be hig
                                         // but checking if the pin is low before any file read/writes
                                         // will make sure the developer follows the correct SPI protocol.
 
-static char csvBuffer[CSV_SPI_BUFFER_SIZE];
+static uint16_t currCmd = 0;            // Before every BSP_SPI_Read, BSP_SPI_Write needs to be called to
+                                        // specify the command to handle
 
-static void PEC15_Table_Init(void);
-static uint16_t PEC15_Calc(char *data , int len);
-static void ExtractCmdFromBuff(uint8_t *buf);
-static void CreatePacket(uint8_t *pkt, uint16_t cmdCode, uint8_t *data, uint32_t dataSize);
+static char csvBuffer[CSV_SPI_BUFFER_SIZE];
+static ltc6811_sim_t simulationData[NUM_MINIONS];
 
 /**
- * @brief   Initializes the SPI port connected to the LTC6820. This port communicates with the LTC6811
- *          voltage and temperature monitoring IC. The LTC6820 converts the SPI pins to 2-wire isolated SPI.
+ * @brief   Data formating functions
+ */
+static void CmdHandler(uint8_t *buf, uint32_t len);
+static void PEC15_Table_Init(void);
+static uint16_t PEC15_Calc(char *data , int len);
+static uint16_t ExtractCmdFromBuff(uint8_t *buf, uint32_t len);
+static void ExtractDataFromBuff(uint8_t *data, uint8_t *buf, uint32_t len);
+static void CreateReadPacket(uint8_t *pkt, uint8_t *data, uint32_t dataSize);
+
+/**
+ * @brief   File access functions
+ */
+static bool LoadCSV(void);
+static bool UpdateSimulationData(void);
+
+/**
+ * @brief   Initializes the SPI port connected to the LTC6820.
+ *          This port communicates with the LTC6811 voltage and temperature
+ *          monitoring IC. The LTC6820 converts the SPI pins to 2-wire isolated SPI.
  *          Look at analog devices website and LTC6811's or LTC6820's datasheets.
  * @param   None
  * @return  None
  */
 void BSP_SPI_Init(void) {
-    // No intialization required.
+    PEC15_Table_Init();
 }
 
 /**
- * @brief   Transmits data to through SPI. With the way the LTC6811 communication works,
- *          the LTC6811 will not send anything during a transmit for uC to LTC6811. This is unlike what
- *          the SPI protocol expects where a transmit and receive happen simultaneously.
+ * @brief   Transmits data to through SPI.
+ *          With the way the LTC6811 communication works, the LTC6811 will not send
+ *          anything during a transmit for uC to LTC6811. This is unlike what
+ *          the SPI protocol expects where a transmit and receive happen
+ *          simultaneously.
  * @note    Blocking statement
- * @param   txBuf data array that contains the data to be sent.
- * @param   txLen length of data array.
+ * @param   txBuf   data array that contains the data to be sent.
+ * @param   txLen   length of data array.
  * @return  None
  */
 void BSP_SPI_Write(uint8_t *txBuf, uint32_t txLen) {
-    FILE* fp = fopen(file, "r");
-    if (!fp) {
-        printf("SPI not available\n\r");
-        return;
-    }
+    currCmd = ExtractCmdFromBuff(txBuf, txLen);
+    currCmd &= ~0x180;  // Bit Mask to ignore any cmd configuration bits i.e. ignore the MD, DCP, etc. bits
 
-    fgets(csvBuffer, 1024, fp);
+    // Ignore PEC (bits 2 and 3), PEC is meant to be able to check if EMI/noise affected the data
 
+    CmdHandler(txBuf, txLen);
 }
 
 /**
  * @brief   Gets the data from SPI. With the way the LTC6811 communication works,
- *          the LTC6811 will not be expecting anything from the uC. The SPI protocol requires the uC to
- *          transmit data in order to receive anything so the uC will send junk data.
+ *          the LTC6811 will not be expecting anything from the uC.
+ *          The SPI protocol requires the uC to transmit data in order to receive
+ *          anything so the uC will send junk data.
  * @note    Blocking statement
- * @param   rxBuf data array to store the data that is received.
- * @param   rxLen length of data array.
+ * @param   rxBuf   data array to store the data that is received.
+ * @param   rxLen   length of data array.
  * @return  None
  */
 void BSP_SPI_Read(uint8_t *rxBuf, uint32_t rxLen) {
-    FILE* fp = fopen(file, "r");
-    if (!fp) {
-        printf("SPI not available\n\r");
-        return;
-    }
-
-    fgets(csvBuffer, 1024, fp);
-
+    CmdHandler(rxBuf, rxLen);
 }
 
 /**
- * @brief   Sets the state of the chip select output pin. Set the state to low/0 to notify the LTC6811 that
- *          the data sent on the SPI lines are for it. Set the state to high/1 to make the LTC6811 go to standby.
- * @param   state 0 for select, 1 to deselect
+ * @brief   Sets the state of the chip select output pin.
+ *          Set the state to low/0 to notify the LTC6811 that the data sent on the
+ *          SPI lines are for it. Set the state to high/1 to make the LTC6811
+ *          go to standby.
+ * @param   state   0 for select, 1 to deselect
  * @return  None
  */
 void BSP_SPI_SetStateCS(uint8_t state) {
@@ -131,54 +150,179 @@ void BSP_SPI_SetStateCS(uint8_t state) {
 
 
 
+
 /**
  * @brief   PRIVATE FUNCTIONS
  */
 
 /**
- * @brief 
- * 
- * @param buf 
+ * @brief   Handles are command codess
+ * @param   buf     Depends on which command is in the currCmd variable.
+ *                  If a RD command was sent, then buf will be used to store all
+ *                  the data that the LTC6811 driver functions will be expecting.
+ *                  If a WR command was sent, then buf should hold what the LTC6811
+ *                  drivers sent into BSP_SPI_Write.
+ * @param   len 
  */
-static void ExtractCmdFromBuff(uint8_t *buf) {
+static void CmdHandler(uint8_t *buf, uint32_t len) {
+
+    const uint8_t BYTES_PER_REG = 6;
+
+    switch(currCmd) {
+        // LTC6811 Configuration
+        case WRCFGA: {
+            uint8_t data[NUM_MINIONS * 6];   // Each register in the LTC6811 is 6 bytes
+            ExtractDataFromBuff(data, buf, len);
+            int dataIdx = 0;
+            for(int i = NUM_MINIONS; i > 0; i--) {
+                // Copy data to config register
+                memcpy(simulationData[i].config, &data[dataIdx*BYTES_PER_REG], BYTES_PER_REG);
+                dataIdx++;
+            }
+            break;
+        }
+
+        case RDCFGA: {
+            // store config registers of all LTC6811s into one continuous array
+            uint8_t data[NUM_MINIONS * BYTES_PER_REG];
+            int dataIdx = 0;
+            for(int i = NUM_MINIONS; i > 0; i--) {
+                memcpy(&data[dataIdx * BYTES_PER_REG], simulationData[i].config, BYTES_PER_REG);
+                dataIdx++;
+            }
+            CreateReadPacket(buf, data, NUM_MINIONS * BYTES_PER_REG);
+            break;
+        }
+
+        // Start ADC Conversion
+        case ADCV:
+            UpdateSimulationData();
+            break;
+
+        // Read Cell Voltages
+        case RDCVA:
+
+            break;
+
+        case RDCVB:
+            break;
+
+        case RDCVC:
+            break;
+
+        case RDCVD:
+            break;
+
+        case RDCVE:
+            break;
+
+        case RDCVF:
+            break;
+
+        default:
+            break;
+    }
+}
+
+
+/**
+ * @brief FILE ACCESSING FUNCTIONS
+ */
+
+/**
+ * @brief   Reads the CSV file and loads the data into the buffer
+ * @return  true if data was read successfully, false if failed
+ */
+static bool LoadCSV(void) {
+    FILE* fp = fopen(file, "r");
+    if (!fp) {
+        printf("SPI not available\n\r");
+        return false;
+    }
+
+    fgets(csvBuffer, 1024, fp);
+    
+    return true;
+}
+
+/**
+ * @brief   Updates the simulationData struct from the CSV file
+ * @return  true if data was read successfully, false if failed
+ */
+static bool UpdateSimulationData(void) {
+    bool success = LoadCSV();
+    if(!success) {
+        return false;
+    }
+
+
+
+}
+
+
+
+
+/**
+ * @brief   DATA FORMATTING FUNCTIONS
+ */
+
+/**
+ * @brief   Get the command code from the buffer
+ * @param   buf 
+ * @param   len
+ */
+static uint16_t ExtractCmdFromBuff(uint8_t *buf, uint32_t len) {
+    return (uint16_t)((buf[0] << 8) | buf[1]);
+}
+
+/**
+ * @brief   Get all the 6 bytes of data from the buffer.
+ *          Depending on how many LTC6811 ICs are being used, the data
+ *          is formatted as [data0:6B][pec0:2B][data1:6B][pec1:2B]...[dataN-1:6B][pecN-1:2B]
+ * @param   buf 
+ * @param   len
+ */
+static void ExtractDataFromBuff(uint8_t *data, uint8_t *buf, uint32_t len) {
+    const uint8_t BYTES_PER_REG = 6;
+    const uint8_t BYTES_PER_IC = 8;     // Register size (6B) + PEC (2B)
+
+    // Extract only the data so ignore PEC and command code
+    for(int i = 0; i < NUM_MINIONS; i++) {
+        // The +4 is because bytes [0:1] holds the command code and [2:3] holds
+        //  the PEC for the command code.
+        memcpy(&data[i*BYTES_PER_REG], &buf[i*BYTES_PER_IC+4], BYTES_PER_REG);
+    }
 
 }
 
 /**
- * @brief Create a Packet that the LTC6811 will usually send back
- * 
- * @param pkt
- * @param cmdCode 
- * @param data 
- * @param dataSize 
+ * @brief   Create a Packet that the LTC6811 will usually send back to uC
+ * @param   pkt         array that will be filled with the formated cmd+data with respective PECs
+ * @param   data        data array for all modules
+ * @param   dataSize    size of data array
  */
-static void CreatePacket(uint8_t *pkt, uint16_t cmdCode, uint8_t *data, uint32_t dataSize) {
-    const uint8_t BYTES_IN_REG = 8;
+static void CreateReadPacket(uint8_t *pkt, uint8_t *data, uint32_t dataSize) {
+    const uint8_t BYTES_PER_REG = 6;
 
-    // Format the first 4 bytes of the packet which is the cmd (2bytes) and pec of the cmd (2bytes)
-    pkt[0] = (cmdCode >> 8) & 0x00FF;
-    pkt[1] = cmdCode & 0x00FF;
-    uint16_t cmdPEC = PEC15_Calc(pkt, 2);
-    pkt[2] = (cmdPEC >> 8) & 0x00FF;
-    pkt[3] = cmdPEC & 0x00FF;
-
-    uint32_t pktIdx = 4;
+    uint32_t pktIdx = 0;
     for (uint8_t currIC = NUM_MINIONS; currIC > 0; currIC--) {
         // executes for each LTC681x in daisy chain, this loops starts with
         // the last IC on the stack. The first configuration written is
         // received by the last IC in the daisy chain
 
-        for (uint8_t currByte = 0; currByte < BYTES_IN_REG; currByte++) {
+        for (uint8_t currByte = 0; currByte < BYTES_PER_REG; currByte++) {
             pkt[pktIdx] = data[((currIC-1)*6)+currByte];
             pktIdx = pktIdx + 1;
         }
 
-        uint16_t dataPEC = PEC15_Calc(&data[(currIC-1)*6], BYTES_IN_REG);    // calculating the PEC for each Iss configuration register data
-        pkt[pktIdx] = (uint8_t)(dataPEC >> 8);
-        pkt[pktIdx + 1] = (uint8_t)dataPEC;
+        uint16_t dataPEC = PEC15_Calc((char *)&data[(currIC-1)*6], BYTES_PER_REG);    // calculating the PEC for each Iss configuration register data
+        pkt[pktIdx] = (dataPEC >> 8) & 0x00FF;
+        pkt[pktIdx + 1] = dataPEC & 0x00FF;
         pktIdx = pktIdx + 2;
     }
 }
+
+
 
 
 /************************************
