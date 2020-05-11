@@ -85,12 +85,11 @@ void delay_m(uint16_t milli)
 
 void wakeup_idle(uint8_t total_ic)
 {
-	volatile uint8_t tempReg;		// Temporary buffer
   for (int i =0; i<total_ic; i++)
   {
     cs_set(0);
     delay_m(5); //Guarantees the isoSPI will be in ready mode
-    tempReg = spi_read8();
+    spi_read8();
     cs_set(1);
   }
 }
@@ -273,7 +272,7 @@ void LTC681x_adcvax(
   md_bits = (MD & 0x02) >> 1;
   cmd[0] = md_bits | 0x04;
   md_bits = (MD & 0x01) << 7;
-  cmd[1] =  md_bits | ((DCP&0x01)<<4) + 0x6F;
+  cmd[1] =  md_bits | ((DCP&0x01)<<4) | 0x6F;
   cmd_68(cmd);
 }
 
@@ -1304,11 +1303,9 @@ int16_t LTC681x_run_adc_redundancy_st(uint8_t adc_mode, uint8_t adc_reg, uint8_t
 	uint16_t pullDwn[total_ic][N_CHANNELS];
 	uint16_t openWire_delta[total_ic][N_CHANNELS];
 
-	volatile int8_t error;
 	int8_t opencells[N_CHANNELS];
 	int8_t n=0; // Number of open cells
 	int8_t i,j,k;
-	volatile uint32_t conv_time=0;
 	
 	long openwires = 0;
 
@@ -1320,11 +1317,11 @@ int16_t LTC681x_run_adc_redundancy_st(uint8_t adc_mode, uint8_t adc_reg, uint8_t
 	{ 
 		wakeup_idle(total_ic);
 		LTC681x_adow(MD_26HZ_2KHZ,PULL_UP_CURRENT,CELL_CH_ALL,DCP_DISABLED);
-		conv_time = LTC681x_pollAdc();
+		LTC681x_pollAdc();
 	} 
 
 	wakeup_idle(total_ic);
-	error = LTC681x_rdcv(0, total_ic,ic);
+	LTC681x_rdcv(0, total_ic,ic);
 
 	for (int cic=0; cic<total_ic; cic++)
 	{
@@ -1339,11 +1336,11 @@ int16_t LTC681x_run_adc_redundancy_st(uint8_t adc_mode, uint8_t adc_reg, uint8_t
 	{  
 	  wakeup_idle(total_ic);
 	  LTC681x_adow(MD_26HZ_2KHZ,PULL_DOWN_CURRENT,CELL_CH_ALL,DCP_DISABLED);
-	  conv_time =   LTC681x_pollAdc();
+	  LTC681x_pollAdc();
 	}
 
 	wakeup_idle(total_ic);
-	error = LTC681x_rdcv(0, total_ic,ic); 
+	LTC681x_rdcv(0, total_ic,ic); 
 
 	for (int cic=0; cic<total_ic; cic++)
 	{
@@ -1757,7 +1754,6 @@ void LTC681x_stcomm()
 
   uint8_t cmd[4];
   uint16_t cmd_pec;
-	volatile uint8_t temp;
 
   cmd[0] = 0x07;
   cmd[1] = 0x23;
@@ -1769,7 +1765,7 @@ void LTC681x_stcomm()
   spi_write_multi8(cmd,4);
   for (int i = 0; i<9; i++)
   {
-    temp = spi_read8();
+    spi_read8();
   }
   cs_set(1);
 

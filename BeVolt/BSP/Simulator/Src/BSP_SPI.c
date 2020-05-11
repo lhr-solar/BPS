@@ -53,9 +53,16 @@
 #define RDCOMM      0x722
 #define STCOMM      0x723
 
+#define MUX1        0x90
+#define MUX2        0x92
+
 typedef struct {
     uint8_t config[6];              // Configuration data of the LTC6811
     uint16_t voltage_data[12];      // Each board can support 12 battery modules
+    uint8_t temperature_mux;        // Holds the MUX addr that corresponds to the temperature_sel
+    uint16_t temperature_sel;       // Holds which temperature sensors the LTC6811 driver wants to read from.
+                                    //      The process of getting temperature data requires knowing what the MUX is set to.
+                                    //      Only one temperature sensor is sent from the LTC6811 at a time.
     uint16_t temperature_data[18];  // Each board can support 18 temperature sensors
     uint16_t open_wire;             // Each bit indicates a battery node wire
 } ltc6811_sim_t;
@@ -87,8 +94,11 @@ static void PEC15_Table_Init(void);
 static uint16_t PEC15_Calc(char *data , int len);
 static uint16_t ExtractCmdFromBuff(uint8_t *buf, uint32_t len);
 static void ExtractDataFromBuff(uint8_t *data, uint8_t *buf, uint32_t len);
+static void ExtractMUXAddrFromBuff(uint8_t *comm);
+static void ExtractMUXSelFromBuff(uint8_t *comm);
 static void CreateReadPacket(uint8_t *pkt, uint8_t *data, uint32_t dataSize);
 static void CopyVoltageToByteArray(uint8_t *data, Group group);
+static void CopyTemperatureToByteArray(uint8_t *data, Group group);
 
 /**
  * @brief   File access functions
@@ -198,6 +208,14 @@ static void WRCommandHandler(uint8_t *buf, uint32_t len) {
             UpdateSimulationData();
             break;
 
+        case ADAX:
+            UpdateSimulationData();
+            break;
+
+        case WRCOMM:
+            
+            break;
+
         default:
             break;
     }
@@ -245,6 +263,13 @@ static void RDCommandHandler(uint8_t *buf, uint32_t len) {
 
         case RDCVD:
             CopyVoltageToByteArray(data, D);
+            CreateReadPacket(buf, data, NUM_MINIONS * BYTES_PER_REG);
+            break;
+
+        case RDAUXA:
+            ExtractMUXAddrFromBuff(buf);
+            ExtractMUXSelFromBuff(buf);
+            CopyTemperatureToByteArray(data, A);
             CreateReadPacket(buf, data, NUM_MINIONS * BYTES_PER_REG);
             break;
 
@@ -305,9 +330,11 @@ static uint16_t ExtractCmdFromBuff(uint8_t *buf, uint32_t len) {
 }
 
 /**
- * @brief   Get all the 6 bytes of data from the buffer.
- *          Depending on how many LTC6811 ICs are being used, the data
- *          is formatted as [data0:6B][pec0:2B][data1:6B][pec1:2B]...[dataN-1:6B][pecN-1:2B]
+ * @brief   Deletes all the PEC codes of the buffer
+ *          Depending on how many LTC6811 ICs are being used, the buf is formatted
+ *          as [dataN-1:6B][pecN-1:2B][dataN-2:6B][pecN-2:2B]...[data0:6B][pec0:2B].
+ *          data will hold [dataN-1:6B][dataN-2:6B]...[data0:6B].
+ * @param   data
  * @param   buf 
  * @param   len
  */
@@ -322,6 +349,46 @@ static void ExtractDataFromBuff(uint8_t *data, uint8_t *buf, uint32_t len) {
         memcpy(&data[i*BYTES_PER_REG], &buf[i*BYTES_PER_IC+4], BYTES_PER_REG);
     }
 
+}
+
+/**
+ * @brief   Extracts the MUX address from the 6B COMM register.
+ * @note    There are two 1:8 MUXs on each Minion Board. There are 16 temperature sensors that
+ *          can read on each board. Each MUX has different addresses. MUX1 is connected to the
+ *          first 8 temperature sensors and MUX2 is connected to the other 8 temperature sensors.
+ * @note    MUX1 addr: 0x90
+ *          MUX2 addr: 0x92
+ * @param   buf     raw data the LTC6811 drivers sent into BSP_SPI_Write.
+ */
+static void ExtractMUXAddrFromBuff(uint8_t *buf) {
+    const uint8_t BYTES_PER_REG = 6;
+
+    buf = buf + 4;
+
+    int minionIdx = 0;
+    for(int i = NUM_MINIONS-1; i >= 0; i--) {
+        simulationData[minionIdx].temperature_mux = ((buf[i*BYTES_PER_REG] << 4) & 0xFF00)
+                                                    | ((buf[i*BYTES_PER_REG+1] >> 4) & 0x00FF);
+        minionIdx++;
+    }
+}
+
+/**
+ * @brief   Extracts the select bits for the MUXs from the 6B COMM register.
+ * @note    
+ * @param   buf     raw data the LTC6811 drivers sent into BSP_SPI_Write.
+ */
+static void ExtractMUXSelFromBuff(uint8_t *buf) {
+    const uint8_t BYTES_PER_REG = 6;
+
+    buf = buf + 4;
+
+    int minionIdx = 0;
+    for(int i = NUM_MINIONS-1; i >= 0; i--) {
+        uint8_t sel = 8 - ((buf[i*BYTES_PER_REG+3] >> 4) & 0x00FF);     // Check LTC1380 as to why there is an 8
+        simulationData[minionIdx].temperature_sel = sel;
+        minionIdx++;
+    }
 }
 
 /**
@@ -367,6 +434,35 @@ static void CopyVoltageToByteArray(uint8_t *data, Group group) {
     for(int i = NUM_MINIONS-1; i >= 0; i--) {
         memcpy(&data[dataIdx * BYTES_PER_REG], (uint8_t *)&(simulationData[i].voltage_data[voltageStartIdx]), BYTES_PER_REG);
         dataIdx++;
+    }
+}
+
+/**
+ * @brief   Copies the temperature data into one continuous array.
+ * @note    Only 2 Bytes of the 6 Bytes are written to depending on the group.
+ * @note    Only one temperature sensor is placed into the array, that's determined by
+ *          the temperature_mux and temperature_sel pins of the simulationData.
+ * @param   data      array that will be filled
+ * @param   group     enum of [A,F]
+ */
+static void CopyTemperatureToByteArray(uint8_t *data, Group group) {
+    const uint8_t BYTES_PER_REG = 6;
+
+    // Only GPIO1 is connected to an analog voltage so group A Bytes[0:1] is the only
+    // location that is updated.
+    if(group == A) {
+        int dataIdx = 0;
+        for(int i = NUM_MINIONS-1; i >= 0; i--) {
+
+            uint8_t temperatureIdx = simulationData[i].temperature_sel;
+
+            if(simulationData[i].temperature_mux == MUX2) {
+                temperatureIdx += 8;
+            }
+
+            memcpy(&data[dataIdx * BYTES_PER_REG], (uint8_t *)&(simulationData[i].temperature_data[temperatureIdx]), 2);
+            dataIdx++;
+        }
     }
 }
 
