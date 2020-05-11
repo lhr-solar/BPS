@@ -174,7 +174,7 @@ static void CmdHandler(uint8_t *buf, uint32_t len) {
             uint8_t data[NUM_MINIONS * 6];   // Each register in the LTC6811 is 6 bytes
             ExtractDataFromBuff(data, buf, len);
             int dataIdx = 0;
-            for(int i = NUM_MINIONS; i > 0; i--) {
+            for(int i = NUM_MINIONS - 1; i >= 0; i--) {
                 // Copy data to config register
                 memcpy(simulationData[i].config, &data[dataIdx*BYTES_PER_REG], BYTES_PER_REG);
                 dataIdx++;
@@ -186,7 +186,7 @@ static void CmdHandler(uint8_t *buf, uint32_t len) {
             // store config registers of all LTC6811s into one continuous array
             uint8_t data[NUM_MINIONS * BYTES_PER_REG];
             int dataIdx = 0;
-            for(int i = NUM_MINIONS; i > 0; i--) {
+            for(int i = NUM_MINIONS - 1; i >= 0; i--) {
                 memcpy(&data[dataIdx * BYTES_PER_REG], simulationData[i].config, BYTES_PER_REG);
                 dataIdx++;
             }
