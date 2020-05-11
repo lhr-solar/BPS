@@ -12,6 +12,8 @@ int main() {
 
     LTC6811_rdcfg(NUM_MINIONS, minions);
 
+    LTC6811_rdcv(0, NUM_MINIONS, minions);
+
     while(1) {
         
     }

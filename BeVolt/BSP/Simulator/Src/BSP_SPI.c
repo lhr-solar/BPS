@@ -60,6 +60,10 @@ typedef struct {
     uint16_t open_wire;             // Each bit indicates a battery node wire
 } ltc6811_sim_t;
 
+typedef enum {
+    A=0, B, C, D, E, F
+} Group;
+
 // Path relative to the executable
 const char* file = "BSP/Simulator/DataGeneration/Data/SPI.csv";
 
@@ -77,12 +81,14 @@ static ltc6811_sim_t simulationData[NUM_MINIONS];
 /**
  * @brief   Data formating functions
  */
-static void CmdHandler(uint8_t *buf, uint32_t len);
+static void WRCommandHandler(uint8_t *buf, uint32_t len);
+static void RDCommandHandler(uint8_t *buf, uint32_t len);
 static void PEC15_Table_Init(void);
 static uint16_t PEC15_Calc(char *data , int len);
 static uint16_t ExtractCmdFromBuff(uint8_t *buf, uint32_t len);
 static void ExtractDataFromBuff(uint8_t *data, uint8_t *buf, uint32_t len);
 static void CreateReadPacket(uint8_t *pkt, uint8_t *data, uint32_t dataSize);
+static void CopyVoltageToByteArray(uint8_t *data, Group group);
 
 /**
  * @brief   File access functions
@@ -99,6 +105,14 @@ static bool UpdateSimulationData(void);
  * @return  None
  */
 void BSP_SPI_Init(void) {
+
+    for(int i = 0; i < NUM_MINIONS; i++) {
+        for(int j = 0; j < 12; j++) {
+            simulationData[i].voltage_data[j] = j+1;
+            simulationData[i].temperature_data[j] = 12-j;
+        }
+    }
+
     PEC15_Table_Init();
 }
 
@@ -119,7 +133,7 @@ void BSP_SPI_Write(uint8_t *txBuf, uint32_t txLen) {
 
     // Ignore PEC (bits 2 and 3), PEC is meant to be able to check if EMI/noise affected the data
 
-    CmdHandler(txBuf, txLen);
+    WRCommandHandler(txBuf, txLen);
 }
 
 /**
@@ -133,7 +147,7 @@ void BSP_SPI_Write(uint8_t *txBuf, uint32_t txLen) {
  * @return  None
  */
 void BSP_SPI_Read(uint8_t *rxBuf, uint32_t rxLen) {
-    CmdHandler(rxBuf, rxLen);
+    RDCommandHandler(rxBuf, rxLen);
 }
 
 /**
@@ -156,22 +170,19 @@ void BSP_SPI_SetStateCS(uint8_t state) {
  */
 
 /**
- * @brief   Handles are command codess
- * @param   buf     Depends on which command is in the currCmd variable.
- *                  If a RD command was sent, then buf will be used to store all
- *                  the data that the LTC6811 driver functions will be expecting.
- *                  If a WR command was sent, then buf should hold what the LTC6811
- *                  drivers sent into BSP_SPI_Write.
+ * @brief   Handles are WR command codes.
+ *          Generic commands where commands with no following data is sent is also handled here.
+ * @param   buf     raw data the LTC6811 drivers sent into BSP_SPI_Write.
  * @param   len 
  */
-static void CmdHandler(uint8_t *buf, uint32_t len) {
+static void WRCommandHandler(uint8_t *buf, uint32_t len) {
 
     const uint8_t BYTES_PER_REG = 6;
+    uint8_t data[NUM_MINIONS * BYTES_PER_REG];
 
     switch(currCmd) {
         // LTC6811 Configuration
         case WRCFGA: {
-            uint8_t data[NUM_MINIONS * 6];   // Each register in the LTC6811 is 6 bytes
             ExtractDataFromBuff(data, buf, len);
             int dataIdx = 0;
             for(int i = NUM_MINIONS - 1; i >= 0; i--) {
@@ -182,9 +193,31 @@ static void CmdHandler(uint8_t *buf, uint32_t len) {
             break;
         }
 
+        // Start ADC Conversion
+        case ADCV:
+            UpdateSimulationData();
+            break;
+
+        default:
+            break;
+    }
+}
+
+/**
+ * @brief   Handles are RD command codes
+ * @param   buf     used to store all the data that the LTC6811 driver functions will be expecting.
+ *                  drivers sent into BSP_SPI_Write.
+ * @param   len 
+ */
+static void RDCommandHandler(uint8_t *buf, uint32_t len) {
+
+    const uint8_t BYTES_PER_REG = 6;
+    uint8_t data[NUM_MINIONS * BYTES_PER_REG];
+
+    switch(currCmd) {
+        // LTC6811 Configuration
         case RDCFGA: {
             // store config registers of all LTC6811s into one continuous array
-            uint8_t data[NUM_MINIONS * BYTES_PER_REG];
             int dataIdx = 0;
             for(int i = NUM_MINIONS - 1; i >= 0; i--) {
                 memcpy(&data[dataIdx * BYTES_PER_REG], simulationData[i].config, BYTES_PER_REG);
@@ -194,29 +227,25 @@ static void CmdHandler(uint8_t *buf, uint32_t len) {
             break;
         }
 
-        // Start ADC Conversion
-        case ADCV:
-            UpdateSimulationData();
-            break;
-
         // Read Cell Voltages
         case RDCVA:
-
+            CopyVoltageToByteArray(data, A);
+            CreateReadPacket(buf, data, NUM_MINIONS * BYTES_PER_REG);
             break;
 
         case RDCVB:
+            CopyVoltageToByteArray(data, B);
+            CreateReadPacket(buf, data, NUM_MINIONS * BYTES_PER_REG);
             break;
 
         case RDCVC:
+            CopyVoltageToByteArray(data, C);
+            CreateReadPacket(buf, data, NUM_MINIONS * BYTES_PER_REG);
             break;
 
         case RDCVD:
-            break;
-
-        case RDCVE:
-            break;
-
-        case RDCVF:
+            CopyVoltageToByteArray(data, D);
+            CreateReadPacket(buf, data, NUM_MINIONS * BYTES_PER_REG);
             break;
 
         default:
@@ -322,7 +351,24 @@ static void CreateReadPacket(uint8_t *pkt, uint8_t *data, uint32_t dataSize) {
     }
 }
 
+/**
+ * @brief   Copies the voltage data in each array into one continuous array
+ * @param   data      array that will be filled
+ * @param   group     enum of [A,F]
+ */
+static void CopyVoltageToByteArray(uint8_t *data, Group group) {
+    const uint8_t BYTES_PER_REG = 6;
 
+    // The LTC6811 returns only 3 voltage values at a time depending on the group,
+    // i.e. group A will only send the voltage values [0,2], group B will send [3,5], and so on
+    int voltageStartIdx = group * 3;
+
+    int dataIdx = 0;
+    for(int i = NUM_MINIONS-1; i >= 0; i--) {
+        memcpy(&data[dataIdx * BYTES_PER_REG], (uint8_t *)&(simulationData[i].voltage_data[voltageStartIdx]), BYTES_PER_REG);
+        dataIdx++;
+    }
+}
 
 
 /************************************
