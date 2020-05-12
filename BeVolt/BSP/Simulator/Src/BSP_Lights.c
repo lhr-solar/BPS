@@ -11,7 +11,8 @@ int LEDReg;
  */
 void BSP_Lights_Init(void) {
 	// Creates file if none exists
-	FILE* fp = fopen(file, "a");
+	FILE* fp = fopen(file, "w+");
+	fprintf(fp, "0");
 	fclose(fp);
 }
 

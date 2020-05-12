@@ -46,12 +46,18 @@ def display(battery=None):
     stdscr.addstr(0, 90, "LEDs")
     stdscr.addstr(1, 80, "=======================")
     lights = Lights.read()
+    curses.init_pair(1, curses.COLOR_RED, curses.COLOR_RED)
+    curses.init_pair(2, curses.COLOR_GREEN, curses.COLOR_GREEN)
+    curses.init_pair(3, curses.COLOR_BLACK, curses.COLOR_BLACK)
     for i in range(9):
         stdscr.addstr(i+2, 80, lights_names[i])
         if lights & (0x1<<i):
-            stdscr.addstr(i+2, 100, "[X]")
+            if i == 7:
+                stdscr.addstr(i+2, 100, "[]", curses.color_pair(2))
+            else:
+                stdscr.addstr(i+2, 100, "[]", curses.color_pair(1))
         else:
-            stdscr.addstr(i+2, 100, "[ ]")
+            stdscr.addstr(i+2, 100, "[]", curses.color_pair(3))
     stdscr.refresh()
 
 
@@ -91,6 +97,7 @@ def main():
         configure()
     global stdscr
     stdscr = curses.initscr()
+    curses.start_color()
     curses.noecho()
     curses.cbreak()
     while True:
@@ -108,22 +115,26 @@ def main():
                 if choice == 'wires':
                     change_wires(BeVolt)
                     stdscr = curses.initscr()
+                    curses.start_color()
                 elif choice == 'quit':
                     break
                 else:
                     print("That is not a valid option. Continuing simulation...")
                     stdscr = curses.initscr()
+                    curses.start_color()
             else:
                 print("\n\rWould you like to change 'config' or 'quit'?")
                 choice = input()
                 if choice == 'config':
                     configure()
                     stdscr = curses.initscr()
+                    curses.start_color()
                 elif choice == 'quit':
                     break
                 else:
                     print("That is not a valid option. Continuing simulation...")
                     stdscr = curses.initscr()
+                    curses.start_color()
         except Exception as e:
             print(e)
             break

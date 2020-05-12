@@ -10,7 +10,7 @@ file = "BSP/Simulator/DataGeneration/Data/Lights.csv"
 def read():
     lights = []
     os.makedirs(os.path.dirname(file), exist_ok=True)   # creates directory if not exists
-    with open(file, 'w+') as csvfile:
+    with open(file, 'a') as csvfile:
         pass    # creates file if not exists
     with open(file, 'r') as csvfile: #read file
         csvreader = csv.reader(csvfile)
