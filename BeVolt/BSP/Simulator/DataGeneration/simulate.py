@@ -3,6 +3,7 @@ import time
 import battery
 import ADC
 import Lights
+import SPI
 
 # Global configurations
 state = ''  # Charging/Discharging
@@ -13,14 +14,13 @@ lights_names = ['EXTRA', 'CAN', 'WDOG', 'UVOLT', 'OVOLT', 'OTEMP', 'OCURR', 'RUN
 
 def generate(battery=None):
     global state, mode
+    # Update battery's state
     if battery is not None:
-        # Update battery's state
         battery.update()
-        # Generate ADC values
-        ADC.generate(state, mode, battery.current)
-    else:
-        # Generate ADC values
-        ADC.generate(state, mode)
+    # Generate ADC values
+    ADC.generate(state, mode, battery)
+    # Generate SPI values
+    SPI.generate(state, mode, battery)
 
 
 def display(battery=None):
@@ -96,7 +96,8 @@ def main():
                 break
             else:
                 print("That is not a valid option. Continuing simulation...")
-        except Exception:
+        except Exception as e:
+            print(e)
             break
     curses.echo()
     curses.nocbreak()

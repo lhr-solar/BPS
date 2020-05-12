@@ -36,8 +36,7 @@ def random_voltage(mode):
 
 def specific_voltage(battery):
     global voltage_values
-    for i, module in enumerate(battery.modules):
-        voltage_values[i] = module.voltage
+    voltage_values = [int(module.voltage*100) for module in battery.modules]
 
 
 def random_temperature(state, mode):
@@ -61,12 +60,13 @@ def random_temperature(state, mode):
 def generate(state, mode, battery=None):
     global wires, voltage_values, temperature_values
     os.makedirs(os.path.dirname(file), exist_ok=True)
-    random_temperature(state, mode)
     open_wires(battery)
     if battery is not None:
         specific_voltage(battery)
+        random_temperature('discharging', 'normal')
     else:
         random_voltage(mode)
+        random_temperature(state, mode)
     with open(file, 'w+') as csvfile:
         csvwriter = csv.writer(csvfile)
         row = []
@@ -77,8 +77,3 @@ def generate(state, mode, battery=None):
             row.append(temperature_values[i][1])
             csvwriter.writerow(row)
             row = []
-
-
-
-if __name__ == '__main__':
-    generate('discharging', 'normal')
