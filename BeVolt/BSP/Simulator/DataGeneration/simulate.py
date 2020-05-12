@@ -70,6 +70,17 @@ def configure():
         mode = input()
 
 
+def change_wires(battery):
+    done = False
+    while not done:
+        print("Which module? (0 to exit)")
+        module = int(input())
+        if module:
+            battery.modules[module-1].connected = not battery.modules[module-1].connected
+        else:
+            done = True
+
+
 def main():
     print("Welcome to the BPS Simulator")
     print("Type 'start' to start BeVolt. Otherwise, you can specify the types of data to simulate.")
@@ -86,21 +97,33 @@ def main():
         try:
             # Generate all values
             generate(BeVolt)
+            # Display all values
             display(BeVolt)
             time.sleep(1)     # one second delay
         except KeyboardInterrupt:
             curses.endwin()
             if BeVolt is not None:
-                break
-            print("\n\rWould you like to change 'config' or 'quit'?")
-            choice = input()
-            if choice == 'config':
-                configure()
-                stdscr = curses.initscr()
-            elif choice == 'quit':
-                break
+                print("\n\rWould you like to change 'wires' or 'quit'?")
+                choice = input()
+                if choice == 'wires':
+                    change_wires(BeVolt)
+                    stdscr = curses.initscr()
+                elif choice == 'quit':
+                    break
+                else:
+                    print("That is not a valid option. Continuing simulation...")
+                    stdscr = curses.initscr()
             else:
-                print("That is not a valid option. Continuing simulation...")
+                print("\n\rWould you like to change 'config' or 'quit'?")
+                choice = input()
+                if choice == 'config':
+                    configure()
+                    stdscr = curses.initscr()
+                elif choice == 'quit':
+                    break
+                else:
+                    print("That is not a valid option. Continuing simulation...")
+                    stdscr = curses.initscr()
         except Exception as e:
             print(e)
             break
