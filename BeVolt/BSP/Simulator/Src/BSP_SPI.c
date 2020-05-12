@@ -139,7 +139,10 @@ void BSP_SPI_Init(void) {
  */
 void BSP_SPI_Write(uint8_t *txBuf, uint32_t txLen) {
     currCmd = ExtractCmdFromBuff(txBuf, txLen);
-    currCmd &= ~0x180;  // Bit Mask to ignore any cmd configuration bits i.e. ignore the MD, DCP, etc. bits
+
+    if(((currCmd & 0x600) == 0x200) || (currCmd & 0x700) == 0x400) {
+        currCmd &= ~0x180;  // Bit Mask to ignore any cmd configuration bits i.e. ignore the MD, DCP, etc. bits
+    }
 
     // Ignore PEC (bits 2 and 3), PEC is meant to be able to check if EMI/noise affected the data
 
@@ -213,7 +216,8 @@ static void WRCommandHandler(uint8_t *buf, uint32_t len) {
             break;
 
         case WRCOMM:
-            
+            ExtractMUXAddrFromBuff(buf);
+            ExtractMUXSelFromBuff(buf);
             break;
 
         default:
@@ -267,8 +271,6 @@ static void RDCommandHandler(uint8_t *buf, uint32_t len) {
             break;
 
         case RDAUXA:
-            ExtractMUXAddrFromBuff(buf);
-            ExtractMUXSelFromBuff(buf);
             CopyTemperatureToByteArray(data, A);
             CreateReadPacket(buf, data, NUM_MINIONS * BYTES_PER_REG);
             break;
