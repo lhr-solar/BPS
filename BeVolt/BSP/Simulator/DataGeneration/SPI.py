@@ -12,8 +12,8 @@ file = "BSP/Simulator/DataGeneration/Data/SPI.csv"
 
 # sensor values
 wires = []                  # list of 31 modules (1 = connected; 0 = open)
-voltage_values = []         # list of 31 modules (fixed point 0.01)
-temperature_values = []     # list of 31 pairs of sensors (Celsius)
+voltage_values = []         # list of 31 modules (fixed point 0.0001)
+temperature_values = []     # list of 31 pairs of sensors (fixed point 0.01)
 
 
 def open_wires(battery=None):
@@ -36,20 +36,21 @@ def random_voltage(mode):
     """
     global voltage_values
     if mode == 'low':
-        voltage_values = [random.randint(250, 270) for i in range(31)]
+        voltage_values = [random.randint(25000, 27000) for i in range(31)]
     elif mode == 'normal':
-        voltage_values = [random.randint(270, 400) for i in range(31)]
+        voltage_values = [random.randint(27000, 40000) for i in range(31)]
     elif mode == 'high':
-        voltage_values = [random.randint(400, 420) for i in range(31)]
+        voltage_values = [random.randint(40000, 42000) for i in range(31)]
 
 
 def specific_voltage(battery):
     """
     @brief generate list of voltage values based on battery object
+           with +-1.2mV error
     @param battery : battery object with module voltages
     """
     global voltage_values
-    voltage_values = [int(module.voltage*100) for module in battery.modules]
+    voltage_values = [int((module.voltage*10000)+random.randint(-12, 12)) for module in battery.modules]
 
 
 def random_temperature(state, mode):
@@ -61,18 +62,18 @@ def random_temperature(state, mode):
     global temperature_values
     if state == 'charging':
         if mode == 'low':
-            temperature_values = [(random.randint(10, 25), random.randint(10, 25)) for i in range(31)]
+            temperature_values = [(random.randint(1000, 2500), random.randint(1000, 2500)) for i in range(31)]
         elif mode == 'normal':
-            temperature_values = [(random.randint(25, 48), random.randint(25, 48)) for i in range(31)]
+            temperature_values = [(random.randint(2500, 4800), random.randint(2500, 4800)) for i in range(31)]
         elif mode == 'high':
-            temperature_values = [(random.randint(48, 60), random.randint(48, 60)) for i in range(31)]
+            temperature_values = [(random.randint(4800, 6000), random.randint(4800, 6000)) for i in range(31)]
     elif state == 'discharging':
         if mode == 'low':
-            temperature_values = [(random.randint(10, 30), random.randint(10, 30)) for i in range(31)]
+            temperature_values = [(random.randint(1000, 3000), random.randint(1000, 3000)) for i in range(31)]
         elif mode == 'normal':
-            temperature_values = [(random.randint(30, 73), random.randint(30, 73)) for i in range(31)]
+            temperature_values = [(random.randint(3000, 7300), random.randint(3000, 7300)) for i in range(31)]
         elif mode == 'high':
-            temperature_values = [(random.randint(73, 90), random.randint(73, 90)) for i in range(31)]
+            temperature_values = [(random.randint(7300, 9000), random.randint(7300, 9000)) for i in range(31)]
 
 
 def generate(state, mode, battery=None):
@@ -109,7 +110,7 @@ def read():
     @brief read csv file with wire, voltage, and temperature data
         Function called by simulate.py
     @return list of all data
-        Format: [wire status, voltage*100, temperature sensor 1, temperature sensor 2]
+        Format: [wire status, voltage*10000, temperature sensor 1 * 100, temperature sensor 2 * 100]
             for each of 31 modules
     """
     values = []

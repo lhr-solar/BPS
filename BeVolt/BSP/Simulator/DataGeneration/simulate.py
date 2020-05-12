@@ -36,12 +36,12 @@ def display(battery=None):
     stdscr.addstr(4, 0, f"Current:")
     stdscr.addstr(4, 10, f"{adc_values[1]} A ")
     # Read Module values
-    stdscr.addstr(0, 49, "Modules")
-    stdscr.addstr(1, 40, "===========================")
+    stdscr.addstr(0, 54, "Modules")
+    stdscr.addstr(1, 40, "===================================")
     module_values = SPI.read()
     for i, module in enumerate(module_values):
         stdscr.addstr(i+2, 37, f"{i+1}")
-        stdscr.addstr(i+2, 40, f"| {'X' if module[0] else ' '} | {module[1]/100:.2f}V | {module[2]}°C | {module[3]}°C |")
+        stdscr.addstr(i+2, 40, f"| {'X' if module[0] else ' '} | {module[1]/10000:.4f}V | {module[2]/100:.2f}°C | {module[3]/100:.2f}°C |")
     # Read LED values
     stdscr.addstr(0, 90, "LEDs")
     stdscr.addstr(1, 80, "=======================")
