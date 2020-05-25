@@ -1,13 +1,37 @@
 #include "BSP_I2C.h"
+#include <stdint.h>
+#include <stdlib.h>
+#include <stdio.h>
+
+//only supports EEPROM peripheral (as of May 2020, the EEPROM is the only peripheral on the I2C bus)
+
+//path for EEPROM file
+static const char* file = "BSP/Simulator/DataGeneration/Data/EEPROM.csv";
 
 /**
- * @brief   Initializes the I2C port that interfaces with the EEPROM.
+ * @brief   Initializes the I2C port that interfaces with the EEPROM. Creates EEPROM csv file if it does not already exist
  * @param   None
  * @return  None
  */
 void BSP_I2C_Init(void) {
-    // TODO: Initialize the I2C pins connected to the EEPROM.
-    //      By default, the code assumes the I2C bus is running at 100kHz
+    //create and initialize csv file to simulate EEPROM if it does not exist already
+    char hex[3];//to hold first 2 characters of file
+    //open and close file (to prevent seg fault if file does not exist)
+    FILE *fp = fopen(file, "a");
+    fclose(fp);
+    //check if first 2 characters in file are equal to "0x", if not, reinitialize EEPROM
+    fp = fopen(file, "r");
+    fgets(hex, 3, fp);
+    fclose(fp);
+    //if csv file does not exist (or has incorrect format of first element), initialize csv file EEPROM with all 0s
+    if (strcmp(hex, "0x")){
+        fp = fopen(file, "w");
+        for (uint32_t i = 0; i < (EEPROM_BYTES - 1); i++){
+            fprintf(fp, "0x00,");
+        }
+        fprintf(fp, "0x00");
+    }
+    fclose(fp);
 }
 
 /**
