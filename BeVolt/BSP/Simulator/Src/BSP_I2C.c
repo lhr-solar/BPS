@@ -2,6 +2,10 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include "EEPROM.h"
+
+#define CSV_ENTRY_LENGTH 5  //"0x??," is 5 characters
+#define CSV_ENTRY_OFFSET 2  //"0x" is 2 characters
 
 //only supports EEPROM peripheral (as of May 2020, the EEPROM is the only peripheral on the I2C bus)
 
@@ -44,7 +48,18 @@ void BSP_I2C_Init(void) {
  */
 uint8_t  BSP_I2C_Write(uint8_t deviceAddr, uint16_t regAddr, uint8_t *txData, uint32_t txLen) {
     // TODO: Transmit the data onto the I2C bus. Packet the data as needed.
-
+    if (deviceAddr != EEPROM_ADDRESS){
+        return 0;//fail because device address is incorrect
+    }
+    FILE *fp = fopen(file, "r+");
+    fseek(fp, regAddr * CSV_ENTRY_LENGTH + CSV_ENTRY_OFFSET, SEEK_SET);
+    char data[3];
+    for (uint32_t i = 0; i < txLen; i++){
+        sprintf(data, "%x", txData[i]);//convert uint8_t to char[]
+        fprintf(fp, "%c%c", data[0], data[1]);
+        fseek(fp, CSV_ENTRY_LENGTH - 2 /*subtract 2, since 2 bytes were written*/, SEEK_CUR);
+    }
+    fclose(fp);
     return 0;
 }
 
