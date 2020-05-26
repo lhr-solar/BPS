@@ -75,6 +75,19 @@ uint8_t BSP_I2C_Read(uint8_t deviceAddr, uint16_t regAddr, uint8_t *rxData, uint
     // TODO: Get the data from the other device/IC.
     //      The I2C bus has only two lines, the Clock and Data pins. The process for reading data
     //      is to first transmit the regAddr then immediately read.
-
-    return 0;
+    if (deviceAddr != EEPROM_ADDRESS){
+        return ERROR;//fail because device address is incorrect
+    }
+    FILE *fp = fopen(file, "r");
+    fseek(fp, regAddr * CSV_ENTRY_LENGTH, SEEK_SET);//set file pointer to starting EEPROM address in csv file
+    char data[5];//want to include "0x" prefix
+    data[4] = '\0';
+    for (uint32_t i = 0; i < rxLen; i++){
+        char *end;//needed for strtol
+        fscanf(fp, "%c%c%c%c", &(data[0]), &(data[1]), &(data[2]), &(data[3]));
+        rxData[i] = (uint8_t) strtol(data, &end, 16);
+        fseek(fp, CSV_ENTRY_LENGTH - 4, SEEK_CUR);//iterate to next "address" in csv file
+    }
+    fclose(fp);
+    return SUCCESS;
 }
