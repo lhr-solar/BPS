@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "EEPROM.h"
+#include "config.h"
 
 #define CSV_ENTRY_LENGTH 5  //"0x??," is 5 characters
 #define CSV_ENTRY_OFFSET 2  //"0x" is 2 characters
@@ -47,20 +48,19 @@ void BSP_I2C_Init(void) {
  * @return  error status, 0 if fail, 1 if success
  */
 uint8_t  BSP_I2C_Write(uint8_t deviceAddr, uint16_t regAddr, uint8_t *txData, uint32_t txLen) {
-    // TODO: Transmit the data onto the I2C bus. Packet the data as needed.
     if (deviceAddr != EEPROM_ADDRESS){
-        return 0;//fail because device address is incorrect
+        return ERROR;//fail because device address is incorrect
     }
     FILE *fp = fopen(file, "r+");
-    fseek(fp, regAddr * CSV_ENTRY_LENGTH + CSV_ENTRY_OFFSET, SEEK_SET);
+    fseek(fp, regAddr * CSV_ENTRY_LENGTH + CSV_ENTRY_OFFSET, SEEK_SET);//set file pointer to starting EEPROM address in csv file
     char data[3];
     for (uint32_t i = 0; i < txLen; i++){
-        sprintf(data, "%x", txData[i]);//convert uint8_t to char[]
+        sprintf(data, "%x", txData[i]);//convert uint8_t to char[], so that it can be written to csv file
         fprintf(fp, "%c%c", data[0], data[1]);
-        fseek(fp, CSV_ENTRY_LENGTH - 2 /*subtract 2, since 2 bytes were written*/, SEEK_CUR);
+        fseek(fp, CSV_ENTRY_LENGTH - 2 /*subtract 2, since 2 bytes were written*/, SEEK_CUR);//iterate to next "address" in csv file
     }
     fclose(fp);
-    return 0;
+    return SUCCESS;
 }
 
 /**
