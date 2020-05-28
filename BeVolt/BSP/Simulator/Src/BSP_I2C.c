@@ -21,7 +21,7 @@ static const char* file = "BSP/Simulator/DataGeneration/Data/EEPROM.csv";
 void BSP_I2C_Init(void) {
     //create and initialize csv file to simulate EEPROM if it does not exist already
     char hex[3];//to hold first 2 characters of file
-    //open and close file (to prevent seg fault if file does not exist)
+    //open and close file (to create file if it does not exist)
     FILE *fp = fopen(file, "a");
     fclose(fp);
     //check if first 2 characters in file are equal to "0x", if not, reinitialize EEPROM
@@ -72,9 +72,6 @@ uint8_t  BSP_I2C_Write(uint8_t deviceAddr, uint16_t regAddr, uint8_t *txData, ui
  * @return  error status, 0 if fail, 1 if success
  */
 uint8_t BSP_I2C_Read(uint8_t deviceAddr, uint16_t regAddr, uint8_t *rxData, uint32_t rxLen) {
-    // TODO: Get the data from the other device/IC.
-    //      The I2C bus has only two lines, the Clock and Data pins. The process for reading data
-    //      is to first transmit the regAddr then immediately read.
     if (deviceAddr != EEPROM_ADDRESS){
         return ERROR;//fail because device address is incorrect
     }
