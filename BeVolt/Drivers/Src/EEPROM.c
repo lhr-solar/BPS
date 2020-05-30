@@ -27,9 +27,15 @@ static uint16_t faultCodePtr,
                 canFaultPtr,
                 socDataPtr;
 
-// void DelayMs(uint32_t ms) {
-//     for(int i = 0; i < 1000000; i++);
-// }
+/** DelayMS
+ * Delays for specified number of milliseconds (not accurate)
+ * @param input is number of milliseconds to delay
+ */
+void DelayMs(uint32_t ms) {
+    for(int i = 0; i < ms; i++) {
+        for(int j = 0; j < 50000; j++);
+    }
+}
 
 /** EEPROM_Init
  * Initializes I2C to communicate with EEPROM (M24128)
