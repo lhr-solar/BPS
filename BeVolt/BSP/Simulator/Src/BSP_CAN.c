@@ -78,13 +78,6 @@ uint8_t BSP_CAN_Read(uint32_t *id, uint8_t *data) {
     fclose(fp);
     
     fopen(file, "w");
-    fprintf(fp, "%.3x   ", *id);
-
-    data -= 8;
-    for(int k = 0; k<8; k++){
-        fprintf(fp, "%.2x", *data);
-        data++;
-    }
     fclose(fp);
     return 1;
 }
