@@ -27,7 +27,7 @@ INC_DIR = \
 
 LIB = -lm -lpthread
 
-FLAGS = -Wall -g -std=c11 $(INC_DIR)
+FLAGS = -Wall -g -std=c11 $(INC_DIR) -DSIMULATION
 
 BUILD_DIR = ../../Objects
 OBJ = $(addprefix $(BUILD_DIR)/,$(notdir $(SRC:.c=.o)))
