@@ -16,7 +16,6 @@ static const char* file = "BSP/Simulator/DataGeneration/Data/CAN.csv";
 
 void BSP_CAN_Init(void) {
 
-    // TODO: Initialize the CAN port that connects to the rest of the car.
     FILE* fp = fopen(file, "w"); 
     fclose(fp);
 }
@@ -32,16 +31,21 @@ void BSP_CAN_Init(void) {
  */
 
 uint8_t BSP_CAN_Write(uint32_t id, uint8_t data[8], uint8_t length) {
-    uint32_t offset;
-    // TODO: Transmit the data onto the CAN bus with the specified ID.
-    
+    if(length > 8){
+        return 0;
+    }
 
     FILE* fp = fopen(file, "w");
-    fprintf(fp, "0x%.3x,", id);
+    fprintf(fp, "id: 0x%.3x,", id);
+    fprintf(fp, " message: ");
     for(int i = 0; i < 8; i++){
-        fprintf(fp, "%.2x", data[i]);      
+        if(i == (7)){
+            fprintf(fp, "0x%.2x", data[i]);
+        }else{
+            fprintf(fp, "0x%.2x,", data[i]); 
+        }
+             
     }
-    fprintf(fp, ",%d", length);
     fclose(fp);
 
     return 1;
@@ -61,18 +65,26 @@ uint8_t BSP_CAN_Read(uint32_t *id, uint8_t *data) {
     // TODO: Check if a message has been received.
     //      If message was received, then store the id and data of the message into the pointers and return a value other than 0.
     char check;
+    int meh;
     FILE* fp = fopen(file, "r+");
     fseek(fp, 6, SEEK_SET);
     fscanf(fp, "%3x", id);
 
-    fseek(fp, 19,SEEK_SET);
+    fseek(fp, 20,SEEK_SET);
     for(int i = 0; i < 8; i++){
-        fscanf(fp, "%2x", data);
+        fscanf(fp, "%*c%*c%2x%*c", data);
         data++;
     }
     fclose(fp);
-
+    
     fopen(file, "w");
-    fclose(fp);    
+    fprintf(fp, "%.3x   ", *id);
+
+    data -= 8;
+    for(int k = 0; k<8; k++){
+        fprintf(fp, "%.2x", *data);
+        data++;
+    }
+    fclose(fp);
     return 1;
 }
