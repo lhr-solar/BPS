@@ -25,11 +25,22 @@ void initialize(void);
 void preliminaryCheck(void);
 void faultCondition(void);
 
+#ifndef SIMULATION
+static void __enable_irq() { asm("CPSIE I"); }
+static void __disable_irq(){ asm("CPSID I"); }
+#endif
+
 int main(){
-	// __disable_irq();		// Disable all interrupts until initialization is done
-	initialize();			// Initialize codes/pins
+	#ifndef SIMULATION
+        __disable_irq();		// Disable all interrupts until initialization is done
+	#endif
+        
+        initialize();			// Initialize codes/pins
 	preliminaryCheck();		// Wait until all boards are powered on
-	// __enable_irq();			// Enable interrupts
+	
+        #ifndef SIMULATION
+        __enable_irq();			// Enable interrupts
+        #endif
 
 	BSP_WDTimer_Start();
 
