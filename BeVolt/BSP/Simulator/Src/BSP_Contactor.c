@@ -45,7 +45,7 @@ void BSP_Contactor_Off(void) {
     // Hardware: Set the state to low for the output pin.
     // Software: Set integer to 0
     FILE* fp = fopen(file, "w"); //Open file to write
-    fprintf(fp, "%d", 1); //Write 0 to file
+    fprintf(fp, "%d", 0); //Write 0 to file
     fclose(fp);
 }
 
