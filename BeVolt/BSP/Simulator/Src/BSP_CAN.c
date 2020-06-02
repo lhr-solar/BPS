@@ -36,8 +36,7 @@ uint8_t BSP_CAN_Write(uint32_t id, uint8_t data[8], uint8_t length) {
     }
 
     FILE* fp = fopen(file, "w");
-    fprintf(fp, "id: 0x%.3x,", id);
-    fprintf(fp, " message: ");
+    fprintf(fp, "0x%.3x,", id);
     for(int i = 0; i < 8; i++){
         if(i == (7)){
             fprintf(fp, "0x%.2x", data[i]);
@@ -61,16 +60,13 @@ uint8_t BSP_CAN_Write(uint32_t id, uint8_t data[8], uint8_t length) {
  * clear the message that was read from the file
  */
 uint8_t BSP_CAN_Read(uint32_t *id, uint8_t *data) {
-
-    // TODO: Check if a message has been received.
-    //      If message was received, then store the id and data of the message into the pointers and return a value other than 0.
     char check;
     int meh;
     FILE* fp = fopen(file, "r+");
-    fseek(fp, 6, SEEK_SET);
+    fseek(fp, 2, SEEK_SET);
     fscanf(fp, "%3x", id);
 
-    fseek(fp, 20,SEEK_SET);
+    fseek(fp, 6 ,SEEK_SET);
     for(int i = 0; i < 8; i++){
         fscanf(fp, "%*c%*c%2x%*c", data);
         data++;

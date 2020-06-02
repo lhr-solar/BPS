@@ -3,6 +3,7 @@ import time
 import battery
 import ADC
 import Lights
+import CAN
 
 # Global configurations
 state = ''  # Charging/Discharging
@@ -37,6 +38,8 @@ def display(battery=None):
     # Read Current values
     stdscr.addstr(4, 0, f"Current:")
     stdscr.addstr(4, 10, f"{adc_values[1]} A ")
+    #Read CAN data
+    stdscr.addstr(12, 0, f"CAN: {CAN.Get_CAN_Info()}")
     # Read LED values
     lights = Lights.read()
     for i in range(0, 9):
@@ -53,16 +56,26 @@ def configure():
     # Get configuration settings
     global state, mode
     print("Welcome to the BPS Simulator")
-    print("Would you like to simulate 'charging' or 'discharging'?")
+    print("Would you like to simulate 'charging', 'discharging', or 'CAN'?")
     state = input()
-    while state != 'charging' and state != 'discharging':
+    while state != 'charging' and state != 'discharging' and state != 'CAN':
         print("That is not a valid option. Please enter 'charging' or 'discharging': ")
         state = input()
-    print("Would you like to simulate 'low', 'normal', or 'high' values?")
-    mode = input()
-    while mode != 'low' and mode != 'normal' and mode != 'high':
-        print("That is not a valid option. Please enter 'low', 'normal', or 'high': ")
+    if state == 'CAN':
+        print("Enter the CAN ID for the system you wish to simulate. Leave out '0x'.")
+        id = input()
+        while(CAN.Invalid_CAN_ID(id) == True):
+            print("Invalid CAN ID.")
+            id = input()
+        print("Enter the 8 bytes of the CAN message that you would like to send, and separate each byte by a ','. Leave out '0x'.")
+        message = input().split(',')
+        CAN.Send_Message(id, message)
+    else:
+        print("Would you like to simulate 'low', 'normal', or 'high' values?")
         mode = input()
+        while mode != 'low' and mode != 'normal' and mode != 'high':
+            print("That is not a valid option. Please enter 'low', 'normal', or 'high': ")
+            mode = input()
 
 
 def main():
@@ -96,7 +109,8 @@ def main():
                 break
             else:
                 print("That is not a valid option. Continuing simulation...")
-        except Exception:
+        except Exception as e:
+            print(e)
             break
     curses.echo()
     curses.nocbreak()
