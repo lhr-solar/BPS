@@ -20,7 +20,3 @@ def Get_Frequency():
     global CurrentFrequency
     return int(Current_Frequency)
 
-def Print_Frequency():
-    with open(file, 'w') as csvfile:
-        csvwriter = csv.writer(csvfile)
-        csvwriter.writerow([Current_Frequency])
