@@ -7,11 +7,6 @@ file = "Data/Contactor.csv"
 
 #Reads file and returns 1 or 0, 1 is on, 0 is off
 def Read_Contactor():
-    with open(file, 'r') as csv:
-        Contactor_Read = csv.reader(csv)
-        return Contactor_Read
-
-
-
-if __name__ == "main":
-    Read_Contactor()
+    with open(file, 'r') as csvfile:
+        csvreader = csv.reader(csvfile)
+        return csvreader

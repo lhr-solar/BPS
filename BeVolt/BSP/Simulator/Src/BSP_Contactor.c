@@ -1,6 +1,7 @@
 #include "BSP_Contactor.h"
+#include <stdio.h>
 
-const char* ContactorFile = "BSP/Simulator/DataGeneration/Data/ADC.csv";
+static const char* file = "BSP/Simulator/DataGeneration/Data/Contactor.csv";
 /**
  * @brief   Initializes the GPIO pins that interfaces with the Contactor.
  *          Two GPIO pins are initialized. One as an output and one as an input.
@@ -12,15 +13,11 @@ const char* ContactorFile = "BSP/Simulator/DataGeneration/Data/ADC.csv";
 void BSP_Contactor_Init(void) {
     /* Hardware: Initialize two pins that will be connected to the Contactor. One must be configued as an input
           and the other must be configued as an output.
-    Software: Create file that contains one unsigned integer, 0 means off, 1 means on 
+    Software: Create file that contains one unsigned integer, 0 means off, 1 means on
     */
-   FILE* ContactorFilePtr;
-   if (ContactorFilePtr = fopen(ContactorFile, 'r')) fclose(ContactorFilePtr); //if file exists
-   else{
-       ContactorFilePtr = fopen(ContactorFile, 'w+'); //if it doesn't exist, create it and allow reading and writing
-       fclose(ContactorFilePtr);
-   }
-
+   FILE* fp = fopen(file, "w+"); //if file doesn't exist, it is created
+   fprintf(fp, "%d", 0); //write 0 to file
+   fclose(fp); //close file
 }
 
 /**
@@ -33,10 +30,9 @@ void BSP_Contactor_On(void) {
     // Hardware: Set the state to high for the output pin.
     //      Use Positive Logic.
     // Software: Set integer to 1
-    FILE* ContactorFilePtr = fopen(ContactorFile, 'w'); //Open file to write
-    fseek(ContactorFilePtr, 0, SEEK_SET); //Go to start of file
-    fprintf(ContactorFilePtr, "%d", 1); //Write 1 to file
-
+    FILE* fp = fopen(file, "w"); //Open file to write
+    fprintf(fp, "%d", 1); //Write 1 to file
+    fclose(fp);
 }
 
 /**
@@ -48,9 +44,9 @@ void BSP_Contactor_On(void) {
 void BSP_Contactor_Off(void) {
     // Hardware: Set the state to low for the output pin.
     // Software: Set integer to 0
-    FILE* ContactorFilePtr = fopen(ContactorFile, 'w'); //Open file to write
-    fseek(ContactorFilePtr, 0, SEEK_SET); //Go to start of file
-    fprintf(ContactorFilePtr, "%d", 1); //Write 0 to file
+    FILE* fp = fopen(file, "w"); //Open file to write
+    fprintf(fp, "%d", 1); //Write 0 to file
+    fclose(fp);
 }
 
 /**
@@ -64,7 +60,8 @@ bool BSP_Contactor_GetState(void) {
     //      you check that your return value is the same value of what the contactor is irl.
     // Software: Read integer stored in file
     int ContactorState;
-    FILE* ContactorFilePtr = fopen(ContactorFile, 'r'); //Open file to read
-    ReadValfscanf(ContactorFilePtr, "%d", &ContactorState)
+    FILE* fp = fopen(file, "r"); //Open file to read
+    fscanf(fp, "%d", &ContactorState);
+    fclose(fp);
     return ContactorState;
 }

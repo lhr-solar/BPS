@@ -13,5 +13,8 @@
         "temperature.h": "c",
         "math.h": "c",
         "bsp_adc.h": "c"
-    }
+    },
+    "python.pythonPath": "/usr/bin/python3",
+    "python.linting.pylintEnabled": true,
+    "python.linting.enabled": true
 }
