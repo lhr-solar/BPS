@@ -3,13 +3,14 @@ import time
 import battery
 import ADC
 import Lights
+import PLL
 
 # Global configurations
 state = ''  # Charging/Discharging
 mode = ''   # Low, Normal, High
 stdscr = None   # Output screen
 lights_names = ['EXTRA', 'CAN', 'WDOG', 'UVOLT', 'OVOLT', 'OTEMP', 'OCURR', 'RUN', 'FAULT']
-
+frequency = None
 
 def generate(battery=None):
     global state, mode
@@ -29,14 +30,19 @@ def display(battery=None):
         stdscr.addstr(5, 0, battery.__str__())
     # Read ADC values
     adc_values = ADC.read()
+    
+    global frequency 
+    frequency = PLL.Get_Frequency()
+    
     stdscr.addstr(0, 0, "Simulator")
     stdscr.addstr(1, 0, "=============================")
-    stdscr.addstr(2, 0, f"ADC:")
-    stdscr.addstr(2, 10, f"Low Precision: {adc_values[0][0]}")
-    stdscr.addstr(3, 10, f"High Precision: {adc_values[0][1]}")
+    stdscr.addstr(2, 0, f"Clock Frequency: {frequency} Hz")
+    stdscr.addstr(3, 0, f"ADC:")
+    stdscr.addstr(3, 10, f"Low Precision: {adc_values[0][0]}")
+    stdscr.addstr(4, 10, f"High Precision: {adc_values[0][1]}")
     # Read Current values
-    stdscr.addstr(4, 0, f"Current:")
-    stdscr.addstr(4, 10, f"{adc_values[1]} A ")
+    stdscr.addstr(5, 0, f"Current:")
+    stdscr.addstr(5, 10, f"{adc_values[1]} A ")
     # Read LED values
     lights = Lights.read()
     for i in range(0, 9):
@@ -45,6 +51,9 @@ def display(battery=None):
             stdscr.addstr(i+2, 50, "[X]")
         else:
             stdscr.addstr(i+2, 50, "[ ]")
+    
+    
+
     stdscr.refresh()
 
 
@@ -53,16 +62,21 @@ def configure():
     # Get configuration settings
     global state, mode
     print("Welcome to the BPS Simulator")
-    print("Would you like to simulate 'charging' or 'discharging'?")
+    print("Would you like to simulate 'charging', 'discharging', or 'PLL'?")
     state = input()
-    while state != 'charging' and state != 'discharging':
-        print("That is not a valid option. Please enter 'charging' or 'discharging': ")
+    while state != 'charging' and state != 'discharging' and state != 'PLL':
+        print("That is not a valid option. Please enter 'charging', 'discharging', or 'PLL': ")
         state = input()
-    print("Would you like to simulate 'low', 'normal', or 'high' values?")
-    mode = input()
-    while mode != 'low' and mode != 'normal' and mode != 'high':
-        print("That is not a valid option. Please enter 'low', 'normal', or 'high': ")
+    if state == 'PLL':
+        print("Enter the frequency you would like to change the clock to in Hz.")
+        frequency = int(input())
+        PLL.Change_Frequency(frequency)
+    else:
+        print("Would you like to simulate 'low', 'normal', or 'high' values?")
         mode = input()
+        while mode != 'low' and mode != 'normal' and mode != 'high':
+            print("That is not a valid option. Please enter 'low', 'normal', or 'high': ")
+            mode = input()
 
 
 def main():
@@ -96,7 +110,8 @@ def main():
                 break
             else:
                 print("That is not a valid option. Continuing simulation...")
-        except Exception:
+        except Exception as e:
+            print(e)
             break
     curses.echo()
     curses.nocbreak()
