@@ -10,8 +10,9 @@ static char* file = "BSP/Simulator/DataGeneration/Data/PLL.csv";
  * @return  None
  */
 void BSP_PLL_Init(void) {
-    // TODO: Set to specific frequency. This function is optional.
+
     FILE* fp = fopen(file, "w");
+    fprintf(fp, "%d", 16000000);
 	fclose(fp);
 }
 
@@ -27,5 +28,5 @@ uint32_t BSP_PLL_GetSystemClock(void) {
     fgets(str, 20, fp);
     fclose(fp);
     currentFreq = atoi(str);
-    return currentFreq;    // Return default 16MHz
+    return currentFreq;   
 }

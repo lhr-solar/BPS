@@ -6,7 +6,7 @@ file = "BSP/Simulator/DataGeneration/Data/PLL.csv"
 @brief change the clock frequency
     Function to be called by simulate.py
 """
-CurrentFrequency = 0
+CurrentFrequency = 16000000
 
 
 def Change_Frequency(newFrequency):
