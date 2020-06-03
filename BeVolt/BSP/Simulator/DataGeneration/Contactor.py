@@ -9,4 +9,8 @@ file = "Data/Contactor.csv"
 def Read_Contactor():
     with open(file, 'r') as csvfile:
         csvreader = csv.reader(csvfile)
-        return csvreader
+        return next(csvreader)
+        #print(next(csvreader)): used this to test function
+
+#Ran the function to test if it works
+#Read_Contactor()
