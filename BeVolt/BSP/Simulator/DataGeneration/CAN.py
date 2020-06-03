@@ -21,7 +21,6 @@ def Get_CAN_Info():
         return next(csvreader)
 
 def Invalid_CAN_ID(id):
-    ret = True
     for i in valid_IDs:
         if (i == id):
             return False    #This id is valid

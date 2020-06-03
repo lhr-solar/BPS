@@ -58,18 +58,9 @@ def configure():
     print("Welcome to the BPS Simulator")
     print("Would you like to simulate 'charging', 'discharging', or 'CAN'?")
     state = input()
-    while state != 'charging' and state != 'discharging' and state != 'CAN':
+    while state != 'charging' and state != 'discharging':
         print("That is not a valid option. Please enter 'charging' or 'discharging': ")
         state = input()
-    if state == 'CAN':
-        print("Enter the CAN ID for the system you wish to simulate. Leave out '0x'.")
-        id = input()
-        while(CAN.Invalid_CAN_ID(id) == True):
-            print("Invalid CAN ID.")
-            id = input()
-        print("Enter the 8 bytes of the CAN message that you would like to send, and separate each byte by a ','. Leave out '0x'.")
-        message = input().split(',')
-        CAN.Send_Message(id, message)
     else:
         print("Would you like to simulate 'low', 'normal', or 'high' values?")
         mode = input()
@@ -100,13 +91,23 @@ def main():
             curses.endwin()
             if BeVolt is not None:
                 break
-            print("\n\rWould you like to change 'config' or 'quit'?")
+            print("\n\rWould you like to change 'config', 'quit', or send a CAN message ('CAN')?")
             choice = input()
             if choice == 'config':
                 configure()
                 stdscr = curses.initscr()
             elif choice == 'quit':
                 break
+            elif choice == 'CAN':
+                print("Enter the CAN ID for the system you wish to simulate. Leave out '0x'.")
+                id = input()
+                while(CAN.Invalid_CAN_ID(id) == True):
+                    print("Invalid CAN ID.")
+                    id = input()
+                print("Enter the 8 bytes of the CAN message that you would like to send, and separate each byte by a ','. Leave out '0x'.")
+                message = input().split(',')
+                CAN.Send_Message(id, message)
+
             else:
                 print("That is not a valid option. Continuing simulation...")
         except Exception as e:
