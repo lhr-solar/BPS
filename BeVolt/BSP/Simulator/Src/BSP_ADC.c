@@ -22,7 +22,7 @@ uint16_t BSP_ADC_High_GetMilliVoltage(void) {
     FILE* fp = fopen(file, "r");
     if (!fp) {
         printf("ADC not available\n\r");
-        return;
+        return BAD_ADC;
     }
     // Get raw CSV string
     char csv[16];
@@ -47,7 +47,7 @@ uint16_t BSP_ADC_Low_GetMilliVoltage(void) {
     FILE* fp = fopen(file, "r");
     if (!fp) {
         printf("ADC not available\n\r");
-        return;
+        return BAD_ADC;
     }
     // Get raw CSV string
     char csv[16];

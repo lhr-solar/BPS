@@ -24,7 +24,6 @@ void *ScanThread(void *arg);
  */
 void BSP_UART_Init(void) {
     int err = 0;
-    int stack_size = 256;
     pthread_attr_t attr;
     pthread_t id;
 
