@@ -4,7 +4,7 @@
 
 static const char* file = "BSP/Simulator/DataGeneration/Data/CAN.csv";
 
-
+uint32_t flag;
 
 /**
  * @brief   Initializes the CAN module that communicates with the rest of the electrical system.
@@ -18,6 +18,7 @@ void BSP_CAN_Init(void) {
 
     FILE* fp = fopen(file, "w"); 
     fclose(fp);
+    flag = 0;
 }
 
 
@@ -46,7 +47,7 @@ uint8_t BSP_CAN_Write(uint32_t id, uint8_t data[8], uint8_t length) {
              
     }
     fclose(fp);
-
+    flag = 1;
     return 1;
 }
 
@@ -60,20 +61,24 @@ uint8_t BSP_CAN_Write(uint32_t id, uint8_t data[8], uint8_t length) {
  * clear the message that was read from the file
  */
 uint8_t BSP_CAN_Read(uint32_t *id, uint8_t *data) {
-    char check;
-    int meh;
-    FILE* fp = fopen(file, "r+");
-    fseek(fp, 2, SEEK_SET);
-    fscanf(fp, "%3x", id);
+    if(flag){
+        FILE* fp = fopen(file, "r+");
+        fseek(fp, 2, SEEK_SET);
+        fscanf(fp, "%3x", id);
 
-    fseek(fp, 6 ,SEEK_SET);
-    for(int i = 0; i < 8; i++){
-        fscanf(fp, "%*c%*c%2x%*c", data);
-        data++;
-    }
-    fclose(fp);
+        fseek(fp, 6 ,SEEK_SET);
+        for(int i = 0; i < 8; i++){
+            fscanf(fp, "%*c%*c%2x%*c", data);
+            data++;
+        }
+        fclose(fp);
     
-    fopen(file, "w");
-    fclose(fp);
-    return 1;
+        fopen(file, "w");
+        fclose(fp);
+        flag  = 0;
+        return 1;
+    }
+    
+    
+    return 0;
 }
