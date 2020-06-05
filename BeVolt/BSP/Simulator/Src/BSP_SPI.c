@@ -200,8 +200,6 @@ void BSP_SPI_SetStateCS(uint8_t state) {
 }
 
 
-
-
 /**
  * @brief   PRIVATE FUNCTIONS
  */
@@ -397,8 +395,6 @@ static bool UpdateSimulationData(void) {
 
     fclose(fp);
 }
-
-
 
 
 /**
