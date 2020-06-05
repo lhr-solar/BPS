@@ -394,6 +394,8 @@ static bool UpdateSimulationData(void) {
 
         lineIdx++;
     }
+
+    fclose(fp);
 }
 
 
