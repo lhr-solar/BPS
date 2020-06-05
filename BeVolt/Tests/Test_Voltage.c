@@ -42,9 +42,14 @@ int main() {
 
     }
 
-    printf("Printing voltage modules.\r\n");
+    printf("Printing voltage values.\r\n");
     for(int i = 0; i < NUM_BATTERY_MODULES; i++) {
         printf("\t%d: %dmV\r\n", i, Voltage_GetModuleMillivoltage(i));
+    }
+
+    printf("Printing pins open wires.\r\n");
+    for(int i = 0; i < NUM_MINIONS; i++) {
+        printf("\tMinion %d: 0x%lx\r\n", i, minions[i].system_open_wire);
     }
 
     printf("Printing modules that failed.\r\n");

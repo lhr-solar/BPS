@@ -64,7 +64,7 @@ typedef struct {
     uint16_t temperature_sel;       // Holds which temperature sensors the LTC6811 driver wants to read from.
                                     //      The process of getting temperature data requires knowing what the MUX is set to.
                                     //      Only one temperature sensor is sent from the LTC6811 at a time.
-    int32_t temperature_data[18];   // Each board can support 18 temperature sensors
+    int32_t temperature_data[16];   // Each board can support 16 temperature sensors
     uint16_t open_wire;             // Each bit indicates a battery node wire
 } ltc6811_sim_t;
 
@@ -238,8 +238,11 @@ static void WRCommandHandler(uint8_t *buf, uint32_t len) {
             break;
 
         case ADOWPU:
-            openWirePUFlag = true;
         case ADOWPD:
+            openWirePUFlag = false;
+            if(currCmd == ADOWPU) {
+                openWirePUFlag = true;
+            }
             UpdateSimulationData();
             openWireOpFlag = true;
             break;
@@ -335,11 +338,11 @@ static void RDCommandHandler(uint8_t *buf, uint32_t len) {
  * @return  true if data was read successfully, false if failed
  */
 static bool LoadCSV(void) {
-    fp = fopen(file, "r");
-    if (!fp) {
-        printf("SPI not available\n\r");
-        return false;
-    }    
+    // Might be waiting for OS to release access to the file since the python
+    // script may be writing to it often.
+    do {
+        fp = fopen(file, "r");
+    } while(!fp);
     return true;
 }
 
@@ -525,22 +528,45 @@ static void CopyVoltageToByteArray(uint8_t *data, Group group) {
  */
 static void CopyOpenWireVoltageToByteArray(uint8_t *data, Group group, bool pullup) {
     const uint8_t BYTES_PER_REG = 6;
+    const int MAX_PINS_PER_LTC6811 = 12;         // LTC6811 can only support 12 voltage modules
+    uint16_t pullupVoltages[NUM_MINIONS][MAX_PINS_PER_LTC6811];
+    uint16_t pulldownVoltages[NUM_MINIONS][MAX_PINS_PER_LTC6811];
 
     // The LTC6811 returns only 3 voltage values at a time depending on the group,
     // i.e. group A will only send the voltage values [0,2], group B will send [3,5], and so on
     int voltageStartIdx = group * 3;
 
-    
+    // LTC6811 datasheet may be wrong***
+    // For pins 1-11, the pullupVolt-pulldownVolt > -400mV must be true in order for the LTC6811
+    // driver to recognize that the pin is an open wire.
+    // If pullupVolt[1] = 0, then pin C0 is open.
+    // If pulldownVolt[12] = 0, then pin C12 is open.
+    // TODO: Simulator currently does not support open wire indication of pin C0 (ground pin)
+    for(int i = 0; i < NUM_MINIONS; i++) {
+        for(int j = 0; j < MAX_PINS_PER_LTC6811; j++) {
+            if(simulationData[i].open_wire & (1 << j)) {
+                pullupVoltages[i][j] = 40000;       // These are just dummy values. As long as
+                                                    // pullup-pulldown > 4000 (-400mV)
+                pulldownVoltages[i][j] = 30000;
+                
+            } else {
+                pullupVoltages[i][j] = 30000;
+                pulldownVoltages[i][j] = 40000;
+            }
+        }
+    }
 
     int dataIdx = 0;
     for(int i = NUM_MINIONS-1; i >= 0; i--) {
-        memcpy(&data[dataIdx * BYTES_PER_REG], (uint8_t *)&(simulationData[i].voltage_data[voltageStartIdx]), BYTES_PER_REG);
+
+        if(pullup) {
+            memcpy(&data[dataIdx * BYTES_PER_REG], (uint8_t *)&(pullupVoltages[i][voltageStartIdx]), BYTES_PER_REG);
+        } else {
+            memcpy(&data[dataIdx * BYTES_PER_REG], (uint8_t *)&(pulldownVoltages[i][voltageStartIdx]), BYTES_PER_REG);
+        }
+
         dataIdx++;
     }
-
-    // Reset flags
-    openWirePUFlag = false;
-    openWireOpFlag = false;
 }
 
 /**

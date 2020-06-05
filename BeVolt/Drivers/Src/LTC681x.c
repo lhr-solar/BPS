@@ -1291,7 +1291,7 @@ int16_t LTC681x_run_adc_redundancy_st(uint8_t adc_mode, uint8_t adc_reg, uint8_t
 
 
 /* Runs the data sheet algorithm for open wire for multiple cell and two consecutive cells detection */
- uint32_t LTC681x_run_openwire_multi(uint8_t total_ic, // Number of ICs in the daisy chain
+ uint64_t LTC681x_run_openwire_multi(uint8_t total_ic, // Number of ICs in the daisy chain
 						  cell_asic ic[], // A two dimensional array that will store the data
 							bool print	// Condition that either prints or just returns the array
 						  )
@@ -1306,6 +1306,10 @@ int16_t LTC681x_run_adc_redundancy_st(uint8_t adc_mode, uint8_t adc_reg, uint8_t
 	int8_t opencells[N_CHANNELS];
 	int8_t n=0; // Number of open cells
 	int8_t i,j,k;
+
+    for(int i = 0; i < N_CHANNELS; i++) {
+        opencells[i] = 0;
+    }
 	
 	long openwires = 0;
 
@@ -1475,11 +1479,15 @@ int16_t LTC681x_run_adc_redundancy_st(uint8_t adc_mode, uint8_t adc_reg, uint8_t
 				}
 			}
 		}
+
+        // Reset system_open_wire
+        ic[cic].system_open_wire = 0;
 		
 		// Store the array into a long to return
 		for(int x=0;x<N_CHANNELS;x++){
 			if(opencells[x] != 0){
 				openwires += (1<<((opencells[x])+(N_CHANNELS*(cic+1))));
+                ic[cic].system_open_wire |= (1 << (opencells[x]));
 			}
 		}
 	}
