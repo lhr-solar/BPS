@@ -33,7 +33,8 @@
 #define STSCTRL     0x019
 #define CLRSCTRL    0x018
 #define ADCV        0x260       // 0 1 MD[1] MD[0] 1 1 DCP 0 CH[2] CH[1] CH[0]
-#define ADOW        0x268       // 0 1 MD[1] MD[0] 1 1 DCP 1 CH[2] CH[1] CH[0]
+#define ADOWPU      0x268       // 0 1 MD[1] MD[0] PUP 1 DCP 1 CH[2] CH[1] CH[0]
+#define ADOWPD      0x228       // 0 1 MD[1] MD[0] PUP 1 DCP 1 CH[2] CH[1] CH[0]
 #define CVST        0x207       // 0 1 MD[1] MD[0] ST[1] ST[0] 0 0 1 1 1
 #define ADOL        0x201       // 0 1 MD[1] MD[0] 0 0 DCP 0 0 0 1
 #define ADAX        0x460       // 1 0 MD[1] MD[0] 1 1 0 0 CHG[2] CHG[1] CHG[0]
@@ -81,7 +82,25 @@ static uint8_t chipSelectState = 1;     // During idle, the cs pin should be hig
                                         // will make sure the developer follows the correct SPI protocol.
 
 static uint16_t currCmd = 0;            // Before every BSP_SPI_Read, BSP_SPI_Write needs to be called to
-                                        // specify the command to handle
+                                        // specify the command to handle.
+
+static bool openWireOpFlag = false;     // The reading of voltages for both regular and openwire modes are
+                                        // the same. The commands are different though. To measure the
+                                        // regular voltage values, the ADCV command code is used. To measure
+                                        // the open wire voltage values, the ADOW command code is used.
+                                        // Look in the LTC6811 datasheet for more information on the difference.
+                                        // The command to read the voltage values for both commands is RDCV.
+                                        // When the ADOW command is called in BSP_SPI_Write, this flag should
+                                        // turn true so the next time the BSP_SPI_Read function is called with
+                                        // the RDCV command set, the RDCommandHandler will know to return the
+                                        // appropratie open wire voltages. Any other command that's not ADOW but
+                                        // still triggers and ADC conversion (e.g. ADCV), then this flag should
+                                        // be set to false.
+
+static bool openWirePUFlag = false;     // Indicates if the pull-up voltage values should be copied or not.
+                                        // This flag is set if the ADOWPU command was issued in
+                                        // BSP_SPI_Write. The CopyOpenWireVoltageToByteArray function uses
+                                        // this flag to determine which voltage values should be written.
 
 static char csvBuffer[CSV_SPI_BUFFER_SIZE];
 static ltc6811_sim_t simulationData[NUM_MINIONS];
@@ -99,6 +118,7 @@ static void ExtractMUXAddrFromBuff(uint8_t *comm);
 static void ExtractMUXSelFromBuff(uint8_t *comm);
 static void CreateReadPacket(uint8_t *pkt, uint8_t *data, uint32_t dataSize);
 static void CopyVoltageToByteArray(uint8_t *data, Group group);
+static void CopyOpenWireVoltageToByteArray(uint8_t *data, Group group, bool pullup);
 static void CopyTemperatureToByteArray(uint8_t *data, Group group);
 static uint16_t ConvertTemperatureToMilliVolts(int32_t celcius);
 
@@ -212,16 +232,16 @@ static void WRCommandHandler(uint8_t *buf, uint32_t len) {
 
         // Start ADC Conversion
         case ADCV:
-            UpdateSimulationData();
-            break;
-
-        case ADOW:
-            UpdateSimulationData();
-            // Set Flag
-            break;
-
         case ADAX:
             UpdateSimulationData();
+            openWireOpFlag = false;
+            break;
+
+        case ADOWPU:
+            openWirePUFlag = true;
+        case ADOWPD:
+            UpdateSimulationData();
+            openWireOpFlag = true;
             break;
 
         case WRCOMM:
@@ -260,22 +280,38 @@ static void RDCommandHandler(uint8_t *buf, uint32_t len) {
 
         // Read Cell Voltages
         case RDCVA:
-            CopyVoltageToByteArray(data, A);
+            if(openWireOpFlag) {
+                CopyOpenWireVoltageToByteArray(data, A, openWirePUFlag);
+            } else {
+                CopyVoltageToByteArray(data, A);
+            }
             CreateReadPacket(buf, data, NUM_MINIONS * BYTES_PER_REG);
             break;
 
         case RDCVB:
-            CopyVoltageToByteArray(data, B);
+            if(openWireOpFlag) {
+                CopyOpenWireVoltageToByteArray(data, B, openWirePUFlag);
+            } else {
+                CopyVoltageToByteArray(data, B);
+            }
             CreateReadPacket(buf, data, NUM_MINIONS * BYTES_PER_REG);
             break;
 
         case RDCVC:
-            CopyVoltageToByteArray(data, C);
+            if(openWireOpFlag) {
+                CopyOpenWireVoltageToByteArray(data, C, openWirePUFlag);
+            } else {
+                CopyVoltageToByteArray(data, C);
+            }
             CreateReadPacket(buf, data, NUM_MINIONS * BYTES_PER_REG);
             break;
 
         case RDCVD:
-            CopyVoltageToByteArray(data, D);
+            if(openWireOpFlag) {
+                CopyOpenWireVoltageToByteArray(data, D, openWirePUFlag);
+            } else {
+                CopyVoltageToByteArray(data, D);
+            }
             CreateReadPacket(buf, data, NUM_MINIONS * BYTES_PER_REG);
             break;
 
@@ -479,6 +515,32 @@ static void CopyVoltageToByteArray(uint8_t *data, Group group) {
         memcpy(&data[dataIdx * BYTES_PER_REG], (uint8_t *)&(simulationData[i].voltage_data[voltageStartIdx]), BYTES_PER_REG);
         dataIdx++;
     }
+}
+
+/**
+ * @brief   Copies the Pull-up voltage data in each separate array into one continuous array
+ * @param   data        array that will be filled
+ * @param   group       enum of [A,F]
+ * @param   pullup      true if pullup voltage data, false if pulldown voltage data to be copied
+ */
+static void CopyOpenWireVoltageToByteArray(uint8_t *data, Group group, bool pullup) {
+    const uint8_t BYTES_PER_REG = 6;
+
+    // The LTC6811 returns only 3 voltage values at a time depending on the group,
+    // i.e. group A will only send the voltage values [0,2], group B will send [3,5], and so on
+    int voltageStartIdx = group * 3;
+
+    
+
+    int dataIdx = 0;
+    for(int i = NUM_MINIONS-1; i >= 0; i--) {
+        memcpy(&data[dataIdx * BYTES_PER_REG], (uint8_t *)&(simulationData[i].voltage_data[voltageStartIdx]), BYTES_PER_REG);
+        dataIdx++;
+    }
+
+    // Reset flags
+    openWirePUFlag = false;
+    openWireOpFlag = false;
 }
 
 /**
