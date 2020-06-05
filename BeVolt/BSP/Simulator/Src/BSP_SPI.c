@@ -363,7 +363,7 @@ static void ExtractDataFromBuff(uint8_t *data, uint8_t *buf, uint32_t len) {
  * @param   buf     raw data the LTC6811 drivers sent into BSP_SPI_Write.
  */
 static void ExtractMUXAddrFromBuff(uint8_t *buf) {
-    const uint8_t BYTES_PER_REG = 6;
+    const uint8_t BYTES_PER_REG = 8;
 
     buf = buf + 4;
 
@@ -381,13 +381,13 @@ static void ExtractMUXAddrFromBuff(uint8_t *buf) {
  * @param   buf     raw data the LTC6811 drivers sent into BSP_SPI_Write.
  */
 static void ExtractMUXSelFromBuff(uint8_t *buf) {
-    const uint8_t BYTES_PER_REG = 6;
+    const uint8_t BYTES_PER_REG = 8;
 
     buf = buf + 4;
 
     int minionIdx = 0;
     for(int i = NUM_MINIONS-1; i >= 0; i--) {
-        uint8_t sel = 8 - ((buf[i*BYTES_PER_REG+3] >> 4) & 0x00FF);     // Check LTC1380 as to why there is an 8
+        uint8_t sel = ((buf[i*BYTES_PER_REG+3] >> 4) & 0x000F) - 8;     // Check LTC1380 as to why there is an 8
         simulationData[minionIdx].temperature_sel = sel;
         minionIdx++;
     }

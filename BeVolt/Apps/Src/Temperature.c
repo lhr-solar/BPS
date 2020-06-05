@@ -83,12 +83,14 @@ ErrorStatus Temperature_ChannelConfig(uint8_t tempChannel) {
 		Minions[board].com.tx_data[4] = (AUX_I2C_NO_TRANSMIT << 4) + 0xF;
 		Minions[board].com.tx_data[5] = (0xF << 4) + AUX_I2C_NACK_STOP;
 
-		// Send data
-		wakeup_sleep(NUM_MINIONS);
-		LTC6811_wrcomm(NUM_MINIONS, Minions);
-		LTC6811_stcomm();
-			
-		
+    }
+
+    // Send data
+    wakeup_sleep(NUM_MINIONS);
+    LTC6811_wrcomm(NUM_MINIONS, Minions);
+    LTC6811_stcomm();
+        
+	for (int board = 0; board < NUM_MINIONS; board++) {
 		/* Open channel on mux */
 		
 		// Send Address for a particular mux
@@ -105,12 +107,12 @@ ErrorStatus Temperature_ChannelConfig(uint8_t tempChannel) {
 		// Rest is no transmit with all data bits set to high, makes sure there's nothing else we're sending
 		Minions[board].com.tx_data[4] = (AUX_I2C_NO_TRANSMIT << 4) + 0xF;
 		Minions[board].com.tx_data[5] = (0xF << 4) + AUX_I2C_NACK_STOP;
-
-		// Send data
-		wakeup_sleep(NUM_MINIONS);
-		LTC6811_wrcomm(NUM_MINIONS, Minions);
-		LTC6811_stcomm();
-	}
+    }
+    
+    // Send data
+    wakeup_sleep(NUM_MINIONS);
+    LTC6811_wrcomm(NUM_MINIONS, Minions);
+    LTC6811_stcomm();
 
 	return SUCCESS;
 }
