@@ -37,7 +37,7 @@ def display(battery=None):
     stdscr.addstr(4, 10, f"{adc_values[1]} A ")
     # Read Module values
     stdscr.addstr(0, 54, "Modules")
-    stdscr.addstr(1, 40, "===================================")
+    stdscr.addstr(1, 40, "====================================")
     module_values = SPI.read()
     for i, module in enumerate(module_values):
         stdscr.addstr(i+2, 37, f"{i+1}")
