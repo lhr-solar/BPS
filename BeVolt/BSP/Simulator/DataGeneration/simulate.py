@@ -65,11 +65,13 @@ def configure():
     # Get configuration settings
     global state, mode
     print("Would you like to simulate 'charging' or 'discharging'?")
+    print(">>", end="")
     state = input()
     while state != 'charging' and state != 'discharging':
         print("That is not a valid option. Please enter 'charging' or 'discharging': ")
         state = input()
     print("Would you like to simulate 'low', 'normal', or 'high' values?")
+    print(">>", end="")
     mode = input()
     while mode != 'low' and mode != 'normal' and mode != 'high':
         print("That is not a valid option. Please enter 'low', 'normal', or 'high': ")
@@ -80,6 +82,7 @@ def change_wires(battery):
     done = False
     while not done:
         print("Which module? (0 to exit)")
+        print(">>", end="")
         module = int(input())
         if module:
             battery.modules[module-1].connected = not battery.modules[module-1].connected
@@ -139,7 +142,9 @@ def main():
                     stdscr = curses.initscr()
                     curses.start_color()
         except Exception as e:
-            print(e)
+            print("ERROR:", end=" ")
+            print(e, end="\r\n")
+            print("If addwstr() returned ERR, make your terminal window bigger.")
             break
     curses.echo()
     curses.nocbreak()
