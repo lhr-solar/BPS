@@ -118,6 +118,9 @@ static bool UpdateSimulationData(void);
  */
 void BSP_SPI_Init(void) {
 
+    // Reset values
+    memset(simulationData, 0, sizeof(simulationData));
+
     PEC15_Table_Init();
 }
 
@@ -155,7 +158,13 @@ void BSP_SPI_Write(uint8_t *txBuf, uint32_t txLen) {
  * @return  None
  */
 void BSP_SPI_Read(uint8_t *rxBuf, uint32_t rxLen) {
-    RDCommandHandler(rxBuf, rxLen);
+
+    // One register is 8 bytes or greater. If there was an SPI call where rxLen
+    // is less than 8, that means it's either a wakeup call or some generic call
+    // that does not require data to be returned by the LTC6811
+    if(rxLen >= 8) {
+        RDCommandHandler(rxBuf, rxLen);
+    }
 }
 
 /**
@@ -204,6 +213,11 @@ static void WRCommandHandler(uint8_t *buf, uint32_t len) {
         // Start ADC Conversion
         case ADCV:
             UpdateSimulationData();
+            break;
+
+        case ADOW:
+            UpdateSimulationData();
+            // Set Flag
             break;
 
         case ADAX:
@@ -305,6 +319,7 @@ static bool UpdateSimulationData(void) {
     int lineIdx = 0;
     int temperatureIdx = 0;
     int voltageIdx = 0;
+    int openWireIdx = 0;
 
     while(fgets(csvBuffer, CSV_SPI_BUFFER_SIZE, fp) != 0) {
         char *saveDataPtr = NULL;
@@ -319,14 +334,24 @@ static bool UpdateSimulationData(void) {
         temperature2[strlen(temperature2) - 1] = 0;
 
         // Place into ltc6811_sim_t data struct
+        // Voltage Data
         simulationData[lineIdx / MAX_VOLT_SENSORS_PER_MINION_BOARD].voltage_data[voltageIdx] = atoi(voltage);
+        
         voltageIdx = (voltageIdx + 1) % MAX_VOLT_SENSORS_PER_MINION_BOARD;
 
+        // Temperature Data
         simulationData[lineIdx / MAX_VOLT_SENSORS_PER_MINION_BOARD].temperature_data[temperatureIdx] = atoi(temperature1);
 
         simulationData[lineIdx / MAX_VOLT_SENSORS_PER_MINION_BOARD].temperature_data[temperatureIdx + MAX_TEMP_SENSORS_PER_MINION_BOARD / NUM_TEMP_SENSORS_PER_MOD] = atoi(temperature2);
         
         temperatureIdx = (temperatureIdx + 1) % (MAX_TEMP_SENSORS_PER_MINION_BOARD / NUM_TEMP_SENSORS_PER_MOD);
+
+        // Open Wire Data
+        // Open wires are indicated as a bitmap instead of an array
+        // 1 is open wire, 0 means closed wired
+        simulationData[lineIdx / MAX_VOLT_SENSORS_PER_MINION_BOARD].open_wire |= (atoi(openWire) & 0x01) << openWireIdx;
+        
+        openWireIdx = (openWireIdx + 1) % MAX_VOLT_SENSORS_PER_MINION_BOARD;
 
         lineIdx++;
     }

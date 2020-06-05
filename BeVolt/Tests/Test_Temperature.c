@@ -3,6 +3,7 @@
 #include "Temperature.h"
 #include "LTC6811.h"
 #include "BSP_UART.h"
+#include <unistd.h>
 
 cell_asic minions[NUM_MINIONS];
 
@@ -10,7 +11,7 @@ int main() {
 
     BSP_UART_Init();    // Initialize printf
 
-    printf("Testing Temperature\r\n");
+    printf("Testing Temperature functions.\r\n");
 
     Temperature_Init(minions);
 
@@ -25,7 +26,11 @@ int main() {
         }
     }
 
+    sleep(1);
+
+    printf("Testing Temperature functions in loop.\r\n");
+
     while(1) {
-        
+
     }
 }
