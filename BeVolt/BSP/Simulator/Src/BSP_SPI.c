@@ -394,6 +394,8 @@ static bool UpdateSimulationData(void) {
     }
 
     fclose(fp);
+
+    return true;
 }
 
 
