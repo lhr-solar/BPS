@@ -136,7 +136,7 @@ void BSP_SPI_Write(uint8_t *txBuf, uint32_t txLen) {
     currCmd = ExtractCmdFromBuff(txBuf, txLen);
 
     if(((currCmd & 0x600) == 0x200) || (currCmd & 0x700) == 0x400) {
-        currCmd &= ~0x180;  // Bit Mask to ignore any cmd configuration bits i.e. ignore the MD, DCP, etc. bits
+        currCmd &= ~0x187;  // Bit Mask to ignore any cmd configuration bits i.e. ignore the MD, DCP, etc. bits
     }
 
     // Ignore PEC (bits 2 and 3), PEC is meant to be able to check if EMI/noise affected the data
@@ -316,6 +316,7 @@ static bool UpdateSimulationData(void) {
         char *voltage = __strtok_r(NULL, ",", &saveDataPtr);
         char *temperature1 = __strtok_r(NULL, ",", &saveDataPtr);
         char *temperature2 = __strtok_r(NULL, ",", &saveDataPtr);
+        temperature2[strlen(temperature2) - 1] = 0;
 
         // Place into ltc6811_sim_t data struct
         simulationData[lineIdx / MAX_VOLT_SENSORS_PER_MINION_BOARD].voltage_data[voltageIdx] = atoi(voltage);
@@ -329,7 +330,6 @@ static bool UpdateSimulationData(void) {
 
         lineIdx++;
     }
-
 }
 
 
@@ -386,8 +386,8 @@ static void ExtractMUXAddrFromBuff(uint8_t *buf) {
 
     int minionIdx = 0;
     for(int i = NUM_MINIONS-1; i >= 0; i--) {
-        simulationData[minionIdx].temperature_mux = ((buf[i*BYTES_PER_REG] << 4) & 0xFF00)
-                                                    | ((buf[i*BYTES_PER_REG+1] >> 4) & 0x00FF);
+        simulationData[minionIdx].temperature_mux = ((buf[i*BYTES_PER_REG] << 4) & 0xF0)
+                                                    | ((buf[i*BYTES_PER_REG+1] >> 4) & 0x0F);
         minionIdx++;
     }
 }
@@ -479,9 +479,9 @@ static void CopyTemperatureToByteArray(uint8_t *data, Group group) {
                 temperatureIdx += 8;
             }
 
-            uint16_t rawADCdata = ConvertTemperatureToMilliVolts(simulationData[i].temperature_data[temperatureIdx]);
+            uint16_t mVData = ConvertTemperatureToMilliVolts(simulationData[i].temperature_data[temperatureIdx]) * 10;   // multiply by 10 because the Temperature library is expecting 0.0001 resolution
 
-            memcpy(&data[dataIdx * BYTES_PER_REG], (uint8_t *)&(rawADCdata), 2);
+            memcpy(&data[dataIdx * BYTES_PER_REG], (uint8_t *)&(mVData), 2);
             dataIdx++;
         }
     }
