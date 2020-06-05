@@ -41,7 +41,7 @@ def display(battery=None):
     module_values = SPI.read()
     for i, module in enumerate(module_values):
         stdscr.addstr(i+2, 37, f"{i+1}")
-        stdscr.addstr(i+2, 40, f"| {'X' if module[0] else ' '} | {module[1]/10000:.4f}V | {module[2]/100:.2f}°C | {module[3]/100:.2f}°C |")
+        stdscr.addstr(i+2, 40, f"| {'X' if module[0] else ' '} | {module[1]/10000:.4f}V | {module[2]/1000:.3f}°C | {module[3]/1000:.3f}°C |")
     # Read LED values
     stdscr.addstr(0, 90, "LEDs")
     stdscr.addstr(1, 80, "=======================")
@@ -90,6 +90,7 @@ def change_wires(battery):
 def main():
     print("Welcome to the BPS Simulator")
     print("Type 'start' to start BeVolt. Otherwise, you can specify the types of data to simulate.")
+    print(">>", end="")
     if input() == 'start':
         BeVolt = battery.Battery(30, 2950*434)
     else:
@@ -111,6 +112,7 @@ def main():
             curses.endwin()
             if BeVolt is not None:
                 print("\n\rWould you like to change 'wires' or 'quit'?")
+                print(">>", end="")
                 choice = input()
                 if choice == 'wires':
                     change_wires(BeVolt)
@@ -124,6 +126,7 @@ def main():
                     curses.start_color()
             else:
                 print("\n\rWould you like to change 'config' or 'quit'?")
+                print(">>", end="")
                 choice = input()
                 if choice == 'config':
                     configure()
