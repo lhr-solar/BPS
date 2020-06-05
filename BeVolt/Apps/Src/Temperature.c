@@ -5,7 +5,7 @@
 #include "Temperature.h"
 
 // Holds the temperatures in Celsius (Fixed Point with .001 resolution) for each sensor on each board
-int16_t ModuleTemperatures[NUM_MINIONS][MAX_TEMP_SENSORS_PER_MINION_BOARD];
+int32_t ModuleTemperatures[NUM_MINIONS][MAX_TEMP_SENSORS_PER_MINION_BOARD];
 
 // 0 if discharging 1 if charging
 static uint8_t ChargingState;
@@ -108,7 +108,7 @@ ErrorStatus Temperature_ChannelConfig(uint8_t tempChannel) {
 		Minions[board].com.tx_data[4] = (AUX_I2C_NO_TRANSMIT << 4) + 0xF;
 		Minions[board].com.tx_data[5] = (0xF << 4) + AUX_I2C_NACK_STOP;
     }
-    
+
     // Send data
     wakeup_sleep(NUM_MINIONS);
     LTC6811_wrcomm(NUM_MINIONS, Minions);
@@ -176,7 +176,7 @@ ErrorStatus Temperature_UpdateAllMeasurements(){
  * @return SAFE or DANGER
  */
 SafetyStatus Temperature_CheckStatus(uint8_t isCharging){
-	int16_t temperatureLimit = isCharging == 1 ? MAX_CHARGE_TEMPERATURE_LIMIT : MAX_DISCHARGE_TEMPERATURE_LIMIT;
+	int32_t temperatureLimit = isCharging == 1 ? MAX_CHARGE_TEMPERATURE_LIMIT : MAX_DISCHARGE_TEMPERATURE_LIMIT;
 	temperatureLimit *= MILLI_SCALING_FACTOR;
 
 	for (int i = 0; i < NUM_MINIONS; i++) {
@@ -208,7 +208,7 @@ void Temperature_SetChargeState(uint8_t isCharging){
  */
 uint8_t *Temperature_GetModulesInDanger(void){
 	static uint8_t ModuleTempStatus[NUM_BATTERY_MODULES];
-	int16_t temperatureLimit = ChargingState == 1 ? MAX_CHARGE_TEMPERATURE_LIMIT : MAX_DISCHARGE_TEMPERATURE_LIMIT;
+	int32_t temperatureLimit = ChargingState == 1 ? MAX_CHARGE_TEMPERATURE_LIMIT : MAX_DISCHARGE_TEMPERATURE_LIMIT;
 
 	for (int i = 0; i < NUM_MINIONS-1; i++) {
 		for (int j = 0; j < MAX_TEMP_SENSORS_PER_MINION_BOARD; j++) {
@@ -227,7 +227,7 @@ uint8_t *Temperature_GetModulesInDanger(void){
  * @param index of sensor (0-indexed based)
  * @return temperature of the battery module at specified index
  */
-int16_t Temperature_GetSingleTempSensor(uint8_t board, uint8_t sensorIdx) {
+int32_t Temperature_GetSingleTempSensor(uint8_t board, uint8_t sensorIdx) {
 	return ModuleTemperatures[board][sensorIdx];
 }
 
@@ -238,7 +238,7 @@ int16_t Temperature_GetSingleTempSensor(uint8_t board, uint8_t sensorIdx) {
  * @param index of module (0-indexed based)
  * @return temperature of the battery module at specified index
  */
-int16_t Temperature_GetModuleTemperature(uint8_t moduleIdx){
+int32_t Temperature_GetModuleTemperature(uint8_t moduleIdx){
 	int32_t total = 0;
 	uint8_t board = (moduleIdx * 2) / MAX_TEMP_SENSORS_PER_MINION_BOARD;
 	uint8_t sensor = moduleIdx % (MAX_TEMP_SENSORS_PER_MINION_BOARD / 2);
@@ -255,7 +255,7 @@ int16_t Temperature_GetModuleTemperature(uint8_t moduleIdx){
  * Gets the average temperature of the whole battery pack
  * @return average temperature of battery pack
  */
-int16_t Temperature_GetTotalPackAvgTemperature(void){
+int32_t Temperature_GetTotalPackAvgTemperature(void){
 	int32_t total = 0;
 	for (int i = 0; i < NUM_BATTERY_MODULES; i++) {
 		total += Temperature_GetModuleTemperature(i);

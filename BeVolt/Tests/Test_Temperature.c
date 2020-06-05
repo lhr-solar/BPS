@@ -14,10 +14,6 @@ int main() {
 
     Temperature_Init(minions);
 
-    Temperature_UpdateSingleChannel(0);
-    Temperature_UpdateSingleChannel(1);
-    Temperature_UpdateSingleChannel(2);
-
     Temperature_UpdateAllMeasurements();
 
     for(int i = 0; i < NUM_MINIONS; i++) {

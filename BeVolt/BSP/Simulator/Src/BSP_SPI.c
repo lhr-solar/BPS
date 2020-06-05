@@ -63,7 +63,7 @@ typedef struct {
     uint16_t temperature_sel;       // Holds which temperature sensors the LTC6811 driver wants to read from.
                                     //      The process of getting temperature data requires knowing what the MUX is set to.
                                     //      Only one temperature sensor is sent from the LTC6811 at a time.
-    uint16_t temperature_data[18];  // Each board can support 18 temperature sensors
+    int32_t temperature_data[18];   // Each board can support 18 temperature sensors
     uint16_t open_wire;             // Each bit indicates a battery node wire
 } ltc6811_sim_t;
 
@@ -73,6 +73,7 @@ typedef enum {
 
 // Path relative to the executable
 const char* file = "BSP/Simulator/DataGeneration/Data/SPI.csv";
+static FILE* fp;
 
 static uint8_t chipSelectState = 1;     // During idle, the cs pin should be high.
                                         // Knowing the cs pin's state is not needed for the simulator,
@@ -99,6 +100,7 @@ static void ExtractMUXSelFromBuff(uint8_t *comm);
 static void CreateReadPacket(uint8_t *pkt, uint8_t *data, uint32_t dataSize);
 static void CopyVoltageToByteArray(uint8_t *data, Group group);
 static void CopyTemperatureToByteArray(uint8_t *data, Group group);
+static uint16_t ConvertTemperatureToMilliVolts(int32_t celcius);
 
 /**
  * @brief   File access functions
@@ -115,13 +117,6 @@ static bool UpdateSimulationData(void);
  * @return  None
  */
 void BSP_SPI_Init(void) {
-
-    for(int i = 0; i < NUM_MINIONS; i++) {
-        for(int j = 0; j < 12; j++) {
-            simulationData[i].voltage_data[j] = j+1;
-            simulationData[i].temperature_data[j] = 12-j;
-        }
-    }
 
     PEC15_Table_Init();
 }
@@ -290,14 +285,11 @@ static void RDCommandHandler(uint8_t *buf, uint32_t len) {
  * @return  true if data was read successfully, false if failed
  */
 static bool LoadCSV(void) {
-    FILE* fp = fopen(file, "r");
+    fp = fopen(file, "r");
     if (!fp) {
         printf("SPI not available\n\r");
         return false;
-    }
-
-    fgets(csvBuffer, 1024, fp);
-    
+    }    
     return true;
 }
 
@@ -306,12 +298,37 @@ static bool LoadCSV(void) {
  * @return  true if data was read successfully, false if failed
  */
 static bool UpdateSimulationData(void) {
-    bool success = LoadCSV();
-    if(!success) {
+    if(!LoadCSV()) {
         return false;
     }
 
+    int lineIdx = 0;
+    int temperatureIdx = 0;
+    int voltageIdx = 0;
 
+    while(fgets(csvBuffer, CSV_SPI_BUFFER_SIZE, fp) != 0) {
+        char *saveDataPtr = NULL;
+
+        // Make sure the csv buffer has the following format:
+        //  [wire status, voltage*10000, temperature sensor 1 * 100, temperature sensor 2 * 100]
+        // If you wish to add more SPI data, then add the data extraction here
+        char *openWire = __strtok_r(csvBuffer, ",", &saveDataPtr);
+        char *voltage = __strtok_r(NULL, ",", &saveDataPtr);
+        char *temperature1 = __strtok_r(NULL, ",", &saveDataPtr);
+        char *temperature2 = __strtok_r(NULL, ",", &saveDataPtr);
+
+        // Place into ltc6811_sim_t data struct
+        simulationData[lineIdx / MAX_VOLT_SENSORS_PER_MINION_BOARD].voltage_data[voltageIdx] = atoi(voltage);
+        voltageIdx = (voltageIdx + 1) % MAX_VOLT_SENSORS_PER_MINION_BOARD;
+
+        simulationData[lineIdx / MAX_VOLT_SENSORS_PER_MINION_BOARD].temperature_data[temperatureIdx] = atoi(temperature1);
+
+        simulationData[lineIdx / MAX_VOLT_SENSORS_PER_MINION_BOARD].temperature_data[temperatureIdx + MAX_TEMP_SENSORS_PER_MINION_BOARD / NUM_TEMP_SENSORS_PER_MOD] = atoi(temperature2);
+        
+        temperatureIdx = (temperatureIdx + 1) % (MAX_TEMP_SENSORS_PER_MINION_BOARD / NUM_TEMP_SENSORS_PER_MOD);
+
+        lineIdx++;
+    }
 
 }
 
@@ -462,12 +479,30 @@ static void CopyTemperatureToByteArray(uint8_t *data, Group group) {
                 temperatureIdx += 8;
             }
 
-            memcpy(&data[dataIdx * BYTES_PER_REG], (uint8_t *)&(simulationData[i].temperature_data[temperatureIdx]), 2);
+            uint16_t rawADCdata = ConvertTemperatureToMilliVolts(simulationData[i].temperature_data[temperatureIdx]);
+
+            memcpy(&data[dataIdx * BYTES_PER_REG], (uint8_t *)&(rawADCdata), 2);
             dataIdx++;
         }
     }
 }
 
+/**
+ * @brief   Converts the temperature data in celcius to millivolts that the
+ *          Temperature.c library will be expecting.
+ * @note    The simulator writes the actualy temperature value in Celcius into the
+ *          csv file but the LTC6811 really returns the analog mV reading of the sensor.
+ * @note    EQUATION: mV = 2230.8 - [13.582 (T - 30)] - [0.00433 (T - 30)^2]
+ * @param   data    fixed point value of temperature data in celcius. resolution=0.001
+ * @return  mV value in 0.001 resolution
+ */
+static uint16_t ConvertTemperatureToMilliVolts(int32_t celcius) {
+
+    float celcius_float = (float)celcius / 1000;
+    uint16_t mV = 2230.8 - (13.582 * (celcius_float - 30)) - (0.00433 * powf(celcius_float - 30, 2));
+
+    return mV;
+}
 
 /************************************
 Copyright 2012 Linear Technology Corp. (LTC)
