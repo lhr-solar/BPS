@@ -142,6 +142,13 @@ void BSP_SPI_Init(void) {
     memset(simulationData, 0, sizeof(simulationData));
 
     PEC15_Table_Init();
+
+    // Check if simulator is running i.e. were the csv files created?
+    if(access(file, F_OK) != 0) {
+        // File doesn't exit if true
+        perror("SPI.csv");
+        exit(EXIT_FAILURE);
+    }
 }
 
 /**
@@ -368,7 +375,6 @@ static bool UpdateSimulationData(void) {
         char *voltage = __strtok_r(NULL, ",", &saveDataPtr);
         char *temperature1 = __strtok_r(NULL, ",", &saveDataPtr);
         char *temperature2 = __strtok_r(NULL, ",", &saveDataPtr);
-        temperature2[strlen(temperature2) - 1] = 0;
 
         // Place into ltc6811_sim_t data struct
         // Voltage Data
