@@ -392,7 +392,7 @@ static bool UpdateSimulationData(void) {
         // Open Wire Data
         // Open wires are indicated as a bitmap instead of an array
         // 1 is open wire, 0 means closed wired
-        simulationData[lineIdx / MAX_VOLT_SENSORS_PER_MINION_BOARD].open_wire |= (atoi(openWire) & 0x01) << openWireIdx;
+        simulationData[lineIdx / MAX_VOLT_SENSORS_PER_MINION_BOARD].open_wire |= (~atoi(openWire) & 0x01) << openWireIdx;
         
         openWireIdx = (openWireIdx + 1) % MAX_VOLT_SENSORS_PER_MINION_BOARD;
 
