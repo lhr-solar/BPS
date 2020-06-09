@@ -244,8 +244,14 @@ void CLI_Temperature(int* hashTokens) {
 					printf("Module number %d: %.3f C\n\r", hashTokens[2], Temperature_GetModuleTemperature(hashTokens[2]-1)/MILLI_UNIT_CONVERSION);
 				} else if(hashTokens[3]-1 == 0 || hashTokens[3]-1 == 1) {//temperature of specific sensor in module
 					uint16_t boardNum = (hashTokens[2]-1)/MAX_VOLT_SENSORS_PER_MINION_BOARD;
+					uint16_t sensorNum;
+					if (hashTokens[3]-1) {
+						sensorNum = ((hashTokens[2]-1)%MAX_VOLT_SENSORS_PER_MINION_BOARD)+MAX_VOLT_SENSORS_PER_MINION_BOARD;
+					} else {
+						sensorNum = (hashTokens[2]-1)%MAX_VOLT_SENSORS_PER_MINION_BOARD;
+					}
 					printf("Sensor %d on module %d: %.3f C\n\r", hashTokens[3], hashTokens[2], 
-							Temperature_GetSingleTempSensor(boardNum, hashTokens[3]-1)/MILLI_UNIT_CONVERSION);
+							Temperature_GetSingleTempSensor(boardNum, sensorNum)/MILLI_UNIT_CONVERSION);
 				} else {
 					printf("Invalid sensor number\n\r");
 				}
@@ -388,7 +394,7 @@ void setLED(Light input, int state) {
  */
 void CLI_LED(int* hashTokens) {
 	State error = BSP_Light_GetState(FAULT);
-	if(hashTokens[1] == 0) {
+	if((int *)hashTokens[1] == NULL) {
 		if(error == ON) {
 			printf("Error light is On\n\r");
 		} else {
