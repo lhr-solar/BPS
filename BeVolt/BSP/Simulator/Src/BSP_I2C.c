@@ -11,7 +11,7 @@
 //only supports EEPROM peripheral (as of May 2020, the EEPROM is the only peripheral on the I2C bus)
 
 //path for EEPROM file
-static const char* file = "BSP/Simulator/DataGeneration/Data/EEPROM.txt";
+static const char* file = "BSP/Simulator/DataGeneration/Data/I2C.csv";
 
 /**
  * @brief   Initializes the I2C port that interfaces with the EEPROM. Creates EEPROM txt file if it does not already exist
