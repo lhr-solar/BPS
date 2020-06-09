@@ -1,6 +1,7 @@
 import csv
 import random
 import os
+import fcntl
 
 """
 This module generates Voltage and Temperature
@@ -116,9 +117,11 @@ def read():
     values = []
     os.makedirs(os.path.dirname(file), exist_ok=True)
     with open(file, 'r') as csvfile:
+        fcntl.flock(csvfile.fileno(), fcntl.LOCK_EX)    # Lock file before writing
         csvreader = csv.reader(csvfile)
         for row in csvreader:
             for i in range(len(row)):
                 row[i] = int(row[i])
             values.append(row)
+        fcntl.flock(csvfile.fileno(), fcntl.LOCK_UN)    # Unlock file after writing
     return values

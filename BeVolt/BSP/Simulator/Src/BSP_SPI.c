@@ -1,5 +1,6 @@
 #include "BSP_SPI.h"
 #include "config.h"
+#include <sys/file.h>
 
 #define CSV_SPI_BUFFER_SIZE     1024
 
@@ -348,6 +349,11 @@ static bool LoadCSV(void) {
     do {
         fp = fopen(file, "r");
     } while(!fp);
+
+    // Lock the file so simulator.py/SPI.py can not write it during a read op
+    // This is a blocking statement
+    flock(fp, LOCK_EX);
+
     return true;
 }
 
@@ -399,6 +405,8 @@ static bool UpdateSimulationData(void) {
         lineIdx++;
     }
 
+    // Unlock the lock so the simulator can write to SPI.csv again
+    flock(fp, LOCK_UN);
     fclose(fp);
 
     return true;
