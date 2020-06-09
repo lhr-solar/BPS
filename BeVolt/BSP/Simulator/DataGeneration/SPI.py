@@ -71,7 +71,7 @@ def random_temperature(state, mode):
         if mode == 'low':
             temperature_values = [(random.randint(10000, 30000), random.randint(10000, 30000)) for i in range(31)]
         elif mode == 'normal':
-            temperature_values = [(random.randint(30000, 73000), random.randint(30000, 73000)) for i in range(31)]
+            temperature_values = [(random.randint(30000, 72000), random.randint(30000, 72000)) for i in range(31)]
         elif mode == 'high':
             temperature_values = [(random.randint(73000, 90000), random.randint(73000, 90000)) for i in range(31)]
 
