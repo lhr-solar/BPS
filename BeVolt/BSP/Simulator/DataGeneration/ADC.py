@@ -75,7 +75,6 @@ def specific_adc(current):
     return (amps_to_adc(current, 'l'), amps_to_adc(current, 'h'))
 
 
-
 def generate(state, mode, battery=None):
     """
     @brief create csv file with randomized ADC data
