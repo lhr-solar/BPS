@@ -125,7 +125,6 @@ static uint16_t ConvertTemperatureToMilliVolts(int32_t celcius);
 /**
  * @brief   File access functions
  */
-static bool LoadCSV(void);
 static bool UpdateSimulationData(void);
 
 /**
@@ -358,7 +357,8 @@ static bool UpdateSimulationData(void) {
 
     // Lock the file so simulator.py/SPI.py can not write it during a read op
     // This is a blocking statement
-    flock(fp, LOCK_EX);
+    int fno = fileno(fp);
+    flock(fno, LOCK_EX);
 
     // Read data
     while(fgets(csvBuffer, CSV_SPI_BUFFER_SIZE, fp) != 0) {
@@ -396,7 +396,7 @@ static bool UpdateSimulationData(void) {
     }
 
     // Unlock the lock so the simulator can write to SPI.csv again
-    flock(fp, LOCK_UN);
+    flock(fno, LOCK_UN);
 
     // Close file.
     fclose(fp);

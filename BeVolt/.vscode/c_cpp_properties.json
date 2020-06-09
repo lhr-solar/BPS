@@ -19,7 +19,8 @@
             ],
             "defines": [
                 "STM32F413_423xx",
-                "USE_STDPERIPH_DRIVER"
+                "USE_STDPERIPH_DRIVER",
+                "_POSIX_C_SOURCE=200112L"
             ],
             "compilerPath": "/usr/bin/gcc",
             "cStandard": "c11",
