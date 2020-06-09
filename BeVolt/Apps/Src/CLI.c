@@ -45,8 +45,11 @@ void CLI_Init(cell_asic* boards) {
  * @param parsedTokens is an array to pass the parsed words back
  */
 void CLI_InputParse(char* input, int* parsedTokens) {
+    static char inputCpy[COMMAND_SIZE];
+    strcpy(inputCpy, input);
+
 	char *tokenized;
-	char *split = strtok_r(input, " ", &tokenized);
+	char *split = __strtok_r(inputCpy, " ", &tokenized);
 	for(int i = 0; i < MAX_TOKEN_SIZE && split != NULL; i++) {
 		for(int j = 0; j < strlen(split); j++) {
 			split[j] = tolower(split[j]);
@@ -59,7 +62,7 @@ void CLI_InputParse(char* input, int* parsedTokens) {
 		} else {
 			parsedTokens[i] = CLI_StringHash(split);
 		}
-		split = strtok_r(NULL, " ", &tokenized);
+		split = __strtok_r(NULL, " ", &tokenized);
 	}
 }
 
@@ -245,8 +248,14 @@ void CLI_Temperature(int* hashTokens) {
 					printf("Module number %d: %.3f C\n\r", hashTokens[2], Temperature_GetModuleTemperature(hashTokens[2]-1)/MILLI_UNIT_CONVERSION);
 				} else if(hashTokens[3]-1 == 0 || hashTokens[3]-1 == 1) {//temperature of specific sensor in module
 					uint16_t boardNum = (hashTokens[2]-1)/MAX_VOLT_SENSORS_PER_MINION_BOARD;
+					uint16_t sensorNum;
+					if (hashTokens[3]-1) {
+						sensorNum = ((hashTokens[2]-1)%MAX_VOLT_SENSORS_PER_MINION_BOARD)+MAX_VOLT_SENSORS_PER_MINION_BOARD;
+					} else {
+						sensorNum = (hashTokens[2]-1)%MAX_VOLT_SENSORS_PER_MINION_BOARD;
+					}
 					printf("Sensor %d on module %d: %.3f C\n\r", hashTokens[3], hashTokens[2], 
-							Temperature_GetSingleTempSensor(boardNum, hashTokens[3]-1)/MILLI_UNIT_CONVERSION);
+							Temperature_GetSingleTempSensor(boardNum, sensorNum)/MILLI_UNIT_CONVERSION);
 				} else {
 					printf("Invalid sensor number\n\r");
 				}
@@ -388,9 +397,9 @@ void setLED(Light input, int state) {
  * @param hashTokens is the array of hashed tokens
  */
 void CLI_LED(int* hashTokens) {
-	uint8_t error = BSP_Light_GetState(FAULT);
+	State error = BSP_Light_GetState(FAULT);
 	if((int *)hashTokens[1] == NULL) {
-		if(error) {
+		if(error == ON) {
 			printf("Error light is On\n\r");
 		} else {
 			printf("Error light is Off\n\r");
@@ -677,6 +686,7 @@ void CLI_All(void) {
  */
 void CLI_Handler(char* input) {
 	int hashTokens[MAX_TOKEN_SIZE] = {0};
+
 	CLI_InputParse(input, hashTokens);
 
 	#ifdef PARTY_PARROT
@@ -770,6 +780,5 @@ void CLI_Handler(char* input) {
 			printf("Invalid command. Type 'help' or 'menu' for the help menu\n\r");
 			break;
 	}
-	printf("%d\n\r", hashTokens[0]);
 	printf(">> ");
 }
