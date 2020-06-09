@@ -388,7 +388,7 @@ void setLED(Light input, int state) {
  */
 void CLI_LED(int* hashTokens) {
 	State error = BSP_Light_GetState(FAULT);
-	if((int *)hashTokens[1] == NULL) {
+	if(hashTokens[1] == 0) {
 		if(error == ON) {
 			printf("Error light is On\n\r");
 		} else {
