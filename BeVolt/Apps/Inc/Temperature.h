@@ -87,7 +87,7 @@ uint8_t *Temperature_GetModulesInDanger(void);
  * @param index of sensor (0-indexed based)
  * @return temperature of the battery module at specified index
  */
-int16_t Temperature_GetSingleTempSensor(uint8_t board, uint8_t sensorIdx);
+int32_t Temperature_GetSingleTempSensor(uint8_t board, uint8_t sensorIdx);
 
 /** Temperature_GetModuleTemperature
  * Gets the avg temperature of a certain battery module in the battery pack. Since there
@@ -96,13 +96,13 @@ int16_t Temperature_GetSingleTempSensor(uint8_t board, uint8_t sensorIdx);
  * @param index of module (0-indexed based)
  * @return temperature of the battery module at specified index
  */
-int16_t Temperature_GetModuleTemperature(uint8_t moduleIdx);
+int32_t Temperature_GetModuleTemperature(uint8_t moduleIdx);
 
 /** Temperature_GetTotalPackAvgTemperature
  * Gets the average temperature of the whole battery pack
  * @return average temperature of battery pack
  */
-int16_t Temperature_GetTotalPackAvgTemperature(void);
+int32_t Temperature_GetTotalPackAvgTemperature(void);
 
 /** Temperature_SampleADC
  * Starts ADC conversion on GPIO1 on LTC6811's auxiliary registers on all boards

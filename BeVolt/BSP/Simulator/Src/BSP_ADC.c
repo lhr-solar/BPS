@@ -10,7 +10,12 @@ static const char* file = "BSP/Simulator/DataGeneration/Data/ADC.csv";
  * @return  None
  */
 void BSP_ADC_Init(void) {
-    // No initialization for simulator
+    // Check if simulator is running i.e. were the csv files created?
+    if(access(file, F_OK) != 0) {
+        // File doesn't exit if true
+        perror("ADC.csv");
+        exit(EXIT_FAILURE);
+    }
 }
 
 /**

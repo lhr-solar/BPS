@@ -75,7 +75,7 @@ def specific_adc(current):
     return (amps_to_adc(current, 'l'), amps_to_adc(current, 'h'))
 
 
-def generate(state, mode, current=None):
+def generate(state, mode, battery=None):
     """
     @brief create csv file with randomized ADC data
         Function called by simulate.py
@@ -84,15 +84,15 @@ def generate(state, mode, current=None):
     """
     global current_value
     os.makedirs(os.path.dirname(file), exist_ok=True)
-    if current is None:
+    if battery is None:
         with open(file, 'w+') as csvfile:
             csvwriter = csv.writer(csvfile)
             csvwriter.writerow(list(random_adc(state, mode)))
     else:
         with open(file, 'w+') as csvfile:
             csvwriter = csv.writer(csvfile)
-            csvwriter.writerow(list(specific_adc(current)))
-        current_value = current
+            csvwriter.writerow(list(specific_adc(battery.current)))
+        current_value = battery.current
 
 
 def read():
