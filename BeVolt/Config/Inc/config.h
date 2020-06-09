@@ -13,6 +13,7 @@ typedef enum {ERROR = 0, SUCCESS = !ERROR} ErrorStatus;
 typedef enum {SAFE = 0, DANGER = 1, OVERVOLTAGE = 2, UNDERVOLTAGE = 3} SafetyStatus;
 
 // NUCLEO or custom
+#define COMMAND_SIZE			128
 #define NUCLEO		0		// Change 1 if using nucleo, 0 if not
 
 //--------------------------------------------------------------------------------
