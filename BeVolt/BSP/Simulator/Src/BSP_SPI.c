@@ -75,7 +75,6 @@ typedef enum {
 
 // Path relative to the executable
 const char* file = "BSP/Simulator/DataGeneration/Data/SPI.csv";
-static FILE* fp;
 
 static uint8_t chipSelectState = 1;     // During idle, the cs pin should be high.
                                         // Knowing the cs pin's state is not needed for the simulator,
@@ -340,37 +339,28 @@ static void RDCommandHandler(uint8_t *buf, uint32_t len) {
  */
 
 /**
- * @brief   Reads the CSV file and loads the data into the buffer
- * @return  true if data was read successfully, false if failed
- */
-static bool LoadCSV(void) {
-    // Might be waiting for OS to release access to the file since the python
-    // script may be writing to it often.
-    do {
-        fp = fopen(file, "r");
-    } while(!fp);
-
-    // Lock the file so simulator.py/SPI.py can not write it during a read op
-    // This is a blocking statement
-    flock(fp, LOCK_EX);
-
-    return true;
-}
-
-/**
  * @brief   Updates the simulationData struct from the CSV file
  * @return  true if data was read successfully, false if failed
  */
 static bool UpdateSimulationData(void) {
-    if(!LoadCSV()) {
-        return false;
-    }
-
     int lineIdx = 0;
     int temperatureIdx = 0;
     int voltageIdx = 0;
     int openWireIdx = 0;
 
+    // Open File and get file descriptor
+    FILE* fp = fopen(file, "r");
+    if(!fp) {
+        // Exit, error!
+        perror("SPI.csv");
+        exit(EXIT_FAILURE);
+    }
+
+    // Lock the file so simulator.py/SPI.py can not write it during a read op
+    // This is a blocking statement
+    flock(fp, LOCK_EX);
+
+    // Read data
     while(fgets(csvBuffer, CSV_SPI_BUFFER_SIZE, fp) != 0) {
         char *saveDataPtr = NULL;
 
@@ -407,6 +397,8 @@ static bool UpdateSimulationData(void) {
 
     // Unlock the lock so the simulator can write to SPI.csv again
     flock(fp, LOCK_UN);
+
+    // Close file.
     fclose(fp);
 
     return true;
