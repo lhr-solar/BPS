@@ -11,4 +11,5 @@
    
    BSP_CAN_Write(0x10A, message, length);
    BSP_CAN_Read(id, readData);
+   exit(0);
 }
