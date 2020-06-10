@@ -91,7 +91,7 @@ uint8_t BSP_CAN_Read(uint32_t *id, uint8_t *data) {
 
         fseek(fp, 6 ,SEEK_SET);
         for(int i = 0; i < 8; i++){
-            fscanf(fp, "%*c%*c%2x%*c", data);
+            fscanf(fp, "%*c%*c%2hhx%*c", data);
             data++;
         }
         flock(fno, LOCK_UN);
