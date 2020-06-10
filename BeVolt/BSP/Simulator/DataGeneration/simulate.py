@@ -142,10 +142,18 @@ def main():
                     stdscr = curses.initscr()
                     curses.start_color()
         except Exception as e:
+            curses.echo()
+            curses.nocbreak()
+            curses.endwin()
             print("ERROR:", end=" ")
             print(e, end="\r\n")
             print("If addwstr() returned ERR, make your terminal window bigger.")
-            break
+            print("\n\rContinue? (Y/n): ", end="")
+            cont = input()
+            if(cont.lower() == "n" or cont.lower() == "no"):
+                break
+            print("Continuing...")
+            main()
     curses.echo()
     curses.nocbreak()
     curses.endwin()

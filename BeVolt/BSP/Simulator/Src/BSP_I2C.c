@@ -35,8 +35,8 @@ void BSP_I2C_Init(void) {
             fprintf(fp, "0x00\n");
         }
         fprintf(fp, "0x00");
+        fclose(fp);
     }
-    fclose(fp);
 }
 
 /**
