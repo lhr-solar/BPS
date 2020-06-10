@@ -123,6 +123,7 @@ static void CopyVoltageToByteArray(uint8_t *data, Group group);
 static void CopyOpenWireVoltageToByteArray(uint8_t *data, Group group, bool pullup);
 static void CopyTemperatureToByteArray(uint8_t *data, Group group);
 static uint16_t ConvertTemperatureToMilliVolts(int32_t celcius);
+static Group DetermineGroupLetter(uint16_t cmd);
 
 /**
  * @brief   File access functions
@@ -289,51 +290,76 @@ static void RDCommandHandler(uint8_t *buf, uint32_t len) {
 
         // Read Cell Voltages
         case SIM_LTC6811_RDCVA:
-            if(openWireOpFlag) {
-                CopyOpenWireVoltageToByteArray(data, GroupA, openWirePUFlag);
-            } else {
-                CopyVoltageToByteArray(data, GroupA);
-            }
-            CreateReadPacket(buf, data, NUM_MINIONS * BYTES_PER_REG);
-            break;
-
         case SIM_LTC6811_RDCVB:
-            if(openWireOpFlag) {
-                CopyOpenWireVoltageToByteArray(data, GroupB, openWirePUFlag);
-            } else {
-                CopyVoltageToByteArray(data, GroupB);
-            }
-            CreateReadPacket(buf, data, NUM_MINIONS * BYTES_PER_REG);
-            break;
-
         case SIM_LTC6811_RDCVC:
-            if(openWireOpFlag) {
-                CopyOpenWireVoltageToByteArray(data, GroupC, openWirePUFlag);
-            } else {
-                CopyVoltageToByteArray(data, GroupC);
-            }
-            CreateReadPacket(buf, data, NUM_MINIONS * BYTES_PER_REG);
-            break;
-
         case SIM_LTC6811_RDCVD:
+        case SIM_LTC6811_RDCVE:
+        case SIM_LTC6811_RDCVF: {
+            Group grp = DetermineGroupLetter(currCmd);
             if(openWireOpFlag) {
-                CopyOpenWireVoltageToByteArray(data, GroupD, openWirePUFlag);
+                CopyOpenWireVoltageToByteArray(data, grp, openWirePUFlag);
             } else {
-                CopyVoltageToByteArray(data, GroupD);
+                CopyVoltageToByteArray(data, grp);
             }
             CreateReadPacket(buf, data, NUM_MINIONS * BYTES_PER_REG);
             break;
+        }
 
-        case SIM_LTC6811_RDAUXA:
-            CopyTemperatureToByteArray(data, GroupA);
+        case SIM_LTC6811_RDAUXA: {
+            Group grp = DetermineGroupLetter(currCmd);
+            CopyTemperatureToByteArray(data, grp);
             CreateReadPacket(buf, data, NUM_MINIONS * BYTES_PER_REG);
             break;
+        }
 
         default:
             break;
     }
 }
 
+/**
+ * @brief   Returns the group letter depenging on the cmd and if grouping is required.
+ * @param   cmd     specifies which group must be selected
+ * @return  Group   letter of the cmd group
+ */
+static Group DetermineGroupLetter(uint16_t cmd) {
+    Group grp = GroupA;
+
+    switch(cmd) {
+        case SIM_LTC6811_RDCVA:
+        case SIM_LTC6811_RDAUXA:
+            grp = GroupA;
+            break;
+
+        case SIM_LTC6811_RDCVB:
+        case SIM_LTC6811_RDAUXB:
+            grp = GroupB;
+            break;
+
+        case SIM_LTC6811_RDCVC:
+        case SIM_LTC6811_RDAUXC:
+            grp = GroupC;
+            break;
+
+        case SIM_LTC6811_RDCVD:
+        case SIM_LTC6811_RDAUXD:
+            grp = GroupD;
+            break;
+
+        case SIM_LTC6811_RDCVE:
+            grp = GroupE;
+
+        case SIM_LTC6811_RDCVF:
+            grp = GroupF;
+            break;
+
+        default:
+            grp = GroupA;
+            break;
+    }
+
+    return grp;
+}
 
 /**
  * @brief FILE ACCESSING FUNCTIONS
