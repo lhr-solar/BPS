@@ -11,18 +11,16 @@ static char* file = "BSP/Simulator/DataGeneration/Data/PLL.csv";
  * @return  None
  */
 void BSP_PLL_Init(void) {
-    FILE* fp = fopen(file, "r");
+    FILE* fp = fopen(file, "w");
     if(!fp) {
         perror("PLL.csv");
         exit(EXIT_FAILURE);
     }
     int fno = fileno(fp);
     flock(fno, LOCK_EX);
-    flock(fno, LOCK_UN);
-    fclose(fp);
-
-    fp = fopen(file, "w");
+    
     fprintf(fp, "%d", 16000000);
+    flock(fno, LOCK_UN);
 	fclose(fp);
 }
 
@@ -41,10 +39,8 @@ uint32_t BSP_PLL_GetSystemClock(void) {
     }
     int fno = fileno(fp);
     flock(fno, LOCK_EX);
-    flock(fno, LOCK_UN);
-    fclose(fp);
-    fp = fopen(file, "r");
     fgets(str, 20, fp);
+    flock(fno, LOCK_UN);
     fclose(fp);
     currentFreq = atoi(str);
     return currentFreq;   
