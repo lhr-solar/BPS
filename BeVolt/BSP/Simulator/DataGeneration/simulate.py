@@ -68,9 +68,9 @@ def configure():
     while state != 'charging' and state != 'discharging':
         print("That is not a valid option. Please enter 'charging' or 'discharging'")
         state = input()
-        print("Would you like to simulate 'low', 'normal', or 'high' values?")
-        mode = input()
-        while mode != 'low' and mode != 'normal' and mode != 'high':
+    print("Would you like to simulate 'low', 'normal', or 'high' values?")
+    mode = input()
+    while mode != 'low' and mode != 'normal' and mode != 'high':
             print("That is not a valid option. Please enter 'low', 'normal', or 'high': ")
             mode = input()
 
