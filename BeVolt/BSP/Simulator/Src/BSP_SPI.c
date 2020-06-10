@@ -76,7 +76,7 @@ typedef enum {
 } Group;
 
 // Path relative to the executable
-static const char* file = GET_CSV_PATH("SPI.csv");
+static const char* file = GET_CSV_PATH(SPI_CSV_FILE);
 
 static uint8_t chipSelectState = 1;     // During idle, the cs pin should be high.
                                         // Knowing the cs pin's state is not needed for the simulator,
@@ -147,7 +147,7 @@ void BSP_SPI_Init(void) {
     // Check if simulator is running i.e. were the csv files created?
     if(access(file, F_OK) != 0) {
         // File doesn't exit if true
-        perror("SPI.csv");
+        perror(SPI_CSV_FILE);
         exit(EXIT_FAILURE);
     }
 }
@@ -353,7 +353,7 @@ static bool UpdateSimulationData(void) {
     FILE* fp = fopen(file, "r");
     if(!fp) {
         // Exit, error!
-        perror("SPI.csv");
+        perror(SPI_CSV_FILE);
         exit(EXIT_FAILURE);
     }
 

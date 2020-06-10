@@ -1,7 +1,7 @@
 #include "BSP_Lights.h"
 #include "simulator_conf.h"
 
-static const char* file = GET_CSV_PATH("Lights.csv");
+static const char* file = GET_CSV_PATH(LIGHTS_CSV_FILE);
 
 int LEDReg;
 /**

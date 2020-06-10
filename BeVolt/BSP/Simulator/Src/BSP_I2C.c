@@ -9,7 +9,7 @@
 //only supports EEPROM peripheral (as of May 2020, the EEPROM is the only peripheral on the I2C bus)
 
 //path for EEPROM file
-static const char* file = GET_CSV_PATH("I2C.csv");
+static const char* file = GET_CSV_PATH(I2C_CSV_FILE);
 
 /**
  * @brief   Initializes the I2C port that interfaces with the EEPROM. Creates EEPROM txt file if it does not already exist
