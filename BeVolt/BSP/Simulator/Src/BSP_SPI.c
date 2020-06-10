@@ -71,7 +71,7 @@ typedef struct {
 } ltc6811_sim_t;
 
 typedef enum {
-    A=0, B, C, D, E, F
+    GroupA=0, GroupB, GroupC, GroupD, GroupE, GroupF
 } Group;
 
 // Path relative to the executable
@@ -289,42 +289,42 @@ static void RDCommandHandler(uint8_t *buf, uint32_t len) {
         // Read Cell Voltages
         case SIM_LTC6811_RDCVA:
             if(openWireOpFlag) {
-                CopyOpenWireVoltageToByteArray(data, A, openWirePUFlag);
+                CopyOpenWireVoltageToByteArray(data, GroupA, openWirePUFlag);
             } else {
-                CopyVoltageToByteArray(data, A);
+                CopyVoltageToByteArray(data, GroupA);
             }
             CreateReadPacket(buf, data, NUM_MINIONS * BYTES_PER_REG);
             break;
 
         case SIM_LTC6811_RDCVB:
             if(openWireOpFlag) {
-                CopyOpenWireVoltageToByteArray(data, B, openWirePUFlag);
+                CopyOpenWireVoltageToByteArray(data, GroupB, openWirePUFlag);
             } else {
-                CopyVoltageToByteArray(data, B);
+                CopyVoltageToByteArray(data, GroupB);
             }
             CreateReadPacket(buf, data, NUM_MINIONS * BYTES_PER_REG);
             break;
 
         case SIM_LTC6811_RDCVC:
             if(openWireOpFlag) {
-                CopyOpenWireVoltageToByteArray(data, C, openWirePUFlag);
+                CopyOpenWireVoltageToByteArray(data, GroupC, openWirePUFlag);
             } else {
-                CopyVoltageToByteArray(data, C);
+                CopyVoltageToByteArray(data, GroupC);
             }
             CreateReadPacket(buf, data, NUM_MINIONS * BYTES_PER_REG);
             break;
 
         case SIM_LTC6811_RDCVD:
             if(openWireOpFlag) {
-                CopyOpenWireVoltageToByteArray(data, D, openWirePUFlag);
+                CopyOpenWireVoltageToByteArray(data, GroupD, openWirePUFlag);
             } else {
-                CopyVoltageToByteArray(data, D);
+                CopyVoltageToByteArray(data, GroupD);
             }
             CreateReadPacket(buf, data, NUM_MINIONS * BYTES_PER_REG);
             break;
 
         case SIM_LTC6811_RDAUXA:
-            CopyTemperatureToByteArray(data, A);
+            CopyTemperatureToByteArray(data, GroupA);
             CreateReadPacket(buf, data, NUM_MINIONS * BYTES_PER_REG);
             break;
 
@@ -589,7 +589,7 @@ static void CopyTemperatureToByteArray(uint8_t *data, Group group) {
 
     // Only GPIO1 is connected to an analog voltage so group A Bytes[0:1] is the only
     // location that is updated.
-    if(group == A) {
+    if(group == GroupA) {
         int dataIdx = 0;
         for(int i = NUM_MINIONS-1; i >= 0; i--) {
 
