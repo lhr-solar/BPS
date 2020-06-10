@@ -1,5 +1,6 @@
 #include "BSP_SPI.h"
 #include "config.h"
+#include <unistd.h>
 #include <sys/file.h>
 
 #define CSV_SPI_BUFFER_SIZE     1024
