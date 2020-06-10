@@ -36,6 +36,7 @@ def display(battery=None):
     
     stdscr.addstr(0, 0, "Simulator")
     stdscr.addstr(1, 0, "=============================")
+    stdscr.addstr(2, 0, f"                                          ") 
     stdscr.addstr(2, 0, f"Clock Frequency: {frequency} Hz")
     stdscr.addstr(3, 0, f"ADC:")
     stdscr.addstr(3, 10, f"Low Precision: {adc_values[0][0]}")
@@ -62,16 +63,11 @@ def configure():
     # Get configuration settings
     global state, mode
     print("Welcome to the BPS Simulator")
-    print("Would you like to simulate 'charging', 'discharging', or 'PLL'?")
+    print("Would you like to simulate 'charging', or 'discharging'")
     state = input()
-    while state != 'charging' and state != 'discharging' and state != 'PLL':
-        print("That is not a valid option. Please enter 'charging', 'discharging', or 'PLL': ")
+    while state != 'charging' and state != 'discharging':
+        print("That is not a valid option. Please enter 'charging' or 'discharging'")
         state = input()
-    if state == 'PLL':
-        print("Enter the frequency you would like to change the clock to in Hz.")
-        frequency = int(input())
-        PLL.Change_Frequency(frequency)
-    else:
         print("Would you like to simulate 'low', 'normal', or 'high' values?")
         mode = input()
         while mode != 'low' and mode != 'normal' and mode != 'high':
@@ -101,11 +97,15 @@ def main():
             curses.endwin()
             if BeVolt is not None:
                 break
-            print("\n\rWould you like to change 'config' or 'quit'?")
+            print("\n\rWould you like to change 'config', 'PLL', or 'quit'?")
             choice = input()
             if choice == 'config':
                 configure()
                 stdscr = curses.initscr()
+            elif choice == 'PLL':
+                print("Enter the frequency you would like to change the clock to in Hz.")
+                frequency = int(input())
+                PLL.Change_Frequency(frequency)
             elif choice == 'quit':
                 break
             else:
