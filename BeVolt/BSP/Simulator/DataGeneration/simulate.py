@@ -56,17 +56,16 @@ def configure():
     # Get configuration settings
     global state, mode
     print("Welcome to the BPS Simulator")
-    print("Would you like to simulate 'charging', 'discharging', or 'CAN'?")
+    print("Would you like to simulate 'charging' or'discharging'")
     state = input()
     while state != 'charging' and state != 'discharging':
         print("That is not a valid option. Please enter 'charging' or 'discharging': ")
         state = input()
-    else:
-        print("Would you like to simulate 'low', 'normal', or 'high' values?")
+    print("Would you like to simulate 'low', 'normal', or 'high' values?")
+    mode = input()
+    while mode != 'low' and mode != 'normal' and mode != 'high':
+        print("That is not a valid option. Please enter 'low', 'normal', or 'high': ")
         mode = input()
-        while mode != 'low' and mode != 'normal' and mode != 'high':
-            print("That is not a valid option. Please enter 'low', 'normal', or 'high': ")
-            mode = input()
 
 
 def main():

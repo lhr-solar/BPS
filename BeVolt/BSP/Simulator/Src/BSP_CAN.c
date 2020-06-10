@@ -1,6 +1,7 @@
 #include "BSP_CAN.h"
 #include <stdint.h>
 #include <stdlib.h>
+#include <sys/file.h>
 
 static const char* file = "BSP/Simulator/DataGeneration/Data/CAN.csv";
 
@@ -15,8 +16,14 @@ uint32_t flag;
 
 
 void BSP_CAN_Init(void) {
-
-    FILE* fp = fopen(file, "w"); 
+    FILE* fp = fopen(file, "w");
+    if(!fp) {
+        perror("CAN.csv");
+        exit(EXIT_FAILURE);
+    }
+    int fno = fileno(fp);
+    flock(fno, LOCK_EX);
+    flock(fno, LOCK_UN);
     fclose(fp);
     flag = 0;
 }
@@ -32,11 +39,20 @@ void BSP_CAN_Init(void) {
  */
 
 uint8_t BSP_CAN_Write(uint32_t id, uint8_t data[8], uint8_t length) {
+    FILE* fp = fopen(file, "w");
+    if(!fp) {
+        perror("CAN.csv");
+        exit(EXIT_FAILURE);
+    }
+    int fno = fileno(fp);
+    flock(fno, LOCK_EX);
+    
     if(length > 8){
+        flock(fno, LOCK_UN);
+        fclose(fp);
         return 0;
     }
 
-    FILE* fp = fopen(file, "w");
     fprintf(fp, "0x%.3x,", id);
     for(int i = 0; i < 8; i++){
         if(i == (7)){
@@ -46,6 +62,7 @@ uint8_t BSP_CAN_Write(uint32_t id, uint8_t data[8], uint8_t length) {
         }
              
     }
+    flock(fno, LOCK_UN);
     fclose(fp);
     flag = 1;
     return 1;
@@ -61,8 +78,14 @@ uint8_t BSP_CAN_Write(uint32_t id, uint8_t data[8], uint8_t length) {
  * clear the message that was read from the file
  */
 uint8_t BSP_CAN_Read(uint32_t *id, uint8_t *data) {
+    FILE* fp = fopen(file, "r+");
+    if(!fp) {
+        perror("CAN.csv");
+        exit(EXIT_FAILURE);
+    }
+    int fno = fileno(fp);
+    flock(fno, LOCK_EX);
     if(flag){
-        FILE* fp = fopen(file, "r+");
         fseek(fp, 2, SEEK_SET);
         fscanf(fp, "%3x", id);
 
@@ -71,9 +94,18 @@ uint8_t BSP_CAN_Read(uint32_t *id, uint8_t *data) {
             fscanf(fp, "%*c%*c%2x%*c", data);
             data++;
         }
+        flock(fno, LOCK_UN);
         fclose(fp);
     
-        fopen(file, "w");
+        
+        fp = fopen(file, "w");
+        if(!fp) {
+            perror("CAN.csv");
+            exit(EXIT_FAILURE);
+        }
+        int fno = fileno(fp);
+        flock(fno, LOCK_EX);
+        flock(fno, LOCK_UN);
         fclose(fp);
         flag  = 0;
         return 1;
