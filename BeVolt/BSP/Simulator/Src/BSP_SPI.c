@@ -1,5 +1,6 @@
 #include "BSP_SPI.h"
 #include "config.h"
+#include "simulator_conf.h"
 #include <unistd.h>
 #include <sys/file.h>
 
@@ -75,7 +76,7 @@ typedef enum {
 } Group;
 
 // Path relative to the executable
-const char* file = "BSP/Simulator/DataGeneration/Data/SPI.csv";
+static const char* file = GET_CSV_PATH("SPI.csv");
 
 static uint8_t chipSelectState = 1;     // During idle, the cs pin should be high.
                                         // Knowing the cs pin's state is not needed for the simulator,

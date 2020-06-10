@@ -1,8 +1,8 @@
 #include "BSP_Lights.h"
-#include <stdint.h>
-#include <stdlib.h>
+#include "simulator_conf.h"
 
-static const char* file = "BSP/Simulator/DataGeneration/Data/Lights.csv";
+static const char* file = GET_CSV_PATH("Lights.csv");
+
 int LEDReg;
 /**
  * @brief   Initialize all the GPIO pins connected to each LED/Light
