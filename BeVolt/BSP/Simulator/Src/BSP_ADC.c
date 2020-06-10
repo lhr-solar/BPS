@@ -1,4 +1,5 @@
 #include "BSP_ADC.h"
+#include <unistd.h>
 
 // Path relative to the executable
 static const char* file = "BSP/Simulator/DataGeneration/Data/ADC.csv";
