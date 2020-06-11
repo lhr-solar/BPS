@@ -5,7 +5,7 @@
 
 static const char* file = "BSP/Simulator/DataGeneration/Data/CAN.csv";
 
-uint32_t flag;
+uint32_t flag;  // 1 = there is a message ready to read, 0 = there is no message ready to be read
 
 /**
  * @brief   Initializes the CAN module that communicates with the rest of the electrical system.
