@@ -42,9 +42,10 @@ uint32_t BSP_UART_ReadLine(char *str) {
     if(lineReceived) {
         // TODO: Disble UART Receive interrupts HERE
         uint8_t data = 0;
+        uint32_t recvd = 0;
         RxFifo_Peek(&data);
         while(!RxFifo_IsEmpty() && data != '\r') {
-            RxFifo_Get(str++);
+            recvd += RxFifo_Get(str++);
             RxFifo_Peek(&data);
         }
 
@@ -54,27 +55,28 @@ uint32_t BSP_UART_ReadLine(char *str) {
 
         lineReceived = false;
         // TODO: Disble UART Receive interrupts HERE
-        return true;
+        return recvd;
     }
 
-    return false;
+    return 0;
 }
 
 /**
  * @brief   Transmits data to through UART line
  * @param   str : pointer to buffer with data to send.
  * @param   len : size of buffer
- * @return  numer of bytes that were sent
+ * @return  number of bytes that were sent
  */
 uint32_t BSP_UART_Write(char *str, uint32_t len) {
     // TODO: Disble UART Transmit interrupts HERE
+    uint32_t sent = 0;
     while(*str != '\0' && len > 0) {
-        TxFifo_Put(*str);
+        sent += TxFifo_Put(*str);
         str++;
         len--;
     }
     // TODO: Enable UART Transmit interrupts HERE
-    return true;
+    return sent;
 }
 
 

@@ -82,9 +82,10 @@ uint32_t BSP_UART_ReadLine(char *str) {
     if(lineReceived) {
         USART_ITConfig(USART3, USART_IT_RXNE, RESET);
         uint8_t data = 0;
+        uint32_t recvd = 0;
         RxFifo_Peek(&data);
         while(!RxFifo_IsEmpty() && data != '\r') {
-            RxFifo_Get((uint8_t *)str++);
+            recvd += RxFifo_Get((uint8_t *)str++);
             RxFifo_Peek(&data);
         }
 
@@ -94,10 +95,10 @@ uint32_t BSP_UART_ReadLine(char *str) {
 
         lineReceived = false;
         USART_ITConfig(USART3, USART_IT_RXNE, SET);
-        return true;
+        return recvd;
     }
 
-    return false;
+    return 0;
 }
 
 /**
@@ -108,13 +109,14 @@ uint32_t BSP_UART_ReadLine(char *str) {
  */
 uint32_t BSP_UART_Write(char *str, uint32_t len) {
     USART_ITConfig(USART3, USART_IT_TC, RESET);
+    uint32_t sent = 0;
     while(*str != '\0' && len > 0) {
-        TxFifo_Put(*str);
+        sent += TxFifo_Put(*str);
         str++;
         len--;
     }
     USART_ITConfig(USART3, USART_IT_TC, SET);
-    return true;
+    return sent;
 }
 
 void USART3_IRQHandler(void) {

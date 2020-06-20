@@ -52,6 +52,7 @@ class Battery:
             self.soc = soc if soc is not None else capacity
             self.cells = self.create_cells()
             self.voltage = self.calc_voltage()
+            self.connected = True
         
 
         def __str__(self):
