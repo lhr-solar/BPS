@@ -4,6 +4,7 @@ import battery
 import ADC
 import Lights
 import SPI
+import WDTimer
 
 # Global configurations
 state = ''  # Charging/Discharging
@@ -21,9 +22,13 @@ def generate(battery=None):
     ADC.generate(state, mode, battery)
     # Generate SPI values
     SPI.generate(state, mode, battery)
+    #Pet Watchdog
+    WDTimer.Check_State()
+    #Initialize Watchdog Timer
+    WDTimer.WD_Enable()
 
 
-def display(battery=None):
+def display(battery=None):  #print watchdog countdown 
     global stdscr
     # Read ADC values
     adc_values = ADC.read()
@@ -35,6 +40,9 @@ def display(battery=None):
     # Read Current values
     stdscr.addstr(4, 0, f"Current:")
     stdscr.addstr(4, 10, f"{adc_values[1]} A ")
+    # Display Watchdog ticks
+    ticks = WDTimer.Tick()
+    stdscr.addstr(10, 0, f"WDTimer Countdown: {ticks}")
     # Read Module values
     stdscr.addstr(0, 54, "Modules")
     stdscr.addstr(1, 40, "====================================")
