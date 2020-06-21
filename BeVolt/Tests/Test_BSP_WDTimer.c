@@ -3,8 +3,6 @@
 #include "BSP_WDTimer.h"
 
 int main(){
-    //bool testResetCheck = BSP_WDTimer_DidSystemReset();
-    //exit(0);
     uint32_t delay = 150000000;
     uint32_t secs = 40;
     uint32_t resetCount = 3;
