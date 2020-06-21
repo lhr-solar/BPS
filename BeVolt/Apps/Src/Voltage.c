@@ -4,12 +4,12 @@
  */
 
 #include "Voltage.h"
-#include "LTC6811.h"
+#include "LTC681x.h"
 #include "config.h"
 #include <stdlib.h>
 
 static cell_asic *Minions;
-
+uint16_t VoltageVal[NUM_BATTERY_MODULES]; //Voltage values gathered
 /** LTC ADC measures with resolution of 4 decimal places, 
  * But we standardized to have 3 decimal places to work with
  * millivolts
@@ -59,7 +59,12 @@ ErrorStatus Voltage_UpdateMeasurements(void){
 	// Read Cell Voltage Registers
 	wakeup_idle(NUM_MINIONS); // Not sure if wakeup is necessary if you start conversion then read consecutively
 	error = LTC6811_rdcv(0, NUM_MINIONS, Minions); // Set to read back all cell voltage registers
-
+	
+	//copies values from cells.c_codes to private array
+	for(int i = 0; i < NUM_BATTERY_MODULES; i++){
+		VoltageVal[i] = Minions[i / MAX_VOLT_SENSORS_PER_MINION_BOARD].cells.c_codes[i % MAX_VOLT_SENSORS_PER_MINION_BOARD];
+	}
+	
 	if(error == 0){
 		return SUCCESS;
 	}else{
@@ -163,7 +168,7 @@ uint16_t Voltage_GetModuleMillivoltage(uint8_t moduleIdx){
         return 0xFFFF;  // return -1 which indicates error voltage
     }
 
-	return Minions[moduleIdx / MAX_VOLT_SENSORS_PER_MINION_BOARD].cells.c_codes[moduleIdx % MAX_VOLT_SENSORS_PER_MINION_BOARD] / 10;
+	return VoltageVal[moduleIdx] / 10;
 }
 
 /** Voltage_GetTotalPackVoltage
