@@ -5,24 +5,24 @@
 #include "config.h"
 
 /**
- * @brief Initialize all GPIO pins connected to Strobe
- * @param None
- * @return None
+ * @brief   Create text file if none exists (Simulator)
+ * @param   None
+ * @return  None
  */
- void BSP_Strobe_Init(void);
+void BSP_Strobe_Init(void);
 
 /**
  * @brief   Turns on Strobe (pulse once per second)
  * @param   None
  * @return  None
  */
-void BSP_Strobe_On(Light signal);
+void BSP_Strobe_On(void);
 
 /**
  * @brief   Turns off Strobe
  * @param   None
  * @return  None
  */
-void BSP_Strobe_Off(Light signal);
+void BSP_Strobe_Off(void);
 
 #endif
