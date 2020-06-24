@@ -6,17 +6,21 @@ char a;
 int  main() {
 BSP_Strobe_Init();
 BSP_Strobe_On();
+/*
 FILE* fp = fopen(file, "r");
 a = getc(fp);
 fclose(fp);
 printf("After Strobe_On, current status is %c", a);
 printf(" ... ");
+*/
 
 BSP_Strobe_Off();
+/*
 fp = fopen(file, "r");
 a = getc(fp);
 fclose(fp);
 printf("After Strobe_Off, current status is %c", a);
+*/
 
 return(0);
 }

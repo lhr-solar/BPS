@@ -13,7 +13,8 @@ def read();
         pass   #creates file if it doesn't exist
     with open(file 'r') as csvfile: #read file
         csvreader = csv.reader(csvfile)
-        if len(strobe):
-            return int (strobe)
+        if row in csvreader:
+            strobe = row
+        return int (strobe)
         else:
             return 0

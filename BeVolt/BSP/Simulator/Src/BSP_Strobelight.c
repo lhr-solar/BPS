@@ -1,8 +1,8 @@
 #include "../../Inc/BSP_Strobelight.h"
 #include <stdint.h>
 #include <stdlib.h>
-#define OFF 0
-#define PULSING 1
+#define STROBE_OFF 0
+#define STROBE_PULSING 1
 
 static const char* file = "BSP/Simulator/DataGeneration/Data/Strobe.csv";
 int StrobeStatus = 0;
@@ -24,7 +24,7 @@ void BSP_Strobe_Init(void) {
  * @return  None
  */
 void BSP_Strobe_On(void) {
-    StrobeStatus = PULSING;    //1 = pulsing
+    StrobeStatus = STROBE_PULSING;    //1 = pulsing
     FILE* fp = fopen(file, "w");
     fprintf(fp, "%d", StrobeStatus);
     fclose(fp);
@@ -36,7 +36,7 @@ void BSP_Strobe_On(void) {
  * @return  None
  */
 void BSP_Strobe_Off(void) {
-    StrobeStatus = OFF;     //0 = off
+    StrobeStatus = STROBE_OFF;     //0 = off
     FILE* fp = fopen(file, "w");
     fprintf(fp, "%d", StrobeStatus);
     fclose(fp);
