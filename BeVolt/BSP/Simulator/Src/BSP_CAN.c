@@ -5,7 +5,8 @@
 
 static const char* file = "BSP/Simulator/DataGeneration/Data/CAN.csv";
 
-uint32_t flag;  // 1 = there is a message ready to read, 0 = there is no message ready to be read
+//uint32_t flag;  // 1 = there is a message ready to read, 0 = there is no message ready to be read
+//uint32_t recentLength;
 
 /**
  * @brief   Initializes the CAN module that communicates with the rest of the electrical system.
@@ -25,7 +26,6 @@ void BSP_CAN_Init(void) {
     flock(fno, LOCK_EX);
     flock(fno, LOCK_UN);
     fclose(fp);
-    flag = 0;
 }
 
 
@@ -54,8 +54,8 @@ uint8_t BSP_CAN_Write(uint32_t id, uint8_t data[8], uint8_t length) {
     }
 
     fprintf(fp, "0x%.3x,", id);
-    for(int i = 0; i < 8; i++){
-        if(i == (7)){
+    for(int i = 0; i < length; i++){
+        if(i == (length-1)){
             fprintf(fp, "0x%.2x", data[i]);
         }else{
             fprintf(fp, "0x%.2x,", data[i]); 
@@ -64,7 +64,6 @@ uint8_t BSP_CAN_Write(uint32_t id, uint8_t data[8], uint8_t length) {
     }
     flock(fno, LOCK_UN);
     fclose(fp);
-    flag = 1;
     return 1;
 }
 
@@ -78,6 +77,7 @@ uint8_t BSP_CAN_Write(uint32_t id, uint8_t data[8], uint8_t length) {
  * clear the message that was read from the file
  */
 uint8_t BSP_CAN_Read(uint32_t *id, uint8_t *data) {
+    
     FILE* fp = fopen(file, "r+");
     if(!fp) {
         perror("CAN.csv");
@@ -85,7 +85,9 @@ uint8_t BSP_CAN_Read(uint32_t *id, uint8_t *data) {
     }
     int fno = fileno(fp);
     flock(fno, LOCK_EX);
-    if(flag){
+    fseek(fp, 1, SEEK_SET);
+    
+    if(fgetc(fp) == 'x'){                       //check if file is empty or not, the first item in the .csv is always "0x" + <CAN id>
         fseek(fp, 2, SEEK_SET);
         fscanf(fp, "%3x", id);
 
@@ -97,8 +99,7 @@ uint8_t BSP_CAN_Read(uint32_t *id, uint8_t *data) {
         flock(fno, LOCK_UN);
         fclose(fp);
     
-        
-        fp = fopen(file, "w");
+        fp = fopen(file, "w");                  //message was read, so clear .csv file
         if(!fp) {
             perror("CAN.csv");
             exit(EXIT_FAILURE);
@@ -107,10 +108,10 @@ uint8_t BSP_CAN_Read(uint32_t *id, uint8_t *data) {
         flock(fno, LOCK_EX);
         flock(fno, LOCK_UN);
         fclose(fp);
-        flag  = 0;
         return 1;
+    }else{
+        flock(fno, LOCK_UN);
+        fclose(fp);
+        return 0;
     }
-    
-    
-    return 0;
 }
