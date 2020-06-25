@@ -4,6 +4,7 @@ import battery
 import ADC
 import Lights
 import SPI
+import Strobelight
 
 # Global configurations
 state = ''  # Charging/Discharging
@@ -58,6 +59,14 @@ def display(battery=None):
                 stdscr.addstr(i+2, 100, "[]", curses.color_pair(1))
         else:
             stdscr.addstr(i+2, 100, "[]", curses.color_pair(3))
+    strobe = Strobelight.read()
+
+    stdscr.addstr(11, 80, 'S_PULSING')
+    if strobe:
+        stdscr.addstr(11, 100, "[]", curses.color_pair(2))
+    else:
+        stdscr.addstr(11, 100, "[]", curses.color_pair(3))
+
     stdscr.refresh()
 
 

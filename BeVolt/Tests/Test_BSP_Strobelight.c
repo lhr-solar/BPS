@@ -1,26 +1,22 @@
-#include "../BSP/Inc/BSP_Strobelight.h"
+#include "BSP_Strobelight.h"
 #include <stdio.h>
 
-static const char* file = "BSP/Simulator/DataGeneration/Data/Strobe.csv";
-char a;
-int  main() {
-BSP_Strobe_Init();
-BSP_Strobe_On();
-/*
-FILE* fp = fopen(file, "r");
-a = getc(fp);
-fclose(fp);
-printf("After Strobe_On, current status is %c", a);
-printf(" ... ");
-*/
 
-BSP_Strobe_Off();
-/*
-fp = fopen(file, "r");
-a = getc(fp);
-fclose(fp);
-printf("After Strobe_Off, current status is %c", a);
-*/
+int  main(){
+char strobeIn;
 
-return(0);
+    BSP_Strobe_Init();
+    printf("Strobe Control : Enter 'p' for pulsing or 'o' for off\n");
+    while(1){
+        strobeIn = getchar();
+        if(strobeIn==('p')){
+            BSP_Strobe_On();
+            printf("Strobe = Pulsing\n>> ");
+        }
+        if(strobeIn=='o'){
+            BSP_Strobe_Off();
+            printf("Strobe = Off\n>> ");
+        }
+    }
+    return(0);
 }
