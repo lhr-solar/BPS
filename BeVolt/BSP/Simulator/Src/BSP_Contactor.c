@@ -1,9 +1,11 @@
 #include "BSP_Contactor.h"
+#include "simulator_conf.h"
 #include <stdio.h>
 #include <sys/file.h>
 
-static const char* file = "BSP/Simulator/DataGeneration/Data/Contactor.csv";
-/**
+static const char* file = GET_CSV_PATH(CONTACTOR_CSV_FILE);
+
+/*
  * @brief   Initializes the GPIO pins that interfaces with the Contactor.
  *          Two GPIO pins are initialized. One as an output and one as an input.
  *          The output pin controls the state and the input pin views what state the contactor is through the
