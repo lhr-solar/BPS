@@ -42,6 +42,7 @@ def display(battery=None):  #print watchdog countdown
     stdscr.addstr(4, 10, f"{adc_values[1]} A ")
     # Display Watchdog ticks
     ticks = WDTimer.Tick()
+    stdscr.addstr(10, 0, f"                              ") #clear previous tick
     stdscr.addstr(10, 0, f"WDTimer Countdown: {ticks}")
     # Read Module values
     stdscr.addstr(0, 54, "Modules")

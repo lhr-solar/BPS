@@ -4,12 +4,16 @@
 #include <sys/file.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include "simulator_conf.h"
 
+static const char* file = GET_CSV_PATH(WDTIMER_CSV_FILE);
 
-static const char* file = "BSP/Simulator/DataGeneration/Data/WDTimer.csv";
+enum{
+    Start = 1, Reset = 2
+};
 
-bool DidSystemReset;
-bool HasStarted;
+static bool didSystemReset;
+static bool hasStarted;
 /**
  * @brief   Initialize the watch dog timer.
  * @param   None
@@ -18,16 +22,16 @@ bool HasStarted;
 void BSP_WDTimer_Init(void) {
     FILE* fp = fopen(file, "w");
     if(!fp) {
-        perror("WDTimer.csv");
+        perror(WDTIMER_CSV_FILE);
         exit(EXIT_FAILURE);
     }
     int fno = fileno(fp);
     flock(fno, LOCK_EX);
-    fprintf(fp, "%d", (int)getpid()); //call some function that gets PID of simulator.out and save in in the csv
+    fprintf(fp, "\n%d", (int)getpid()); //call some function that gets PID of simulator.out and save in in the csv
     flock(fno, LOCK_UN);
     fclose(fp);
-    DidSystemReset = false;
-    HasStarted = false;
+    didSystemReset = false;
+    hasStarted = false;
 }
 
 /**
@@ -36,11 +40,11 @@ void BSP_WDTimer_Init(void) {
  * @return  true if a reset occurred previously, false if system started up normally.
  */
 bool BSP_WDTimer_DidSystemReset(void){
-    if(DidSystemReset == true){
-        DidSystemReset = false;      //clear flag
+    if(didSystemReset == true){
+        didSystemReset = false;      //clear flag
         return true;
     }else{
-        return DidSystemReset;
+        return didSystemReset;
     }
 }
 
@@ -49,22 +53,22 @@ void CheckReset(void){
     char resetValue;
     FILE* fp = fopen(file, "r+");       //check if python script left system reset flag ('b')
     if(!fp) {
-        perror("WDTimer.csv");
+        perror(WDTIMER_CSV_FILE);
         exit(EXIT_FAILURE);
     }
     int fno = fileno(fp);
     flock(fno, LOCK_EX);
 
-    fseek(fp, 5, SEEK_SET);
+    fseek(fp, 2, SEEK_SET);
     resetValue = fgetc(fp);
     if(resetValue == 'b'){
-        DidSystemReset = true;
+        didSystemReset = true;
     }else{
-        DidSystemReset = false;
+        didSystemReset = false;
     }
     flock(fno, LOCK_UN);
     fclose(fp);
-    HasStarted = false; 
+    hasStarted = false; 
 
     
     
@@ -81,13 +85,13 @@ void BSP_WDTimer_Start(void) {
     CheckReset();
     FILE* fp = fopen(file, "w");
     if(!fp) {
-        perror("WDTimer.csv");
+        perror(WDTIMER_CSV_FILE);
         exit(EXIT_FAILURE);
     }
     int fno = fileno(fp);
     flock(fno, LOCK_EX);
-    fprintf(fp, "%x\n%d", 0xCCCC, (int)getpid());
-    HasStarted = true;
+    fprintf(fp, "%x\n%d", Start, (int)getpid());
+    hasStarted = true;
     flock(fno, LOCK_UN);
     fclose(fp);
 }
@@ -99,18 +103,16 @@ void BSP_WDTimer_Start(void) {
  * @return  None
  */
 void BSP_WDTimer_Reset(void) {
-    // TODO: Reset the watchdog countdown
-    //uint32_t *check;
-    if(HasStarted == true){
+    if(hasStarted == true){
         FILE* fp = fopen(file, "r+");
         if(!fp) {
-            perror("WDTimer.csv");
+            perror(WDTIMER_CSV_FILE);
             exit(EXIT_FAILURE);
         }
         int fno = fileno(fp);
         flock(fno, LOCK_EX);
         
-        fprintf(fp, "%x\n%d", 0xAAAA, 0);
+        fprintf(fp, "%x\n%d", Reset, 0);
     
         flock(fno, LOCK_UN);
         fclose(fp);

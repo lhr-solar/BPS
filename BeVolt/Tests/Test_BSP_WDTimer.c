@@ -4,29 +4,29 @@
 
 int main(){
     uint32_t delay = 150000000;
-    uint32_t secs = 40;
-    uint32_t resetCount = 3;
+    uint32_t time = 40;
+    uint32_t resetCount = 3;        //for testing WDTimer resets, these delays will let BSP_Reset() be called before the WDTimer finishes counting down 
     BSP_WDTimer_Start();
     printf("pid should be saved, countdown started\n");
-    secs = 40;
-    while(secs){
+    time = 40;
+    while(time){
         delay = 15000000;
         while(delay){
             delay--;
         }
-        secs--;
+        time--;
     }
     
     while(1){
 
         while(resetCount){
-            secs = 40;
-            while(secs){
+            time = 40;
+            while(time){
                 delay = 150000000;
                 while(delay){
                     delay--;
                 }
-                secs--;
+                time--;
             }
         
             BSP_WDTimer_Reset();
@@ -36,15 +36,15 @@ int main(){
             resetCount--;
         }
         resetCount = 3;
-        printf("this process will be killed any second now...\n");
-        while(resetCount){
-            secs = 20;
-            while(secs){
+        printf("this process will be killed any second now...\n"); 
+        while(resetCount){                                                      //this delay is longer than the WDTimer countdown, so this process should be killed before the delay finishes
+            time = 20;
+            while(time){
                 delay = 150000000;
                 while(delay){
                     delay--;
                 }
-                secs--;
+                time--;
             }
         }
         exit(0);

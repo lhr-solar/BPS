@@ -5,9 +5,12 @@ import fcntl
 file = "BSP/Simulator/DataGeneration/Data/WDTimer.csv"
 
 TimerEnable = False
-duration = 15
+duration = 15 #unit is in seconds
 pid = 0
 systemReset = False
+
+start = '1'
+reset = '2'
 
 def Check_State():
     global duration
@@ -18,16 +21,16 @@ def Check_State():
             fcntl.flock(csvfile.fileno(), fcntl.LOCK_EX)  
             csvreader = csv.reader(csvfile)
             currentState = next(csvreader)
-            if ((currentState[0] == 'aaaa') and (duration > 0)):
+            if ((currentState[0] == reset) and (duration > 0)):
                 duration = 15 #reset countdown
                 csvfile.seek(0)
                 csvwriter = csv.writer(csvfile)
-                csvwriter.writerow(["____"]) #Kick watchdog. Clear the reset message ('aaaa'), a blank .csv file crashes program
+                csvwriter.writerow([" "]) #Kick watchdog. Clear the reset message ('2').
                 csvwriter.writerow(["0"])
-            elif (((currentState[0] != '____') and (currentState[0] != 'aaaa') and (currentState[0] != 'cccc')) or (duration <= 0)):
+            elif (duration <= 0):
                 csvfile.seek(0)
                 csvwriter = csv.writer(csvfile)
-                csvwriter.writerow(["5555", "b"]) #print system reset message. The '5555' has no significance, it's just there to keep the formatting
+                csvwriter.writerow([" ", "b"]) #print system reset message. The ' ' has no significance, it's just there to keep the formatting. The 'b' notifies the C program that the system has been reset
                 csvwriter.writerow(["0"])
                 os.kill(int(pid), 9) #system reset - kill process
                 TimerEnable = False #After system reset, watchdog can start again 
@@ -44,7 +47,7 @@ def WD_Enable():
         csvreader = csv.reader(csvfile)
         currentState = next(csvreader)
         if TimerEnable == False:    #check for timer startup
-            if currentState[0] == 'cccc':
+            if currentState[0] == start:
                     TimerEnable = True #start Watchdog timer
             secondLine = next(csvreader)
             if secondLine[0] != 0:
@@ -60,4 +63,4 @@ def Tick():
         else:
             return duration
     else:
-        return '//' #Watchdog hasn't been started by C code yet
+        return 'Not started' #// = Watchdog hasn't been started by C code yet
