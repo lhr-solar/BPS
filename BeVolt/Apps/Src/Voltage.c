@@ -9,7 +9,7 @@
 #include <stdlib.h>
 
 static cell_asic *Minions;
-uint16_t VoltageVal[NUM_BATTERY_MODULES]; //Voltage values gathered
+static uint16_t VoltageVal[NUM_BATTERY_MODULES]; //Voltage values gathered
 /** LTC ADC measures with resolution of 4 decimal places, 
  * But we standardized to have 3 decimal places to work with
  * millivolts
