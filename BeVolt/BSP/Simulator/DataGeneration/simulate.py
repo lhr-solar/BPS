@@ -37,8 +37,7 @@ def display(battery=None):
     stdscr.addstr(4, 0, f"Current:")
     stdscr.addstr(4, 10, f"{adc_values[1]} A ")
     #Read CAN data
-    stdscr.addstr(12, 80,f"                                                                                         ") #clear previous CAN entry
-    stdscr.addstr(12, 80, f"CAN: {CAN.Get_CAN_Info()}")
+    stdscr.addstr(12, 0, f"CAN: {CAN.Get_CAN_Info()}")
     # Read Module values
     stdscr.addstr(0, 54, "Modules")
     stdscr.addstr(1, 40, "====================================")
@@ -143,11 +142,11 @@ def main():
                     print("Enter the CAN ID for the system you wish to simulate. Leave out '0x'.")
                     id = input()
                     while(CAN.Invalid_CAN_ID(id) == True):
-                        print("Invalid CAN ID, try again.")
+                        print("Invalid CAN ID.")
                         id = input()
-                    print("Enter up to 8 bytes of the CAN message that you would like to send, and separate each byte by a ','. Leave out '0x'.")
+                    print("Enter the 8 bytes of the CAN message that you would like to send, and separate each byte by a ','. Leave out '0x'.")
                     message = input().split(',')
-                    CAN.Send_Message(id, message, len(message))
+                    CAN.Send_Message(id, message)
                 else:
                     print("That is not a valid option. Continuing simulation...")
                     stdscr = curses.initscr()

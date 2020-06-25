@@ -110,6 +110,7 @@ SafetyStatus *Voltage_GetModulesInDanger(void){
 	}
 	return checks;
 }
+
 /** Voltage_OpenWireSummary
  * Runs the open wire method with print=true
  */

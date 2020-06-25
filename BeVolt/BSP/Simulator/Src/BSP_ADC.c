@@ -1,7 +1,9 @@
 #include "BSP_ADC.h"
+#include "simulator_conf.h"
+#include <unistd.h>
 
 // Path relative to the executable
-static const char* file = "BSP/Simulator/DataGeneration/Data/ADC.csv";
+static const char* file = GET_CSV_PATH(ADC_CSV_FILE);
 
 /**
  * @brief   Initializes the ADC module. This is to measure the hall effect sensors
@@ -10,7 +12,12 @@ static const char* file = "BSP/Simulator/DataGeneration/Data/ADC.csv";
  * @return  None
  */
 void BSP_ADC_Init(void) {
-    // No initialization for simulator
+    // Check if simulator is running i.e. were the csv files created?
+    if(access(file, F_OK) != 0) {
+        // File doesn't exit if true
+        perror(ADC_CSV_FILE);
+        exit(EXIT_FAILURE);
+    }
 }
 
 /**
@@ -22,7 +29,7 @@ uint16_t BSP_ADC_High_GetMilliVoltage(void) {
     FILE* fp = fopen(file, "r");
     if (!fp) {
         printf("ADC not available\n\r");
-        return;
+        return BAD_ADC;
     }
     // Get raw CSV string
     char csv[16];
@@ -47,7 +54,7 @@ uint16_t BSP_ADC_Low_GetMilliVoltage(void) {
     FILE* fp = fopen(file, "r");
     if (!fp) {
         printf("ADC not available\n\r");
-        return;
+        return BAD_ADC;
     }
     // Get raw CSV string
     char csv[16];
