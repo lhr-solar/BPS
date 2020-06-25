@@ -107,4 +107,10 @@ void EEPROM_ReadMultipleBytes(uint16_t address, uint32_t bytes, uint8_t* buffer)
  */
 uint8_t EEPROM_ReadByte(uint16_t address);
 
+/** DelayMS
+ * Delays for specified number of milliseconds (not accurate)
+ * @param input is number of milliseconds to delay
+ */
+void DelayMs(uint32_t ms);
+
 #endif

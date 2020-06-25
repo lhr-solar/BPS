@@ -25,11 +25,22 @@ void initialize(void);
 void preliminaryCheck(void);
 void faultCondition(void);
 
+#ifndef SIMULATION
+static void __enable_irq() { asm("CPSIE I"); }
+static void __disable_irq(){ asm("CPSID I"); }
+#endif
+
 int main(){
-	// __disable_irq();		// Disable all interrupts until initialization is done
-	initialize();			// Initialize codes/pins
+	#ifndef SIMULATION
+        __disable_irq();		// Disable all interrupts until initialization is done
+	#endif
+        
+        initialize();			// Initialize codes/pins
 	preliminaryCheck();		// Wait until all boards are powered on
-	// __enable_irq();			// Enable interrupts
+	
+        #ifndef SIMULATION
+        __enable_irq();			// Enable interrupts
+        #endif
 
 	BSP_WDTimer_Start();
 
@@ -60,6 +71,8 @@ int main(){
 		} else {
 			break;
 		}
+
+		// TODO: Implement heartbeat for RUN light at a visible frequency
 
 		// Update necessary
 		// CAN_SendMessageStatus()	// Most likely need to put this on a timer if sending too frequently
@@ -117,7 +130,7 @@ void initialize(void){
  */
 void preliminaryCheck(void){
 	// Check if Watch dog timer was triggered previously
-	if (BSP_WDTimer_DidSystemReset() == DANGER) {
+	if (BSP_WDTimer_DidSystemReset()) {
 		BSP_Light_On(FAULT);
 		BSP_Light_On(WDOG);
 		while(1);		// Spin
@@ -136,12 +149,12 @@ void faultCondition(void){
 
 	uint8_t error = 0;
 
-	if(!Current_CheckStatus(false)){
+	if(Current_CheckStatus(false) != SAFE){
 		error |= FAULT_HIGH_CURRENT;
 		BSP_Light_On(OCURR);
 	}
 
-	if(!Voltage_CheckStatus()){
+	if(Voltage_CheckStatus() != SAFE){
 		// Toggle Voltage fault LED
 		switch(Voltage_CheckStatus()){
 			case OVERVOLTAGE:
@@ -164,9 +177,9 @@ void faultCondition(void){
 		}
 	}
 
-	if(!Temperature_CheckStatus(Current_IsCharging())){
+	if(Temperature_CheckStatus(Current_IsCharging()) != SAFE){
 		error |= FAULT_HIGH_TEMP;
-		BSP_Light_On(OCURR);
+		BSP_Light_On(OTEMP);
 	}
 
 	// Log all the errors that we have

@@ -359,7 +359,7 @@ int16_t LTC6811_run_adc_redundancy_st(uint8_t adc_mode,
                                       cell_asic ic[]);
 
 /*! Helper function that runs the datasheet open wire algorithm*/
-uint32_t LTC6811_run_openwire_multi(uint8_t total_ic,
+uint64_t LTC6811_run_openwire_multi(uint8_t total_ic,
                           cell_asic ic[],
 													bool print);
 

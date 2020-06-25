@@ -3,6 +3,9 @@
 
 #include "common.h"
 
+//return this if the ADC is not available
+#define BAD_ADC 0xffff
+
 /**
  * @brief   Initializes the ADC module. This is to measure the hall effect sensors
  *          on the Current Monitor Board.
