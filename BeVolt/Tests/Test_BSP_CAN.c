@@ -7,7 +7,7 @@
    uint8_t readData[8] = {0,0,0,0,0,0,0,0};
    uint32_t id[1];
   
-   uint8_t length = 8;
+   uint8_t length = 1;
    
    BSP_CAN_Write(0x10A, message, length);
    BSP_CAN_Read(id, readData);

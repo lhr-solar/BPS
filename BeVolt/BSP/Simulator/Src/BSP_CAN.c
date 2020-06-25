@@ -1,12 +1,14 @@
 #include "BSP_CAN.h"
+#include "simulator_conf.h"
 #include <stdint.h>
 #include <stdlib.h>
 #include <sys/file.h>
+#include <unistd.h>
 
-static const char* file = "BSP/Simulator/DataGeneration/Data/CAN.csv";
 
-//uint32_t flag;  // 1 = there is a message ready to read, 0 = there is no message ready to be read
-//uint32_t recentLength;
+static const char* file = GET_CSV_PATH(CAN_CSV_FILE);
+
+
 
 /**
  * @brief   Initializes the CAN module that communicates with the rest of the electrical system.
@@ -19,7 +21,7 @@ static const char* file = "BSP/Simulator/DataGeneration/Data/CAN.csv";
 void BSP_CAN_Init(void) {
     FILE* fp = fopen(file, "w");
     if(!fp) {
-        perror("CAN.csv");
+        perror(CAN_CSV_FILE);
         exit(EXIT_FAILURE);
     }
     int fno = fileno(fp);
@@ -41,7 +43,7 @@ void BSP_CAN_Init(void) {
 uint8_t BSP_CAN_Write(uint32_t id, uint8_t data[8], uint8_t length) {
     FILE* fp = fopen(file, "w");
     if(!fp) {
-        perror("CAN.csv");
+        perror(CAN_CSV_FILE);
         exit(EXIT_FAILURE);
     }
     int fno = fileno(fp);
@@ -80,7 +82,7 @@ uint8_t BSP_CAN_Read(uint32_t *id, uint8_t *data) {
     
     FILE* fp = fopen(file, "r+");
     if(!fp) {
-        perror("CAN.csv");
+        perror(CAN_CSV_FILE);
         exit(EXIT_FAILURE);
     }
     int fno = fileno(fp);
@@ -101,7 +103,7 @@ uint8_t BSP_CAN_Read(uint32_t *id, uint8_t *data) {
     
         fp = fopen(file, "w");                  //message was read, so clear .csv file
         if(!fp) {
-            perror("CAN.csv");
+            perror(CAN_CSV_FILE);
             exit(EXIT_FAILURE);
         }
         int fno = fileno(fp);
