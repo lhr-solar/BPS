@@ -1,9 +1,7 @@
 #include "BSP_I2C.h"
-#include <stdint.h>
-#include <stdlib.h>
-#include <stdio.h>
 #include "EEPROM.h"
 #include "config.h"
+#include "simulator_conf.h"
 
 #define CSV_ENTRY_LENGTH 5  //"0x??," is 5 characters
 #define CSV_ENTRY_OFFSET 2  //"0x" is 2 characters
@@ -11,7 +9,7 @@
 //only supports EEPROM peripheral (as of May 2020, the EEPROM is the only peripheral on the I2C bus)
 
 //path for EEPROM file
-static const char* file = "BSP/Simulator/DataGeneration/Data/I2C.csv";
+static const char* file = GET_CSV_PATH(I2C_CSV_FILE);
 
 /**
  * @brief   Initializes the I2C port that interfaces with the EEPROM. Creates EEPROM txt file if it does not already exist
@@ -35,8 +33,8 @@ void BSP_I2C_Init(void) {
             fprintf(fp, "0x00\n");
         }
         fprintf(fp, "0x00");
+        fclose(fp);
     }
-    fclose(fp);
 }
 
 /**

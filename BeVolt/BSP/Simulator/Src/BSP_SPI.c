@@ -1,5 +1,7 @@
 #include "BSP_SPI.h"
 #include "config.h"
+#include "simulator_conf.h"
+#include <unistd.h>
 #include <sys/file.h>
 
 #define CSV_SPI_BUFFER_SIZE     1024
@@ -9,54 +11,54 @@
  * @note    Some commands can have certain bits that can be either high or low. By default, the macro
  *          definitions set these bits to lo e.g. check ADCV. Look at the LTC6811 datasheet for more info.
  */
-#define WRCFGA      0x001
-#define WRCFGB      0x024
-#define RDCFGA      0x002
-#define RDCFGB      0x026
-#define RDCVA       0x004
-#define RDCVB       0x006
-#define RDCVC       0x008
-#define RDCVD       0x00A
-#define RDCVE       0x009
-#define RDCVF       0x00B
-#define RDAUXA      0x00C
-#define RDAUXB      0x00E
-#define RDAUXC      0x00D
-#define RDAUXD      0x00F
-#define RDSTATA     0x010
-#define RDSTATB     0x012
-#define WRSCTRL     0x014
-#define WRPWM       0x020
-#define WRPSB       0x01C
-#define RDSCTRL     0x016
-#define RDPWM       0x022
-#define RDPSB       0x01E
-#define STSCTRL     0x019
-#define CLRSCTRL    0x018
-#define ADCV        0x260       // 0 1 MD[1] MD[0] 1 1 DCP 0 CH[2] CH[1] CH[0]
-#define ADOWPU      0x268       // 0 1 MD[1] MD[0] PUP 1 DCP 1 CH[2] CH[1] CH[0]
-#define ADOWPD      0x228       // 0 1 MD[1] MD[0] PUP 1 DCP 1 CH[2] CH[1] CH[0]
-#define CVST        0x207       // 0 1 MD[1] MD[0] ST[1] ST[0] 0 0 1 1 1
-#define ADOL        0x201       // 0 1 MD[1] MD[0] 0 0 DCP 0 0 0 1
-#define ADAX        0x460       // 1 0 MD[1] MD[0] 1 1 0 0 CHG[2] CHG[1] CHG[0]
-#define ADAXD       0x400       // 1 0 MD[1] MD[0] 0 0 0 0 CHG[2] CHG[1] CHG[0]
-#define AXST        0x407       // 1 0 MD[1] MD[0] ST[1] ST[0] 0 0 1 1 1
-#define ADSTAT      0x468       // 1 0 MD[1] MD[0] 1 1 0 1 CHST[2] CHST[1] CHST[0]
-#define ADSTATD     0x468       // 1 0 MD[1] MD[0] 0 0 0 1 CHST[2] CHST[1] CHST[0]
-#define STATST      0x40F       // 1 0 MD[1] MD[0] ST[1] ST[0] 0 1 1 1 1
-#define ADCVAX      0x46F       // 1 0 MD[1] MD[0] 1 1 DCP 1 1 1 1
-#define ADCVSC      0x467       // 1 0 MD[1] MD[0] 1 1 DCP 0 1 1 1
-#define CLRCELL     0x711
-#define CLRAUX      0x712
-#define CLRSTAT     0x713
-#define PLADC       0x714
-#define DIAGN       0x715
-#define WRCOMM      0x721
-#define RDCOMM      0x722
-#define STCOMM      0x723
+#define SIM_LTC6811_WRCFGA      0x001
+#define SIM_LTC6811_WRCFGB      0x024
+#define SIM_LTC6811_RDCFGA      0x002
+#define SIM_LTC6811_RDCFGB      0x026
+#define SIM_LTC6811_RDCVA       0x004
+#define SIM_LTC6811_RDCVB       0x006
+#define SIM_LTC6811_RDCVC       0x008
+#define SIM_LTC6811_RDCVD       0x00A
+#define SIM_LTC6811_RDCVE       0x009
+#define SIM_LTC6811_RDCVF       0x00B
+#define SIM_LTC6811_RDAUXA      0x00C
+#define SIM_LTC6811_RDAUXB      0x00E
+#define SIM_LTC6811_RDAUXC      0x00D
+#define SIM_LTC6811_RDAUXD      0x00F
+#define SIM_LTC6811_RDSTATA     0x010
+#define SIM_LTC6811_RDSTATB     0x012
+#define SIM_LTC6811_WRSCTRL     0x014
+#define SIM_LTC6811_WRPWM       0x020
+#define SIM_LTC6811_WRPSB       0x01C
+#define SIM_LTC6811_RDSCTRL     0x016
+#define SIM_LTC6811_RDPWM       0x022
+#define SIM_LTC6811_RDPSB       0x01E
+#define SIM_LTC6811_STSCTRL     0x019
+#define SIM_LTC6811_CLRSCTRL    0x018
+#define SIM_LTC6811_ADCV        0x260       // 0 1 MD[1] MD[0] 1 1 DCP 0 CH[2] CH[1] CH[0]
+#define SIM_LTC6811_ADOWPU      0x268       // 0 1 MD[1] MD[0] PUP 1 DCP 1 CH[2] CH[1] CH[0]
+#define SIM_LTC6811_ADOWPD      0x228       // 0 1 MD[1] MD[0] PUP 1 DCP 1 CH[2] CH[1] CH[0]
+#define SIM_LTC6811_CVST        0x207       // 0 1 MD[1] MD[0] ST[1] ST[0] 0 0 1 1 1
+#define SIM_LTC6811_ADOL        0x201       // 0 1 MD[1] MD[0] 0 0 DCP 0 0 0 1
+#define SIM_LTC6811_ADAX        0x460       // 1 0 MD[1] MD[0] 1 1 0 0 CHG[2] CHG[1] CHG[0]
+#define SIM_LTC6811_ADAXD       0x400       // 1 0 MD[1] MD[0] 0 0 0 0 CHG[2] CHG[1] CHG[0]
+#define SIM_LTC6811_AXST        0x407       // 1 0 MD[1] MD[0] ST[1] ST[0] 0 0 1 1 1
+#define SIM_LTC6811_ADSTAT      0x468       // 1 0 MD[1] MD[0] 1 1 0 1 CHST[2] CHST[1] CHST[0]
+#define SIM_LTC6811_ADSTATD     0x468       // 1 0 MD[1] MD[0] 0 0 0 1 CHST[2] CHST[1] CHST[0]
+#define SIM_LTC6811_STATST      0x40F       // 1 0 MD[1] MD[0] ST[1] ST[0] 0 1 1 1 1
+#define SIM_LTC6811_ADCVAX      0x46F       // 1 0 MD[1] MD[0] 1 1 DCP 1 1 1 1
+#define SIM_LTC6811_ADCVSC      0x467       // 1 0 MD[1] MD[0] 1 1 DCP 0 1 1 1
+#define SIM_LTC6811_CLRCELL     0x711
+#define SIM_LTC6811_CLRAUX      0x712
+#define SIM_LTC6811_CLRSTAT     0x713
+#define SIM_LTC6811_PLADC       0x714
+#define SIM_LTC6811_DIAGN       0x715
+#define SIM_LTC6811_WRCOMM      0x721
+#define SIM_LTC6811_RDCOMM      0x722
+#define SIM_LTC6811_STCOMM      0x723
 
-#define MUX1        0x90
-#define MUX2        0x92
+#define SIM_LTC1380_MUX1        0x90        // MUX addresses on Minion boards
+#define SIM_LTC1380_MUX2        0x92
 
 typedef struct {
     uint8_t config[6];              // Configuration data of the LTC6811
@@ -70,11 +72,11 @@ typedef struct {
 } ltc6811_sim_t;
 
 typedef enum {
-    A=0, B, C, D, E, F
+    GroupA=0, GroupB, GroupC, GroupD, GroupE, GroupF
 } Group;
 
 // Path relative to the executable
-const char* file = "BSP/Simulator/DataGeneration/Data/SPI.csv";
+static const char* file = GET_CSV_PATH(SPI_CSV_FILE);
 
 static uint8_t chipSelectState = 1;     // During idle, the cs pin should be high.
                                         // Knowing the cs pin's state is not needed for the simulator,
@@ -121,6 +123,7 @@ static void CopyVoltageToByteArray(uint8_t *data, Group group);
 static void CopyOpenWireVoltageToByteArray(uint8_t *data, Group group, bool pullup);
 static void CopyTemperatureToByteArray(uint8_t *data, Group group);
 static uint16_t ConvertTemperatureToMilliVolts(int32_t celcius);
+static Group DetermineGroupLetter(uint16_t cmd);
 
 /**
  * @brief   File access functions
@@ -145,7 +148,7 @@ void BSP_SPI_Init(void) {
     // Check if simulator is running i.e. were the csv files created?
     if(access(file, F_OK) != 0) {
         // File doesn't exit if true
-        perror("SPI.csv");
+        perror(SPI_CSV_FILE);
         exit(EXIT_FAILURE);
     }
 }
@@ -223,7 +226,7 @@ static void WRCommandHandler(uint8_t *buf, uint32_t len) {
 
     switch(currCmd) {
         // LTC6811 Configuration
-        case WRCFGA: {
+        case SIM_LTC6811_WRCFGA: {
             ExtractDataFromBuff(data, buf, len);
             int dataIdx = 0;
             for(int i = NUM_MINIONS - 1; i >= 0; i--) {
@@ -235,23 +238,23 @@ static void WRCommandHandler(uint8_t *buf, uint32_t len) {
         }
 
         // Start ADC Conversion
-        case ADCV:
-        case ADAX:
+        case SIM_LTC6811_ADCV:
+        case SIM_LTC6811_ADAX:
             UpdateSimulationData();
             openWireOpFlag = false;
             break;
 
-        case ADOWPU:
-        case ADOWPD:
+        case SIM_LTC6811_ADOWPU:
+        case SIM_LTC6811_ADOWPD:
             openWirePUFlag = false;
-            if(currCmd == ADOWPU) {
+            if(currCmd == SIM_LTC6811_ADOWPU) {
                 openWirePUFlag = true;
             }
             UpdateSimulationData();
             openWireOpFlag = true;
             break;
 
-        case WRCOMM:
+        case SIM_LTC6811_WRCOMM:
             ExtractMUXAddrFromBuff(buf);
             ExtractMUXSelFromBuff(buf);
             break;
@@ -274,7 +277,7 @@ static void RDCommandHandler(uint8_t *buf, uint32_t len) {
 
     switch(currCmd) {
         // LTC6811 Configuration
-        case RDCFGA: {
+        case SIM_LTC6811_RDCFGA: {
             // store config registers of all LTC6811s into one continuous array
             int dataIdx = 0;
             for(int i = NUM_MINIONS - 1; i >= 0; i--) {
@@ -286,52 +289,77 @@ static void RDCommandHandler(uint8_t *buf, uint32_t len) {
         }
 
         // Read Cell Voltages
-        case RDCVA:
+        case SIM_LTC6811_RDCVA:
+        case SIM_LTC6811_RDCVB:
+        case SIM_LTC6811_RDCVC:
+        case SIM_LTC6811_RDCVD:
+        case SIM_LTC6811_RDCVE:
+        case SIM_LTC6811_RDCVF: {
+            Group grp = DetermineGroupLetter(currCmd);
             if(openWireOpFlag) {
-                CopyOpenWireVoltageToByteArray(data, A, openWirePUFlag);
+                CopyOpenWireVoltageToByteArray(data, grp, openWirePUFlag);
             } else {
-                CopyVoltageToByteArray(data, A);
+                CopyVoltageToByteArray(data, grp);
             }
             CreateReadPacket(buf, data, NUM_MINIONS * BYTES_PER_REG);
             break;
+        }
 
-        case RDCVB:
-            if(openWireOpFlag) {
-                CopyOpenWireVoltageToByteArray(data, B, openWirePUFlag);
-            } else {
-                CopyVoltageToByteArray(data, B);
-            }
+        case SIM_LTC6811_RDAUXA: {
+            Group grp = DetermineGroupLetter(currCmd);
+            CopyTemperatureToByteArray(data, grp);
             CreateReadPacket(buf, data, NUM_MINIONS * BYTES_PER_REG);
             break;
-
-        case RDCVC:
-            if(openWireOpFlag) {
-                CopyOpenWireVoltageToByteArray(data, C, openWirePUFlag);
-            } else {
-                CopyVoltageToByteArray(data, C);
-            }
-            CreateReadPacket(buf, data, NUM_MINIONS * BYTES_PER_REG);
-            break;
-
-        case RDCVD:
-            if(openWireOpFlag) {
-                CopyOpenWireVoltageToByteArray(data, D, openWirePUFlag);
-            } else {
-                CopyVoltageToByteArray(data, D);
-            }
-            CreateReadPacket(buf, data, NUM_MINIONS * BYTES_PER_REG);
-            break;
-
-        case RDAUXA:
-            CopyTemperatureToByteArray(data, A);
-            CreateReadPacket(buf, data, NUM_MINIONS * BYTES_PER_REG);
-            break;
+        }
 
         default:
             break;
     }
 }
 
+/**
+ * @brief   Returns the group letter depenging on the cmd and if grouping is required.
+ * @param   cmd     specifies which group must be selected
+ * @return  Group   letter of the cmd group
+ */
+static Group DetermineGroupLetter(uint16_t cmd) {
+    Group grp = GroupA;
+
+    switch(cmd) {
+        case SIM_LTC6811_RDCVA:
+        case SIM_LTC6811_RDAUXA:
+            grp = GroupA;
+            break;
+
+        case SIM_LTC6811_RDCVB:
+        case SIM_LTC6811_RDAUXB:
+            grp = GroupB;
+            break;
+
+        case SIM_LTC6811_RDCVC:
+        case SIM_LTC6811_RDAUXC:
+            grp = GroupC;
+            break;
+
+        case SIM_LTC6811_RDCVD:
+        case SIM_LTC6811_RDAUXD:
+            grp = GroupD;
+            break;
+
+        case SIM_LTC6811_RDCVE:
+            grp = GroupE;
+
+        case SIM_LTC6811_RDCVF:
+            grp = GroupF;
+            break;
+
+        default:
+            grp = GroupA;
+            break;
+    }
+
+    return grp;
+}
 
 /**
  * @brief FILE ACCESSING FUNCTIONS
@@ -351,7 +379,7 @@ static bool UpdateSimulationData(void) {
     FILE* fp = fopen(file, "r");
     if(!fp) {
         // Exit, error!
-        perror("SPI.csv");
+        perror(SPI_CSV_FILE);
         exit(EXIT_FAILURE);
     }
 
@@ -588,13 +616,13 @@ static void CopyTemperatureToByteArray(uint8_t *data, Group group) {
 
     // Only GPIO1 is connected to an analog voltage so group A Bytes[0:1] is the only
     // location that is updated.
-    if(group == A) {
+    if(group == GroupA) {
         int dataIdx = 0;
         for(int i = NUM_MINIONS-1; i >= 0; i--) {
 
             uint8_t temperatureIdx = simulationData[i].temperature_sel;
 
-            if(simulationData[i].temperature_mux == MUX2) {
+            if(simulationData[i].temperature_mux == SIM_LTC1380_MUX2) {
                 temperatureIdx += 8;
             }
 
