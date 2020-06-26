@@ -2,8 +2,9 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <sys/file.h>
+#include "simulator_conf.h"
 
-static char* file = "BSP/Simulator/DataGeneration/Data/PLL.csv";
+static char* file = GET_CSV_PATH(PLL_CSV_FILE);
 
 /**
  * @brief   Initialize the PLL so the system core frequency runs at your preferred frequency.
@@ -13,7 +14,7 @@ static char* file = "BSP/Simulator/DataGeneration/Data/PLL.csv";
 void BSP_PLL_Init(void) {
     FILE* fp = fopen(file, "w");
     if(!fp) {
-        perror("PLL.csv");
+        perror(PLL_CSV_FILE);
         exit(EXIT_FAILURE);
     }
     int fno = fileno(fp);
@@ -34,7 +35,7 @@ uint32_t BSP_PLL_GetSystemClock(void) {
     char str[20];
     FILE* fp = fopen(file, "r");
     if(!fp) {
-        perror("PLL.csv");
+        perror(PLL_CSV_FILE);
         exit(EXIT_FAILURE);
     }
     int fno = fileno(fp);
