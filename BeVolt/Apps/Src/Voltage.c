@@ -4,7 +4,7 @@
  */
 
 #include "Voltage.h"
-#include "LTC681x.h"
+#include "LTC6811.h"
 #include "config.h"
 #include <stdlib.h>
 
