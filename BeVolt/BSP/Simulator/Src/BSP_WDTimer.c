@@ -20,18 +20,25 @@ static bool hasStarted;
  * @return  None
  */
 void BSP_WDTimer_Init(void) {
-    FILE* fp = fopen(file, "w");
-    if(!fp) {
-        perror(WDTIMER_CSV_FILE);
-        exit(EXIT_FAILURE);
+    if(access(file, F_OK) != 0) {
+        // File is created if it doesn't exist, otherwise this function does nothing at all
+        //perror(WDTIMER_CSV_FILE);
+        //exit(EXIT_FAILURE);
+        FILE* fp = fopen(file, "w");
+        if(!fp) {
+            perror(WDTIMER_CSV_FILE);
+            exit(EXIT_FAILURE);
+        }
+        int fno = fileno(fp);
+        flock(fno, LOCK_EX);
+        fprintf(fp, "\n%d", (int)getpid()); //call some function that gets PID of simulator.out and save in in the csv
+        flock(fno, LOCK_UN);
+        fclose(fp);
+        didSystemReset = false;
+        hasStarted = false;
     }
-    int fno = fileno(fp);
-    flock(fno, LOCK_EX);
-    fprintf(fp, "\n%d", (int)getpid()); //call some function that gets PID of simulator.out and save in in the csv
-    flock(fno, LOCK_UN);
-    fclose(fp);
-    didSystemReset = false;
-    hasStarted = false;
+    
+    
 }
 
 /**

@@ -6,6 +6,7 @@ int main(){
     uint32_t delay = 150000000;
     uint32_t time = 40;
     uint32_t resetCount = 3;        //for testing WDTimer resets, these delays will let BSP_Reset() be called before the WDTimer finishes counting down 
+    BSP_WDTimer_Init();
     BSP_WDTimer_Start();
     printf("pid should be saved, countdown started\n");
     time = 40;
