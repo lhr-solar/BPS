@@ -22,6 +22,14 @@ def Change_Frequency(newFrequency):
         fcntl.flock(csvfile.fileno(), fcntl.LOCK_UN)    
 
 def Get_Frequency():
-    global CurrentFrequency
+    if os.stat(file).st_size != 0:      #check if file is empty
+        os.makedirs(os.path.dirname(file), exist_ok=True)
+        with open(file, 'r') as csvfile:
+            fcntl.flock(csvfile.fileno(), fcntl.LOCK_EX)    
+            csvreader = csv.reader(csvfile)
+            data = next(csvreader)
+            global CurrentFrequency 
+            CurrentFrequency = data[0]
+            fcntl.flock(csvfile.fileno(), fcntl.LOCK_UN)    
     return int(CurrentFrequency)
 
