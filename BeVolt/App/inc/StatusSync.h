@@ -12,7 +12,7 @@
 void TIM2_IRQHandler(void);
 
 /** TIM2_Init
- * initializes timer 2
+ * initializes timer 2 with a period of 500 milliseconds
  */
 void TIM2Init(void);
 
