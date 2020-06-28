@@ -22,8 +22,6 @@ static bool hasStarted;
 void BSP_WDTimer_Init(void) {
     if(access(file, F_OK) != 0) {
         // File is created if it doesn't exist, otherwise this function does nothing at all
-        //perror(WDTIMER_CSV_FILE);
-        //exit(EXIT_FAILURE);
         FILE* fp = fopen(file, "w");
         if(!fp) {
             perror(WDTIMER_CSV_FILE);
