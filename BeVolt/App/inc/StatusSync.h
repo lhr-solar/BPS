@@ -11,7 +11,15 @@
  */
 void TIM2_IRQHandler(void);
 
+/** TIM2_Init
+ * initializes timer 2
+ */
 void TIM2Init(void);
+
+/** EnableTIM2Interrupt
+ * enables interrupts on timer 2
+ * called by TIM2Init()
+ */
 void EnableTIM2Interrupt(void);
 
 /** DashMessage
