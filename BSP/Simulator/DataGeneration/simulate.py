@@ -5,13 +5,14 @@ import ADC
 import Lights
 import SPI
 import WDTimer
+import PLL
 
 # Global configurations
 state = ''  # Charging/Discharging
 mode = ''   # Low, Normal, High
 stdscr = None   # Output screen
 lights_names = ['EXTRA', 'CAN', 'WDOG', 'UVOLT', 'OVOLT', 'OTEMP', 'OCURR', 'RUN', 'FAULT']
-
+frequency = None
 
 def generate(battery=None):
     global state, mode
@@ -32,6 +33,9 @@ def display(battery=None):  #print watchdog countdown
     global stdscr
     # Read ADC values
     adc_values = ADC.read()
+    global frequency 
+    frequency = PLL.Get_Frequency()
+
     stdscr.addstr(0, 10, "Battery")
     stdscr.addstr(1, 0, "==============================")
     stdscr.addstr(2, 0, f"ADC:")
@@ -44,6 +48,9 @@ def display(battery=None):  #print watchdog countdown
     ticks = WDTimer.Tick()
     stdscr.addstr(10, 0, f"                              ") #clear previous tick
     stdscr.addstr(10, 0, f"WDTimer Countdown: {ticks}")
+    #Display current frequency
+    stdscr.addstr(6, 0, f"                                          ") 
+    stdscr.addstr(6, 0, f"Clock Frequency: {frequency} Hz")
     # Read Module values
     stdscr.addstr(0, 54, "Modules")
     stdscr.addstr(1, 40, "====================================")
@@ -77,7 +84,7 @@ def configure():
     print(">>", end="")
     state = input()
     while state != 'charging' and state != 'discharging':
-        print("That is not a valid option. Please enter 'charging' or 'discharging': ")
+        print("That is not a valid option. Please enter 'charging' or 'discharging'")
         state = input()
     print("Would you like to simulate 'low', 'normal', or 'high' values?")
     print(">>", end="")
@@ -104,7 +111,8 @@ def main():
     print("Type 'start' to start BeVolt. Otherwise, you can specify the types of data to simulate.")
     print(">>", end="")
     if input() == 'start':
-        BeVolt = battery.Battery(30, 2950*434, 2500*434)
+        BeVolt = battery.Battery(30, 2950*434, 2900*434)
+        PLL.PLL_Init()
     else:
         BeVolt = None
         configure()
@@ -123,7 +131,7 @@ def main():
         except KeyboardInterrupt:
             curses.endwin()
             if BeVolt is not None:
-                print("\n\rWould you like to change 'wires' or 'quit'?")
+                print("\n\rWould you like to change 'wires', 'quit', or 'PLL'?")
                 print(">>", end="")
                 choice = input()
                 if choice == 'wires':
@@ -132,6 +140,10 @@ def main():
                     curses.start_color()
                 elif choice == 'quit':
                     break
+                elif choice == 'PLL':
+                    print("Enter the frequency you would like to change the clock to in Hz.")
+                    frequency = int(input())
+                    PLL.Change_Frequency(frequency)
                 else:
                     print("That is not a valid option. Continuing simulation...")
                     stdscr = curses.initscr()
