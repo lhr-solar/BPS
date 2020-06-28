@@ -26,12 +26,6 @@ char hexString[8];
 const float MILLI_UNIT_CONVERSION = 1000;
 const float PERCENT_CONVERSION = 100;
 
-void DelayMs(uint32_t ms) {
-    for(int i = 0; i < ms; i++) {
-        for(int j = 0; j < 50000; j++);
-    }
-}
-
 /** CLI_Init
  * Initializes the CLI with the values it needs
  * @param boards is a cell_asic struct pointer to the minion boards
