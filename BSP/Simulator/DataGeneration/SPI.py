@@ -2,6 +2,7 @@ import csv
 import random
 import os
 import fcntl
+import config
 
 """
 This module generates Voltage and Temperature
@@ -9,7 +10,7 @@ values as they would be read by the LTC6811s
 """
 
 # path/name of file
-file = "BSP/Simulator/DataGeneration/Data/SPI.csv"
+file = config.directory_path + config.files['SPI']
 
 # sensor values
 wires = []                  # list of 31 modules (1 = connected; 0 = open)

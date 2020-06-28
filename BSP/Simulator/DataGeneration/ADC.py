@@ -1,6 +1,7 @@
 import csv
 import random
 import os
+import config
 
 """
 This module will generate ADC data to simulate Current readings
@@ -8,7 +9,7 @@ and store the simulated data in ADC.csv to be read by BSP_ADC.c
 """
 
 # path/name of file
-file = "BSP/Simulator/DataGeneration/Data/ADC.csv"
+file = config.directory_path + config.files['ADC']
 
 # randomized current value
 current_value = 0
