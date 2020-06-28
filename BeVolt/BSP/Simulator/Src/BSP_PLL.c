@@ -20,7 +20,7 @@ void BSP_PLL_Init(void) {
     int fno = fileno(fp);
     flock(fno, LOCK_EX);
     
-    fprintf(fp, "%d", 80000000);
+    fprintf(fp, "%d", 80000000); 
     flock(fno, LOCK_UN);
 	fclose(fp);
 }

@@ -8,8 +8,17 @@ file = "BSP/Simulator/DataGeneration/Data/PLL.csv"
 @brief change the clock frequency
     Function to be called by simulate.py
 """
-CurrentFrequency = 16000000
+CurrentFrequency = 0
 
+def PLL_Init():
+    global CurrentFrequency
+    os.makedirs(os.path.dirname(file), exist_ok=True)
+    with open(file, 'w') as csvfile:    #make the csv file, clock is 16MHz on startup
+        fcntl.flock(csvfile.fileno(), fcntl.LOCK_EX)
+        csvwriter = csv.writer(csvfile)
+        CurrentFrequency = 16000000
+        csvwriter.writerow([CurrentFrequency])
+        fcntl.flock(csvfile.fileno(), fcntl.LOCK_UN)  
 
 def Change_Frequency(newFrequency):
     os.makedirs(os.path.dirname(file), exist_ok=True)
@@ -30,6 +39,6 @@ def Get_Frequency():
             data = next(csvreader)
             global CurrentFrequency 
             CurrentFrequency = data[0]
-            fcntl.flock(csvfile.fileno(), fcntl.LOCK_UN)    
+            fcntl.flock(csvfile.fileno(), fcntl.LOCK_UN) 
     return int(CurrentFrequency)
 

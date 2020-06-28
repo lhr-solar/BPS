@@ -103,6 +103,7 @@ def main():
     print(">>", end="")
     if input() == 'start':
         BeVolt = battery.Battery(30, 2950*434, 2900*434)
+        PLL.PLL_Init()
     else:
         BeVolt = None
         configure()
