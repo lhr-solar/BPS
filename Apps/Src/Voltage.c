@@ -98,13 +98,20 @@ SafetyStatus *Voltage_GetModulesInDanger(void){
 	uint32_t open_wires = Voltage_GetOpenWire();
 	
 	for (int i = 0; i < NUM_BATTERY_MODULES; i++) {	
-		// Check if battery is in range of voltage limit
-		if (Voltage_GetModuleMillivoltage(i) > MAX_VOLTAGE_LIMIT * MILLI_SCALING_FACTOR || Voltage_GetModuleMillivoltage(i) < MIN_VOLTAGE_LIMIT * MILLI_SCALING_FACTOR) {
-			checks[i] = DANGER;
+		// Check if battery is under max voltage limit
+		if (Voltage_GetModuleMillivoltage(i) > MAX_VOLTAGE_LIMIT * MILLI_SCALING_FACTOR){
+			checks[i] = OVERVOLTAGE;
 		}
+		// Check if battery is above minimum voltage limit
+		else if (Voltage_GetModuleMillivoltage(i) < MIN_VOLTAGE_LIMIT * MILLI_SCALING_FACTOR){
+			checks[i] = UNDERVOLTAGE;
+		}
+		//Check if open wires at module
 		else if((open_wires >> i) & 1) {
-			checks[i] = DANGER;
-		} else {
+			checks[i] = OPENWIRE;
+		} 
+		//No errors 
+		else {
 			checks[i] = SAFE;
 		}
 	}
