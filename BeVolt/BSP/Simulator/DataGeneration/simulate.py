@@ -81,8 +81,8 @@ def configure():
     print(">>", end="")
     mode = input()
     while mode != 'low' and mode != 'normal' and mode != 'high':
-            print("That is not a valid option. Please enter 'low', 'normal', or 'high': ")
-            mode = input()
+        print("That is not a valid option. Please enter 'low', 'normal', or 'high': ")
+        mode = input()
 
 
 def change_wires(battery):
