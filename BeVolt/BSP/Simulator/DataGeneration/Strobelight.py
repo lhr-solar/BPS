@@ -19,4 +19,3 @@ def read():
             return int(strobe[0][0])
         else:
             return 0
-print(read())

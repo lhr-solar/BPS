@@ -1,4 +1,4 @@
-#include "../../Inc/BSP_Strobelight.h"
+#include "BSP_Strobelight.h"
 #include <stdint.h>
 #include <stdlib.h>
 #define STROBE_OFF 0
@@ -14,8 +14,11 @@ int StrobeStatus = 0;
  */
 void BSP_Strobe_Init(void) {
 	FILE* fp = fopen(file, "w+");
+    int fno = fileno(fp);
+    flock(fno, LOCK_EX);
 	fprintf(fp, "0");
 	fclose(fp);
+    flock(fno, LOCK_UN);
 }
 
 /**
@@ -26,8 +29,11 @@ void BSP_Strobe_Init(void) {
 void BSP_Strobe_On(void) {
     StrobeStatus = STROBE_PULSING;    //1 = pulsing
     FILE* fp = fopen(file, "w");
+    int fno = fileno(fp);
+    flock(fno, LOCK_EX);
     fprintf(fp, "%d", StrobeStatus);
     fclose(fp);
+    flock(fno, LOCK_UN);
 }
 
 /**
@@ -38,6 +44,9 @@ void BSP_Strobe_On(void) {
 void BSP_Strobe_Off(void) {
     StrobeStatus = STROBE_OFF;     //0 = off
     FILE* fp = fopen(file, "w");
+    int fno = fileno(fp);
+    flock(fno, LOCK_EX);
     fprintf(fp, "%d", StrobeStatus);
     fclose(fp);
+    flock(fno, LOCK_UN);
 }

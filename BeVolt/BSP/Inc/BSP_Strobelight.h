@@ -3,6 +3,7 @@
 
 #include "common.h"
 #include "config.h"
+#include <sys/file.h>
 
 /**
  * @brief   Create text file if none exists (Simulator)
