@@ -56,12 +56,13 @@ def Send_Message(id, message, length):
         fcntl.flock(csvfile.fileno(), fcntl.LOCK_UN)
 
 def Get_CAN_Info():
+    nothingOnCAN = ["nothing on CAN bus"]
     os.makedirs(os.path.dirname(file), exist_ok=True)
     with open(file, 'r') as csvfile:
         fcntl.flock(csvfile.fileno(), fcntl.LOCK_EX)
         if os.stat(file).st_size == 0:     #check if file is empty
             fcntl.flock(csvfile.fileno(), fcntl.LOCK_UN)
-            return 'Nothing has been sent through CAN bus'
+            return nothingOnCAN
         else:
             csvreader = csv.reader(csvfile)
             fcntl.flock(csvfile.fileno(), fcntl.LOCK_UN)

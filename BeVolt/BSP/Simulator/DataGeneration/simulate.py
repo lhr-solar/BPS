@@ -1,4 +1,5 @@
 import curses
+import textwrap
 import time
 import battery
 import ADC
@@ -10,6 +11,7 @@ import SPI
 state = ''  # Charging/Discharging
 mode = ''   # Low, Normal, High
 stdscr = None   # Output screen
+CANbox = None   #box that displays the CAN messages
 lights_names = ['EXTRA', 'CAN', 'WDOG', 'UVOLT', 'OVOLT', 'OTEMP', 'OCURR', 'RUN', 'FAULT']
 
 
@@ -37,8 +39,11 @@ def display(battery=None):
     stdscr.addstr(4, 0, f"Current:")
     stdscr.addstr(4, 10, f"{adc_values[1]} A ")
     #Read CAN data
-    stdscr.addstr(12, 80, f"                                                    ") #clear previous data
-    stdscr.addstr(12, 80, f"CAN: {CAN.Get_CAN_Info()}")
+    CANdata = CAN.Get_CAN_Info()
+    text = ' '.join([elem for elem in CANdata]) #put elements of the list of CAN data bytes into a string 
+    CANbox.erase()  #clear previous data in the box
+    CANbox.addstr(4, 0, textwrap.fill(text, 40))
+    CANbox.addstr(3, 2, "CAN ID and Message:")
     # Read Module values
     stdscr.addstr(0, 54, "Modules")
     stdscr.addstr(1, 40, "====================================")
@@ -63,6 +68,7 @@ def display(battery=None):
         else:
             stdscr.addstr(i+2, 100, "[]", curses.color_pair(3))
     stdscr.refresh()
+    CANbox.refresh()
 
 
 def configure():
@@ -104,10 +110,16 @@ def main():
         BeVolt = None
         configure()
     global stdscr
+    global CANbox
     stdscr = curses.initscr()
     curses.start_color()
     curses.noecho()
     curses.cbreak()
+    #box is for CAN messages
+    CANbox = curses.newwin(7, 21, 12, 78)
+    CANbox.immedok(True)
+    CANbox.box()
+    CANbox.refresh()
     while True:
         try:
             # Generate all values
