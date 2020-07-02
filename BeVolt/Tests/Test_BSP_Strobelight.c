@@ -3,7 +3,7 @@
 
 
 int  main(){
-char strobeIn;
+    char strobeIn;
 
     BSP_Strobe_Init();
     printf("Strobe Control : Enter 'p' for pulsing or 'o' for off\n");

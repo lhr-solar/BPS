@@ -13,7 +13,7 @@ int StrobeStatus = 0;
  * @return  None
  */
 void BSP_Strobe_Init(void) {
-	FILE* fp = fopen(file, "w+");
+	FILE* fp = fopen(file, "w");
     int fno = fileno(fp);
     flock(fno, LOCK_EX);
 	fprintf(fp, "0");
