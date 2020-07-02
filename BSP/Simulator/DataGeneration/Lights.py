@@ -1,5 +1,6 @@
 import csv
 import os
+import fcntl
 import config
 
 #This module will hold the statuses of the LED's on the BPS. 
@@ -14,9 +15,11 @@ def read():
     with open(file, 'a') as csvfile:
         pass    # creates file if not exists
     with open(file, 'r') as csvfile: #read file
+        fcntl.flock(csvfile.fileno(), fcntl.LOCK_EX)    # Lock file
         csvreader = csv.reader(csvfile)
         for row in csvreader:
             lights.append(row)
+        fcntl.flock(csvfile.fileno(), fcntl.LOCK_UN)    # Unlock file
         if len(lights):
             return int(lights[0][0])
         else:
