@@ -120,7 +120,7 @@ def main():
     print("Type 'start' to start BeVolt. Otherwise, you can specify the types of data to simulate.")
     print(">>", end="")
     if input() == 'start':
-        BeVolt = battery.Battery(30, 2950*434, 2900*434)
+        BeVolt = battery.Battery(30, 2950*434, 2500*434)
         PLL.PLL_Init()
     else:
         BeVolt = None

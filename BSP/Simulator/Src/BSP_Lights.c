@@ -1,5 +1,7 @@
 #include "BSP_Lights.h"
 #include "simulator_conf.h"
+#include <unistd.h>
+#include <sys/file.h>
 
 static const char* file = GET_CSV_PATH(LIGHTS_CSV_FILE);
 
@@ -12,7 +14,17 @@ int LEDReg;
 void BSP_Lights_Init(void) {
 	// Creates file if none exists
 	FILE* fp = fopen(file, "w+");
+
+    // Lock the file so simulator.py/Lights.py can not write it during a read op.
+    // This is a blocking statement
+    int fno = fileno(fp);
+    flock(fno, LOCK_EX);
+
 	fprintf(fp, "0");
+
+    // Unlock the lock so the simulator can write to Lights.csv again
+    flock(fno, LOCK_UN);
+
 	fclose(fp);
 }
 
@@ -23,9 +35,25 @@ void BSP_Lights_Init(void) {
  */
 void BSP_Light_Toggle(Light signal) {
 	FILE* fp = fopen(file, "r");
+    if (!fp) {
+        // File doesn't exit if true
+        perror(LIGHTS_CSV_FILE);
+        exit(EXIT_FAILURE);
+    }
+
+    // Lock the file so simulator.py/Lights.py can not write it during a read op.
+    // This is a blocking statement
+    int fno = fileno(fp);
+    flock(fno, LOCK_EX);
+
 	char csv[4];
 	fgets(csv, 4, fp);
-	fclose(fp);
+    
+    // Unlock the lock so the simulator can write to Lights.csv again
+    flock(fno, LOCK_UN);
+
+    fclose(fp);
+
 	LEDReg = atoi(csv);
     switch(signal){
 		case FAULT:
@@ -67,8 +95,24 @@ void BSP_Light_Toggle(Light signal) {
         default:
             break;
 	}
-	fp = fopen(file, "w");
+
+    fp = fopen(file, "w");
+    if (!fp) {
+        // File doesn't exit if true
+        perror(LIGHTS_CSV_FILE);
+        exit(EXIT_FAILURE);
+    }
+
+    // Lock the file so simulator.py/Lights.py can not write it during a read op.
+    // This is a blocking statement
+    fno = fileno(fp);
+    flock(fno, LOCK_EX);
+
 	fprintf(fp, "%d", LEDReg);
+
+    // Unlock the lock so the simulator can write to Lights.csv again
+    flock(fno, LOCK_UN);
+
 	fclose(fp);
 }
 
@@ -79,9 +123,25 @@ void BSP_Light_Toggle(Light signal) {
  */
 void BSP_Light_On(Light signal) {
 	FILE* fp = fopen(file, "r");
+    if (!fp) {
+        // File doesn't exit if true
+        perror(LIGHTS_CSV_FILE);
+        exit(EXIT_FAILURE);
+    }
+
+    // Lock the file so simulator.py/Lights.py can not write it during a read op.
+    // This is a blocking statement
+    int fno = fileno(fp);
+    flock(fno, LOCK_EX);
+
 	char csv[4];
 	fgets(csv, 4, fp);
-	fclose(fp);
+
+    // Unlock the lock so the simulator can write to Lights.csv again
+    flock(fno, LOCK_UN);
+
+    fclose(fp);
+
 	LEDReg = atoi(csv);
     switch(signal){
 		case FAULT:
@@ -123,8 +183,24 @@ void BSP_Light_On(Light signal) {
         default:
             break;
 	}
-	fp = fopen(file, "w");
+
+    fp = fopen(file, "w");
+    if (!fp) {
+        // File doesn't exit if true
+        perror(LIGHTS_CSV_FILE);
+        exit(EXIT_FAILURE);
+    }
+
+    // Lock the file so simulator.py/Lights.py can not write it during a read op.
+    // This is a blocking statement
+    fno = fileno(fp);
+    flock(fno, LOCK_EX);
+
 	fprintf(fp, "%d", LEDReg);
+
+    // Unlock the lock so the simulator can write to Lights.csv again
+    flock(fno, LOCK_UN);
+
 	fclose(fp);
 }
 
@@ -135,9 +211,25 @@ void BSP_Light_On(Light signal) {
  */
 void BSP_Light_Off(Light signal) {
 	FILE* fp = fopen(file, "r");
+    if (!fp) {
+        // File doesn't exit if true
+        perror(LIGHTS_CSV_FILE);
+        exit(EXIT_FAILURE);
+    }
+
+    // Lock the file so simulator.py/Lights.py can not write it during a read op.
+    // This is a blocking statement
+    int fno = fileno(fp);
+    flock(fno, LOCK_EX);
+
 	char csv[4];
 	fgets(csv, 4, fp);
-	fclose(fp);
+
+    // Unlock the lock so the simulator can write to Lights.csv again
+    flock(fno, LOCK_UN);
+
+    fclose(fp);
+
 	LEDReg = atoi(csv);
     switch(signal){
 		case FAULT:
@@ -179,8 +271,24 @@ void BSP_Light_Off(Light signal) {
         default:
             break;
 	}
-	fp = fopen(file, "w");
+
+    fp = fopen(file, "w");
+    if (!fp) {
+        // File doesn't exit if true
+        perror(LIGHTS_CSV_FILE);
+        exit(EXIT_FAILURE);
+    }
+
+    // Lock the file so simulator.py/Lights.py can not write it during a read op.
+    // This is a blocking statement
+    fno = fileno(fp);
+    flock(fno, LOCK_EX);
+
 	fprintf(fp, "%d", LEDReg);
+    
+    // Unlock the lock so the simulator can write to Lights.csv again
+    flock(fno, LOCK_UN);
+
 	fclose(fp);
 }
 
@@ -192,6 +300,17 @@ void BSP_Light_Off(Light signal) {
 State BSP_Light_GetState(Light signal) {
 	State returnVal;
 	FILE* fp = fopen(file, "r");
+    if (!fp) {
+        // File doesn't exit if true
+        perror(LIGHTS_CSV_FILE);
+        exit(EXIT_FAILURE);
+    }
+
+    // Lock the file so simulator.py/Lights.py can not write it during a read op.
+    // This is a blocking statement
+    int fno = fileno(fp);
+    flock(fno, LOCK_EX);
+
 	char csv[4];
 	fgets(csv, 4, fp);
 	LEDReg = atoi(csv);
@@ -226,6 +345,11 @@ State BSP_Light_GetState(Light signal) {
         default:
             returnVal = OFF;
 	}
-	fclose(fp); //close file
+
+    // Unlock the lock so the simulator can write to Lights.csv again
+    flock(fno, LOCK_UN);
+
+	fclose(fp);
+
 	return returnVal;
 }
