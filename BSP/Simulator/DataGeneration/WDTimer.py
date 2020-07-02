@@ -1,8 +1,9 @@
 import csv
 import os
 import fcntl
+import config
 
-file = "BSP/Simulator/DataGeneration/Data/WDTimer.csv"
+file = config.directory_path + config.files['WDTimer']
 
 TimerEnable = False
 duration = 15 #unit is in seconds

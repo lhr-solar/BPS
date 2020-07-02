@@ -1,8 +1,9 @@
 import csv
 import os
 import fcntl
+import config
 
-file = "BSP/Simulator/DataGeneration/Data/PLL.csv"
+file = config.directory_path + config.files['PLL']
 
 """
 @brief change the clock frequency

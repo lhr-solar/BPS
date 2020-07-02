@@ -5,7 +5,7 @@ import config
 #This module will hold the statuses of the LED's on the BPS. 
 
 #path name to file
-file = file = config.directory_path + config.files['Lights']
+file = config.directory_path + config.files['Lights']
 
 #returns integer where 9 LSB are status of 9 LED's
 def read():
