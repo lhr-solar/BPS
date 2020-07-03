@@ -7,6 +7,9 @@ import SPI
 import WDTimer
 import PLL
 
+import os
+import sys
+
 # Global configurations
 state = ''  # Charging/Discharging
 mode = ''   # Low, Normal, High
@@ -105,6 +108,27 @@ def change_wires(battery):
         else:
             done = True
 
+def launch_bevolt():
+    # Suppress stdout and stderr
+    null_fds = [os.open(os.devnull, os.O_RDWR) for x in range(2)]
+    # save the current stdout and stderr
+    save = os.dup(1), os.dup(2)
+    # put /dev/null fds on 1 and 2
+    os.dup2(null_fds[0], 1)
+    os.dup2(null_fds[1], 2)
+
+    # Launch the BPS code for BeVolt
+    isParent = os.fork()
+    if isParent == 0:   # we only want to do this in the child process
+        os.execl("simulate", "simulate", "bevolt")
+    
+    os.dup2(save[0], 1)
+    os.dup2(save[1], 2)
+    
+    os.close(null_fds[0])
+    os.close(null_fds[1])
+    os.close(save[0])
+    os.close(save[1])
 
 def main():
     print("Welcome to the BPS Simulator")
@@ -116,6 +140,12 @@ def main():
     else:
         BeVolt = None
         configure()
+    
+    try:
+        launch_bevolt()
+    except Exception as e:
+        print(repr(e))
+    
     global stdscr
     stdscr = curses.initscr()
     curses.start_color()
@@ -167,7 +197,7 @@ def main():
             curses.nocbreak()
             curses.endwin()
             print("ERROR:", end=" ")
-            print(e, end="\r\n")
+            print(repr(e), end="\r\n")
             print("If addwstr() returned ERR, make your terminal window bigger.")
             print("\n\rContinue? (Y/n): ", end="")
             cont = input()
