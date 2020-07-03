@@ -16,8 +16,8 @@ reset = '2'
 def Check_State():
     global duration
     global TimerEnable
+    os.makedirs(os.path.dirname(file), exist_ok=True)
     if TimerEnable == True:
-        os.makedirs(os.path.dirname(file), exist_ok=True)
         with open(file, 'r+') as csvfile:
             fcntl.flock(csvfile.fileno(), fcntl.LOCK_EX)  
             csvreader = csv.reader(csvfile)
