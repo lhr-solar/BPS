@@ -15,8 +15,26 @@ function simulate() {
         echo "Launching gnome-terminal..."
         gnome-terminal --working-directory="$(pwd)" --geometry=103x33 -- python3 BSP/Simulator/DataGeneration/simulate.py  
     fi
-
-    ./bps-simulator.out
 }
 
-simulate
+function start_bevolt() {
+    cd "$(dirname "$0")"
+    
+    # Do a quick check for operating system.
+    # Right now, the only linux shell that is supported is gnome-terminal,
+    # since that's the default on Ubuntu.
+    if [[ $(uname -a | grep Microsoft) ]]; then
+        echo "Launching a new WSL shell..."
+        # This line makes me sad
+        cmd.exe /c start cmd.exe /c "mode con: cols=103 lines=33 && wsl.exe ./bps-simulator.out" &
+    else
+        echo "Launching gnome-terminal..."
+        gnome-terminal --working-directory="$(pwd)" --geometry=103x33 -- ./bps-simulator.out
+    fi
+}
+
+if [[ $# -ne 1 ]]; then
+    simulate
+else
+    start_bevolt
+fi
