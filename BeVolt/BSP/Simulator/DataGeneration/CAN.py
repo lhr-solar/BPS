@@ -58,16 +58,21 @@ def Send_Message(id, message, length):
 def Get_CAN_Info():
     nothingOnCAN = ["nothing on CAN bus"]
     os.makedirs(os.path.dirname(file), exist_ok=True)
+
+    ret = None
+
     with open(file, 'r') as csvfile:
         fcntl.flock(csvfile.fileno(), fcntl.LOCK_EX)
-        if os.stat(file).st_size == 0:     #check if file is empty
-            fcntl.flock(csvfile.fileno(), fcntl.LOCK_UN)
-            return nothingOnCAN
-        else:
+        try:
             csvreader = csv.reader(csvfile)
-            fcntl.flock(csvfile.fileno(), fcntl.LOCK_UN)
-            return next(csvreader)
-
+            ret = next(csvreader)
+        except StopIteration as stopIt:
+            ret = nothingOnCAN
+        fcntl.flock(csvfile.fileno(), fcntl.LOCK_UN)
+    
+    return ret
+        
+ 
 def Invalid_CAN_ID(id):
     return not id in valid_IDs
 

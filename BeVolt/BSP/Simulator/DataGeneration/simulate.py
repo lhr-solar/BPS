@@ -169,7 +169,7 @@ def main():
             curses.nocbreak()
             curses.endwin()
             print("ERROR:", end=" ")
-            print(e, end="\r\n")
+            print(repr(e), end="\r\n")
             print("If addwstr() returned ERR, make your terminal window bigger.")
             print("\n\rContinue? (Y/n): ", end="")
             cont = input()
