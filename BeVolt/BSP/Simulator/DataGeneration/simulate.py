@@ -40,7 +40,7 @@ def display(battery=None):
     stdscr.addstr(4, 10, f"{adc_values[1]} A ")
     #Read CAN data
     CANdata = CAN.Get_CAN_Info()
-    text = ' '.join([elem for elem in CANdata]) #put elements of the list of CAN data bytes into a string 
+    text = ' '.join(CANdata) #put elements of the list of CAN data bytes into a string 
     CANbox.erase()  #clear previous data in the box
     CANbox.addstr(4, 0, textwrap.fill(text, 40))
     CANbox.addstr(3, 2, "CAN ID and Message:")
@@ -68,7 +68,6 @@ def display(battery=None):
         else:
             stdscr.addstr(i+2, 100, "[]", curses.color_pair(3))
     stdscr.refresh()
-    CANbox.refresh()
 
 
 def configure():
@@ -169,7 +168,7 @@ def main():
             curses.nocbreak()
             curses.endwin()
             print("ERROR:", end=" ")
-            print(e, end="\r\n")
+            print(repr(e), end="\r\n")
             print("If addwstr() returned ERR, make your terminal window bigger.")
             print("\n\rContinue? (Y/n): ", end="")
             cont = input()

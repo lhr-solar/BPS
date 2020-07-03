@@ -58,22 +58,27 @@ def Send_Message(id, message, length):
 def Get_CAN_Info():
     nothingOnCAN = ["nothing on CAN bus"]
     InitCANMsg = ["CAN isn't initialized"]
+    os.makedirs(os.path.dirname(file), exist_ok=True)
+
+    ret = None
     if os.path.isfile(file) == True:    #only execute the following code if the .csv file has been created 
-        os.makedirs(os.path.dirname(file), exist_ok=True)
         with open(file, 'r') as csvfile:
             fcntl.flock(csvfile.fileno(), fcntl.LOCK_EX)
-            if os.stat(file).st_size == 0:     #check if file is empty
-                fcntl.flock(csvfile.fileno(), fcntl.LOCK_UN)
-                return nothingOnCAN
-            else:
+            try:
                 csvreader = csv.reader(csvfile)
-                info = next(csvreader)
-                fcntl.flock(csvfile.fileno(), fcntl.LOCK_UN)
-                return info
+                ret = next(csvreader)
+            except StopIteration as stopIt:
+                ret = nothingOnCAN
+            fcntl.flock(csvfile.fileno(), fcntl.LOCK_UN)
     else:
-        return InitCANMsg
+        ret = InitCANMsg
+    return ret
+    
     
 
+
+        
+ 
 def Invalid_CAN_ID(id):
     return not id in valid_IDs
 
