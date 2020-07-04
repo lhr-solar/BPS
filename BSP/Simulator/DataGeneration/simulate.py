@@ -7,6 +7,7 @@ import SPI
 import Strobelight
 import WDTimer
 import PLL
+import config
 
 # Global configurations
 state = ''  # Charging/Discharging
@@ -120,7 +121,9 @@ def main():
     print("Type 'start' to start BeVolt. Otherwise, you can specify the types of data to simulate.")
     print(">>", end="")
     if input() == 'start':
-        BeVolt = battery.Battery(30, 2950*434, 2500*434)
+        # Initial capacity is (2500*14)/(2950*14)=0.847 i.e. 84.7% charged
+        init_capacity_mah = 2500 * config.num_batt_cells_parallel_per_module
+        BeVolt = battery.Battery(30, config.total_batt_pack_capacity_mah, init_capacity_mah)
         PLL.PLL_Init()
     else:
         BeVolt = None
