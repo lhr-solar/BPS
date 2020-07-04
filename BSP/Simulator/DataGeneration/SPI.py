@@ -96,6 +96,7 @@ def generate(state, mode, battery=None):
         random_voltage(mode)
         random_temperature(state, mode)
     with open(file, 'w+') as csvfile:
+        fcntl.flock(csvfile.fileno(), fcntl.LOCK_EX)    # Lock file
         csvwriter = csv.writer(csvfile)
         row = []
         for i in range(len(voltage_values)):
@@ -105,6 +106,7 @@ def generate(state, mode, battery=None):
             row.append(temperature_values[i][1])
             csvwriter.writerow(row)
             row = []
+        fcntl.flock(csvfile.fileno(), fcntl.LOCK_UN)    # Unlock file
 
 
 def read():
@@ -118,11 +120,11 @@ def read():
     values = []
     os.makedirs(os.path.dirname(file), exist_ok=True)
     with open(file, 'r') as csvfile:
-        fcntl.flock(csvfile.fileno(), fcntl.LOCK_EX)    # Lock file before writing
+        fcntl.flock(csvfile.fileno(), fcntl.LOCK_EX)    # Lock file
         csvreader = csv.reader(csvfile)
         for row in csvreader:
             for i in range(len(row)):
                 row[i] = int(row[i])
             values.append(row)
-        fcntl.flock(csvfile.fileno(), fcntl.LOCK_UN)    # Unlock file after writing
+        fcntl.flock(csvfile.fileno(), fcntl.LOCK_UN)    # Unlock file
     return values

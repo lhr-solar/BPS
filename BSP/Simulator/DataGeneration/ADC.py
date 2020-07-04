@@ -1,6 +1,7 @@
 import csv
 import random
 import os
+import fcntl
 import config
 
 """
@@ -87,12 +88,16 @@ def generate(state, mode, battery=None):
     os.makedirs(os.path.dirname(file), exist_ok=True)
     if battery is None:
         with open(file, 'w+') as csvfile:
+            fcntl.flock(csvfile.fileno(), fcntl.LOCK_EX)    # Lock file
             csvwriter = csv.writer(csvfile)
             csvwriter.writerow(list(random_adc(state, mode)))
+            fcntl.flock(csvfile.fileno(), fcntl.LOCK_UN)    # Unlock file
     else:
         with open(file, 'w+') as csvfile:
+            fcntl.flock(csvfile.fileno(), fcntl.LOCK_EX)    # Lock file
             csvwriter = csv.writer(csvfile)
             csvwriter.writerow(list(specific_adc(battery.current)))
+            fcntl.flock(csvfile.fileno(), fcntl.LOCK_UN)    # Unlock file
         current_value = battery.current
 
 
@@ -106,8 +111,10 @@ def read():
     values = []
     os.makedirs(os.path.dirname(file), exist_ok=True)
     with open(file, 'r') as csvfile:
+        fcntl.flock(csvfile.fileno(), fcntl.LOCK_EX)    # Lock file
         csvreader = csv.reader(csvfile)
         for row in csvreader:
             values.append(row)
+        fcntl.flock(csvfile.fileno(), fcntl.LOCK_UN)    # Unlock file
     values.append(current_value)
     return values
