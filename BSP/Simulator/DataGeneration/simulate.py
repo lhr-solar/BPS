@@ -123,7 +123,12 @@ def main():
     if input() == 'start':
         # Initial capacity is (2500*14)/(2950*14)=0.847 i.e. 84.7% charged
         init_capacity_mah = 2500 * config.num_batt_cells_parallel_per_module
-        BeVolt = battery.Battery(30, config.total_batt_pack_capacity_mah, init_capacity_mah)
+
+        # Amperes current draw of the electrical system
+        ampere_draw = 30
+
+        # Create state of the battery
+        BeVolt = battery.Battery(ampere_draw, config.total_batt_pack_capacity_mah, init_capacity_mah)
         PLL.PLL_Init()
     else:
         BeVolt = None
