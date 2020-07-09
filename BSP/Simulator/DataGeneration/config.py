@@ -13,7 +13,8 @@ files = dict(
     PLL = "PLL.csv",
     SPI = "SPI.csv",
     Timer = "Timer.csv",
-    WDTimer = "WDTimer.csv"
+    WDTimer = "WDTimer.csv",
+    Strobelight = "Strobe.csv"
 
     # Add more files if needed here.
 )
