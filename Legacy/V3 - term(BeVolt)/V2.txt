@@ -1,2 +1,0 @@
-This is the initial firmware for the UTSVt-nextGen car.
-it's pretty much a revision of the "V1" code from the TexSun. While V1 code was an almost from-scratch rewrite of the v0 (Archer's Solorean vode), V2 is really more of a tweak of the V1 code.
