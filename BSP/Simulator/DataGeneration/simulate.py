@@ -1,8 +1,10 @@
 import curses
+import textwrap
 import time
 import battery
 import ADC
 import Lights
+import CAN
 import SPI
 import Strobelight
 import WDTimer
@@ -16,6 +18,7 @@ import sys
 state = ''  # Charging/Discharging
 mode = ''   # Low, Normal, High
 stdscr = None   # Output screen
+CANbox = None   #box that displays the CAN messages
 lights_names = ['EXTRA', 'CAN', 'WDOG', 'UVOLT', 'OVOLT', 'OTEMP', 'OCURR', 'RUN', 'FAULT']
 frequency = None
 
@@ -49,6 +52,12 @@ def display(battery=None):  #print watchdog countdown
     # Read Current values
     stdscr.addstr(4, 0, f"Current:")
     stdscr.addstr(4, 10, f"{adc_values[1]} A ")
+    #Read CAN data
+    CANdata = CAN.Get_CAN_Info()
+    text = ' '.join(CANdata) #put elements of the list of CAN data bytes into a string 
+    CANbox.erase()  #clear previous data in the box
+    CANbox.addstr(4, 0, textwrap.fill(text, 40))
+    CANbox.addstr(3, 2, "CAN ID and Message:")
     # Display Watchdog ticks
     ticks = WDTimer.Tick()
     stdscr.addstr(10, 0, f"                              ") #clear previous tick
@@ -164,10 +173,16 @@ def main():
         print(repr(e))
     
     global stdscr
+    global CANbox
     stdscr = curses.initscr()
     curses.start_color()
     curses.noecho()
     curses.cbreak()
+    #box is for CAN messages
+    CANbox = curses.newwin(7, 21, 12, 78)
+    CANbox.immedok(True)
+    CANbox.box()
+    CANbox.refresh()
     while True:
         try:
             # Generate all values
@@ -196,15 +211,22 @@ def main():
                     stdscr = curses.initscr()
                     curses.start_color()
             else:
-                print("\n\rWould you like to change 'config' or 'quit'?")
-                print(">>", end="")
+                print("\n\rWould you like to change 'config', 'quit', or send a CAN message ('CAN')?")
                 choice = input()
                 if choice == 'config':
                     configure()
                     stdscr = curses.initscr()
-                    curses.start_color()
                 elif choice == 'quit':
                     break
+                elif choice == 'CAN':
+                    print("Enter the CAN ID for the system you wish to simulate. Leave out '0x'.")
+                    id = input()
+                    while(CAN.Invalid_CAN_ID(id) == True):
+                        print("Invalid CAN ID. Try again.")
+                        id = input()
+                    print("Enter up to 8 bytes of the CAN message that you would like to send, and separate each byte by a ','. Leave out '0x'.")
+                    message = input().split(',')
+                    CAN.Send_Message(id, message, len(message))
                 else:
                     print("That is not a valid option. Continuing simulation...")
                     stdscr = curses.initscr()
