@@ -73,6 +73,7 @@ int main(){
 		}
 
 		// TODO: Implement heartbeat for RUN light at a visible frequency
+		BSP_Light_Toggle(RUN);
 
 		// Update necessary
 		// CAN_SendMessageStatus()	// Most likely need to put this on a timer if sending too frequently
