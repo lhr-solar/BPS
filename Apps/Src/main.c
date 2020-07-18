@@ -44,6 +44,8 @@ int main(){
 
 	BSP_WDTimer_Start();
 
+	uint32_t heartcount = 0;
+
 	while(1) {
 		// First update the measurements.
 		Voltage_UpdateMeasurements();
@@ -72,8 +74,7 @@ int main(){
 			break;
 		}
 
-		// TODO: Implement heartbeat for RUN light at a visible frequency
-		BSP_Light_Toggle(RUN);
+		heartbeat();
 
 		// Update necessary
 		// CAN_SendMessageStatus()	// Most likely need to put this on a timer if sending too frequently
@@ -135,6 +136,17 @@ void preliminaryCheck(void){
 		BSP_Light_On(FAULT);
 		BSP_Light_On(WDOG);
 		while(1);		// Spin
+	}
+}
+
+/** heartbeat
+ * Toggle heartbeat at visible frequency (RUN light)
+ */
+void heartbeat(void){
+	// increment heartcount variable once per while(1) loop
+	heartcount = (heartcount + 1)%(heartbeatDelay);
+	if(heartcount = 0) {
+		BSP_Light_Toggle(RUN);
 	}
 }
 
