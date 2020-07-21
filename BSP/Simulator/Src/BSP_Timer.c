@@ -1,12 +1,39 @@
 #include "BSP_Timer.h"
+#include <stdint.h>
+#include <stdlib.h>
+#include <sys/file.h>
+#include <sys/types.h>
+#include <unistd.h>
+#include "simulator_conf.h"
 
+static const char* file = GET_CSV_PATH(TIMER_CSV_FILE);
+
+static bool hasBeenStarted = false;
+
+static uint32_t ticks;
+
+enum{
+    Start = -5
+};
 /**
  * @brief   Initialize the timer for time measurements.
  * @param   None
  * @return  None
  */
 void BSP_Timer_Init(void) {
-    // TODO: Initialize a regular timer with no interrupts
+    // File is created if it doesn't exist, otherwise this function does nothing at all
+    if(access(file, F_OK) != 0) {   
+        FILE* fp = fopen(file, "w");
+        if(!fp) {
+            perror(TIMER_CSV_FILE);
+            exit(EXIT_FAILURE);
+        }
+        int fno = fileno(fp);
+        flock(fno, LOCK_EX);
+        flock(fno, LOCK_UN);
+        fclose(fp);
+        ticks = 0;
+    }
 }
 
 /**
@@ -16,6 +43,19 @@ void BSP_Timer_Init(void) {
  */
 void BSP_Timer_Start(void) {
     // TODO: Start the timer
+    char init = 's';
+    FILE* fp = fopen(file, "w");
+    if(!fp){
+        perror(TIMER_CSV_FILE);
+        exit(EXIT_FAILURE);
+    }
+    int fno = fileno(fp);
+    flock(fno, LOCK_EX);
+    fprintf(fp, "%c", init);
+    flock(fno, LOCK_UN);
+    fclose(fp);
+    hasBeenStarted = true;
+
 }
 
 /**
@@ -25,7 +65,35 @@ void BSP_Timer_Start(void) {
  */
 uint32_t BSP_Timer_GetTicksElapsed(void) {
     // TODO: return the number of ticks from this last function call to now
-    return 0;
+    char numberString[30];
+    uint32_t number;
+    uint32_t ret;
+    char check;
+    
+    if(hasBeenStarted){
+        FILE* fp = fopen(file, "r");
+        if(!fp){
+            perror(TIMER_CSV_FILE);
+            exit(EXIT_FAILURE);
+        }
+        int fno = fileno(fp);
+        flock(fno, LOCK_EX);
+        
+        check = fgetc(fp);
+        if(check != 's'){
+            fseek(fp, 0, SEEK_SET);     //reset file pointer to the beginning of the file
+            fgets(numberString, 30, fp);
+            number = atoi(numberString);
+            ret = (number - ticks) & 0x00FFFFFF;    //Account for overflow
+            ticks = number;
+        }
+        flock(fno, LOCK_UN);
+        fclose(fp);
+    
+        return ret;
+    }else{
+        return 0;
+    }
 }
 
 /**

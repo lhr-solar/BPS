@@ -9,7 +9,9 @@ import SPI
 import Strobelight
 import WDTimer
 import PLL
+
 import config
+import Timer
 
 import os
 import sys
@@ -35,6 +37,8 @@ def generate(battery=None):
     WDTimer.Check_State()
     #Initialize Watchdog Timer
     WDTimer.WD_Enable()
+    #Initialize Timer
+    Timer.Enable()
 
 
 def display(battery=None):  #print watchdog countdown 
@@ -43,6 +47,8 @@ def display(battery=None):  #print watchdog countdown
     adc_values = ADC.read()
     global frequency 
     frequency = PLL.Get_Frequency()
+
+    #Timer.Tick()
 
     stdscr.addstr(0, 10, "Battery")
     stdscr.addstr(1, 0, "==============================")
@@ -183,6 +189,9 @@ def main():
     CANbox.immedok(True)
     CANbox.box()
     CANbox.refresh()
+    #Start background thread for timer 
+    timerThread = Timer.timer_Thread
+    timerThread.start()
     while True:
         try:
             # Generate all values
