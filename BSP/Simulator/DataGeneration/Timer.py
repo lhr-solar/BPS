@@ -9,7 +9,9 @@ import time
 file = config.directory_path + config.files['Timer']
 ticks = 0
 startFlag = False
+initCharacter = 's' #this character is left by C code when it has started the timer
 
+#this function runs the timer continuously, it is meant to be called in a seperate thread
 def Tick():
     global ticks
     os.makedirs(os.path.dirname(file), exist_ok=True)
@@ -33,6 +35,7 @@ def Tick():
 
 timer_Thread = threading.Thread(target=Tick)
 
+#checks if the timer has been started by C code
 def Enable():
     global startFlag
     os.makedirs(os.path.dirname(file), exist_ok=True)
@@ -42,7 +45,7 @@ def Enable():
                 fcntl.flock(csvfile.fileno(), fcntl.LOCK_EX)
                 csvreader = csv.reader(csvfile)
                 check = next(csvreader)
-                if(check[0] == 's'):
+                if(check[0] == initCharacter):
                     startFlag = True
                     csvfile.seek(0)
                     csvwriter = csv.writer(csvfile)

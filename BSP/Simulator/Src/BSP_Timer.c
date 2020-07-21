@@ -12,9 +12,9 @@ static bool hasBeenStarted = false;
 
 static uint32_t ticks;
 
-enum{
-    Start = -5
-};
+static char init = 's';
+
+
 /**
  * @brief   Initialize the timer for time measurements.
  * @param   None
@@ -42,8 +42,6 @@ void BSP_Timer_Init(void) {
  * @return  None
  */
 void BSP_Timer_Start(void) {
-    // TODO: Start the timer
-    char init = 's';
     FILE* fp = fopen(file, "w");
     if(!fp){
         perror(TIMER_CSV_FILE);
@@ -64,7 +62,6 @@ void BSP_Timer_Start(void) {
  * @return  Number of ticks
  */
 uint32_t BSP_Timer_GetTicksElapsed(void) {
-    // TODO: return the number of ticks from this last function call to now
     char numberString[30];
     uint32_t number;
     uint32_t ret;
@@ -80,7 +77,7 @@ uint32_t BSP_Timer_GetTicksElapsed(void) {
         flock(fno, LOCK_EX);
         
         check = fgetc(fp);
-        if(check != 's'){
+        if(check != init){
             fseek(fp, 0, SEEK_SET);     //reset file pointer to the beginning of the file
             fgets(numberString, 30, fp);
             number = atoi(numberString);
