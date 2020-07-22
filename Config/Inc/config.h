@@ -55,8 +55,8 @@ typedef enum {SAFE = 0, DANGER = 1, OVERVOLTAGE = 2, UNDERVOLTAGE = 3} SafetySta
 #define MAX_TEMP_SENSORS_PER_MINION_BOARD	16
 
 //--------------------------------------------------------------------------------
-// HeartBeat delay length (# of loops before toggle)
-// Define heartbeatDelay as # of desired loops per toggle
+// HeartBeat Delay Ticks
+// Define heartbeatDelay as # of desired while(1) loops per toggle
 #define heartbeatDelay 0x6000
 
 #endif

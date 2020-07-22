@@ -16,11 +16,11 @@
 #include "BSP_Lights.h"
 #include "BSP_WDTimer.h"
 
-
 cell_asic Minions[NUM_MINIONS];
 bool override = false;		// This will be changed by user via CLI
 char command[COMMAND_SIZE];
 
+void heartbeat(void);
 void initialize(void);
 void preliminaryCheck(void);
 void faultCondition(void);
@@ -43,8 +43,6 @@ int main(){
         #endif
 
 	BSP_WDTimer_Start();
-
-	uint32_t heartcount = 0;
 
 	while(1) {
 		// First update the measurements.
@@ -144,6 +142,7 @@ void preliminaryCheck(void){
  */
 void heartbeat(void){
 	// increment heartcount variable once per while(1) loop
+	static int heartcount;
 	heartcount = (heartcount + 1)%(heartbeatDelay);
 	if(heartcount == 0) {
 		BSP_Light_Toggle(RUN);
