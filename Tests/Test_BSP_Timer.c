@@ -5,17 +5,19 @@
 
 int main(void){
     uint32_t test;
-    uint32_t delay = 1500000;
+    uint32_t delay = 150000000;
     uint32_t time = 40;        
     
     BSP_Timer_Init();
     BSP_Timer_Start();
+    uint32_t freq = BSP_Timer_GetRunFreq();
+    printf("Timer frequency: %d\n\r", freq);
     
     while(1){
         test = BSP_Timer_GetTicksElapsed();
         printf("Ticks elapsed : %d\n\r", test);  
         while(time){                        //this is a delay to prevent the elapsed time being negligible
-            delay = 1500000;
+            delay = 150000000;
             while(delay){
                 delay--;
             }

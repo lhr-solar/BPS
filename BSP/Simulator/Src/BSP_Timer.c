@@ -7,6 +7,7 @@
 #include "simulator_conf.h"
 
 static const char* file = GET_CSV_PATH(TIMER_CSV_FILE);
+static const char* PLLfile = GET_CSV_PATH(PLL_CSV_FILE);
 
 static bool hasBeenStarted = false;
 
@@ -99,5 +100,24 @@ uint32_t BSP_Timer_GetTicksElapsed(void) {
  * @return  frequency in Hz
  */
 uint32_t BSP_Timer_GetRunFreq(void) {
-    return 16000000;
+    uint32_t currentFreq;
+    char str[20];
+    FILE* fp = fopen(PLLfile, "r");
+    
+    if(access(PLLfile, F_OK) != 0) {
+        return 16000000;    //return default value if PLL csv hasn't been created
+    }else{
+        if(!fp) {
+            perror(PLL_CSV_FILE);
+            exit(EXIT_FAILURE);
+        }
+        int fno = fileno(fp);   //same as BSP_PLL_GetSystemClock()
+        flock(fno, LOCK_EX);
+        fgets(str, 20, fp);
+        flock(fno, LOCK_UN);
+        fclose(fp);
+        currentFreq = atoi(str);
+        return currentFreq;  
+    }
+     
 }

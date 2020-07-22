@@ -28,7 +28,7 @@ def Tick():
                 csvwriter.writerow([ticks])
                 fcntl.flock(csvfile.fileno(), fcntl.LOCK_UN)
             ticks = ticks + 1
-            time.sleep(.00000001)    #this delay is here to control the tick rate
+            
              
         
             
