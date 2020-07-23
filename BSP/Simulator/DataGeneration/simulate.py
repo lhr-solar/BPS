@@ -48,8 +48,6 @@ def display(battery=None):  #print watchdog countdown
     global frequency 
     frequency = PLL.Get_Frequency()
 
-    #Timer.Tick()
-
     stdscr.addstr(0, 10, "Battery")
     stdscr.addstr(1, 0, "==============================")
     stdscr.addstr(2, 0, f"ADC:")
@@ -256,6 +254,8 @@ def main():
     curses.echo()
     curses.nocbreak()
     curses.endwin()
+    Timer.terminate(True)
+
 
 
 if __name__ == '__main__':

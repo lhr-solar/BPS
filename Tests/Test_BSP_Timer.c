@@ -15,7 +15,9 @@ int main(void){
     
     while(1){
         test = BSP_Timer_GetTicksElapsed();
-        printf("Ticks elapsed : %d\n\r", test);  
+        printf("Ticks elapsed : %d\n\r", test);
+        freq = BSP_Timer_GetRunFreq();
+        printf("Timer frequency: %d\n\r", freq);  
         while(time){                        //this is a delay to prevent the elapsed time being negligible
             delay = 150000000;
             while(delay){
