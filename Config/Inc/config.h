@@ -57,6 +57,6 @@ typedef enum {SAFE = 0, DANGER = 1, OVERVOLTAGE = 2, UNDERVOLTAGE = 3} SafetySta
 //--------------------------------------------------------------------------------
 // HeartBeat Delay Ticks
 // Define heartbeatDelay as # of desired while(1) loops per toggle
-#define heartbeatDelay 0x6000
+#define HEARTBEAT_DELAY 0x10
 
 #endif

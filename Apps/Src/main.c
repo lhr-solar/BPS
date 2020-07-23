@@ -143,7 +143,7 @@ void preliminaryCheck(void){
 void heartbeat(void){
 	// increment heartcount variable once per while(1) loop
 	static int heartcount;
-	heartcount = (heartcount + 1)%(heartbeatDelay);
+	heartcount = (heartcount + 1)%(HEARTBEAT_DELAY);
 	if(heartcount == 0) {
 		BSP_Light_Toggle(RUN);
 	}
