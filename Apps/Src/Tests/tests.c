@@ -426,46 +426,46 @@ int main(){
 #elif defined SOC_TEST
 
 // *****************************************************************************************
-#include "SoC.h"
+#include "Charge.h"
 #include <stdio.h>
 #include <UART.h>
-void ChargingSoCTest(void);
-void DischargingSoCTest(void);
+void ChargingChargeTest(void);
+void DischargingChargeTest(void);
 
-extern uint32_t fixedPoint_SoC;
-extern float float_SoC;
+extern uint32_t fixedPoint_Charge;
+extern float float_Charge;
 
 int main(){
 	UART3_Init(9600);
-	SoC_Init();
-	//ChargingSoCTest();
-	//DischargingSoCTest();
+	Charge_Init();
+	//ChargingChargeTest();
+	//DischargingChargeTest();
 }
 
-void ChargingSoCTest(void) {
+void ChargingChargeTest(void) {
 	char str[50];
-	sprintf(str,"Starting SoC Charging Test..");
+	sprintf(str,"Starting Charge Charging Test..");
 	UART3_Write(str, strlen(str));
 
-	fixedPoint_SoC = 0;
-	float_SoC = 0;
+	fixedPoint_Charge = 0;
+	float_Charge = 0;
 	while(1){
-		SoC_Calculate(500); 									// Charging with 500 mA, should take a while
-		sprintf(str,"SoC: %.2f%%\r\n",float_SoC);
+		Charge_Calculate(500); 									// Charging with 500 mA, should take a while
+		sprintf(str,"Charge: %.2f%%\r\n",float_Charge);
 		UART3_Write(str, strlen(str));
 	}
 }
 
-void DischargingSoCTest(void) {
+void DischargingChargeTest(void) {
 	char str[50];
-	sprintf(str,"Starting SoC Discharging Test..");
+	sprintf(str,"Starting Charge Discharging Test..");
 	UART3_Write(str, strlen(str));
 
-	fixedPoint_SoC = 10000;
-	float_SoC = 100.00;
+	fixedPoint_Charge = 10000;
+	float_Charge = 100.00;
 	while(1){
-		SoC_Calculate(-500); 									// Consuming 500 mA, should take a while
-		sprintf(str,"SoC: %.2f%%\r\n",float_SoC);
+		Charge_Calculate(-500); 									// Consuming 500 mA, should take a while
+		sprintf(str,"Charge: %.2f%%\r\n",float_Charge);
 		UART3_Write(str, strlen(str));
 	}
 }
@@ -912,7 +912,7 @@ int main(void){
 #include "Voltage.h"
 #include "Temperature.h"
 #include "Current.h"
-#include "SoC.h"
+#include "Charge.h"
 
 // Define this if listening to yourself
 //#define CAN_SELF_TEST
@@ -972,7 +972,7 @@ int CAN_send(uint32_t id)
 
 		case CAN_ID_SOC_DATA:
 			length = 4;
-			uint32_t *temp = SoC_GetPercent();
+			uint32_t *temp = Charge_GetPercent();
 
 			for (int i = 0; i < 4; i++)
 			{

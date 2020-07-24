@@ -11,7 +11,7 @@
 #include "BSP_WDTimer.h"
 #include "BSP_Lights.h"
 #include "config.h"
-#include "SoC.h"
+#include "Charge.h"
 #include "CANbus.h"
 #include "BSP_CAN.h"
 #include "BSP_UART.h"
@@ -349,16 +349,16 @@ void CLI_Contactor(int* hashTokens) {
  */
 void CLI_Charge(int* hashTokens) {
 	if(hashTokens[1] == 0) {
-		printf("The battery percentage is %.2f%%\n\r", SoC_GetPercent()/PERCENT_CONVERSION);
+		printf("The battery percentage is %.2f%%\n\r", Charge_GetPercent()/PERCENT_CONVERSION);
 		return;
 	}
 	switch(hashTokens[1]) {
 		case CLI_RESET_HASH:
-			SoC_SetAccum(0);	//resets accumulator
+			Charge_SetAccum(0);	//resets accumulator
 			printf("Accumulator has been reset\n\r");
 			break;
 		case CLI_SET_HASH:
-			SoC_SetAccum(hashTokens[2]);
+			Charge_SetAccum(hashTokens[2]);
 			printf("Accumulator has been set to %d%%\n\r", hashTokens[2]);
 			break;
 		default: 
@@ -608,7 +608,7 @@ void CLI_EEPROM(int* hashTokens) {
 				case CLI_CHARGE_HASH:
 					EEPROM_ReadMultipleBytes(EEPROM_SOC_PTR_LOC, 2, errorAddrArray);
 					errorAddr = (errorAddrArray[0] << 2) + errorAddrArray[1];
-					printf("SoC error: %d", EEPROM_ReadByte(errorAddr-1));
+					printf("Charge error: %d", EEPROM_ReadByte(errorAddr-1));
 					break;
 				default:
 					break;
