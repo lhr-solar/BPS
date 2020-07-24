@@ -16,11 +16,11 @@
 #include "BSP_Lights.h"
 #include "BSP_WDTimer.h"
 
-
 cell_asic Minions[NUM_MINIONS];
 bool override = false;		// This will be changed by user via CLI
 char command[COMMAND_SIZE];
 
+void heartbeat(void);
 void initialize(void);
 void preliminaryCheck(void);
 void faultCondition(void);
@@ -72,7 +72,7 @@ int main(){
 			break;
 		}
 
-		// TODO: Implement heartbeat for RUN light at a visible frequency
+		heartbeat();
 
 		// Update necessary
 		// CAN_SendMessageStatus()	// Most likely need to put this on a timer if sending too frequently
@@ -134,6 +134,18 @@ void preliminaryCheck(void){
 		BSP_Light_On(FAULT);
 		BSP_Light_On(WDOG);
 		while(1);		// Spin
+	}
+}
+
+/** heartbeat
+ * Toggle heartbeat at visible frequency (RUN light)
+ */
+void heartbeat(void){
+	// increment heartcount variable once per while(1) loop
+	static int heartcount;
+	heartcount = (heartcount + 1)%(HEARTBEAT_DELAY);
+	if(heartcount == 0) {
+		BSP_Light_Toggle(RUN);
 	}
 }
 
