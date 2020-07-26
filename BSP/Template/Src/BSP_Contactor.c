@@ -1,8 +1,11 @@
 #include "BSP_Contactor.h"
+#include "simulator_conf.h"
 #include <stdio.h>
+#include <sys/file.h>
 
-static const char* file = "BSP/Simulator/DataGeneration/Data/Contactor.csv";
-/**
+static const char* file = GET_CSV_PATH(CONTACTOR_CSV_FILE);
+
+/*
  * @brief   Initializes the GPIO pins that interfaces with the Contactor.
  *          Two GPIO pins are initialized. One as an output and one as an input.
  *          The output pin controls the state and the input pin views what state the contactor is through the
@@ -15,9 +18,12 @@ void BSP_Contactor_Init(void) {
           and the other must be configued as an output.
     Software: Create file that contains one unsigned integer, 0 means off, 1 means on
     */
-   FILE* fp = fopen(file, "w+"); //if file doesn't exist, it is created
-   fprintf(fp, "%d", 0); //write 0 to file
-   fclose(fp); //close file
+    FILE* fp = fopen(file, "w+"); //if file doesn't exist, it is created
+    int fno = fileno(fp); //lock file
+    flock(fno, LOCK_EX);
+    fprintf(fp, "%d", 0); //write 0 to file
+    flock(fno, LOCK_UN); //unlock lock
+    fclose(fp); //close file
 }
 
 /**
@@ -31,8 +37,11 @@ void BSP_Contactor_On(void) {
     //      Use Positive Logic.
     // Software: Set integer to 1
     FILE* fp = fopen(file, "w"); //Open file to write
+    int fno = fileno(fp); //lock file
+    flock(fno, LOCK_EX);
     fprintf(fp, "%d", 1); //Write 1 to file
-    fclose(fp);
+    flock(fno, LOCK_UN); //unlock lock
+    fclose(fp); //close file
 }
 
 /**
@@ -45,8 +54,11 @@ void BSP_Contactor_Off(void) {
     // Hardware: Set the state to low for the output pin.
     // Software: Set integer to 0
     FILE* fp = fopen(file, "w"); //Open file to write
+    int fno = fileno(fp); //lock file
+    flock(fno, LOCK_EX);
     fprintf(fp, "%d", 0); //Write 0 to file
-    fclose(fp);
+    flock(fno, LOCK_UN); //unlock lock
+    fclose(fp); //close file
 }
 
 /**
@@ -61,7 +73,10 @@ bool BSP_Contactor_GetState(void) {
     // Software: Read integer stored in file
     int ContactorState;
     FILE* fp = fopen(file, "r"); //Open file to read
-    fscanf(fp, "%d", &ContactorState);
-    fclose(fp);
+    int fno = fileno(fp); //lock file
+    flock(fno, LOCK_EX);
+    fscanf(fp, "%d", &ContactorState); //read file
+    flock(fno, LOCK_UN); //unlock lock
+    fclose(fp); //close file
     return ContactorState;
 }
