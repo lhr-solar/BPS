@@ -9,7 +9,7 @@
 #include "Current.h"
 #include "Temperature.h"
 #include "EEPROM.h"
-#include "SoC.h"
+#include "Charge.h"
 #include "CLI.h"
 #include "BSP_UART.h"
 #include "BSP_Contactor.h"
@@ -51,7 +51,7 @@ int main(){
     	Temperature_UpdateAllMeasurements();
 
 		// Update battery percentage
-		SoC_Calculate(Current_GetLowPrecReading());
+		Charge_Calculate(Current_GetLowPrecReading());
 
 		// Checks for user input to send to CLI
 		if(BSP_UART_ReadLine(command)) {
@@ -98,7 +98,7 @@ void initialize(void){
 	BSP_Contactor_Off();
 	BSP_WDTimer_Init();
 	EEPROM_Init();
-	SoC_Init();
+	Charge_Init();
 	Current_Init();
 	Voltage_Init(Minions);
 	Temperature_Init(Minions);
@@ -172,13 +172,13 @@ void faultCondition(void){
 			case OVERVOLTAGE:
 				error |= FAULT_HIGH_VOLT;
 				BSP_Light_On(OVOLT);
-				SoC_Calibrate(OVERVOLTAGE);
+				Charge_Calibrate(OVERVOLTAGE);
 				break;
 
 			case UNDERVOLTAGE:
 				error |= FAULT_LOW_VOLT;
 				BSP_Light_On(UVOLT);
-				SoC_Calibrate(UNDERVOLTAGE);
+				Charge_Calibrate(UNDERVOLTAGE);
 				break;
 
 			default:
