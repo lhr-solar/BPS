@@ -9,6 +9,7 @@ import SPI
 import Strobelight
 import WDTimer
 import PLL
+import I2C
 
 import config
 import Timer
