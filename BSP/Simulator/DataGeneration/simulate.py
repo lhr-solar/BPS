@@ -223,7 +223,7 @@ def main():
                         print("The system will break if you input anything else :)")#placeholder for I2C.EEPROM_Dump()
                         choiceEEPROM = input()  #placeholder for I2C.EEPROM_Dump() (so simulator still works)
                         break                   #placeholder for I2C.EEPROM_Dump()
-                        I2C.EEPROM_Dump()
+                        # print(I2C.EEPROM_Dump())
                     elif choiceEEPROM == 'enter read address':
                         print("Enter address to read faults from.")
                         choiceEEPROM2 = input()
