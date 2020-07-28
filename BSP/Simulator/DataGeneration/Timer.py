@@ -21,7 +21,8 @@ def Tick():
     global isDead
     os.makedirs(os.path.dirname(file), exist_ok=True)
     while startFlag != True:    #do nothing until timer is enabled
-        wait = 0    #filler statement to avoid traceback errors
+        if isDead: #make sure the thread doesn't get stuck here after it is supposed to be dead
+            return
     while True:
         reload = 2**24 #when reload value has been reached, reset for next function call. Meant to simulate 24 bit SysTick 
         ticks = 0
