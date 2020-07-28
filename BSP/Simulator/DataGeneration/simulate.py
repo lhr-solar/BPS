@@ -220,26 +220,33 @@ def main():
                     print(">>", end="")
                     choiceEEPROM = input()
                     if choiceEEPROM == 'all data':
+                        print("The system will break if you input anything else :)")#placeholder for I2C.EEPROM_Dump()
+                        choiceEEPROM = input()  #placeholder for I2C.EEPROM_Dump() (so simulator still works)
+                        break                   #placeholder for I2C.EEPROM_Dump()
                         I2C.EEPROM_Dump()
                     elif choiceEEPROM == 'enter read address':
                         print("Enter address to read faults from.")
                         choiceEEPROM2 = input()
                         EEPROMAddress = int(choiceEEPROM2, 16)
-                        #choiceEEPROM = input()
-                        if EEPROMAddress > 0 and EEPROMAddress < maxEEPROMAddress #This must be changed at top of file:
+                        print("The system will break after your next input :)") # placeholder so simulator works
+                        choiceEEPROM = input()
+                        break   # statements below won't be reached (eventually this will all work)
+                        if EEPROMAddress > 0 and EEPROMAddress < maxEEPROMAddress: #This must be changed at top of file
+                            break
                             I2C.I2C_Read(EEPROMAddress)
-                        else:
-                            print("That is not a valid address. Continuing simulation...")
-                            stdscr = curses.initscr()
-                            curses.start_color()
-                    else:
-                        print("That is not a valid choice. Continuing simulation...")
-                            stdscr = curses.initscr()
-                            curses.start_color()
-                else:
-                    print("That is not a valid EEPROM option. Continuing simulation...")
-                    stdscr = curses.initscr()
-                    curses.start_color()
+            # Not entirely sure why these else statements break the simulator but they do
+                        # else:
+                        #     print("That is not a valid address. Continuing simulation...")
+                        #     stdscr = curses.initscr()
+                        #     curses.start_color()
+                    # else:
+                    #     print("That is not a valid choice. Continuing simulation...")
+                    #         stdscr = curses.initscr()
+                    #         curses.start_color()
+                # else:
+                #     print("That is not a valid EEPROM option. Continuing simulation...")
+                #     stdscr = curses.initscr()
+                #     curses.start_color()
             else:
                 print("\n\rWould you like to change 'config', 'quit', or send a CAN message ('CAN')?")
                 choice = input()
