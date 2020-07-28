@@ -200,7 +200,7 @@ def main():
         except KeyboardInterrupt:
             curses.endwin()
             if BeVolt is not None:
-                print("\n\rWould you like to change 'wires', 'quit', or 'PLL'?")
+                print("\n\rWould you like to change 'wires', 'quit', 'PLL', or send a CAN message ('CAN')?")
                 print(">>", end="")
                 choice = input()
                 if choice == 'wires':
@@ -213,18 +213,32 @@ def main():
                     print("Enter the frequency you would like to change the clock to in Hz.")
                     frequency = int(input())
                     PLL.Change_Frequency(frequency)
+                elif choice == 'CAN':
+                    print("Enter the CAN ID for the system you wish to simulate. Leave out '0x'.")
+                    id = input()
+                    while(CAN.Invalid_CAN_ID(id) == True):
+                        print("Invalid CAN ID. Try again.")
+                        id = input()
+                    print("Enter up to 8 bytes of the CAN message that you would like to send, and separate each byte by a ','. Leave out '0x'.")
+                    message = input().split(',')
+                    CAN.Send_Message(id, message, len(message))
                 else:
                     print("That is not a valid option. Continuing simulation...")
                     stdscr = curses.initscr()
                     curses.start_color()
             else:
-                print("\n\rWould you like to change 'config', 'quit', or send a CAN message ('CAN')?")
+                print("\n\rWould you like to change 'config', 'quit', 'PLL', or send a CAN message ('CAN')?")
+                print(">>", end="")
                 choice = input()
                 if choice == 'config':
                     configure()
                     stdscr = curses.initscr()
                 elif choice == 'quit':
                     break
+                elif choice == 'PLL':
+                    print("Enter the frequency you would like to change the clock to in Hz.")
+                    frequency = int(input())
+                    PLL.Change_Frequency(frequency)
                 elif choice == 'CAN':
                     print("Enter the CAN ID for the system you wish to simulate. Leave out '0x'.")
                     id = input()
