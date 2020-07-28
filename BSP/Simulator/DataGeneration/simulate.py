@@ -24,6 +24,7 @@ stdscr = None   # Output screen
 CANbox = None   #box that displays the CAN messages
 lights_names = ['EXTRA', 'CAN', 'WDOG', 'UVOLT', 'OVOLT', 'OTEMP', 'OCURR', 'RUN', 'FAULT']
 frequency = None
+maxEEPROMAddress = 10000000 #this is a random number, I'm not actually sure what the max EEPROM address is 
 
 def generate(battery=None):
     global state, mode
@@ -201,7 +202,7 @@ def main():
         except KeyboardInterrupt:
             curses.endwin()
             if BeVolt is not None:
-                print("\n\rWould you like to change 'wires', 'quit', or 'PLL'?")
+                print("\n\rWould you like to change 'wires', 'quit', 'PLL', or see 'EEPROM'?")
                 print(">>", end="")
                 choice = input()
                 if choice == 'wires':
@@ -214,8 +215,29 @@ def main():
                     print("Enter the frequency you would like to change the clock to in Hz.")
                     frequency = int(input())
                     PLL.Change_Frequency(frequency)
+                elif choice == 'EEPROM':
+                    print("Would you like 'all data' or to 'enter read address'?")
+                    print(">>", end="")
+                    choiceEEPROM = input()
+                    if choiceEEPROM == 'all data':
+                        I2C.EEPROM_Dump()
+                    elif choiceEEPROM == 'enter read address':
+                        print("Enter address to read faults from.")
+                        choiceEEPROM2 = input()
+                        EEPROMAddress = int(choiceEEPROM2, 16)
+                        #choiceEEPROM = input()
+                        if EEPROMAddress > 0 and EEPROMAddress < maxEEPROMAddress #This must be changed at top of file:
+                            I2C.I2C_Read(EEPROMAddress)
+                        else:
+                            print("That is not a valid address. Continuing simulation...")
+                            stdscr = curses.initscr()
+                            curses.start_color()
+                    else:
+                        print("That is not a valid choice. Continuing simulation...")
+                            stdscr = curses.initscr()
+                            curses.start_color()
                 else:
-                    print("That is not a valid option. Continuing simulation...")
+                    print("That is not a valid EEPROM option. Continuing simulation...")
                     stdscr = curses.initscr()
                     curses.start_color()
             else:
