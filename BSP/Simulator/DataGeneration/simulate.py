@@ -216,14 +216,16 @@ def main():
                     frequency = int(input())
                     PLL.Change_Frequency(frequency)
                 elif choice == 'EEPROM':
-                    print("Would you like 'all data' or to 'enter read address'?")
+                    print("Enter 'all' for all data or 'read' to enter specific address to read.")
                     print(">>", end="")
                     choiceEEPROM = input()
-                    if choiceEEPROM == 'all data':
-                        print("The system will break if you input anything else :)")#placeholder for I2C.EEPROM_Dump()
-                        choiceEEPROM = input()  #placeholder for I2C.EEPROM_Dump() (so simulator still works)
-                        break                   #placeholder for I2C.EEPROM_Dump()
-                        # print(I2C.EEPROM_Dump())
+                    if choiceEEPROM == 'all':
+                        # print("The system will break if you input anything else :)")#placeholder for I2C.EEPROM_Dump()
+                        # choiceEEPROM = input()  #placeholder for I2C.EEPROM_Dump() (so simulator still works)
+                        # break                   #placeholder for I2C.EEPROM_Dump()
+                        print(I2C.EEPROM_Dump())
+                        print("Enter to continue simulator:")
+                        choice = input()
                     elif choiceEEPROM == 'enter read address':
                         print("Enter address to read faults from.")
                         choiceEEPROM2 = input()
