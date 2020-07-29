@@ -31,7 +31,6 @@ def EEPROM_Dump():
             fcntl.flock(csvfile.fileno(), fcntl.LOCK_EX)    
             csvreader = csv.reader(csvfile)
             DataList = list(csvreader)
-            # remember to check if making this list each time is avoidable by iterating csv file
             for fault in DataList:
                 if fault == TERMINATOR:
                     break

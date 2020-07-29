@@ -228,7 +228,7 @@ def main():
                         print(">>", end="")
                         choice = input()
                     elif choiceEEPROM == 'read':
-                        print("Enter address to read faults from.")
+                        print("Enter address to read faults from (in hex format).")
                         choiceEEPROM2 = input()
                         EEPROMAddress = int(choiceEEPROM2, 16)
                         print(I2C.I2C_Read(EEPROMAddress))
