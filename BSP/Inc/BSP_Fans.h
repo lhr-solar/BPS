@@ -20,13 +20,6 @@ void BSP_Fans_Init(void);
 void BSP_Fans_Set(int dutyCycle);
 
 /**
- * @brief   Turns fans on at currently set duty cycle
- * @param   None
- * @return  None
- */
-void BSP_Fans_On(void);
-
-/**
  * @brief   Turns fans off
  * @param   None
  * @return  None
@@ -40,17 +33,4 @@ void BSP_Fans_Off(void);
  */
 int BSP_Fans_GetDuty(void);
 
-/**
- * @brief   Get current status of fans
- * @param   None
- * @return  1 if fans are on, 0 otherwise
- */
-int BSP_Fans_GetStatus(void);
-
-/**
- * @brief   Write files for fan simulation
- * @param   None
- * @return  None
- */
-void BSP_Fans_Write(void);
 #endif
