@@ -15,5 +15,6 @@
 #define SPI_CSV_FILE            "SPI.csv"
 #define TIMER_CSV_FILE          "Timer.csv"
 #define WDTIMER_CSV_FILE        "WDTimer.csv"
+#define FANS_CSV_FILE           "Fans.csv"
 
 #endif
