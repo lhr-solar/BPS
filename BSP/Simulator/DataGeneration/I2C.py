@@ -24,24 +24,41 @@ faultDict = {
 """
 
 def EEPROM_Dump():
-    dump = []
+    Dump = []
     if os.stat(file).st_size != 0:
         os.makedirs(os.path.dirname(file), exist_ok=True)
         with open(file, 'r') as csvfile:
             fcntl.flock(csvfile.fileno(), fcntl.LOCK_EX)    
             csvreader = csv.reader(csvfile)
-            dataList = list(csvreader)
-            for fault in dataList:
+            DataList = list(csvreader)
+            # remember to check if making this list each time is avoidable by iterating csv file
+            for fault in DataList:
                 if fault == TERMINATOR:
                     break
                 # print faultDict[str(fault).strip('[]')]
                 # I'd like to printout each error's name but cannot get this dictionary printing to work
-                dump.append(fault)
+                Dump.append(fault)
             fcntl.flock(csvfile.fileno(), fcntl.LOCK_UN)
-            return str(dump)
-    return "no EEPROM data"
+            return str(Dump)
+    return "No EEPROM data"
     #Dump all faults from I2C.csv file
 
 def I2C_Read(startAddress):
-    #Read faults from I2C.csv starting at startAdddress
-    pass
+    ReadFaults = []
+    if os.stat(file).st_size != 0:
+        os.makedirs(os.path.dirname(file), exist_ok=True)
+        with open(file, 'r') as csvfile:
+            fcntl.flock(csvfile.fileno(), fcntl.LOCK_EX)    
+            csvreader = csv.reader(csvfile)
+            Faults = list(csvreader)
+            for i in range(startAddress, len(Faults)):
+                if Faults[i] == 0:
+                    return "This value is too high. Nothing in the EEPROM at this address yet."
+                elif Faults[i] == TERMINATOR:
+                    break
+                else:
+                    ReadFaults.append(Faults[i])
+            return str(ReadFaults)
+    return "No EEPROM data"
+
+

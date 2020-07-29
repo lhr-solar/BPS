@@ -225,14 +225,16 @@ def main():
                         # break                   #placeholder for I2C.EEPROM_Dump()
                         print(I2C.EEPROM_Dump())
                         print("Enter to continue simulator:")
+                        print(">>", end="")
                         choice = input()
-                    elif choiceEEPROM == 'enter read address':
+                    elif choiceEEPROM == 'read':
                         print("Enter address to read faults from.")
                         choiceEEPROM2 = input()
                         EEPROMAddress = int(choiceEEPROM2, 16)
-                        print("The system will break after your next input :)") # placeholder so simulator works
+                        print(I2C.I2C_Read(EEPROMAddress))
+                        print("Enter to continue simulator:")
                         choiceEEPROM = input()
-                        break   # statements below won't be reached (eventually this will all work)
+                        break
                         if EEPROMAddress > 0 and EEPROMAddress < maxEEPROMAddress: #This must be changed at top of file
                             break
                             I2C.I2C_Read(EEPROMAddress)
