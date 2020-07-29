@@ -18,7 +18,7 @@ void BSP_Fans_Init(void)
     flock(fno, LOCK_EX);
     fprintf(fp, "%d", 0);
     flock(fno, LOCK_UN);
-	fclose(fp);
+    fclose(fp);
 }
 
 /**
