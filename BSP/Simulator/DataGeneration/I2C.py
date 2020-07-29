@@ -40,7 +40,6 @@ def EEPROM_Dump():
             fcntl.flock(csvfile.fileno(), fcntl.LOCK_UN)
             return str(Dump)
     return "No EEPROM data"
-    #Dump all faults from I2C.csv file
 
 def I2C_Read(startAddress):
     ReadFaults = []
