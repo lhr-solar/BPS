@@ -13,7 +13,7 @@ static const char* file = GET_CSV_PATH(FANS_CSV_FILE);
 void BSP_Fans_Init(void)
 {
     // Creates file if none exists
-	FILE* fp = fopen(file, "w+");
+    FILE* fp = fopen(file, "w+");
     int fno = fileno(fp);
     flock(fno, LOCK_EX);
     fprintf(fp, "%d", 0);
@@ -33,7 +33,7 @@ void BSP_Fans_Set(int dutyCycle)
     flock(fno, LOCK_EX);                
     fprintf(fp, "%d", dutyCycle);       //Write dutyCycle
     flock(fno, LOCK_UN);                //Unlock
-	fclose(fp);                         //Close file
+    fclose(fp);                         //Close file
 }
 
 /**
@@ -48,7 +48,7 @@ void BSP_Fans_Off(void)
     flock(fno, LOCK_EX);
     fprintf(fp, "%d", 0);               //Write 0
     flock(fno, LOCK_UN);                //Unlock
-	fclose(fp);                         //Close file
+    fclose(fp);                         //Close file
 }
 
 /**
