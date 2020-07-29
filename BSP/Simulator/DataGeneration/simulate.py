@@ -200,58 +200,37 @@ def main():
         except KeyboardInterrupt:
             curses.endwin()
             if BeVolt is not None:
-                print("\n\rWould you like to change 'wires', 'quit', 'PLL', or send a CAN message ('CAN')?")
-                print(">>", end="")
-                choice = input()
-                if choice == 'wires':
-                    change_wires(BeVolt)
-                    stdscr = curses.initscr()
-                    curses.start_color()
-                elif choice == 'quit':
-                    break
-                elif choice == 'PLL':
-                    print("Enter the frequency you would like to change the clock to in Hz.")
-                    frequency = int(input())
-                    PLL.Change_Frequency(frequency)
-                elif choice == 'CAN':
-                    print("Enter the CAN ID for the system you wish to simulate. Leave out '0x'.")
-                    id = input()
-                    while(CAN.Invalid_CAN_ID(id) == True):
-                        print("Invalid CAN ID. Try again.")
-                        id = input()
-                    print("Enter up to 8 bytes of the CAN message that you would like to send, and separate each byte by a ','. Leave out '0x'.")
-                    message = input().split(',')
-                    CAN.Send_Message(id, message, len(message))
-                else:
-                    print("That is not a valid option. Continuing simulation...")
-                    stdscr = curses.initscr()
-                    curses.start_color()
+                print("\n\rWould you like to change \n\r1. 'wires'\n\r2. 'quit'\n\r3. 'PLL'\n\r4. send a CAN message ('CAN')?")
             else:
-                print("\n\rWould you like to change 'config', 'quit', 'PLL', or send a CAN message ('CAN')?")
-                print(">>", end="")
-                choice = input()
-                if choice == 'config':
-                    configure()
-                    stdscr = curses.initscr()
-                elif choice == 'quit':
-                    break
-                elif choice == 'PLL':
-                    print("Enter the frequency you would like to change the clock to in Hz.")
-                    frequency = int(input())
-                    PLL.Change_Frequency(frequency)
-                elif choice == 'CAN':
-                    print("Enter the CAN ID for the system you wish to simulate. Leave out '0x'.")
+                print("\n\rWould you like to change\n\r1. 'config'\n\r2. 'quit'\n\r3. 'PLL'\n\r4. send a CAN message ('CAN')?")
+            print(">>", end="")
+            choice = input()
+            if (choice == 'wires' or choice == '1') and BeVolt is not None:
+                change_wires(BeVolt)
+                stdscr = curses.initscr()
+                curses.start_color()
+            elif (choice == 'config' or choice == '1') and BeVolt is None:
+                configure()
+                stdscr = curses.initscr()
+            elif choice == 'quit' or choice == '2':
+                break
+            elif choice == 'PLL' or choice == '3':
+                print("Enter the frequency you would like to change the clock to in Hz.")
+                frequency = int(input())
+                PLL.Change_Frequency(frequency)
+            elif choice == 'CAN' or choice == '4':
+                print("Enter the CAN ID for the system you wish to simulate. Leave out '0x'.")
+                id = input()
+                while(CAN.Invalid_CAN_ID(id) == True):
+                    print("Invalid CAN ID. Try again.")
                     id = input()
-                    while(CAN.Invalid_CAN_ID(id) == True):
-                        print("Invalid CAN ID. Try again.")
-                        id = input()
-                    print("Enter up to 8 bytes of the CAN message that you would like to send, and separate each byte by a ','. Leave out '0x'.")
-                    message = input().split(',')
-                    CAN.Send_Message(id, message, len(message))
-                else:
-                    print("That is not a valid option. Continuing simulation...")
-                    stdscr = curses.initscr()
-                    curses.start_color()
+                print("Enter up to 8 bytes of the CAN message that you would like to send, and separate each byte by a ','. Leave out '0x'.")
+                message = input().split(',')
+                CAN.Send_Message(id, message, len(message))
+            else:
+                print("That is not a valid option. Continuing simulation...")
+                stdscr = curses.initscr()
+                curses.start_color()
         except Exception as e:
             curses.echo()
             curses.nocbreak()
