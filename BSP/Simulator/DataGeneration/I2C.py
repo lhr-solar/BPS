@@ -16,7 +16,7 @@ def EEPROM_Dump():
     dump = []
     if os.stat(file).st_size != 0:
         os.makedirs(os.path.dirname(file), exist_ok=True)
-        with open(file, 'r') as csv file:
+        with open(file, 'r') as csvfile:
             fcntl.flock(csvfile.fileno(), fcntl.LOCK_EX)    
             csvreader = csv.reader(csvfile)
             data = next(csvreader)
