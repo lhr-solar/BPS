@@ -24,7 +24,7 @@ stdscr = None   # Output screen
 CANbox = None   #box that displays the CAN messages
 lights_names = ['EXTRA', 'CAN', 'WDOG', 'UVOLT', 'OVOLT', 'OTEMP', 'OCURR', 'RUN', 'FAULT']
 frequency = None
-maxEEPROMAddress = 10000000 #this is a random number, I'm not actually sure what the max EEPROM address is 
+maxEEPROMAddress = 0x1FFFF 
 
 def generate(battery=None):
     global state, mode
@@ -220,9 +220,6 @@ def main():
                     print(">>", end="")
                     choiceEEPROM = input()
                     if choiceEEPROM == 'all':
-                        # print("The system will break if you input anything else :)")#placeholder for I2C.EEPROM_Dump()
-                        # choiceEEPROM = input()  #placeholder for I2C.EEPROM_Dump() (so simulator still works)
-                        # break                   #placeholder for I2C.EEPROM_Dump()
                         print(I2C.EEPROM_Dump())
                         print("Enter to continue simulator:")
                         print(">>", end="")
@@ -231,26 +228,18 @@ def main():
                         print("Enter address to read faults from (in hex format).")
                         choiceEEPROM2 = input()
                         EEPROMAddress = int(choiceEEPROM2, 16)
-                        print(I2C.I2C_Read(EEPROMAddress))
+                        if EEPROMAddress > 0 and EEPROMAddress < maxEEPROMAddress:
+                            print(I2C.I2C_Read(EEPROMAddress))
+                            print("Enter to continue simulator:")
+                            choiceEEPROM = input()
+                        else:
+                            print("Invalid address..." end="\n")
+                            print("Enter to continue simulator:")
+                            choiceEEPROM = input()
+                    else:
+                        print("Invalid entry..." end="\n")
                         print("Enter to continue simulator:")
-                        choiceEEPROM = input()
-                        break
-                        if EEPROMAddress > 0 and EEPROMAddress < maxEEPROMAddress: #This must be changed at top of file
-                            break
-                            I2C.I2C_Read(EEPROMAddress)
-            # Not entirely sure why these else statements break the simulator but they do
-                        # else:
-                        #     print("That is not a valid address. Continuing simulation...")
-                        #     stdscr = curses.initscr()
-                        #     curses.start_color()
-                    # else:
-                    #     print("That is not a valid choice. Continuing simulation...")
-                    #         stdscr = curses.initscr()
-                    #         curses.start_color()
-                # else:
-                #     print("That is not a valid EEPROM option. Continuing simulation...")
-                #     stdscr = curses.initscr()
-                #     curses.start_color()
+                            choiceEEPROM = input()
             else:
                 print("\n\rWould you like to change 'config', 'quit', or send a CAN message ('CAN')?")
                 choice = input()
