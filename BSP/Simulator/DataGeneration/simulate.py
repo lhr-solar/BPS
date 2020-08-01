@@ -236,10 +236,10 @@ def main():
                         #     print("Invalid address..." end="\n")
                         #     print("Enter to continue simulator:")
                         #     choiceEEPROM = input()
-                    # else:
-                    #     print("Invalid entry..." end="\n")
-                    #     print("Enter to continue simulator:")
-                    #         choiceEEPROM = input()
+                    else:
+                        print("Invalid entry...", end="\n")
+                        print("Enter to continue simulator:")
+                        choiceEEPROM = input()
             else:
                 print("\n\rWould you like to change 'config', 'quit', or send a CAN message ('CAN')?")
                 choice = input()
