@@ -50,7 +50,7 @@ def I2C_Read(startAddress):
             csvreader = csv.reader(csvfile)
             Faults = list(csvreader)
             for i in range(startAddress, len(Faults)):
-                if Faults[i] == 0:
+                if Faults[i] == ["0x00"]:
                     return "This value is too high. Nothing in the EEPROM at this address yet."
                 elif Faults[i] == TERMINATOR:
                     break

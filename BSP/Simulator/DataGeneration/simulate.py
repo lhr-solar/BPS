@@ -228,18 +228,18 @@ def main():
                         print("Enter address to read faults from (in hex format).")
                         choiceEEPROM2 = input()
                         EEPROMAddress = int(choiceEEPROM2, 16)
-                        if EEPROMAddress > 0 and EEPROMAddress < maxEEPROMAddress:
-                            print(I2C.I2C_Read(EEPROMAddress))
-                            print("Enter to continue simulator:")
-                            choiceEEPROM = input()
-                        else:
-                            print("Invalid address..." end="\n")
-                            print("Enter to continue simulator:")
-                            choiceEEPROM = input()
-                    else:
-                        print("Invalid entry..." end="\n")
+                        # if EEPROMAddress > 0 and EEPROMAddress < maxEEPROMAddress:
+                        print(I2C.I2C_Read(EEPROMAddress))
                         print("Enter to continue simulator:")
-                            choiceEEPROM = input()
+                        choiceEEPROM = input()
+                        # else:
+                        #     print("Invalid address..." end="\n")
+                        #     print("Enter to continue simulator:")
+                        #     choiceEEPROM = input()
+                    # else:
+                    #     print("Invalid entry..." end="\n")
+                    #     print("Enter to continue simulator:")
+                    #         choiceEEPROM = input()
             else:
                 print("\n\rWould you like to change 'config', 'quit', or send a CAN message ('CAN')?")
                 choice = input()
