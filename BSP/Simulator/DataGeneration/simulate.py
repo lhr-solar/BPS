@@ -24,7 +24,7 @@ stdscr = None   # Output screen
 CANbox = None   #box that displays the CAN messages
 lights_names = ['EXTRA', 'CAN', 'WDOG', 'UVOLT', 'OVOLT', 'OTEMP', 'OCURR', 'RUN', 'FAULT']
 frequency = None
-maxEEPROMAddress = 0x1FFFF 
+maxEEPROMAddress = 0x3FFF
 
 def generate(battery=None):
     global state, mode
@@ -218,28 +218,42 @@ def main():
                 elif choice == 'EEPROM':
                     print("Enter 'all' for all data or 'read' to enter specific address to read.")
                     print(">>", end="")
-                    choiceEEPROM = input()
-                    if choiceEEPROM == 'all':
-                        print(I2C.EEPROM_Dump())
-                        print("Enter to continue simulator:")
-                        print(">>", end="")
-                        choice = input()
-                    elif choiceEEPROM == 'read':
-                        print("Enter address to read faults from (in hex format).")
-                        choiceEEPROM2 = input()
-                        EEPROMAddress = int(choiceEEPROM2, 16)
-                        # if EEPROMAddress > 0 and EEPROMAddress < maxEEPROMAddress:
-                        print(I2C.I2C_Read(EEPROMAddress))
-                        print("Enter to continue simulator:")
-                        choiceEEPROM = input()
-                        # else:
-                        #     print("Invalid address..." end="\n")
-                        #     print("Enter to continue simulator:")
-                        #     choiceEEPROM = input()
+                    choiceEEPROM1 = input()
+                    print("Enter 'raw' to read the raw hex values or 'msg' for the translated error messages.")
+                    choiceEEPROM2 = input()
+                    if choiceEEPROM2 == 'raw':
+                        errormsg = 1
+                    elif choiceEEPROM2 == 'msg':
+                        errormsg = 0
                     else:
                         print("Invalid entry...", end="\n")
                         print("Enter to continue simulator:")
                         choiceEEPROM = input()
+                    if choiceEEPROM1 == 'all':
+                        print(I2C.EEPROM_Dump(errormsg))
+                        print("Enter to continue simulator:")
+                        print(">>", end="")
+                        choice = input()
+                    elif choiceEEPROM1 == 'read':
+                        print("Enter address to read faults from (in hex format).")
+                        choiceEEPROM3 = input()
+                        EEPROMAddress = int(choiceEEPROM3, 16)
+                        if EEPROMAddress > 0 and EEPROMAddress < maxEEPROMAddress:
+                            print(I2C.I2C_Read(EEPROMAddress, errormsg))
+                            print("Enter to continue simulator:")
+                            choiceEEPROM = input()
+                        else:
+                            print("Invalid address...", end="\n")
+                            print("Enter to continue simulator:")
+                            choiceEEPROM = input()
+                    else:
+                        print("Invalid entry...", end="\n")
+                        print("Enter to continue simulator:")
+                        choiceEEPROM = input()
+                else:
+                    print("Invalid entry...", end="\n")
+                    print("Enter to continue simulator:")
+                    choiceEEPROM = input()
             else:
                 print("\n\rWould you like to change 'config', 'quit', or send a CAN message ('CAN')?")
                 choice = input()

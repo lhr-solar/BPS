@@ -18,12 +18,14 @@ faultDict = {
     "0x80" : "DATA_SOC"
 }
 
+errornames = bool
+
 """
 @brief output the EEPROM error messages
     Function to be called by simulate.py
 """
 
-def EEPROM_Dump():
+def EEPROM_Dump(errornames):
     Dump = []
     if os.stat(file).st_size != 0:
         os.makedirs(os.path.dirname(file), exist_ok=True)
@@ -31,17 +33,26 @@ def EEPROM_Dump():
             fcntl.flock(csvfile.fileno(), fcntl.LOCK_EX)    
             csvreader = csv.reader(csvfile)
             DataList = list(csvreader)
-            for fault in DataList:
-                if fault == TERMINATOR:
-                    break
-                # print faultDict[str(fault).strip('[]')]
-                # I'd like to printout each error's name but cannot get this dictionary printing to work
-                Dump.append(fault)
-            fcntl.flock(csvfile.fileno(), fcntl.LOCK_UN)
-            return str(Dump)
+            if errornames == 1:
+                for fault in DataList:
+                    if fault == TERMINATOR:
+                        break
+                    fault = fault[0]
+                    fault = faultDict[fault]
+                    Dump.append(fault)
+                fcntl.flock(csvfile.fileno(), fcntl.LOCK_UN)
+                return Dump
+            else:
+                for fault in DataList:
+                    if fault == TERMINATOR:
+                        break
+                    Dump.append(fault)
+                fcntl.flock(csvfile.fileno(), fcntl.LOCK_UN)
+                return str(Dump)
+            return "No EEPROM data"
     return "No EEPROM data"
 
-def I2C_Read(startAddress):
+def I2C_Read(startAddress, errornames):
     ReadFaults = []
     if os.stat(file).st_size != 0:
         os.makedirs(os.path.dirname(file), exist_ok=True)
@@ -49,7 +60,19 @@ def I2C_Read(startAddress):
             fcntl.flock(csvfile.fileno(), fcntl.LOCK_EX)    
             csvreader = csv.reader(csvfile)
             Faults = list(csvreader)
-            for i in range(startAddress, len(Faults)):
+            if errornames==1:
+                for i in range(startAddress, len(Faults)):
+                    if Faults[i] == ["0x00"]:
+                        return "This value is too high. Nothing in the EEPROM at this address yet."
+                    elif Faults[i] == TERMINATOR:
+                        break
+                    else:
+                        fault = Faults[i]
+                        fault = faultDict[fault]
+                        ReadFaults.append(fault)
+                return (ReadFaults)
+            else:
+                for i in range(startAddress, len(Faults)):
                 if Faults[i] == ["0x00"]:
                     return "This value is too high. Nothing in the EEPROM at this address yet."
                 elif Faults[i] == TERMINATOR:
