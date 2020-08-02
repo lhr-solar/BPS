@@ -15,6 +15,7 @@ import Timer
 
 import os
 import sys
+import traceback
 
 # Global configurations
 state = ''  # Charging/Discharging
@@ -259,4 +260,9 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    try:
+        main()
+    except:
+        traceback.print_exc()
+        while True:
+            pass
