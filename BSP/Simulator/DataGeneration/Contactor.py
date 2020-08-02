@@ -5,7 +5,7 @@ import os
 #This module will read from the csv file to determine the status of the Contactor
 
 #file path to data
-file = "Data/Contactor.csv"
+file = config.directory_path + config.files['Contactor']
 
 #Reads file and returns 1 or 0, 1 is on, 0 is off
 def Read_Contactor():
