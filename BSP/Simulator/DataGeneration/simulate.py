@@ -216,19 +216,20 @@ def main():
                     frequency = int(input())
                     PLL.Change_Frequency(frequency)
                 elif choice == 'EEPROM':
+                    errormsg = 0
                     print("Enter 'all' for all data or 'read' to enter specific address to read.")
                     print(">>", end="")
                     choiceEEPROM1 = input()
-                    print("Enter 'raw' to read the raw hex values or 'msg' for the translated error messages.")
+                    print("Enter 'raw' to read the raw hex values or 'msg' for the translated error messages.", end="\n")
+                    print("If invalid response is given, default is raw data.")
                     choiceEEPROM2 = input()
                     if choiceEEPROM2 == 'raw':
-                        errormsg = 1
-                    elif choiceEEPROM2 == 'msg':
                         errormsg = 0
+                    elif choiceEEPROM2 == 'msg':
+                        errormsg = 1
                     else:
                         print("Invalid entry...", end="\n")
-                        print("Enter to continue simulator:")
-                        choiceEEPROM = input()
+                        print("Defaulted to raw data.")
                     if choiceEEPROM1 == 'all':
                         print(I2C.EEPROM_Dump(errormsg))
                         print("Enter to continue simulator:")
