@@ -25,10 +25,9 @@ INC_DIR = \
 -I../../Drivers/Inc \
 -I../../Config/Inc
 
-LIB = \
--lm
+LIB = -lm -lpthread
 
-FLAGS = -Wall -g -std=c11 $(INC_DIR)
+FLAGS = -Wall -g -std=c11 $(INC_DIR) -DSIMULATION -D_POSIX_C_SOURCE=200112L
 
 BUILD_DIR = ../../Objects
 OBJ = $(addprefix $(BUILD_DIR)/,$(notdir $(SRC:.c=.o)))

@@ -9,27 +9,38 @@
 #include "Current.h"
 #include "Temperature.h"
 #include "EEPROM.h"
-#include "SoC.h"
+#include "Charge.h"
 #include "CLI.h"
 #include "BSP_UART.h"
 #include "BSP_Contactor.h"
 #include "BSP_Lights.h"
 #include "BSP_WDTimer.h"
 
-
 cell_asic Minions[NUM_MINIONS];
 bool override = false;		// This will be changed by user via CLI
-char command[128];
+char command[COMMAND_SIZE];
 
+void heartbeat(void);
 void initialize(void);
 void preliminaryCheck(void);
 void faultCondition(void);
 
+#ifndef SIMULATION
+static void __enable_irq() { asm("CPSIE I"); }
+static void __disable_irq(){ asm("CPSID I"); }
+#endif
+
 int main(){
-	// __disable_irq();		// Disable all interrupts until initialization is done
-	initialize();			// Initialize codes/pins
+	#ifndef SIMULATION
+        __disable_irq();		// Disable all interrupts until initialization is done
+	#endif
+        
+        initialize();			// Initialize codes/pins
 	preliminaryCheck();		// Wait until all boards are powered on
-	// __enable_irq();			// Enable interrupts
+	
+        #ifndef SIMULATION
+        __enable_irq();			// Enable interrupts
+        #endif
 
 	BSP_WDTimer_Start();
 
@@ -40,7 +51,7 @@ int main(){
     	Temperature_UpdateAllMeasurements();
 
 		// Update battery percentage
-		SoC_Calculate(Current_GetLowPrecReading());
+		Charge_Calculate(Current_GetLowPrecReading());
 
 		// Checks for user input to send to CLI
 		if(BSP_UART_ReadLine(command)) {
@@ -61,7 +72,7 @@ int main(){
 			break;
 		}
 
-		// TODO: Implement heartbeat for RUN light at a visible frequency
+		heartbeat();
 
 		// Update necessary
 		// CAN_SendMessageStatus()	// Most likely need to put this on a timer if sending too frequently
@@ -87,7 +98,7 @@ void initialize(void){
 	BSP_Contactor_Off();
 	BSP_WDTimer_Init();
 	EEPROM_Init();
-	SoC_Init();
+	Charge_Init();
 	Current_Init();
 	Voltage_Init(Minions);
 	Temperature_Init(Minions);
@@ -126,6 +137,18 @@ void preliminaryCheck(void){
 	}
 }
 
+/** heartbeat
+ * Toggle heartbeat at visible frequency (RUN light)
+ */
+void heartbeat(void){
+	// increment heartcount variable once per while(1) loop
+	static int heartcount;
+	heartcount = (heartcount + 1)%(HEARTBEAT_DELAY);
+	if(heartcount == 0) {
+		BSP_Light_Toggle(RUN);
+	}
+}
+
 /** faultCondition
  * This block of code will be executed whenever there is a fault.
  * If bps trips, make it spin and impossible to connect the battery to car again
@@ -149,13 +172,13 @@ void faultCondition(void){
 			case OVERVOLTAGE:
 				error |= FAULT_HIGH_VOLT;
 				BSP_Light_On(OVOLT);
-				SoC_Calibrate(OVERVOLTAGE);
+				Charge_Calibrate(OVERVOLTAGE);
 				break;
 
 			case UNDERVOLTAGE:
 				error |= FAULT_LOW_VOLT;
 				BSP_Light_On(UVOLT);
-				SoC_Calibrate(UNDERVOLTAGE);
+				Charge_Calibrate(UNDERVOLTAGE);
 				break;
 
 			default:
@@ -213,6 +236,10 @@ void faultCondition(void){
 	}
 
 	while(1) {
+		Current_UpdateMeasurements();
+		if(BSP_UART_ReadLine(command)) {
+			CLI_Handler(command);
+		}
 		BSP_WDTimer_Reset();	// Even though faulted, WDTimer needs to be updated or else system will reset
 					// causing WDOG error. WDTimer can't be stopped after it starts.
 	}

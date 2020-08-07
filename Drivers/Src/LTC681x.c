@@ -85,12 +85,11 @@ void delay_m(uint16_t milli)
 
 void wakeup_idle(uint8_t total_ic)
 {
-	volatile uint8_t tempReg;		// Temporary buffer
   for (int i =0; i<total_ic; i++)
   {
     cs_set(0);
     delay_m(5); //Guarantees the isoSPI will be in ready mode
-    tempReg = spi_read8();
+    spi_read8();
     cs_set(1);
   }
 }
@@ -273,7 +272,7 @@ void LTC681x_adcvax(
   md_bits = (MD & 0x02) >> 1;
   cmd[0] = md_bits | 0x04;
   md_bits = (MD & 0x01) << 7;
-  cmd[1] =  md_bits | ((DCP&0x01)<<4) + 0x6F;
+  cmd[1] =  md_bits | ((DCP&0x01)<<4) | 0x6F;
   cmd_68(cmd);
 }
 
@@ -956,7 +955,8 @@ int8_t LTC681x_rdstat(uint8_t reg, //Determines which Stat  register is read bac
       }
       else if (reg == 2)
       {
-        parsed_stat = data[data_counter++] + (data[data_counter++]<<8);              //Each gpio codes is received as two bytes and is combined to
+        parsed_stat = data[data_counter] + (data[data_counter+1]<<8);              //Each gpio codes is received as two bytes and is combined to
+        data_counter += 2;
         ic[c_ic].stat.stat_codes[3] = parsed_stat;
         ic[c_ic].stat.flags[0] = data[data_counter++];
         ic[c_ic].stat.flags[1] = data[data_counter++];
@@ -1292,7 +1292,7 @@ int16_t LTC681x_run_adc_redundancy_st(uint8_t adc_mode, uint8_t adc_reg, uint8_t
 
 
 /* Runs the data sheet algorithm for open wire for multiple cell and two consecutive cells detection */
- uint32_t LTC681x_run_openwire_multi(uint8_t total_ic, // Number of ICs in the daisy chain
+ uint64_t LTC681x_run_openwire_multi(uint8_t total_ic, // Number of ICs in the daisy chain
 						  cell_asic ic[], // A two dimensional array that will store the data
 							bool print	// Condition that either prints or just returns the array
 						  )
@@ -1304,11 +1304,9 @@ int16_t LTC681x_run_adc_redundancy_st(uint8_t adc_mode, uint8_t adc_reg, uint8_t
 	uint16_t pullDwn[total_ic][N_CHANNELS];
 	uint16_t openWire_delta[total_ic][N_CHANNELS];
 
-	volatile int8_t error;
 	int8_t opencells[N_CHANNELS];
 	int8_t n=0; // Number of open cells
 	int8_t i,j,k;
-	volatile uint32_t conv_time=0;
 	
 	long openwires = 0;
 
@@ -1320,11 +1318,11 @@ int16_t LTC681x_run_adc_redundancy_st(uint8_t adc_mode, uint8_t adc_reg, uint8_t
 	{ 
 		wakeup_idle(total_ic);
 		LTC681x_adow(MD_26HZ_2KHZ,PULL_UP_CURRENT,CELL_CH_ALL,DCP_DISABLED);
-		conv_time = LTC681x_pollAdc();
+		LTC681x_pollAdc();
 	} 
 
 	wakeup_idle(total_ic);
-	error = LTC681x_rdcv(0, total_ic,ic);
+	LTC681x_rdcv(0, total_ic,ic);
 
 	for (int cic=0; cic<total_ic; cic++)
 	{
@@ -1339,11 +1337,11 @@ int16_t LTC681x_run_adc_redundancy_st(uint8_t adc_mode, uint8_t adc_reg, uint8_t
 	{  
 	  wakeup_idle(total_ic);
 	  LTC681x_adow(MD_26HZ_2KHZ,PULL_DOWN_CURRENT,CELL_CH_ALL,DCP_DISABLED);
-	  conv_time =   LTC681x_pollAdc();
+	  LTC681x_pollAdc();
 	}
 
 	wakeup_idle(total_ic);
-	error = LTC681x_rdcv(0, total_ic,ic); 
+	LTC681x_rdcv(0, total_ic,ic); 
 
 	for (int cic=0; cic<total_ic; cic++)
 	{
@@ -1370,6 +1368,11 @@ int16_t LTC681x_run_adc_redundancy_st(uint8_t adc_mode, uint8_t adc_reg, uint8_t
 
 	for (int cic=0; cic<total_ic; cic++)
 	{ 
+
+        for(int i = 0; i < N_CHANNELS; i++) {
+            opencells[i] = 0;
+        }
+
 		n=0;
 		if(print) {
 			printf("IC:");
@@ -1478,11 +1481,15 @@ int16_t LTC681x_run_adc_redundancy_st(uint8_t adc_mode, uint8_t adc_reg, uint8_t
 				}
 			}
 		}
+
+        // Reset system_open_wire
+        ic[cic].system_open_wire = 0;
 		
 		// Store the array into a long to return
 		for(int x=0;x<N_CHANNELS;x++){
 			if(opencells[x] != 0){
 				openwires += (1<<((opencells[x])+(N_CHANNELS*(cic+1))));
+                ic[cic].system_open_wire |= (1 << (opencells[x]));
 			}
 		}
 	}
@@ -1757,7 +1764,6 @@ void LTC681x_stcomm()
 
   uint8_t cmd[4];
   uint16_t cmd_pec;
-	volatile uint8_t temp;
 
   cmd[0] = 0x07;
   cmd[1] = 0x23;
@@ -1769,7 +1775,7 @@ void LTC681x_stcomm()
   spi_write_multi8(cmd,4);
   for (int i = 0; i<9; i++)
   {
-    temp = spi_read8();
+    spi_read8();
   }
   cs_set(1);
 

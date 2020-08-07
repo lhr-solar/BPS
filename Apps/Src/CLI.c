@@ -11,11 +11,13 @@
 #include "BSP_WDTimer.h"
 #include "BSP_Lights.h"
 #include "config.h"
-#include "SoC.h"
+#include "Charge.h"
 #include "CANbus.h"
 #include "BSP_CAN.h"
 #include "BSP_UART.h"
 #include "Images.h"
+#include "BSP_ADC.h"
+#include "EEPROM.h"
 
 #define MAX_TOKEN_SIZE 4
 
@@ -23,12 +25,6 @@ static cell_asic* Minions;
 char hexString[8];
 const float MILLI_UNIT_CONVERSION = 1000;
 const float PERCENT_CONVERSION = 100;
-
-void DelayMs(uint32_t ms) {
-    for(int i = 0; i < ms; i++) {
-        for(int j = 0; j < 50000; j++);
-    }
-}
 
 /** CLI_Init
  * Initializes the CLI with the values it needs
@@ -124,7 +120,7 @@ void CLI_Help(void) {
  * @param hashTokens is the array of hashed tokens
  */
 void CLI_Voltage(int* hashTokens) {
-	if((int *)hashTokens[1] == NULL) {
+	if(hashTokens[1] == 0) {
 		for(int i = 0; i < NUM_BATTERY_MODULES; i++){
 			printf("Module number %d: %.3fV\n\r", i+1, Voltage_GetModuleMillivoltage(i)/MILLI_UNIT_CONVERSION);
 		}
@@ -134,7 +130,7 @@ void CLI_Voltage(int* hashTokens) {
 	switch(hashTokens[1]){		
 		// Specific module
 		case CLI_MODULE_HASH:
-			if ((int *)hashTokens[2] == NULL || hashTokens[2] > NUM_BATTERY_MODULES || hashTokens[2] < 1){
+			if (hashTokens[2] == 0 || hashTokens[2] > NUM_BATTERY_MODULES || hashTokens[2] < 1){
 				printf("Invalid module number");
 			}
 			else {
@@ -178,7 +174,7 @@ void CLI_Voltage(int* hashTokens) {
  * @param hashTokens is the array of hashed tokens
  */
 void CLI_Current(int* hashTokens) {
-	if((int *)hashTokens[1] == NULL) {
+	if(hashTokens[1] == 0) {
 		printf("High: %.3fA\n\r", Current_GetHighPrecReading()/MILLI_UNIT_CONVERSION);	// Prints 4 digits, number, and A
 		printf("Low: %.3fA\n\r", Current_GetLowPrecReading()/MILLI_UNIT_CONVERSION);
 		return;
@@ -220,7 +216,7 @@ void CLI_Current(int* hashTokens) {
  * @param hashTokens is the array of hashed tokens
  */
 void CLI_Temperature(int* hashTokens) {
-	if((int *)hashTokens[1] == NULL) {
+	if(hashTokens[1] == 0) {
 		for(int i = 0; i < NUM_BATTERY_MODULES; i++) {
 			printf("Module number %d: %.3f C\n\r", i+1, Temperature_GetModuleTemperature(i)/MILLI_UNIT_CONVERSION);
 		}
@@ -240,11 +236,11 @@ void CLI_Temperature(int* hashTokens) {
 			break;
 		// Temperature of specific module
 		case CLI_MODULE_HASH:
-			if ((int *)hashTokens[2] == NULL || hashTokens[2]-1 > NUM_BATTERY_MODULES || hashTokens[2]-1 < 0){
+			if (hashTokens[2] == 0 || hashTokens[2]-1 > NUM_BATTERY_MODULES || hashTokens[2]-1 < 0){
 				printf("Invalid module number\n\r");
 			}
 			else {
-				if((int *)hashTokens[3] == NULL) {//temperature of module
+				if(hashTokens[3] == 0) {//temperature of module
 					printf("Module number %d: %.3f C\n\r", hashTokens[2], Temperature_GetModuleTemperature(hashTokens[2]-1)/MILLI_UNIT_CONVERSION);
 				} else if(hashTokens[3]-1 == 0 || hashTokens[3]-1 == 1) {//temperature of specific sensor in module
 					uint16_t boardNum = (hashTokens[2]-1)/MAX_VOLT_SENSORS_PER_MINION_BOARD;
@@ -335,7 +331,7 @@ void CLI_LTC6811(void) {
  */
 void CLI_Contactor(int* hashTokens) {
 	State contactor = BSP_Contactor_GetState();
-	if((int *)hashTokens[1] == NULL) {
+	if(hashTokens[1] == 0) {
 		if(contactor == ON) {
 			printf("Contactor is Enabled\n\r");
 		} else {
@@ -352,17 +348,17 @@ void CLI_Contactor(int* hashTokens) {
  * @param hashTokens is the array of hashed tokens
  */
 void CLI_Charge(int* hashTokens) {
-	if((int *)hashTokens[1] == NULL) {
-		printf("The battery percentage is %.2f%%\n\r", SoC_GetPercent()/PERCENT_CONVERSION);
+	if(hashTokens[1] == 0) {
+		printf("The battery percentage is %.2f%%\n\r", Charge_GetPercent()/PERCENT_CONVERSION);
 		return;
 	}
 	switch(hashTokens[1]) {
 		case CLI_RESET_HASH:
-			SoC_SetAccum(0);	//resets accumulator
+			Charge_SetAccum(0);	//resets accumulator
 			printf("Accumulator has been reset\n\r");
 			break;
 		case CLI_SET_HASH:
-			SoC_SetAccum(hashTokens[2]);
+			Charge_SetAccum(hashTokens[2]);
 			printf("Accumulator has been set to %d%%\n\r", hashTokens[2]);
 			break;
 		default: 
@@ -398,7 +394,7 @@ void setLED(Light input, int state) {
  */
 void CLI_LED(int* hashTokens) {
 	State error = BSP_Light_GetState(FAULT);
-	if((int *)hashTokens[1] == NULL) {
+	if(hashTokens[1] == 0) {
 		if(error == ON) {
 			printf("Error light is On\n\r");
 		} else {
@@ -539,7 +535,7 @@ void CLI_Display(void) {
  * @param hashTokens is the array of hashed tokens
  */
 void CLI_Watchdog(int* hashTokens) {
-	if((int *)hashTokens[1] == NULL) {
+	if(hashTokens[1] == 0) {
 		printf("Safety Status: ");
 		if (!BSP_WDTimer_DidSystemReset()){
 			printf("SAFE\n\r");
@@ -566,7 +562,7 @@ void CLI_Watchdog(int* hashTokens) {
  * @param hashTokens is the array of hashed tokens
  */
 void CLI_EEPROM(int* hashTokens) {
-	if((int *)hashTokens[1] == NULL) {
+	if(hashTokens[1] == 0) {
 		EEPROM_SerialPrintData();
 		return;
 	}
@@ -612,7 +608,7 @@ void CLI_EEPROM(int* hashTokens) {
 				case CLI_CHARGE_HASH:
 					EEPROM_ReadMultipleBytes(EEPROM_SOC_PTR_LOC, 2, errorAddrArray);
 					errorAddr = (errorAddrArray[0] << 2) + errorAddrArray[1];
-					printf("SoC error: %d", EEPROM_ReadByte(errorAddr-1));
+					printf("Charge error: %d", EEPROM_ReadByte(errorAddr-1));
 					break;
 				default:
 					break;
