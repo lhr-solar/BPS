@@ -248,7 +248,7 @@ def main():
                             print("Enter to continue simulator:")
                             choiceEEPROM = input()
                     else:
-                        print("Invalid entry...", end="\n")
+                        print("Invalid entry given for 1st choice (all/read)...", end="\n")
                         print("Enter to continue simulator:")
                         choiceEEPROM = input()
                 else:
