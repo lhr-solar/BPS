@@ -14,7 +14,8 @@ files = dict(
     SPI = "SPI.csv",
     Timer = "Timer.csv",
     WDTimer = "WDTimer.csv",
-    Strobelight = "Strobe.csv"
+    Strobelight = "Strobe.csv",
+    Fans = "Fans.csv"
 
     # Add more files if needed here.
 )
