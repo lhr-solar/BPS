@@ -70,9 +70,12 @@ def I2C_Read(startAddress, endAddress, errornames):
                     else:
                         fault = Faults[i]
                         fault = fault[0]
-                        fault = faultDict[fault]
-                        ReadFaults += fault
-                        ReadFaults += ", "
+                        if fault in faultDict:
+                            fault = faultDict[fault]
+                            ReadFaults += fault
+                            ReadFaults += ", "
+                        else:
+                            ReadFaults += "Invalid, "
                 return (ReadFaults)
             else:
                 ReadFaults = []
