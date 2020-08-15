@@ -222,6 +222,7 @@ def main():
                     choiceEEPROM1 = input()
                     print("Enter 'raw' to read the raw hex values or 'msg' for the translated error messages.", end="\n")
                     print("If invalid response is given, default is raw data.")
+                    print(">>", end="")
                     choiceEEPROM2 = input()
                     if choiceEEPROM2 == 'raw':
                         returnErrorCodes = 0
@@ -237,13 +238,13 @@ def main():
                         choice = input()
                     elif choiceEEPROM1 == 'read':
                         print("Enter address to start reading faults from (in hex format).")
+                        print(">>", end="")
                         EEPROMstartAddress = input()
                         print("Enter address to stop reading faults from (in hex format).")
+                        print(">>", end="")
                         EEPROMendAddress = input()
                         EEPROMstartAddress = int(EEPROMstartAddress, 16)
                         EEPROMendAddress = int(EEPROMendAddress, 16)
-                        print(EEPROMstartAddress)
-                        print(EEPROMendAddress)
                         if EEPROMstartAddress > 0 and EEPROMstartAddress < maxEEPROMAddress and EEPROMendAddress > 0 and EEPROMendAddress < maxEEPROMAddress:
                             print(I2C.I2C_Read(EEPROMstartAddress,EEPROMendAddress, returnErrorCodes))
                             print("Enter to continue simulator:")
