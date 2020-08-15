@@ -53,7 +53,7 @@ def EEPROM_Dump(errornames):
                 return str(Dump)
     return "No EEPROM data"
 
-def I2C_Read(startAddress, errornames):
+def I2C_Read(startAddress, endAddress, errornames):
     if os.stat(file).st_size != 0:
         os.makedirs(os.path.dirname(file), exist_ok=True)
         with open(file, 'r') as csvfile:
@@ -62,10 +62,10 @@ def I2C_Read(startAddress, errornames):
             Faults = list(csvreader)
             if errornames==1:
                 ReadFaults = ""
-                for i in range(startAddress, len(Faults)):
-                    if Faults[i] == ["0x00"]:
-                        return "This value is too high. Nothing in the EEPROM at this address yet."
-                    elif Faults[i] == TERMINATOR:
+                for i in range(startAddress, endAddress):
+                    # if Faults[i] == ["0x00"]:
+                    #     return "This value is too high. Nothing in the EEPROM at this address yet."
+                    if Faults[i] == TERMINATOR:
                         break
                     else:
                         fault = Faults[i]
@@ -76,10 +76,10 @@ def I2C_Read(startAddress, errornames):
                 return (ReadFaults)
             else:
                 ReadFaults = []
-                for i in range(startAddress, len(Faults)):
-                    if Faults[i] == ["0x00"]:
-                        return "This value is too high. Nothing in the EEPROM at this address yet."
-                    elif Faults[i] == TERMINATOR:
+                for i in range(startAddress, endAddress):
+                    # if Faults[i] == ["0x00"]:
+                    #     return "This value is too high. Nothing in the EEPROM at this address yet."
+                    if Faults[i] == TERMINATOR:
                         break
                     else:
                         ReadFaults.append(Faults[i])

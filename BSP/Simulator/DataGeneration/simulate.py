@@ -216,7 +216,7 @@ def main():
                     frequency = int(input())
                     PLL.Change_Frequency(frequency)
                 elif choice == 'EEPROM':
-                    errormsg = 0
+                    returnErrorCodes = 0
                     print("Enter 'all' for all data or 'read' to enter specific address to read.")
                     print(">>", end="")
                     choiceEEPROM1 = input()
@@ -224,23 +224,28 @@ def main():
                     print("If invalid response is given, default is raw data.")
                     choiceEEPROM2 = input()
                     if choiceEEPROM2 == 'raw':
-                        errormsg = 0
+                        returnErrorCodes = 0
                     elif choiceEEPROM2 == 'msg':
-                        errormsg = 1
+                        returnErrorCodes = 1
                     else:
                         print("Invalid entry...", end="\n")
                         print("Defaulted to raw data.")
                     if choiceEEPROM1 == 'all':
-                        print(I2C.EEPROM_Dump(errormsg))
+                        print(I2C.EEPROM_Dump(returnErrorCodes))
                         print("Enter to continue simulator:")
                         print(">>", end="")
                         choice = input()
                     elif choiceEEPROM1 == 'read':
-                        print("Enter address to read faults from (in hex format).")
-                        choiceEEPROM3 = input()
-                        EEPROMAddress = int(choiceEEPROM3, 16)
-                        if EEPROMAddress > 0 and EEPROMAddress < maxEEPROMAddress:
-                            print(I2C.I2C_Read(EEPROMAddress, errormsg))
+                        print("Enter address to start reading faults from (in hex format).")
+                        EEPROMstartAddress = input()
+                        print("Enter address to stop reading faults from (in hex format).")
+                        EEPROMendAddress = input()
+                        EEPROMstartAddress = int(EEPROMstartAddress, 16)
+                        EEPROMendAddress = int(EEPROMendAddress, 16)
+                        print(EEPROMstartAddress)
+                        print(EEPROMendAddress)
+                        if EEPROMstartAddress > 0 and EEPROMstartAddress < maxEEPROMAddress and EEPROMendAddress > 0 and EEPROMendAddress < maxEEPROMAddress:
+                            print(I2C.I2C_Read(EEPROMstartAddress,EEPROMendAddress, returnErrorCodes))
                             print("Enter to continue simulator:")
                             choiceEEPROM = input()
                         else:
