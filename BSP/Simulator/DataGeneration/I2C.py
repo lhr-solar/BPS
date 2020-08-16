@@ -63,8 +63,6 @@ def I2C_Read(startAddress, endAddress, errornames):
             if errornames==1:
                 ReadFaults = ""
                 for i in range(startAddress, endAddress):
-                    # if Faults[i] == ["0x00"]:
-                    #     return "This value is too high. Nothing in the EEPROM at this address yet."
                     if Faults[i] == TERMINATOR:
                         break
                     else:
@@ -80,8 +78,6 @@ def I2C_Read(startAddress, endAddress, errornames):
             else:
                 ReadFaults = []
                 for i in range(startAddress, endAddress):
-                    # if Faults[i] == ["0x00"]:
-                    #     return "This value is too high. Nothing in the EEPROM at this address yet."
                     if Faults[i] == TERMINATOR:
                         break
                     else:
