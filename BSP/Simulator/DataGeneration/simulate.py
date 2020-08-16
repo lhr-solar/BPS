@@ -9,6 +9,7 @@ import SPI
 import Strobelight
 import WDTimer
 import PLL
+import I2C
 
 import config
 import Timer
@@ -24,6 +25,7 @@ stdscr = None   # Output screen
 CANbox = None   #box that displays the CAN messages
 lights_names = ['EXTRA', 'CAN', 'WDOG', 'UVOLT', 'OVOLT', 'OTEMP', 'OCURR', 'RUN', 'FAULT']
 frequency = None
+maxEEPROMAddress = 0x3FFF
 
 def generate(battery=None):
     global state, mode
@@ -201,9 +203,9 @@ def main():
         except KeyboardInterrupt:
             curses.endwin()
             if BeVolt is not None:
-                print("\n\rWould you like to change \n\r1. 'wires'\n\r2. 'quit'\n\r3. 'PLL'\n\r4. send a CAN message ('CAN')?")
+                print("\n\rWould you like to change \n\r1. 'wires'\n\r2. 'quit'\n\r3. 'PLL'\n\r4. send a CAN message ('CAN')\n\r5. 'EEPROM'")
             else:
-                print("\n\rWould you like to change\n\r1. 'config'\n\r2. 'quit'\n\r3. 'PLL'\n\r4. send a CAN message ('CAN')?")
+                print("\n\rWould you like to change\n\r1. 'config'\n\r2. 'quit'\n\r3. 'PLL'\n\r4. send a CAN message ('CAN')\n\r5. 'EEPROM'")
             print(">>", end="")
             choice = input()
             if (choice == 'wires' or choice == '1') and BeVolt is not None:
@@ -228,6 +230,48 @@ def main():
                 print("Enter up to 8 bytes of the CAN message that you would like to send, and separate each byte by a ','. Leave out '0x'.")
                 message = input().split(',')
                 CAN.Send_Message(id, message, len(message))
+            elif choice == 'EEPROM' or choice == '5':
+                returnErrorCodes = 0
+                print("Enter 'all' for all data or 'read' to enter specific address to read.")
+                print(">>", end="")
+                choiceEEPROM1 = input()
+                print("Enter 'raw' to read the raw hex values or 'msg' for the translated error messages.", end="\n")
+                print("If invalid response is given, default is raw data.")
+                print(">>", end="")
+                choiceEEPROM2 = input()
+                if choiceEEPROM2 == 'raw':
+                    returnErrorCodes = 0
+                elif choiceEEPROM2 == 'msg':
+                    returnErrorCodes = 1
+                else:
+                    print("Invalid entry...", end="\n")
+                    print("Defaulted to raw data.")
+                if choiceEEPROM1 == 'all':
+                    print(I2C.EEPROM_Dump(returnErrorCodes))
+                    print("Enter to continue simulator:")
+                    print(">>", end="")
+                    choice = input()
+                elif choiceEEPROM1 == 'read':
+                    print("Enter address to start reading faults from (in hex format).")
+                    print(">>", end="")
+                    EEPROMstartAddress = input()
+                    print("Enter address to stop reading faults from (in hex format).")
+                    print(">>", end="")
+                    EEPROMendAddress = input()
+                    EEPROMstartAddress = int(EEPROMstartAddress, 16)
+                    EEPROMendAddress = int(EEPROMendAddress, 16)
+                    if EEPROMstartAddress >= 0 and EEPROMstartAddress <= maxEEPROMAddress and EEPROMendAddress >= 0 and EEPROMendAddress <= maxEEPROMAddress:
+                        print(I2C.I2C_Read(EEPROMstartAddress,EEPROMendAddress, returnErrorCodes))
+                        print("Enter to continue simulator:")
+                        choiceEEPROM = input()
+                    else:
+                        print("Invalid address...", end="\n")
+                        print("Enter to continue simulator:")
+                        choiceEEPROM = input()
+                else:
+                    print("Invalid entry given for 1st choice (all/read)...", end="\n")
+                    print("Enter to continue simulator:")
+                    choiceEEPROM = input()
             else:
                 print("That is not a valid option. Continuing simulation...")
                 stdscr = curses.initscr()
