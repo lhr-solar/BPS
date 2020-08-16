@@ -1,9 +1,9 @@
 import csv
 import fcntl
 import os
+import config
 
-
-file = "BSP/Simulator/DataGeneration/Data/CAN.csv"
+file = config.directory_path + config.files['CAN']
 
 valid_IDs = {
  '001' : "DASH_KILL_SWITCH",
@@ -49,7 +49,6 @@ def Send_Message(id, message, length):
         fcntl.flock(csvfile.fileno(), fcntl.LOCK_EX)  
         csvwriter = csv.writer(csvfile)
         CANString.append("0x" + id)
-        i = 1
         for i in range (length):
             CANString.append("0x" + message[i])      
         csvwriter.writerow(CANString)   

@@ -3,7 +3,7 @@
 
 #include "common.h"
 
-#define EEPROM_BYTES 16384
+#define EEPROM_BYTES 0x4000
 
 /**
  * @brief   Initializes the I2C port that interfaces with the EEPROM.
