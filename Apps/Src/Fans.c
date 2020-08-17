@@ -60,8 +60,14 @@ void FansInit(void){
     TIM_ARRPreloadConfig(TIM8, ENABLE);
     }
 
+/*This function will change the speed of the fans
+Inputs: Number of fan to change speed (1-4)
+        Increase or decrease speed (1 or -1)
+*/
 void FanSpeedChange(uint8_t fan, int8_t accel){
     //Range of pulse is 0-4000, change in increments of 500
+    //First check to make sure that change is within range of values
+    //Load new value into Compare and Capture Register
     switch (fan)
     {
     case 1:
