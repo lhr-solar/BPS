@@ -62,29 +62,26 @@ void FansInit(void){
 
 /*This function will change the speed of the fans
 Inputs: Number of fan to change speed (1-4)
-        Increase or decrease speed (1 or -1)
+        Speed of Fan(0-8)
 */
-void FanSpeedChange(uint8_t fan, int8_t accel){
-    //Range of pulse is 0-4000, change in increments of 500
+void FanSpeedChange(uint8_t fan, uint32_t vel){
+    //Range of pulse is 0-4000
     //First check to make sure that change is within range of values
     //Load new value into Compare and Capture Register
+    if  (vel < 0 || vel > 8) return; //if not in range, leave function
     switch (fan)
     {
     case 1:
-        if ((TIM8->CCR1 + (accel * 500)) > 0 || (TIM8->CCR1 + (accel * 500)) < 4000)
-        TIM8->CCR1 += (accel * 500);
+        TIM8->CCR1 = (vel * 500);
         break;
-    case2:
-        if ((TIM8->CCR2 + (accel * 500)) > 0 || (TIM8->CCR2 + (accel * 500)) < 4000)
-        TIM8->CCR2 += (accel * 500);
+    case 2:
+        TIM8->CCR2 = (vel * 500);
         break;
-    case3:
-        if ((TIM8->CCR3 + (accel * 500)) > 0 || (TIM8->CCR3 + (accel * 500)) < 4000)
-        TIM8->CCR3 += (accel * 500);
+    case 3:
+        TIM8->CCR3 = (vel * 500);
         break;
-    case3:
-        if ((TIM8->CCR4 + (accel * 500)) > 0 || (TIM8->CCR4 + (accel * 500)) < 4000)
-        TIM8->CCR4 += (accel * 500);
+    case 4:
+        TIM8->CCR4 = (vel * 500);
         break;
     default:
         break;

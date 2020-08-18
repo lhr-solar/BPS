@@ -16,8 +16,8 @@ void FansInit(void);
 
 /*This function will change the speed of the fans
 Inputs: Number of fan to change speed (1-4)
-        Increase or decrease speed (1 or -1)
+        Speed of fan (0-8)
 */
-void FanChangeSpeed(uint8_t fan, int8_t accel);
+void FanChangeSpeed(uint8_t fan, uint32_t vel);
 
 #endif
