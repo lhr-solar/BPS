@@ -4,13 +4,13 @@ Uses Pins PC6,7 and PB14,15
 */
 
 #include <stdint.h>
-#include "Fans.h"
+#include "../../Inc/BSP_Fans.h"
 
 GPIO_InitTypeDef GPIO_INIT_STRUCT; //struct used to initialize pins
 TIM_OCInitTypeDef TIMER_STRUCT; //struct used to configure timers
 TIM_TimeBaseInitTypeDef TIMER_INIT_STRUCT; //struct used to initialize PWM timers
 
-void FansInit(void){
+void Fans_Init(void){
     //Enable Port Clocks
     RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC, ENABLE); 
     RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE); 
@@ -64,7 +64,7 @@ void FansInit(void){
 Inputs: Number of fan to change speed (1-4)
         Speed of Fan(0-8)
 */
-void FanSpeedChange(uint8_t fan, uint32_t vel){
+void Fans_Speed(uint8_t fan, uint32_t vel){
     //Range of pulse is 0-4000
     //First check to make sure that change is within range of values
     //Load new value into Compare and Capture Register
