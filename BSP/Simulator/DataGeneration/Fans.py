@@ -3,12 +3,12 @@ import os
 import fcntl
 import config
 
-#This module will hold the statuses of the LED's on the BPS. 
+#This module will hold the statuses of the Fans on the BPS.
 
 #path name to file
 file = config.directory_path + config.files['Fans']
 
-#returns integer where 9 LSB are status of 9 LED's
+#returns integer representing duty cycle
 def read():
     duty = []
     os.makedirs(os.path.dirname(file), exist_ok=True)   # creates directory if not exists
@@ -20,7 +20,7 @@ def read():
         for row in csvreader:
             duty.append(row)
         fcntl.flock(csvfile.fileno(), fcntl.LOCK_UN)    # Unlock file
-        if len(lights):
+        if len(duty):
             return int(duty[0][0])
         else:
             return 0

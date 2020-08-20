@@ -2,6 +2,7 @@
 #define __BSP_FANS_H
 
 #include "common.h"
+#include "config.h"
 
 
 

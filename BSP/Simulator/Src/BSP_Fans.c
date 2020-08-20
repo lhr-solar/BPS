@@ -1,6 +1,6 @@
 #include "BSP_Fans.h"
 #include "simulator_conf.h"
-#include <stdio.h>
+#include <unistd.h>
 #include <sys/file.h>
 
 static const char* file = GET_CSV_PATH(FANS_CSV_FILE);
