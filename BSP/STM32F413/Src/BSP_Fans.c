@@ -6,11 +6,13 @@ Uses Pins PC6,7 and PB14,15
 #include <stdint.h>
 #include "../../Inc/BSP_Fans.h"
 
+#define DIVIDER 500 //Speed increments
+#define TOPSPEED 4000/DIVIDER //top speed achievable
 GPIO_InitTypeDef GPIO_INIT_STRUCT; //struct used to initialize pins
 TIM_OCInitTypeDef TIMER_STRUCT; //struct used to configure timers
 TIM_TimeBaseInitTypeDef TIMER_INIT_STRUCT; //struct used to initialize PWM timers
 
-void Fans_Init(void){
+void BSP_Fans_Init(void){
     //Enable Port Clocks
     RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC, ENABLE); 
     RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE); 
@@ -64,31 +66,49 @@ void Fans_Init(void){
 Inputs: Number of fan to change speed (1-4)
         Speed of Fan(0-8)
 */
-ErrorStatus Fans_Speed(uint8_t fan, uint32_t speed){
+ErrorStatus BSP_Fans_Set(uint8_t fan, uint32_t speed){
     //Range of pulse is 0-4000
     //First check to make sure that change is within range of values
     //Load new value into Compare and Capture Register
-    if  (speed < 0 || speed > 8) return ERROR; ; //if not in range, leave function with error code
+    if  (speed < 0 || speed > TOPSPEED) return ERROR; ; //if not in range, leave function with error code
     switch (fan)
     {
     case 1:
-        TIM8->CCR1 = (speed * 500);
+        TIM8->CCR1 = (speed * DIVIDER);
         return SUCCESS;
         break;
     case 2:
-        TIM8->CCR2 = (speed * 500);
+        TIM8->CCR2 = (speed * DIVIDER);
         return SUCCESS;
         break;
     case 3:
-        TIM8->CCR3 = (speed * 500);
+        TIM8->CCR3 = (speed * DIVIDER);
         return SUCCESS;
         break;
     case 4:
-        TIM8->CCR4 = (speed * 500);
+        TIM8->CCR4 = (speed * DIVIDER);
         return SUCCESS;
         break;
     default:
         return ERROR; //invalid fan value
+        break;
+    }
+}
+
+int BSP_Fans_GetSpeed(uint8_t fan){
+    switch (fan)
+    {
+    case 1:
+        return TIM8-> CCR1 / DIVIDER;
+        break;
+    case 2:
+        return TIM8-> CCR2 / DIVIDER;
+        break;
+    case 3:
+        return TIM8-> CCR3 / DIVIDER;
+        break;
+    case 4:
+        return TIM8-> CCR4 / DIVIDER;
         break;
     }
 }
