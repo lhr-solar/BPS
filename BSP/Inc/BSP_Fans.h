@@ -17,7 +17,10 @@ void Fans_Init(void);
 /*This function will change the speed of the fans
 Inputs: Number of fan to change speed (1-4)
         Speed of fan (0-8)
+Output: Error Status
+        0: Gave invalid fan value
+        1: Gave invalid velocity value
 */
-void FanS_Speed(uint8_t fan, uint32_t vel);
+uint8_t Fans_Speed(uint8_t fan, uint32_t vel);
 
 #endif
