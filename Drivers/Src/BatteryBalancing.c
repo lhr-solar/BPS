@@ -58,26 +58,12 @@ void ClearDischargeBit(int Cell, //The cell to be discharged
   for(int i=0; i<total_ic; i++)
   {
     if((Cell<9)&& (Cell!=0))
-      ic[i].config.tx_data[4] = ic[i].config.tx_data[4] ^ (1<<(Cell-1));
+      ic[i].config.tx_data[4] = ic[i].config.tx_data[4] & ~(1<<(Cell-1));
     else if(Cell < 13)
-      ic[i].config.tx_data[5] = ic[i].config.tx_data[5] ^ (1<<(Cell-9));
+      ic[i].config.tx_data[5] = ic[i].config.tx_data[5] & ~(1<<(Cell-9));
 	else
 		break;
  }
-}
-
-void setDischarge(uint8_t i, cell_asic ic[]) { //i is module number
-	uint8_t ICNumber = 0; 
-	uint8_t ModuleNumber = 0;
-	getICNumber(i, &ICNumber, &ModuleNumber);//Get IC and ModuleInIC number
-	LTC681x_rdcfg(1,ic);
-	LTC681x_wrcfg(1,ic);
-	//ic[i].config.tx_data[4] = ic[i].config.tx_data[4] | (1<<(ModuleNumber-1));
-	LTC6811_set_discharge(ModuleNumber, 4, &ic[ICNumber]); //Set discharge bit
-	LTC681x_wrcfg(1,ic);	
-	LTC681x_rdcfg(1,ic);
-	printf("\r\n%d",ic[0].config.rx_data[4]);
-	printf(" %d\n" ,ic[0].config.rx_data[5]);
 }
 
 void getICNumber(uint8_t i, uint8_t* ICNumber, uint8_t* ModuleNumber) {
@@ -92,29 +78,38 @@ void getICNumber(uint8_t i, uint8_t* ICNumber, uint8_t* ModuleNumber) {
 	}
 }
 
+void setDischarge(uint8_t i, cell_asic ic[]) { //i is module number
+	uint8_t ICNumber = 0; 
+	uint8_t ModuleNumber = 0;
+	getICNumber(i, &ICNumber, &ModuleNumber);//Get IC and ModuleInIC number
+	LTC681x_rdcfg(4,ic);
+	
+	LTC6811_set_discharge(ModuleNumber, 4, &ic[ICNumber]); //Set discharge bit
+	LTC681x_wrcfg(4,ic);	
+	LTC681x_rdcfg(4,ic);
+	printf("\r\n%d",ic[0].config.rx_data[4]);
+	printf(" %d\n" ,ic[0].config.rx_data[5]);
+}
+
+
+
 void testDischarge(cell_asic ic[]) {
-	LTC681x_rdcfg(1, ic); 
-	//uint8_t temp = ic[0].config.tx_data[4]; 
+	LTC681x_rdcfg(4, ic);  
 	printf("0x%x\n\r",ic[0].config.tx_data[4]);
 	ic[0].config.tx_data[4] |= 0xFF;
 	ic[0].config.tx_data[5] |= 0x0F;
-	//ic[0].config.tx_data[0] = temp;
-	LTC681x_wrcfg(1,ic);
-	LTC681x_rdcfg(1,ic);
-	//uint8_t temp1 = ic[0].config.tx_data[4]; 
+	LTC681x_wrcfg(4,ic);
+	LTC681x_rdcfg(4,ic); 
 	printf("0x%x\n\r",ic[0].config.tx_data[4]);
 }
 
 void testStopDischarge(cell_asic ic[]) {
 	LTC681x_rdcfg(1, ic); 
-	//uint8_t temp = ic[0].config.tx_data[4]; 
 	printf("0x%x\n\r",ic[0].config.tx_data[4]);
 	ic[0].config.tx_data[4] &= 0x00;
 	ic[0].config.tx_data[5] &= 0xF0;
-	//ic[0].config.tx_data[0] = temp;
 	LTC681x_wrcfg(1,ic);
-	LTC681x_rdcfg(1,ic);
-	//uint8_t temp1 = ic[0].config.tx_data[4]; 
+	LTC681x_rdcfg(1,ic); 
 	printf("0x%x\n\r",ic[0].config.tx_data[4]);
 }
 
