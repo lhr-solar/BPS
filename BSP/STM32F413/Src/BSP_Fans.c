@@ -3,8 +3,7 @@ Controls speed of fans which cool down the battery pack.
 Uses Pins PC6,7 and PB14,15
 */
 
-#include <stdint.h>
-#include "../../Inc/BSP_Fans.h"
+#include "BSP_Fans.h"
 
 #define DIVIDER 500 //Speed increments
 #define TOPSPEED 4000/DIVIDER //top speed achievable
