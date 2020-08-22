@@ -64,27 +64,31 @@ void Fans_Init(void){
 Inputs: Number of fan to change speed (1-4)
         Speed of Fan(0-8)
 */
-uint8_t Fans_Speed(uint8_t fan, uint32_t vel){
+ErrorStatus Fans_Speed(uint8_t fan, uint32_t speed){
     //Range of pulse is 0-4000
     //First check to make sure that change is within range of values
     //Load new value into Compare and Capture Register
-    if  (vel < 0 || vel > 8) return 1; //if not in range, leave function with error code
+    if  (speed < 0 || speed > 8) return ERROR; ; //if not in range, leave function with error code
     switch (fan)
     {
     case 1:
-        TIM8->CCR1 = (vel * 500);
+        TIM8->CCR1 = (speed * 500);
+        return SUCCESS;
         break;
     case 2:
-        TIM8->CCR2 = (vel * 500);
+        TIM8->CCR2 = (speed * 500);
+        return SUCCESS;
         break;
     case 3:
-        TIM8->CCR3 = (vel * 500);
+        TIM8->CCR3 = (speed * 500);
+        return SUCCESS;
         break;
     case 4:
-        TIM8->CCR4 = (vel * 500);
+        TIM8->CCR4 = (speed * 500);
+        return SUCCESS;
         break;
     default:
-        return 0; //invalid fan value
+        return ERROR; //invalid fan value
         break;
     }
 }

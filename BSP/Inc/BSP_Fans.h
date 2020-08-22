@@ -21,6 +21,6 @@ Output: Error Status
         0: Gave invalid fan value
         1: Gave invalid velocity value
 */
-uint8_t Fans_Speed(uint8_t fan, uint32_t vel);
+ErrorStatus Fans_Speed(uint8_t fan, uint32_t speed);
 
 #endif
