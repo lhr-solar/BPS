@@ -144,7 +144,8 @@ void CAN1_RX0_IRQHandler(void)
     for(int i = 0; i < 8; i++){
         CANFIFO[CANFIFOHEAD][i] = RxMessage.Data[i]; //store data in FIFO
         (++CANFIFOHEAD)%CANFIFOMAX; //increment FIFO Head
-        }
+    }
+    //If high priority message, standard CAN message, with 1 byte is sent
     if ((RxMessage.StdId == 0x001)&&(RxMessage.IDE == CAN_ID_STD) && (RxMessage.DLC == 1)){
         // TODO: do stuff
         RxFlag = true;
