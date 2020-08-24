@@ -2,10 +2,13 @@
 #include "stm32f4xx.h"
 
 #define CAN_MODE        CAN_Mode_Normal
+#define CANFIFOMAX  32 //most messages it can take before wrapping around
 
 static CanTxMsg TxMessage;
 static CanRxMsg RxMessage;
-
+uint8_t CANFIFO[32][8] = {0}; //initialize 32 by 8 array containing FIFO data 
+CANFIFOHEAD = 0; //row of head
+CANFIFOTAIL = 0; //row of tail
 static bool RxFlag = false;
 
 /**
@@ -125,10 +128,11 @@ uint8_t BSP_CAN_Write(uint32_t id, uint8_t data[8], uint8_t length) {
 uint8_t BSP_CAN_Read(uint32_t *id, uint8_t *data) {
     if(RxFlag){
 		for(int i = 0; i < 8; i++){
-			data[i] = RxMessage.Data[i];
+			data[i] = CANFIFO[CANFIFOTAIL][i];
+            (++CANFIFOTAIL)%CANFIFOMAX; //increment FIFO tail
 		}
         *id = RxMessage.StdId;
-		RxFlag = false;
+        if (CANFIFOHEAD == CANFIFOTAIL) RxFlag = false; //If all data is taken, remove flag
 		return 1;
 	}
     return 0;
@@ -137,7 +141,10 @@ uint8_t BSP_CAN_Read(uint32_t *id, uint8_t *data) {
 void CAN1_RX0_IRQHandler(void)
 {
     CAN_Receive(CAN1, CAN_FIFO0, &RxMessage);
-
+    for(int i = 0; i < 8; i++){
+        CANFIFO[CANFIFOHEAD][i] = RxMessage.Data[i]; //store data in FIFO
+        (++CANFIFOHEAD)%CANFIFOMAX; //increment FIFO Head
+        }
     if ((RxMessage.StdId == 0x001)&&(RxMessage.IDE == CAN_ID_STD) && (RxMessage.DLC == 1)){
         // TODO: do stuff
         RxFlag = true;
