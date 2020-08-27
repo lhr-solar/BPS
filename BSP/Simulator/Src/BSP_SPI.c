@@ -129,6 +129,7 @@ static Group DetermineGroupLetter(uint16_t cmd);
  * @brief   File access functions
  */
 static bool UpdateSimulationData(void);
+static void dischargeModules(void);
 
 /**
  * @brief   Initializes the SPI port connected to the LTC6820.
@@ -234,6 +235,8 @@ static void WRCommandHandler(uint8_t *buf, uint32_t len) {
                 memcpy(simulationData[i].config, &data[dataIdx*BYTES_PER_REG], BYTES_PER_REG);
                 dataIdx++;
             }
+            //if any DCC bits are set, reflect that in SPI.csv
+            dischargeModules();
             break;
         }
 
@@ -432,6 +435,48 @@ static bool UpdateSimulationData(void) {
     return true;
 }
 
+static void writeDCC(int moduleNum, int newStatus){
+    FILE* fp = fopen(file, "r+");
+    if(!fp) {
+        perror(SPI_CSV_FILE);
+        exit(EXIT_FAILURE);
+    }
+    int fno = fileno(fp);
+    flock(fno, LOCK_EX);
+
+    fseek(fp, moduleNum * 20, SEEK_SET);
+    if(newStatus == 1){
+        fprintf(fp, "%d", 1);   //on
+    }
+    else if(newStatus == 0){
+        fprintf(fp, "%d", 0);   //off
+    }
+
+    flock(fno, LOCK_UN);
+    fclose(fp);
+}
+
+static void dischargeModules(void){
+    int moduleCount = 1;
+    int bound = 8;
+    //loop through each IC for all modules
+    for(int i = 0; i < NUM_MINIONS; i++) {
+        //check if any DCC bits in the 4th config register are set
+        if(i == 3){
+            bound = 7;
+        }
+        for(int j = 0; j < bound; j++){
+            if(simulationData[i].config[4] & (1<<(j))){
+                writeDCC(moduleCount, 1);
+            }else{
+                writeDCC(moduleCount, 0);
+            }
+            moduleCount++;
+        }
+                
+                
+    }
+}
 
 /**
  * @brief   DATA FORMATTING FUNCTIONS

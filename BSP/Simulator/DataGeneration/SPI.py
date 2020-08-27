@@ -16,6 +16,7 @@ file = config.directory_path + config.files['SPI']
 wires = []                  # list of 31 modules (1 = connected; 0 = open)
 voltage_values = []         # list of 31 modules (fixed point 0.0001)
 temperature_values = []     # list of 31 pairs of sensors (fixed point 0.001)
+DCC_values = [0] * 31             # list of 31 modules (1 = discharging)
 
 
 def open_wires(battery=None):
@@ -86,7 +87,7 @@ def generate(state, mode, battery=None):
     @param mode : 'low', 'normal', or 'high' ranges respective to the state
     @param battery : battery object with set modules
     """
-    global wires, voltage_values, temperature_values
+    global wires, voltage_values, temperature_values, DCC_values
     os.makedirs(os.path.dirname(file), exist_ok=True)
     open_wires(battery)
     if battery is not None:
@@ -104,6 +105,7 @@ def generate(state, mode, battery=None):
             row.append(voltage_values[i])
             row.append(temperature_values[i][0])
             row.append(temperature_values[i][1])
+            row.append(DCC_values[i])
             csvwriter.writerow(row)
             row = []
         fcntl.flock(csvfile.fileno(), fcntl.LOCK_UN)    # Unlock file
