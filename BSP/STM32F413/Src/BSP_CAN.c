@@ -10,6 +10,7 @@ static uint8_t rxFifo[CAN_FIFO_SIZE][8] = {0}; //initialize 32 by 8 array contai
 static uint8_t rxFifoHead = 0; //row of head
 static uint8_t rxFifoTail = 0; //row of tail
 static bool RxFlag = false;
+static uint8_t rxFifoOverFlow = 0;
 
 /**
  * @brief   Initializes the CAN module that communicates with the rest of the electrical system.
@@ -126,14 +127,16 @@ uint8_t BSP_CAN_Write(uint32_t id, uint8_t data[8], uint8_t length) {
  * @return  0 if nothing was received so ignore id and data that was received. Any other value indicates data was received and stored.
  */
 uint8_t BSP_CAN_Read(uint32_t *id, uint8_t *data) {
-    if(RxFlag){
+    //if the head and tail are not the same, or they are the same and it is overflowing
+    if((rxFifoHead != rxFifoTail) || (rxFifoHead == rxFifoTail && rxFifoOverFlow == 1)){
 		for(int i = 0; i < 8; i++){
 			data[i] = rxFifo[rxFifoTail][i];
-            (++rxFifoTail)%CAN_FIFO_SIZE; //increment FIFO tail
 		}
+        rxFifoTail = (rxFifoTail + 1)%CAN_FIFO_SIZE; //increment FIFO tail
         *id = RxMessage.StdId;
-        if (rxFifoHead == rxFifoTail) RxFlag = false; //If all data is taken, remove flag
 		return 1;
+        //if the head is not right below the tail, remove error status
+        if ((rxFifoHead + 1)%CAN_FIFO_SIZE != rxFifoTail) rxFifoOverFlow = 0;
 	}
     return 0;
 }
@@ -144,13 +147,12 @@ void CAN1_RX0_IRQHandler(void)
     for(int i = 0; i < 8; i++){
         rxFifo[rxFifoHead][i] = RxMessage.Data[i]; //store data in FIFO
     }
-    (++rxFifoHead)%CAN_FIFO_SIZE; //increment FIFO Head
-    if (rxFifoHead == rxFifoTail){
-        //set error status
+    rxFifoHead = (rxFifoHead + 1)%CAN_FIFO_SIZE; //increment FIFO Head
+    if ((rxFifoHead + 1)%CAN_FIFO_SIZE == rxFifoTail){ //If the head is right below the tail
+        rxFifoOverFlow = 1; //set error status
     }
     //If high priority message, standard CAN message, with 1 byte is sent
     if ((RxMessage.StdId == 0x001)&&(RxMessage.IDE == CAN_ID_STD) && (RxMessage.DLC == 1)){
         // TODO: do stuff
-        RxFlag = true; //There is data in Fifo
     }
 }
