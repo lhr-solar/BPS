@@ -143,11 +143,14 @@ void CAN1_RX0_IRQHandler(void)
     CAN_Receive(CAN1, CAN_FIFO0, &RxMessage);
     for(int i = 0; i < 8; i++){
         rxFifo[rxFifoHead][i] = RxMessage.Data[i]; //store data in FIFO
-        (++rxFifoHead)%CAN_FIFO_SIZE; //increment FIFO Head
+    }
+    (++rxFifoHead)%CAN_FIFO_SIZE; //increment FIFO Head
+    if (rxFifoHead == rxFifoTail){
+        //set error status
     }
     //If high priority message, standard CAN message, with 1 byte is sent
     if ((RxMessage.StdId == 0x001)&&(RxMessage.IDE == CAN_ID_STD) && (RxMessage.DLC == 1)){
         // TODO: do stuff
-        RxFlag = true;
+        RxFlag = true; //There is data in Fifo
     }
 }
