@@ -230,7 +230,7 @@ static void WRCommandHandler(uint8_t *buf, uint32_t len) {
         case SIM_LTC6811_WRCFGA: {
             ExtractDataFromBuff(data, buf, len);
             int dataIdx = 0;
-            for(int i = NUM_MINIONS - 1; i >= 0; i--) {
+            for(int i = 0; i < NUM_MINIONS; i++) {
                 // Copy data to config register
                 memcpy(simulationData[i].config, &data[dataIdx*BYTES_PER_REG], BYTES_PER_REG);
                 dataIdx++;
@@ -283,7 +283,7 @@ static void RDCommandHandler(uint8_t *buf, uint32_t len) {
         case SIM_LTC6811_RDCFGA: {
             // store config registers of all LTC6811s into one continuous array
             int dataIdx = 0;
-            for(int i = NUM_MINIONS - 1; i >= 0; i--) {
+            for(int i = 0; i < NUM_MINIONS; i++) {
                 memcpy(&data[dataIdx * BYTES_PER_REG], simulationData[i].config, BYTES_PER_REG);
                 dataIdx++;
             }
@@ -528,7 +528,7 @@ static void ExtractMUXAddrFromBuff(uint8_t *buf) {
     buf = buf + 4;
 
     int minionIdx = 0;
-    for(int i = NUM_MINIONS-1; i >= 0; i--) {
+    for(int i = 0; i < NUM_MINIONS; i++) {
         simulationData[minionIdx].temperature_mux = ((buf[i*BYTES_PER_REG] << 4) & 0xF0)
                                                     | ((buf[i*BYTES_PER_REG+1] >> 4) & 0x0F);
         minionIdx++;
@@ -546,7 +546,7 @@ static void ExtractMUXSelFromBuff(uint8_t *buf) {
     buf = buf + 4;
 
     int minionIdx = 0;
-    for(int i = NUM_MINIONS-1; i >= 0; i--) {
+    for(int i = 0; i < NUM_MINIONS; i++) {
         uint8_t sel = ((buf[i*BYTES_PER_REG+3] >> 4) & 0x000F) - 8;     // Check LTC1380 as to why there is an 8
         simulationData[minionIdx].temperature_sel = sel;
         minionIdx++;
