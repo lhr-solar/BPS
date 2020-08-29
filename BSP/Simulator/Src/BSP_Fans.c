@@ -16,47 +16,38 @@ void BSP_Fans_Init(void)
     FILE* fp = fopen(file, "w+");
     int fno = fileno(fp);
     flock(fno, LOCK_EX);
-    fprintf(fp, "%d", 0);
+    fprintf(fp, "0,0,0,0"); 
     flock(fno, LOCK_UN);
     fclose(fp);
 }
 
 /**
  * @brief   Sets fan duty cycle
- * @param   dutyCycle: int for duty cycle amount in range 0-100
+ * @param   dutyCycle: int for duty cycle amount in range 0-8
+ *          fan: fan number whose speed should be changed (1-4)
  * @return  None
  */
-void BSP_Fans_Set(int dutyCycle)
-{
-    FILE* fp = fopen(file, "w");        //Open file for writing
+ErrorStatus BSP_Fans_Set(uint8_t fan, uint32_t dutyCycle){
+    //if input is outside of bounds
+    char Fans[4];
+    if (fan < 1 || fan > 4 || dutyCycle < 0 || dutyCycle > 8) return ERROR;
+    FILE* fp = fopen(file, "r");        //Open file for reading
     int fno = fileno(fp);               //Lock
-    flock(fno, LOCK_EX);                
-    fprintf(fp, "%d", dutyCycle);       //Write dutyCycle
+    flock(fno, LOCK_EX);    
+    fgets(Fans, 4, fp);
+    Fans[fan-1] = dutyCycle;
+    fprintf(fp, Fans, dutyCycle); //Write dutyCycle and fan number
     flock(fno, LOCK_UN);                //Unlock
     fclose(fp);                         //Close file
-}
-
-/**
- * @brief   Turns fans off
- * @param   None
- * @return  None
- */
-void BSP_Fans_Off(void)
-{
-    FILE* fp = fopen(file, "w");        //Open file for writing
-    int fno = fileno(fp);               //Lock
-    flock(fno, LOCK_EX);
-    fprintf(fp, "%d", 0);               //Write 0
-    flock(fno, LOCK_UN);                //Unlock
-    fclose(fp);                         //Close file
+    return SAFE;
 }
 
 /**
  * @brief   Get current duty cycle of fans
- * @param   None
+ * @param   fan number
  * @return  Current PWM duty cycle
  */
-int BSP_Fans_GetDuty(void)
+int BSP_Fans_GetDuty(uint8_t fan)
 {
     int state;
     FILE* fp = fopen(file, "r");        //Open file for reading
