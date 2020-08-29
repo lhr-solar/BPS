@@ -6,22 +6,21 @@
 
 
 #include "LTC6811.h"
-#include "LTC6811.h"
 #include "Voltage.h"
 
 /**
- * @brief   Sets the global minVoltage variable to the lowest voltage amongst the 31 modules
+ * @brief   Finds lowest voltage amongst the 31 modules. Meant to be called only in Balancing_Balance()
  * @param   None
- * @return  None
+ * @return  the  
  */
-void ReleaseChargeInit(void);
+static uint16_t Balancing_Init(void);
 
 /**
  * @brief   Loops through all 31 modules, sets discharge bits for any module if its voltage is too high, and clears discharge bits for any modules with voltages that are too low
  * @param   Minions array of the ICs that the modules are connected to
  * @return  None
  */
-void ReleaseCharge(cell_asic Minions[]);
+void Balancing_Balance(cell_asic Minions[]);
 
 /**
  * @brief   Recieves module number out of 31 and stores the module number and its IC number in two buffers
@@ -30,27 +29,27 @@ void ReleaseCharge(cell_asic Minions[]);
  * @param   ModuleNumber buffer for module number
  * @return  None
  */
-void getICNumber(uint8_t i, uint8_t* ICNumber, uint8_t* ModuleNumber);
+void Balancing_GetICNumber(uint8_t i, uint8_t* ICNumber, uint8_t* ModuleNumber);
 
 
 /**
  * @brief   Loops through all 31 modules, sets discharge bits for any module if its voltage is too high, and clears discharge bits for any modules with voltages that are too low
- * @param   i module number 
+ * @param   module module number 
  * @param   ic array of the ICs in the system
  * @return  None
  */
-void setDischarge(uint8_t i, cell_asic ic[]);
+void Balancing_SetDischarge(uint8_t module, cell_asic ic[]);
 
 	
 
 /**
  * @brief   Clears the discharge bit of the desired module
- * @param   Cell module number
+ * @param   Cell cell that will stop discharging
  * @param   total_ic total number of ICs in the system
  * @param   ic array of ICs in the system
  * @return  None
  */
-void ClearDischargeBit(int Cell, uint8_t total_ic, cell_asic ic[]);
+void Balancing_ClearDischargeBit(int Cell, uint8_t total_ic, cell_asic ic[]);
 
 void testDischarge(cell_asic ic[]);
 
