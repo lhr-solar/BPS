@@ -4,7 +4,7 @@
 #include <sys/file.h>
 
 static const char* file = GET_CSV_PATH(FANS_CSV_FILE);
-
+static char Fans[5];
 /**
  * @brief   Initialize all the GPIO pins connected to each fan
  * @param   None
@@ -16,7 +16,7 @@ void BSP_Fans_Init(void)
     FILE* fp = fopen(file, "w+");
     int fno = fileno(fp);
     flock(fno, LOCK_EX);
-    fprintf(fp, "0,0,0,0"); 
+    fprintf(fp, "0000"); 
     flock(fno, LOCK_UN);
     fclose(fp);
 }
@@ -29,17 +29,20 @@ void BSP_Fans_Init(void)
  */
 ErrorStatus BSP_Fans_Set(uint8_t fan, uint32_t dutyCycle){
     //if input is outside of bounds
-    char Fans[4];
     if (fan < 1 || fan > 4 || dutyCycle < 0 || dutyCycle > 8) return ERROR;
-    FILE* fp = fopen(file, "r");        //Open file for reading
-    int fno = fileno(fp);               //Lock
+    FILE* fp = fopen(file, "r"); //Open file for reading
+    int fno = fileno(fp);  //Lock
     flock(fno, LOCK_EX);    
-    fgets(Fans, 4, fp);
-    Fans[fan-1] = dutyCycle;
-    fprintf(fp, Fans, dutyCycle); //Write dutyCycle and fan number
-    flock(fno, LOCK_UN);                //Unlock
-    fclose(fp);                         //Close file
-    return SAFE;
+    //fscanf(fp, "%s", Fans);
+    fgets(Fans, 5, fp); //read from file
+    flock(fno, LOCK_UN); //Unlock
+    fclose(fp); //Close file
+    fp = fopen(file, "w"); //Open file for writing
+    Fans[fan-1] = dutyCycle + '0';
+    fprintf(fp, "%s", Fans); //Write dutyCycle and fan number
+    flock(fno, LOCK_UN); //Unlock
+    fclose(fp); //Close file
+    return SUCCESS;
 }
 
 /**
@@ -47,14 +50,13 @@ ErrorStatus BSP_Fans_Set(uint8_t fan, uint32_t dutyCycle){
  * @param   fan number
  * @return  Current PWM duty cycle
  */
-int BSP_Fans_GetDuty(uint8_t fan)
+int BSP_Fans_GetSpeed(uint8_t fan)
 {
-    int state;
-    FILE* fp = fopen(file, "r");        //Open file for reading
-    int fno = fileno(fp);               //Lock
+    FILE* fp = fopen(file, "r"); //Open file for reading
+    int fno = fileno(fp); //Lock
     flock(fno, LOCK_EX);
-    fscanf(fp, "%d", &state);           //Read state
-    flock(fno, LOCK_UN);                //Unlock
-    fclose(fp);                         //Close file
-    return state;                       
+    fgets(Fans, 5, fp); //read from file
+    flock(fno, LOCK_UN); //Unlock
+    fclose(fp); //Close file
+    return Fans[fan-1] - '0';                       
 }
