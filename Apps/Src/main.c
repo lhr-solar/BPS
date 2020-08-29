@@ -6,7 +6,7 @@
 #include "config.h"
 #include "LTC6811.h"
 #include "Voltage.h"
-#include "Current.h"
+#include "Amps.h"
 #include "Temperature.h"
 #include "EEPROM.h"
 #include "Charge.h"
@@ -47,19 +47,19 @@ int main(){
 	while(1) {
 		// First update the measurements.
 		Voltage_UpdateMeasurements();
-		Current_UpdateMeasurements();
+		Amps_UpdateMeasurements();
     	Temperature_UpdateAllMeasurements();
 
 		// Update battery percentage
-		Charge_Calculate(Current_GetLowPrecReading());
+		Charge_Calculate(Amps_GetReading());
 
 		// Checks for user input to send to CLI
 		if(BSP_UART_ReadLine(command)) {
 			CLI_Handler(command);
 		}
 		
-		SafetyStatus current = Current_CheckStatus(override);
-		SafetyStatus temp = Temperature_CheckStatus(Current_IsCharging());
+		SafetyStatus current = Amps_CheckStatus(override);
+		SafetyStatus temp = Temperature_CheckStatus(Amps_IsCharging());
 		SafetyStatus voltage = Voltage_CheckStatus();
 
 		// Check if everything is safe (all return SAFE = 0)
@@ -99,7 +99,7 @@ void initialize(void){
 	BSP_WDTimer_Init();
 	EEPROM_Init();
 	Charge_Init();
-	Current_Init();
+	Amps_Init();
 	Voltage_Init(Minions);
 	Temperature_Init(Minions);
 	CLI_Init(Minions);
@@ -161,7 +161,7 @@ void faultCondition(void){
 
 	uint8_t error = 0;
 
-	if(Current_CheckStatus(false) != SAFE){
+	if(Amps_CheckStatus(false) != SAFE){
 		error |= FAULT_HIGH_CURRENT;
 		BSP_Light_On(OCURR);
 	}
@@ -189,7 +189,7 @@ void faultCondition(void){
 		}
 	}
 
-	if(Temperature_CheckStatus(Current_IsCharging()) != SAFE){
+	if(Temperature_CheckStatus(Amps_IsCharging()) != SAFE){
 		error |= FAULT_HIGH_TEMP;
 		BSP_Light_On(OTEMP);
 	}
@@ -225,10 +225,7 @@ void faultCondition(void){
 
 		// Current fault handling
 		case FAULT_HIGH_CURRENT:
-			curr = Current_GetLowPrecReading();
-			EEPROM_LogData(FAULT_HIGH_CURRENT, 0x00FF & curr);
-			EEPROM_LogData(FAULT_HIGH_CURRENT, 0x00FF & (curr >> 8));
-			curr = Current_GetHighPrecReading();
+			curr = Amps_GetReading();
 			EEPROM_LogData(FAULT_HIGH_CURRENT, 0x00FF & curr);
 			EEPROM_LogData(FAULT_HIGH_CURRENT, 0x00FF & (curr >> 8));
 			break;
@@ -236,7 +233,7 @@ void faultCondition(void){
 	}
 
 	while(1) {
-		Current_UpdateMeasurements();
+		Amps_UpdateMeasurements();
 		if(BSP_UART_ReadLine(command)) {
 			CLI_Handler(command);
 		}

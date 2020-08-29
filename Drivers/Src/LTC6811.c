@@ -69,13 +69,13 @@ Copyright 2017 Linear Technology Corp. (LTC)
 #include "LTC681x.h"
 #include "LTC6811.h"
 #include "config.h"
-#include "BSP_SPI.h"
+#include "BSP_SPI1.h"
 
 /*********************************************************/
 /*** Code that was added by UTSVT. ***/
 /*********************************************************/
 void LTC6811_Init(cell_asic *battMod){	
-	BSP_SPI_Init();				// Initialize SPI1 for voltage board	
+	BSP_SPI1_Init();				// Initialize SPI1 for voltage board	
 	
 	LTC681x_init_cfg(NUM_MINIONS, battMod);
 	LTC6811_reset_crc_count(NUM_MINIONS, battMod);

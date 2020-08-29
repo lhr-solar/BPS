@@ -1,11 +1,4 @@
-#ifndef __BSP_SPI_H
-#define __BSP_SPI_H
-
-#include "common.h"
-
-/**
- * @note    If other ICs need to be connected onto the SPI line, this code will have to be modified.
- */
+#include "BSP_SPI1.h"
 
 /**
  * @brief   Initializes the SPI port connected to the LTC6820.
@@ -15,7 +8,13 @@
  * @param   None
  * @return  None
  */
-void BSP_SPI_Init(void);
+void BSP_SPI1_Init(void) {
+    // TODO: Initialize the SPI port and a digital output pin for the chip select
+    //      SPI configuration:
+    //          speed : 125kbps
+    //          CPOL : 1 (polarity of clock during idle is high)
+    //          CPHA : 1 (tx recorded during 2nd edge)
+}
 
 /**
  * @brief   Transmits data to through SPI.
@@ -28,7 +27,10 @@ void BSP_SPI_Init(void);
  * @param   txLen   length of data array.
  * @return  None
  */
-void BSP_SPI_Write(uint8_t *txBuf, uint32_t txLen);
+void BSP_SPI1_Write(uint8_t *txBuf, uint32_t txLen) {
+    // TODO: Transmit data through SPI.
+    //      Any data the uC receives during this process should just be thrown away.
+}
 
 /**
  * @brief   Gets the data from SPI. With the way the LTC6811 communication works,
@@ -40,7 +42,10 @@ void BSP_SPI_Write(uint8_t *txBuf, uint32_t txLen);
  * @param   rxLen   length of data array.
  * @return  None
  */
-void BSP_SPI_Read(uint8_t *rxBuf, uint32_t rxLen);
+void BSP_SPI1_Read(uint8_t *rxBuf, uint32_t rxLen) {
+    // TODO: Read data from SPI.
+    //      Send 0x00 in order to get data
+}
 
 /**
  * @brief   Sets the state of the chip select output pin.
@@ -50,6 +55,6 @@ void BSP_SPI_Read(uint8_t *rxBuf, uint32_t rxLen);
  * @param   state   0 for select, 1 to deselect
  * @return  None
  */
-void BSP_SPI_SetStateCS(uint8_t state);
-
-#endif
+void BSP_SPI1_SetStateCS(uint8_t state) {
+    // TODO: Set CS pin to high or low depending on state
+}

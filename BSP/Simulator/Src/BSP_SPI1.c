@@ -1,4 +1,4 @@
-#include "BSP_SPI.h"
+#include "BSP_SPI1.h"
 #include "config.h"
 #include "simulator_conf.h"
 #include <unistd.h>
@@ -138,7 +138,7 @@ static bool UpdateSimulationData(void);
  * @param   None
  * @return  None
  */
-void BSP_SPI_Init(void) {
+void BSP_SPI1_Init(void) {
 
     // Reset values
     memset(simulationData, 0, sizeof(simulationData));
@@ -164,7 +164,7 @@ void BSP_SPI_Init(void) {
  * @param   txLen   length of data array.
  * @return  None
  */
-void BSP_SPI_Write(uint8_t *txBuf, uint32_t txLen) {
+void BSP_SPI1_Write(uint8_t *txBuf, uint32_t txLen) {
     currCmd = ExtractCmdFromBuff(txBuf, txLen);
 
     if(((currCmd & 0x600) == 0x200) || (currCmd & 0x700) == 0x400) {
@@ -186,7 +186,7 @@ void BSP_SPI_Write(uint8_t *txBuf, uint32_t txLen) {
  * @param   rxLen   length of data array.
  * @return  None
  */
-void BSP_SPI_Read(uint8_t *rxBuf, uint32_t rxLen) {
+void BSP_SPI1_Read(uint8_t *rxBuf, uint32_t rxLen) {
 
     // One register is 8 bytes or greater. If there was an SPI call where rxLen
     // is less than 8, that means it's either a wakeup call or some generic call
@@ -204,7 +204,7 @@ void BSP_SPI_Read(uint8_t *rxBuf, uint32_t rxLen) {
  * @param   state   0 for select, 1 to deselect
  * @return  None
  */
-void BSP_SPI_SetStateCS(uint8_t state) {
+void BSP_SPI1_SetStateCS(uint8_t state) {
     chipSelectState = state;
 }
 

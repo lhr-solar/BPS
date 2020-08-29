@@ -1,4 +1,4 @@
-#include "BSP_SPI.h"
+#include "BSP_SPI1.h"
 #include "stm32f4xx.h"
 
 // Use this macro function to wait until SPI communication is complete
@@ -9,7 +9,7 @@
  * @param   txData single byte that will be sent to the device.
  * @return  rxData single byte that was read from the device.
  */
-static uint8_t SPI_WriteRead(uint8_t txData){
+static uint8_t SPI1_WriteRead(uint8_t txData){
 	SPI_Wait(SPI1);
 	SPI1->DR = txData & 0x00FF;
 	SPI_Wait(SPI1);
@@ -24,7 +24,7 @@ static uint8_t SPI_WriteRead(uint8_t txData){
  * @param   None
  * @return  None
  */
-void BSP_SPI_Init(void) {
+void BSP_SPI1_Init(void) {
     //      SPI configuration:
     //          speed : 125kbps
     //          CPOL : 1 (polarity of clock during idle is high)
@@ -88,9 +88,9 @@ void BSP_SPI_Init(void) {
  * @param   txLen   length of data array.
  * @return  None
  */
-void BSP_SPI_Write(uint8_t *txBuf, uint32_t txLen) {
+void BSP_SPI1_Write(uint8_t *txBuf, uint32_t txLen) {
     for(uint32_t i = 0; i < txLen; i++){
-		SPI_WriteRead(txBuf[i]);
+		SPI1_WriteRead(txBuf[i]);
 	}
 }
 
@@ -104,9 +104,9 @@ void BSP_SPI_Write(uint8_t *txBuf, uint32_t txLen) {
  * @param   rxLen   length of data array.
  * @return  None
  */
-void BSP_SPI_Read(uint8_t *rxBuf, uint32_t rxLen) {
+void BSP_SPI1_Read(uint8_t *rxBuf, uint32_t rxLen) {
     for(uint32_t i = 0; i < rxLen; i++){
-		rxBuf[i] = SPI_WriteRead(0x00);
+		rxBuf[i] = SPI1_WriteRead(0x00);
 	}
 }
 
@@ -118,7 +118,7 @@ void BSP_SPI_Read(uint8_t *rxBuf, uint32_t rxLen) {
  * @param   state   0 for select, 1 to deselect
  * @return  None
  */
-void BSP_SPI_SetStateCS(uint8_t state) {
+void BSP_SPI1_SetStateCS(uint8_t state) {
     // PB6 is the Chip Select pin for the LTC6811
     if(state) {
         GPIO_SetBits(GPIOB, GPIO_Pin_6);
