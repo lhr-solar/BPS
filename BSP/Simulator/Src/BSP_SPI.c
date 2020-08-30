@@ -6,6 +6,9 @@
 
 #define CSV_SPI_BUFFER_SIZE     1024
 
+static const char* file_w = GET_CSV_PATH(SPIW_CSV_FILE);
+
+static const char* file_r = GET_CSV_PATH(SPIR_CSV_FILE);
 /**
  * @brief   10-bit Command Codes for the LTC6811
  * @note    Some commands can have certain bits that can be either high or low. By default, the macro
@@ -145,6 +148,8 @@ void BSP_SPI_Init(void) {
     memset(simulationData, 0, sizeof(simulationData));
 
     PEC15_Table_Init();
+    FILE *fp = fopen(file_r, 'w+'); //create SPI_read file
+    fclose(fp); //close file
 
     // Check if simulator is running i.e. were the csv files created?
     if(access(file, F_OK) != 0) {
@@ -161,20 +166,17 @@ void BSP_SPI_Init(void) {
  *          the SPI protocol expects where a transmit and receive happen
  *          simultaneously.
  * @note    Blocking statement
- * @param   txBuf   data array that contains the data to be sent.
- * @param   txLen   length of data array.
+ * @param   data memory address to data array that contains the data to be sent.
  * @return  None
  */
-void BSP_SPI_Write(uint8_t *txBuf, uint32_t txLen) {
-    currCmd = ExtractCmdFromBuff(txBuf, txLen);
-
-    if(((currCmd & 0x600) == 0x200) || (currCmd & 0x700) == 0x400) {
-        currCmd &= ~0x187;  // Bit Mask to ignore any cmd configuration bits i.e. ignore the MD, DCP, etc. bits
-    }
-
-    // Ignore PEC (bits 2 and 3), PEC is meant to be able to check if EMI/noise affected the data
-
-    WRCommandHandler(txBuf, txLen);
+void BSP_SPI_Write(uint32_t data) {
+    FILE *fp = fopen(file_w, 'a'); //open to append
+    int fno = fileno(fp); //lock
+    flock(fno, LOCK_EX);
+    //because the data is 36 bits, it will be stored in a string with 9 characters
+    fprintf(fp, "%s", data);
+    flock(fno, LOCK_UN); //unlock
+    fclose(fp); //close file
 }
 
 /**
@@ -183,18 +185,20 @@ void BSP_SPI_Write(uint8_t *txBuf, uint32_t txLen) {
  *          The SPI protocol requires the uC to transmit data in order to receive
  *          anything so the uC will send junk data.
  * @note    Blocking statement
- * @param   rxBuf   data array to store the data that is received.
- * @param   rxLen   length of data array.
+ * @param   none
  * @return  None
  */
-void BSP_SPI_Read(uint8_t *rxBuf, uint32_t rxLen) {
-
-    // One register is 8 bytes or greater. If there was an SPI call where rxLen
-    // is less than 8, that means it's either a wakeup call or some generic call
-    // that does not require data to be returned by the LTC6811
-    if(rxLen >= 8) {
-        RDCommandHandler(rxBuf, rxLen);
-    }
+uint32_t BSP_SPI_Read() {
+    //Data will be read from the top. Then it will be deleted
+    char data[9];
+    FILE *fp = fopen(file_w, 'r'); //open to read
+    int fno = fileno(fp); //lock
+    flock(fno, LOCK_EX);
+    //because the data is 36 bits, it will be stored in a string with 9 characters
+    fgets(fp, 37, data); //store data in array
+    flock(fno, LOCK_UN); //unlock
+    fclose(fp); //close file
+    return data; //return address to front of array
 }
 
 /**

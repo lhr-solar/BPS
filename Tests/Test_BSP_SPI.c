@@ -11,8 +11,8 @@ int main() {
 
     uint8_t data[4+NUM_MINIONS*8] = {0x00, 0x01, 0x00, 0x02};
 
-    BSP_SPI_Write(data, 4);
-    BSP_SPI_Read(data, 4+NUM_MINIONS*8);
+    BSP_SPI_Write(data);
+    int address = BSP_SPI_Read();
 
     while(1) {
         

@@ -24,11 +24,10 @@ void BSP_SPI_Init(void);
  *          the SPI protocol expects where a transmit and receive happen
  *          simultaneously.
  * @note    Blocking statement
- * @param   txBuf   data array that contains the data to be sent.
- * @param   txLen   length of data array.
+ * @param   data  memory address to data array that contains the data to be sent.
  * @return  None
  */
-void BSP_SPI_Write(uint8_t *txBuf, uint32_t txLen);
+void BSP_SPI_Write(uint32_t data);
 
 /**
  * @brief   Gets the data from SPI. With the way the LTC6811 communication works,
@@ -36,11 +35,10 @@ void BSP_SPI_Write(uint8_t *txBuf, uint32_t txLen);
  *          The SPI protocol requires the uC to transmit data in order to receive
  *          anything so the uC will send junk data.
  * @note    Blocking statement
- * @param   rxBuf   data array to store the data that is received.
- * @param   rxLen   length of data array.
- * @return  None
+ * @param   none
+ * @return  memory address to 36 bit array holding data
  */
-void BSP_SPI_Read(uint8_t *rxBuf, uint32_t rxLen);
+uint32_t BSP_SPI_Read();
 
 /**
  * @brief   Sets the state of the chip select output pin.
