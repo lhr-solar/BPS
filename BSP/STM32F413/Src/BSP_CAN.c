@@ -145,9 +145,10 @@ void CAN1_RX0_IRQHandler(void)
         rxFifo[rxFifoHead][i] = RxMessage.Data[i]; //store data in FIFO
     }
     rxFifoHead = (rxFifoHead + 1)%CAN_FIFO_SIZE; //increment FIFO Head
-    if ((rxFifoHead + 1)%CAN_FIFO_SIZE == rxFifoTail){ //If the head is right below the tail
-        rxFifoTail++;
-    }
+    //If the head is right below the tail, increment tail to prevent overflow
+    if ((rxFifoHead + 1)%CAN_FIFO_SIZE == rxFifoTail){
+        rxFifoTail = (rxFifoTail + 1)%CAN_FIFO_SIZE;
+    } 
     //If high priority message, standard CAN message, with 1 byte is sent
     if ((RxMessage.StdId == 0x001)&&(RxMessage.IDE == CAN_ID_STD) && (RxMessage.DLC == 1)){
         // TODO: do stuff
