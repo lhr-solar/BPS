@@ -27,7 +27,7 @@ void BSP_SPI_Init(void);
  * @param   data  memory address to data array that contains the data to be sent.
  * @return  None
  */
-void BSP_SPI_Write(uint32_t data);
+void BSP_SPI_Write(char* data);
 
 /**
  * @brief   Gets the data from SPI. With the way the LTC6811 communication works,
@@ -35,10 +35,10 @@ void BSP_SPI_Write(uint32_t data);
  *          The SPI protocol requires the uC to transmit data in order to receive
  *          anything so the uC will send junk data.
  * @note    Blocking statement
- * @param   none
- * @return  memory address to 36 bit array holding data
+ * @param   data memory address to store data in
+ * @return  none
  */
-uint32_t BSP_SPI_Read();
+void BSP_SPI_Read(char* data);
 
 /**
  * @brief   Sets the state of the chip select output pin.

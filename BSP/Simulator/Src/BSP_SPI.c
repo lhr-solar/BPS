@@ -7,7 +7,6 @@
 #define CSV_SPI_BUFFER_SIZE     1024
 
 static const char* file_w = GET_CSV_PATH(SPIW_CSV_FILE);
-
 static const char* file_r = GET_CSV_PATH(SPIR_CSV_FILE);
 /**
  * @brief   10-bit Command Codes for the LTC6811
@@ -148,7 +147,7 @@ void BSP_SPI_Init(void) {
     memset(simulationData, 0, sizeof(simulationData));
 
     PEC15_Table_Init();
-    FILE *fp = fopen(file_r, 'w+'); //create SPI_read file
+    FILE *fp = fopen(file_r, "w+"); //create SPI_read file
     fclose(fp); //close file
 
     // Check if simulator is running i.e. were the csv files created?
@@ -169,12 +168,12 @@ void BSP_SPI_Init(void) {
  * @param   data memory address to data array that contains the data to be sent.
  * @return  None
  */
-void BSP_SPI_Write(uint32_t data) {
-    FILE *fp = fopen(file_w, 'a'); //open to append
+void BSP_SPI_Write(char* data) {
+    FILE *fp = fopen(file_w, "a"); //open to append
     int fno = fileno(fp); //lock
     flock(fno, LOCK_EX);
-    //because the data is 36 bits, it will be stored in a string with 9 characters
-    fprintf(fp, "%s", data);
+    //data stored in rows
+    fprintf(fp, "%s\n", data);
     flock(fno, LOCK_UN); //unlock
     fclose(fp); //close file
 }
@@ -185,20 +184,17 @@ void BSP_SPI_Write(uint32_t data) {
  *          The SPI protocol requires the uC to transmit data in order to receive
  *          anything so the uC will send junk data.
  * @note    Blocking statement
- * @param   none
+ * @param   data address to store data in
  * @return  None
  */
-uint32_t BSP_SPI_Read() {
+void BSP_SPI_Read(char* data) {
     //Data will be read from the top. Then it will be deleted
-    char data[9];
-    FILE *fp = fopen(file_w, 'r'); //open to read
+    FILE *fp = fopen(file_w, "r"); //open to read
     int fno = fileno(fp); //lock
     flock(fno, LOCK_EX);
-    //because the data is 36 bits, it will be stored in a string with 9 characters
-    fgets(fp, 37, data); //store data in array
+    fgets(data, 6, fp); //read data
     flock(fno, LOCK_UN); //unlock
     fclose(fp); //close file
-    return data; //return address to front of array
 }
 
 /**
