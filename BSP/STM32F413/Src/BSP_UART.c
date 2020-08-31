@@ -156,7 +156,7 @@ void USART3_IRQHandler(void) {
     if(USART_GetITStatus(USART3, USART_IT_TC) != RESET) {
 
         // If getting data from fifo fails i.e. the tx fifo is empty, then turn off the TX interrupt
-        if(!TxFifo_Get(&(USART3->DR))) {
+        if(!TxFifo_Get((uint8_t *)&(USART3->DR))) {
             USART_ITConfig(USART3, USART_IT_TC, RESET);
         }
 
