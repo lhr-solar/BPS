@@ -100,6 +100,14 @@ void Task_BatteryBalance(void *p_arg) {
     }
 }
 
+void Task_CLI(void *p_arg) {
+    (void)p_arg;
+
+    while(1) {
+        // Todo:
+    }
+}
+
 void Task_BLE(void *p_arg) {
     (void)p_arg;
 
