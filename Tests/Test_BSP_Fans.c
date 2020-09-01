@@ -14,6 +14,10 @@ int main()
     printf("This is test 2\n");
     printf("The speed of fan 2 is %d\n", BSP_Fans_GetSpeed(2));
     printf("%i\n", BSP_Fans_Set(5,7));
+    BSP_Fans_Set(1,2);
+    BSP_Fans_Set(2,3);
+    BSP_Fans_Set(3,4);
+    BSP_Fans_Set(4,5);
     printf("This is test 3\n");
     printf("The speed of fan 1 is %d\n", BSP_Fans_GetSpeed(1));
     printf("The speed of fan 2 is %d\n", BSP_Fans_GetSpeed(2));
