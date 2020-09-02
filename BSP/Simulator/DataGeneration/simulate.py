@@ -7,6 +7,7 @@ import Lights
 import CAN
 import SPI
 import Strobelight
+import Fans
 import WDTimer
 import PLL
 import I2C
