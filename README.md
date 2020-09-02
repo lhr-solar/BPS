@@ -21,6 +21,10 @@ The system can also be built and deployed from a terminal, allowing you to use d
     - C/C++
     - ARM
     - cortex-debug
+5. OPTIONAL: If you are testing on the simulator, you must add the following line in `/etc/security/limits.conf` then restart your machine:
+    ```
+    <username> - rtprio unlimited
+    ```
 
 ## Building
 When calling any of the following commands, make sure you are in the BeVolt folder.

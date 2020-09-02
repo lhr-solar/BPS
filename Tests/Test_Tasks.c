@@ -18,11 +18,13 @@ void Task1(void *p_arg) {
     CPU_TS ts;
     
     while(1) {
+        for(int i = 0; i < 4; i++) {
         OSSemPend(&SafetyCheck_Sem4,
                     0,
                     OS_OPT_PEND_BLOCKING,
                     &ts,
                     &err);
+        }
         
         printf("1\r\n");
     }
@@ -70,7 +72,7 @@ int main(void) {
                 "Task 2",
                 Task2,
                 (void *)0,
-                1,
+                2,
                 Task2_Stk,
                 128,
                 256,
