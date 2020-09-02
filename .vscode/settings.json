@@ -15,5 +15,6 @@
         "bsp_adc.h": "c"
     },
     "python.linting.pylintEnabled": true,
-    "python.linting.enabled": true
+    "python.linting.enabled": true,
+    "python.pythonPath": "/usr/bin/python3"
 }
