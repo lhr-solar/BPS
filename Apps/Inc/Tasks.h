@@ -30,4 +30,30 @@
 #define TASK_BLE_STACK_SIZE                 DEFAULT_STACK_SIZE
 #define TASK_IDLE_STACK_SIZE                DEFAULT_STACK_SIZE
 
+void Tasks_Init(void);
+
+void Task_FaultState(void *p_arg);
+
+void Task_CriticalState(void *p_arg);
+
+void Task_PetWDog(void *p_arg);
+
+void Task_VoltTempMonitor(void *p_arg);
+
+void Task_AmperesMonitor(void *p_arg);
+
+void Task_LogInfo(void *p_arg);
+
+void Task_CANBusConsumer(void *p_arg);
+
+void Task_MotorNotify(void *p_arg);
+
+void Task_BatteryBalance(void *p_arg);
+
+void Task_CLI(void *p_arg);
+
+void Task_BLE(void *p_arg);
+
+void Task_Idle(void *p_arg);
+
 #endif
