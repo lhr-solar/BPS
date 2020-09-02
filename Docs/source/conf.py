@@ -20,7 +20,7 @@ import sphinx_rtd_theme # ReadTheDocs theme. More information available at: http
 # -- Project information -----------------------------------------------------
 
 project = 'BPS_Docs'
-copyright = '2020, Clark Poon'
+copyright = '2020, LHR Solar'
 author = 'Clark Poon'
 
 # The full version, including alpha/beta/rc tags
