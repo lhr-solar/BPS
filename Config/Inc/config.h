@@ -19,7 +19,10 @@ typedef enum {SAFE = 0, DANGER = 1, OVERVOLTAGE = 2, UNDERVOLTAGE = 3, OPENWIRE 
 //--------------------------------------------------------------------------------
 // Basic Parameters of BPS layout
 #define NUM_MINIONS	4					 // Number of minion boards
-												//
+
+//--------------------------------------------------------------------------------
+// Battery Fault Checks
+#define NUM_FAULT_POINTS				4
 
 //--------------------------------------------------------------------------------
 // Battery Pack layout
