@@ -43,6 +43,7 @@ ErrorStatus BSP_Fans_Set(uint8_t fan, uint32_t dutyCycle){
     fclose(fp); //Close file
     fp = fopen(file, "w"); //Open file for writing
     //convert integer to string and store in Fans array
+    //NOTE: WHEN WE ADD DOUBLE DIGIT SPEED SETTINGS, REMOVE THE ZERO IN THE SPRINTF CALL!!!!!
     sprintf(&Fans[3 * (fan-1)], "0%d", dutyCycle);
     Fans[(3 * fan) - 1] = ','; //itoa might make last character newline so have to replace with comma
     fprintf(fp, "%s", Fans); //Write dutyCycle and fan number

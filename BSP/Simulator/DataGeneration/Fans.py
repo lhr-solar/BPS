@@ -8,7 +8,7 @@ import config
 #path name to file
 file = config.directory_path + config.files['Fans']
 
-#returns integers representing duty cycles of all Fans
+#returns array of integers representing duty cycles of all Fans
 def read():
     duty = []
     os.makedirs(os.path.dirname(file), exist_ok=True)   # creates directory if not exists
@@ -21,10 +21,6 @@ def read():
             duty.append(row)
         fcntl.flock(csvfile.fileno(), fcntl.LOCK_UN)    # Unlock file
         if len(duty):
-            print(int(duty))
-            #return duty #return list with speed for every fan
+            return int(duty) #return list with speed for every fan
         else:
             return 0
-
-if __name__ == "__main__": 
-    read() 
