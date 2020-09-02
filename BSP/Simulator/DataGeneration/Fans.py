@@ -10,7 +10,6 @@ file = config.directory_path + config.files['Fans']
 
 #returns array of integers representing duty cycles of all Fans
 def read():
-    duty = []
     os.makedirs(os.path.dirname(file), exist_ok=True)   # creates directory if not exists
     with open(file, 'a') as csvfile:
         pass    # creates file if not exists
@@ -18,9 +17,9 @@ def read():
         fcntl.flock(csvfile.fileno(), fcntl.LOCK_EX)    # Lock file
         csvreader = csv.reader(csvfile, delimiter = ',')
         for row in csvreader:
-            duty.append(row)
+            duty = row
         fcntl.flock(csvfile.fileno(), fcntl.LOCK_UN)    # Unlock file
         if len(duty):
-            return int(duty) #return list with speed for every fan
+            return duty #return list with speed for every fan
         else:
             return 0
