@@ -22,7 +22,7 @@ void BSP_Fans_Init(void);
  * @brief   Sets fan duty cycle
  * @param   dutyCycle: int for duty cycle amount in range 0-8
  *          fan: fan number whose speed should be changed
- * @return  None
+ * @return  ErrorStatus
  */
 ErrorStatus BSP_Fans_Set(uint8_t fan, uint32_t speed);
 
