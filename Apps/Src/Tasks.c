@@ -175,7 +175,7 @@ void Task_CANBusConsumer(void *p_arg) {
     }
 }
 
-void Task_MotorNotify(void *p_arg) {
+void Task_DashboardNotify(void *p_arg) {
     (void)p_arg;
 
     OS_ERR err;

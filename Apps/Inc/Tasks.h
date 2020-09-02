@@ -8,7 +8,7 @@
 #define TASK_AMPERES_MONITOR_PRIO           4
 #define TASK_LOG_INFO_PRIO                  5
 #define TASK_CANBUS_CONSUMER_PRIO           6
-#define TASK_MOTOR_NOTIFY_PRIO              7
+#define TASK_DASHBOARD_NOTIFY_PRIO          7
 #define TASK_BATTERY_BALANCE_PRIO           8
 #define TASK_CLI_PRIO                       9
 #define TASK_BLE_PRIO                       10
@@ -24,7 +24,7 @@
 #define TASK_AMPERES_MONITOR_STACK_SIZE     DEFAULT_STACK_SIZE
 #define TASK_LOG_INFO_STACK_SIZE            DEFAULT_STACK_SIZE
 #define TASK_CANBUS_CONSUMER_STACK_SIZE     DEFAULT_STACK_SIZE
-#define TASK_MOTOR_NOTIFY_SIZE              DEFAULT_STACK_SIZE
+#define TASK_DASHBOARD_NOTIFY_SIZE          DEFAULT_STACK_SIZE
 #define TASK_BATTERY_BALANCE_STACK_SIZE     512
 #define TASK_CLI_STACK_SIZE                 DEFAULT_STACK_SIZE
 #define TASK_BLE_STACK_SIZE                 DEFAULT_STACK_SIZE
@@ -46,7 +46,7 @@ void Task_LogInfo(void *p_arg);
 
 void Task_CANBusConsumer(void *p_arg);
 
-void Task_MotorNotify(void *p_arg);
+void Task_DashboardNotify(void *p_arg);
 
 void Task_BatteryBalance(void *p_arg);
 
