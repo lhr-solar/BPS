@@ -4,10 +4,9 @@
 #include <sys/file.h>
 #define MAX_SPEED    8
 #define NUM_FANS     4
-#define ARRAY_SIZE  (NUM_FANS * 3)
 
 static const char* file = GET_CSV_PATH(FANS_CSV_FILE);
-static char Fans[ARRAY_SIZE];
+static int Fans[NUM_FANS];
 
 /**
  * @brief   Initialize all the GPIO pins connected to each fan
@@ -20,7 +19,7 @@ void BSP_Fans_Init(void)
     FILE* fp = fopen(file, "w+");
     int fno = fileno(fp);
     flock(fno, LOCK_EX);
-    fprintf(fp, "00,00,00,00"); 
+    fprintf(fp, "0,0,0,0"); 
     flock(fno, LOCK_UN);
     fclose(fp);
 }
@@ -37,16 +36,13 @@ ErrorStatus BSP_Fans_Set(uint8_t fan, uint32_t dutyCycle){
     if (dutyCycle < 0 || dutyCycle > MAX_SPEED) return ERROR;
     FILE* fp = fopen(file, "r"); //Open file for reading
     int fno = fileno(fp);  //Lock
-    flock(fno, LOCK_EX);    
-    fgets(Fans, ARRAY_SIZE, fp); //read from file
+    flock(fno, LOCK_EX);  
+    fscanf(fp, "%d,%d,%d,%d", &(Fans[0]), &(Fans[1]), &(Fans[2]), &(Fans[3])); //read file
     flock(fno, LOCK_UN); //Unlock
     fclose(fp); //Close file
     fp = fopen(file, "w"); //Open file for writing
-    //convert integer to string and store in Fans array
-    //NOTE: WHEN WE ADD DOUBLE DIGIT SPEED SETTINGS, REMOVE THE ZERO IN THE SPRINTF CALL!!!!!
-    sprintf(&Fans[3 * (fan-1)], "0%d", dutyCycle);
-    Fans[(3 * fan) - 1] = ','; //itoa might make last character newline so have to replace with comma
-    fprintf(fp, "%s", Fans); //Write dutyCycle and fan number
+    Fans[fan - 1] = dutyCycle; //write to array
+    fprintf(fp, "%d,%d,%d,%d", Fans[0], Fans[1], Fans[2], Fans[3]); //write to file
     flock(fno, LOCK_UN); //Unlock
     fclose(fp); //Close file
     return SUCCESS;
@@ -61,9 +57,8 @@ int BSP_Fans_GetSpeed(uint8_t fan){
     FILE* fp = fopen(file, "r"); //Open file for reading
     int fno = fileno(fp); //Lock
     flock(fno, LOCK_EX);
-    fgets(Fans, ARRAY_SIZE, fp); //read from file
+    fscanf(fp, "%d,%d,%d,%d", &(Fans[0]), &(Fans[1]), &(Fans[2]), &(Fans[3])); //read file
     flock(fno, LOCK_UN); //Unlock
     fclose(fp); //Close file
-    Fans[(3 * fan) - 1] = '\n'; //place new line for atoi function
-    return atoi(&Fans[3 * (fan - 1)]); //return integer value converted from string                     
+    return Fans[fan - 1];                   
 }
