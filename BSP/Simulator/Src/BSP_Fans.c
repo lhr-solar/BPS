@@ -65,6 +65,5 @@ int BSP_Fans_GetSpeed(uint8_t fan){
     flock(fno, LOCK_UN); //Unlock
     fclose(fp); //Close file
     Fans[(3 * fan) - 1] = '\n'; //place new line for atoi function
-    int x = atoi(&Fans[3 * (fan - 1)]); 
     return atoi(&Fans[3 * (fan - 1)]); //return integer value converted from string                     
 }
