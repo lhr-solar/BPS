@@ -192,16 +192,25 @@ void BSP_SPI_Write(uint8_t *txBuf, uint32_t txLen) {
  */
 void BSP_SPI_Read(uint8_t *rxBuf, uint32_t rxLen) {
     //Data will be read from the top. Then it will be deleted
-    int counter;
+    int counter, i;
+    uint8_t tempArr[100];
     FILE *fp = fopen(file_w, "r"); //open to read
     int fno = fileno(fp); //lock
     flock(fno, LOCK_EX);
     //read counter value
     fscanf(fp, "%d", &counter);
     counter++; //increment counter to read from that line
-    /*for (int i = 0; i <= counter; i++){
-        fgets(rxBuf, )
-    }*/
+    //read row into temporary array
+    for (i = 0; i <= counter; i++) fgets(tempArr, 100, fp);
+    i = 0;
+    //remove all commas from temporary array and store data in buffer
+    while (tempArr[i] != '\n'){
+        if (tempArr[i] != ','){
+            for (int j = 0; j <= rxLen; j++){
+                *(rxBuf + j) = tempArr[i];
+            }
+        }
+    }
     flock(fno, LOCK_UN); //unlock
     fclose(fp); //close file
 }
