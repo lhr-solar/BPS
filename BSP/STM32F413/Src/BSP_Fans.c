@@ -4,6 +4,9 @@ Uses Pins PC6,7 and PB14,15
 */
 
 #include "BSP_Fans.h"
+#include "stm32f4xx_gpio.h"
+#include "stm32f4xx_tim.h"
+#include "stm32f4xx_rcc.h"
 
 #define DIVIDER 500 //Speed increments
 #define TOPSPEED 4000/DIVIDER //top speed achievable

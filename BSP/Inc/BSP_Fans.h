@@ -7,9 +7,6 @@ Uses Pins PC6,7 and PB14,15
 
 #include "common.h"
 #include "config.h"
-#include "stm32f4xx_gpio.h"
-#include "stm32f4xx_tim.h"
-#include "stm32f4xx_rcc.h"
 
 /**
  * @brief   Initialize all the GPIO pins connected to each Fan
