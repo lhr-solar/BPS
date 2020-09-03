@@ -75,6 +75,9 @@ typedef enum {
     GroupA=0, GroupB, GroupC, GroupD, GroupE, GroupF
 } Group;
 
+static const char* file_w = GET_CSV_PATH(SPIW_CSV_FILE);
+static const char* file_r = GET_CSV_PATH(SPIR_CSV_FILE);
+
 // Path relative to the executable
 static const char* file = GET_CSV_PATH(SPI_CSV_FILE);
 
@@ -145,7 +148,8 @@ void BSP_SPI_Init(void) {
     memset(simulationData, 0, sizeof(simulationData));
 
     PEC15_Table_Init();
-
+    FILE *fp = fopen(file_r, "w+"); //create SPI_read file
+    fclose(fp); //close file
     // Check if simulator is running i.e. were the csv files created?
     if(access(file, F_OK) != 0) {
         // File doesn't exit if true
@@ -166,15 +170,14 @@ void BSP_SPI_Init(void) {
  * @return  None
  */
 void BSP_SPI_Write(uint8_t *txBuf, uint32_t txLen) {
-    currCmd = ExtractCmdFromBuff(txBuf, txLen);
-
-    if(((currCmd & 0x600) == 0x200) || (currCmd & 0x700) == 0x400) {
-        currCmd &= ~0x187;  // Bit Mask to ignore any cmd configuration bits i.e. ignore the MD, DCP, etc. bits
-    }
-
-    // Ignore PEC (bits 2 and 3), PEC is meant to be able to check if EMI/noise affected the data
-
-    WRCommandHandler(txBuf, txLen);
+    FILE *fp = fopen(file_w, "a"); //open to append
+    int fno = fileno(fp); //lock
+    flock(fno, LOCK_EX);
+    //write all data to file
+    for (int i = 0; i < txLen; i++) fprintf(fp, "%o", *(txBuf + i));
+    fprintf(fp, "%c", '\n'); //write newline at end of data
+    flock(fno, LOCK_UN); //unlock
+    fclose(fp); //close file
 }
 
 /**
@@ -188,13 +191,14 @@ void BSP_SPI_Write(uint8_t *txBuf, uint32_t txLen) {
  * @return  None
  */
 void BSP_SPI_Read(uint8_t *rxBuf, uint32_t rxLen) {
-
-    // One register is 8 bytes or greater. If there was an SPI call where rxLen
-    // is less than 8, that means it's either a wakeup call or some generic call
-    // that does not require data to be returned by the LTC6811
-    if(rxLen >= 8) {
-        RDCommandHandler(rxBuf, rxLen);
-    }
+    //Data will be read from the top. Then it will be deleted
+    FILE *fp = fopen(file_w, "r"); //open to read
+    int fno = fileno(fp); //lock
+    flock(fno, LOCK_EX);
+    //read data and store in array
+    
+    flock(fno, LOCK_UN); //unlock
+    fclose(fp); //close file
 }
 
 /**
