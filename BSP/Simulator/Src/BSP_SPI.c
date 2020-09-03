@@ -152,10 +152,6 @@ void BSP_SPI_Init(void) {
     PEC15_Table_Init();
     FILE *fp = fopen(file_r, "w+"); //create SPI_read file
     fclose(fp); //close file
-<<<<<<< HEAD
-
-=======
->>>>>>> temp_simulator_SPI
     // Check if simulator is running i.e. were the csv files created?
     if(access(file, F_OK) != 0) {
         // File doesn't exit if true
@@ -174,14 +170,6 @@ void BSP_SPI_Init(void) {
  * @param   data memory address to data array that contains the data to be sent.
  * @return  None
  */
-<<<<<<< HEAD
-void BSP_SPI_Write(char* data) {
-    FILE *fp = fopen(file_w, "a"); //open to append
-    int fno = fileno(fp); //lock
-    flock(fno, LOCK_EX);
-    //data stored in rows
-    fprintf(fp, "%s\n", data);
-=======
 void BSP_SPI_Write(uint8_t *txBuf, uint32_t txLen) {
     FILE *fp = fopen(file_w, "a"); //open to append
     int fno = fileno(fp); //lock
@@ -189,7 +177,6 @@ void BSP_SPI_Write(uint8_t *txBuf, uint32_t txLen) {
     //write all data to file
     for (int i = 0; i < txLen; i++) fprintf(fp, "%o", *(txBuf + i));
     fprintf(fp, "%c", '\n'); //write newline at end of data
->>>>>>> temp_simulator_SPI
     flock(fno, LOCK_UN); //unlock
     fclose(fp); //close file
 }
@@ -203,14 +190,6 @@ void BSP_SPI_Write(uint8_t *txBuf, uint32_t txLen) {
  * @param   data address to store data in
  * @return  None
  */
-<<<<<<< HEAD
-void BSP_SPI_Read(char* data) {
-    //Data will be read from the top. Then it will be deleted
-    FILE *fp = fopen(file_w, "r"); //open to read
-    int fno = fileno(fp); //lock
-    flock(fno, LOCK_EX);
-    fgets(data, 6, fp); //read data
-=======
 void BSP_SPI_Read(uint8_t *rxBuf, uint32_t rxLen) {
     //Data will be read from the top. Then it will be deleted
     int counter;
@@ -223,7 +202,6 @@ void BSP_SPI_Read(uint8_t *rxBuf, uint32_t rxLen) {
     /*for (int i = 0; i <= counter; i++){
         fgets(rxBuf, )
     }*/
->>>>>>> temp_simulator_SPI
     flock(fno, LOCK_UN); //unlock
     fclose(fp); //close file
 }
