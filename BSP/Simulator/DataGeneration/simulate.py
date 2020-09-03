@@ -7,6 +7,7 @@ import Lights
 import CAN
 import SPI
 import Strobelight
+import Fans
 import WDTimer
 import PLL
 import I2C
@@ -102,7 +103,13 @@ def display(battery=None):  #print watchdog countdown
         stdscr.addstr(11, 100, "[]", curses.color_pair(2))
     else:
         stdscr.addstr(11, 100, "[]", curses.color_pair(3))
-
+    speed = Fans.read()
+    stdscr.addstr(12, 9, "Fan Speeds")
+    stdscr.addstr(13, 0, "================================")
+    stdscr.addstr(14, 0, f"Fan 1: {speed[0]}/8")
+    stdscr.addstr(14, 15, f"Fan 2: {speed[1]}/8")
+    stdscr.addstr(15, 0, f"Fan 3: {speed[2]}/8")
+    stdscr.addstr(15, 15, f"Fan 4: {speed[3]}/8")
     stdscr.refresh()
 
 
