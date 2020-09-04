@@ -6,11 +6,14 @@
 Welcome to BPS's documentation!
 ====================================
 
+.. include:: introduction.rst
+
 .. toctree::
+   :hidden:
    :maxdepth: 2
-   :caption: Contents:
+   :caption: Overview
 
-
+   Overview/design-requirements
 
 Indices and tables
 ==================
