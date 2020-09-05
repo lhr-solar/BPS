@@ -9,7 +9,7 @@ This module generates Voltage and Temperature
 values as they would be read by the LTC6811s
 """
 NUM_MINIONS = 4
-
+simulationData[4][6] = 0
 #dictionary of all command codes
 command_codes = {
     'SIM_LTC6811_WRCFGA' : 0x001,
@@ -172,15 +172,9 @@ def WRCommandHandler(buf, len):
         ExtractDataFromBuff(data, buf, len)
         int dataIdx = 0
         for x in range(NUM_MINIONS - 1, 0, -1)
-            memcpy(simulationData[x].config, &data[dataIdx*BYTES_PER_REG], BYTES_PER_REG)
+            memcpy(simulationData[x][].config, &data[dataIdx*BYTES_PER_REG], BYTES_PER_REG)
             dataIdx = dataIdx + 1
         pass
-    if currCmd == command_codes['SIM_LTC6811_ADAX']:
-        
-    if currCmd == command_codes['SIM_LTC6811_ADOWPD']
-        #read status of discharge timer(NOT SURE WHERE THIS IS)
-    if currCmd == command_codes['SIM_LTC6811_WRCOMM']
-        #read configuration register B  
     else:
         pass
     
