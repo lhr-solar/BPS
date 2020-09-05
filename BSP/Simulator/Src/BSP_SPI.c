@@ -77,8 +77,8 @@ typedef enum {
     GroupA=0, GroupB, GroupC, GroupD, GroupE, GroupF
 } Group;
 
-static const char* file_w = GET_CSV_PATH(SPIW_CSV_FILE);
-static const char* file_r = GET_CSV_PATH(SPIR_CSV_FILE);
+static const char* file_w = GET_CSV_PATH(SPIWRITE_CSV_FILE);
+static const char* file_r = GET_CSV_PATH(SPIREAD_CSV_FILE);
 
 // Path relative to the executable
 static const char* file = GET_CSV_PATH(SPI_CSV_FILE);
@@ -201,6 +201,18 @@ void BSP_SPI_Read(uint8_t *rxBuf, uint32_t rxLen) {
     fscanf(fp, "%d", &counter);
     counter++; //increment counter to read from that line
     //read row into rxbuffer
+    //read row into temporary array
+    for (i = 0; i <= counter; i++) {
+        fgets(tempArr, 100, fp);
+	    i = 0;
+    //remove all commas from temporary array and store data in buffer
+    while (tempArr[i] != '\n'){
+        if (tempArr[i] != ','){
+            for (int j = 0; j <= rxLen; j++){
+                *(rxBuf + j) = tempArr[i];
+            }
+        }
+    }
     fgets(rxBuf, rxLen + 1, fp);
     flock(fno, LOCK_UN); //unlock
     fclose(fp); //close file
@@ -229,7 +241,7 @@ void BSP_SPI_SetStateCS(uint8_t state) {
  * @param   buf     raw data the LTC6811 drivers sent into BSP_SPI_Write.
  * @param   len 
  */
-static void WRCommandHandler(uint8_t *buf, uint32_t len) {
+/*static void WRCommandHandler(uint8_t *buf, uint32_t len) {
 
     const uint8_t BYTES_PER_REG = 6;
     uint8_t data[NUM_MINIONS * BYTES_PER_REG];
@@ -274,7 +286,7 @@ static void WRCommandHandler(uint8_t *buf, uint32_t len) {
         default:
             break;
     }
-}
+}*/
 
 /**
  * @brief   Handles are RD command codes
@@ -282,7 +294,7 @@ static void WRCommandHandler(uint8_t *buf, uint32_t len) {
  *                  drivers sent into BSP_SPI_Write.
  * @param   len 
  */
-static void RDCommandHandler(uint8_t *buf, uint32_t len) {
+/*static void RDCommandHandler(uint8_t *buf, uint32_t len) {
 
     const uint8_t BYTES_PER_REG = 6;
     uint8_t data[NUM_MINIONS * BYTES_PER_REG];
@@ -327,14 +339,14 @@ static void RDCommandHandler(uint8_t *buf, uint32_t len) {
         default:
             break;
     }
-}
+}*/
 
 /**
  * @brief   Returns the group letter depenging on the cmd and if grouping is required.
  * @param   cmd     specifies which group must be selected
  * @return  Group   letter of the cmd group
  */
-static Group DetermineGroupLetter(uint16_t cmd) {
+/*static Group DetermineGroupLetter(uint16_t cmd) {
     Group grp = GroupA;
 
     switch(cmd) {
@@ -371,7 +383,7 @@ static Group DetermineGroupLetter(uint16_t cmd) {
     }
 
     return grp;
-}
+}*/
 
 /**
  * @brief FILE ACCESSING FUNCTIONS
@@ -381,7 +393,7 @@ static Group DetermineGroupLetter(uint16_t cmd) {
  * @brief   Updates the simulationData struct from the CSV file
  * @return  true if data was read successfully, false if failed
  */
-static bool UpdateSimulationData(void) {
+/*static bool UpdateSimulationData(void) {
     int lineIdx = 0;
     int temperatureIdx = 0;
     int voltageIdx = 0;
@@ -485,7 +497,7 @@ static void dischargeModules(void){
                 
                 
     }
-}
+}*/
 
 /**
  * @brief   DATA FORMATTING FUNCTIONS
