@@ -200,17 +200,8 @@ void BSP_SPI_Read(uint8_t *rxBuf, uint32_t rxLen) {
     //read counter value
     fscanf(fp, "%d", &counter);
     counter++; //increment counter to read from that line
-    //read row into temporary array
-    for (i = 0; i <= counter; i++) fgets(tempArr, 100, fp);
-    i = 0;
-    //remove all commas from temporary array and store data in buffer
-    while (tempArr[i] != '\n'){
-        if (tempArr[i] != ','){
-            for (int j = 0; j <= rxLen; j++){
-                *(rxBuf + j) = tempArr[i];
-            }
-        }
-    }
+    //read row into rxbuffer
+    fgets(rxBuf, rxLen + 1, fp);
     flock(fno, LOCK_UN); //unlock
     fclose(fp); //close file
 }
