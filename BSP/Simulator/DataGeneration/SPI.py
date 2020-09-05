@@ -171,9 +171,8 @@ def CreateReadPacket(data, len):
     BYTES_PER_REG = 6
     pkt[] = data[]
     dataPEC = PEC15_Calc(data[(currIC-1)*6], BYTES_PER_REG)
-    pktIdx = len + 1
-    pkt[pktIdx] = (dataPEC >> 8) & 0x00FF
-    pkt[pktIdx + 1] = dataPEC & 0x00FF
+    pkt[len] = (dataPEC >> 8) & 0x00FF
+    pkt[len + 1] = dataPEC & 0x00FF
     pktIdx = pktIdx + 2
     return pkt
 
@@ -216,7 +215,7 @@ def Write_SPIR():
         fcntl.flock(csvfile.fileno(), fcntl.LOCK_EX)    # Lock file
         csvwriter = csv.writer(csvfile)
         writeRow = csvwriter.writerow(csvfile)
-        CreateReadPacket() = writeRow
+        CreateReadPacket(config_register, 24) = writeRow
         fcntl.flock(csvfile.fileno(), fcntl.LOCK_UN)    # Unlock file
 
 def open_wires(battery=None):
