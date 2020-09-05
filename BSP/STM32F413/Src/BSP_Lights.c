@@ -14,27 +14,20 @@ void BSP_Lights_Init(void) {
 	// PC2 : Over volt
 	// PC3 : Under volt
 	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC, ENABLE);
-	GPIO_InitStruct.GPIO_Pin = GPIO_Pin_0 | GPIO_Pin_1 | GPIO_Pin_2 | GPIO_Pin_3;
-	GPIO_InitStruct.GPIO_Mode = GPIO_Mode_OUT;
-	GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
-	GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_DOWN;
+	GPIO_InitStruct.GPIO_Pin = GPIO_Pin_0 | GPIO_Pin_1 | GPIO_Pin_2| GPIO_Pin_3 | GPIO_Pin_4; 
+	GPIO_InitStruct.GPIO_Mode =  GPIO_Mode_OUT;
+	GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;	
+	GPIO_InitStruct.GPIO_PuPd =  GPIO_PuPd_NOPULL;
 	GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
 	GPIO_Init(GPIOC, &GPIO_InitStruct);
-	
-	// PA0 : Run
-	// PA5 : Extra
-	// PA6 : CAN
-	// PA7 : WDog
+
 	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
-	GPIO_InitStruct.GPIO_Pin = GPIO_Pin_0 | GPIO_Pin_5 | GPIO_Pin_6 | GPIO_Pin_7;
-	// GPIO_InitStruct haven't changed so only pins have to be updated
+	GPIO_InitStruct.GPIO_Pin = GPIO_Pin_4 | GPIO_Pin_5 | GPIO_Pin_6| GPIO_Pin_7; 
+	GPIO_InitStruct.GPIO_Mode =  GPIO_Mode_OUT;
+	GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;	
+	GPIO_InitStruct.GPIO_PuPd =  GPIO_PuPd_NOPULL;
+	GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
 	GPIO_Init(GPIOA, &GPIO_InitStruct);
-	
-	// PB12 : Fault
-	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
-	GPIO_InitStruct.GPIO_Pin = GPIO_Pin_12;
-	// GPIO_InitStruct haven't changed so only pins have to be updated
-	GPIO_Init(GPIOB, &GPIO_InitStruct);
 }
 
 /**
@@ -44,51 +37,44 @@ void BSP_Lights_Init(void) {
  */
 void BSP_Light_Toggle(Light signal) {
     switch(signal){
-		// PB12
-		case FAULT:
-			GPIOB->ODR ^= GPIO_Pin_12;
-			break;
-			
-		// PA0
-		case RUN:
-			GPIOA->ODR ^= GPIO_Pin_0;
-			break;
-			
+
 		// PC0
-		case OCURR:
+		case EXTRA:
 			GPIOC->ODR ^= GPIO_Pin_0;
 			break;
-			
 		// PC1
-		case OTEMP:
+		case CAN:
 			GPIOC->ODR ^= GPIO_Pin_1;
 			break;
-			
 		// PC2
-		case OVOLT:
+		case WDError:
 			GPIOC->ODR ^= GPIO_Pin_2;
 			break;
-			
-		// PC3;
-		case UVOLT:
+		// PC3
+		case Wire:
 			GPIOC->ODR ^= GPIO_Pin_3;
 			break;
-			
-		// PA7
-		case WDOG:
-			GPIOA->ODR ^= GPIO_Pin_7;
+		// PC4
+		case Heartbeat:
+			GPIOC->ODR ^= GPIO_Pin_4;
 			break;
-			
-		// PA6
-		case CAN:
-			GPIOA->ODR ^= GPIO_Pin_6;
+		// PA4
+		case OCURR:
+			GPIOA->ODR ^= GPIO_Pin_4;
 			break;
-			
 		// PA5
-		case EXTRA:
+		case OTEMP:
 			GPIOA->ODR ^= GPIO_Pin_5;
 			break;
-
+		// PA6
+		case OVOLT:
+			GPIOA->ODR ^= GPIO_Pin_6;
+			break;
+		// PA7
+		case UVOLT:
+			GPIOA->ODR ^= GPIO_Pin_7;
+			break;
+		
         default:
             break;
 	}

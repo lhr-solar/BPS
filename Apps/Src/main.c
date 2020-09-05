@@ -55,7 +55,7 @@ int main(){
 
 		// Checks for user input to send to CLI
 		if(BSP_UART_ReadLine(command)) {
-			CLI_Handler(command);
+			CLI_Handler(command);				
 		}
 		
 		SafetyStatus current = Current_CheckStatus(override);
