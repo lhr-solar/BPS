@@ -195,6 +195,14 @@ def read_SPIW():
         currCmd &= ~0x187  # Bit Mask to ignore any cmd configuration bits i.e. ignore the MD, DCP, etc. bits
     WRCommandHandler(currentWrite, #some length variable)
 
+#Writes to SPIR
+def Write_SPIR():
+    RDCommandHandler()
+    with open(file_r, 'a') as csvfile:
+        fcntl.flock(csvfile.fileno(), fcntl.LOCK_EX)    # Lock file
+        csvwriter = csv.writer(csvfile)
+        CreateReadPacket() = csvwriter.writerow(csvfile)
+        fcntl.flock(csvfile.fileno(), fcntl.LOCK_UN)    # Unlock file
 
 
 
