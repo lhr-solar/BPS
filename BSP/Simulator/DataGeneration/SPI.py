@@ -166,17 +166,15 @@ def getNthRow(rowNum, filename):
 
 def RDCommandHandler():
 
-def CreateReadPacket(data):
+def CreateReadPacket(data, len):
     pkt[]
-    pktIdx = 0
     BYTES_PER_REG = 6
-    for currIC in range(NUM_MINIONS, 0, -1)
-        for currByte in  range(0, BYTES_PER_REG, 1)
-            pkt[pktIdx] = data[((currIC-1)*6)+currByte]
-        dataPEC = PEC15_Calc(data[(currIC-1)*6], BYTES_PER_REG)
-        pkt[pktIdx] = (dataPEC >> 8) & 0x00FF
-        pkt[pktIdx + 1] = dataPEC & 0x00FF
-        pktIdx = pktIdx + 2
+    pkt[] = data[]
+    dataPEC = PEC15_Calc(data[(currIC-1)*6], BYTES_PER_REG)
+    pktIdx = len + 1
+    pkt[pktIdx] = (dataPEC >> 8) & 0x00FF
+    pkt[pktIdx + 1] = dataPEC & 0x00FF
+    pktIdx = pktIdx + 2
     return pkt
 
 
