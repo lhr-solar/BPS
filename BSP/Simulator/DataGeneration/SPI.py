@@ -9,7 +9,7 @@ This module generates Voltage and Temperature
 values as they would be read by the LTC6811s
 """
 NUM_MINIONS = 4
-config_registers[4][6] = 0
+config_registers[24] = 0
 #dictionary of all command codes
 command_codes = {
     'SIM_LTC6811_WRCFGA' : 0x001,
@@ -170,10 +170,7 @@ def WRCommandHandler(buf, len):
 
     if currCmd == command_codes['SIM_LTC6811_WRCFGA']:
         ExtractDataFromBuff(data, buf, len)
-        int dataIdx = 0
-        for x in range(NUM_MINIONS - 1, 0, -1)
-            memcpy(simulationData[x][].config, &data[dataIdx*BYTES_PER_REG], BYTES_PER_REG)
-            dataIdx = dataIdx + 1
+        config_registers[] = data[]
         pass
     else:
         pass
