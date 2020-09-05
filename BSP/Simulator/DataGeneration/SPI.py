@@ -9,7 +9,7 @@ This module generates Voltage and Temperature
 values as they would be read by the LTC6811s
 """
 NUM_MINIONS = 4
-config_registers[24] = 0
+simulationData[4][6] = 0
 #dictionary of all command codes
 command_codes = {
     'SIM_LTC6811_WRCFGA' : 0x001,
@@ -62,6 +62,7 @@ command_codes = {
 # path/name of file
 file_w = config.directory_path + config.files['SPIW']
 file_r = config.directory_path + config.files['SPIR']
+file = config.directory_path + config.files['SPI']
 
 # sensor values
 wires = []                  # list of 31 modules (1 = connected; 0 = open)
@@ -91,7 +92,6 @@ def SPI_Init():
         csvwriter.writerow(["0"])
         fcntl.flock(csvfile.fileno(), fcntl.LOCK_UN)    # Unlock file
     
-
 def PEC15_Table_Init():
     global pec15Table
     for i in range (0, 256): 
@@ -115,7 +115,19 @@ def PEC15_Calc(data , len):
     return (remainder*2) #The CRC15 has a 0 in the LSB so the final value must be multiplied by 2
 
 def ExtractCmdFromBuff(buf, len):
-    return int((buf[0] << 8) | buf[1])
+    global currentRow, currCmd
+    #read the row counter that is at the very beginning of the file
+    os.makedirs(os.path.dirname(file_w), exist_ok=True)
+    with open(file_w, 'r') as csvfile:
+        fcntl.flock(csvfile.fileno(), fcntl.LOCK_EX)    # Lock file
+        csvreader = csv.reader(csvfile)
+        firstRow = csvreader.next(csvreader)
+        currentRow = firstRow[0]    #update currentRow
+        fcntl.flock(csvfile.fileno(), fcntl.LOCK_UN)    # Unlock file
+
+    currentWrite = getNthRow(currentRow, file_w)    #get the latest data written into SPIW
+    currCmd = int((currentWrite[0] << 8) | currentWrite[1])      #set currCmd to newest command
+    return int((currentWrite[0] << 8) | currentWrite[1])
 
 def ExtractDataFromBuff(data, buf, len) {
     BYTES_PER_REG = 6
@@ -164,13 +176,23 @@ def getNthRow(rowNum, filename):
                 i += 1
             fcntl.flock(csvfile.fileno(), fcntl.LOCK_UN)    # Unlock file
 
+def RDCommandHandler():
+
+def write_SPIR():
+    
+
+def CreateReadPacket():
+
 def WRCommandHandler(buf, len):
     BYTES_PER_REG = 6
     data = [0] * (NUM_MINIONS * BYTES_PER_REG)
 
     if currCmd == command_codes['SIM_LTC6811_WRCFGA']:
         ExtractDataFromBuff(data, buf, len)
-        config_registers[] = data[]
+        int dataIdx = 0
+        for x in range(NUM_MINIONS - 1, 0, -1)
+            memcpy(simulationData[x][].config, &data[dataIdx*BYTES_PER_REG], BYTES_PER_REG)
+            dataIdx = dataIdx + 1
         pass
     else:
         pass
@@ -194,9 +216,6 @@ def read_SPIW():
     if(((currCmd & 0x600) == 0x200) or (currCmd & 0x700) == 0x400) :
         currCmd &= ~0x187  # Bit Mask to ignore any cmd configuration bits i.e. ignore the MD, DCP, etc. bits
     WRCommandHandler(currentWrite, #some length variable)
-
-
-
 
 
 def open_wires(battery=None):
