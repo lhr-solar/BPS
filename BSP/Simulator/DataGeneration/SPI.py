@@ -165,8 +165,19 @@ def getNthRow(rowNum, filename):
             fcntl.flock(csvfile.fileno(), fcntl.LOCK_UN)    # Unlock file
 
 def RDCommandHandler():
-    
-def CreateReadPacket():
+
+def CreateReadPacket(data):
+    pkt[]
+    pktIdx = 0
+    BYTES_PER_REG = 6
+    for currIC in range(NUM_MINIONS, 0, -1)
+        for currByte in  range(0, BYTES_PER_REG, 1)
+            pkt[pktIdx] = data[((currIC-1)*6)+currByte]
+        dataPEC = PEC15_Calc(data[(currIC-1)*6], BYTES_PER_REG)
+        pkt[pktIdx] = (dataPEC >> 8) & 0x00FF
+        pkt[pktIdx + 1] = dataPEC & 0x00FF
+        pktIdx = pktIdx + 2
+
 
 def WRCommandHandler(buf, len):
     BYTES_PER_REG = 6
@@ -202,10 +213,11 @@ def read_SPIW():
 #Writes to SPIR
 def Write_SPIR():
     RDCommandHandler()
-    with open(file_r, 'a') as csvfile:
+    with open(file_r, 'a') as csvfile: #open to append
         fcntl.flock(csvfile.fileno(), fcntl.LOCK_EX)    # Lock file
         csvwriter = csv.writer(csvfile)
-        CreateReadPacket() = csvwriter.writerow(csvfile)
+        writeRow = csvwriter.writerow(csvfile)
+        CreateReadPacket() = writeRow
         fcntl.flock(csvfile.fileno(), fcntl.LOCK_UN)    # Unlock file
 
 def open_wires(battery=None):
