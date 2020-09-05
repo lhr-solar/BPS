@@ -23,7 +23,7 @@ The system can also be built and deployed from a terminal, allowing you to use d
     - cortex-debug
 
 ## Building
-When calling any of the following commands, make sure you are in the BeVolt folder.
+When calling any of the following commands, make sure you are in the top most level of the directory.
 
 Call ```make bsp_type``` to compile the release version of the code. ```bsp_type``` is the system you want to compile for.
 
