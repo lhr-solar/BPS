@@ -218,8 +218,7 @@ def Write_SPIR():
     with open(file_r, 'a') as csvfile: #open to append
         fcntl.flock(csvfile.fileno(), fcntl.LOCK_EX)    # Lock file
         csvwriter = csv.writer(csvfile)
-        writeRow = csvwriter.writerow(csvfile)
-        CreateReadPacket(config_register) = writeRow
+        csvwriter.writerow(CreateReadPacket(config_register))
         fcntl.flock(csvfile.fileno(), fcntl.LOCK_UN)    # Unlock file
 
 def open_wires(battery=None):
