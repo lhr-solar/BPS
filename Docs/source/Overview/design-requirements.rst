@@ -9,6 +9,20 @@ Design requirements vary based on the type of batteries you use. For example, le
     we need to be specific. 
     Link to cell datasheet would be good. 
 
-The minimum coverage the BPS should have is on the module level (groups of cells in parallel). There must be a fuse rated for 200% of the typical current draw of the motors. The fuse is not enough as protection so the BPS must know to fault as well. The BPS should trip whenever the voltage of a module is below or above the min and max limits, respectively. The BPS should trip whenever the temperature exceeds the max limit according to the datasheets. The max temperature limit will vary depending on if the battery is charging or discharging so you must account for both situations. During a fault, the BPS must disconnect the battery from the car.
+The BPS should have the following components and features:
 
-There must be an error light indicator in the dashboard and a strobe light indicator on the canopy of the cockpit. An emergency switch is required to shut down the car which is located on the canopy as well. The emergency switch should be connected between the power distribution board and BPS. The switch is always closed in the off position and whenever it is pressed, the switch should disconnect the power line between the BPS and power distribution board.
+    * Minimum coverage on the module level (groups of cells in parallel)
+    * Fuse rated for 200% of the typical current draw of the motors
+    * Trip system that disconnects the battery from the car when:
+        
+        * the voltage of a module exceeds the safe range
+        * the temperature exceeds the maximum specified in the datasheets
+        .. note::
+            The temperature limit varies depending on whether the battery is charging or discharging. 
+            Account for both situations in the design.
+    * Error light indicator in the dashboard
+    * Strobe light indicator on the cockpit canopy
+    * Emergency shutoff switch on the cockpit canopy
+    .. note::
+        The shutoff switch connects the BPS to the power distribution board, and is closed by default. 
+        When pressed, the switch disconnects the power line between the BPS and the board, shutting down the car.
