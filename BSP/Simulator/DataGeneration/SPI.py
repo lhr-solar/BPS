@@ -9,7 +9,7 @@ This module generates Voltage and Temperature
 values as they would be read by the LTC6811s
 """
 NUM_MINIONS = 4
-simulationData[4][6] = 0
+config_registers[4][6] = 0
 #dictionary of all command codes
 command_codes = {
     'SIM_LTC6811_WRCFGA' : 0x001,
