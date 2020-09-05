@@ -16,7 +16,6 @@ file = config.directory_path + config.files['SPI']
 wires = []                  # list of 31 modules (1 = connected; 0 = open)
 voltage_values = []         # list of 31 modules (fixed point 0.0001)
 temperature_values = []     # list of 31 pairs of sensors (fixed point 0.001)
-DCC_values = [0] * 31             # list of 31 modules (1 = discharging)
 
 
 def open_wires(battery=None):

@@ -6,8 +6,8 @@
 
 #define CSV_SPI_BUFFER_SIZE     1024
 
-static const char* file_w = GET_CSV_PATH(SPIW_CSV_FILE);
-static const char* file_r = GET_CSV_PATH(SPIR_CSV_FILE);
+static const char* file_w = GET_CSV_PATH(SPIWRITE_CSV_FILE);
+static const char* file_r = GET_CSV_PATH(SPIREAD_CSV_FILE);
 /**
  * @brief   10-bit Command Codes for the LTC6811
  * @note    Some commands can have certain bits that can be either high or low. By default, the macro

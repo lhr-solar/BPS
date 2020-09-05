@@ -15,7 +15,7 @@
 #define SPI_CSV_FILE            "SPI.csv"
 #define TIMER_CSV_FILE          "Timer.csv"
 #define WDTIMER_CSV_FILE        "WDTimer.csv"
-#define SPIW_CSV_FILE           "SPIW.csv"
-#define SPIR_CSV_FILE           "SPIR.csv"
+#define SPIWRITE_CSV_FILE           "SPIW.csv"
+#define SPIREAD_CSV_FILE           "SPIR.csv"
 
 #endif
