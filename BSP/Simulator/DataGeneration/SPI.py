@@ -177,6 +177,7 @@ def CreateReadPacket(data):
         pkt[pktIdx] = (dataPEC >> 8) & 0x00FF
         pkt[pktIdx + 1] = dataPEC & 0x00FF
         pktIdx = pktIdx + 2
+    return pkt
 
 
 def WRCommandHandler(buf, len):
