@@ -167,10 +167,23 @@ def getNthRow(rowNum, filename):
 def WRCommandHandler(buf, len):
     BYTES_PER_REG = 6
     data = [0] * (NUM_MINIONS * BYTES_PER_REG)
-    
-    #the switch statement goes here
-    if currCmd == command_codes['SIM_LTC6811_WRCGFA']:
 
+    if currCmd == command_codes['SIM_LTC6811_WRCFGA']:
+        ExtractDataFromBuff(data, buf, len)
+        int dataIdx = 0
+        for x in range(NUM_MINIONS - 1, 0, -1)
+            memcpy(simulationData[x].config, &data[dataIdx*BYTES_PER_REG], BYTES_PER_REG)
+            dataIdx = dataIdx + 1
+        pass
+    if currCmd == command_codes['SIM_LTC6811_ADAX']:
+        
+    if currCmd == command_codes['SIM_LTC6811_ADOWPD']
+        #read status of discharge timer(NOT SURE WHERE THIS IS)
+    if currCmd == command_codes['SIM_LTC6811_WRCOMM']
+        #read configuration register B  
+    else:
+        pass
+    
 
 #Reads SPI_Write and updates the globals
 def read_SPIW(): 
