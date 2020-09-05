@@ -115,18 +115,6 @@ def PEC15_Calc(data , len):
     return (remainder*2) #The CRC15 has a 0 in the LSB so the final value must be multiplied by 2
 
 def ExtractCmdFromBuff(buf, len):
-    global currentRow, currCmd
-    #read the row counter that is at the very beginning of the file
-    os.makedirs(os.path.dirname(file_w), exist_ok=True)
-    with open(file_w, 'r') as csvfile:
-        fcntl.flock(csvfile.fileno(), fcntl.LOCK_EX)    # Lock file
-        csvreader = csv.reader(csvfile)
-        firstRow = csvreader.next(csvreader)
-        currentRow = firstRow[0]    #update currentRow
-        fcntl.flock(csvfile.fileno(), fcntl.LOCK_UN)    # Unlock file
-
-    currentWrite = getNthRow(currentRow, file_w)    #get the latest data written into SPIW
-    currCmd = int((currentWrite[0] << 8) | currentWrite[1])      #set currCmd to newest command
     return int((currentWrite[0] << 8) | currentWrite[1])
 
 def ExtractDataFromBuff(data, buf, len) {
