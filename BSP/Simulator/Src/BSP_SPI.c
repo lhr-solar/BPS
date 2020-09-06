@@ -6,8 +6,6 @@
 
 #define CSV_SPI_BUFFER_SIZE     1024
 
-static const char* file_w = GET_CSV_PATH(SPIWRITE_CSV_FILE);
-static const char* file_r = GET_CSV_PATH(SPIREAD_CSV_FILE);
 /**
  * @brief   10-bit Command Codes for the LTC6811
  * @note    Some commands can have certain bits that can be either high or low. By default, the macro
@@ -77,21 +75,20 @@ typedef enum {
     GroupA=0, GroupB, GroupC, GroupD, GroupE, GroupF
 } Group;
 
-static const char* file_w = GET_CSV_PATH(SPIWRITE_CSV_FILE);
-static const char* file_r = GET_CSV_PATH(SPIREAD_CSV_FILE);
-
 // Path relative to the executable
 static const char* file = GET_CSV_PATH(SPI_CSV_FILE);
+static const char* file_w = GET_CSV_PATH(SPIWRITE_CSV_FILE);
+static const char* file_r = GET_CSV_PATH(SPIREAD_CSV_FILE);
 
 static uint8_t chipSelectState = 1;     // During idle, the cs pin should be high.
                                         // Knowing the cs pin's state is not needed for the simulator,
                                         // but checking if the pin is low before any file read/writes
                                         // will make sure the developer follows the correct SPI protocol.
 
-static uint16_t currCmd = 0;            // Before every BSP_SPI_Read, BSP_SPI_Write needs to be called to
+//static uint16_t currCmd = 0;            // Before every BSP_SPI_Read, BSP_SPI_Write needs to be called to
                                         // specify the command to handle.
 
-static bool openWireOpFlag = false;     // The reading of voltages for both regular and openwire modes are
+//static bool openWireOpFlag = false;     // The reading of voltages for both regular and openwire modes are
                                         // the same. The commands are different though. To measure the
                                         // regular voltage values, the ADCV command code is used. To measure
                                         // the open wire voltage values, the ADOW command code is used.
@@ -104,21 +101,21 @@ static bool openWireOpFlag = false;     // The reading of voltages for both regu
                                         // still triggers and ADC conversion (e.g. ADCV), then this flag should
                                         // be set to false.
 
-static bool openWirePUFlag = false;     // Indicates if the pull-up voltage values should be copied or not.
+//static bool openWirePUFlag = false;     // Indicates if the pull-up voltage values should be copied or not.
                                         // This flag is set if the ADOWPU command was issued in
                                         // BSP_SPI_Write. The CopyOpenWireVoltageToByteArray function uses
                                         // this flag to determine which voltage values should be written.
 
-static char csvBuffer[CSV_SPI_BUFFER_SIZE];
+//static char csvBuffer[CSV_SPI_BUFFER_SIZE];
 static ltc6811_sim_t simulationData[NUM_MINIONS];
 
 /**
  * @brief   Data formating functions
  */
-static void WRCommandHandler(uint8_t *buf, uint32_t len);
-static void RDCommandHandler(uint8_t *buf, uint32_t len);
+//static void WRCommandHandler(uint8_t *buf, uint32_t len);
+//static void RDCommandHandler(uint8_t *buf, uint32_t len);
 static void PEC15_Table_Init(void);
-static uint16_t PEC15_Calc(char *data , int len);
+/*static uint16_t PEC15_Calc(char *data , int len);
 static uint16_t ExtractCmdFromBuff(uint8_t *buf, uint32_t len);
 static void ExtractDataFromBuff(uint8_t *data, uint8_t *buf, uint32_t len);
 static void ExtractMUXAddrFromBuff(uint8_t *comm);
@@ -128,13 +125,13 @@ static void CopyVoltageToByteArray(uint8_t *data, Group group);
 static void CopyOpenWireVoltageToByteArray(uint8_t *data, Group group, bool pullup);
 static void CopyTemperatureToByteArray(uint8_t *data, Group group);
 static uint16_t ConvertTemperatureToMilliVolts(int32_t celcius);
-static Group DetermineGroupLetter(uint16_t cmd);
+static Group DetermineGroupLetter(uint16_t cmd);*/
 
 /**
  * @brief   File access functions
  */
-static bool UpdateSimulationData(void);
-static void dischargeModules(void);
+//static bool UpdateSimulationData(void);
+//static void dischargeModules(void);
 
 /**
  * @brief   Initializes the SPI port connected to the LTC6820.
@@ -151,6 +148,7 @@ void BSP_SPI_Init(void) {
 
     PEC15_Table_Init();
     FILE *fp = fopen(file_r, "w+"); //create SPI_read file
+    fprintf(fp, "%d\n", 0);
     fclose(fp); //close file
     // Check if simulator is running i.e. were the csv files created?
     if(access(file, F_OK) != 0) {
@@ -175,7 +173,7 @@ void BSP_SPI_Write(uint8_t *txBuf, uint32_t txLen) {
     int fno = fileno(fp); //lock
     flock(fno, LOCK_EX);
     //write all data to file
-    for (int i = 0; i < txLen; i++) fprintf(fp, "%o", *(txBuf + i));
+    for (int i = 0; i < txLen; i++) fprintf(fp, "%c,", *(txBuf + i));
     fprintf(fp, "%c", '\n'); //write newline at end of data
     flock(fno, LOCK_UN); //unlock
     fclose(fp); //close file
@@ -192,28 +190,25 @@ void BSP_SPI_Write(uint8_t *txBuf, uint32_t txLen) {
  */
 void BSP_SPI_Read(uint8_t *rxBuf, uint32_t rxLen) {
     //Data will be read from the top. Then it will be deleted
-    int counter, i;
+    int counter, i, j = 0;
     uint8_t tempArr[100];
-    FILE *fp = fopen(file_w, "r"); //open to read
+    FILE *fp = fopen(file_r, "r"); //open to read
     int fno = fileno(fp); //lock
     flock(fno, LOCK_EX);
     //read counter value
     fscanf(fp, "%d", &counter);
     counter++; //increment counter to read from that line
-    //read row into rxbuffer
     //read row into temporary array
-    for (i = 0; i <= counter; i++) {
-        fgets(tempArr, 100, fp);
-	    i = 0;
+    for (i = 0; i <= counter; i++) fgets(tempArr, 100, fp);
+    i = 0;
     //remove all commas from temporary array and store data in buffer
     while (tempArr[i] != '\n'){
         if (tempArr[i] != ','){
-            for (int j = 0; j <= rxLen; j++){
-                *(rxBuf + j) = tempArr[i];
-            }
+            *(rxBuf + j) = tempArr[i];
+            j++;
         }
+        i++;
     }
-    fgets(rxBuf, rxLen + 1, fp);
     flock(fno, LOCK_UN); //unlock
     fclose(fp); //close file
 }
@@ -508,9 +503,9 @@ static void dischargeModules(void){
  * @param   buf 
  * @param   len
  */
-static uint16_t ExtractCmdFromBuff(uint8_t *buf, uint32_t len) {
+/*static uint16_t ExtractCmdFromBuff(uint8_t *buf, uint32_t len) {
     return (uint16_t)((buf[0] << 8) | buf[1]);
-}
+}*/
 
 /**
  * @brief   Deletes all the PEC codes of the buffer
@@ -521,7 +516,7 @@ static uint16_t ExtractCmdFromBuff(uint8_t *buf, uint32_t len) {
  * @param   buf 
  * @param   len
  */
-static void ExtractDataFromBuff(uint8_t *data, uint8_t *buf, uint32_t len) {
+/*static void ExtractDataFromBuff(uint8_t *data, uint8_t *buf, uint32_t len) {
     const uint8_t BYTES_PER_REG = 6;
     const uint8_t BYTES_PER_IC = 8;     // Register size (6B) + PEC (2B)
 
@@ -532,7 +527,7 @@ static void ExtractDataFromBuff(uint8_t *data, uint8_t *buf, uint32_t len) {
         memcpy(&data[i*BYTES_PER_REG], &buf[i*BYTES_PER_IC+4], BYTES_PER_REG);
     }
 
-}
+}*/
 
 /**
  * @brief   Extracts the MUX address from the 6B COMM register.
@@ -543,7 +538,7 @@ static void ExtractDataFromBuff(uint8_t *data, uint8_t *buf, uint32_t len) {
  *          MUX2 addr: 0x92
  * @param   buf     raw data the LTC6811 drivers sent into BSP_SPI_Write.
  */
-static void ExtractMUXAddrFromBuff(uint8_t *buf) {
+/*static void ExtractMUXAddrFromBuff(uint8_t *buf) {
     const uint8_t BYTES_PER_REG = 8;
 
     buf = buf + 4;
@@ -554,14 +549,14 @@ static void ExtractMUXAddrFromBuff(uint8_t *buf) {
                                                     | ((buf[i*BYTES_PER_REG+1] >> 4) & 0x0F);
         minionIdx++;
     }
-}
+}*/
 
 /**
  * @brief   Extracts the select bits for the MUXs from the 6B COMM register.
  * @note    
  * @param   buf     raw data the LTC6811 drivers sent into BSP_SPI_Write.
  */
-static void ExtractMUXSelFromBuff(uint8_t *buf) {
+/*static void ExtractMUXSelFromBuff(uint8_t *buf) {
     const uint8_t BYTES_PER_REG = 8;
 
     buf = buf + 4;
@@ -572,7 +567,7 @@ static void ExtractMUXSelFromBuff(uint8_t *buf) {
         simulationData[minionIdx].temperature_sel = sel;
         minionIdx++;
     }
-}
+}*/
 
 /**
  * @brief   Create a Packet that the LTC6811 will usually send back to uC
@@ -580,7 +575,7 @@ static void ExtractMUXSelFromBuff(uint8_t *buf) {
  * @param   data        data array for all modules
  * @param   dataSize    size of data array
  */
-static void CreateReadPacket(uint8_t *pkt, uint8_t *data, uint32_t dataSize) {
+/*static void CreateReadPacket(uint8_t *pkt, uint8_t *data, uint32_t dataSize) {
     const uint8_t BYTES_PER_REG = 6;
 
     uint32_t pktIdx = 0;
@@ -599,14 +594,14 @@ static void CreateReadPacket(uint8_t *pkt, uint8_t *data, uint32_t dataSize) {
         pkt[pktIdx + 1] = dataPEC & 0x00FF;
         pktIdx = pktIdx + 2;
     }
-}
+}*/
 
 /**
  * @brief   Copies the voltage data in each array into one continuous array
  * @param   data      array that will be filled
  * @param   group     enum of [A,F]
  */
-static void CopyVoltageToByteArray(uint8_t *data, Group group) {
+/*static void CopyVoltageToByteArray(uint8_t *data, Group group) {
     const uint8_t BYTES_PER_REG = 6;
 
     // The LTC6811 returns only 3 voltage values at a time depending on the group,
@@ -618,7 +613,7 @@ static void CopyVoltageToByteArray(uint8_t *data, Group group) {
         memcpy(&data[dataIdx * BYTES_PER_REG], (uint8_t *)&(simulationData[i].voltage_data[voltageStartIdx]), BYTES_PER_REG);
         dataIdx++;
     }
-}
+}*/
 
 /**
  * @brief   Copies the Pull-up voltage data in each separate array into one continuous array
@@ -626,7 +621,7 @@ static void CopyVoltageToByteArray(uint8_t *data, Group group) {
  * @param   group       enum of [A,F]
  * @param   pullup      true if pullup voltage data, false if pulldown voltage data to be copied
  */
-static void CopyOpenWireVoltageToByteArray(uint8_t *data, Group group, bool pullup) {
+/*static void CopyOpenWireVoltageToByteArray(uint8_t *data, Group group, bool pullup) {
     const uint8_t BYTES_PER_REG = 6;
     const int MAX_PINS_PER_LTC6811 = 12;         // LTC6811 can only support 12 voltage modules
     uint16_t pullupVoltages[NUM_MINIONS][MAX_PINS_PER_LTC6811];
@@ -667,7 +662,7 @@ static void CopyOpenWireVoltageToByteArray(uint8_t *data, Group group, bool pull
 
         dataIdx++;
     }
-}
+}*/
 
 /**
  * @brief   Copies the temperature data into one continuous array.
@@ -677,7 +672,7 @@ static void CopyOpenWireVoltageToByteArray(uint8_t *data, Group group, bool pull
  * @param   data      array that will be filled
  * @param   group     enum of [A,F]
  */
-static void CopyTemperatureToByteArray(uint8_t *data, Group group) {
+/*static void CopyTemperatureToByteArray(uint8_t *data, Group group) {
     const uint8_t BYTES_PER_REG = 6;
 
     // Only GPIO1 is connected to an analog voltage so group A Bytes[0:1] is the only
@@ -698,7 +693,7 @@ static void CopyTemperatureToByteArray(uint8_t *data, Group group) {
             dataIdx++;
         }
     }
-}
+}*/
 
 /**
  * @brief   Converts the temperature data in celcius to millivolts that the
@@ -709,13 +704,13 @@ static void CopyTemperatureToByteArray(uint8_t *data, Group group) {
  * @param   data    fixed point value of temperature data in celcius. resolution=0.001
  * @return  mV value in 0.001 resolution
  */
-static uint16_t ConvertTemperatureToMilliVolts(int32_t celcius) {
+/*static uint16_t ConvertTemperatureToMilliVolts(int32_t celcius) {
 
     float celcius_float = (float)celcius / 1000;
     uint16_t mV = 2230.8 - (13.582 * (celcius_float - 30)) - (0.00433 * powf(celcius_float - 30, 2));
 
     return mV;
-}
+}*/
 
 /************************************
 Copyright 2012 Linear Technology Corp. (LTC)
@@ -746,7 +741,7 @@ static void PEC15_Table_Init(void) {
         pec15Table[i] = remainder&0xFFFF;
     }
 }
-
+/*
 static uint16_t PEC15_Calc(char *data , int len) {
     uint16_t remainder,address;
     remainder = 16;//PEC seed
@@ -755,7 +750,7 @@ static uint16_t PEC15_Calc(char *data , int len) {
         remainder = (remainder << 8 ) ^ pec15Table[address];
     }
     return (remainder*2);//The CRC15 has a 0 in the LSB so the final value must be multiplied by 2
-}
+}*/
 
 
 

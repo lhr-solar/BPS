@@ -10,9 +10,9 @@ int main() {
     BSP_SPI_Init();
 
     //uint8_t data[4+NUM_MINIONS*8] = {0x00, 0x01, 0x00, 0x02};
-    char data[5] = {'a','b','c','d', 'e'};
-    BSP_SPI_Write(data);
-    char* address;
-    BSP_SPI_Read(address);
+    uint8_t data[5] = {'a','b','c','d', 'e'};
+    BSP_SPI_Write(data, 5);
+    uint8_t address[20];
+    BSP_SPI_Read(address, 10);
     printf("%s\n", address);
 }
