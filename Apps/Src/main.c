@@ -7,10 +7,16 @@
 #include "os.h"
 #include "Tasks.h"
 
-int main() {
 
-	OSStart();
+
+int main() {
 	
+	OS_ERR err;
+
 	Tasks_Init();
+
+	OSStart(&err);
+
+	// Should not get here or else there is an error
 }
 

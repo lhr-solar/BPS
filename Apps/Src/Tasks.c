@@ -8,6 +8,20 @@
 /*******************************************************************************
 *    Shared Resources
 *******************************************************************************/
+/**
+ * @brief   TCBs
+ */
+OS_TCB FaultState_TCB;
+OS_TCB CriticalState_TCB;
+OS_TCB PetWDog_TCB;
+OS_TCB VoltTempMonitor_TCB;
+OS_TCB AmperesMonitor_TCB;
+OS_TCB LogInfo_TCB;
+OS_TCB CANBusConsumer_TCB;
+OS_TCB BatteryBalance_TCB;
+OS_TCB CLI_TCB;
+OS_TCB BLE_TCB;
+OS_TCB Idle_TCB;
 
 /**
  * @brief   Queue for pushing and popping CAN Messages
@@ -155,6 +169,15 @@ void Task_AmperesMonitor(void *p_arg) {
     }
 }
 
+void Task_DashboardNotify(void *p_arg) {
+    (void)p_arg;
+
+    OS_ERR err;
+
+    // Create Motor Enable CAN Msg
+    // Push message to CAN Q
+}
+
 void Task_LogInfo(void *p_arg) {
     (void)p_arg;
 
@@ -173,15 +196,6 @@ void Task_CANBusConsumer(void *p_arg) {
         // BLOCKING =====================
         // Transmit to CAN Bus
     }
-}
-
-void Task_DashboardNotify(void *p_arg) {
-    (void)p_arg;
-
-    OS_ERR err;
-
-    // Create Motor Enable CAN Msg
-    // Push message to CAN Q
 }
 
 void Task_BatteryBalance(void *p_arg) {
