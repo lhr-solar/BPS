@@ -24,7 +24,8 @@ void BSP_SPI_Init(void);
  *          the SPI protocol expects where a transmit and receive happen
  *          simultaneously.
  * @note    Blocking statement
- * @param   data  memory address to data array that contains the data to be sent.
+ * @param   txBuf   data array that contains the data to be sent.
+ * @param   txLen   length of data array.
  * @return  None
  */
 void BSP_SPI_Write(uint8_t *txBuf, uint32_t txLen);
@@ -35,10 +36,11 @@ void BSP_SPI_Write(uint8_t *txBuf, uint32_t txLen);
  *          The SPI protocol requires the uC to transmit data in order to receive
  *          anything so the uC will send junk data.
  * @note    Blocking statement
- * @param   data memory address to store data in
- * @return  none
+ * @param   rxBuf   data array to store the data that is received.
+ * @param   rxLen   length of data array.
+ * @return  None
  */
-void BSP_SPI_Read(uint8_t *txBuf, uint32_t txLen);
+void BSP_SPI_Read(uint8_t *rxBuf, uint32_t rxLen);
 
 /**
  * @brief   Sets the state of the chip select output pin.
