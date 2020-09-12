@@ -10,6 +10,29 @@ values as they would be read by the LTC6811s
 """
 NUM_MINIONS = 4
 config_register[24] = 0
+
+openWireOpFlag = False                  # The reading of voltages for both regular and openwire modes are
+                                        # the same. The commands are different though. To measure the
+                                        # regular voltage values, the ADCV command code is used. To measure
+                                        # the open wire voltage values, the ADOW command code is used.
+                                        # Look in the LTC6811 datasheet for more information on the difference.
+                                        # The command to read the voltage values for both commands is RDCV.
+                                        # When the ADOW command is called in BSP_SPI_Write, this flag should
+                                        # turn true so the next time the BSP_SPI_Read function is called with
+                                        # the RDCV command set, the RDCommandHandler will know to return the
+                                        # appropratie open wire voltages. Any other command that's not ADOW but
+                                        # still triggers and ADC conversion (e.g. ADCV), then this flag should
+                                        # be set to false.
+
+openWirePUFlag = False                  # Indicates if the pull-up voltage values should be copied or not.
+                                        # This flag is set if the ADOWPU command was issued in
+                                        # BSP_SPI_Write. The CopyOpenWireVoltageToByteArray function uses
+                                        # this flag to determine which voltage values should be written.
+
+temperature_mux[4] = 0
+
+temperature_sel[4] = 0
+
 #dictionary of all command codes
 command_codes = {
     'SIM_LTC6811_WRCFGA' : 0x001,
@@ -59,6 +82,11 @@ command_codes = {
     'SIM_LTC6811_STCOMM' : 0x723
 }
 
+mux_addresses = {
+    'SIM_LTC1380_MUX1' : 0x90,        # MUX addresses on Minion boards
+    'SIM_LTC1380_MUX2' : 0x92
+}
+
 # path/name of file
 file_w = config.directory_path + config.files['SPIW']
 file_r = config.directory_path + config.files['SPIR']
@@ -73,7 +101,7 @@ pec15Table = [0] * 256
 CRC15_POLY = 0x4599
 
 currentRow = 1  #the first SPI_Write will be written on the second row
-currCmd = 0
+currCmd = 0     #Before every BSP_SPI_Read, BSP_SPI_Write needs to be called to specify the command to handle.
 
 #erases both SPI csv files and resets their counters
 def SPI_Init():
@@ -164,7 +192,153 @@ def getNthRow(rowNum, filename):
                 i += 1
             fcntl.flock(csvfile.fileno(), fcntl.LOCK_UN)    # Unlock file
 
-def RDCommandHandler():
+def DetermineGroupLetter(command):
+    group = 0
+    if(command == command_codes['SIM_LTC6811_RDAUXA']):
+        group = 0   #group A
+    elif(command == command_codes('SIM_LTC6811_RDAUXB')):
+        group = 1   #group B
+    elif(command == command_codes['SIM_LTC6811_RDAUXC']):
+        group = 2   #group C
+    elif(command == command_codes['SIM_LTC6811_RDAUXD']):
+        group = 3   #group D
+    elif(command == command_codes['SIM_LTC6811_RDCVE']):
+        group = 4   #group E
+    elif(command == command_codes['SIM_LTC6811_RDCVF']):
+        group = 5   #group F
+    else:
+        group = 0   #group A
+    return group
+
+
+def RDCommandHandler(buf, len):
+    global currCmd
+    BYTES_PER_REG = 6
+    data = [0] * (NUM_MINIONS * BYTES_PER_REG)
+
+    if currCmd == command_codes['SIM_LTC6811_RDCFGA'] :
+        CreateReadPacket(config_register)
+    if currCmd == command_codes['SIM_LTC6811_RDCVF']: 
+        groupLetter = DetermineGroupLetter(currCmd)
+        if(openWireOpFlag):
+            CopyOpenWireVoltageToByteArray(data, groupLetter, openWirePUFlag)
+        else:
+            CopyVoltageToByteArray(data, groupLetter)
+        
+        CreateReadPacket(data)
+    if currCmd == command_codes['SIM_LTC6811_RDAUXA']:
+        groupLetter = DetermineGroupLetter(currCmd)
+        CopyTemperatureToByteArray(data, groupLetter)
+        CreateReadPacket(buf, data, NUM_MINIONS * BYTES_PER_REG)
+    
+
+
+def determineModuleIndicies(grp):
+    if group == 0:
+        startingIndicies = [0, 8, 16, 24]   #Group A will return 3 voltages per IC
+    elif group == 1:
+        startingIndicies = [3, 11, 19, 27]  #Group B will return 3 voltages per IC
+    elif group == 2:
+        startingIndicies = [6, 14, 22, 30]  #Group C will return 2 voltages for ICs [0:2] and 1 voltage for the last IC
+    return startingIndicies
+
+def CopyOpenWireVoltageToByteArray(data, group, pullup):
+    BYTES_PER_REG = 6
+    NUM_MODULES = 31
+    int MAX_PINS_PER_LTC6811 = 12         # LTC6811 can only support 12 voltage modules
+    pullupVoltages[NUM_MODULES] = 0       #there are 31 modules and 4 minions currently. The minions are connected to {8,8,8,7} modules
+    pulldownVoltages[NUM_MODULES] = 0
+    
+    indicies = []
+    indicies = determineModuleIndicies(group)
+    
+    # LTC6811 datasheet may be wrong***
+    # For pins 1-11, the pullupVolt-pulldownVolt > -400mV must be true in order for the LTC6811
+    # driver to recognize that the pin is an open wire.
+    # If pullupVolt[1] = 0, then pin C0 is open.
+    # If pulldownVolt[12] = 0, then pin C12 is open.
+    # TODO: Simulator currently does not support open wire indication of pin C0 (ground pin)
+    for i in range(0, NUM_MODULES):
+        if open_wires[i] == 1:
+            pullupVoltages[i] = 40000               # These are just dummy values. As long as
+                                                    # pullup-pulldown > 4000 (-400mV)
+            pulldownVoltages[i] = 30000
+        
+        else:
+            pullupVoltages[i] = 30000
+            pulldownVoltages[i] = 40000
+    dataIdx = 0
+    
+    for i in range(NUM_MINIONS-1, -1, -1):
+        sixBytes = [0,0,0,0,0,0]
+        groupVoltages = [0,0,0]
+        index = indicies[i] 
+        if pullup:
+            if group != 3:
+                for s in range(0, 3):
+                    groupVoltages[s] = pullupVoltages[index+s]                  #save the 3 voltages from the group for each IC
+                byteIndex = 0
+                for s in range(0, 3):
+                    if byteIndex > 5:
+                        break
+                    sixBytes[byteIndex] = hex(groupVoltages[s]) & 0xFF00        #break up each 16 bit voltage into two bytes
+                    sixBytes[byteIndex+1] = hex(groupVoltages[s]) & 0x00FF
+                    byteIndex +=2
+            else:
+                for s in range(0, 2):       #group C for the 4 ICs will return {2,2,2,1} voltage values
+                    groupVoltages[s] = pullupVoltages[index+s]
+                byteIndex = 0
+                for s in range(0, 2):
+                    if byteIndex > 5:
+                        break
+                    sixBytes[byteIndex] = hex(groupVoltages[s]) & 0xFF00
+                    sixBytes[byteIndex+1] = hex(groupVoltages[s]) & 0x00FF
+                    byteIndex += 2
+            for k in range(0, 6):
+                data[(dataIdx * BYTES_PER_REG) + k] = sixBytes[k]           #save all 6 bytes of voltage data into array
+        
+        else: #pulldown
+            if group != 3:
+                for s in range(0, 3):
+                    groupVoltages[s] = pulldownVoltages[index+s]                  #save the 3 voltages from the group for each IC
+                byteIndex = 0
+                for s in range(0, 3):
+                    if byteIndex > 5:
+                        break
+                    sixBytes[byteIndex] = hex(groupVoltages[s]) & 0xFF00        #break up each 16 bit voltage into two bytes
+                    sixBytes[byteIndex+1] = hex(groupVoltages[s]) & 0x00FF
+                    byteIndex +=2
+            else:
+                for s in range(0, 2):       #group C for the 4 ICs will return {2,2,2,1} voltage values
+                    groupVoltages[s] = pulldownVoltages[index+s]
+                byteIndex = 0
+                for s in range(0, 2):
+                    if byteIndex > 5:
+                        break
+                    sixBytes[byteIndex] = hex(groupVoltages[s]) & 0xFF00
+                    sixBytes[byteIndex+1] = hex(groupVoltages[s]) & 0x00FF
+                    byteIndex += 2
+            for k in range(0, 6):
+                data[(dataIdx * BYTES_PER_REG) + k] = sixBytes[k]           #save all 6 bytes of voltage data into array
+        
+        dataIdx += 1        
+        
+        return data
+    
+
+def CopyVoltageToByteArray(data, group):
+    dataIdx = 0
+    
+    indicies = determineModuleIndicies(group)
+
+
+    for i in range(NUM_MINIONS-1, -1, -1):
+        groupVolts = [0, 0, 0]
+        data[dataIdx * BYTES_PER_REG] = voltage_values[indicies[i]]
+        for k in range(1, 3):
+            data[(dataIdx * BYTES_PER_REG) + k] = voltage_values[startingIndex + k]
+        dataIdx += 1
+
 
 def CreateReadPacket(data):
     pkt[]
@@ -182,6 +356,8 @@ def CreateReadPacket(data):
 
 
 def WRCommandHandler(buf, len):
+    global openWireOpFlag, openWirePUFlag
+    
     BYTES_PER_REG = 6
     data = [0] * (NUM_MINIONS * BYTES_PER_REG)
 
@@ -189,6 +365,14 @@ def WRCommandHandler(buf, len):
         ExtractDataFromBuff(data, buf, len)
         config_register[] = data[]
         pass
+    elif currCmd == command_codes['SIM_LTC6811_ADAX']:
+        openWireOpFlag = False
+    elif currCmd == command_codes['SIM_LTC6811_ADOWPU']:
+        openWirePUFlag = True
+
+    elif currCmd == command_codes['SIM_LTC6811_ADOWPD'] #ask Sijin about this on Saturday
+        openWirePUFlag = False      
+        openWireOpFlag = True
     else:
         pass
     
