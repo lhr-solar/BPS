@@ -47,15 +47,15 @@ void BSP_Light_Toggle(Light signal) {
 			GPIOC->ODR ^= GPIO_Pin_1;
 			break;
 		// PC2
-		case WDError:
+		case WDERROR:
 			GPIOC->ODR ^= GPIO_Pin_2;
 			break;
 		// PC3
-		case Wire:
+		case WIRE:
 			GPIOC->ODR ^= GPIO_Pin_3;
 			break;
 		// PC4
-		case Heartbeat:
+		case HEARTBEAT:
 			GPIOC->ODR ^= GPIO_Pin_4;
 			break;
 		// PA4
