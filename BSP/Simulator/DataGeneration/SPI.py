@@ -305,12 +305,16 @@ def CopyOpenWireVoltageToByteArray(data, group, pullup):
                 for s in range(0, 3):
                     if byteIndex > 5:
                         break
-                    sixBytes[byteIndex] = hex(groupVoltages[s]) & 0xFF00        #break up each 16 bit voltage into two bytes
+                    sixBytes[byteIndex] = hex(groupVoltages[s]) & 0xFF00        #break up each 16 bit voltage into two bytes each
                     sixBytes[byteIndex+1] = hex(groupVoltages[s]) & 0x00FF
                     byteIndex +=2
             else:
-                for s in range(0, 2):       #group C for the 4 ICs will return {2,2,2,1} voltage values
-                    groupVoltages[s] = pulldownVoltages[index+s]
+                if index != 30
+                    for s in range(0, 2):       #group C for the 4 ICs will return {2,2,2,1} voltage values
+                        groupVoltages[s] = pulldownVoltages[index+s]
+                else:   #account for Group C of the IC with only 7 modules
+                    groupVoltages[s] = pulldownVoltages[index]
+                
                 byteIndex = 0
                 for s in range(0, 2):
                     if byteIndex > 5:
@@ -327,16 +331,42 @@ def CopyOpenWireVoltageToByteArray(data, group, pullup):
     
 
 def CopyVoltageToByteArray(data, group):
+    global voltage_values
     dataIdx = 0
     
     indicies = determineModuleIndicies(group)
 
 
     for i in range(NUM_MINIONS-1, -1, -1):
-        groupVolts = [0, 0, 0]
-        data[dataIdx * BYTES_PER_REG] = voltage_values[indicies[i]]
-        for k in range(1, 3):
-            data[(dataIdx * BYTES_PER_REG) + k] = voltage_values[startingIndex + k]
+        groupVoltages = [0, 0, 0]
+        sixBytes = [0,0,0,0,0,0]
+        index = indicies[i]
+        if group != 3:
+            for s in range(0, 3):
+                groupVoltages = voltage_values[index+s]     #save the the voltages for the group
+            for s in range(0, 3)
+                if byteIndex > 5:
+                        break
+                sixBytes[byteIndex] = hex(groupVoltages[s]) & 0xFF00        #break up each 16 bit voltage into two bytes and save them
+                sixBytes[byteIndex+1] = hex(groupVoltages[s]) & 0x00FF
+                byteIndex +=2
+        else:
+            if index != 30:
+                for s in range(0, 2):       #group C for the 4 ICs will return {2,2,2,1} voltage values
+                    groupVoltages[s] = voltage_values[index+s]
+            else:   #account for Group C of the IC with only 7 modules
+                groupVoltages[s] = voltage_values[index]
+            byteIndex = 0
+            for s in range(0, 2):
+                if byteIndex > 5:
+                    break
+                sixBytes[byteIndex] = hex(groupVoltages[s]) & 0xFF00        #break up each 16 bit voltage into two bytes each
+                sixBytes[byteIndex+1] = hex(groupVoltages[s]) & 0x00FF
+                byteIndex += 2
+
+        for k in range(0, 6):
+            data[(dataIdx * BYTES_PER_REG) + k] = sixBytes[k]           #save all 6 bytes of voltage data into array
+
         dataIdx += 1
 
 
