@@ -9,7 +9,7 @@ This module generates Voltage and Temperature
 values as they would be read by the LTC6811s
 """
 NUM_MINIONS = 4
-config_register[24] = 0
+config_register = [] * 24
 
 openWireOpFlag = False                  # The reading of voltages for both regular and openwire modes are
                                         # the same. The commands are different though. To measure the
@@ -29,9 +29,9 @@ openWirePUFlag = False                  # Indicates if the pull-up voltage value
                                         # BSP_SPI_Write. The CopyOpenWireVoltageToByteArray function uses
                                         # this flag to determine which voltage values should be written.
 
-temperature_mux[4] = 0
+temperature_mux = [0] * 4
 
-temperature_sel[4] = 0
+temperature_sel = [0] * 4
 
 #dictionary of all command codes
 command_codes = {
@@ -154,7 +154,7 @@ def ExtractDataFromBuff(data, buf, len):
         #The +4 is because bytes [0:1] holds the command code and [2:3] holds
         #the PEC for the command code.
         for j in range(0,BYTES_PER_REG):
-            data[(i) * BYTES_PER_REG) + j] = buf[(i * BYTES_PER_IC) + 4 + j]
+            data[(i * BYTES_PER_REG) + j] = buf[(i * BYTES_PER_IC) + 4 + j]
             #The above code does the same as the code below except in python
             #memcpy(&data[i*BYTES_PER_REG], &buf[i*BYTES_PER_IC+4], BYTES_PER_REG)
 
@@ -163,8 +163,8 @@ def ExtractMUXAddrFromBuff(buf):
     BYTES_PER_REG = 8
 
     buf = buf + 4
-
-    int minionIdx = 0
+    
+    minionIdx = 0
     i = NUM_MINIONS - 1 
     while(i>=0):
         i = i - 1
@@ -176,7 +176,7 @@ def ExtractMUXSelFromBuff(buf):    #buf was a pointer in C
 
     buf = buf + 4
 
-    int minionIdx = 0
+    minionIdx = 0
     i = NUM_MINIONS - 1
     while(i >= 0):
         sel = ((buf[i*BYTES_PER_REG+3] >> 4) & 0x000F) - 8;     # Check LTC1380 as to why there is an 8
@@ -185,15 +185,15 @@ def ExtractMUXSelFromBuff(buf):    #buf was a pointer in C
 
 def getNthRow(rowNum, filename):
     i=0
-        with open(filename, 'r') as csvfile:
-            fcntl.flock(csvfile.fileno(), fcntl.LOCK_EX)    # Lock file
-            csvreader = csv.reader(filename)
-            for row in csvreader:
-                if i==rowNum:
-                    # do nothing
-                    return row
-                i += 1
-            fcntl.flock(csvfile.fileno(), fcntl.LOCK_UN)    # Unlock file
+    with open(filename, 'r') as csvfile:
+        fcntl.flock(csvfile.fileno(), fcntl.LOCK_EX)    # Lock file
+        csvreader = csv.reader(filename)
+        for row in csvreader:
+            if i==rowNum:
+                # do nothing
+                return row
+            i += 1
+        fcntl.flock(csvfile.fileno(), fcntl.LOCK_UN)    # Unlock file
 
 def DetermineGroupLetter(command):
     group = 0
@@ -248,7 +248,7 @@ def determineModuleIndicies(grp):
 def CopyOpenWireVoltageToByteArray(data, group, pullup):
     BYTES_PER_REG = 6
     NUM_MODULES = 31
-    int MAX_PINS_PER_LTC6811 = 12         # LTC6811 can only support 12 voltage modules
+    MAX_PINS_PER_LTC6811 = 12         # LTC6811 can only support 12 voltage modules
     pullupVoltages[NUM_MODULES] = 0       #there are 31 modules and 4 minions currently. The minions are connected to {8,8,8,7} modules
     pulldownVoltages[NUM_MODULES] = 0
     
@@ -312,7 +312,7 @@ def CopyOpenWireVoltageToByteArray(data, group, pullup):
                     sixBytes[byteIndex+1] = hex(groupVoltages[s]) & 0x00FF
                     byteIndex +=2
             else:
-                if index != 30
+                if index != 30:
                     for s in range(0, 2):       #group C for the 4 ICs will return {2,2,2,1} voltage values
                         groupVoltages[s] = pulldownVoltages[index+s]
                 else:   #account for Group C of the IC with only 7 modules
@@ -347,7 +347,7 @@ def CopyVoltageToByteArray(data, group):
         if group != 3:
             for s in range(0, 3):
                 groupVoltages = voltage_values[index+s]     #save the the voltages for the group
-            for s in range(0, 3)
+            for s in range(0, 3):
                 if byteIndex > 5:
                         break
                 sixBytes[byteIndex] = hex(groupVoltages[s]) & 0xFF00        #break up each 16 bit voltage into two bytes and save them
@@ -374,27 +374,27 @@ def CopyVoltageToByteArray(data, group):
 
 
 def CopyTemperatureToByteArray(data, group):
-    int BYTES_PER_REG = 6
-    group = DetermineGroupLetter(group):
-    if group = 0
-        int dataIdx = 0
+    BYTES_PER_REG = 6
+    group = DetermineGroupLetter(group)
+    if group == 0:
+        dataIdx = 0
         for i in range(NUM_MINIONS - 1, -1, -1):
-            int temperatureIdx = temperature_sel[i]
-            if temperature_mux[i] = SIM_LTC1380_MUX2:
+            temperatureIdx = temperature_sel[i]
+            if temperature_mux[i] == SIM_LTC1380_MUX2:
                 temperatureIdx = temperatureIdx + 1    
-            float celcius_float = float(temperature_values[8 * i + temperatureIdx])
-            int mvData = (2230.8 - (13.582 * (celcius_float - 30)) - (0.00433 * pow(celcius_float - 30, 2))) * 10
+            celcius_float = float(temperature_values[8 * i + temperatureIdx])
+            mvData = (2230.8 - (13.582 * (celcius_float - 30)) - (0.00433 * pow(celcius_float - 30, 2))) * 10
             data[dataIdx * BYTES_PER_REG] = mvData & 0xFF00
             data[(dataIdx * BYTES_PER_REG) + 1] = (mvData & 0x00FF) << 8
             dataIdx = dataIdx + 1
 
 
 def CreateReadPacket(data):
-    pkt[]
+    pkt = []
     pktIdx = 0
     BYTES_PER_REG = 6
-    for currIC in range(NUM_MINIONS, -1, -1)
-        for currByte in  range(0, BYTES_PER_REG, 1)
+    for currIC in range(NUM_MINIONS, -1, -1):
+        for currByte in  range(0, BYTES_PER_REG, 1):
             pkt[pktIdx] = data[((currIC-1)*6)+currByte]
             pktIdx = pktIdx + 1
         dataPEC = PEC15_Calc(data[(currIC-1)*6], BYTES_PER_REG)
@@ -412,14 +412,14 @@ def WRCommandHandler(buf, len):
 
     if currCmd == command_codes['SIM_LTC6811_WRCFGA']:
         ExtractDataFromBuff(data, buf, len)
-        config_register[] = data[]
+        config_register = list(data)
         pass
     elif currCmd == command_codes['SIM_LTC6811_ADAX']:
         openWireOpFlag = False
     elif currCmd == command_codes['SIM_LTC6811_ADOWPU']:
         openWirePUFlag = True
 
-    elif currCmd == command_codes['SIM_LTC6811_ADOWPD'] #ask Sijin about this on Saturday
+    elif currCmd == command_codes['SIM_LTC6811_ADOWPD']: #ask Sijin about this on Saturday
         openWirePUFlag = False      
         openWireOpFlag = True
     else:
@@ -443,7 +443,7 @@ def read_SPIW():
 
     if(((currCmd & 0x600) == 0x200) or (currCmd & 0x700) == 0x400) :
         currCmd &= ~0x187  # Bit Mask to ignore any cmd configuration bits i.e. ignore the MD, DCP, etc. bits
-    WRCommandHandler(currentWrite, #some length variable)
+    WRCommandHandler(currentWrite, len(currentWrite))
 
 #Writes to SPIR
 def Write_SPIR():
