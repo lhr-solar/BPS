@@ -168,7 +168,7 @@ def ExtractMUXAddrFromBuff(buf):
     i = NUM_MINIONS - 1 
     while(i>=0):
         i = i - 1
-        simulationData[minionIdx].temperature_mux = ((buf[i*BYTES_PER_REG] << 4) & 0xF0) | ((buf[i*BYTES_PER_REG+1] >> 4) & 0x0F)
+        temperature_mux[minionIdx] = ((buf[i*BYTES_PER_REG] << 4) & 0xF0) | ((buf[i*BYTES_PER_REG+1] >> 4) & 0x0F)
         minionIdx = minionIdx + 1
 
 def ExtractMUXSelFromBuff(buf):    #buf was a pointer in C
@@ -180,7 +180,7 @@ def ExtractMUXSelFromBuff(buf):    #buf was a pointer in C
     i = NUM_MINIONS - 1
     while(i >= 0):
         sel = ((buf[i*BYTES_PER_REG+3] >> 4) & 0x000F) - 8;     # Check LTC1380 as to why there is an 8
-        simulationData[minionIdx].temperature_sel = sel
+        temperature_sel[minionIdx] = sel
         minionIdx = minionIdx + 1
 
 def getNthRow(rowNum, filename):
