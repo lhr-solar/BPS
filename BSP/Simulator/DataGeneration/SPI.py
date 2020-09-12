@@ -153,7 +153,10 @@ def ExtractDataFromBuff(data, buf, len):
     for i in range(0, NUM_MINIONS): 
         #The +4 is because bytes [0:1] holds the command code and [2:3] holds
         #the PEC for the command code.
-        memcpy(&data[i*BYTES_PER_REG], &buf[i*BYTES_PER_IC+4], BYTES_PER_REG)   #COME BACK TO THIS
+        for j in range(0,BYTES_PER_REG):
+            data[(i) * BYTES_PER_REG) + j] = buf[(i * BYTES_PER_IC) + 4 + j]
+            #The above code does the same as the code below except in python
+            #memcpy(&data[i*BYTES_PER_REG], &buf[i*BYTES_PER_IC+4], BYTES_PER_REG)
 
 
 def ExtractMUXAddrFromBuff(buf):
