@@ -372,14 +372,15 @@ def CopyVoltageToByteArray(data, group):
 
 def CopyTemperatureToByteArray(data, group):
     int BYTES_PER_REG = 6
-    if group = DetermineGroupLetter(group):
+    group = DetermineGroupLetter(group):
+    if group = 0
         int dataIdx = 0
         for i in range(NUM_MINIONS - 1, -1, -1):
-            int temperatureIdx = simulationData[i].temperature_sel
-            if simulationData.temperature_mux = SIM_LTC1380_MUX2:
-                temperatureIdx = temperatureIdx + 8    
-            float celcius_float = float(simulationData[i].temperature_values[temperatureIdx])
-            int mvData = 2230.8 - (13.582 * (celcius_float - 30)) - (0.00433 * pow(celcius_float - 30, 2))
+            int temperatureIdx = temperature_sel[i]
+            if temperature_mux[i] = SIM_LTC1380_MUX2:
+                temperatureIdx = temperatureIdx + 1    
+            float celcius_float = float(temperature_values[8 * i + temperatureIdx])
+            int mvData = (2230.8 - (13.582 * (celcius_float - 30)) - (0.00433 * pow(celcius_float - 30, 2))) * 10
             data[dataIdx * BYTES_PER_REG] = mvData & 0xFF00
             data[(dataIdx * BYTES_PER_REG) + 1] = (mvData & 0x00FF) << 8
             dataIdx = dataIdx + 1
