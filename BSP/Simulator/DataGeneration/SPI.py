@@ -145,7 +145,7 @@ def PEC15_Calc(data , len):
 def ExtractCmdFromBuff(buf, len):
     return int((currentWrite[0] << 8) | currentWrite[1])
 
-def ExtractDataFromBuff(data, buf, len) {
+def ExtractDataFromBuff(data, buf, len):
     BYTES_PER_REG = 6
     BYTES_PER_IC = 8   # Register size (6B) + PEC (2B)
 
@@ -370,11 +370,26 @@ def CopyVoltageToByteArray(data, group):
         dataIdx += 1
 
 
+def CopyTemperatureToByteArray(data, group):
+    int BYTES_PER_REG = 6
+    if group = DetermineGroupLetter(group):
+        int dataIdx = 0
+        for i in range(NUM_MINIONS - 1, -1, -1):
+            int temperatureIdx = simulationData[i].temperature_sel
+            if simulationData.temperature_mux = SIM_LTC1380_MUX2:
+                temperatureIdx = temperatureIdx + 8    
+            float celcius_float = float(simulationData[i].temperature_values[temperatureIdx])
+            int mvData = 2230.8 - (13.582 * (celcius_float - 30)) - (0.00433 * pow(celcius_float - 30, 2))
+            data[dataIdx * BYTES_PER_REG] = mvData & 0xFF00
+            data[(dataIdx * BYTES_PER_REG) + 1] = (mvData & 0x00FF) << 8
+            dataIdx = dataIdx + 1
+
+
 def CreateReadPacket(data):
     pkt[]
     pktIdx = 0
     BYTES_PER_REG = 6
-    for currIC in range(NUM_MINIONS, 0, -1)
+    for currIC in range(NUM_MINIONS, -1, -1)
         for currByte in  range(0, BYTES_PER_REG, 1)
             pkt[pktIdx] = data[((currIC-1)*6)+currByte]
             pktIdx = pktIdx + 1
