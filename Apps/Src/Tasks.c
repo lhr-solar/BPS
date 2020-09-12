@@ -1,6 +1,7 @@
 #include "common.h"
 #include "config.h"
 #include "os.h"
+#include "Tasks.h"
 #include "Current.h"
 #include "Voltage.h"
 #include "Temperature.h"
@@ -24,6 +25,21 @@ OS_TCB BLE_TCB;
 OS_TCB Idle_TCB;
 
 /**
+ * @brief   Stacks
+ */
+CPU_STK FaultState_Stk[TASK_FAULT_STATE_STACK_SIZE];
+CPU_STK CriticalState_Stk[TASK_CANBUS_CONSUMER_STACK_SIZE];
+CPU_STK PetWDog_Stk[TASK_PETWDOG_STACK_SIZE];
+CPU_STK VoltTempMonitor_Stk[TASK_VOLT_TEMP_MONITOR_STACK_SIZE];
+CPU_STK AmperesMonitor_Stk[TASK_AMPERES_MONITOR_STACK_SIZE];
+CPU_STK LogInfo_Stk[TASK_LOG_INFO_STACK_SIZE];
+CPU_STK CANBusConsumer_Stk[TASK_CANBUS_CONSUMER_STACK_SIZE];
+CPU_STK BatteryBalance_Stk[TASK_BATTERY_BALANCE_STACK_SIZE];
+CPU_STK CLI_Stk[TASK_CLI_STACK_SIZE];
+CPU_STK BLE_Stk[TASK_BLE_STACK_SIZE];
+CPU_STK Idle_Stk[TASK_IDLE_STACK_SIZE];
+
+/**
  * @brief   Queue for pushing and popping CAN Messages
  */
 OS_Q CANBus_MsgQ;
@@ -45,7 +61,7 @@ OS_MUTEX MinionsASIC_Mutex;
 cell_asic Minions[NUM_MINIONS];
 uint32_t WDog_BitMap = 0;
 
-void Tasks_Init(void) {
+void Task_Init(void *p_arg) {
 
     OS_ERR err;
 
@@ -68,6 +84,8 @@ void Tasks_Init(void) {
                 &err);
 
     // ASSERT err
+
+    // TODO: Initialize threads! Look at main.c for reference
 }
 
 void Task_FaultState(void *p_arg) {

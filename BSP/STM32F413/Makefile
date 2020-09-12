@@ -58,7 +58,7 @@ endif
 # ASM sources
 ASM_SOURCES =  \
 $(TOP_DIR)/BSP/STM32F413/Src/startup_stm32f413xx.s	\
-$(wildcard $(RTOS_DIR)/uC-CPU/ARM-Cortex-M/GNU/*.s)	\
+$(wildcard $(RTOS_DIR)/uC-CPU/ARM-Cortex-M4/GNU/*.s)	\
 $(wildcard $(RTOS_DIR)/uC-LIB/Ports/ARM-Cortex-M4/GNU/*.s)	\
 $(wildcard $(RTOS_DIR)/uCOS-III/Ports/ARM-Cortex-M4/Generic/GNU/*.s)	
 
