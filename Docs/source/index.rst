@@ -3,8 +3,9 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to BPS's documentation!
-====================================
+****************************************
+Welcome to the BeVolt BPS documentation!
+****************************************
 
 .. include:: introduction.rst
 
@@ -14,11 +15,11 @@ Welcome to BPS's documentation!
    :caption: Overview
 
    Overview/design-requirements
+   Overview/design-overview
 
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
-* :ref:`I only added this link to test the webhook`
+.. toctree::
+   :hidden:
+   :maxdepth: 1
+   :caption: Glossary
+   
+   glossary
