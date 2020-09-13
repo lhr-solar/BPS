@@ -2,12 +2,9 @@ Design Requirements
 ====================
 Read the regulations at `American Solar Challenge <https://www.americansolarchallenge.org/regulations/2020-american-solar-challenge-regulations/>`_ before creating a BPS. 
 
-Design requirements vary based on the type of batteries you use. For example, lead-acid packs require less protection than lithium-ion cells. BeVolt’s battery pack uses Samsung INR18650-30Q lithium-ion cells. The BPS is required to monitor the current, voltage, and temperature of the battery pack.
-
-.. 
-    Packs vs cells - do lead-acid batteries only come as single units or can you get lead-acid cells? Can a battery pack contain one of either li-ion cells or lead-acid cells? If so, 
-    we need to be specific. 
-    Link to cell datasheet would be good. 
+Design requirements vary based on the type of batteries you use. For example, lead-acid cells require less protection than lithium-ion cells. 
+BeVolt’s battery pack uses `Samsung INR18650-30Q lithium-ion cells <https://www.18650batterystore.com/v/files/samsung_30q_data_sheet.pdf>`_. 
+The BPS is required to monitor the current, voltage, and temperature of the battery pack.
 
 The BPS should have the following components and features:
 
@@ -16,11 +13,13 @@ The BPS should have the following components and features:
     * Trip system that disconnects the battery from the car when:
         
         * the voltage of a module exceeds the safe range
-        * the temperature exceeds the maximum specified in the datasheets
+        * the current through the cells exceeds the safe range
+        * the temperature exceeds the maximum specified in the datasheet
         .. note::
-            The temperature limit varies depending on whether the battery is charging or discharging. 
+            The temperature and current limits vary depending on whether the battery is charging or discharging. 
             Account for both situations in the design.
-    * Error light indicator in the dashboard
+        
+    * Error light indicator on the dashboard
     * Strobe light indicator on the cockpit canopy
     * Emergency shutoff switch on the cockpit canopy
     .. note::
