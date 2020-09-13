@@ -78,6 +78,15 @@ def random_temperature(state, mode):
             temperature_values = [(random.randint(73000, 90000), random.randint(73000, 90000)) for i in range(31)]
 
 
+def specific_temperature(battery):
+    """
+    @brief generate list of temperature values based on battery object
+    @param battery : battery object with module voltages
+    """
+    global temperature_values
+    temperature_values = [(int(module.temperatures_cel[0] * 1000), int(module.temperatures_cel[1] * 1000)) for module in battery.modules]
+
+
 def generate(state, mode, battery=None):
     """
     @brief create csv file with voltage and temperature data
@@ -91,10 +100,13 @@ def generate(state, mode, battery=None):
     open_wires(battery)
     if battery is not None:
         specific_voltage(battery)
-        random_temperature('discharging', 'normal')
+        specific_temperature(battery)
     else:
         random_voltage(mode)
         random_temperature(state, mode)
+
+
+    # Replace with formatting
     with open(file, 'w+') as csvfile:
         fcntl.flock(csvfile.fileno(), fcntl.LOCK_EX)    # Lock file
         csvwriter = csv.writer(csvfile)
@@ -128,3 +140,34 @@ def read():
             values.append(row)
         fcntl.flock(csvfile.fileno(), fcntl.LOCK_UN)    # Unlock file
     return values
+
+
+class LTC6811:
+    def __init__(self, batt_modules):
+        self.batt_modules = batt_modules
+
+    @staticmethod
+    def format_full_protocol(ics):
+        protocol = []
+
+        for ic in ics:
+            protocol.append(ic.batt_modules[0].voltage)
+
+        return protocol
+
+
+
+ics = []
+
+if __name__ == "__main__":
+    import battery
+    BeVolt = battery.Battery(30, config.total_batt_pack_capacity_mah, 2500 * config.num_batt_cells_parallel_per_module)
+    generate('discharging', 'normal', BeVolt)
+    module_values = read()
+    for i, module in enumerate(module_values):
+        print("| {0} | {1:.4f}V | {2:.3f}°C | {3:.3f}°C |".format('X' if module[0] else ' ', module[1]/10000, module[2]/1000, module[3]/1000))
+
+    print()
+
+    protocol = LTC6811.format_full_protocol(ics)
+    print(protocol)
