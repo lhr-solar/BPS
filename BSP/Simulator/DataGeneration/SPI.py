@@ -199,8 +199,17 @@ if __name__ == "__main__":
     protocol.insert(1, 0x01)
     protocol.insert(2, (pec >> 8) & 0x00FF)    # PEC0
     protocol.insert(3, pec & 0x00FF)           # PEC1
-
     ltc6811.parse_full_protocol(minions, protocol)
 
-    for minion in minions:
-        print(minion.rx_data)
+    protocol.clear()
+    pec = ltc6811.calc_pec([0x00, 0x02])
+    protocol.insert(0, 0x00)
+    protocol.insert(1, 0x02)
+    protocol.insert(2, (pec >> 8) & 0x00FF)    # PEC0
+    protocol.insert(3, pec & 0x00FF)           # PEC1
+    ltc6811.parse_full_protocol(minions, protocol)
+    
+    print(minions[0])
+    print(minions[1])
+    print(minions[2])
+    print(minions[3])

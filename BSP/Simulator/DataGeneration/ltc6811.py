@@ -12,7 +12,13 @@ import config
 # dictionary's defined location.
 def wrcfga_handler(ltc6811):
     print("wrcfga")
+    # Copy contents of rx_data into config_reg
+    ltc6811.config_reg = ltc6811.rx_data.copy()
 
+def rdcfga_handler(ltc6811):
+    print("rdcfga")
+    ltc6811.tx_data = ltc6811.config_reg.copy()
+    
 
 # Dictionary of all LTC6811 command codes
 # command_codes is nested dictionary
@@ -23,7 +29,7 @@ def wrcfga_handler(ltc6811):
 command_codes = {
     'SIM_LTC6811_WRCFGA'    : {'code': 0x001, 'handler': wrcfga_handler},
     'SIM_LTC6811_WRCFGB'    : {'code': 0x024, 'handler': None},
-    'SIM_LTC6811_RDCFGA'    : {'code': 0x002, 'handler': None},
+    'SIM_LTC6811_RDCFGA'    : {'code': 0x002, 'handler': rdcfga_handler},
     'SIM_LTC6811_RDCFGB'    : {'code': 0x026, 'handler': None},
     'SIM_LTC6811_RDCVA'     : {'code': 0x004, 'handler': None},
     'SIM_LTC6811_RDCVB'     : {'code': 0x006, 'handler': None},
@@ -107,13 +113,23 @@ def parse_full_protocol(ics, protocol):
                         Electrical Team > BPS/BMS > BPS > Documentation/Reports
                         
     '''
-    DATA_START_IDX = 4
 
     # First to bytes are the command
     # The next two lines of code pops the first 4 bytes which are the cmd
     #   related bytes.
     cmd = ((protocol.pop(0) << 8) & 0xFF00) | (protocol.pop(0) & 0x00FF)
     cmd_pec = ((protocol.pop(0) << 8) & 0xFF00) | (protocol.pop(0) & 0x00FF)
+
+    # Check if only the cmd was sent. There are some commands that the LTC6811
+    # driver can send that only contains the 4B of command code and nothing else.
+    if len(protocol) == 0:
+        for ic in ics:
+            # Staging phase of LTC object
+            ic.stage(cmd)
+
+            # Update LTC object
+            ic.update()
+        return
 
     # Update all the LTCs with new cmd
     for ic in ics:
@@ -124,8 +140,11 @@ def parse_full_protocol(ics, protocol):
         # data_pec saved but not needed
         data_pec = ((protocol.pop(0) << 8) & 0xFF00) | (protocol.pop(0) & 0x00FF)
 
-        # Update LTC
-        ic.command_update(cmd, data)
+        # Staging phase of LTC object
+        ic.stage(cmd, data)
+
+        # Update LTC object
+        ic.update()
 
 
 
@@ -193,14 +212,31 @@ class LTC6811:
 
 
     def __str__(self):
-        print("Config: ", end='')
+        ltc_str = "Config: "
         for byte in self.config_reg:
-            print(hex(byte), end=' ')
+            ltc_str += hex(byte) + " "
+
+        return ltc_str
 
 
-    def command_update(self, new_cmd_code, data):
+    def stage(self, new_cmd_code, data=None):
+        '''
+        @brief  Prepares the LTC6811 object to update the LTC simulator.
+        @note   This must be called before update(). This is the staging phase to update
+                the object with new parameters.
+        @param  new_cmd_code : the new command that was received from the BPS firmware.
+        @param  data : data that was received from the BPS firmware.
+        '''
         self.curr_cmd_code = new_cmd_code
+        if data == None:
+            data = [0] * 6  # Initialize as empty
         self.rx_data = data
+    
+
+    def update(self):
+        '''
+        @brief  Updates the LTC6811 object with the new command that was set in stage_update.
+        '''
 
         # command_codes is nested dictionary
         # {cmd_key : {code, handler}}
