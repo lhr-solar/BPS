@@ -129,6 +129,9 @@ class Battery:
 
         class Cell:
             def __init__(self, current, capacity, charge=None, state='discharging', mode='normal'):
+                # Operation
+                self.state = state
+                self.mode = mode                
                 # Voltage values (V)
                 self.end_voltage = 2.5
                 self.nominal_voltage = 3.6
