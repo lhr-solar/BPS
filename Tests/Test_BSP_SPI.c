@@ -9,10 +9,10 @@ int main() {
 
     BSP_SPI_Init();
 
-    uint8_t data[4+NUM_MINIONS*8] = {0x00, 0x01, 0x00, 0x02};
+    uint8_t data[4+NUM_MINIONS*8] = {0x00, 0x01, 0x3D, 0x6E};   // 0x00, 0x02, 0x2B, 0x0A
 
     BSP_SPI_Write(data, 4);
-    BSP_SPI_Read(data, 4+NUM_MINIONS*8);
+    // BSP_SPI_Read(data, 4+NUM_MINIONS*8);
 
     while(1) {
         

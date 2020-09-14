@@ -20,6 +20,9 @@ def rdcfga_handler(ltc6811):
     print("rdcfga")
     ltc6811.tx_data = ltc6811.config_reg.copy()
 
+def adcv_handler(ltc6811):
+    print("adcv")
+
 
 # Dictionary of all LTC6811 command codes
 # command_codes is nested dictionary
@@ -52,7 +55,7 @@ command_codes = {
     'SIM_LTC6811_RDPSB'     : {'code': 0x01E, 'handler': None},
     'SIM_LTC6811_STSCTRL'   : {'code': 0x019, 'handler': None},
     'SIM_LTC6811_CLRSCTRL'  : {'code': 0x018, 'handler': None},
-    'SIM_LTC6811_ADCV'      : {'code': 0x260, 'handler': None},       # 0 1 MD[1] MD[0] 1 1 DCP 0 CH[2] CH[1] CH[0]
+    'SIM_LTC6811_ADCV'      : {'code': 0x260, 'handler': adcv_handler},       # 0 1 MD[1] MD[0] 1 1 DCP 0 CH[2] CH[1] CH[0]
     'SIM_LTC6811_ADOWPU'    : {'code': 0x268, 'handler': None},       # 0 1 MD[1] MD[0] PUP 1 DCP 1 CH[2] CH[1] CH[0]
     'SIM_LTC6811_ADOWPD'    : {'code': 0x228, 'handler': None},       # 0 1 MD[1] MD[0] PUP 1 DCP 1 CH[2] CH[1] CH[0]
     'SIM_LTC6811_CVST'      : {'code': 0x207, 'handler': None},       # 0 1 MD[1] MD[0] ST[1] ST[0] 0 0 1 1 1
