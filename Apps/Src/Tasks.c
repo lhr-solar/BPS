@@ -232,11 +232,22 @@ void Task_CLI(void *p_arg) {
 
     OS_ERR err;
 
+    initialize();
+	__enable_irq();
+	Contactor_On();
+	char command[fifo_size];
+	CLI_Startup();
+	
     while(1) {
         // BLOCKING =====================
         // Wait for command
 
         // Handle command
+        UART3_CheckAndEcho(&CLIFifo);
+		if (UART3_HasCommand(&CLIFifo)) {
+			UART3_GetCommand(&CLIFifo, command);
+			CLI_Handler(command);
+		}
     }
 }
 
