@@ -11,7 +11,10 @@ values as they would be read by the LTC6811s
 """
 
 # path/name of file
-file = config.directory_path + config.files['SPI']
+# POV is of BSP_SPI, not SPI.py so that's why read_file is path of SPIW.csv
+# and vice versa
+read_file = config.directory_path + config.files['SPIW']
+write_file = config.directory_path + config.files['SPIR']
 
 # sensor values
 wires = []                  # list of 31 modules (1 = connected; 0 = open)
@@ -90,6 +93,11 @@ def specific_temperature(battery):
     temperature_values = [(int(module.temperatures_cel[0] * 1000), int(module.temperatures_cel[1] * 1000)) for module in battery.modules]
 
 
+def init(battery=None):
+    for i in range(4):
+        minions.append(ltc6811.LTC6811(battery))
+
+
 def generate(state, mode, battery=None):
     """
     @brief create csv file with voltage and temperature data
@@ -99,7 +107,8 @@ def generate(state, mode, battery=None):
     @param battery : battery object with set modules
     """
     global wires, voltage_values, temperature_values
-    os.makedirs(os.path.dirname(file), exist_ok=True)
+    os.makedirs(os.path.dirname(read_file), exist_ok=True)
+    os.makedirs(os.path.dirname(write_file), exist_ok=True)
     open_wires(battery)
     if battery is not None:
         specific_voltage(battery)
@@ -108,20 +117,34 @@ def generate(state, mode, battery=None):
         random_voltage(mode)
         random_temperature(state, mode)
 
+    # Record if file is not empty
+    try:
+        with open(read_file, 'r+') as csvfile:
+            fcntl.flock(csvfile.fileno(), fcntl.LOCK_EX)    # Lock file
 
-    # Replace with formatting
-    with open(file, 'w+') as csvfile:
-        fcntl.flock(csvfile.fileno(), fcntl.LOCK_EX)    # Lock file
-        csvwriter = csv.writer(csvfile)
-        row = []
-        for i in range(len(voltage_values)):
-            row.append(wires[i])
-            row.append(voltage_values[i])
-            row.append(temperature_values[i][0])
-            row.append(temperature_values[i][1])
-            csvwriter.writerow(row)
-            row = []
-        fcntl.flock(csvfile.fileno(), fcntl.LOCK_UN)    # Unlock file
+            # If file is empty, then do nothing
+            filesize = os.path.getsize(read_file)
+            if filesize == 0:
+                return
+
+            # Get message
+            message = []
+            csvreader = csv.reader(csvfile)
+            for row in csvreader:
+                for i in range(len(row)):
+                    message.append(int(row[i]))
+            ltc6811.parse_full_protocol(minions, message)
+            csvfile.truncate(0)     # Delete the command to indicate simulator has resolved it
+            fcntl.flock(csvfile.fileno(), fcntl.LOCK_UN)    # Unlock file
+
+        with open(write_file, 'w+') as csvfile:
+            fcntl.flock(csvfile.fileno(), fcntl.LOCK_EX)    # Lock file
+            csvwriter = csv.writer(csvfile)
+            message = ltc6811.format_full_protocol(minions)
+            csvwriter.writerow(message)
+            fcntl.flock(csvfile.fileno(), fcntl.LOCK_UN)    # Unlock file
+    except:    
+        pass 
 
 
 def read():
@@ -133,15 +156,14 @@ def read():
             for each of 31 modules
     """
     values = []
-    os.makedirs(os.path.dirname(file), exist_ok=True)
-    with open(file, 'r') as csvfile:
-        fcntl.flock(csvfile.fileno(), fcntl.LOCK_EX)    # Lock file
-        csvreader = csv.reader(csvfile)
-        for row in csvreader:
-            for i in range(len(row)):
-                row[i] = int(row[i])
-            values.append(row)
-        fcntl.flock(csvfile.fileno(), fcntl.LOCK_UN)    # Unlock file
+    row = []
+    for i in range(len(voltage_values)):
+        row.append(wires[i])
+        row.append(voltage_values[i])
+        row.append(temperature_values[i][0])
+        row.append(temperature_values[i][1])
+        values.append(row)
+        row = []
     return values
 
 
@@ -158,7 +180,6 @@ if __name__ == "__main__":
     # Test SPI functions
     import battery
     BeVolt = battery.Battery(30, config.total_batt_pack_capacity_mah, 2500 * config.num_batt_cells_parallel_per_module)
-    generate('discharging', 'normal', BeVolt)
     module_values = read()
     for i, module in enumerate(module_values):
         print("| {0} | {1:.4f}V | {2:.3f}°C | {3:.3f}°C |".format('X' if module[0] else ' ', module[1]/10000, module[2]/1000, module[3]/1000))
@@ -213,3 +234,5 @@ if __name__ == "__main__":
     print(minions[1])
     print(minions[2])
     print(minions[3])
+
+    generate('discharging', 'normal', BeVolt)

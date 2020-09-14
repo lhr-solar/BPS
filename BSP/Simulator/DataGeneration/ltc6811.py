@@ -14,11 +14,12 @@ def wrcfga_handler(ltc6811):
     print("wrcfga")
     # Copy contents of rx_data into config_reg
     ltc6811.config_reg = ltc6811.rx_data.copy()
+    ltc6811.tx_data = [0] * 6   # Reset because there shouldn't be any data sent back
 
 def rdcfga_handler(ltc6811):
     print("rdcfga")
     ltc6811.tx_data = ltc6811.config_reg.copy()
-    
+
 
 # Dictionary of all LTC6811 command codes
 # command_codes is nested dictionary
@@ -81,6 +82,7 @@ mux_addresses = {
 
 CRC15_POLY = 0x4599
 pec15_table = [0] * 256
+
 
 def format_full_protocol(ics):
     '''
@@ -199,6 +201,11 @@ class LTC6811:
     def __init__(self, batt_modules):
         self.batt_modules = batt_modules
 
+        # Temporary solution.
+        # Voltages and temperatures should be reference batt modules object list
+        self.voltages = [0] * 8
+        self.temperatures_cel = [0, 0] * 8
+
         # reg suffixes indicate data stored in LTC6811 registers
         self.config_reg = [0] * 6   # 6B: Configuration register of LTC
 
@@ -230,7 +237,7 @@ class LTC6811:
         self.curr_cmd_code = new_cmd_code
         if data == None:
             data = [0] * 6  # Initialize as empty
-        self.rx_data = data
+        self.rx_data = data.copy()
     
 
     def update(self):
@@ -245,11 +252,17 @@ class LTC6811:
         # handler is the function to call to handle its respective command
         for cmd_key in command_codes:
             if self.curr_cmd_code == command_codes[cmd_key]['code']:
-                print(cmd_key)
                 cmd_handler = command_codes[cmd_key]['handler']
                 
                 # Execute only if handler exists
                 if cmd_handler is not None:
                     cmd_handler(self)
+
+
+    def set_voltage(self, voltages):
+        self.voltages = voltages.copy()
+    
+    def set_temperatures(self, temperatures_cel):
+        self.temperatures_cel = temperatures_cel.copy()
 
 
