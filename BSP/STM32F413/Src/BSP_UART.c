@@ -31,11 +31,11 @@ static bool RxFifo_IsEmpty(void);
 void BSP_UART_Init(void) {
     GPIO_InitTypeDef GPIO_InitStruct = {0};
     USART_InitTypeDef UART_InitStruct = {0};
-
+    //Enable USART3, PC5, PB10 clocks
     RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART3, ENABLE);
     RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
     RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC, ENABLE);
-
+    //Initialize pins for USART
     GPIO_InitStruct.GPIO_Pin = GPIO_Pin_10;
     GPIO_InitStruct.GPIO_Mode = GPIO_Mode_AF;
     GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
@@ -44,6 +44,10 @@ void BSP_UART_Init(void) {
     GPIO_Init(GPIOB, &GPIO_InitStruct);
     GPIO_InitStruct.GPIO_Pin = GPIO_Pin_5;
     GPIO_Init(GPIOC, &GPIO_InitStruct);
+    //Enable USART2, PA2, PA3 clocks
+    RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART2, ENABLE);
+    RCC_APB1PeriphClockCmd(RCC_APB1Periph_GPIOA, ENABLE);
+    //Initialize pins for USART
 
     GPIO_PinAFConfig(GPIOB, GPIO_PinSource10, GPIO_AF_USART3);
     GPIO_PinAFConfig(GPIOC, GPIO_PinSource5, GPIO_AF_USART3);
