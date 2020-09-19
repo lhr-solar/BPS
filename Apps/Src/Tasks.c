@@ -5,6 +5,7 @@
 #include "Current.h"
 #include "Voltage.h"
 #include "Temperature.h"
+#include "BSP_UART.h"
 
 /*******************************************************************************
 *    Shared Resources
@@ -226,27 +227,90 @@ void Task_BatteryBalance(void *p_arg) {
     }
 }
 
+void Check_ResourceForCLI(int resourceNum){
+    switch(resourceNum){
+        case 0:
+            OS_Sem4Pend(&SafetyCheck_Sem4);
+            break;
+        case 1:
+            OS_MutexLock(&MinionsASIC_Mutex);
+            break;
+        case 2:
+            OS_MutexLock(&VoltageBuffer_Mutex);
+            break;
+        case 3:
+            OS_MutexLock(&Temperature_Mutex);
+            break;
+        case 4:
+            OS_MutexLock(&OpenWireBuffer_Mutex);
+            break;
+        case 5:
+            OS_Sem4Pend(&MinionIO_Sem4);
+            break;
+        case 6:
+            OS_Sem4Pend(&AmperesIO_Sem4);
+            break;
+        case 7:
+            OS_MutexLock(&AmperesData_Mutex);
+            break;
+        default:
+            break;
+    }
+}
+
+void Post_ResourceForCLI(int resourceNum){
+    switch(resourceNum){
+        case 0:
+            OS_Sem4Post(&SafetyCheck_Sem4);
+            break;
+        case 1:
+            OS_MutexUnlock(&MinionsASIC_Mutex);
+            break;
+        case 2:
+            OS_MutexUnlock(&VoltageBuffer_Mutex);
+            break;
+        case 3:
+            OS_MutexUnlock(&Temperature_Mutex);
+            break;
+        case 4:
+            OS_MutexUnlock(&OpenWireBuffer_Mutex);
+            break;
+        case 5:
+            OS_Sem4Post(&MinionIO_Sem4);
+            break;
+        case 6:
+            OS_Sem4Post(&AmperesIO_Sem4);
+            break;
+        case 7:
+            OS_MutexUnlock(&AmperesData_Mutex);
+            break;
+        default:
+            break;
+    }
+}
+
 void Task_CLI(void *p_arg) {
     (void)p_arg;
 
     OS_ERR err;
 
+    OS_Sem4Pend(&SafetyCheck_Sem4);
+    //call OS_Sem4Pend() in whatever CLI function uses the specific semaphore
+
     initialize();
 	__enable_irq();
-	Contactor_On();
-	char command[fifo_size];
+	//Contactor_On();
+	uint32_t fifo_size = 200;
+    char command[fifo_size];
 	CLI_Startup();
 	
     while(1) {
         // BLOCKING =====================
         // Wait for command
-
-        // Handle command
-        UART3_CheckAndEcho(&CLIFifo);
-		if (UART3_HasCommand(&CLIFifo)) {
-			UART3_GetCommand(&CLIFifo, command);
-			CLI_Handler(command);
-		}
+        if(BSP_UART_ReadLine(command) != 0){
+            //Handle command
+            CLI_Handler(command);
+        }
     }
 }
 
