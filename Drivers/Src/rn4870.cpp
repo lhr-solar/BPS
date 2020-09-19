@@ -1,5 +1,4 @@
-#include "../rn4870.h"
-#include "rn4870Model.h"
+#include "rn4870.h"
 
 void RN4870::begin(char *buffer, int bufferLen, Uart *_antenna, long baudrate) {
     setStatus(dataMode);
@@ -9,7 +8,7 @@ void RN4870::begin(char *buffer, int bufferLen, Uart *_antenna, long baudrate) {
     antenna->begin(baudrate);
 }
 
-boolean RN4870::startBLE(char userRA[6]) {
+bool RN4870::startBLE(char userRA[6]) {
     if (enterConfigurationMode() == false) {
         return false;
     }
@@ -26,7 +25,7 @@ boolean RN4870::startBLE(char userRA[6]) {
 }
 
 
-void RN4870::rawConfiguration(String stream) {
+void RN4870::rawConfiguration(char *stream) {
     answerLen =0; // reset Answer Counter
     memset(uartBuffer, 0, uartBufferLen);
     stream.concat("\r");
@@ -34,7 +33,7 @@ void RN4870::rawConfiguration(String stream) {
 }
 
 volatile char  timeout=0;
-boolean RN4870::enterConfigurationMode(void) {
+bool RN4870::enterConfigurationMode(void) {
 
     setStatus(enterConfmode);
     antenna->print(CONF_CHAR);
@@ -47,7 +46,7 @@ boolean RN4870::enterConfigurationMode(void) {
     return answerOrTimeout();
 }
 
-boolean RN4870::enterDataMode(void) {
+bool RN4870::enterDataMode(void) {
 
     setStatus(enterDatamode);
     antenna->print(EXIT_CONF);
@@ -85,7 +84,7 @@ AnswerE RN4870::hasAnswer(void) {
 }
 
 
-boolean RN4870::factoryReset(void) {
+bool RN4870::factoryReset(void) {
     // if not in configuration mode enter immediately
     if (status != confMode) {
         if (!enterConfigurationMode())
@@ -96,7 +95,7 @@ boolean RN4870::factoryReset(void) {
     return true;
 }
 
-boolean RN4870::assignRandomAddress(char userRA[6]){
+bool RN4870::assignRandomAddress(char userRA[6]){
     if (status == confMode) {
         char timeout=0;
         if(NULL == userRA) {
@@ -125,7 +124,7 @@ void RN4870::sendData(char *stream, int streamLen) {
 }
 
 
-boolean RN4870::setName(char *newName, char nameLen){
+bool RN4870::setName(char *newName, char nameLen){
     if (status != confMode)
         return false;
 
@@ -138,7 +137,7 @@ boolean RN4870::setName(char *newName, char nameLen){
 }
 
 
-boolean RN4870::getName(char* name){ 
+bool RN4870::getName(char* name){ 
 
     if (status != confMode)
         return false;
@@ -153,7 +152,7 @@ boolean RN4870::getName(char* name){
 }
 
 
-boolean RN4870::getFwVersion(char *bufferParam)
+bool RN4870::getFwVersion(char *bufferParam)
 {
     if (status != confMode)
         return false;
@@ -162,7 +161,7 @@ boolean RN4870::getFwVersion(char *bufferParam)
     return answerOrTimeout();
 }
 
-boolean RN4870::getSwVersion(char *bufferParam)
+bool RN4870::getSwVersion(char *bufferParam)
 {
     if (status != confMode)
         return false;
@@ -171,7 +170,7 @@ boolean RN4870::getSwVersion(char *bufferParam)
     return answerOrTimeout();
 }
 
-boolean RN4870::getHwVersion(char *bufferParam)
+bool RN4870::getHwVersion(char *bufferParam)
 {
     if (status != confMode)
         return false;
@@ -180,7 +179,7 @@ boolean RN4870::getHwVersion(char *bufferParam)
     return answerOrTimeout();
 }
 
-boolean RN4870::setBaudRate(char bufferParam)
+bool RN4870::setBaudRate(char bufferParam)
 {
     if (status != confMode)
         return false;
@@ -193,7 +192,7 @@ boolean RN4870::setBaudRate(char bufferParam)
     return answerOrTimeout();
 }
 
-boolean RN4870::getBaudRate(char *bufferParam)
+bool RN4870::getBaudRate(char *bufferParam)
 {
     if (status != confMode)
         return false;
@@ -204,7 +203,7 @@ boolean RN4870::getBaudRate(char *bufferParam)
 
 
 
-boolean RN4870::getSN(char *bufferParam)
+bool RN4870::getSN(char *bufferParam)
 {
     if (status != confMode)
         return false;
@@ -215,7 +214,7 @@ boolean RN4870::getSN(char *bufferParam)
 
 
 
-boolean RN4870::setPowerSave(boolean powerSave){
+bool RN4870::setPowerSave(bool powerSave){
 
     // if not in configuration mode enter immediately
     if (status != confMode) {
@@ -242,7 +241,7 @@ boolean RN4870::setPowerSave(boolean powerSave){
  * get the internal baud-rate
  *
  */
-boolean RN4870::getPowerSave(boolean *powerSave){
+bool RN4870::getPowerSave(bool *powerSave){
     if (status != confMode)
         return false;
 
@@ -251,7 +250,7 @@ boolean RN4870::getPowerSave(boolean *powerSave){
         if (getLastAnswer()[0] == '1') {
             *powerSave= true;
         } else {
-            powerSave = false;
+            *powerSave = false;
         } 
         return true;           
     } else {
@@ -278,7 +277,7 @@ char* RN4870::trim(char* input) {
 }
 
 
-boolean RN4870::validateAnswer(void) {
+bool RN4870::validateAnswer(void) {
     switch(status) {
     case enterConfmode:
         if ((uartBuffer[0] == PROMPT_FIRST_CHAR) &&
@@ -320,7 +319,7 @@ void RN4870::setStatus(RN4870StatusE newStatus) {
     }
 }
 
-boolean RN4870::answerOrTimeout(void) {
+bool RN4870::answerOrTimeout(void) {
     // wait till there is an Answer or timeout occurred.
     while ((this->hasAnswer()!=completeAnswer) && (INTERNAL_CMD_TIMEOUT>timeout)){
         delay(DELAY_INTERNAL_CMD);
