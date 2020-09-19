@@ -49,11 +49,21 @@ OS_Q CANBus_MsgQ;
  */
 OS_SEM SafetyCheck_Sem4;
 OS_SEM Fault_Sem4;
+OS_SEM MinionIO_Sem4;
+OS_SEM AmperesIO_Sem4;
+OS_SEM StorageIO_Sem4;
+OS_SEM CANBusIO_Sem4;
+OS_SEM SerialIO_Sem4;
 
 /**
  * Mutexes
  */
 OS_MUTEX MinionsASIC_Mutex;
+OS_MUTEX VoltageBuffer_Mutex;
+OS_MUTEX TemperatureBuffer_Mutex;
+OS_MUTEX AmperesData_Mutex;
+OS_MUTEX OpenWireBuffer_Mutex;
+OS_MUTEX WDog_Mutex;
 
 /**
  * Global Variables
