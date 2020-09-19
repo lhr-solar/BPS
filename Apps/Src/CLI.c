@@ -18,6 +18,7 @@
 #include "Images.h"
 #include "BSP_ADC.h"
 #include "EEPROM.h"
+#include "Tasks.h"
 
 #define MAX_TOKEN_SIZE 4
 
@@ -713,7 +714,9 @@ void CLI_Handler(char* input) {
 			break;
 		// Voltage commands
 		case CLI_VOLTAGE_HASH:
+			Check_ResourceForCLI(0);	//come back ot this and check this
 			CLI_Voltage(hashTokens);
+			Post_ResourceForCLI(0);
 			break;
 		// Current commands
 		case CLI_CURRENT_HASH:
@@ -721,12 +724,16 @@ void CLI_Handler(char* input) {
 			break;
 		// Temperature commands
 		case CLI_TEMPERATURE_HASH:
+			Check_ResourceForCLI(3);
 			CLI_Temperature(hashTokens);
+			Post_ResourceForCLI(3);
 			break;
 		// LTC6811 register commands
 		case CLI_REGISTER_HASH:
 		case CLI_LTC_HASH:
+			Check_ResourceForCLI(1);
 			CLI_LTC6811();
+			Post_ResourceForCLI(1);
 			break;
 		// Contactor/Switch commands
 		case CLI_SWITCH_HASH:
