@@ -53,7 +53,6 @@ OS_SEM Fault_Sem4;
 /**
  * Mutexes
  */
-OS_MUTEX MinionsASIC_Mutex;
 
 /**
  * Global Variables

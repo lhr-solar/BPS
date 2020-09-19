@@ -59,6 +59,5 @@ void Task_Idle(void *p_arg);
 
 extern OS_SEM SafetyCheck_Sem4;
 extern OS_SEM Fault_Sem4;
-extern OS_MUTEX MinionsASIC_Mutex;
 
 #endif
