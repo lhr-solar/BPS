@@ -19,11 +19,5 @@ void Task_Init(void *p_arg) {
 
     // ASSERT err
 
-    OSMutexCreate(&MinionsASIC_Mutex,
-                "Minions ASIC Mutex",
-                &err);
-
-    // ASSERT err
-
     // TODO: Initialize threads! Look at main.c for reference
 }
