@@ -71,7 +71,7 @@ Copyright 2017 Linear Technology Corp. (LTC)
 #include "config.h"
 #include "BSP_SPI.h"
 #include "os.h"
-#include "../../Apps/inc/tasks.h"
+#include "Tasks.h"
 
 /*********************************************************/
 /*** Code that was added by UTSVT. ***/
