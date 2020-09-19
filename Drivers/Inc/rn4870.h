@@ -1,17 +1,19 @@
 #ifndef RN4870_H
 #define RN4870_H
 
-#include <Arduino.h>
-#include "ble/rn4870Model.h"
+#include "rn4870Model.h"
+#include <stdbool.h>
+#include <stdlib.h>
+#include <string.h>
 
-
+class Uart;
 class RN4870 {
 private:
     Uart *antenna;
     int answerLen;
 
 private:
-    boolean checkAnswer(const char *answer);
+    bool checkAnswer(const char *answer);
     char *uartBuffer;
     int uartBufferLen;
     RN4870StatusE status;
@@ -25,18 +27,18 @@ public:
 #elif defined (ASME3_REVISION)
     void begin(char *buffer, int bufferLen,Uart *antenna=&BLE, long baudrate=115200);
 #else
-    void begin(char *buffer, int bufferLen,Uart *antenna=&Serial1, long baudrate=115200);
+    void begin(char *buffer, int bufferLen, Uart *antenna=&Serial1, long baudrate=115200);
 #endif
 
     /*
      * The function set the address and move in data mode
      */
-    boolean startBLE(char userRA[6]=NULL);
+    bool startBLE(char userRA[6]=NULL);
 
     /* 
      * Send a specific string of configuration
      */
-    void rawConfiguration(String stream);
+    void rawConfiguration(char *stream);
 
     /*
      * Send a streamLen of bytes over the air
@@ -46,12 +48,12 @@ public:
     /* 
      * function to enter in the BLE chip configuration
      */
-    boolean enterConfigurationMode(void);
+    bool enterConfigurationMode(void);
 
     /*
      * function to enter in the BLE data communication
      */
-    boolean enterDataMode(void);
+    bool enterDataMode(void);
 
     AnswerE hasAnswer(void);
 
@@ -72,7 +74,7 @@ public:
      *  When the use does not assign a specific address it will be automatically
      *  found by the BLE, otherwise the user address will be assign.
      */
-    boolean assignRandomAddress(char userRA[6]=NULL);
+    bool assignRandomAddress(char userRA[6]=NULL);
 
     /* 
      * Return the latest receive message from the configuration command or 
@@ -85,7 +87,7 @@ public:
      * 
      * The function works either in configuration or in data mode.
      */
-    boolean factoryReset(void);
+    bool factoryReset(void);
 
     /*
      * The function return the address used by the BLE 
@@ -98,7 +100,7 @@ public:
      *
      * The function works in configuration mode.
      */
-    boolean setName(char *newName, char nameLen);
+    bool setName(char *newName, char nameLen);
 
     /*
      * retrieve the configured name
@@ -106,7 +108,7 @@ public:
      * The function works in configuration mode.
      *
      */
-    boolean getName(char *name);
+    bool getName(char *name);
 
     /*
      * Set the internal baud rate
@@ -126,14 +128,14 @@ public:
      *
      * The function works in configuration mode.
      */
-    boolean setBaudRate(char bufferParam);
+    bool setBaudRate(char bufferParam);
 
     /*
      * get the internal baud-rate
      *
      * The function works in configuration mode.
      */
-    boolean getBaudRate(char *bufferParam);
+    bool getBaudRate(char *bufferParam);
 
 
     /*
@@ -141,28 +143,28 @@ public:
      *
      * The function works in configuration mode.
      */
-    boolean getFwVersion(char *bufferParam);
+    bool getFwVersion(char *bufferParam);
 
     /*
      * get the SW version of the BLE
      *
      * The function works in configuration mode.
      */
-    boolean getSwVersion(char *bufferParam);
+    bool getSwVersion(char *bufferParam);
 
     /*
      * get the HW version of the BLE
      *
      * The function works in configuration mode.
      */
-    boolean getHwVersion(char *bufferParam);
+    bool getHwVersion(char *bufferParam);
 
     /*
      * get the Serial Number of the BLE
      *
      * The function works in configuration mode.
      */
-    boolean getSN(char *bufferParam);
+    bool getSN(char *bufferParam);
 
 
     /*
@@ -188,20 +190,20 @@ public:
      *
      *   The function works either in configuration or in data mode.
      */
-    boolean setPowerSave(boolean powerSave);
+    bool setPowerSave(bool powerSave);
 
     /*
      * get the internal baud-rate
      *
      * The function works in configuration mode.
      */
-    boolean getPowerSave(boolean *powerSave);
+    bool getPowerSave(bool *powerSave);
 
 private:
-    boolean validateAnswer(void);
+    bool validateAnswer(void);
     void setStatus(RN4870StatusE newStatus);
     char* trim(char* input);
-    boolean answerOrTimeout(void);
+    bool answerOrTimeout(void);
     void setAddress(const char *address);
     void getCleanCommandAnswer(char* stream, char* name);
 };
