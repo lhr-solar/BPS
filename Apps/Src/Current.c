@@ -9,6 +9,7 @@
 
 #include "Current.h"
 #include "BSP_ADC.h"
+#include "os.h"
 
 int32_t HighPrecisionCurrent;	// Milliamp measurement of hall effect sensor of high precision
 int32_t LowPrecisionCurrent;	// Milliamp measurement of hall effect sensor of low precision
@@ -99,3 +100,17 @@ static int32_t Current_Conversion (uint32_t milliVolts, CurrentSensor s) {
 			return sensorOutput * (100 / 4);	// In mA.
 	}
 }
+
+
+void Task_AmperesMonitor(void *p_arg) {
+    (void)p_arg;
+
+    OS_ERR err;
+
+    while(1) {
+        // BLOCKING =====================
+        // Update Amperes Measurements
+        // Check if amperes is NOT safe:
+    }
+}
+
