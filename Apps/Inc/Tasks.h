@@ -57,4 +57,7 @@ void Task_BLE(void *p_arg);
 
 void Task_Idle(void *p_arg);
 
+extern OS_SEM SafetyCheck_Sem4;
+extern OS_SEM Fault_Sem4;
+
 #endif

@@ -18,6 +18,7 @@
 #include "Images.h"
 #include "BSP_ADC.h"
 #include "EEPROM.h"
+#include "os.h"
 
 #define MAX_TOKEN_SIZE 4
 
@@ -778,3 +779,18 @@ void CLI_Handler(char* input) {
 	}
 	printf(">> ");
 }
+
+
+void Task_CLI(void *p_arg) {
+    (void)p_arg;
+
+    OS_ERR err;
+
+    while(1) {
+        // BLOCKING =====================
+        // Wait for command
+
+        // Handle command
+    }
+}
+

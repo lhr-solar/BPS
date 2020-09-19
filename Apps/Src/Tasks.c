@@ -53,7 +53,6 @@ OS_SEM Fault_Sem4;
 /**
  * Mutexes
  */
-OS_MUTEX MinionsASIC_Mutex;
 
 /**
  * Global Variables
@@ -61,6 +60,8 @@ OS_MUTEX MinionsASIC_Mutex;
 cell_asic Minions[NUM_MINIONS];
 uint32_t WDog_BitMap = 0;
 
+//leaving these functions in the code for now, so it is easier to rebase this into other people's branches
+/*
 void Task_Init(void *p_arg) {
 
     OS_ERR err;
@@ -256,3 +257,4 @@ void Task_Idle(void *p_arg) {
         // Todo: Do something cool or be lame.
     }
 }
+*/

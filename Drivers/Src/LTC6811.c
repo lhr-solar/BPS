@@ -70,11 +70,27 @@ Copyright 2017 Linear Technology Corp. (LTC)
 #include "LTC6811.h"
 #include "config.h"
 #include "BSP_SPI.h"
+#include "os.h"
+#include "Tasks.h"
 
 /*********************************************************/
 /*** Code that was added by UTSVT. ***/
 /*********************************************************/
-void LTC6811_Init(cell_asic *battMod){	
+static OS_MUTEX MinionsASIC_Mutex;
+
+void LTC6811_Init(cell_asic *battMod){
+  OS_ERR err;
+  OSMutexCreate(&MinionsASIC_Mutex,
+                "Minions ASIC Mutex",
+                &err);
+
+    // ASSERT err
+    if (err != OS_ERR_NONE){
+      //if there is an error creating the mutex, something has gone horribly wrong
+      //kill the car by scheduling FaultState_Task()
+      OSSemPost(&Fault_Sem4, OS_OPT_POST_1, &err);
+    }
+
 	BSP_SPI_Init();				// Initialize SPI1 for voltage board	
 	
 	LTC681x_init_cfg(NUM_MINIONS, battMod);
