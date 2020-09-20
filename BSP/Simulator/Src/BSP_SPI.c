@@ -92,7 +92,7 @@ void BSP_SPI_Read(uint8_t *rxBuf, uint32_t rxLen) {
     // Check until SPIR.csv file has contents. 
     // The simulator will update SPIR.csv once it's ready.
 
-	FILE* fp_r = fopen(read_file, "r");
+	FILE* fp_r = fopen(read_file, "r+");
     if (!fp_r) {
         // File doesn't exit if true
         perror(SPI_R_CSV_FILE);
