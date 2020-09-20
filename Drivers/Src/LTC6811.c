@@ -495,33 +495,25 @@ void LTC6811_stcomm()
 //Helper function to set discharge bit in CFG register
 void LTC6811_set_discharge(int Cell, uint8_t total_ic, cell_asic ic[])
 {
+  //take control of mutex
+  OS_ERR err;
+  OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
+  assertOSError(err);
+  //LTC's code
   for (int i=0; i<total_ic; i++)
   {
     if (Cell<9)
     {
-      //take control of mutex
-      OS_ERR err;
-      OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
-      assertOSError(err);
-      //LTC's code
       ic[i].config.tx_data[4] = ic[i].config.tx_data[4] | (1<<(Cell-1));
-      //release mutex
-      OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
-      assertOSError(err);
     }
     else if (Cell < 13)
     {
-      //take control of mutex
-      OS_ERR err;
-      OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
-      assertOSError(err);
-      //LTC's code
       ic[i].config.tx_data[5] = ic[i].config.tx_data[5] | (1<<(Cell-9));
-      //release mutex
-      OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
-      assertOSError(err);
     }
   }
+  //release mutex
+  OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
+  assertOSError(err);
 }
 
 // Runs the Digital Filter Self Test
@@ -591,48 +583,44 @@ void LTC6811_max_min(uint8_t total_ic, cell_asic ic_cells[],
                      cell_asic ic_max[],
                      cell_asic ic_delta[])
 {
+  //take control of mutex
+  OS_ERR err;
+  OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
+  assertOSError(err);
+  //LTC's code
   for (int j=0; j < total_ic; j++)
   {
     for (int i = 0; i< 12; i++)
     {
-      //take control of mutex
-      OS_ERR err;
-      OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
-      assertOSError(err);
-      //LTC's code
       if (ic_cells[j].cells.c_codes[i]>ic_max[j].cells.c_codes[i])ic_max[j].cells.c_codes[i]=ic_cells[j].cells.c_codes[i];
       else if (ic_cells[j].cells.c_codes[i]<ic_min[j].cells.c_codes[i])ic_min[j].cells.c_codes[i]=ic_cells[j].cells.c_codes[i];
       ic_delta[j].cells.c_codes[i] = ic_max[j].cells.c_codes[i] - ic_min[j].cells.c_codes[i];
-      //release mutex
-      OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
-      assertOSError(err);
+      
     }
   }
-
-
-
-
+  //release mutex
+  OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
+  assertOSError(err);
 }
 
 void LTC6811_init_max_min(uint8_t total_ic, cell_asic ic[],cell_asic ic_max[],cell_asic ic_min[])
 {
+  //take control of mutex
+  OS_ERR err;
+  OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
+  assertOSError(err);
+  //LTC's code
   for (int j=0; j < total_ic; j++)
   {
     for (int i = 0; i< ic[j].ic_reg.cell_channels; i++)
     {
-      //take control of mutex
-      OS_ERR err;
-      OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
-      assertOSError(err);
-      //LTC's code
       ic_max[j].cells.c_codes[i]=0;
       ic_min[j].cells.c_codes[i]=0xFFFF;
-      //release mutex
-      OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
-      assertOSError(err);
     }
   }
-
+  //release mutex
+  OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
+  assertOSError(err);
 }
 
 //Helper function that increments PEC counters
