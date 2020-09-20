@@ -144,7 +144,12 @@ def generate(state, mode, battery=None):
             fcntl.flock(csvfile.fileno(), fcntl.LOCK_EX)    # Lock file
             csvwriter = csv.writer(csvfile)
             message = ltc6811.format_full_protocol(minions)
-            csvwriter.writerow(message)
+            if message is not None:
+                 # Write
+                csvwriter.writerow(message)
+            else:
+                # Delete contents
+                csvfile.truncate(0)
             fcntl.flock(csvfile.fileno(), fcntl.LOCK_UN)    # Unlock file
     except:    
         pass 

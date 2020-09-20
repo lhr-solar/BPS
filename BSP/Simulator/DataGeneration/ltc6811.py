@@ -7,6 +7,8 @@ in the team Google Drive under Electrical Team > BPS/BMS > BPS > Documentation/R
 """
 import config
 
+LTC6811_NUM_REG = 6
+
 LTC6811_GPIO1_IDX = 0
 LTC6811_GPIO2_IDX = 0
 LTC6811_GPIO3_IDX = 0
@@ -17,15 +19,17 @@ def wrcfga_handler(ltc6811):
     print("wrcfga")
     # Copy contents of rx_data into config_reg
     ltc6811.config_reg = ltc6811.rx_data.copy()
-    ltc6811.tx_data = [0] * 6   # Reset because there shouldn't be any data sent back
+    ltc6811.tx_available = 0   # Reset because there shouldn't be any data sent back
 
 def rdcfga_handler(ltc6811):
     print("rdcfga")
     ltc6811.tx_data = ltc6811.config_reg.copy()
+    ltc6811.tx_available = 1
 
 def adcv_md0_dcp0_ch0_handler(ltc6811):
     # Start Cell ADC Measurements
     print("adcv_md0_dcp0_ch0")
+    ltc6811.tx_available = 0   # Reset because there shouldn't be any data sent back
 
 def pladc_handler(ltc6811):
     print("poll adc")
@@ -34,8 +38,9 @@ def pladc_handler(ltc6811):
     # complete. If the LTC returns 0, then then the ADC still has not finished
     # yet.
     # Write a value greater than 0 to indicate the ADC finished.
-    ltc6811.tx_data = [0] * 6
+    ltc6811.tx_data = [0] * LTC6811_NUM_REG
     ltc6811.tx_data[0] = 1
+    ltc6811.tx_available = 1
 
 def rdcva_handler(ltc6811):
     # Read 0-2 cell voltages (3 at a time)
@@ -60,21 +65,25 @@ def clrcell_handler(ltc6811):
 def adowpu_md0_dcp0_ch0_handler(ltc6811):
     # Open Wire measure pull up voltages
     print("adowpu_md0_dcp0_ch0")
+    ltc6811.tx_available = 0   # Reset because there shouldn't be any data sent back
 
 def adowpd_md0_dcp0_ch0_handler(ltc6811):
     # Open Wire measure pull down voltages
     print("adowpd_md0_dcp0_ch0")
+    ltc6811.tx_available = 0   # Reset because there shouldn't be any data sent back
 
 def adax_md0_chg1_handler(ltc6811):
     # Start AUX ADC GPIO1 converstion
     print("adax_md0_chg1")
+    ltc6811.tx_available = 0   # Reset because there shouldn't be any data sent back
 
 def rdauxa_handler(ltc6811):
     # Read AUX ADC GPIO1,2,3 register
     print("rdauxa")
-    ltc6811.tx_data = [0] * 6   # Clear
+    ltc6811.tx_data = [0] * LTC6811_NUM_REG   # Clear
     ltc6811.tx_data[0] = ltc6811.gpio[LTC6811_GPIO1_IDX] & 0x00FF
     ltc6811.tx_data[1] = (ltc6811.gpio[LTC6811_GPIO1_IDX] >> 8) & 0x00FF
+    ltc6811.tx_available = 1
 
 def wrcomm_handler(ltc6811):
     # Write I2C
@@ -158,9 +167,14 @@ def format_full_protocol(ics):
             driver expects.
     @param  ics : list of LTC6811 objects
     '''
+
     protocol = []
 
     for ic in ics:
+
+        if ic.tx_available is 0:
+            return None
+
         # Copy data
         for byte in ic.tx_data:
             protocol.append(byte)
@@ -168,6 +182,9 @@ def format_full_protocol(ics):
         pec = calc_pec(ic.tx_data)
         protocol.append((pec >> 8) & 0x00FF)    # PEC0
         protocol.append(pec & 0x00FF)           # PEC1
+
+        # reset tx_available since we consumed it
+        ic.tx_available = 0
 
     return protocol
 
@@ -203,8 +220,8 @@ def parse_full_protocol(ics, protocol):
 
     # Update all the LTCs with new cmd
     for ic in ics:
-        data = [0] * 6
-        for i in range(6):
+        data = [0] * LTC6811_NUM_REG
+        for i in range(LTC6811_NUM_REG):
             data[i] = protocol.pop(0)   # Pop the data
 
         # data_pec saved but not needed
@@ -271,17 +288,18 @@ class LTC6811:
 
         # Temporary solthe uCution.
         # Voltages and temperatures should be reference batt modules object list
-        self.voltages = [0] * 8
-        self.temperatures_cel = [0, 0] * 8
+        self.voltages = [0] * config.num_batt_modules_per_ltc6811
+        self.temperatures_cel = [[0] * config.num_temp_sensors_per_batt_module] * config.num_batt_modules_per_ltc6811
 
         # reg suffixes indicate data stored in LTC6811 registers
-        self.config_reg = [0] * 6   # 6B: Configuration register of LTC
-        self.gpio = [0] * 5         # 10B: 5 GPIO Registers (2B per GPIO)
+        self.config_reg = [0] * LTC6811_NUM_REG # 6B: Configuration register of LTC
+        self.gpio = [0] * 5                     # 10B: 5 GPIO Registers (2B per GPIO)
 
         # staging buffers that will be used when formatting bus
         self.curr_cmd_code = 0  # 12-bits
-        self.tx_data = [0] * 6  # 6B: POV of simulator
-        self.rx_data = [0] * 6  # 6B
+        self.tx_available = 0
+        self.tx_data = [0] * LTC6811_NUM_REG    # 6B: POV of simulator
+        self.rx_data = [0] * LTC6811_NUM_REG    # 6B
 
         # As long this is called once, pec will work
         pec_init()
@@ -306,7 +324,7 @@ class LTC6811:
         self.curr_cmd_code = new_cmd_code
         # Handle cmd cases such as MD, ST, etc.
         if data == None:
-            data = [0] * 6  # Initialize as empty
+            data = [0] * LTC6811_NUM_REG  # Initialize as empty
         self.rx_data = data.copy()
     
 
