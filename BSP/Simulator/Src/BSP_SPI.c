@@ -1,10 +1,11 @@
 #include "BSP_SPI.h"
 #include "config.h"
+#include "common.h"
 #include "simulator_conf.h"
 #include <unistd.h>
 #include <sys/file.h>
 
-#define CSV_SPI_BUFFER_SIZE     64
+#define CSV_SPI_BUFFER_SIZE     256
 
 // Path relative to the executable
 static const char* read_file = GET_CSV_PATH(SPI_R_CSV_FILE);
@@ -56,7 +57,7 @@ void BSP_SPI_Write(uint8_t *txBuf, uint32_t txLen) {
         exit(EXIT_FAILURE);
     }
 
-    // Lock the file so simulator.py/ADC.py can not write it during a read op.
+    // Lock the file so simulator.py/SPI.py can not write it during a read op.
     // This is a blocking statement
     int fno = fileno(fp);
     flock(fno, LOCK_EX);
@@ -70,7 +71,7 @@ void BSP_SPI_Write(uint8_t *txBuf, uint32_t txLen) {
         }
     }
 
-    // Unlock the lock so the simulator can write to ADC.csv again
+    // Unlock the lock so the simulator can write to SPI.csv again
     flock(fno, LOCK_UN);
 
     fclose(fp);
@@ -87,23 +88,78 @@ void BSP_SPI_Write(uint8_t *txBuf, uint32_t txLen) {
  * @return  None
  */
 void BSP_SPI_Read(uint8_t *rxBuf, uint32_t rxLen) {
-    // Creates file if none exists
-	FILE* fp = fopen(read_file, "r");
-
-    // Lock the file so simulator.py/ADC.py can not write it during a read op.
-    // This is a blocking statement
-    int fno = fileno(fp);
-    flock(fno, LOCK_EX);
-
+    //========= Check SPIW.csv file until it's empty =========
     // Check until SPIW.csv file is empty. The simulator indicates the SPIR.csv
-    // file has been updated by deleting the command in SPIW.csv
+    // file has been updated by deleting the contents in SPIW.csv
 
-    fgets(csvBuffer, CSV_SPI_BUFFER_SIZE, fp);
+    // Creates file if none exists
+	FILE* fp_w = fopen(write_file, "r");
+    if (!fp_w) {
+        // File doesn't exit if true
+        perror(SPI_W_CSV_FILE);
+        exit(EXIT_FAILURE);
+    }
 
-    // Unlock the lock so the simulator can write to ADC.csv again
+    // Lock the file so simulator.py/SPI.py can not write it during a read op.
+    // This is a blocking statement
+    int fno = fileno(fp_w);
+
+    // Check if the file is empty
+    int size = 0;
+    do {
+        flock(fno, LOCK_EX);
+
+        fseek(fp_w, 0, SEEK_END);
+        size = ftell(fp_w);
+        
+        // Unlock the lock so the simulator can write to SPI.csv again
+        flock(fno, LOCK_UN);
+    } while (size > 0);     // Loop until nothing is in the file.
+
+    // Unlock the lock so the simulator can write to SPI.csv again
     flock(fno, LOCK_UN);
 
-    fclose(fp);
+    fclose(fp_w);
+
+
+    //========= Check contents of SPIR.csv file =========
+    // Creates file if none exists
+	FILE* fp_r = fopen(read_file, "r");
+    if (!fp_r) {
+        // File doesn't exit if true
+        perror(SPI_R_CSV_FILE);
+        exit(EXIT_FAILURE);
+    }
+
+    // Lock the file so simulator.py/SPI.py can not write it during a read op.
+    // This is a blocking statement
+    fno = fileno(fp_r);
+    flock(fno, LOCK_EX);
+
+    // Grab first line only. There shouldn't be any other lines to grab with
+    // current scheme of interface.
+    fgets(csvBuffer, CSV_SPI_BUFFER_SIZE, fp_r);
+
+    // Copy each byte of data in SPIR.csv into rxBuf. The bytes of data in
+    // SPIR.csv are delimited by a comma.
+    int byte_idx = 0;
+    char *token_save_byte = NULL;
+    char *token_byte = __strtok_r(csvBuffer, ",", &token_save_byte);
+    while((token_byte != NULL) && (byte_idx < rxLen)) {
+        sscanf(token_byte, "%hu", (short unsigned int *)&rxBuf[byte_idx]);
+        token_byte = __strtok_r(NULL, ",", &token_save_byte);
+        byte_idx++;
+    }
+
+    // Pad the rest with 0s
+    while(byte_idx < rxLen) {
+        rxBuf[byte_idx++] = 0;
+    }
+
+    // Unlock the lock so the simulator can write to SPI.csv again
+    flock(fno, LOCK_UN);
+
+    fclose(fp_r);
 }
 
 /**
