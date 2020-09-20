@@ -23,6 +23,15 @@ def rdcfga_handler(ltc6811):
 def adcv_handler(ltc6811):
     print("adcv")
 
+def pladc_handler(ltc6811):
+    print("poll adc")
+    # While the uC is polling the LTC to see if the ADC is done, there is 
+    # a count up timer in the LTC that measures how long the ADC took to
+    # complete. If the LTC returns 0, then then the ADC still has not finished
+    # yet.
+    # Write a 0 to indicate the ADC finished.
+    for
+
 
 # Dictionary of all LTC6811 command codes
 # command_codes is nested dictionary
@@ -71,7 +80,7 @@ command_codes = {
     'SIM_LTC6811_CLRCELL'   : {'code': 0x711, 'handler': None},
     'SIM_LTC6811_CLRAUX'    : {'code': 0x712, 'handler': None},
     'SIM_LTC6811_CLRSTAT'   : {'code': 0x713, 'handler': None},
-    'SIM_LTC6811_PLADC'     : {'code': 0x714, 'handler': None},
+    'SIM_LTC6811_PLADC'     : {'code': 0x714, 'handler': pladc_handler},
     'SIM_LTC6811_DIAGN'     : {'code': 0x715, 'handler': None},
     'SIM_LTC6811_WRCOMM'    : {'code': 0x721, 'handler': None},
     'SIM_LTC6811_RDCOMM'    : {'code': 0x722, 'handler': None},
@@ -204,7 +213,7 @@ class LTC6811:
     def __init__(self, batt_modules):
         self.batt_modules = batt_modules
 
-        # Temporary solution.
+        # Temporary solthe uCution.
         # Voltages and temperatures should be reference batt modules object list
         self.voltages = [0] * 8
         self.temperatures_cel = [0, 0] * 8

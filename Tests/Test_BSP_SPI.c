@@ -13,11 +13,6 @@ int main() {
 
     BSP_SPI_Write(data, 4);
 
-    // NOTE!!! When testing with the simulator, go into the SPIW.csv and delete
-    // all the contents. BSP_SPI_Read waits for the contents in the file to be
-    // deleted before reading SPIR.csv to perform the correct handshake with
-    // the python scripts.
-
     BSP_SPI_Read(data, 4+NUM_MINIONS*8);
 
     for(int i = 0; i < NUM_MINIONS*8; i++) {
