@@ -57,6 +57,12 @@ void Task_BLE(void *p_arg);
 
 void Task_Idle(void *p_arg);
 
+/**
+ * Used to assert if there has been an error in one of the OS functions
+ * Kills the car if there is an OS error
+ **/
+void assertOSError(OS_ERR err);
+
 extern OS_SEM SafetyCheck_Sem4;
 extern OS_SEM Fault_Sem4;
 
