@@ -718,7 +718,9 @@ void CLI_Handler(char* input) {
 			break;
 		// Current commands
 		case CLI_CURRENT_HASH:
+			Check_ResourceForCLI(7)
 			CLI_Current(hashTokens);
+			Post_ResourceForCLI(7);
 			break;
 		// Temperature commands
 		case CLI_TEMPERATURE_HASH:
