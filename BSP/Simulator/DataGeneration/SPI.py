@@ -92,10 +92,7 @@ def specific_temperature(battery):
     global temperature_values
     temperature_values = [(int(module.temperatures_cel[0] * 1000), int(module.temperatures_cel[1] * 1000)) for module in battery.modules]
 
-# If file is empty, then do nothing
-            filesize = os.path.getsize(read_file)
-            if filesize == 0:
-                return
+
 def init(battery=None):
     for i in range(4):
         minions.append(ltc6811.LTC6811(battery))
