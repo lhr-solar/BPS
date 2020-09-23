@@ -446,7 +446,7 @@ class LTC6811:
         # handler is the function to call to handle its respective command
         for cmd_key in command_codes:
             if self.curr_cmd_code == command_codes[cmd_key]['code']:
-                cmd_handler = command_codSIM_LTC1380_MUX1es[cmd_key]['handler']
+                cmd_handler = command_codes[cmd_key]['handler']
                 
                 # Execute only if handler exists
                 if cmd_handler is not None:

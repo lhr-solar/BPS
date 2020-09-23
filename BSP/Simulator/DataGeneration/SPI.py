@@ -117,6 +117,44 @@ def generate(state, mode, battery=None):
         random_voltage(mode)
         random_temperature(state, mode)
 
+    # Scale by 10 because LTC handles returns 0.0001 fixed pt resolution
+    for a,b in temperature_values:
+        a *= 10
+        b *= 10
+
+    temperature_values_copy = temperature_values.copy()
+    voltage_values_copy = voltage_values.copy()
+    minion_idx = 0
+    for minion in minions:
+        voltage_partition = []
+        temperature_partition = []
+        voltage_partition.clear()
+        temperature_partition.clear()
+
+        for i in range(8):
+            voltage_partition.append(voltage_values_copy.pop(0))
+            temperature_partition.append(temperature_values_copy.pop(0))
+
+            if len(voltage_values_copy) == 0 and len(temperature_values_copy) == 0:
+                break
+
+        for i in range(4):
+            voltage_partition.append(0)
+
+        # Append extra
+        if minion_idx == 3:
+            voltage_partition.append(0)
+            temperature_partition.append([0, 0])
+        
+
+        print(temperature_partition)
+        print(voltage_partition)
+
+        minion.set_temperatures(temperature_partition)
+        minion.set_voltage(voltage_partition)
+
+        minion_idx += 1
+
     # Record if file is not empty
     try:
         with open(read_file, 'r+') as csvfile:
@@ -216,6 +254,8 @@ if __name__ == "__main__":
     minions[1].tx_data = [6, 7, 8, 9, 10, 11]
     minions[2].tx_data = [12, 13, 14, 15, 16, 17]
     minions[3].tx_data = [18, 19, 20, 21, 22, 23]
+    for minion in minions:
+        minion.tx_available = 1
     protocol = ltc6811.format_full_protocol(minions)
     ltc6811.print_protocol(protocol)
 
