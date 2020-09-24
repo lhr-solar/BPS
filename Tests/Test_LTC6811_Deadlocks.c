@@ -5,8 +5,14 @@
 #include "LTC681x.h"
 #include "config.h"
 #include "BSP_SPI.h"
+#include "os.h"
 
-int main(void){
+OS_TCB LTC6811_Deadlocks_TCB;
+CPU_STK LTC6811_Deadlocks_Stk[512];
+
+void LTC6811_Deadlocks(void *p_arg){
+    (void)p_arg;
+
     cell_asic boards[NUM_MINIONS];
     printf("initializing...\n");
     BSP_SPI_Init();
@@ -42,4 +48,27 @@ int main(void){
         Temperature_SampleADC(arg);
         arg ^= 0x01;
     }
+}
+
+
+int main() {
+    OS_ERR err;
+
+    OSTaskCreate(&LTC6811_Deadlocks_TCB,				// TCB
+				"LTC6811 Deadlocks Test",	// Task Name (String)
+				LTC6811_Deadlocks,				// Task function pointer
+				(void *)0,				// Task function args
+				1,			// Priority
+				LTC6811_Deadlocks_Stk,				// Stack
+				256,	// Watermark limit for debugging
+				512,		// Stack size
+				0,						// Queue size (not needed)
+				10,						// Time quanta (time slice) 10 ticks
+				(void *)0,				// Extension pointer (not needed)
+				OS_OPT_TASK_STK_CHK | OS_OPT_TASK_SAVE_FP,	// Options
+				&err);					// return err code
+
+	// ASSERT err
+
+	OSStart(&err);
 }
