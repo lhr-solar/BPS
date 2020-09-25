@@ -3,7 +3,7 @@
 
 #define TX_SIZE     128
 #define RX_SIZE     64
-
+//These variables are for USART 2 which is used for the BLE
 static char txBuffer2[TX_SIZE];
 static uint32_t txPut2 = 0;
 static uint32_t txGet2 = 0;
@@ -12,7 +12,7 @@ static char rxBuffer2[RX_SIZE];
 static uint32_t rxPut2 = 0;
 static uint32_t rxGet2 = 0;
 static bool lineReceived2 = false;
-
+//These variables are for USART 3 which is used for the USB
 static char txBuffer3[TX_SIZE];
 static uint32_t txPut3 = 0;
 static uint32_t txGet3 = 0;
@@ -22,17 +22,17 @@ static uint32_t rxPut3 = 0;
 static uint32_t rxGet3 = 0;
 static bool lineReceived3 = false;
 
-static bool TxFifo_Get(uint8_t *data, uint8_t usart);
-static bool TxFifo_Put(uint8_t data, uint8_t usart);
-static bool TxFifo_IsFull(uint8_t usart);
-static bool TxFifo_IsEmpty(uint8_t usart);
+static bool TxFifo_Get(uint8_t *data, UART_Port usart);
+static bool TxFifo_Put(uint8_t data, UART_Port usart);
+static bool TxFifo_IsFull(UART_Port usart);
+static bool TxFifo_IsEmpty(UART_Port usart);
 
-static bool RxFifo_Get(uint8_t *data, uint8_t usart);
-static bool RxFifo_Put(uint8_t data, uint8_t usart);
-static bool RxFifo_RemoveLast(uint8_t *data, uint8_t usart);
-static bool RxFifo_Peek(uint8_t *data, uint8_t usart);
-static bool RxFifo_IsFull(uint8_t usart);
-static bool RxFifo_IsEmpty(uint8_t usart);
+static bool RxFifo_Get(uint8_t *data, UART_Port usart);
+static bool RxFifo_Put(uint8_t data, UART_Port usart);
+static bool RxFifo_RemoveLast(uint8_t *data, UART_Port usart);
+static bool RxFifo_Peek(uint8_t *data, UART_Port usart);
+static bool RxFifo_IsFull(UART_Port usart);
+static bool RxFifo_IsEmpty(UART_Port usart);
 
 /**
  * @brief   Initializes the UART peripheral
@@ -103,30 +103,30 @@ void BSP_UART_Init(void) {
  * @param   usart : which usart to read from (2 or 3)
  * @return  number of bytes that was read
  */
-uint32_t BSP_UART_ReadLine(char *str, uint8_t usart) {
+uint32_t BSP_UART_ReadLine(char *str, UART_Port usart) {
     uint8_t data = 0;
     uint32_t recvd = 0;
-    if(lineReceived3 && (usart == 3)) { //read from 3rd usart
+    if(lineReceived3 && (usart == UART_USB)) { //read from 3rd usart
         USART_ITConfig(USART3, USART_IT_RXNE, RESET);
-        RxFifo_Peek(&data, 3);
-        while(!RxFifo_IsEmpty(3) && data != '\r') {
-            recvd += RxFifo_Get((uint8_t *)str++, 3);
-            RxFifo_Peek(&data, 3);
+        RxFifo_Peek(&data, UART_USB);
+        while(!RxFifo_IsEmpty(UART_USB) && data != '\r') {
+            recvd += RxFifo_Get((uint8_t *)str++, UART_USB);
+            RxFifo_Peek(&data, UART_USB);
         }
-        RxFifo_Get(&data, 3);
+        RxFifo_Get(&data, UART_USB);
         *str = 0;
         lineReceived3 = false;
         USART_ITConfig(USART3, USART_IT_RXNE, SET);
         return recvd;
     }
-    if(lineReceived2 && (usart == 2)) { //read from usart 2
+    if(lineReceived2 && (usart == UART_BLE)) { //read from usart 2
         USART_ITConfig(USART2, USART_IT_RXNE, RESET);
-        RxFifo_Peek(&data, 2);
-        while(!RxFifo_IsEmpty(2) && data != '\r') {
-            recvd += RxFifo_Get((uint8_t *)str++, 2);
-            RxFifo_Peek(&data, 2);
+        RxFifo_Peek(&data,UART_BLE);
+        while(!RxFifo_IsEmpty(UART_BLE) && data != '\r') {
+            recvd += RxFifo_Get((uint8_t *)str++,UART_BLE);
+            RxFifo_Peek(&data,UART_BLE);
         }
-        RxFifo_Get(&data, 2);
+        RxFifo_Get(&data,UART_BLE);
         *str = 0;
         lineReceived2 = false;
         USART_ITConfig(USART2, USART_IT_RXNE, SET);
@@ -144,20 +144,20 @@ uint32_t BSP_UART_ReadLine(char *str, uint8_t usart) {
  */
 uint32_t BSP_UART_Write(char *str, uint32_t len, uint8_t usart) {
     uint32_t sent = 0;
-    if (usart == 3){
+    if (usart == UART_USB){
         USART_ITConfig(USART3, USART_IT_TC, RESET);
         while (*str != '\0' && len > 0){
-            sent += TxFifo_Put(*str, 3);
+            sent += TxFifo_Put(*str,UART_USB);
             str++;
             len--;
         }
         USART_ITConfig(USART3, USART_IT_TC, SET);
         return sent;
     }
-    if (usart == 2){
+    if (usart == UART_BLE){
         USART_ITConfig(USART2, USART_IT_TC, RESET);
         while (*str != '\0' && len > 0){
-            sent += TxFifo_Put(*str, 2);
+            sent += TxFifo_Put(*str,UART_BLE);
             str++;
             len--;
         }
@@ -175,20 +175,20 @@ void USART2_IRQHandler(void) {
         // Check if it was a backspace.
         // '\b' for minicmom
         // '\177' for putty
-        if(data != '\b' && data != '\177') RxFifo_Put(data, 2);
+        if(data != '\b' && data != '\177') RxFifo_Put(data,UART_BLE);
         // Sweet, just a "regular" key. Put it into the fifo
         // Doesn't matter if it fails. If it fails, then the data gets thrown away
         // and the easiest solution for this is to increase RX_SIZE
         else {
             uint8_t junk = 0;
             // Delete the last entry!
-            removeSuccess = RxFifo_RemoveLast(&junk, 2);
+            removeSuccess = RxFifo_RemoveLast(&junk,UART_BLE);
         }
         if(removeSuccess) USART2->DR = data;
     }
     if(USART_GetITStatus(USART2, USART_IT_TC) != RESET) {
         // If getting data from fifo fails i.e. the tx fifo is empty, then turn off the TX interrupt
-        if(!TxFifo_Get((uint8_t *)&(USART2->DR), 2)) USART_ITConfig(USART2, USART_IT_TC, RESET);
+        if(!TxFifo_Get((uint8_t *)&(USART2->DR),UART_BLE)) USART_ITConfig(USART2, USART_IT_TC, RESET);
     }
     if(USART_GetITStatus(USART2, USART_IT_ORE) != RESET);
 }
@@ -201,32 +201,32 @@ void USART3_IRQHandler(void) {
         // Check if it was a backspace.
         // '\b' for minicmom
         // '\177' for putty
-        if(data != '\b' && data != '\177') RxFifo_Put(data, 3);
+        if(data != '\b' && data != '\177') RxFifo_Put(data,UART_USB);
         // Sweet, just a "regular" key. Put it into the fifo
         // Doesn't matter if it fails. If it fails, then the data gets thrown away
         // and the easiest solution for this is to increase RX_SIZE
         else {
             uint8_t junk = 0;
             // Delete the last entry!
-            removeSuccess = RxFifo_RemoveLast(&junk, 3);
+            removeSuccess = RxFifo_RemoveLast(&junk,UART_USB);
         }
         if(removeSuccess) USART3->DR = data;
     }
     if(USART_GetITStatus(USART3, USART_IT_TC) != RESET) {
         // If getting data from fifo fails i.e. the tx fifo is empty, then turn off the TX interrupt
-        if(!TxFifo_Get((uint8_t *)&(USART3->DR), 3)) USART_ITConfig(USART3, USART_IT_TC, RESET);
+        if(!TxFifo_Get((uint8_t *)&(USART3->DR),UART_USB)) USART_ITConfig(USART3, USART_IT_TC, RESET);
     }
     if(USART_GetITStatus(USART3, USART_IT_ORE) != RESET);
 }
 
 
-static bool TxFifo_Get(uint8_t *data, uint8_t usart) {
-    if(!TxFifo_IsEmpty(3) && (usart == 3)) {
+static bool TxFifo_Get(uint8_t *data, UART_Port usart) {
+    if(!TxFifo_IsEmpty(UART_USB) && (usart == UART_USB)) {
         *data = txBuffer3[txGet3];
         txGet3 = (txGet3 + 1) % TX_SIZE;
         return true;
     }
-    if(!TxFifo_IsEmpty(2) && usart == 2) {
+    if(!TxFifo_IsEmpty(UART_BLE) && usart == UART_BLE) {
         *data = txBuffer2[txGet2];
         txGet2 = (txGet2 + 1) % TX_SIZE;
         return true;
@@ -234,13 +234,13 @@ static bool TxFifo_Get(uint8_t *data, uint8_t usart) {
     return false;
 }
 
-static bool TxFifo_Put(uint8_t data, uint8_t usart) {
-    if(!TxFifo_IsFull(3) && (usart  == 3)) {
+static bool TxFifo_Put(uint8_t data, UART_Port usart) {
+    if(!TxFifo_IsFull(UART_USB) && (usart  == UART_USB)) {
         txBuffer3[txPut3] = data;
         txPut3 = (txPut3 + 1) % TX_SIZE;
         return true;
     }
-    if(!TxFifo_IsFull(2) && (usart == 2)) {
+    if(!TxFifo_IsFull(UART_BLE) && (usart == UART_BLE)) {
         txBuffer2[txPut2] = data;
         txPut2 = (txPut2 + 1) % TX_SIZE;
         return true;
@@ -248,25 +248,25 @@ static bool TxFifo_Put(uint8_t data, uint8_t usart) {
     return false;
 }
 
-static bool TxFifo_IsFull(uint8_t usart) {
-    if (usart == 3) return (txPut3 + 1) % TX_SIZE == txGet3;
-    if (usart == 2) return (txPut2 + 1) % TX_SIZE == txGet2;
+static bool TxFifo_IsFull(UART_Port usart) {
+    if (usart == UART_USB) return (txPut3 + 1) % TX_SIZE == txGet3;
+    if (usart == UART_BLE) return (txPut2 + 1) % TX_SIZE == txGet2;
     return 0;
 }
 
-static bool TxFifo_IsEmpty(uint8_t usart) {
-    if (usart == 3) return txGet3 == txPut3;
-    if (usart == 2) return txGet2 == txPut2;
+static bool TxFifo_IsEmpty(UART_Port usart) {
+    if (usart == UART_USB) return txGet3 == txPut3;
+    if (usart == UART_BLE) return txGet2 == txPut2;
     return 0;
 }
 
-static bool RxFifo_Get(uint8_t *data, uint8_t usart) {
-    if(!RxFifo_IsEmpty(3) && (usart == 3)) {
+static bool RxFifo_Get(uint8_t *data, UART_Port usart) {
+    if(!RxFifo_IsEmpty(UART_USB) && (usart == UART_USB)) {
         *data = rxBuffer3[rxGet3];
         rxGet3 = (rxGet3 + 1) % RX_SIZE;
         return true;
     }
-    if(!RxFifo_IsEmpty(2) && (usart == 2)) {
+    if(!RxFifo_IsEmpty(UART_BLE) && (usart == UART_BLE)) {
         *data = rxBuffer2[rxGet2];
         rxGet2 = (rxGet2 + 1) % RX_SIZE;
         return true;
@@ -274,13 +274,13 @@ static bool RxFifo_Get(uint8_t *data, uint8_t usart) {
     return false;
 }
 
-static bool RxFifo_Put(uint8_t data, uint8_t usart) {
-    if(!RxFifo_IsFull(3) && (usart == 3)) {
+static bool RxFifo_Put(uint8_t data, UART_Port usart) {
+    if(!RxFifo_IsFull(UART_USB) && (usart == UART_USB)) {
         rxBuffer3[rxPut3] = data;
         rxPut3 = (rxPut3 + 1) % RX_SIZE;
         return true;
     }
-    if(!RxFifo_IsFull(2) && (usart == 2)) {
+    if(!RxFifo_IsFull(UART_BLE) && (usart == UART_BLE)) {
         rxBuffer2[rxPut2] = data;
         rxPut2 = (rxPut2 + 1) % RX_SIZE;
         return true;
@@ -288,14 +288,14 @@ static bool RxFifo_Put(uint8_t data, uint8_t usart) {
     return false;
 }
 
-static bool RxFifo_RemoveLast(uint8_t *data, uint8_t usart) {
-    if(!RxFifo_IsEmpty(3) && (usart == 3)) {
+static bool RxFifo_RemoveLast(uint8_t *data, UART_Port usart) {
+    if(!RxFifo_IsEmpty(UART_USB) && (usart == UART_USB)) {
         *data = rxBuffer3[rxPut3 - 1];
         if(rxPut3 > 0) rxPut3--;
         else rxPut3 = RX_SIZE - 1;
         return true;
     }
-    if(!RxFifo_IsEmpty(2) && (usart == 2)) {
+    if(!RxFifo_IsEmpty(UART_BLE) && (usart == UART_BLE)) {
         *data = rxBuffer2[rxPut2 - 1];
         if(rxPut2 > 0) rxPut2--;
         else rxPut2 = RX_SIZE - 1;
@@ -304,26 +304,26 @@ static bool RxFifo_RemoveLast(uint8_t *data, uint8_t usart) {
     return false;
 }
 
-static bool RxFifo_Peek(uint8_t *data, uint8_t usart) {
-    if(!RxFifo_IsEmpty(3) && (usart == 3)) {
+static bool RxFifo_Peek(uint8_t *data, UART_Port usart) {
+    if(!RxFifo_IsEmpty(UART_USB) && (usart == UART_USB)) {
         *data = rxBuffer3[rxGet3];
         return true;
     }
-    if(!RxFifo_IsEmpty(2) && (usart == 2)) {
+    if(!RxFifo_IsEmpty(UART_BLE) && (usart == UART_BLE)) {
         *data = rxBuffer2[rxGet2];
         return true;
     }
     return false;
 }
 
-static bool RxFifo_IsFull(uint8_t usart) {
-    if (usart == 3) return (rxPut3 + 1) % RX_SIZE == rxGet3;
-    if (usart == 2) return (rxPut2 + 1) % RX_SIZE == rxGet2;
+static bool RxFifo_IsFull(UART_Port usart) {
+    if (usart == UART_USB) return (rxPut3 + 1) % RX_SIZE == rxGet3;
+    if (usart == UART_BLE) return (rxPut2 + 1) % RX_SIZE == rxGet2;
     return 0;
 }
 
-static bool RxFifo_IsEmpty(uint8_t usart) {
-    if (usart == 3) return rxGet3 == rxPut3;
-    if (usart == 2) return rxGet2 == rxPut2;
+static bool RxFifo_IsEmpty(UART_Port usart) {
+    if (usart == UART_USB) return rxGet3 == rxPut3;
+    if (usart == UART_BLE) return rxGet2 == rxPut2;
     return 0;
 }
