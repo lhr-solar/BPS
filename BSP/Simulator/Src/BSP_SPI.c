@@ -88,6 +88,13 @@ void BSP_SPI_Write(uint8_t *txBuf, uint32_t txLen) {
  * @return  None
  */
 void BSP_SPI_Read(uint8_t *rxBuf, uint32_t rxLen) {
+
+    if(rxLen == 1) {
+        rxBuf[0] = 0;
+        return;
+    }
+
+
     //========= Check SPIR.csv file until it's empty =========
     // Check until SPIR.csv file has contents. 
     // The simulator will update SPIR.csv once it's ready.

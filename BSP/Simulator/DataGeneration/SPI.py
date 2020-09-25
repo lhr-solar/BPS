@@ -124,16 +124,22 @@ def generate(state, mode, battery=None):
 
     temperature_values_copy = temperature_values.copy()
     voltage_values_copy = voltage_values.copy()
+    wires_copy = wires.copy()
+
     minion_idx = 0
     for minion in minions:
         voltage_partition = []
         temperature_partition = []
+        wires_partition = []
+
         voltage_partition.clear()
         temperature_partition.clear()
+        wires_partition.clear()
 
         for i in range(8):
             voltage_partition.append(voltage_values_copy.pop(0))
             temperature_partition.append(temperature_values_copy.pop(0))
+            wires_partition.append(wires_copy.pop(0))
 
             if len(voltage_values_copy) == 0 and len(temperature_values_copy) == 0:
                 break
@@ -147,8 +153,8 @@ def generate(state, mode, battery=None):
             temperature_partition.append([0, 0])
         
 
-        print(temperature_partition)
-        print(voltage_partition)
+        # print(temperature_partition)
+        # print(voltage_partition)
 
         minion.set_temperatures(temperature_partition)
         minion.set_voltage(voltage_partition)
@@ -171,6 +177,7 @@ def generate(state, mode, battery=None):
             for row in csvreader:
                 for i in range(len(row)):
                     message.append(int(row[i]))
+
             ltc6811.parse_full_protocol(minions, message)
             csvfile.truncate(0)     # Delete the command to indicate simulator has resolved it
             fcntl.flock(csvfile.fileno(), fcntl.LOCK_UN)    # Unlock file
@@ -179,6 +186,7 @@ def generate(state, mode, battery=None):
             fcntl.flock(csvfile.fileno(), fcntl.LOCK_EX)    # Lock file
             csvwriter = csv.writer(csvfile)
             message = ltc6811.format_full_protocol(minions)
+            print(message)
             if message is not None:
                  # Write
                 csvwriter.writerow(message)
@@ -219,65 +227,77 @@ def read():
 
 
 # TEST
+UNIT_TEST = 0
 if __name__ == "__main__":
-    # Test SPI functions
-    import battery
-    BeVolt = battery.Battery(30, config.total_batt_pack_capacity_mah, 2500 * config.num_batt_cells_parallel_per_module)
-    module_values = read()
-    for i, module in enumerate(module_values):
-        print("| {0} | {1:.4f}V | {2:.3f}°C | {3:.3f}°C |".format('X' if module[0] else ' ', module[1]/10000, module[2]/1000, module[3]/1000))
 
-    # Test LTC6811 instantiation
-    for ic in range(4):
-        batt_modules = []
-        lim = 8
 
-        # Last ic in chain only monitors 7 battery modules
-        if ic == 3:
-            lim = 7
+    if UNIT_TEST:
+        # Test SPI functions
+        import battery
+        BeVolt = battery.Battery(30, config.total_batt_pack_capacity_mah, 2500 * config.num_batt_cells_parallel_per_module)
+        module_values = read()
+        for i, module in enumerate(module_values):
+            print("| {0} | {1:.4f}V | {2:.3f}°C | {3:.3f}°C |".format('X' if module[0] else ' ', module[1]/10000, module[2]/1000, module[3]/1000))
 
-        for batt in range(lim):
-            batt_modules.append(BeVolt.modules[ic * 8 + batt])
+        # Test LTC6811 instantiation
+        for ic in range(4):
+            batt_modules = []
+            lim = 8
 
-        minions.append(ltc6811.LTC6811(batt_modules))
-    print()
+            # Last ic in chain only monitors 7 battery modules
+            if ic == 3:
+                lim = 7
 
-    # Test PEC
-    print("PEC Test")
-    ltc6811.pec_init()
-    print(hex(ltc6811.calc_pec([0x00, 0x01])))
-    print()
+            for batt in range(lim):
+                batt_modules.append(BeVolt.modules[ic * 8 + batt])
 
-    # Test LTC6811 static methods
-    print("LTC6811 Static Methods Test")
-    minions[0].tx_data = [0, 1, 2, 3, 4, 5]
-    minions[1].tx_data = [6, 7, 8, 9, 10, 11]
-    minions[2].tx_data = [12, 13, 14, 15, 16, 17]
-    minions[3].tx_data = [18, 19, 20, 21, 22, 23]
-    for minion in minions:
-        minion.tx_available = 1
-    protocol = ltc6811.format_full_protocol(minions)
-    ltc6811.print_protocol(protocol)
+            minions.append(ltc6811.LTC6811(batt_modules))
+        print()
 
-    # Add command at the front + cmd_pec
-    pec = ltc6811.calc_pec([0x00, 0x01])
-    protocol.insert(0, 0x00)
-    protocol.insert(1, 0x01)
-    protocol.insert(2, (pec >> 8) & 0x00FF)    # PEC0
-    protocol.insert(3, pec & 0x00FF)           # PEC1
-    ltc6811.parse_full_protocol(minions, protocol)
+        # Test PEC
+        print("PEC Test")
+        ltc6811.pec_init()
+        print(hex(ltc6811.calc_pec([0x00, 0x01])))
+        print()
 
-    protocol.clear()
-    pec = ltc6811.calc_pec([0x00, 0x02])
-    protocol.insert(0, 0x00)
-    protocol.insert(1, 0x02)
-    protocol.insert(2, (pec >> 8) & 0x00FF)    # PEC0
-    protocol.insert(3, pec & 0x00FF)           # PEC1
-    ltc6811.parse_full_protocol(minions, protocol)
-    
-    print(minions[0])
-    print(minions[1])
-    print(minions[2])
-    print(minions[3])
+        # Test LTC6811 static methods
+        print("LTC6811 Static Methods Test")
+        minions[0].tx_data = [0, 1, 2, 3, 4, 5]
+        minions[1].tx_data = [6, 7, 8, 9, 10, 11]
+        minions[2].tx_data = [12, 13, 14, 15, 16, 17]
+        minions[3].tx_data = [18, 19, 20, 21, 22, 23]
+        for minion in minions:
+            minion.tx_available = 1
+        protocol = ltc6811.format_full_protocol(minions)
+        ltc6811.print_protocol(protocol)
 
-    generate('discharging', 'normal', BeVolt)
+        # Add command at the front + cmd_pec
+        pec = ltc6811.calc_pec([0x00, 0x01])
+        protocol.insert(0, 0x00)
+        protocol.insert(1, 0x01)
+        protocol.insert(2, (pec >> 8) & 0x00FF)    # PEC0
+        protocol.insert(3, pec & 0x00FF)           # PEC1
+        ltc6811.parse_full_protocol(minions, protocol)
+
+        protocol.clear()
+        pec = ltc6811.calc_pec([0x00, 0x02])
+        protocol.insert(0, 0x00)
+        protocol.insert(1, 0x02)
+        protocol.insert(2, (pec >> 8) & 0x00FF)    # PEC0
+        protocol.insert(3, pec & 0x00FF)           # PEC1
+        ltc6811.parse_full_protocol(minions, protocol)
+        # 
+        print(minions[0])
+        print(minions[1])
+        print(minions[2])
+        print(minions[3])
+
+        generate('discharging', 'normal', BeVolt)
+
+    else:
+        import time
+        init()
+
+        while True:
+            generate('discharging', 'normal', None)
+            time.sleep(1)
