@@ -2,7 +2,7 @@
 Useful functions.
 """
 
-DEBUG = True
+DEBUG = False
 
 def log(s, end="\n"):
     if DEBUG:

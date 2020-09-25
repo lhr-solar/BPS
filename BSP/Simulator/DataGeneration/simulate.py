@@ -177,6 +177,7 @@ def main():
         # Create state of the battery
         BeVolt = battery.Battery(ampere_draw, config.total_batt_pack_capacity_mah, init_capacity_mah)
         PLL.PLL_Init()
+        SPI.init()
     else:
         BeVolt = None
         configure()
@@ -289,6 +290,9 @@ def main():
             curses.endwin()
             print("ERROR:", end=" ")
             print(repr(e), end="\r\n")
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+            print(exc_type, fname, exc_tb.tb_lineno)
             print("If addwstr() returned ERR, make your terminal window bigger.")
             print("\n\rContinue? (Y/n): ", end="")
             cont = input()
