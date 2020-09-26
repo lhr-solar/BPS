@@ -11,6 +11,7 @@
 #include "CANbus.h"
 #include "BSP_UART.h"
 #include "config.h"
+//Authored by Manthan Upadhyaya: 10/2020
 
 void Task_FaultState(void *p_arg) {
     (void)p_arg;
