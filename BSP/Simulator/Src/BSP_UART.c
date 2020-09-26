@@ -97,7 +97,6 @@ void *ScanThread(void *arg) {
 
     do {
         int data = fgetc(stdin);
-        printf("%c", data);
 
         if(data == '\r' || data == '\n') {
             lineReceived = true;

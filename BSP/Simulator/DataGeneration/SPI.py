@@ -98,7 +98,6 @@ def specific_temperature(battery):
 st = 'discharging'
 md = 'normal'
 batt = None
-en = False
 def init(state='discharging', mode='normal', battery=None):
     global st, md, batt
     f_r = open(read_file, 'w')
@@ -109,20 +108,9 @@ def init(state='discharging', mode='normal', battery=None):
     st = state
     md = mode
     batt = battery
-    en = True
     
     for i in range(4):
         minions.append(ltc6811.LTC6811(battery))
-
-def spi_task():
-    while en == False:
-        pass
-
-    logging.info('Starting SPI Task')
-    while True:
-        generate(st, md, batt)
-
-spi_thread = threading.Thread(target=spi_task)
 
 def generate(state, mode, battery=None):
     """
@@ -161,10 +149,6 @@ def generate(state, mode, battery=None):
         voltage_partition.clear()
         temperature_partition.clear()
         wires_partition.clear()
-
-        logging.debug(voltage_values_copy)
-        logging.debug(temperature_values_copy)
-        logging.debug(wires_copy)
 
         for i in range(8):
             voltage_partition.append(voltage_values_copy.pop(0))
@@ -208,7 +192,8 @@ def generate(state, mode, battery=None):
                 for i in range(len(row)):
                     message.append(int(row[i]))
                 break
-                
+            
+            print(message)
 
             ltc6811.parse_full_protocol(minions, message)
             csvfile.truncate(0)     # Delete the command to indicate simulator has resolved it
@@ -218,6 +203,7 @@ def generate(state, mode, battery=None):
             fcntl.flock(csvfile.fileno(), fcntl.LOCK_EX)    # Lock file
             csvwriter = csv.writer(csvfile)
             message = ltc6811.format_full_protocol(minions)
+            print(message)
             if message is not None:
                 # Write
                 csvwriter.writerow(message)
@@ -227,6 +213,14 @@ def generate(state, mode, battery=None):
             fcntl.flock(csvfile.fileno(), fcntl.LOCK_UN)    # Unlock file
     except:    
         pass 
+
+
+def spi_task():
+    logging.info('Starting SPI Task')
+    while True:
+        generate(st, md, batt)
+
+spi_thread = threading.Thread(target=spi_task)
 
 
 def read():

@@ -149,13 +149,10 @@ void BSP_SPI_Read(uint8_t *rxBuf, uint32_t rxLen) {
     char *token_save_byte = NULL;
     char *token_byte = __strtok_r(csvBuffer, ",", &token_save_byte);
     while((token_byte != NULL) && (byte_idx < rxLen)) {
-        //printf("%s,", token_byte);
         sscanf(token_byte, "%hu", (short unsigned int *)&rxBuf[byte_idx]);
         token_byte = __strtok_r(NULL, ",", &token_save_byte);
         byte_idx++;
     }
-
-    //printf("\n");
 
     // Pad the rest with 0s
     while(byte_idx < rxLen) {

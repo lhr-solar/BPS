@@ -242,7 +242,6 @@ void faultCondition(void){
 		}
 		BSP_WDTimer_Reset();	// Even though faulted, WDTimer needs to be updated or else system will reset
 					// causing WDOG error. WDTimer can't be stopped after it starts.
-					printf("=");
 	}
 }
 	

@@ -28,15 +28,22 @@ int main() {
 
         Voltage_UpdateMeasurements();
         
+        printf("Printing voltage values.\r\n");
+        for(int i = 0; i < NUM_BATTERY_MODULES; i++) {
+            printf("\t%d: %dmV\r\n", i, Voltage_GetModuleMillivoltage(i));
+        }
+
         if(Voltage_CheckStatus() != SAFE) {
             printf("DANGER!! Voltage Levels in Danger :(\r\n");
             break;
         }
 
-        if(Voltage_OpenWire() != SAFE) {
-            printf("DANGER!! There is an open wire :(\r\n");
-            break;
-        }
+        Voltage_OpenWire();
+
+        // if(Voltage_OpenWire() != SAFE) {
+        //     printf("DANGER!! There is an open wire :(\r\n");
+        //     break;
+        // }
 
     }
 

@@ -36,7 +36,6 @@ def generate(battery=None):
         battery.update()
     # Generate ADC values
     ADC.generate(state, mode, battery)
-    # Generate SPI values
     #Pet Watchdog
     WDTimer.Check_State()
     #Initialize Watchdog Timer
@@ -204,6 +203,8 @@ def main():
     #Start background thread for timer 
     timerThread = Timer.timer_Thread
     timerThread.start()
+    spiThread = SPI.spi_thread
+    spiThread.start()
     while True:
         try:
             # Generate all values
