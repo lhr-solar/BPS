@@ -37,7 +37,7 @@ def generate(battery=None):
     # Generate ADC values
     ADC.generate(state, mode, battery)
     #Pet Watchdog
-    WDTimer.Check_State()
+    #WDTimer.Check_State()
     #Initialize Watchdog Timer
     WDTimer.WD_Enable()
     #Initialize Timer
@@ -66,7 +66,8 @@ def display(battery=None):  #print watchdog countdown
     CANbox.addstr(4, 0, textwrap.fill(text, 40))
     CANbox.addstr(3, 2, "CAN ID and Message:")
     # Display Watchdog ticks
-    ticks = WDTimer.Tick()
+    #ticks = WDTimer.Tick()
+    ticks = 0
     stdscr.addstr(10, 0, f"                              ") #clear previous tick
     stdscr.addstr(10, 0, f"WDTimer Countdown: {ticks}")
     #Display current frequency

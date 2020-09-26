@@ -174,6 +174,11 @@ def generate(state, mode, battery=None):
 
         minion_idx += 1
 
+        print(temperature_partition)
+        print(voltage_partition)
+        print(wires_partition)
+
+
     # Record if file is not empty
     try:
         with open(read_file, 'r+') as csvfile:
@@ -218,7 +223,7 @@ def generate(state, mode, battery=None):
 def spi_task():
     logging.info('Starting SPI Task')
     while True:
-        generate(st, md, batt)
+        generate('discharging', 'normal', None)
 
 spi_thread = threading.Thread(target=spi_task)
 
