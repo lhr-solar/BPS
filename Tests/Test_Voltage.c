@@ -20,8 +20,6 @@ int main() {
         printf("\t%d: %dmV\r\n", i, Voltage_GetModuleMillivoltage(i));
     }
 
-    sleep(1);
-
     printf("Testing Voltage functions in loop.\r\n");
 
     while(1) {

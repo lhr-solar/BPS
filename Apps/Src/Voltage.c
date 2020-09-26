@@ -130,12 +130,13 @@ void Voltage_OpenWireSummary(void){
  */
 SafetyStatus Voltage_OpenWire(void){
 	wakeup_idle(NUM_MINIONS);
-	long openwires = LTC6811_run_openwire_multi(NUM_MINIONS, Minions, false);
-	if(openwires != 0){
-		return DANGER;
-	} else {
-		return SAFE;
+	LTC6811_run_openwire_multi(NUM_MINIONS, Minions, false);
+
+	for(int32_t i = 0; i < NUM_MINIONS; i++) {
+
 	}
+
+	return DANGER;
 }
 
 /** Voltage_GetOpenWire

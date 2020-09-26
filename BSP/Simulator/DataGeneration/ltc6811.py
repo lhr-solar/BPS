@@ -111,8 +111,10 @@ def adowpu_md0_dcp0_ch0_handler(ltc6811):
     debug.log("adowpu_md0_dcp0_ch0")
     ltc6811.curr_ad_command = ad_commands['ADOWPU']
     ltc6811.tx_available = 0   # Reset because there shouldn't be any data sent back
+    #print(ltc6811.wires)
     for wire_idx in range(12):
-        if ltc6811.open_wires[wire_idx] == 1:
+        # 1 means connected, 0 means open
+        if ltc6811.wires[wire_idx] == 0:
             ltc6811.pullup_volt[wire_idx] = PULL_MAX_VOLT
         else:
             ltc6811.pullup_volt[wire_idx] = PULL_MIN_VOLT
@@ -122,8 +124,9 @@ def adowpd_md0_dcp0_ch0_handler(ltc6811):
     debug.log("adowpd_md0_dcp0_ch0")
     ltc6811.curr_ad_command = ad_commands['ADOWPD']
     ltc6811.tx_available = 0   # Reset because there shouldn't be any data sent back
+    #print(ltc6811.wires)
     for wire_idx in range(12):
-        if ltc6811.open_wires[wire_idx] == 1:
+        if ltc6811.wires[wire_idx] == 0:
             ltc6811.pulldown_volt[wire_idx] = PULL_MIN_VOLT
         else:
             ltc6811.pulldown_volt[wire_idx] = PULL_MAX_VOLT
@@ -212,9 +215,9 @@ command_codes = {
     'SIM_LTC6811_ADCV_DEFAULT'          : {'code': 0x260, 'handler': None},       # 0 1 MD[1] MD[0] 1 1 DCP 0 CH[2] CH[1] CH[0]
     'SIM_LTC6811_ADCV_MD0_DCP0_CH0'     : {'code': 0x260, 'handler': adcv_md0_dcp0_ch0_handler},    # 0 1 0 0 1 1 0 0 0 0 0
     'SIM_LTC6811_ADOWPU_DEFAULT'        : {'code': 0x268, 'handler': None},       # 0 1 MD[1] MD[0] PUP 1 DCP 1 CH[2] CH[1] CH[0]
-    'SIM_LTC6811_ADOWPU_MD0_DCP0_CH0'   : {'code': 0x4E8, 'handler': adowpu_md0_dcp0_ch0_handler},  # 0 1 1 1 1 1 0 1 0 0 0
+    'SIM_LTC6811_ADOWPU_MD0_DCP0_CH0'   : {'code': 0x3E8, 'handler': adowpu_md0_dcp0_ch0_handler},  # 0 1 1 1 1 1 0 1 0 0 0
     'SIM_LTC6811_ADOWPD_DEFAULT'        : {'code': 0x228, 'handler': None},       # 0 1 MD[1] MD[0] PUP 1 DCP 1 CH[2] CH[1] CH[0]
-    'SIM_LTC6811_ADOWPD_MD0_DCP0_CH0'   : {'code': 0x4C8, 'handler': adowpd_md0_dcp0_ch0_handler},  # 0 1 1 1 0 1 0 1 0 0 0
+    'SIM_LTC6811_ADOWPD_MD0_DCP0_CH0'   : {'code': 0x3A8, 'handler': adowpd_md0_dcp0_ch0_handler},  # 0 1 1 1 0 1 0 1 0 0 0
     'SIM_LTC6811_CVST'      : {'code': 0x207, 'handler': None},       # 0 1 MD[1] MD[0] ST[1] ST[0] 0 0 1 1 1
     'SIM_LTC6811_ADOL'      : {'code': 0x201, 'handler': None},       # 0 1 MD[1] MD[0] 0 0 DCP 0 0 0 1
     'SIM_LTC6811_ADAX_DEFAULT'          : {'code': 0x460, 'handler': None},       # 1 0 MD[1] MD[0] 1 1 0 0 CHG[2] CHG[1] CHG[0]
@@ -229,7 +232,7 @@ command_codes = {
     'SIM_LTC6811_CLRCELL'   : {'code': 0x711, 'handler': clrcell_handler},
     'SIM_LTC6811_CLRAUX'    : {'code': 0x712, 'handler': None},
     'SIM_LTC6811_CLRSTAT'   : {'code': 0x713, 'handler': None},
-    'SIM_LTC6811_PLADC'     : {'code': 0x714, 'handler': pladc_handler},
+    'SIM_LTC6811_PLADC'     : {'code': 0x714, 'handler': None},
     'SIM_LTC6811_DIAGN'     : {'code': 0x715, 'handler': None},
     'SIM_LTC6811_WRCOMM'    : {'code': 0x721, 'handler': wrcomm_handler},
     'SIM_LTC6811_RDCOMM'    : {'code': 0x722, 'handler': None},
@@ -378,7 +381,7 @@ class LTC6811:
         # Temporary solution.
         # Voltages and temperatures should be reference batt modules object list
         self.voltages = [0] * 12            # Max number batt minion brd can handle: 12 batt
-        self.open_wires = [0] * 12          # 0 means close, 1 means open
+        self.wires = [1] * 12               # 1 means close, 0 means open
         self.pullup_volt = [0] * 12
         self.pulldown_volt = [0] * 12
 
@@ -466,21 +469,21 @@ class LTC6811:
             self.ltc1380s[mux_idxs['SIM_LTC1380_MUX2']].temperatures_cel[temp_idx] = b
             temp_idx += 1
 
-    def set_open_wires(self, open_wires):
+    def set_wires(self, wires):
         '''
-        @brief  updates array of open_wires
-        @param  open_wires : list of open_wires, each index corresponds to batt module.
-                            0 for not open, 1 for open
+        @brief  updates array of wires
+        @param  wires : list of wires, each index corresponds to batt module.
+                        1 for closed, 0 for open
         '''
-        self.open_wires = open_wires.copy()
+        self.wires = wires.copy()
 
-    def set_single_wire(self, idx, open):
+    def set_single_wire(self, idx, isconnected):
         '''
         @brief  sets a single wire to open or closed
         @param  idx : batt module 0-indexed
-        @param  open : 0 for not open (closed), 1 for open
+        @param  isconnected : 1 for not open (closed), 1 for open
         '''
-        self.open_wires[idx] = open
+        self.wires[idx] = isconnected
 
     def set_voltage_pullup(self, pu_volt):
         self.pullup_volt = pu_volt.copy()

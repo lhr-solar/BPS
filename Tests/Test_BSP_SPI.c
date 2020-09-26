@@ -2,6 +2,7 @@
 #include "config.h"
 #include "BSP_SPI.h"
 #include "BSP_UART.h"
+#include "LTC6811.h"
 
 int main() {
 
@@ -20,6 +21,6 @@ int main() {
     }
 
     while(1) {
-        
+
     }
 }

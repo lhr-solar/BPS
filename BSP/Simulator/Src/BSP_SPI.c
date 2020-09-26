@@ -28,7 +28,6 @@ static char csvBuffer[CSV_SPI_BUFFER_SIZE];
  * @return  None
  */
 void BSP_SPI_Init(void) {
-
     // Check if simulator is running i.e. were the csv files created?
     if(access(read_file, F_OK) != 0) {
         // File doesn't exit if true
@@ -50,7 +49,7 @@ void BSP_SPI_Init(void) {
  */
 void BSP_SPI_Write(uint8_t *txBuf, uint32_t txLen) {
     // Creates file if none exists
-	FILE* fp = fopen(write_file, "w+");
+	FILE* fp = fopen(write_file, "r+");
     if (!fp) {
         // File doesn't exit if true
         perror(SPI_W_CSV_FILE);
@@ -60,7 +59,22 @@ void BSP_SPI_Write(uint8_t *txBuf, uint32_t txLen) {
     // Lock the file so simulator.py/SPI.py can not write it during a read op.
     // This is a blocking statement
     int fno = fileno(fp);
+
+    // Check if the file is empty
+    int size = 0;
+    do {
+        flock(fno, LOCK_EX);
+
+        fseek(fp, 0, SEEK_END);
+        size = ftell(fp);
+        
+        // Unlock the lock so the simulator can write to SPI.csv again
+        flock(fno, LOCK_UN);
+    } while (size > 0);     // Loop until file is empty
+
     flock(fno, LOCK_EX);
+
+    fseek(fp, 0, SEEK_SET);
 
     for(uint32_t i = 0; i < txLen; i++) {
         fprintf(fp, "%d", txBuf[i]);
@@ -90,7 +104,7 @@ void BSP_SPI_Write(uint8_t *txBuf, uint32_t txLen) {
 void BSP_SPI_Read(uint8_t *rxBuf, uint32_t rxLen) {
 
     if(rxLen == 1) {
-        rxBuf[0] = 0;
+        rxBuf[0] = 1;
         return;
     }
 
@@ -135,10 +149,13 @@ void BSP_SPI_Read(uint8_t *rxBuf, uint32_t rxLen) {
     char *token_save_byte = NULL;
     char *token_byte = __strtok_r(csvBuffer, ",", &token_save_byte);
     while((token_byte != NULL) && (byte_idx < rxLen)) {
+        //printf("%s,", token_byte);
         sscanf(token_byte, "%hu", (short unsigned int *)&rxBuf[byte_idx]);
         token_byte = __strtok_r(NULL, ",", &token_save_byte);
         byte_idx++;
     }
+
+    //printf("\n");
 
     // Pad the rest with 0s
     while(byte_idx < rxLen) {
@@ -151,7 +168,7 @@ void BSP_SPI_Read(uint8_t *rxBuf, uint32_t rxLen) {
     fclose(fp_r);
 
     // Delete contents of file
-    fp_r = fopen(read_file, "w");
+    fp_r = fopen(read_file, "w+");
     fclose(fp_r);
 
 }

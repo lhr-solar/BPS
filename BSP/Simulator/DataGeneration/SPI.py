@@ -94,6 +94,11 @@ def specific_temperature(battery):
 
 
 def init(battery=None):
+    f_r = open(read_file, 'w')
+    f_r.close()
+    f_w = open(write_file, 'w')
+    f_w.close()
+    
     for i in range(4):
         minions.append(ltc6811.LTC6811(battery))
 
@@ -141,23 +146,22 @@ def generate(state, mode, battery=None):
             temperature_partition.append(temperature_values_copy.pop(0))
             wires_partition.append(wires_copy.pop(0))
 
-            if len(voltage_values_copy) == 0 and len(temperature_values_copy) == 0:
+            if len(voltage_values_copy) == 0 or len(temperature_values_copy) == 0 or len(wires_copy) == 0:
                 break
 
         for i in range(4):
             voltage_partition.append(0)
+            wires_partition.append(1)
 
         # Append extra
         if minion_idx == 3:
             voltage_partition.append(0)
             temperature_partition.append([0, 0])
-        
-
-        # print(temperature_partition)
-        # print(voltage_partition)
+            wires_partition.append(1)
 
         minion.set_temperatures(temperature_partition)
         minion.set_voltage(voltage_partition)
+        minion.set_wires(wires_partition)
 
         minion_idx += 1
 
@@ -169,6 +173,7 @@ def generate(state, mode, battery=None):
             # If file is empty, then do nothing
             filesize = os.path.getsize(read_file)
             if filesize == 0:
+                fcntl.flock(csvfile.fileno(), fcntl.LOCK_UN)    # Unlock file
                 return
 
             # Get message
@@ -177,18 +182,19 @@ def generate(state, mode, battery=None):
             for row in csvreader:
                 for i in range(len(row)):
                     message.append(int(row[i]))
+                break
+                
 
             ltc6811.parse_full_protocol(minions, message)
             csvfile.truncate(0)     # Delete the command to indicate simulator has resolved it
             fcntl.flock(csvfile.fileno(), fcntl.LOCK_UN)    # Unlock file
 
-        with open(write_file, 'w+') as csvfile:
+        with open(write_file, 'r+') as csvfile:
             fcntl.flock(csvfile.fileno(), fcntl.LOCK_EX)    # Lock file
             csvwriter = csv.writer(csvfile)
             message = ltc6811.format_full_protocol(minions)
-            print(message)
             if message is not None:
-                 # Write
+                # Write
                 csvwriter.writerow(message)
             else:
                 # Delete contents
@@ -300,4 +306,4 @@ if __name__ == "__main__":
 
         while True:
             generate('discharging', 'normal', None)
-            time.sleep(1)
+            
