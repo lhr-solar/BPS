@@ -16,10 +16,11 @@ def read():
     with open(file, 'r') as csvfile: #read file
         fcntl.flock(csvfile.fileno(), fcntl.LOCK_EX)    # Lock file
         csvreader = csv.reader(csvfile, delimiter = ',')
+        duty = None
         for row in csvreader:
             duty = row
         fcntl.flock(csvfile.fileno(), fcntl.LOCK_UN)    # Unlock file
-        if len(duty):
+        if duty is not None and len(duty):
             return duty #return list with speed for every fan
         else:
-            return 0
+            return [0, 0, 0, 0]

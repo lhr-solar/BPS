@@ -37,7 +37,7 @@ def generate(battery=None):
     # Generate ADC values
     ADC.generate(state, mode, battery)
     #Pet Watchdog
-    #WDTimer.Check_State()
+    WDTimer.Check_State()
     #Initialize Watchdog Timer
     WDTimer.WD_Enable()
     #Initialize Timer
@@ -103,7 +103,7 @@ def display(battery=None):  #print watchdog countdown
         stdscr.addstr(11, 100, "[]", curses.color_pair(2))
     else:
         stdscr.addstr(11, 100, "[]", curses.color_pair(3))
-    speed = [1,2,3,4]#Fans.read()
+    speed = Fans.read()
     stdscr.addstr(12, 9, "Fan Speeds")
     stdscr.addstr(13, 0, "================================")
     stdscr.addstr(14, 0, f"Fan 1: {speed[0]}/8")

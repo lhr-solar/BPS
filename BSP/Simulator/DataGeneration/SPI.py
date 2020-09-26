@@ -174,11 +174,6 @@ def generate(state, mode, battery=None):
 
         minion_idx += 1
 
-        print(temperature_partition)
-        print(voltage_partition)
-        print(wires_partition)
-
-
     # Record if file is not empty
     try:
         with open(read_file, 'r+') as csvfile:
@@ -197,8 +192,6 @@ def generate(state, mode, battery=None):
                 for i in range(len(row)):
                     message.append(int(row[i]))
                 break
-            
-            print(message)
 
             ltc6811.parse_full_protocol(minions, message)
             csvfile.truncate(0)     # Delete the command to indicate simulator has resolved it
@@ -208,7 +201,6 @@ def generate(state, mode, battery=None):
             fcntl.flock(csvfile.fileno(), fcntl.LOCK_EX)    # Lock file
             csvwriter = csv.writer(csvfile)
             message = ltc6811.format_full_protocol(minions)
-            print(message)
             if message is not None:
                 # Write
                 csvwriter.writerow(message)
