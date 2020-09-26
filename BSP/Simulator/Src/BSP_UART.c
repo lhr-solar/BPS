@@ -1,7 +1,7 @@
 #include "BSP_UART.h"
 #include <stdint.h>
 #include <pthread.h>
-
+//Written by Sijin and Revised by Manthan Upadhyaya: 10/2020
 #define RX_SIZE     64
 
 static char rxBuffer3[RX_SIZE];
@@ -20,9 +20,11 @@ static bool RxFifo_Peek(uint8_t *data, UART_Port usart);
 static bool RxFifo_IsFull(UART_Port usart);
 static bool RxFifo_IsEmpty(UART_Port usart);
 
-static pthread_mutex_t rx_mutex = PTHREAD_MUTEX_INITIALIZER;
+static pthread_mutex_t rx_mutex3 = PTHREAD_MUTEX_INITIALIZER;
+static pthread_mutex_t rx_mutex2 = PTHREAD_MUTEX_INITIALIZER;
 
-void *ScanThread(void *arg);
+void *ScanThread3(void *arg);
+void *ScanThread2(void *arg);
 
 /**
  * @brief   Initializes the UART peripheral
@@ -40,7 +42,17 @@ void BSP_UART_Init(void) {
         perror("pthread_attr_init");
         exit(EXIT_FAILURE);
     }
-    err = pthread_create(&id, &attr, &ScanThread, NULL);
+    err = pthread_create(&id, &attr, &ScanThread3, NULL);
+    if(err != 0) {
+        perror("pthread_create");
+        exit(EXIT_FAILURE);
+    }
+    err = pthread_attr_init(&attr);
+    if(err != 0) {
+        perror("pthread_attr_init");
+        exit(EXIT_FAILURE);
+    }
+    err = pthread_create(&id, &attr, &ScanThread2, NULL);
     if(err != 0) {
         perror("pthread_create");
         exit(EXIT_FAILURE);
@@ -59,7 +71,7 @@ uint32_t BSP_UART_ReadLine(char *str, UART_Port usart) {
     uint8_t data = 0;
     uint32_t recvd = 0;
     if(lineReceived3 && (usart == UART_USB)) {
-        pthread_mutex_lock(&rx_mutex);
+        pthread_mutex_lock(&rx_mutex3);
         RxFifo_Peek(&data, UART_USB);
         while(!RxFifo_IsEmpty(UART_USB) && data != '\r' && data != '\n') {
             recvd += RxFifo_Get((uint8_t *)str++, UART_USB);
@@ -68,11 +80,11 @@ uint32_t BSP_UART_ReadLine(char *str, UART_Port usart) {
         RxFifo_Get(&data, UART_USB);
         *str = 0;
         lineReceived3 = false;
-        pthread_mutex_unlock(&rx_mutex);
+        pthread_mutex_unlock(&rx_mutex3);
         return recvd;
     }
     if(lineReceived2 && (usart == UART_BLE)) {
-        pthread_mutex_lock(&rx_mutex); //NEED TO CHANGE THIS **********
+        pthread_mutex_lock(&rx_mutex2); //NEED TO CHANGE THIS **********
         RxFifo_Peek(&data, UART_BLE);
         while(!RxFifo_IsEmpty(UART_BLE) && data != '\r' && data != '\n') {
             recvd += RxFifo_Get((uint8_t *)str++, UART_BLE);
@@ -81,10 +93,9 @@ uint32_t BSP_UART_ReadLine(char *str, UART_Port usart) {
         RxFifo_Get(&data, UART_BLE);
         *str = 0;
         lineReceived2 = false;
-        pthread_mutex_unlock(&rx_mutex);//NEED TO CHANG THIS *********
+        pthread_mutex_unlock(&rx_mutex2);//NEED TO CHANG THIS *********
         return recvd;
     }
-
     return 0;
 }
 
@@ -100,32 +111,43 @@ uint32_t BSP_UART_Write(char *str, uint32_t len, UART_Port usart) {
 }
 
 
-void *ScanThread(void *arg) {
-
+void *ScanThread3(void *arg) {
     do {
         int data = fgetc(stdin);
-
-        if(data == '\r' || data == '\n') {
-            lineReceived3 = true;
-        }
-
+        if(data == '\r' || data == '\n') lineReceived3 = true;
         // Check if it was a backspace.
         // '\b' for minicmom
         // '\177' for putty
         if(data != '\b' && data != '\177' && data != 0) {
-
-            pthread_mutex_lock(&rx_mutex);
-
+            pthread_mutex_lock(&rx_mutex3);
             // Sweet, just a "regular" key. Put it into the fifo
             // Doesn't matter if it fails. If it fails, then the data gets thrown away
             // and the easiest solution for this is to increase RX_SIZE
             RxFifo_Put((uint8_t)data, UART_USB);
-
-            pthread_mutex_unlock(&rx_mutex);
+            pthread_mutex_unlock(&rx_mutex3);
         }
-
     } while (1);
+    // Should not get here
+    int retval = 1;
+    pthread_exit(&retval);
+}
 
+void *ScanThread2(void *arg) {
+    do {
+        int data = fgetc(stdin);
+        if(data == '\r' || data == '\n') lineReceived2 = true;
+        // Check if it was a backspace.
+        // '\b' for minicmom
+        // '\177' for putty
+        if(data != '\b' && data != '\177' && data != 0) {
+            pthread_mutex_lock(&rx_mutex2);
+            // Sweet, just a "regular" key. Put it into the fifo
+            // Doesn't matter if it fails. If it fails, then the data gets thrown away
+            // and the easiest solution for this is to increase RX_SIZE
+            RxFifo_Put((uint8_t)data, UART_BLE);
+            pthread_mutex_unlock(&rx_mutex2);
+        }
+    } while (1);
     // Should not get here
     int retval = 1;
     pthread_exit(&retval);
@@ -137,6 +159,11 @@ static bool RxFifo_Get(uint8_t *data, UART_Port usart) {
         rxGet3 = (rxGet3 + 1) % RX_SIZE;
         return true;
     }
+    if(!RxFifo_IsEmpty(UART_BLE)) {
+        *data = rxBuffer2[rxGet2];
+        rxGet2 = (rxGet2 + 1) % RX_SIZE;
+        return true;
+    }
     return false;
 }
 
@@ -144,6 +171,11 @@ static bool RxFifo_Put(uint8_t data, UART_Port usart) {
     if(!RxFifo_IsFull(UART_USB)) {
         rxBuffer3[rxPut3] = data;
         rxPut3 = (rxPut3 + 1) % RX_SIZE;
+        return true;
+    }
+    if(!RxFifo_IsFull(UART_BLE)) {
+        rxBuffer2[rxPut2] = data;
+        rxPut2 = (rxPut2 + 1) % RX_SIZE;
         return true;
     }
     return false;
@@ -154,13 +186,19 @@ static bool RxFifo_Peek(uint8_t *data, UART_Port usart) {
         *data = rxBuffer3[rxGet3];
         return true;
     }
+    if(!RxFifo_IsEmpty(UART_BLE)) {
+        *data = rxBuffer2[rxGet2];
+        return true;
+    }
     return false;
 }
 
 static bool RxFifo_IsFull(UART_Port usart) {
-    return (rxPut3 + 1) % RX_SIZE == rxGet3;
+    if (usart == UART_USB) return (rxPut3 + 1) % RX_SIZE == rxGet3;
+    if (usart == UART_BLE) return (rxPut2 + 1) % RX_SIZE == rxGet2;
 }
 
 static bool RxFifo_IsEmpty(UART_Port usart) {
-    return rxGet3 == rxPut3;
+    if (usart == UART_USB) return rxGet3 == rxPut3;
+    if (usart == UART_BLE) return rxGet2 == rxPut2;
 }
