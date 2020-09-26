@@ -51,7 +51,7 @@ void Task_CANBusConsumer(void *p_arg);
 
 void Task_BatteryBalance(void *p_arg);
 
-void Check_ResourceForCLI(int resourceNum);
+void Pend_ResourceForCLI(int resourceNum);
 
 void Post_ResourceForCLI(int resourceNum);
 

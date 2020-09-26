@@ -18,11 +18,9 @@
 #include "Images.h"
 #include "BSP_ADC.h"
 #include "EEPROM.h"
-<<<<<<< HEAD
-#include "os.h"
-=======
->>>>>>> 7d03f1ee1fd0c7243afc1849e216fe7459c0f209
 #include "Tasks.h"
+
+#include "os.h"
 
 #define MAX_TOKEN_SIZE 4
 
@@ -114,7 +112,7 @@ void CLI_Help(void) {
 	printf("Contactor/Switch\tCharge\t\t\tLights/LED\n\r");
 	printf("CAN\t\t\tEEPROM\t\t\tDisplay\n\r");
 	printf("LTC/Register\t\tWatchdog\t\tADC\n\r");
-	printf("Critical/Abort\t\tAll\n\r");
+	printf("Critical/Abort\t\tOpenwire\t\tAll\n\r");
 	printf("Keep in mind: all values are 1-indexed\n\r");
 	printf("-----------------------------------------------------------\n\r");
 }
@@ -665,7 +663,7 @@ void CLI_OpenWire(void){
 
 /** CLI_All
  * Displays all information about BPS modules
- * (voltage, current, temperature, charge, contactor)
+ * (voltage, current, temperature, charge, contactor, open wires)
  */
 void CLI_All(void) {
 	int hashTokens[MAX_TOKEN_SIZE];
@@ -691,6 +689,10 @@ void CLI_All(void) {
 	printf("Contactor: \n\r");
 	hashTokens[0] = CLI_CONTACTOR_HASH;
 	CLI_Contactor(hashTokens);
+	hashTokens[0] = CLI_OPENWIRE_HASH;
+	Pend_ResourceForCLI(OpenWireBuffer);
+	CLI_OpenWire();
+	Post_ResourceForCLI(OpenWireBuffer);
 }
 
 /** CLI_Handler
@@ -731,28 +733,28 @@ void CLI_Handler(char* input) {
 			break;
 		// Voltage commands
 		case CLI_VOLTAGE_HASH:
-			Check_ResourceForCLI(0);	//come back ot this and check this
+			Pend_ResourceForCLI(VoltageBuffer);	
 			CLI_Voltage(hashTokens);
-			Post_ResourceForCLI(0);
+			Post_ResourceForCLI(VoltageBuffer);
 			break;
 		// Current commands
 		case CLI_CURRENT_HASH:
-			Check_ResourceForCLI(7);
+			Pend_ResourceForCLI(AmperesData);
 			CLI_Current(hashTokens);
-			Post_ResourceForCLI(7);
+			Post_ResourceForCLI(AmperesData);
 			break;
 		// Temperature commands
 		case CLI_TEMPERATURE_HASH:
-			Check_ResourceForCLI(3);
+			Pend_ResourceForCLI(TemperatureBuffer);
 			CLI_Temperature(hashTokens);
-			Post_ResourceForCLI(3);
+			Post_ResourceForCLI(TemperatureBuffer);
 			break;
 		// LTC6811 register commands
 		case CLI_REGISTER_HASH:
 		case CLI_LTC_HASH:
-			Check_ResourceForCLI(1);
+			Pend_ResourceForCLI(MinionsASIC);
 			CLI_LTC6811();
-			Post_ResourceForCLI(1);
+			Post_ResourceForCLI(MinionsASIC);
 			break;
 		// Contactor/Switch commands
 		case CLI_SWITCH_HASH:
