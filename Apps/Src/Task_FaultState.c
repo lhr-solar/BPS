@@ -11,7 +11,7 @@
 #include "CANbus.h"
 #include "BSP_UART.h"
 #include "config.h"
-//Authored by Manthan Upadhyaya: 10/2020
+//Manthan Upadhyaya wuz here: 10/2020
 
 void Task_FaultState(void *p_arg) {
     (void)p_arg;
@@ -27,19 +27,19 @@ void Task_FaultState(void *p_arg) {
     // Turn LEDs On and logs Error into EEPROM
     BSP_Light_Off(RUN); //turn of run light
     BSP_Light_On(FAULT);
-    if (Voltage_CheckStatus == OVERVOLTAGE){
+    if (Voltage_CheckStatus() == OVERVOLTAGE){
         BSP_Light_On(OVOLT);
         EEPROM_LogError(FAULT_HIGH_VOLT);
     }
-    if (Voltage_CheckStatus == UNDERVOLTAGE){
+    if (Voltage_CheckStatus() == UNDERVOLTAGE){
         BSP_Light_On(UVOLT);
         EEPROM_LogError(FAULT_LOW_VOLT);
     }
-    if (Temperature_CheckStatus == DANGER){
+    if (Temperature_CheckStatus(Current_IsCharging()) == DANGER){
         BSP_Light_On(OTEMP);
         EEPROM_LogError(FAULT_HIGH_TEMP);
     }
-    if (Current_CheckStatus == DANGER){
+    if (Current_CheckStatus(false) == DANGER){
         BSP_Light_On(OCURR);
         EEPROM_LogError(FAULT_HIGH_CURRENT);
     }
