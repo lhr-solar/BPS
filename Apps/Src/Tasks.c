@@ -60,6 +60,65 @@ OS_SEM Fault_Sem4;
 cell_asic Minions[NUM_MINIONS];
 uint32_t WDog_BitMap = 0;
 
+
+/** Pend_ResourceForCLI
+ * Pends for desired resource that CLI needs
+ * @param resourceNum the resource you want to wait for, look at CLI_Resource enum in CLI.h
+ */
+void Pend_ResourceForCLI(int resourceNum){
+    switch(resourceNum){
+        case 0:
+            OS_Sem4Pend(&SafetyCheck_Sem4);
+            break;
+        case 1:
+            OS_MutexLock(&MinionsASIC_Mutex);
+            break;
+        case 2:
+            OS_MutexLock(&VoltageBuffer_Mutex);
+            break;
+        case 3:
+            OS_MutexLock(&Temperature_Mutex);
+            break;
+        case 4:
+            OS_MutexLock(&OpenWireBuffer_Mutex);
+            break;
+        case 5:
+            OS_MutexLock(&AmperesData_Mutex);
+            break;
+        default:
+            break;
+    }
+}
+
+/** Post_ResourceForCLI
+ * Posts desired resource that CLI needs
+ * @param resourceNum the resource you want to post, look at CLI_Resource enum in CLI.h
+ */
+void Post_ResourceForCLI(int resourceNum){
+    switch(resourceNum){
+        case 0:
+            OS_Sem4Post(&SafetyCheck_Sem4);
+            break;
+        case 1:
+            OS_MutexUnlock(&MinionsASIC_Mutex);
+            break;
+        case 2:
+            OS_MutexUnlock(&VoltageBuffer_Mutex);
+            break;
+        case 3:
+            OS_MutexUnlock(&Temperature_Mutex);
+            break;
+        case 4:
+            OS_MutexUnlock(&OpenWireBuffer_Mutex);
+            break;
+        case 5:
+            OS_MutexUnlock(&AmperesData_Mutex);
+            break;
+        default:
+            break;
+    }
+}
+
 //leaving these functions in the code for now, so it is easier to rebase this into other people's branches
 /*
 void Task_Init(void *p_arg) {

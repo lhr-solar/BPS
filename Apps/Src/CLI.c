@@ -19,6 +19,7 @@
 #include "BSP_ADC.h"
 #include "EEPROM.h"
 #include "os.h"
+#include "Tasks.h"
 
 #define MAX_TOKEN_SIZE 4
 
@@ -652,6 +653,13 @@ void CLI_Critical(void) {
 	}
 }
 
+/** CLI_OpenWire
+ * Displays open wire status for the BPS system
+ */
+void CLI_OpenWire(void){
+	Voltage_OpenWireSummary();
+}
+
 /** CLI_All
  * Displays all information about BPS modules
  * (voltage, current, temperature, charge, contactor)
@@ -661,13 +669,19 @@ void CLI_All(void) {
 	printf("Voltage: \n\r");
 	hashTokens[0] = CLI_VOLTAGE_HASH;
 	hashTokens[1] = 0;
+	Pend_ResourceForCLI(VoltageBuffer);
 	CLI_Voltage(hashTokens);
+	Post_ResourceForCLI(VoltageBuffer);
 	printf("Current: \n\r");
 	hashTokens[0] = CLI_CURRENT_HASH;
+	Pend_ResourceForCLI(AmperesData);
 	CLI_Current(hashTokens);
+	Post_ResourceForCLI(AmperesData);
 	printf("Temperature: \n\r");
 	hashTokens[0] = CLI_TEMPERATURE_HASH;
+	Pend_ResourceForCLI(TemperatureBuffer);
 	CLI_Temperature(hashTokens);
+	Post_ResourceForCLI(TemperatureBuffer);
 	printf("State of Charge: \n\r");
 	hashTokens[0] = CLI_CHARGE_HASH;
 	CLI_Charge(hashTokens);
@@ -714,22 +728,28 @@ void CLI_Handler(char* input) {
 			break;
 		// Voltage commands
 		case CLI_VOLTAGE_HASH:
+			Post_ResourceForCLI(VoltageBuffer);
 			CLI_Voltage(hashTokens);
+			Post_ResourceForCLI(VoltageBuffer);
 			break;
 		// Current commands
 		case CLI_CURRENT_HASH:
-			Check_ResourceForCLI(7)
+			Post_ResourceForCLI(AmperesData);
 			CLI_Current(hashTokens);
-			Post_ResourceForCLI(7);
+			Post_ResourceForCLI(AmperesData);
 			break;
 		// Temperature commands
 		case CLI_TEMPERATURE_HASH:
+			Post_ResourceForCLI(TemperatureBuffer);
 			CLI_Temperature(hashTokens);
+			Post_ResourceForCLI(TemperatureBuffer);
 			break;
 		// LTC6811 register commands
 		case CLI_REGISTER_HASH:
 		case CLI_LTC_HASH:
+			Post_ResourceForCLI(MinionsASIC);
 			CLI_LTC6811();
+			Post_ResourceForCLI(MinionsASIC);
 			break;
 		// Contactor/Switch commands
 		case CLI_SWITCH_HASH:
@@ -771,6 +791,12 @@ void CLI_Handler(char* input) {
 		case CLI_ABORT_HASH:
 			CLI_Critical();
 			break;
+		//Open wire command
+		case CLI_OPENWIRE_HASH:
+			Pend_ResourceForCLI(OpenWireBuffer);
+			CLI_OpenWire();
+			Post_ResourceForCLI(OpenWireBuffer);
+			break;
 		// All
 		case CLI_ALL_HASH:
 			CLI_All();
@@ -788,11 +814,17 @@ void Task_CLI(void *p_arg) {
 
     OS_ERR err;
 
+	initialize();
+	__enable_irq();
+	uint32_t fifo_size = 128;
+	char command[fifo_size];
+	CLI_Startup();
     while(1) {
-        // BLOCKING =====================
+        // BLOCKING statements will be in CLI_Handler()
         // Wait for command
-
-        // Handle command
+		if(BSP_UART_ReadLine(command) > 0){
+			CLI_Handler(command);	//handle command
+		}
     }
 }
 
