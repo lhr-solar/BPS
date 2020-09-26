@@ -37,13 +37,13 @@ void LTC6811_Deadlocks(void *p_arg){
     int counter = 0;
     int arg = 0;
     while (1){
-        for(int i = 0; i < 4; i++) {
+        //for(int i = 0; i < 4; i++) {
         OSSemPend(&SafetyCheck_Sem4,
                     0,
                     OS_OPT_PEND_BLOCKING,
                     &ts,
                     &err);
-        }
+        //}
 
         printf("running %dth loop, thread 1\n", counter);
         Voltage_UpdateMeasurements();
@@ -129,15 +129,15 @@ void LTC6811_Deadlocks2(void *p_arg){
 }
 
 
-void TaskSwitcherTask(void *p_arg){
-    (void)p_arg;
-
-}
-
-
 int main() {
     OS_ERR err;
     OSInit(&err);
+
+    OSSemCreate(&SafetyCheck_Sem4,
+                "Safety Check Semaphore",
+                0,
+                &err);
+
     OSTaskCreate(&LTC6811_Deadlocks_TCB,				// TCB
 				"LTC6811 Deadlocks Test",	// Task Name (String)
 				LTC6811_Deadlocks,				// Task function pointer
@@ -158,7 +158,7 @@ int main() {
 				"LTC6811 Deadlocks Test",	// Task Name (String)
 				LTC6811_Deadlocks2,				// Task function pointer
 				(void *)0,				// Task function args
-				1,			// Priority
+				2,			// Priority
 				LTC6811_Deadlocks2_Stk,				// Stack
 				256,	// Watermark limit for debugging
 				512,		// Stack size
