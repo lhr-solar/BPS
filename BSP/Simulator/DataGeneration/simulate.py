@@ -11,6 +11,7 @@ import Fans
 import WDTimer
 import PLL
 import I2C
+import logging
 
 import config
 import Timer
@@ -187,6 +188,8 @@ def main():
     except Exception as e:
         print(repr(e))
     
+    logging.basicConfig(filename='debug.log',level=logging.DEBUG)
+
     global stdscr
     global CANbox
     stdscr = curses.initscr()

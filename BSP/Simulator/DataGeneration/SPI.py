@@ -1,3 +1,4 @@
+import logging
 import csv
 import random
 import os
@@ -17,9 +18,9 @@ read_file = config.directory_path + config.files['SPIW']
 write_file = config.directory_path + config.files['SPIR']
 
 # sensor values
-wires = []                  # list of 31 modules (1 = connected; 0 = open)
-voltage_values = []         # list of 31 modules (fixed point 0.0001)
-temperature_values = []     # list of 31 pairs of sensors (fixed point 0.001)
+wires = [1] * 31                # list of 31 modules (1 = connected; 0 = open)
+voltage_values = [0]*31         # list of 31 modules (fixed point 0.0001)
+temperature_values = [[0,0]]*31   # list of 31 pairs of sensors (fixed point 0.001)
 
 # LTC6811 objects
 minions = []
@@ -140,6 +141,10 @@ def generate(state, mode, battery=None):
         voltage_partition.clear()
         temperature_partition.clear()
         wires_partition.clear()
+
+        logging.debug(voltage_values_copy)
+        logging.debug(temperature_values_copy)
+        logging.debug(wires_copy)
 
         for i in range(8):
             voltage_partition.append(voltage_values_copy.pop(0))

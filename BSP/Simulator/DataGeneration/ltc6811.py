@@ -6,7 +6,7 @@ Analog Devices. Some documentation also exists such as the LTC data format
 in the team Google Drive under Electrical Team > BPS/BMS > BPS > Documentation/Reports
 """
 import config
-import debug
+import logging
 
 LTC6811_NUM_REG = 6
 
@@ -34,25 +34,25 @@ ad_commands = {
 # Handler functions must be defined at the beginning because of the command_codes
 # dictionary's defined location.
 def wrcfga_handler(ltc6811):
-    debug.log("wrcfga")
+    logging.info("wrcfga")
     # Copy contents of rx_data into config_reg
     ltc6811.config_reg = ltc6811.rx_data.copy()
     ltc6811.tx_available = 0   # Reset because there shouldn't be any data sent back
 
 def rdcfga_handler(ltc6811):
-    debug.log("rdcfga")
+    logging.info("rdcfga")
     ltc6811.tx_data = ltc6811.config_reg.copy()
     ltc6811.tx_available = 1
 
 def adcv_md0_dcp0_ch0_handler(ltc6811):
     # Start Cell ADC Measurements
-    debug.log("adcv_md0_dcp0_ch0")
+    logging.info("adcv_md0_dcp0_ch0")
     ltc6811.tx_available = 0   # Reset because there shouldn't be any data sent back
     # Start ADC conversion. Not much to do here.
     ltc6811.curr_ad_command = ad_commands['ADCV']
 
 def pladc_handler(ltc6811):
-    debug.log("poll adc")
+    logging.info("poll adc")
     # While the uC is polling the LTC to see if the ADC is done, there is 
     # a count up timer in the LTC that measures how long the ADC took to
     # complete. If the LTC returns 0, then then the ADC still has not finished
@@ -80,35 +80,35 @@ def rdcv_helper(ltc6811, group):
 
 def rdcva_handler(ltc6811):
     # Read 0-2 cell voltages (3 at a time)
-    debug.log("rdcva")
+    logging.info("rdcva")
     rdcv_helper(ltc6811, 'A')
     ltc6811.tx_available = 1
 
 def rdcvb_handler(ltc6811):
     # Read 3-5 cell voltages (3 at a time)
-    debug.log("rdcvb")
+    logging.info("rdcvb")
     rdcv_helper(ltc6811, 'B')
     ltc6811.tx_available = 1
 
 def rdcvc_handler(ltc6811):
     # Read 6-8 cell voltages (3 at a time)
-    debug.log("rdcvc")
+    logging.info("rdcvc")
     rdcv_helper(ltc6811, 'C')
     ltc6811.tx_available = 1
 
 def rdcvd_handler(ltc6811):
     # Read 9-11 cell voltages (3 at a time)
-    debug.log("rdcvd")
+    logging.info("rdcvd")
     rdcv_helper(ltc6811, 'D')
     ltc6811.tx_available = 1
 
 def clrcell_handler(ltc6811):
     # Resets AUX registers to 1
-    debug.log("clrcell")
+    logging.info("clrcell")
 
 def adowpu_md0_dcp0_ch0_handler(ltc6811):
     # Open Wire measure pull up voltages
-    debug.log("adowpu_md0_dcp0_ch0")
+    logging.info("adowpu_md0_dcp0_ch0")
     ltc6811.curr_ad_command = ad_commands['ADOWPU']
     ltc6811.tx_available = 0   # Reset because there shouldn't be any data sent back
     for wire_idx in range(12):
@@ -120,7 +120,7 @@ def adowpu_md0_dcp0_ch0_handler(ltc6811):
 
 def adowpd_md0_dcp0_ch0_handler(ltc6811):
     # Open Wire measure pull down voltages
-    debug.log("adowpd_md0_dcp0_ch0")
+    logging.info("adowpd_md0_dcp0_ch0")
     ltc6811.curr_ad_command = ad_commands['ADOWPD']
     ltc6811.tx_available = 0   # Reset because there shouldn't be any data sent back
     for wire_idx in range(12):
@@ -131,13 +131,13 @@ def adowpd_md0_dcp0_ch0_handler(ltc6811):
 
 def adax_md0_chg1_handler(ltc6811):
     # Start AUX ADC GPIO1 converstion
-    debug.log("adax_md0_chg1")
+    logging.info("adax_md0_chg1")
     ltc6811.tx_available = 0   # Reset because there shouldn't be any data sent back
     ltc6811.update_gpios()
 
 def rdauxa_handler(ltc6811):
     # Read AUX ADC GPIO1,2,3 register
-    debug.log("rdauxa")
+    logging.info("rdauxa")
     ltc6811.tx_data = [0] * LTC6811_NUM_REG   # Clear
     ltc6811.tx_data[0] = ltc6811.gpio[LTC6811_GPIO1_IDX] & 0x00FF
     ltc6811.tx_data[1] = (ltc6811.gpio[LTC6811_GPIO1_IDX] >> 8) & 0x00FF
@@ -158,7 +158,7 @@ def wrcomm_handler(ltc6811):
     rx_data[5] = (0xF << 4) + AUX_I2C_NACK_STOP;
     '''
     # Write I2C
-    debug.log("wrcomm")
+    logging.info("wrcomm")
     ltc6811.tx_available = 0
     i2c_addr = ((ltc6811.rx_data[0] & 0x0F) << 4) | ((ltc6811.rx_data[1] >> 4) & 0x0F)
     i2c_data = (ltc6811.rx_data[3] >> 4) & 0x0F
@@ -174,7 +174,7 @@ def wrcomm_handler(ltc6811):
 
 def stcomm_handler(ltc6811):
     # Start I2C
-    debug.log("stcomm")
+    logging.info("stcomm")
     # Transmit
 
 
@@ -326,7 +326,7 @@ def parse_full_protocol(ics, protocol):
 
 def print_protocol(protocol):
     '''
-    @brief  debug.logs formatted data message in easy to read format
+    @brief  logging.infos formatted data message in easy to read format
     @param  protocol : data that the LTC6811 hardware expects to receive
     '''
     print()
@@ -501,7 +501,7 @@ class LTC6811:
                 temperature_mcel = value
 
         if temperature_mcel == -1:
-            debug.log("ERROR")
+            logging.info("ERROR")
         
         print(temperature_mcel, end="\t")
 
@@ -571,15 +571,15 @@ if __name__ == "__main__":
     wrcfga_handler(minions[0])
     if minions[0].config_reg != config:
         fail = 1
-    debug.log("wrcfga_handler: ", end='')
-    debug.log('FAIL' if fail else 'Success')
+    logging.info("wrcfga_handler: ", end='')
+    logging.info('FAIL' if fail else 'Success')
 
     fail = 0
     rdcfga_handler(minions[0])
     if minions[0].tx_data != config:
         fail = 1
-    debug.log("rdcfga_handler: ", end='')
-    debug.log('FAIL' if fail else 'Success')
+    logging.info("rdcfga_handler: ", end='')
+    logging.info('FAIL' if fail else 'Success')
 
     # Test rdcva_handler
     rdcva_handler(minions[0])
@@ -591,8 +591,8 @@ if __name__ == "__main__":
         tx_idx += 2
         if batt_voltage != tx_voltage:
             fail = 1
-    debug.log("rdcva_handler: ", end='')
-    debug.log('FAIL' if fail else 'Success')
+    logging.info("rdcva_handler: ", end='')
+    logging.info('FAIL' if fail else 'Success')
 
     # Test rdcvb_handler
     rdcvb_handler(minions[0])
@@ -604,8 +604,8 @@ if __name__ == "__main__":
         tx_idx += 2
         if batt_voltage != tx_voltage:
             fail = 1
-    debug.log("rdcvb_handler: ", end='')
-    debug.log('FAIL' if fail else 'Success')
+    logging.info("rdcvb_handler: ", end='')
+    logging.info('FAIL' if fail else 'Success')
 
     # Test rdcvc_handler
     rdcvc_handler(minions[0])
@@ -617,8 +617,8 @@ if __name__ == "__main__":
         tx_idx += 2
         if batt_voltage != tx_voltage:
             fail = 1
-    debug.log("rdcvc_handler: ", end='')
-    debug.log('FAIL' if fail else 'Success')
+    logging.info("rdcvc_handler: ", end='')
+    logging.info('FAIL' if fail else 'Success')
 
     # Test ADOWPU
     minions[0].set_single_wire(2, 1)
@@ -632,8 +632,8 @@ if __name__ == "__main__":
         tx_idx += 2
         if batt_voltage[i] != tx_voltage:
             fail = 1
-    debug.log("adowpu_md0_dcp0_ch0_handler: ", end='')
-    debug.log('FAIL' if fail else 'Success')
+    logging.info("adowpu_md0_dcp0_ch0_handler: ", end='')
+    logging.info('FAIL' if fail else 'Success')
 
     # Test ADOWPD
     minions[0].set_single_wire(2, 1)
@@ -647,8 +647,8 @@ if __name__ == "__main__":
         tx_idx += 2
         if batt_voltage[i] != tx_voltage:
             fail = 1
-    debug.log("adowpd_md0_dcp0_ch0_handler: ", end='')
-    debug.log('FAIL' if fail else 'Success')
+    logging.info("adowpd_md0_dcp0_ch0_handler: ", end='')
+    logging.info('FAIL' if fail else 'Success')
 
     # Test WRCOMM and STCOMM
     minions[0].rx_data = [0xF9, 0x0F, 0xFF, 0x0F, 0xFF, 0xFF]
@@ -660,8 +660,8 @@ if __name__ == "__main__":
     wrcomm_handler(minions[0])
     if minions[0].ltc1380s[mux_idxs['SIM_LTC1380_MUX2']].mux_addr != mux_addresses['SIM_LTC1380_MUX2'] or minions[0].ltc1380s[mux_idxs['SIM_LTC1380_MUX2']].mux_sel != 0x01 or minions[0].ltc1380s[mux_idxs['SIM_LTC1380_MUX2']].mux_en is not True:
         fail = 1
-    debug.log("wrcomm_handler: ", end='')
-    debug.log('FAIL' if fail else 'Success')
+    logging.info("wrcomm_handler: ", end='')
+    logging.info('FAIL' if fail else 'Success')
 
     # Test ADAX
     adax_md0_chg1_handler(minions[0])
@@ -669,8 +669,8 @@ if __name__ == "__main__":
     # Last WRCOMM command wrote to MUX2
     if minions[0].gpio[0] != temperatures[1][1]:
         fail = 1
-    debug.log("adax_md0_chg1_handler: ", end='')
-    debug.log('FAIL' if fail else 'Success')
+    logging.info("adax_md0_chg1_handler: ", end='')
+    logging.info('FAIL' if fail else 'Success')
 
     # Test RDAUXA
     rdauxa_handler(minions[0])
@@ -678,8 +678,8 @@ if __name__ == "__main__":
     tx_voltage = (minions[0].tx_data[0] & 0x00FF) | ((minions[0].tx_data[1] & 0x00FF) << 8)
     if temperatures[1][1] != tx_voltage:
         fail = 1
-    debug.log("rdauxa_handler: ", end='')
-    debug.log('FAIL' if fail else 'Success')
+    logging.info("rdauxa_handler: ", end='')
+    logging.info('FAIL' if fail else 'Success')
 
     for minion in minions:
-        debug.log(minion)
+        logging.info(minion)

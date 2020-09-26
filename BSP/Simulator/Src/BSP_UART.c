@@ -111,6 +111,8 @@ void *ScanThread(void *arg) {
             pthread_mutex_unlock(&rx_mutex);
         }
 
+        pthread_yield();
+
     } while (1);
 
     // Should not get here
