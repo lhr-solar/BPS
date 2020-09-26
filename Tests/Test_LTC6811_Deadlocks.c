@@ -7,7 +7,7 @@
 #include "BSP_SPI.h"
 #include "os.h"
 
-
+OS_SEM SafetyCheck_Sem4;
 
 OS_TCB LTC6811_Deadlocks_TCB;
 CPU_STK LTC6811_Deadlocks_Stk[512];
@@ -20,6 +20,9 @@ int counter2 = 0;
 
 void LTC6811_Deadlocks(void *p_arg){
     (void)p_arg;
+
+    OS_ERR err;
+    CPU_TS ts;
 
     cell_asic boards[NUM_MINIONS];
     printf("initializing...\n");
@@ -34,6 +37,14 @@ void LTC6811_Deadlocks(void *p_arg){
     int counter = 0;
     int arg = 0;
     while (1){
+        for(int i = 0; i < 4; i++) {
+        OSSemPend(&SafetyCheck_Sem4,
+                    0,
+                    OS_OPT_PEND_BLOCKING,
+                    &ts,
+                    &err);
+        }
+
         printf("running %dth loop, thread 1\n", counter);
         Voltage_UpdateMeasurements();
         Voltage_CheckStatus();
@@ -67,6 +78,9 @@ void LTC6811_Deadlocks(void *p_arg){
 void LTC6811_Deadlocks2(void *p_arg){
     (void)p_arg;
 
+    OS_ERR err;
+    CPU_TS ts;
+
     cell_asic boards[NUM_MINIONS];
     printf("initializing...\n");
     BSP_SPI_Init();
@@ -80,6 +94,10 @@ void LTC6811_Deadlocks2(void *p_arg){
     int counter = 0;
     int arg = 0;
     while (1){
+        OSSemPost(&SafetyCheck_Sem4,
+                    OS_OPT_POST_ALL,
+                    &err);
+
         printf("running %dth loop, thread 2\n", counter);
         Voltage_UpdateMeasurements();
         Voltage_CheckStatus();
@@ -109,6 +127,13 @@ void LTC6811_Deadlocks2(void *p_arg){
         }
     }
 }
+
+
+void TaskSwitcherTask(void *p_arg){
+    (void)p_arg;
+
+}
+
 
 int main() {
     OS_ERR err;
