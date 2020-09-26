@@ -234,7 +234,6 @@ uint8_t LTC6811_rdcv(uint8_t reg, // Controls which cell voltage register is rea
 {
 
   int8_t pec_error = 0;
-  printf("0x%X\r\n", (uint32_t)ic[0].cells.c_codes);
   pec_error = LTC681x_rdcv(reg,total_ic,ic);
   return(pec_error);
 }

@@ -548,9 +548,6 @@ int8_t parse_cells(uint8_t current_ic, uint8_t cell_reg, uint8_t cell_data[], ui
   uint16_t data_pec;
   uint8_t data_counter = current_ic*LTC681X_NUM_RX_BYT; //data counter
 
-  if(current_ic == 0)
-    printf("0x%X\r\n", (uint32_t)cell_codes);
-
   for (uint8_t current_cell = 0; current_cell<CELL_IN_REG; current_cell++)  // This loop parses the read back data into cell voltages, it
   {
     // loops once for each of the 3 cell voltage codes in the register
@@ -733,8 +730,6 @@ uint8_t LTC681x_rdcv(uint8_t reg, // Controls which cell voltage register is rea
   int8_t pec_error = 0;
   uint8_t cell_data[LTC681X_NUM_RX_BYT*total_ic];;
   uint8_t c_ic = 0;
-
-  printf("0x%X\r\n", (uint32_t)ic[0].cells.c_codes);
 
   if (reg == 0)
   {
