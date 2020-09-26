@@ -111,7 +111,6 @@ def adowpu_md0_dcp0_ch0_handler(ltc6811):
     debug.log("adowpu_md0_dcp0_ch0")
     ltc6811.curr_ad_command = ad_commands['ADOWPU']
     ltc6811.tx_available = 0   # Reset because there shouldn't be any data sent back
-    #print(ltc6811.wires)
     for wire_idx in range(12):
         # 1 means connected, 0 means open
         if ltc6811.wires[wire_idx] == 0:
@@ -124,7 +123,6 @@ def adowpd_md0_dcp0_ch0_handler(ltc6811):
     debug.log("adowpd_md0_dcp0_ch0")
     ltc6811.curr_ad_command = ad_commands['ADOWPD']
     ltc6811.tx_available = 0   # Reset because there shouldn't be any data sent back
-    #print(ltc6811.wires)
     for wire_idx in range(12):
         if ltc6811.wires[wire_idx] == 0:
             ltc6811.pulldown_volt[wire_idx] = PULL_MIN_VOLT
@@ -136,7 +134,6 @@ def adax_md0_chg1_handler(ltc6811):
     debug.log("adax_md0_chg1")
     ltc6811.tx_available = 0   # Reset because there shouldn't be any data sent back
     ltc6811.update_gpios()
-    ltc6811.tx_available = 0
 
 def rdauxa_handler(ltc6811):
     # Read AUX ADC GPIO1,2,3 register
@@ -269,7 +266,7 @@ def format_full_protocol(ics):
 
         # Copy data
         for byte in ic.tx_data:
-            protocol.append(byte)
+            protocol.append(byte & 0x00FF)
         
         pec = calc_pec(ic.tx_data)
         protocol.append((pec >> 8) & 0x00FF)    # PEC0
@@ -496,18 +493,24 @@ class LTC6811:
             ltc1380.update(en, mux_addr, mux_sel)
 
     def update_gpios(self):
-        gpio1 = -1
+        temperature_mcel = -1
         for ltc1380 in self.ltc1380s:
             value = ltc1380.get_temperature()
             if value != -1:
                 # Valid
-                gpio1 = value
+                temperature_mcel = value
 
-        if gpio1 == -1:
-            while True:
-                pass
+        if temperature_mcel == -1:
+            debug.log("ERROR")
+        
+        print(temperature_mcel, end="\t")
 
-        self.gpio[LTC6811_GPIO1_IDX] = gpio1
+        # Convert GPIO temperature to m
+        celcius_float = temperature_mcel / 1000
+        temperature_mV = 2230.8 - (13.582 * (celcius_float - 30)) - (0.00433 * (celcius_float - 30) ** 2)
+        print(int(temperature_mV))
+
+        self.gpio[LTC6811_GPIO1_IDX] = int(temperature_mV*10)
         
 
     class LTC1380:
