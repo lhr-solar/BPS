@@ -11,7 +11,7 @@
 #include "CANbus.h"
 #include "BSP_UART.h"
 #include "config.h"
-//Authored by Manthan Upadhyaya: 10/2020
+//Manthan Upadhyaya wuz here: 10/2020
 
 //Manthan Upadhyaya wuz here: 10/2020
 
