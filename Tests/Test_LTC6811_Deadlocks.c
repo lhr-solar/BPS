@@ -15,6 +15,9 @@ CPU_STK LTC6811_Deadlocks_Stk[512];
 OS_TCB LTC6811_Deadlocks2_TCB;
 CPU_STK LTC6811_Deadlocks2_Stk[512];
 
+int counter1 = 0;
+int counter2 = 0;
+
 void LTC6811_Deadlocks(void *p_arg){
     (void)p_arg;
 
@@ -53,6 +56,11 @@ void LTC6811_Deadlocks(void *p_arg){
         Temperature_SampleADC(arg);
         arg ^= 0x01;
         counter++;
+        counter1++;
+        if (counter >= 1000){
+            printf("task 1 ran %d times\ntask 2 ran %d times\n", counter1, counter2);
+            exit(0);
+        }
     }
 }
 
@@ -93,6 +101,12 @@ void LTC6811_Deadlocks2(void *p_arg){
         Temperature_GetTotalPackAvgTemperature();
         Temperature_SampleADC(arg);
         arg ^= 0x01;
+        counter++;
+        counter2++;
+        if (counter >= 1000){
+            printf("task 1 ran %d times\ntask 2 ran %d times\n", counter1, counter2);
+            exit(0);
+        }
     }
 }
 
