@@ -18,7 +18,10 @@
 #include "Images.h"
 #include "BSP_ADC.h"
 #include "EEPROM.h"
+<<<<<<< HEAD
 #include "os.h"
+=======
+>>>>>>> 7d03f1ee1fd0c7243afc1849e216fe7459c0f209
 #include "Tasks.h"
 
 #define MAX_TOKEN_SIZE 4
@@ -728,28 +731,28 @@ void CLI_Handler(char* input) {
 			break;
 		// Voltage commands
 		case CLI_VOLTAGE_HASH:
-			Post_ResourceForCLI(VoltageBuffer);
+			Check_ResourceForCLI(0);	//come back ot this and check this
 			CLI_Voltage(hashTokens);
-			Post_ResourceForCLI(VoltageBuffer);
+			Post_ResourceForCLI(0);
 			break;
 		// Current commands
 		case CLI_CURRENT_HASH:
-			Post_ResourceForCLI(AmperesData);
+			Check_ResourceForCLI(7);
 			CLI_Current(hashTokens);
-			Post_ResourceForCLI(AmperesData);
+			Post_ResourceForCLI(7);
 			break;
 		// Temperature commands
 		case CLI_TEMPERATURE_HASH:
-			Post_ResourceForCLI(TemperatureBuffer);
+			Check_ResourceForCLI(3);
 			CLI_Temperature(hashTokens);
-			Post_ResourceForCLI(TemperatureBuffer);
+			Post_ResourceForCLI(3);
 			break;
 		// LTC6811 register commands
 		case CLI_REGISTER_HASH:
 		case CLI_LTC_HASH:
-			Post_ResourceForCLI(MinionsASIC);
+			Check_ResourceForCLI(1);
 			CLI_LTC6811();
-			Post_ResourceForCLI(MinionsASIC);
+			Post_ResourceForCLI(1);
 			break;
 		// Contactor/Switch commands
 		case CLI_SWITCH_HASH:
@@ -759,21 +762,9 @@ void CLI_Handler(char* input) {
 		// State of Charge commands
 		case CLI_CHARGE_HASH:
 			CLI_Charge(hashTokens);
-			break;
-		// Error light commands
-		case CLI_LED_HASH:
-		case CLI_LIGHTS_HASH:
-			CLI_LED(hashTokens);
-			break;
-		// CAN commands
-		case CLI_CAN_HASH:
-		case CLI_CANBUS_HASH:
-			CLI_CAN(hashTokens);
-			break;
 		// Display commands
 		case CLI_DISPLAY_HASH:
 			CLI_Display();
-			break;
 		// Watchdog commands
 		case CLI_WATCHDOG_HASH:
 			CLI_Watchdog(hashTokens);
