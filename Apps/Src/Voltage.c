@@ -58,8 +58,9 @@ ErrorStatus Voltage_UpdateMeasurements(void){
 	
 	// Read Cell Voltage Registers
 	wakeup_idle(NUM_MINIONS); // Not sure if wakeup is necessary if you start conversion then read consecutively
+	printf("0x%X\r\n", (uint32_t)Minions[0].cells.c_codes);
 	error = LTC6811_rdcv(0, NUM_MINIONS, Minions); // Set to read back all cell voltage registers
-	
+	printf("%d", Minions[0].cells.c_codes[0]);
 	//copies values from cells.c_codes to private array
 	for(int i = 0; i < NUM_BATTERY_MODULES; i++){
 		VoltageVal[i] = Minions[i / MAX_VOLT_SENSORS_PER_MINION_BOARD].cells.c_codes[i % MAX_VOLT_SENSORS_PER_MINION_BOARD];
