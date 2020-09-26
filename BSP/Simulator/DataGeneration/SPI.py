@@ -118,7 +118,7 @@ def generate(state, mode, battery=None):
     open_wires(battery)
     if battery is not None:
         specific_voltage(battery)
-        random_temperature(state, mode)
+        random_temperature('discharging', 'normal')
     else:
         random_voltage(mode)
         random_temperature(state, mode)

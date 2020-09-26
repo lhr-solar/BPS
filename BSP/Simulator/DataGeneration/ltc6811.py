@@ -503,12 +503,9 @@ class LTC6811:
         if temperature_mcel == -1:
             logging.info("ERROR")
         
-        print(temperature_mcel, end="\t")
-
         # Convert GPIO temperature to m
         celcius_float = temperature_mcel / 1000
         temperature_mV = 2230.8 - (13.582 * (celcius_float - 30)) - (0.00433 * (celcius_float - 30) ** 2)
-        print(int(temperature_mV))
 
         self.gpio[LTC6811_GPIO1_IDX] = int(temperature_mV*10)
         
