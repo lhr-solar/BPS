@@ -2,6 +2,7 @@ import logging
 import csv
 import random
 import os
+import threading
 import fcntl
 import config
 import ltc6811
@@ -94,15 +95,34 @@ def specific_temperature(battery):
     temperature_values = [(int(module.temperatures_cel[0] * 1000), int(module.temperatures_cel[1] * 1000)) for module in battery.modules]
 
 
-def init(battery=None):
+st = 'discharging'
+md = 'normal'
+batt = None
+en = False
+def init(state='discharging', mode='normal', battery=None):
+    global st, md, batt
     f_r = open(read_file, 'w')
     f_r.close()
     f_w = open(write_file, 'w')
     f_w.close()
+
+    st = state
+    md = mode
+    batt = battery
+    en = True
     
     for i in range(4):
         minions.append(ltc6811.LTC6811(battery))
 
+def spi_task():
+    while en == False:
+        pass
+
+    logging.info('Starting SPI Task')
+    while True:
+        generate(st, md, batt)
+
+spi_thread = threading.Thread(target=spi_task)
 
 def generate(state, mode, battery=None):
     """

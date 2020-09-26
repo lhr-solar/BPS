@@ -37,7 +37,6 @@ def generate(battery=None):
     # Generate ADC values
     ADC.generate(state, mode, battery)
     # Generate SPI values
-    SPI.generate(state, mode, battery)
     #Pet Watchdog
     WDTimer.Check_State()
     #Initialize Watchdog Timer
@@ -178,10 +177,11 @@ def main():
         # Create state of the battery
         BeVolt = battery.Battery(ampere_draw, config.total_batt_pack_capacity_mah, init_capacity_mah)
         PLL.PLL_Init()
-        SPI.init()
+        SPI.init(battery=BeVolt)
     else:
         BeVolt = None
         configure()
+        SPI.init(state=state, mode=mode)
     
     try:
         launch_bevolt()
