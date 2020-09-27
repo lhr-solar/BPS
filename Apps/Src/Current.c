@@ -108,10 +108,15 @@ void Task_AmperesMonitor(void *p_arg) {
 
     OS_ERR err;
 
+	bool isfirst_amperes_check = false;
+
     while(1) {
         // BLOCKING =====================
         // Update Amperes Measurements
+		Current_UpdateMeasurements();
+
         // Check if amperes is NOT safe:
+<<<<<<< HEAD
 
         //signal watchdog
         OSMutexPend(&WDog_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
@@ -121,6 +126,21 @@ void Task_AmperesMonitor(void *p_arg) {
 
         OSMutexPost(&WDog_Mutex, OS_OPT_POST_NONE, &err);
         assertOSError(err);
+=======
+		SafetyStatus amperes_status = Current_CheckStatus(true);
+		if(amperes_status != SAFE) {
+            OSSemPost(&Fault_Sem4,
+                        OS_OPT_POST_1,
+                        &err);
+        } else if((amperes_status == SAFE) && (!isfirst_amperes_check)) {
+            // Signal to turn on contactor but only signal once
+            OSSemPost(&SafetyCheck_Sem4,
+                        OS_OPT_POST_1,
+                        &err);
+            // assert
+            isfirst_amperes_check = true;
+        }
+>>>>>>> Adds safety sema4 operations to amperes and volttemp tasks
     }
 }
 
