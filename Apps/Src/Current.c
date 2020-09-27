@@ -10,6 +10,7 @@
 #include "Current.h"
 #include "BSP_ADC.h"
 #include "os.h"
+#include "Tasks.h"
 
 int32_t HighPrecisionCurrent;	// Milliamp measurement of hall effect sensor of high precision
 int32_t LowPrecisionCurrent;	// Milliamp measurement of hall effect sensor of low precision
@@ -107,10 +108,27 @@ void Task_AmperesMonitor(void *p_arg) {
 
     OS_ERR err;
 
+	bool isfirst_amperes_check = false;
+
     while(1) {
         // BLOCKING =====================
         // Update Amperes Measurements
+		Current_UpdateMeasurements();
+
         // Check if amperes is NOT safe:
+		SafetyStatus amperes_status = Current_CheckStatus(true);
+		if(amperes_status != SAFE) {
+            OSSemPost(&Fault_Sem4,
+                        OS_OPT_POST_1,
+                        &err);
+        } else if((amperes_status == SAFE) && (!isfirst_amperes_check)) {
+            // Signal to turn on contactor but only signal once
+            OSSemPost(&SafetyCheck_Sem4,
+                        OS_OPT_POST_1,
+                        &err);
+            // assert
+            isfirst_amperes_check = true;
+        }
     }
 }
 
