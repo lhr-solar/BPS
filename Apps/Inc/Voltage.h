@@ -10,6 +10,7 @@
 #include "config.h"
 #include "LTC6811.h"
 #include "common.h"
+#include "os.h"
 
 /** Voltage_Init
  * Initializes all device drivers including LTC6811 and GPIO to begin Voltage Monitoring

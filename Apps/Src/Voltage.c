@@ -8,9 +8,12 @@
 #include "config.h"
 #include <stdlib.h>
 #include "os.h"
+
 static cell_asic *Minions;
+
 static OS_MUTEX *Voltage_Mutex;
 static uint16_t VoltageVal[NUM_BATTERY_MODULES]; //Voltage values gathered
+static OS_ERR err;
 /** LTC ADC measures with resolution of 4 decimal places, 
  * But we standardized to have 3 decimal places to work with
  * millivolts
@@ -26,10 +29,9 @@ ErrorStatus Voltage_Init(cell_asic *boards, OS_MUTEX *mutex){
 	// Record pointer
 	Minions = boards;
 	//initialize mutex
-	OS_ERR err;
     OSInit(&err);
 	Voltage_Mutex = mutex; 
-	OSMutexCreate(&Voltage_Mutex,
+	OSMutexCreate(Voltage_Mutex,
 				  "Voltage Buffer Mutex",
 				  &err
 				);
@@ -60,7 +62,8 @@ ErrorStatus Voltage_Init(cell_asic *boards, OS_MUTEX *mutex){
  */
 ErrorStatus Voltage_UpdateMeasurements(void){
 	int8_t error = 0;
-	OS_MutexLock(Voltage_Mutex);
+	CPU_TS ts;
+	OSMutexPend(Voltage_Mutex, 0, OS_OPT_PEND_BLOCKING, &ts, &err);
 	// Start Cell ADC Measurements
 	wakeup_idle(NUM_MINIONS);
 	LTC6811_adcv(ADC_CONVERSION_MODE,ADC_DCP,CELL_CH_TO_CONVERT);
@@ -75,7 +78,7 @@ ErrorStatus Voltage_UpdateMeasurements(void){
 		VoltageVal[i] = Minions[i / MAX_VOLT_SENSORS_PER_MINION_BOARD].cells.c_codes[i % MAX_VOLT_SENSORS_PER_MINION_BOARD];
 	}
 	
-	OS_MutexUnlock(Voltage_Mutex);
+	OSMutexPost(Voltage_Mutex, OS_OPT_POST_NONE, &err);
 	if(error == 0){
 		return SUCCESS;
 	}else{
@@ -171,7 +174,8 @@ uint32_t Voltage_GetOpenWire(void){
  * @return voltage of module at specified index
  */
 uint16_t Voltage_GetModuleMillivoltage(uint8_t moduleIdx){
-	OS_MutexLock(Voltage_Mutex);
+	CPU_TS ts;
+	OSMutexPend(Voltage_Mutex, 0, OS_OPT_PEND_BLOCKING, &ts, &err);
 	// These if statements prevents a hardfault.
     if(moduleIdx >= NUM_BATTERY_MODULES) {
         return 0xFFFF;  // return -1 which indicates error voltage
@@ -186,7 +190,7 @@ uint16_t Voltage_GetModuleMillivoltage(uint8_t moduleIdx){
     }
 
 	uint16_t ret = VoltageVal[moduleIdx] / 10;
-	OS_MutexUnlock(Voltage_Mutex);
+	OSMutexPost(Voltage_Mutex, OS_OPT_POST_NONE, &err);
 	return ret;
 }
 
