@@ -214,4 +214,7 @@ void CLI_All(void);
  */
 void CLI_Handler(char* input);
 
+
+void CLI_Task(void *p_arg);
+
 #endif

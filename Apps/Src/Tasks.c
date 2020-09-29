@@ -67,24 +67,26 @@ uint32_t WDog_BitMap = 0;
  * @param resourceNum the resource you want to wait for, look at CLI_Resource enum in CLI.h
  */
 void Pend_ResourceForCLI(int resourceNum){
+    OS_ERR err;
+    CPU_TS ts;
     switch(resourceNum){
         case 0:
-            OS_Sem4Pend(&SafetyCheck_Sem4);
+            OSSemPend(&SafetyCheck_Sem4, 0, OS_OPT_PEND_BLOCKING, &ts, &err);
             break;
         case 1:
-            OS_MutexLock(&MinionsASIC_Mutex);
+            OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, &ts, &err);
             break;
         case 2:
-            OS_MutexLock(&VoltageBuffer_Mutex);
+            OS_MutexLock(&VoltageBuffer_Mutex, 0, OS_OPT_PEND_BLOCKING, &ts, &err);
             break;
         case 3:
-            OS_MutexLock(&Temperature_Mutex);
+            OS_MutexLock(&Temperature_Mutex, 0, OS_OPT_PEND_BLOCKING, &ts, &err);
             break;
         case 4:
-            OS_MutexLock(&OpenWireBuffer_Mutex);
+            OS_MutexLock(&OpenWireBuffer_Mutex, 0, OS_OPT_PEND_BLOCKING, &ts, &err);
             break;
         case 5:
-            OS_MutexLock(&AmperesData_Mutex);
+            OS_MutexLock(&AmperesData_Mutex, 0, OS_OPT_PEND_BLOCKING, &ts, &err);
             break;
         default:
             break;
@@ -96,9 +98,11 @@ void Pend_ResourceForCLI(int resourceNum){
  * @param resourceNum the resource you want to post, look at CLI_Resource enum in CLI.h
  */
 void Post_ResourceForCLI(int resourceNum){
+    OS_ERR err;
+    CPU_TS ts;
     switch(resourceNum){
         case 0:
-            OS_Sem4Post(&SafetyCheck_Sem4);
+            OS_SemPost(&SafetyCheck_Sem4, OS_OPT_POST_1, &ts, &err);
             break;
         case 1:
             OS_MutexUnlock(&MinionsASIC_Mutex);
