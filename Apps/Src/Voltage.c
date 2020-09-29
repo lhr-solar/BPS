@@ -1,3 +1,5 @@
+/* Copyright (c) 2020 UT Longhorn Racing Solar */
+
 /** Voltage.c
  * Voltage wrapper that holds all voltage related information of BeVolt's
  * battery pack.
