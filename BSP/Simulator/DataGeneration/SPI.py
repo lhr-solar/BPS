@@ -92,7 +92,9 @@ def specific_temperature(battery):
     @param battery : battery object with module voltages
     """
     global temperature_values
-    temperature_values = [(int(module.temperatures_cel[0] * 1000), int(module.temperatures_cel[1] * 1000)) for module in battery.modules]
+    temperature_values = [(int(module.temperatures_cel[0] * 1000),
+                            int(module.temperatures_cel[1] * 1000))
+                            for module in battery.modules]
 
 
 st = 'discharging'
@@ -100,6 +102,9 @@ md = 'normal'
 batt = None
 def init(state='discharging', mode='normal', battery=None):
     global st, md, batt
+    os.makedirs(os.path.dirname(read_file), exist_ok=True)
+    os.makedirs(os.path.dirname(write_file), exist_ok=True)
+    # Create files
     f_r = open(read_file, 'w')
     f_r.close()
     f_w = open(write_file, 'w')
@@ -121,8 +126,6 @@ def generate(state, mode, battery=None):
     @param battery : battery object with set modules
     """
     global wires, voltage_values, temperature_values
-    os.makedirs(os.path.dirname(read_file), exist_ok=True)
-    os.makedirs(os.path.dirname(write_file), exist_ok=True)
     open_wires(battery)
     if battery is not None:
         specific_voltage(battery)
@@ -145,10 +148,6 @@ def generate(state, mode, battery=None):
         voltage_partition = []
         temperature_partition = []
         wires_partition = []
-
-        voltage_partition.clear()
-        temperature_partition.clear()
-        wires_partition.clear()
 
         for i in range(8):
             voltage_partition.append(voltage_values_copy.pop(0))

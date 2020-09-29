@@ -624,11 +624,14 @@ if __name__ == "__main__":
     minions[0].rx_data = [0xF9, 0x0F, 0xFF, 0x0F, 0xFF, 0xFF]
     wrcomm_handler(minions[0])
     fail = 0
-    if minions[0].ltc1380s[mux_idxs['SIM_LTC1380_MUX1']].mux_addr != mux_addresses['SIM_LTC1380_MUX1'] or minions[0].ltc1380s[mux_idxs['SIM_LTC1380_MUX1']].mux_en is True:
+    if minions[0].ltc1380s[mux_idxs['SIM_LTC1380_MUX1']].mux_addr != mux_addresses['SIM_LTC1380_MUX1'] or \
+        minions[0].ltc1380s[mux_idxs['SIM_LTC1380_MUX1']].mux_en is True:
         fail = 1
     minions[0].rx_data = [0xF9, 0x2F, 0xFF, 0x9F, 0xFF, 0xFF]
     wrcomm_handler(minions[0])
-    if minions[0].ltc1380s[mux_idxs['SIM_LTC1380_MUX2']].mux_addr != mux_addresses['SIM_LTC1380_MUX2'] or minions[0].ltc1380s[mux_idxs['SIM_LTC1380_MUX2']].mux_sel != 0x01 or minions[0].ltc1380s[mux_idxs['SIM_LTC1380_MUX2']].mux_en is not True:
+    if minions[0].ltc1380s[mux_idxs['SIM_LTC1380_MUX2']].mux_addr != mux_addresses['SIM_LTC1380_MUX2'] or \
+        minions[0].ltc1380s[mux_idxs['SIM_LTC1380_MUX2']].mux_sel != 0x01 or \
+        minions[0].ltc1380s[mux_idxs['SIM_LTC1380_MUX2']].mux_en is not True:
         fail = 1
 
     # Test ADAX

@@ -16,7 +16,7 @@
 #include "BSP_Lights.h"
 #include "BSP_WDTimer.h"
 
-cell_asic minions[NUM_MINIONS];
+static cell_asic minions[NUM_MINIONS];
 bool override = false;		// This will be changed by user via CLI
 char command[COMMAND_SIZE];
 
