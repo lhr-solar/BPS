@@ -1,3 +1,4 @@
+/* Copyright (c) 2020 UT Longhorn Racing Solar */
 /* CLI.c
  * Command Line Interface file to 
  * define and route commands
