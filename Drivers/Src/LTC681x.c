@@ -548,7 +548,6 @@ int8_t parse_cells(uint8_t current_ic, uint8_t cell_reg, uint8_t cell_data[], ui
   uint16_t data_pec;
   uint8_t data_counter = current_ic*LTC681X_NUM_RX_BYT; //data counter
 
-
   for (uint8_t current_cell = 0; current_cell<CELL_IN_REG; current_cell++)  // This loop parses the read back data into cell voltages, it
   {
     // loops once for each of the 3 cell voltage codes in the register

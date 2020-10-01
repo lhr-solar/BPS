@@ -11,6 +11,7 @@ import Fans
 import WDTimer
 import PLL
 import I2C
+import logging
 
 import config
 import Timer
@@ -35,8 +36,6 @@ def generate(battery=None):
         battery.update()
     # Generate ADC values
     ADC.generate(state, mode, battery)
-    # Generate SPI values
-    SPI.generate(state, mode, battery)
     #Pet Watchdog
     WDTimer.Check_State()
     #Initialize Watchdog Timer
@@ -67,7 +66,8 @@ def display(battery=None):  #print watchdog countdown
     CANbox.addstr(4, 0, textwrap.fill(text, 40))
     CANbox.addstr(3, 2, "CAN ID and Message:")
     # Display Watchdog ticks
-    ticks = WDTimer.Tick()
+    #ticks = WDTimer.Tick()
+    ticks = 0
     stdscr.addstr(10, 0, f"                              ") #clear previous tick
     stdscr.addstr(10, 0, f"WDTimer Countdown: {ticks}")
     #Display current frequency
@@ -177,15 +177,19 @@ def main():
         # Create state of the battery
         BeVolt = battery.Battery(ampere_draw, config.total_batt_pack_capacity_mah, init_capacity_mah)
         PLL.PLL_Init()
+        SPI.init(battery=BeVolt)
     else:
         BeVolt = None
         configure()
+        SPI.init(state=state, mode=mode)
     
     try:
         launch_bevolt()
     except Exception as e:
         print(repr(e))
     
+    logging.basicConfig(filename='debug.log',level=logging.DEBUG)
+
     global stdscr
     global CANbox
     stdscr = curses.initscr()
@@ -200,6 +204,8 @@ def main():
     #Start background thread for timer 
     timerThread = Timer.timer_Thread
     timerThread.start()
+    spiThread = SPI.spi_thread
+    spiThread.start()
     while True:
         try:
             # Generate all values
@@ -289,6 +295,9 @@ def main():
             curses.endwin()
             print("ERROR:", end=" ")
             print(repr(e), end="\r\n")
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+            print(exc_type, fname, exc_tb.tb_lineno)
             print("If addwstr() returned ERR, make your terminal window bigger.")
             print("\n\rContinue? (Y/n): ", end="")
             cont = input()
