@@ -1,8 +1,14 @@
 #include "BSP_UART.h"
 #include "stm32f4xx.h"
 //Written by Sijin and Revised by Manthan Upadhyaya: 10/2020
+//************THIS WILL BE USED FOR THE RTOS VERSION OF THE BPS****************
+OS_Q BLE_RxFifo, BLE_TxFifo, USB_RxFifo, USB_TxFifo;
+OS_ERR BLE_err, USB_err;
+CPU_TS time;
+
 #define TX_SIZE     128
 #define RX_SIZE     64
+//*********THIS WILL BE USED FOR THE BARE METAL VERSION OF THE BPS************
 //These variables are for USART 2 which is used for the BLE
 static char txBuffer2[TX_SIZE];
 static uint32_t txPut2 = 0;
@@ -33,6 +39,8 @@ static bool RxFifo_RemoveLast(uint8_t *data, UART_Port usart);
 static bool RxFifo_Peek(uint8_t *data, UART_Port usart);
 static bool RxFifo_IsFull(UART_Port usart);
 static bool RxFifo_IsEmpty(UART_Port usart);
+
+//************THE FOLLOWING FUNCTIONS ARE FOR THE RTOS VERSION OF THE BPS*************
 
 /**
  * @brief   Initializes the UART peripheral
@@ -93,8 +101,188 @@ void BSP_UART_Init(void) {
     NVIC_Init(&NVIC_InitStructure);
 
     setvbuf(stdout, NULL, _IONBF, 0);
+    //Initialize RTOS FIFO structs
+    OSQCreate(&BLE_RxFifo, "BLERx", 10, &BLE_err);
+    OSQCreate(&BLE_TxFifo, "BLETx", 10, &BLE_err);
+    OSQCreate(&USB_RxFifo, "USBRx", 10, &USB_err);
+    OSQCreate(&USB_TxFifo, "USBTx", 10, &USB_err);
 }
 
+/**
+ * @brief   Gets one line of ASCII text that was received.
+ * @pre     str should be at least 128bytes long.
+ * @param   str : pointer to buffer to store the string. This buffer should be initialized
+ *                  before hand.
+ * @param   usart : which usart to read from (2 or 3)
+ * @return  number of bytes that was read
+ */
+uint32_t BSP_UART_ReadLine(char *str, UART_Port usart) {
+    uint8_t data = 0;
+    uint32_t recvd = 0;
+    if (usart == UART_USB){ //read from 3rd usart
+        USART_ITConfig(USART3, USART_IT_RXNE, RESET);
+        str = OSQPend(&USB_RxFifo, 0, OS_OPT_PEND_BLOCKING, &recvd, &time, &USB_err);
+        if (str[recvd] == '\r') str[recvd] = '0'; //if last was a carriage return
+        *str = 0;
+        USART_ITConfig(USART3, USART_IT_RXNE, SET);
+        return recvd;
+    }
+    if (usart == UART_BLE){ //read from 2nd usart
+        USART_ITConfig(USART2, USART_IT_RXNE, RESET);
+        str = OSQPend(&BLE_RxFifo, 0, OS_OPT_PEND_BLOCKING, &recvd, &time, &BLE_err);
+        if (str[recvd] == '\r') str[recvd] = '0'; //if last was a carriage return
+        *str = 0;
+        USART_ITConfig(USART2, USART_IT_RXNE, SET);
+        return recvd;
+    }
+    return 0;
+}
+
+/**
+ * @brief   Transmits data to through UART line
+ * @param   str : pointer to buffer with data to send.
+ * @param   len : size of buffer
+ * @param   usart : which usart to read from (2 or 3)
+ * @return  number of bytes that were sent
+ */
+uint32_t BSP_UART_Write(char *str, uint32_t len, UART_Port usart) {
+    uint32_t sent = 0;
+    if (usart == UART_USB){
+        USART_ITConfig(USART3, USART_IT_TC, RESET);
+        while (*str != '\0' && len > 0){
+            OSQPost(&USB_TxFifo, str, 1, OS_OPT_POST_FIFO, &USB_err);
+            sent++;
+            len--;
+        }
+        USART_ITConfig(USART3, USART_IT_TC, SET);
+        return sent;
+    }
+    if (usart == UART_BLE){
+        USART_ITConfig(USART2, USART_IT_TC, RESET);
+        while (*str != '\0' && len > 0){
+            OSQPost(&BLE_TxFifo, str, 1, OS_OPT_POST_FIFO, &BLE_err);
+            sent++;
+            len--;
+        }
+        USART_ITConfig(USART2, USART_IT_TC, SET);
+        return sent;
+    }
+    return 0;
+}
+
+void USART2_IRQHandler(void) {
+    if(USART_GetITStatus(USART2, USART_IT_RXNE) != RESET) {
+        uint8_t data = USART2->DR;
+        bool removeSuccess = 1;
+        // Check if it was a backspace.
+        // '\b' for minicmom
+        // '\177' for putty
+        if(data != '\b' && data != '\177') OSQPost(&BLE_RxFifo, data, 1, OS_OPT_POST_FIFO, &BLE_err);
+        // Sweet, just a "regular" key. Put it into the fifo
+        // Doesn't matter if it fails. If it fails, then the data gets thrown away
+        // and the easiest solution for this is to increase RX_SIZE
+        else {
+            uint8_t junk = 0;
+            // Delete the last entry!
+            removeSuccess = RxFifo_RemoveLast(&junk,UART_BLE);
+        }
+        if(removeSuccess) USART2->DR = data;
+    }
+    if(USART_GetITStatus(USART2, USART_IT_TC) != RESET) {
+        // If getting data from fifo fails i.e. the tx fifo is empty, then turn off the TX interrupt
+        OSQPost(&BLE_TxFifo, (uint8_t *)&(USART2->DR), 1, OS_OPT_POST_FIFO, &BLE_err);
+        if(BLE_err != OS_ERR_NONE) USART_ITConfig(USART2, USART_IT_TC, RESET);
+    }
+    if(USART_GetITStatus(USART2, USART_IT_ORE) != RESET);
+}
+
+void USART3_IRQHandler(void) {
+    if(USART_GetITStatus(USART3, USART_IT_RXNE) != RESET) {
+        uint8_t data = USART3->DR;
+        bool removeSuccess = 1;
+        // Check if it was a backspace.
+        // '\b' for minicmom
+        // '\177' for putty
+        if(data != '\b' && data != '\177') OSQPost(&USB_RxFifo, data, 1, OS_OPT_POST_FIFO, &USB_err);
+        // Sweet, just a "regular" key. Put it into the fifo
+        // Doesn't matter if it fails. If it fails, then the data gets thrown away
+        // and the easiest solution for this is to increase RX_SIZE
+        else {
+            uint8_t junk = 0;
+            // Delete the last entry!
+            removeSuccess = RxFifo_RemoveLast(&junk,UART_BLE);
+        }
+        if(removeSuccess) USART3->DR = data;
+    }
+    if(USART_GetITStatus(USART3, USART_IT_TC) != RESET) {
+        // If getting data from fifo fails i.e. the tx fifo is empty, then turn off the TX interrupt
+        OSQPost(&USB_TxFifo, (uint8_t *)&(USART3->DR), 1, OS_OPT_POST_FIFO, &USB_err);
+        if(USB_err != OS_ERR_NONE) USART_ITConfig(USART3, USART_IT_TC, RESET);
+    }
+    if(USART_GetITStatus(USART3, USART_IT_ORE) != RESET);
+}
+
+//*********THE FOLLOWING FUNCTIONS ARE FOR THE BARE-METAL VERSION OF THE BPS*********
+/**
+ * @brief   Initializes the UART peripheral
+ */
+void BSP_UART_Init(void) {
+    GPIO_InitTypeDef GPIO_InitStruct = {0};
+    USART_InitTypeDef UART_InitStruct = {0};
+    //Enable USART3, PC5, PB10, USART2, PA2, PA3 clocks
+    RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART3, ENABLE);
+    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
+    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC, ENABLE);
+    RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART2, ENABLE);
+    RCC_APB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
+    //Initialize pins for USART
+    GPIO_InitStruct.GPIO_Pin = GPIO_Pin_10;
+    GPIO_InitStruct.GPIO_Mode = GPIO_Mode_AF;
+    GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
+    GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_UP;
+    GPIO_InitStruct.GPIO_Speed = GPIO_Speed_25MHz;
+    GPIO_Init(GPIOB, &GPIO_InitStruct);
+    GPIO_InitStruct.GPIO_Pin = GPIO_Pin_5;
+    GPIO_Init(GPIOC, &GPIO_InitStruct);
+    GPIO_InitStruct.GPIO_Pin = GPIO_Pin_2;
+    GPIO_Init(GPIOA, &GPIO_InitStruct);
+    GPIO_InitStruct.GPIO_Pin = GPIO_Pin_3;
+    //Enable alternative function on all pins
+    GPIO_PinAFConfig(GPIOB, GPIO_PinSource10, GPIO_AF_USART3);
+    GPIO_PinAFConfig(GPIOC, GPIO_PinSource5, GPIO_AF_USART3);
+    GPIO_PinAFConfig(GPIOA, GPIO_PinSource2, GPIO_AF_USART2);
+    GPIO_PinAFConfig(GPIOA, GPIO_PinSource3, GPIO_AF_USART2);
+    //Initialize UART2 and 3
+    UART_InitStruct.USART_BaudRate = 115200;
+    UART_InitStruct.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
+    UART_InitStruct.USART_Mode = USART_Mode_Tx | USART_Mode_Rx;
+    UART_InitStruct.USART_Parity = USART_Parity_No;
+    UART_InitStruct.USART_StopBits = USART_StopBits_1;
+    UART_InitStruct.USART_WordLength = USART_WordLength_8b;
+    USART_Init(USART3, &UART_InitStruct);
+    USART_Init(USART2, &UART_InitStruct);
+    //Enable interrupts on receiving and transmitting
+    USART_ITConfig(USART3, USART_IT_RXNE, ENABLE);
+    USART_ITConfig(USART3, USART_IT_TC, ENABLE);
+    USART_ITConfig(USART2, USART_IT_RXNE, ENABLE);
+    USART_ITConfig(USART2, USART_IT_TC, ENABLE);
+    //Enable UART2 and 3
+    USART_Cmd(USART3, ENABLE);
+    USART_Cmd(USART2, ENABLE);
+    //Enable NVIC interrupts for USART2 and 3
+    NVIC_InitTypeDef NVIC_InitStructure;
+  	NVIC_InitStructure.NVIC_IRQChannel = USART3_IRQn;
+    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
+    NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
+    NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+    NVIC_Init(&NVIC_InitStructure);
+    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 1;
+    NVIC_InitStructure.NVIC_IRQChannelSubPriority = 1;
+    NVIC_InitStructure.NVIC_IRQChannel = USART2_IRQn;
+    NVIC_Init(&NVIC_InitStructure);
+
+    setvbuf(stdout, NULL, _IONBF, 0);
+}
 /**
  * @brief   Gets one line of ASCII text that was received.
  * @pre     str should be at least 128bytes long.
@@ -142,7 +330,7 @@ uint32_t BSP_UART_ReadLine(char *str, UART_Port usart) {
  * @param   usart : which usart to read from (2 or 3)
  * @return  number of bytes that were sent
  */
-uint32_t BSP_UART_Write(char *str, uint32_t len, uint8_t usart) {
+uint32_t BSP_UART_Write(char *str, uint32_t len, UART_Port usart) {
     uint32_t sent = 0;
     if (usart == UART_USB){
         USART_ITConfig(USART3, USART_IT_TC, RESET);

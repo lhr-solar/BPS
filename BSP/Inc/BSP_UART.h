@@ -2,6 +2,7 @@
 #define __BSP_UART_H
 
 #include "common.h"
+#include "os.h"
 
 typedef enum {UART_USB, UART_BLE} UART_Port;
 
