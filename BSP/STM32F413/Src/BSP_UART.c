@@ -1,11 +1,16 @@
 #include "BSP_UART.h"
 #include "stm32f4xx.h"
 //Written by Sijin and Revised by Manthan Upadhyaya: 10/2020
-//************THIS WILL BE USED FOR THE RTOS VERSION OF THE BPS****************
-OS_Q BLE_RxFifo, BLE_TxFifo, USB_RxFifo, USB_TxFifo;
-OS_ERR BLE_err, USB_err;
-CPU_TS time;
+#define RTOS_UART  //Can either be RTOS_UART OR BM_UART
 
+#ifdef RTOS_UART
+//************THIS WILL BE USED FOR THE RTOS VERSION OF THE BPS****************
+static OS_Q BLE_RxFifo, BLE_TxFifo, USB_RxFifo, USB_TxFifo;
+static OS_ERR BLE_err, USB_err;
+static CPU_TS time;
+#endif
+
+#ifdef BM_UART
 #define TX_SIZE     128
 #define RX_SIZE     64
 //*********THIS WILL BE USED FOR THE BARE METAL VERSION OF THE BPS************
@@ -39,9 +44,9 @@ static bool RxFifo_RemoveLast(uint8_t *data, UART_Port usart);
 static bool RxFifo_Peek(uint8_t *data, UART_Port usart);
 static bool RxFifo_IsFull(UART_Port usart);
 static bool RxFifo_IsEmpty(UART_Port usart);
-
+#endif
 //************THE FOLLOWING FUNCTIONS ARE FOR THE RTOS VERSION OF THE BPS*************
-
+#ifdef RTOS_UART
 /**
  * @brief   Initializes the UART peripheral
  */
@@ -117,15 +122,14 @@ void BSP_UART_Init(void) {
  * @return  number of bytes that was read
  */
 uint32_t BSP_UART_ReadLine(char *str, UART_Port usart) {
-    uint8_t data = 0;
-    uint32_t recvd = 0;
+    OS_MSG_SIZE recvd = 0;
     if (usart == UART_USB){ //read from 3rd usart
         USART_ITConfig(USART3, USART_IT_RXNE, RESET);
         str = OSQPend(&USB_RxFifo, 0, OS_OPT_PEND_BLOCKING, &recvd, &time, &USB_err);
         if (str[recvd] == '\r') str[recvd] = '0'; //if last was a carriage return
         *str = 0;
         USART_ITConfig(USART3, USART_IT_RXNE, SET);
-        return recvd;
+        return (uint32_t)recvd;
     }
     if (usart == UART_BLE){ //read from 2nd usart
         USART_ITConfig(USART2, USART_IT_RXNE, RESET);
@@ -133,7 +137,7 @@ uint32_t BSP_UART_ReadLine(char *str, UART_Port usart) {
         if (str[recvd] == '\r') str[recvd] = '0'; //if last was a carriage return
         *str = 0;
         USART_ITConfig(USART2, USART_IT_RXNE, SET);
-        return recvd;
+        return (uint32_t)recvd;
     }
     return 0;
 }
@@ -177,14 +181,15 @@ void USART2_IRQHandler(void) {
         // Check if it was a backspace.
         // '\b' for minicmom
         // '\177' for putty
-        if(data != '\b' && data != '\177') OSQPost(&BLE_RxFifo, data, 1, OS_OPT_POST_FIFO, &BLE_err);
+        if(data != '\b' && data != '\177') OSQPost(&BLE_RxFifo, &data, 1, OS_OPT_POST_FIFO, &BLE_err);
         // Sweet, just a "regular" key. Put it into the fifo
         // Doesn't matter if it fails. If it fails, then the data gets thrown away
         // and the easiest solution for this is to increase RX_SIZE
         else {
-            uint8_t junk = 0;
+            //uint8_t junk = 0;
             // Delete the last entry!
-            removeSuccess = RxFifo_RemoveLast(&junk,UART_BLE);
+            //removeSuccess = RxFifo_RemoveLast(&junk,UART_BLE);
+            //REPLACE ABOVE LINE SOMEHOW
         }
         if(removeSuccess) USART2->DR = data;
     }
@@ -203,14 +208,15 @@ void USART3_IRQHandler(void) {
         // Check if it was a backspace.
         // '\b' for minicmom
         // '\177' for putty
-        if(data != '\b' && data != '\177') OSQPost(&USB_RxFifo, data, 1, OS_OPT_POST_FIFO, &USB_err);
+        if(data != '\b' && data != '\177') OSQPost(&USB_RxFifo, &data, 1, OS_OPT_POST_FIFO, &USB_err);
         // Sweet, just a "regular" key. Put it into the fifo
         // Doesn't matter if it fails. If it fails, then the data gets thrown away
         // and the easiest solution for this is to increase RX_SIZE
         else {
-            uint8_t junk = 0;
+            //uint8_t junk = 0;
             // Delete the last entry!
-            removeSuccess = RxFifo_RemoveLast(&junk,UART_BLE);
+            //removeSuccess = RxFifo_RemoveLast(&junk,UART_BLE);
+            //REPLACE ABOVE LINE SOMEHOW
         }
         if(removeSuccess) USART3->DR = data;
     }
@@ -221,8 +227,9 @@ void USART3_IRQHandler(void) {
     }
     if(USART_GetITStatus(USART3, USART_IT_ORE) != RESET);
 }
-
+#endif
 //*********THE FOLLOWING FUNCTIONS ARE FOR THE BARE-METAL VERSION OF THE BPS*********
+#ifdef BM_UART
 /**
  * @brief   Initializes the UART peripheral
  */
@@ -515,3 +522,4 @@ static bool RxFifo_IsEmpty(UART_Port usart) {
     if (usart == UART_BLE) return rxGet2 == rxPut2;
     return 0;
 }
+#endif
