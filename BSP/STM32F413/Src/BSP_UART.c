@@ -6,7 +6,8 @@
 #ifdef RTOS_UART
 //************THIS WILL BE USED FOR THE RTOS VERSION OF THE BPS****************
 static OS_Q BLE_RxFifo, BLE_TxFifo, USB_RxFifo, USB_TxFifo;
-static OS_ERR BLE_err, USB_err;
+static OS_MUTEX BLE_RxFifo_Mutex, BLE_TxFifo_Mutex, USB_RxFifo_Mutex, USB_TxFifo_Mutex;
+static OS_ERR err;
 static CPU_TS time;
 #endif
 
@@ -107,10 +108,15 @@ void BSP_UART_Init(void) {
 
     setvbuf(stdout, NULL, _IONBF, 0);
     //Initialize RTOS FIFO structs
-    OSQCreate(&BLE_RxFifo, "BLERx", 10, &BLE_err);
-    OSQCreate(&BLE_TxFifo, "BLETx", 10, &BLE_err);
-    OSQCreate(&USB_RxFifo, "USBRx", 10, &USB_err);
-    OSQCreate(&USB_TxFifo, "USBTx", 10, &USB_err);
+    OSQCreate(&BLE_RxFifo, "BLERx", 10, &err);
+    OSQCreate(&BLE_TxFifo, "BLETx", 10, &err);
+    OSQCreate(&USB_RxFifo, "USBRx", 10, &err);
+    OSQCreate(&USB_TxFifo, "USBTx", 10, &err);
+    //Create mutexes for fifos
+    OSMutexCreate(&BLE_RxFifo_Mutex, "BLE Rx Mutex", &err);
+    OSMutexCreate(&BLE_TxFifo_Mutex, "BLE Tx Mutex", &err);
+    OSMutexCreate(&USB_RxFifo_Mutex, "USB Rx Mutex", &err);
+    OSMutexCreate(&USB_TxFifo_Mutex, "USB Tx Mutex", &err);
 }
 
 /**
@@ -125,7 +131,9 @@ uint32_t BSP_UART_ReadLine(char *str, UART_Port usart) {
     OS_MSG_SIZE recvd = 0;
     if (usart == UART_USB){ //read from 3rd usart
         USART_ITConfig(USART3, USART_IT_RXNE, RESET);
-        str = OSQPend(&USB_RxFifo, 0, OS_OPT_PEND_BLOCKING, &recvd, &time, &USB_err);
+        OSMutexPend(&USB_RxFifo_Mutex, 0, OS_OPT_PEND_BLOCKING, &time, &err);
+        str = OSQPend(&USB_RxFifo, 0, OS_OPT_PEND_BLOCKING, &recvd, &time, &err);
+        OSMutexPost(&USB_RxFifo_Mutex, OS_OPT_POST_NONE, &err);
         if (str[recvd] == '\r') str[recvd] = '0'; //if last was a carriage return
         *str = 0;
         USART_ITConfig(USART3, USART_IT_RXNE, SET);
@@ -133,7 +141,9 @@ uint32_t BSP_UART_ReadLine(char *str, UART_Port usart) {
     }
     if (usart == UART_BLE){ //read from 2nd usart
         USART_ITConfig(USART2, USART_IT_RXNE, RESET);
-        str = OSQPend(&BLE_RxFifo, 0, OS_OPT_PEND_BLOCKING, &recvd, &time, &BLE_err);
+        OSMutexPend(&BLE_RxFifo_Mutex, 0, OS_OPT_PEND_BLOCKING, &time, &err);
+        str = OSQPend(&BLE_RxFifo, 0, OS_OPT_PEND_BLOCKING, &recvd, &time, &err);
+        OSMutexPost(&BLE_RxFifo_Mutex, OS_OPT_POST_NONE, &err);
         if (str[recvd] == '\r') str[recvd] = '0'; //if last was a carriage return
         *str = 0;
         USART_ITConfig(USART2, USART_IT_RXNE, SET);
@@ -150,38 +160,34 @@ uint32_t BSP_UART_ReadLine(char *str, UART_Port usart) {
  * @return  number of bytes that were sent
  */
 uint32_t BSP_UART_Write(char *str, uint32_t len, UART_Port usart) {
-    uint32_t sent = 0;
     if (usart == UART_USB){
         USART_ITConfig(USART3, USART_IT_TC, RESET);
-        while (*str != '\0' && len > 0){
-            OSQPost(&USB_TxFifo, str, 1, OS_OPT_POST_FIFO, &USB_err);
-            sent++;
-            len--;
-        }
+        OSMutexPend(&USB_TxFifo_Mutex, 0, OS_OPT_PEND_BLOCKING, &time, &err);
+        OSQPost(&USB_TxFifo, str, len, OS_OPT_POST_FIFO, &err);
+        OSMutexPost(&USB_TxFifo_Mutex, OS_OPT_POST_NONE, &err);
         USART_ITConfig(USART3, USART_IT_TC, SET);
-        return sent;
+        return len;
     }
     if (usart == UART_BLE){
         USART_ITConfig(USART2, USART_IT_TC, RESET);
-        while (*str != '\0' && len > 0){
-            OSQPost(&BLE_TxFifo, str, 1, OS_OPT_POST_FIFO, &BLE_err);
-            sent++;
-            len--;
-        }
+        OSMutexPend(&BLE_TxFifo_Mutex, 0, OS_OPT_PEND_BLOCKING, &time, &err);
+        OSQPost(&BLE_TxFifo, str, len, OS_OPT_POST_FIFO, &err);
+        OSMutexPost(&BLE_TxFifo_Mutex, OS_OPT_POST_NONE, &err);
         USART_ITConfig(USART2, USART_IT_TC, SET);
-        return sent;
+        return len;
     }
     return 0;
 }
 
 void USART2_IRQHandler(void) {
+    OS_ERR BLE_err;
     if(USART_GetITStatus(USART2, USART_IT_RXNE) != RESET) {
         uint8_t data = USART2->DR;
         bool removeSuccess = 1;
-        // Check if it was a backspace.
-        // '\b' for minicmom
-        // '\177' for putty
+        OSMutexPend(&BLE_RxFifo_Mutex, 0, OS_OPT_PEND_BLOCKING, &time, &err);
+        // Check if it was a backspace, '\b' for minicmom, '\177' for putty
         if(data != '\b' && data != '\177') OSQPost(&BLE_RxFifo, &data, 1, OS_OPT_POST_FIFO, &BLE_err);
+        OSMutexPost(&BLE_RxFifo_Mutex, OS_OPT_POST_NONE, &err);
         // Sweet, just a "regular" key. Put it into the fifo
         // Doesn't matter if it fails. If it fails, then the data gets thrown away
         // and the easiest solution for this is to increase RX_SIZE
@@ -194,21 +200,24 @@ void USART2_IRQHandler(void) {
         if(removeSuccess) USART2->DR = data;
     }
     if(USART_GetITStatus(USART2, USART_IT_TC) != RESET) {
+        OSMutexPend(&BLE_TxFifo_Mutex, 0, OS_OPT_PEND_BLOCKING, &time, &err);
         // If getting data from fifo fails i.e. the tx fifo is empty, then turn off the TX interrupt
         OSQPost(&BLE_TxFifo, (uint8_t *)&(USART2->DR), 1, OS_OPT_POST_FIFO, &BLE_err);
+        OSMutexPost(&BLE_TxFifo_Mutex, OS_OPT_POST_NONE, &err);
         if(BLE_err != OS_ERR_NONE) USART_ITConfig(USART2, USART_IT_TC, RESET);
     }
     if(USART_GetITStatus(USART2, USART_IT_ORE) != RESET);
 }
 
 void USART3_IRQHandler(void) {
+    OS_ERR USB_err;
     if(USART_GetITStatus(USART3, USART_IT_RXNE) != RESET) {
         uint8_t data = USART3->DR;
         bool removeSuccess = 1;
-        // Check if it was a backspace.
-        // '\b' for minicmom
-        // '\177' for putty
+        OSMutexPend(&USB_RxFifo_Mutex, 0, OS_OPT_PEND_BLOCKING, &time, &err);
+        // Check if it was a backspace, '\b' for minicmom, '\177' for putty
         if(data != '\b' && data != '\177') OSQPost(&USB_RxFifo, &data, 1, OS_OPT_POST_FIFO, &USB_err);
+        OSMutexPost(&USB_RxFifo_Mutex, OS_OPT_POST_NONE, &err);
         // Sweet, just a "regular" key. Put it into the fifo
         // Doesn't matter if it fails. If it fails, then the data gets thrown away
         // and the easiest solution for this is to increase RX_SIZE
@@ -221,8 +230,10 @@ void USART3_IRQHandler(void) {
         if(removeSuccess) USART3->DR = data;
     }
     if(USART_GetITStatus(USART3, USART_IT_TC) != RESET) {
+        OSMutexPend(&USB_TxFifo_Mutex, 0, OS_OPT_PEND_BLOCKING, &time, &err);
         // If getting data from fifo fails i.e. the tx fifo is empty, then turn off the TX interrupt
         OSQPost(&USB_TxFifo, (uint8_t *)&(USART3->DR), 1, OS_OPT_POST_FIFO, &USB_err);
+        OSMutexPost(&USB_TxFifo_Mutex, OS_OPT_POST_NONE, &err);
         if(USB_err != OS_ERR_NONE) USART_ITConfig(USART3, USART_IT_TC, RESET);
     }
     if(USART_GetITStatus(USART3, USART_IT_ORE) != RESET);
