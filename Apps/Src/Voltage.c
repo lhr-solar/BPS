@@ -63,7 +63,6 @@ ErrorStatus Voltage_Init(cell_asic *boards, OS_MUTEX *mutex){
 ErrorStatus Voltage_UpdateMeasurements(void){
 	int8_t error = 0;
 	CPU_TS ts;
-	OSMutexPend(Voltage_Mutex, 0, OS_OPT_PEND_BLOCKING, &ts, &err);
 	// Start Cell ADC Measurements
 	wakeup_idle(NUM_MINIONS);
 	LTC6811_adcv(ADC_CONVERSION_MODE,ADC_DCP,CELL_CH_TO_CONVERT);
@@ -74,10 +73,10 @@ ErrorStatus Voltage_UpdateMeasurements(void){
 	error = LTC6811_rdcv(0, NUM_MINIONS, Minions); // Set to read back all cell voltage registers
 	
 	//copies values from cells.c_codes to private array
+	OSMutexPend(Voltage_Mutex, 0, OS_OPT_PEND_BLOCKING, &ts, &err);
 	for(int i = 0; i < NUM_BATTERY_MODULES; i++){
 		VoltageVal[i] = Minions[i / MAX_VOLT_SENSORS_PER_MINION_BOARD].cells.c_codes[i % MAX_VOLT_SENSORS_PER_MINION_BOARD];
 	}
-	
 	OSMutexPost(Voltage_Mutex, OS_OPT_POST_NONE, &err);
 	if(error == 0){
 		return SUCCESS;
@@ -175,7 +174,6 @@ uint32_t Voltage_GetOpenWire(void){
  */
 uint16_t Voltage_GetModuleMillivoltage(uint8_t moduleIdx){
 	CPU_TS ts;
-	OSMutexPend(Voltage_Mutex, 0, OS_OPT_PEND_BLOCKING, &ts, &err);
 	// These if statements prevents a hardfault.
     if(moduleIdx >= NUM_BATTERY_MODULES) {
         return 0xFFFF;  // return -1 which indicates error voltage
@@ -188,7 +186,7 @@ uint16_t Voltage_GetModuleMillivoltage(uint8_t moduleIdx){
     if((moduleIdx / MAX_VOLT_SENSORS_PER_MINION_BOARD) >= NUM_MINIONS) {
         return 0xFFFF;  // return -1 which indicates error voltage
     }
-
+	OSMutexPend(Voltage_Mutex, 0, OS_OPT_PEND_BLOCKING, &ts, &err);
 	uint16_t ret = VoltageVal[moduleIdx] / 10;
 	OSMutexPost(Voltage_Mutex, OS_OPT_POST_NONE, &err);
 	return ret;
