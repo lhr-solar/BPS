@@ -6,6 +6,7 @@
 #include "Voltage.h"
 #include "Temperature.h"
 #include "BSP_UART.h"
+#include "CLI.h"
 
 /*******************************************************************************
 *    Shared Resources
@@ -62,67 +63,21 @@ cell_asic Minions[NUM_MINIONS];
 uint32_t WDog_BitMap = 0;
 
 
-/** Pend_ResourceForCLI
- * Pends for desired resource that CLI needs
- * @param resourceNum the resource you want to wait for, look at CLI_Resource enum in CLI.h
+/** Fetch_MutexForCLI
+ * Fetches address for desired mutex that CLI needs
+ * @param mutex the mutex you want the address of, look at CLI_Resource enum in CLI.h
+ * @return pointer to desired mutex
  */
-void Pend_ResourceForCLI(int resourceNum){
-    OS_ERR err;
-    CPU_TS ts;
-    switch(resourceNum){
-        case 0:
-            OSSemPend(&SafetyCheck_Sem4, 0, OS_OPT_PEND_BLOCKING, &ts, &err);
-            break;
-        case 1:
-            OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, &ts, &err);
-            break;
-        case 2:
-            OS_MutexLock(&VoltageBuffer_Mutex, 0, OS_OPT_PEND_BLOCKING, &ts, &err);
-            break;
-        case 3:
-            OS_MutexLock(&Temperature_Mutex, 0, OS_OPT_PEND_BLOCKING, &ts, &err);
-            break;
-        case 4:
-            OS_MutexLock(&OpenWireBuffer_Mutex, 0, OS_OPT_PEND_BLOCKING, &ts, &err);
-            break;
-        case 5:
-            OS_MutexLock(&AmperesData_Mutex, 0, OS_OPT_PEND_BLOCKING, &ts, &err);
-            break;
+OS_MUTEX *Fetch_MutexForCLI(CLI_mutex mutex){
+    switch(mutex){
+        case MINIONS_ASIC:
+            return &MinionsASIC_Mutex;
         default:
-            break;
+            return NULL;
     }
 }
 
-/** Post_ResourceForCLI
- * Posts desired resource that CLI needs
- * @param resourceNum the resource you want to post, look at CLI_Resource enum in CLI.h
- */
-void Post_ResourceForCLI(int resourceNum){
-    OS_ERR err;
-    CPU_TS ts;
-    switch(resourceNum){
-        case 0:
-            OS_SemPost(&SafetyCheck_Sem4, OS_OPT_POST_1, &ts, &err);
-            break;
-        case 1:
-            OS_MutexUnlock(&MinionsASIC_Mutex);
-            break;
-        case 2:
-            OS_MutexUnlock(&VoltageBuffer_Mutex);
-            break;
-        case 3:
-            OS_MutexUnlock(&Temperature_Mutex);
-            break;
-        case 4:
-            OS_MutexUnlock(&OpenWireBuffer_Mutex);
-            break;
-        case 5:
-            OS_MutexUnlock(&AmperesData_Mutex);
-            break;
-        default:
-            break;
-    }
-}
+
 
 //leaving these functions in the code for now, so it is easier to rebase this into other people's branches
 /*

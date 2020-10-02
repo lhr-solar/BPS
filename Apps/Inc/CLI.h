@@ -71,8 +71,8 @@
 // Useful values
 #define NUM_TEMP_SENSORS_LAST_MINION    14
 
-//For pending/posting CLI resource semaphores/mutexes
-enum CLI_Resource{SafetyCheck, MinionsASIC, VoltageBuffer, TemperatureBuffer, OpenWireBuffer, AmperesData};
+//For pending/posting CLI mutexes - meant to be used in conjuncion with Fetch_CLIMutex() in Tasks module. As more resources are needed, add them to this enum.
+typedef enum CLI_Mutex{MINIONS_ASIC} CLI_mutex;
 
 /** CLI_Init
  * Initializes the CLI with the values it needs

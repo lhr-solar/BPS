@@ -277,6 +277,10 @@ void CLI_Temperature(int* hashTokens) {
  * (tx_data, rx_date, and rx_pec_match)
  */
 void CLI_LTC6811(void) {
+	OS_ERR err;
+    CPU_TS ts;
+	OS_MUTEX *MinionsMutex = Fetch_MutexForCLI(MINIONS_ASIC);
+	OSMutexPend(MinionsMutex, 0, OS_OPT_PEND_BLOCKING, &ts, &err);
 	for(uint8_t current_ic = 0; current_ic < NUM_MINIONS; current_ic++) {
 		printf("Minion board %d: ", current_ic);
 		printf("Config: \n\rTX: ");
@@ -325,6 +329,7 @@ void CLI_LTC6811(void) {
 		}
 		printf("\n\rPEC: %d\n\r", Minions[current_ic].sctrlb.rx_pec_match);
 	}
+	OSMutexPost(MinionsMutex, OS_OPT_POST_NONE, &err);
 }
 
 /** CLI_Contactor
@@ -670,19 +675,13 @@ void CLI_All(void) {
 	printf("Voltage: \n\r");
 	hashTokens[0] = CLI_VOLTAGE_HASH;
 	hashTokens[1] = 0;
-	Pend_ResourceForCLI(VoltageBuffer);
 	CLI_Voltage(hashTokens);
-	Post_ResourceForCLI(VoltageBuffer);
 	printf("Current: \n\r");
 	hashTokens[0] = CLI_CURRENT_HASH;
-	Pend_ResourceForCLI(AmperesData);
 	CLI_Current(hashTokens);
-	Post_ResourceForCLI(AmperesData);
 	printf("Temperature: \n\r");
 	hashTokens[0] = CLI_TEMPERATURE_HASH;
-	Pend_ResourceForCLI(TemperatureBuffer);
 	CLI_Temperature(hashTokens);
-	Post_ResourceForCLI(TemperatureBuffer);
 	printf("State of Charge: \n\r");
 	hashTokens[0] = CLI_CHARGE_HASH;
 	CLI_Charge(hashTokens);
@@ -690,9 +689,7 @@ void CLI_All(void) {
 	hashTokens[0] = CLI_CONTACTOR_HASH;
 	CLI_Contactor(hashTokens);
 	hashTokens[0] = CLI_OPENWIRE_HASH;
-	Pend_ResourceForCLI(OpenWireBuffer);
 	CLI_OpenWire();
-	Post_ResourceForCLI(OpenWireBuffer);
 }
 
 /** CLI_Handler
@@ -733,28 +730,20 @@ void CLI_Handler(char* input) {
 			break;
 		// Voltage commands
 		case CLI_VOLTAGE_HASH:
-			Pend_ResourceForCLI(VoltageBuffer);	
 			CLI_Voltage(hashTokens);
-			Post_ResourceForCLI(VoltageBuffer);
 			break;
 		// Current commands
 		case CLI_CURRENT_HASH:
-			Pend_ResourceForCLI(AmperesData);
 			CLI_Current(hashTokens);
-			Post_ResourceForCLI(AmperesData);
 			break;
 		// Temperature commands
 		case CLI_TEMPERATURE_HASH:
-			Pend_ResourceForCLI(TemperatureBuffer);
 			CLI_Temperature(hashTokens);
-			Post_ResourceForCLI(TemperatureBuffer);
 			break;
 		// LTC6811 register commands
 		case CLI_REGISTER_HASH:
 		case CLI_LTC_HASH:
-			Pend_ResourceForCLI(MinionsASIC);
 			CLI_LTC6811();
-			Post_ResourceForCLI(MinionsASIC);
 			break;
 		// Contactor/Switch commands
 		case CLI_SWITCH_HASH:
@@ -786,9 +775,7 @@ void CLI_Handler(char* input) {
 			break;
 		//Open wire command
 		case CLI_OPENWIRE_HASH:
-			Pend_ResourceForCLI(OpenWireBuffer);
 			CLI_OpenWire();
-			Post_ResourceForCLI(OpenWireBuffer);
 			break;
 		// All
 		case CLI_ALL_HASH:

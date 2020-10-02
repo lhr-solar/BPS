@@ -51,9 +51,12 @@ void Task_CANBusConsumer(void *p_arg);
 
 void Task_BatteryBalance(void *p_arg);
 
-void Pend_ResourceForCLI(int resourceNum);
-
-void Post_ResourceForCLI(int resourceNum);
+/** Fetch_MutexForCLI
+ * Fetches address for desired mutex that CLI needs
+ * @param mutex the mutex you want the address of, look at CLI_Resource enum in CLI.h
+ * @return pointer to desired mutex
+ */
+OS_MUTEX *Fetch_MutexForCLI(CLI_mutex mutex);
 
 void Task_CLI(void *p_arg);
 
