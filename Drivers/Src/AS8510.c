@@ -1,5 +1,5 @@
 #include "AS8510.h"
-#include "BSP_SPI3.h"
+#include "BSP_SPI.h"
 
 // Addresses of the registers in the AS8510
 #define AS8510_DREG_I1       0x00   // Current data registers
@@ -38,7 +38,7 @@
  */
 void AS8510_Init() 
 {
-    BSP_SPI3_Init();
+    BSP_SPI_Init(spi_as8510);
 
     // TODO: verify that this initialization is correct once
     //       we have the hardware that we need
@@ -146,12 +146,12 @@ ErrorStatus AS8510_WriteToAddr(uint8_t addr, uint8_t *data, uint8_t len)
     txdata[0] = addr;
     memcpy(txdata + 1, data, len);
 
-    BSP_SPI3_SetStateCS(0);
+    BSP_SPI_SetStateCS(spi_as8510, 0);
 
     // Write the data to the registers
-    BSP_SPI3_Write(txdata, len + 1);
+    BSP_SPI_Write(spi_as8510, txdata, len + 1);
 
-    BSP_SPI3_SetStateCS(1);
+    BSP_SPI_SetStateCS(spi_as8510, 1);
 
     return SUCCESS;
 }
@@ -169,12 +169,12 @@ ErrorStatus AS8510_ReadFromAddr(uint8_t addr, uint8_t *data, uint8_t len)
 
     uint8_t txaddr = addr | 0x80;
 
-    BSP_SPI3_SetStateCS(0);
+    BSP_SPI_SetStateCS(spi_as8510, 0);
 
-    BSP_SPI3_Write(&txaddr, 1);
-    BSP_SPI3_Read(data, len);
+    BSP_SPI_Write(spi_as8510, &txaddr, 1);
+    BSP_SPI_Read(spi_as8510, data, len);
 
-    BSP_SPI3_SetStateCS(1);
+    BSP_SPI_SetStateCS(spi_as8510, 1);
 
     return SUCCESS;
 }

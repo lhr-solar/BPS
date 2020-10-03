@@ -1,4 +1,4 @@
-#include "BSP_SPI1.h"
+#include "BSP_SPI.h"
 
 /**
  * @brief   Initializes the SPI port connected to the LTC6820.
@@ -8,7 +8,7 @@
  * @param   None
  * @return  None
  */
-void BSP_SPI1_Init(void) {
+void BSP_SPI_Init(void) {
     // TODO: Initialize the SPI port and a digital output pin for the chip select
     //      SPI configuration:
     //          speed : 125kbps
@@ -27,7 +27,7 @@ void BSP_SPI1_Init(void) {
  * @param   txLen   length of data array.
  * @return  None
  */
-void BSP_SPI1_Write(uint8_t *txBuf, uint32_t txLen) {
+void BSP_SPI_Write(uint8_t *txBuf, uint32_t txLen) {
     // TODO: Transmit data through SPI.
     //      Any data the uC receives during this process should just be thrown away.
 }
@@ -42,7 +42,7 @@ void BSP_SPI1_Write(uint8_t *txBuf, uint32_t txLen) {
  * @param   rxLen   length of data array.
  * @return  None
  */
-void BSP_SPI1_Read(uint8_t *rxBuf, uint32_t rxLen) {
+void BSP_SPI_Read(uint8_t *rxBuf, uint32_t rxLen) {
     // TODO: Read data from SPI.
     //      Send 0x00 in order to get data
 }
@@ -55,6 +55,6 @@ void BSP_SPI1_Read(uint8_t *rxBuf, uint32_t rxLen) {
  * @param   state   0 for select, 1 to deselect
  * @return  None
  */
-void BSP_SPI1_SetStateCS(uint8_t state) {
+void BSP_SPI_SetStateCS(uint8_t state) {
     // TODO: Set CS pin to high or low depending on state
 }

@@ -12,7 +12,8 @@
 #define I2C_CSV_FILE            "I2C.csv"
 #define LIGHTS_CSV_FILE         "Lights.csv"
 #define PLL_CSV_FILE            "PLL.csv"
-#define SPI_CSV_FILE            "SPI.csv"
+#define SPI1_CSV_FILE           "SPI.csv"   // For compatibility purposes, omit the '1'
+#define SPI3_CSV_FILE           "SPI3.csv"
 #define TIMER_CSV_FILE          "Timer.csv"
 #define WDTIMER_CSV_FILE        "WDTimer.csv"
 

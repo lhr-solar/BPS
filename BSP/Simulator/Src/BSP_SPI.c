@@ -1,4 +1,4 @@
-#include "BSP_SPI1.h"
+#include "BSP_SPI.h"
 #include "config.h"
 #include "simulator_conf.h"
 #include <unistd.h>
@@ -76,7 +76,8 @@ typedef enum {
 } Group;
 
 // Path relative to the executable
-static const char* file = GET_CSV_PATH(SPI_CSV_FILE);
+static const char* file1 = GET_CSV_PATH(SPI1_CSV_FILE);
+static const char* file3 = GET_CSV_PATH(SPI3_CSV_FILE);
 
 static uint8_t chipSelectState = 1;     // During idle, the cs pin should be high.
                                         // Knowing the cs pin's state is not needed for the simulator,
@@ -131,14 +132,11 @@ static Group DetermineGroupLetter(uint16_t cmd);
 static bool UpdateSimulationData(void);
 
 /**
- * @brief   Initializes the SPI port connected to the LTC6820.
- *          This port communicates with the LTC6811 voltage and temperature
- *          monitoring IC. The LTC6820 converts the SPI pins to 2-wire isolated SPI.
- *          Look at analog devices website and LTC6811's or LTC6820's datasheets.
- * @param   None
+ * @brief   Initializes the SPI port.
+ * @param   port The SPI port to initialize.
  * @return  None
  */
-void BSP_SPI1_Init(void) {
+void BSP_SPI_Init(spi_port_t port) {
 
     // Reset values
     memset(simulationData, 0, sizeof(simulationData));
@@ -146,25 +144,33 @@ void BSP_SPI1_Init(void) {
     PEC15_Table_Init();
 
     // Check if simulator is running i.e. were the csv files created?
-    if(access(file, F_OK) != 0) {
+    if(access(file1, F_OK) != 0) {
         // File doesn't exit if true
-        perror(SPI_CSV_FILE);
+        perror(SPI1_CSV_FILE);
         exit(EXIT_FAILURE);
     }
+
+    // TODO: add SPI3 capabilities to the simulator
+    #if 0
+    if(access(file3, F_OK) != 0) {
+        perror(SPI3_CSV_FILE);
+        exit(EXIT_FAILURE);
+    }
+    #endif
 }
 
 /**
  * @brief   Transmits data to through SPI.
- *          With the way the LTC6811 communication works, the LTC6811 will not send
- *          anything during a transmit for uC to LTC6811. This is unlike what
- *          the SPI protocol expects where a transmit and receive happen
- *          simultaneously.
  * @note    Blocking statement
+ * @param   port    the SPI port to write to
  * @param   txBuf   data array that contains the data to be sent.
  * @param   txLen   length of data array.
  * @return  None
  */
-void BSP_SPI1_Write(uint8_t *txBuf, uint32_t txLen) {
+void BSP_SPI_Write(spi_port_t port, uint8_t *txBuf, uint32_t txLen) {
+    // TODO: add SPI3 capabilities to the simulator
+    if(port != spi_ltc6811) return;
+
     currCmd = ExtractCmdFromBuff(txBuf, txLen);
 
     if(((currCmd & 0x600) == 0x200) || (currCmd & 0x700) == 0x400) {
@@ -182,11 +188,14 @@ void BSP_SPI1_Write(uint8_t *txBuf, uint32_t txLen) {
  *          The SPI protocol requires the uC to transmit data in order to receive
  *          anything so the uC will send junk data.
  * @note    Blocking statement
+ * @param   port    the SPI port to read from
  * @param   rxBuf   data array to store the data that is received.
  * @param   rxLen   length of data array.
  * @return  None
  */
-void BSP_SPI1_Read(uint8_t *rxBuf, uint32_t rxLen) {
+void BSP_SPI_Read(spi_port_t port, uint8_t *rxBuf, uint32_t rxLen) {
+    // TODO: add SPI3 capabilities to the simulator
+    if(port != spi_ltc6811) return;
 
     // One register is 8 bytes or greater. If there was an SPI call where rxLen
     // is less than 8, that means it's either a wakeup call or some generic call
@@ -201,10 +210,14 @@ void BSP_SPI1_Read(uint8_t *rxBuf, uint32_t rxLen) {
  *          Set the state to low/0 to notify the LTC6811 that the data sent on the
  *          SPI lines are for it. Set the state to high/1 to make the LTC6811
  *          go to standby.
+ * @param   port    the SPI port to select/deselct on
  * @param   state   0 for select, 1 to deselect
  * @return  None
  */
-void BSP_SPI1_SetStateCS(uint8_t state) {
+void BSP_SPI_SetStateCS(spi_port_t port, uint8_t state) {
+    // TODO: add SPI3 capabilities to the simulator
+    if(port != spi_ltc6811) return;
+
     chipSelectState = state;
 }
 
@@ -376,10 +389,10 @@ static bool UpdateSimulationData(void) {
     int openWireIdx = 0;
 
     // Open File and get file descriptor
-    FILE* fp = fopen(file, "r");
+    FILE* fp = fopen(file1, "r");
     if(!fp) {
         // Exit, error!
-        perror(SPI_CSV_FILE);
+        perror(SPI1_CSV_FILE);
         exit(EXIT_FAILURE);
     }
 
