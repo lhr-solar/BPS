@@ -62,7 +62,7 @@ FLAGS = -Wall -g -std=c11 $(INC_DIR)
 # Defines
 ######################################
 DEF = -D_XOPEN_SOURCE=700 -DSIMULATION
-DEF = -D_POSIX_C_SOURCE=200809L
+DEF += -D_POSIX_C_SOURCE=200809L
 
 ######################################
 # Build
