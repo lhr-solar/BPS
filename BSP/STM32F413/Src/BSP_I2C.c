@@ -3,6 +3,8 @@
 
 #define TIMEOUT_THRESHOLD   1200000 // 15 ms delay threshold (3x the write time)
 
+void* ISRPTR; //pointer to function that will be running ISR
+
 /**
  * @brief   Initializes the I2C port that interfaces with the EEPROM.
  * @param   None
@@ -11,7 +13,6 @@
 void BSP_I2C_Init(void) {
     GPIO_InitTypeDef GPIO_InitStruct;
 	I2C_InitTypeDef I2C_InitStruct;
-
 	// Uses PA8 for SCL and PC9 for SDA
 	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
 	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC, ENABLE);
@@ -43,7 +44,21 @@ void BSP_I2C_Init(void) {
                                                                 // Note I left shifted the address. That's because the address is supposed
                                                                 // to be 7-bits and the least significant bit indicates the R/W setting
 	I2C_Init(I2C3, &I2C_InitStruct);
+	I2C_ITConfig(I2C3, I2C_IT_EVT, ENABLE); //Enable interrupts
 	I2C_Cmd(I2C3, ENABLE);
+}
+//I2C3 Event Interrupt Request Handler
+void I2C3_EV_IRQHandler(void){
+
+}
+//Interrupt Service Handler for RTOS
+void StorageIO_ISR(void){
+	asm("CPSID"); //disable all interrupts
+	OSIntEnter();
+}
+//Interrupt Service Handler for Bare-Metal code
+void I2C3_ISR(void){
+	
 }
 
 /**
