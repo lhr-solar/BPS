@@ -18,7 +18,7 @@
  * @param voltageMutex pointer to mutex, meant to pass pointer to VoltageBuffer_Mutex 
  * @return SUCCESS or ERROR
  */
-ErrorStatus Voltage_Init(cell_asic *boards, OS_MUTEX *voltageMutex);
+ErrorStatus Voltage_Init(cell_asic *boards);
 
 /** Voltage_UpdateMeasurements
  * Stores and updates the new measurements received

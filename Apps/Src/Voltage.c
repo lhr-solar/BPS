@@ -11,7 +11,7 @@
 
 static cell_asic *Minions;
 
-static OS_MUTEX *Voltage_Mutex;
+static OS_MUTEX Voltage_Mutex;
 static uint16_t VoltageVal[NUM_BATTERY_MODULES]; //Voltage values gathered
 static OS_ERR err;
 /** LTC ADC measures with resolution of 4 decimal places, 
@@ -25,13 +25,12 @@ static OS_ERR err;
  * @param voltageMutex pointer to mutex, meant to pass pointer to VoltageBuffer_Mutex
  * @return SUCCESS or ERROR
  */
-ErrorStatus Voltage_Init(cell_asic *boards, OS_MUTEX *mutex){
+ErrorStatus Voltage_Init(cell_asic *boards){
 	// Record pointer
 	Minions = boards;
 	//initialize mutex
-    OSInit(&err);
-	Voltage_Mutex = mutex; 
-	OSMutexCreate(Voltage_Mutex,
+    OSInit(&err); 
+	OSMutexCreate(&Voltage_Mutex,
 				  "Voltage Buffer Mutex",
 				  &err
 				);
@@ -73,11 +72,11 @@ ErrorStatus Voltage_UpdateMeasurements(void){
 	error = LTC6811_rdcv(0, NUM_MINIONS, Minions); // Set to read back all cell voltage registers
 	
 	//copies values from cells.c_codes to private array
-	OSMutexPend(Voltage_Mutex, 0, OS_OPT_PEND_BLOCKING, &ts, &err);
+	OSMutexPend(&Voltage_Mutex, 0, OS_OPT_PEND_BLOCKING, &ts, &err);
 	for(int i = 0; i < NUM_BATTERY_MODULES; i++){
 		VoltageVal[i] = Minions[i / MAX_VOLT_SENSORS_PER_MINION_BOARD].cells.c_codes[i % MAX_VOLT_SENSORS_PER_MINION_BOARD];
 	}
-	OSMutexPost(Voltage_Mutex, OS_OPT_POST_NONE, &err);
+	OSMutexPost(&Voltage_Mutex, OS_OPT_POST_NONE, &err);
 	if(error == 0){
 		return SUCCESS;
 	}else{
@@ -186,9 +185,9 @@ uint16_t Voltage_GetModuleMillivoltage(uint8_t moduleIdx){
     if((moduleIdx / MAX_VOLT_SENSORS_PER_MINION_BOARD) >= NUM_MINIONS) {
         return 0xFFFF;  // return -1 which indicates error voltage
     }
-	OSMutexPend(Voltage_Mutex, 0, OS_OPT_PEND_BLOCKING, &ts, &err);
+	OSMutexPend(&Voltage_Mutex, 0, OS_OPT_PEND_BLOCKING, &ts, &err);
 	uint16_t ret = VoltageVal[moduleIdx] / 10;
-	OSMutexPost(Voltage_Mutex, OS_OPT_POST_NONE, &err);
+	OSMutexPost(&Voltage_Mutex, OS_OPT_POST_NONE, &err);
 	return ret;
 }
 
