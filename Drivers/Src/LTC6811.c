@@ -77,7 +77,7 @@ Copyright 2017 Linear Technology Corp. (LTC)
 /*********************************************************/
 /*** Code that was added by UTSVT. ***/
 /*********************************************************/
-static OS_MUTEX MinionsASIC_Mutex;
+OS_MUTEX MinionsASIC_Mutex;
 
 void LTC6811_Init(cell_asic *battMod){
   //only create the mutex the first time this function is called (called by Voltage_Init() and Temperature_Init())
@@ -259,13 +259,17 @@ uint8_t LTC6811_rdcv(uint8_t reg, // Controls which cell voltage register is rea
 {
   //take control of mutex
   OS_ERR err;
+  printf("taking mutex in LTC6811_rdcv\n");
   OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
+  printf("error: %d\n", err);
   assertOSError(err);
+  printf("Mutex taken in LTC6811_rdcv\n");
   //LTC's code
   int8_t pec_error = 0;
   pec_error = LTC681x_rdcv(reg,total_ic,ic);
   //release mutex
   OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
+  printf("error: %d\n", err);
   assertOSError(err);
   return(pec_error);
 }
@@ -290,6 +294,7 @@ int8_t LTC6811_rdaux(uint8_t reg, //Determines which GPIO voltage register is re
   //release mutex
   OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
   assertOSError(err);
+  printf("Mutex released in LTC6811_rdaux\n");
   return (pec_error);
 }
 

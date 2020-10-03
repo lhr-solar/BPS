@@ -7,6 +7,10 @@
 #include "LTC6811.h"
 #include "config.h"
 #include <stdlib.h>
+#include "os.h"
+#include "Tasks.h"
+
+extern OS_MUTEX MinionsASIC_Mutex;
 
 static cell_asic *Minions;
 static uint16_t VoltageVal[NUM_BATTERY_MODULES]; //Voltage values gathered
@@ -54,16 +58,26 @@ ErrorStatus Voltage_UpdateMeasurements(void){
 	// Start Cell ADC Measurements
 	wakeup_idle(NUM_MINIONS);
 	LTC6811_adcv(ADC_CONVERSION_MODE,ADC_DCP,CELL_CH_TO_CONVERT);
+	printf("hello\n");
 	LTC6811_pollAdc();	// In case you want to time the length of the conversion time
+	printf("world\n");
 	
 	// Read Cell Voltage Registers
 	wakeup_idle(NUM_MINIONS); // Not sure if wakeup is necessary if you start conversion then read consecutively
 	error = LTC6811_rdcv(0, NUM_MINIONS, Minions); // Set to read back all cell voltage registers
+	printf("yes??\n");
+	//take control of mutex
 	
+	OS_ERR err;
+  	OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
+	assertOSError(err);
 	//copies values from cells.c_codes to private array
 	for(int i = 0; i < NUM_BATTERY_MODULES; i++){
 		VoltageVal[i] = Minions[i / MAX_VOLT_SENSORS_PER_MINION_BOARD].cells.c_codes[i % MAX_VOLT_SENSORS_PER_MINION_BOARD];
 	}
+	//release mutex
+  	OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
+  	assertOSError(err);
 	
 	if(error == 0){
 		return SUCCESS;
