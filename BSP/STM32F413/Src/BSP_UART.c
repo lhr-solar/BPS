@@ -191,12 +191,12 @@ void USART2_IRQHandler(void) {
         // Sweet, just a "regular" key. Put it into the fifo
         // Doesn't matter if it fails. If it fails, then the data gets thrown away
         // and the easiest solution for this is to increase RX_SIZE
-        else {
+        /*else {
             //uint8_t junk = 0;
             // Delete the last entry!
             //removeSuccess = RxFifo_RemoveLast(&junk,UART_BLE);
             //REPLACE ABOVE LINE SOMEHOW
-        }
+        }*/
         if(removeSuccess) USART2->DR = data;
     }
     if(USART_GetITStatus(USART2, USART_IT_TC) != RESET) {
@@ -221,12 +221,12 @@ void USART3_IRQHandler(void) {
         // Sweet, just a "regular" key. Put it into the fifo
         // Doesn't matter if it fails. If it fails, then the data gets thrown away
         // and the easiest solution for this is to increase RX_SIZE
-        else {
+        /*else {
             //uint8_t junk = 0;
             // Delete the last entry!
             //removeSuccess = RxFifo_RemoveLast(&junk,UART_BLE);
             //REPLACE ABOVE LINE SOMEHOW
-        }
+        }*/
         if(removeSuccess) USART3->DR = data;
     }
     if(USART_GetITStatus(USART3, USART_IT_TC) != RESET) {
