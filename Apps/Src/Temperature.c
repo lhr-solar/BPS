@@ -30,12 +30,25 @@ ErrorStatus Temperature_Init(cell_asic *boards){
 	wakeup_sleep(NUM_MINIONS);
 	LTC6811_Init(Minions);
 
+	//take control of mutex
+	OS_ERR err;
+  	OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
+  	assertOSError(err);
 	// Write Configuration Register
 	LTC6811_wrcfg(NUM_MINIONS, Minions);
+	//release mutex
+  	OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
+  	assertOSError(err);
 
 	// Read Configuration Register
 	wakeup_sleep(NUM_MINIONS);
+	//take control of mutex
+  	OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
+  	assertOSError(err);
 	int8_t error = LTC6811_rdcfg(NUM_MINIONS, Minions);
+	//release mutex
+  	OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
+  	assertOSError(err);
 
 	return error == 0 ? SUCCESS : ERROR;
 }
@@ -99,7 +112,13 @@ ErrorStatus Temperature_ChannelConfig(uint8_t tempChannel) {
 
     // Send data
     wakeup_sleep(NUM_MINIONS);
+	//take control of mutex
+  	OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
+  	assertOSError(err);
     LTC6811_wrcomm(NUM_MINIONS, Minions);
+	//release mutex
+  	OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
+  	assertOSError(err);
     LTC6811_stcomm();
         
 	//take control of mutex
@@ -124,10 +143,19 @@ ErrorStatus Temperature_ChannelConfig(uint8_t tempChannel) {
 		Minions[board].com.tx_data[4] = (AUX_I2C_NO_TRANSMIT << 4) + 0xF;
 		Minions[board].com.tx_data[5] = (0xF << 4) + AUX_I2C_NACK_STOP;
     }
+	//release mutex
+  	OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
+  	assertOSError(err);
 
     // Send data
     wakeup_sleep(NUM_MINIONS);
+	//take control of mutex
+  	OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
+  	assertOSError(err);
     LTC6811_wrcomm(NUM_MINIONS, Minions);
+	//release mutex
+  	OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
+  	assertOSError(err);
     LTC6811_stcomm();
 
 	return SUCCESS;
@@ -298,6 +326,13 @@ ErrorStatus Temperature_SampleADC(uint8_t ADCMode) {
 	LTC6811_pollAdc();
 
 	wakeup_sleep(NUM_MINIONS);
+	//take control of mutex
+	OS_ERR err;
+  	OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
+  	assertOSError(err);
 	int8_t error = LTC6811_rdaux(AUX_CH_GPIO1, NUM_MINIONS, Minions);   // Update Minions with fresh values
+	//release mutex
+  	OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
+  	assertOSError(err);
 	return error != -1 ? SUCCESS : ERROR;
 }

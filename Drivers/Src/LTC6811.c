@@ -94,16 +94,9 @@ void LTC6811_Init(cell_asic *battMod){
 
 	BSP_SPI_Init();				// Initialize SPI1 for voltage board	
 	
-  //take control of mutex
-  OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
-  assertOSError(err);
-  //LTC's code
 	LTC681x_init_cfg(NUM_MINIONS, battMod);
 	LTC6811_reset_crc_count(NUM_MINIONS, battMod);
 	LTC6811_init_reg_limits(NUM_MINIONS, battMod);
-  //release mutex
-  OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
-  assertOSError(err);
 }
 
 /********************************************************
@@ -257,20 +250,8 @@ uint8_t LTC6811_rdcv(uint8_t reg, // Controls which cell voltage register is rea
                      cell_asic ic[] // Array of the parsed cell codes
                     )
 {
-  //take control of mutex
-  OS_ERR err;
-  printf("taking mutex in LTC6811_rdcv\n");
-  OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
-  printf("error: %d\n", err);
-  assertOSError(err);
-  printf("Mutex taken in LTC6811_rdcv\n");
-  //LTC's code
   int8_t pec_error = 0;
   pec_error = LTC681x_rdcv(reg,total_ic,ic);
-  //release mutex
-  OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
-  printf("error: %d\n", err);
-  assertOSError(err);
   return(pec_error);
 }
 
@@ -284,17 +265,8 @@ int8_t LTC6811_rdaux(uint8_t reg, //Determines which GPIO voltage register is re
                      cell_asic ic[]//A two dimensional array of the gpio voltage codes.
                     )
 {
-  //take control of mutex
-  OS_ERR err;
-  OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
-  assertOSError(err);
-  //LTC's code
   int8_t pec_error = 0;
   LTC681x_rdaux(reg,total_ic,ic);
-  //release mutex
-  OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
-  assertOSError(err);
-  printf("Mutex released in LTC6811_rdaux\n");
   return (pec_error);
 }
 
@@ -310,15 +282,7 @@ int8_t LTC6811_rdstat(uint8_t reg, //Determines which Stat  register is read bac
                      )
 {
   int8_t pec_error = 0;
-  //take control of mutex
-  OS_ERR err;
-  OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
-  assertOSError(err);
-  //LTC's code
   pec_error = LTC681x_rdstat(reg,total_ic,ic);
-  //release mutex
-  OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
-  assertOSError(err);
   return (pec_error);
 }
 
@@ -378,15 +342,7 @@ void LTC6811_wrcfg(uint8_t total_ic, //The number of ICs being written to
                    cell_asic ic[] //A two dimensional array of the configuration data that will be written
                   )
 {
-  //take control of mutex
-  OS_ERR err;
-  OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
-  assertOSError(err);
-  //LTC's code
   LTC681x_wrcfg(total_ic,ic);
-  //release mutex
-  OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
-  assertOSError(err);
 }
 
 
@@ -398,15 +354,7 @@ int8_t LTC6811_rdcfg(uint8_t total_ic, //Number of ICs in the system
                     )
 {
   int8_t pec_error = 0;
-  //take control of mutex
-  OS_ERR err;
-  OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
-  assertOSError(err);
-  //LTC's code
   pec_error = LTC681x_rdcfg(total_ic,ic);
-  //release mutex
-  OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
-  assertOSError(err);
   return(pec_error);
 }
 
@@ -418,15 +366,7 @@ void LTC6811_wrpwm(uint8_t total_ic,
                    cell_asic ic[] //A two dimensional array of the configuration data that will be written
                   )
 {
-  //take control of mutex
-  OS_ERR err;
-  OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
-  assertOSError(err);
-  //LTC's code
   LTC681x_wrpwm(total_ic,pwmReg,ic);
-  //release mutex
-  OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
-  assertOSError(err);
 }
 
 
@@ -439,15 +379,7 @@ int8_t LTC6811_rdpwm(uint8_t total_ic, //Number of ICs in the system
                     )
 {
   int8_t pec_error =0;
-  //take control of mutex
-  OS_ERR err;
-  OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
-  assertOSError(err);
-  //LTC's code
   pec_error = LTC681x_rdpwm(total_ic,pwmReg,ic);
-  //release mutex
-  OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
-  assertOSError(err);
   return(pec_error);
 }
 
@@ -458,15 +390,7 @@ void LTC6811_wrcomm(uint8_t total_ic, //The number of ICs being written to
                     cell_asic ic[] //A two dimensional array of the comm data that will be written
                    )
 {
-  //take control of mutex
-  OS_ERR err;
-  OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
-  assertOSError(err);
-  //LTC's code
   LTC681x_wrcomm(total_ic,ic);
-  //release mutex
-  OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
-  assertOSError(err);
 }
 
 /*
@@ -477,15 +401,7 @@ int8_t LTC6811_rdcomm(uint8_t total_ic, //Number of ICs in the system
                      )
 {
   int8_t pec_error = 0;
-  //take control of mutex
-  OS_ERR err;
-  OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
-  assertOSError(err);
-  //LTC's code
   pec_error = LTC681x_rdcomm(total_ic, ic);
-  //release mutex
-  OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
-  assertOSError(err);
   return(pec_error);
 }
 
@@ -500,11 +416,6 @@ void LTC6811_stcomm()
 //Helper function to set discharge bit in CFG register
 void LTC6811_set_discharge(int Cell, uint8_t total_ic, cell_asic ic[])
 {
-  //take control of mutex
-  OS_ERR err;
-  OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
-  assertOSError(err);
-  //LTC's code
   for (int i=0; i<total_ic; i++)
   {
     if (Cell<9)
@@ -516,24 +427,13 @@ void LTC6811_set_discharge(int Cell, uint8_t total_ic, cell_asic ic[])
       ic[i].config.tx_data[5] = ic[i].config.tx_data[5] | (1<<(Cell-9));
     }
   }
-  //release mutex
-  OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
-  assertOSError(err);
 }
 
 // Runs the Digital Filter Self Test
 int16_t LTC6811_run_cell_adc_st(uint8_t adc_reg,uint8_t total_ic, cell_asic ic[])
 {
   int16_t error = 0;
-  //take control of mutex
-  OS_ERR err;
-  OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
-  assertOSError(err);
-  //LTC's code
   error = LTC681x_run_cell_adc_st(adc_reg,total_ic,ic);
-  //release mutex
-  OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
-  assertOSError(err);
   return(error);
 }
 
@@ -541,45 +441,19 @@ int16_t LTC6811_run_cell_adc_st(uint8_t adc_reg,uint8_t total_ic, cell_asic ic[]
 int16_t LTC6811_run_adc_redundancy_st(uint8_t adc_mode, uint8_t adc_reg, uint8_t total_ic, cell_asic ic[])
 {
   int16_t error = 0;
-  //take control of mutex
-  OS_ERR err;
-  OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
-  assertOSError(err);
-  //LTC's code
   LTC681x_run_adc_redundancy_st(adc_mode,adc_reg,total_ic,ic);
-  //release mutex
-  OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
-  assertOSError(err);
   return(error);
 }
 //Runs the datasheet algorithm for open wire
 uint64_t LTC6811_run_openwire_multi(uint8_t total_ic, cell_asic ic[], bool print)
 {
-  uint64_t result;
-  //take control of mutex
-  OS_ERR err;
-  OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
-  assertOSError(err);
-  //LTC's code (modified by Clark to add mutex)
-  result = LTC681x_run_openwire_multi(total_ic,ic, print);
-  //release mutex
-  OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
-  assertOSError(err);
-  return result;
+  return LTC681x_run_openwire_multi(total_ic,ic, print);
 }
 // Runs the ADC overlap test for the IC
 uint16_t LTC6811_run_adc_overlap(uint8_t total_ic, cell_asic ic[])
 {
   uint16_t error = 0;
-  //take control of mutex
-  OS_ERR err;
-  OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
-  assertOSError(err);
-  //LTC's code
   LTC681x_run_adc_overlap(total_ic, ic);
-  //release mutex
-  OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
-  assertOSError(err);
   return(error);
 }
 
@@ -588,11 +462,6 @@ void LTC6811_max_min(uint8_t total_ic, cell_asic ic_cells[],
                      cell_asic ic_max[],
                      cell_asic ic_delta[])
 {
-  //take control of mutex
-  OS_ERR err;
-  OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
-  assertOSError(err);
-  //LTC's code
   for (int j=0; j < total_ic; j++)
   {
     for (int i = 0; i< 12; i++)
@@ -603,18 +472,10 @@ void LTC6811_max_min(uint8_t total_ic, cell_asic ic_cells[],
       
     }
   }
-  //release mutex
-  OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
-  assertOSError(err);
 }
 
 void LTC6811_init_max_min(uint8_t total_ic, cell_asic ic[],cell_asic ic_max[],cell_asic ic_min[])
 {
-  //take control of mutex
-  OS_ERR err;
-  OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
-  assertOSError(err);
-  //LTC's code
   for (int j=0; j < total_ic; j++)
   {
     for (int i = 0; i< ic[j].ic_reg.cell_channels; i++)
@@ -623,136 +484,60 @@ void LTC6811_init_max_min(uint8_t total_ic, cell_asic ic[],cell_asic ic_max[],ce
       ic_min[j].cells.c_codes[i]=0xFFFF;
     }
   }
-  //release mutex
-  OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
-  assertOSError(err);
 }
 
 //Helper function that increments PEC counters
 void LTC6811_check_pec(uint8_t total_ic,uint8_t reg, cell_asic ic[])
 {
-  //take control of mutex
-  OS_ERR err;
-  OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
-  assertOSError(err);
-  //LTC's code
   LTC681x_check_pec(total_ic,reg,ic);
-  //release mutex
-  OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
-  assertOSError(err);
 }
 
 //Helper Function to reset PEC counters
 void LTC6811_reset_crc_count(uint8_t total_ic, cell_asic ic[])
 {
-  //already have control of mutex (only called by LTC6811_Init())
   LTC681x_reset_crc_count(total_ic,ic);
 }
 
 //Helper function to intialize CFG variables.
 void LTC6811_init_cfg(uint8_t total_ic, cell_asic ic[])
 {
-  //take control of mutex
-  OS_ERR err;
-  OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
-  assertOSError(err);
-  //LTC's code
   LTC681x_init_cfg(total_ic,ic);
-  //release mutex
-  OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
-  assertOSError(err);
 }
 //Helper function to set CFGR variable
 void LTC6811_set_cfgr(uint8_t nIC, cell_asic ic[], bool refon, bool adcopt, bool gpio[5],bool dcc[12])
 {
-  //take control of mutex
-  OS_ERR err;
-  OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
-  assertOSError(err);
-  //LTC's code
   LTC681x_set_cfgr_refon(nIC,ic,refon);
   LTC681x_set_cfgr_adcopt(nIC,ic,adcopt);
   LTC681x_set_cfgr_gpio(nIC,ic,gpio);
   LTC681x_set_cfgr_dis(nIC,ic,dcc);
-  //release mutex
-  OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
-  assertOSError(err);
 }
 //Helper function to set the REFON bit
 void LTC6811_set_cfgr_refon(uint8_t nIC, cell_asic ic[], bool refon)
 {
-  //take control of mutex
-  OS_ERR err;
-  OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
-  assertOSError(err);
-  //LTC's code
   LTC681x_set_cfgr_refon(nIC,ic,refon);
-  //release mutex
-  OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
-  assertOSError(err);
 }
 //Helper function to set the adcopt bit
 void LTC6811_set_cfgr_adcopt(uint8_t nIC, cell_asic ic[], bool adcopt)
 {
-  //take control of mutex
-  OS_ERR err;
-  OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
-  assertOSError(err);
-  //LTC's code
   LTC681x_set_cfgr_adcopt(nIC,ic,adcopt);
-  //release mutex
-  OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
-  assertOSError(err);
 }
 //Helper function to set GPIO bits
 void LTC6811_set_cfgr_gpio(uint8_t nIC, cell_asic ic[],bool gpio[5])
 {
-  //take control of mutex
-  OS_ERR err;
-  OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
-  assertOSError(err);
-  //LTC's code
   LTC681x_set_cfgr_gpio(nIC,ic,gpio);
-  //release mutex
-  OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
-  assertOSError(err);
 }
 //Helper function to control discharge
 void LTC6811_set_cfgr_dis(uint8_t nIC, cell_asic ic[],bool dcc[12])
 {
-  //take control of mutex
-  OS_ERR err;
-  OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
-  assertOSError(err);
-  //LTC's code
   LTC681x_set_cfgr_dis(nIC,ic,dcc);
-  //release mutex
-  OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
-  assertOSError(err);
 }
 //Helper Function to set uv value in CFG register
 void LTC6811_set_cfgr_uv(uint8_t nIC, cell_asic ic[],uint16_t uv)
 {
-  //take control of mutex
-  OS_ERR err;
-  OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
-  assertOSError(err);
-  //LTC's code
   LTC681x_set_cfgr_uv(nIC, ic, uv);
-  //release mutex
-  OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
-  assertOSError(err);
 }
 //helper function to set OV value in CFG register
 void LTC6811_set_cfgr_ov(uint8_t nIC, cell_asic ic[],uint16_t ov)
 {
-  //take control of mutex
-  OS_ERR err;
-  OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
-  assertOSError(err);
-  //LTC's code
   LTC681x_set_cfgr_ov( nIC, ic, ov);
-  //release mutex
-  OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
-  assertOSError(err);
 }

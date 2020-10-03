@@ -33,12 +33,25 @@ ErrorStatus Voltage_Init(cell_asic *boards){
 	wakeup_sleep(NUM_MINIONS);
 	LTC6811_Init(Minions);
 	
+	//take control of mutex
+	OS_ERR err;
+  	OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
+  	assertOSError(err);
 	// Write Configuration Register
 	LTC6811_wrcfg(NUM_MINIONS, Minions);
+	//release mutex
+  	OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
+  	assertOSError(err);
 
 	// Read Configuration Register
 	wakeup_sleep(NUM_MINIONS);
+	//take control of mutex
+  	OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
+  	assertOSError(err);
 	error = LTC6811_rdcfg(NUM_MINIONS, Minions);
+	//release mutex
+  	OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
+  	assertOSError(err);
 	
 	if(error == 0){
 		return SUCCESS;
@@ -58,17 +71,19 @@ ErrorStatus Voltage_UpdateMeasurements(void){
 	// Start Cell ADC Measurements
 	wakeup_idle(NUM_MINIONS);
 	LTC6811_adcv(ADC_CONVERSION_MODE,ADC_DCP,CELL_CH_TO_CONVERT);
-	printf("hello\n");
 	LTC6811_pollAdc();	// In case you want to time the length of the conversion time
-	printf("world\n");
 	
 	// Read Cell Voltage Registers
 	wakeup_idle(NUM_MINIONS); // Not sure if wakeup is necessary if you start conversion then read consecutively
-	error = LTC6811_rdcv(0, NUM_MINIONS, Minions); // Set to read back all cell voltage registers
-	printf("yes??\n");
 	//take control of mutex
-	
 	OS_ERR err;
+  	OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
+  	assertOSError(err);
+	error = LTC6811_rdcv(0, NUM_MINIONS, Minions); // Set to read back all cell voltage registers
+	//release mutex
+  	OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
+  	assertOSError(err);
+	//take control of mutex
   	OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
 	assertOSError(err);
 	//copies values from cells.c_codes to private array
@@ -142,7 +157,14 @@ SafetyStatus *Voltage_GetModulesInDanger(void){
  */
 void Voltage_OpenWireSummary(void){
 	wakeup_idle(NUM_MINIONS);
+	//take control of mutex
+	OS_ERR err;
+  	OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
+  	assertOSError(err);
 	LTC6811_run_openwire_multi(NUM_MINIONS, Minions, true);
+	//release mutex
+  	OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
+  	assertOSError(err);
 }
 
 /** Voltage_OpenWire
@@ -165,7 +187,15 @@ SafetyStatus Voltage_OpenWire(void){
  */
 uint32_t Voltage_GetOpenWire(void){
 	wakeup_idle(NUM_MINIONS);
-	return LTC6811_run_openwire_multi(NUM_MINIONS, Minions, false);
+	//take control of mutex
+	OS_ERR err;
+  	OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
+  	assertOSError(err);
+	uint32_t result = LTC6811_run_openwire_multi(NUM_MINIONS, Minions, false);
+	//release mutex
+  	OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
+  	assertOSError(err);
+	return result;
 }
 
 /** Voltage_GetModuleVoltage
