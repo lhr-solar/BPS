@@ -3,6 +3,7 @@
  * battery pack.
  */
 #include "Temperature.h"
+#include "os.h"
 
 // Holds the temperatures in Celsius (Fixed Point with .001 resolution) for each sensor on each board
 int32_t ModuleTemperatures[NUM_MINIONS][MAX_TEMP_SENSORS_PER_MINION_BOARD];
@@ -13,6 +14,8 @@ static uint8_t ChargingState;
 // Interface to communicate with LTC6811 (Register values)
 // Temperature.c uses auxiliary registers to view ADC data and COM register for I2C with LTC1380 MUX
 static cell_asic *Minions;
+
+static OS_MUTEX TemperatureBuffer_Mutex;
 
 /** Temperature_Init
  * Initializes device drivers including SPI inside LTC6811_init and LTC6811 for Temperature Monitoring
@@ -32,6 +35,13 @@ ErrorStatus Temperature_Init(cell_asic *boards){
 	// Read Configuration Register
 	wakeup_sleep(NUM_MINIONS);
 	int8_t error = LTC6811_rdcfg(NUM_MINIONS, Minions);
+
+
+	OS_ERR err;
+	OSMutexCreate(&TemperatureBuffer_Mutex,
+					"Temperature Data Buffer",
+					&err);
+	// assert
 
 	return error == 0 ? SUCCESS : ERROR;
 }
