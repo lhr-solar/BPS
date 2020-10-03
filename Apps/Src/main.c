@@ -14,6 +14,10 @@ int main() {
 	
 	OS_ERR err;
 
+	OSInit(&err);
+
+	// ASSERT err
+
 	OSTaskCreate(&Init_TCB,				// TCB
 				"Initialize System",	// Task Name (String)
 				Task_Init,				// Task function pointer
