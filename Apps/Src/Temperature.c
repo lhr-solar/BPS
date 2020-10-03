@@ -25,6 +25,12 @@ ErrorStatus Temperature_Init(cell_asic *boards){
 	// Record pointer
 	Minions = boards;
 
+	OS_ERR err;
+	OSMutexCreate(&TemperatureBuffer_Mutex,
+					"Temperature Data Buffer",
+					&err);
+	// assert
+
 	// Initialize peripherals
 	wakeup_sleep(NUM_MINIONS);
 	LTC6811_Init(Minions);
@@ -35,13 +41,6 @@ ErrorStatus Temperature_Init(cell_asic *boards){
 	// Read Configuration Register
 	wakeup_sleep(NUM_MINIONS);
 	int8_t error = LTC6811_rdcfg(NUM_MINIONS, Minions);
-
-
-	OS_ERR err;
-	OSMutexCreate(&TemperatureBuffer_Mutex,
-					"Temperature Data Buffer",
-					&err);
-	// assert
 
 	return error == 0 ? SUCCESS : ERROR;
 }
@@ -151,6 +150,9 @@ int milliVoltToCelsius(float milliVolt){
  * @return SUCCESS or ERROR
  */
 ErrorStatus Temperature_UpdateSingleChannel(uint8_t channel){
+	OS_ERR err;
+	CPU_TS ts;
+
 	// Configure correct channel
 	if (ERROR == Temperature_ChannelConfig(channel)) {
 		return ERROR;
@@ -158,7 +160,14 @@ ErrorStatus Temperature_UpdateSingleChannel(uint8_t channel){
 	
 	// Sample ADC channel
 	Temperature_SampleADC(MD_422HZ_1KHZ);
-	
+
+	OSMutexPend(&TemperatureBuffer_Mutex,
+				0,
+				OS_OPT_PEND_BLOCKING,
+				&ts,
+				&err);
+	// assert
+
 	// Convert to Celsius
 	for(int board = 0; board < NUM_MINIONS; board++) {
 		
@@ -166,6 +175,12 @@ ErrorStatus Temperature_UpdateSingleChannel(uint8_t channel){
 		// a_codes[0] is fixed point with .001 resolution in volts -> multiply by .001 * 1000 to get mV in double form
 		ModuleTemperatures[board][channel] = milliVoltToCelsius(Minions[board].aux.a_codes[0]*0.1);
 	}
+
+	OSMutexPost(&TemperatureBuffer_Mutex,
+				OS_OPT_POST_1,
+				&err);
+	// assert
+
 	return SUCCESS;
 }
 
@@ -186,8 +201,17 @@ ErrorStatus Temperature_UpdateAllMeasurements(){
  * @return SAFE or DANGER
  */
 SafetyStatus Temperature_CheckStatus(uint8_t isCharging){
+	OS_ERR err;
+	CPU_TS ts;
 	int32_t temperatureLimit = isCharging == 1 ? MAX_CHARGE_TEMPERATURE_LIMIT : MAX_DISCHARGE_TEMPERATURE_LIMIT;
 	temperatureLimit *= MILLI_SCALING_FACTOR;
+
+	OSMutexPend(&TemperatureBuffer_Mutex,
+				0,
+				OS_OPT_PEND_BLOCKING,
+				&ts,
+				&err);
+	// assert
 
 	for (int i = 0; i < NUM_MINIONS; i++) {
 		for (int j = 0; j < MAX_TEMP_SENSORS_PER_MINION_BOARD; j++) {
@@ -197,6 +221,11 @@ SafetyStatus Temperature_CheckStatus(uint8_t isCharging){
 			}
 		}
 	}
+
+	OSMutexPost(&TemperatureBuffer_Mutex,
+				OS_OPT_POST_1,
+				&err);
+	// assert
 	return SAFE;
 }
 
@@ -217,8 +246,18 @@ void Temperature_SetChargeState(uint8_t isCharging){
  * @return pointer to index of modules that are in danger
  */
 uint8_t *Temperature_GetModulesInDanger(void){
+	OS_ERR err;
+	CPU_TS ts;
+
 	static uint8_t ModuleTempStatus[NUM_BATTERY_MODULES];
 	int32_t temperatureLimit = ChargingState == 1 ? MAX_CHARGE_TEMPERATURE_LIMIT : MAX_DISCHARGE_TEMPERATURE_LIMIT;
+
+	OSMutexPend(&TemperatureBuffer_Mutex,
+				0,
+				OS_OPT_PEND_BLOCKING,
+				&ts,
+				&err);
+	// assert
 
 	for (int i = 0; i < NUM_MINIONS-1; i++) {
 		for (int j = 0; j < MAX_TEMP_SENSORS_PER_MINION_BOARD; j++) {
@@ -228,6 +267,12 @@ uint8_t *Temperature_GetModulesInDanger(void){
 			}
 		}
 	}
+
+	OSMutexPost(&TemperatureBuffer_Mutex,
+				OS_OPT_POST_1,
+				&err);
+	// assert
+
 	return ModuleTempStatus;
 }
 /** Temperature_GetSingleTempSensor
@@ -249,15 +294,32 @@ int32_t Temperature_GetSingleTempSensor(uint8_t board, uint8_t sensorIdx) {
  * @return temperature of the battery module at specified index
  */
 int32_t Temperature_GetModuleTemperature(uint8_t moduleIdx){
+	OS_ERR err;
+	CPU_TS ts;
 	int32_t total = 0;
 	uint8_t board = (moduleIdx * 2) / MAX_TEMP_SENSORS_PER_MINION_BOARD;
 	uint8_t sensor = moduleIdx % (MAX_TEMP_SENSORS_PER_MINION_BOARD / 2);
 	
+	OSMutexPend(&TemperatureBuffer_Mutex,
+				0,
+				OS_OPT_PEND_BLOCKING,
+				&ts,
+				&err);
+	// assert
+
 	total += ModuleTemperatures[board][sensor];
 	
 	// Get temperature from other sensor on other side
 	total += ModuleTemperatures[board][sensor + MAX_TEMP_SENSORS_PER_MINION_BOARD / 2];
+
+	OSMutexPost(&TemperatureBuffer_Mutex,
+				OS_OPT_POST_1,
+				&err);
+	// assert
+
 	total /= 2;
+
+	
 	return total;
 }
 
