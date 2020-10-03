@@ -3,6 +3,14 @@
 
 #define TIMEOUT_THRESHOLD   1200000 // 15 ms delay threshold (3x the write time)
 
+OS_Q I2Ctx, I2Crx;
+const OS_MSG_QTY AMT = 1028;
+OS_ERR err;
+CPU_TS time;
+const uint8_t deviceAddr; //make this EEPROM address
+uint16_t regAddress;
+uint32_t txLength;
+
 void* ISRPTR; //pointer to function that will be running ISR
 
 /**
@@ -46,6 +54,8 @@ void BSP_I2C_Init(void) {
 	I2C_Init(I2C3, &I2C_InitStruct);
 	I2C_ITConfig(I2C3, I2C_IT_EVT, ENABLE); //Enable interrupts
 	I2C_Cmd(I2C3, ENABLE);
+	OSQCreate(&I2Crx, "I2C RX", AMT, &err);
+	OSQCreate(&I2Ctx, "I2C TX", AMT, &err);
 }
 //I2C3 Event Interrupt Request Handler
 void I2C3_EV_IRQHandler(void){
@@ -60,17 +70,53 @@ void StorageIO_ISR(void){
 	unsigned * ptr asm("SP");
 	if (OSIntNestingCtr == 1) (*OSTCBCurPtr).StkPtr = ptr; //store stack ptr in ostcbptr
 	int timeout_count = 0;
-	I2C_AcknowledgeConfig(I2C3, ENABLE);
-	I2C_GenerateSTART(I2C3, ENABLE);
-	while (!I2C_CheckEvent(I2C3, I2C_EVENT_MASTER_TRANSMITTER_MODE_SELECTED)) {
+	if (!I2C_GetFlagStatus(I2C3, I2C_FLAG_BUSY)) {
+		I2C_AcknowledgeConfig(I2C3, ENABLE);
+		// Since no one is using the I2C bus, take control
+		I2C_GenerateSTART(I2C3, ENABLE);
+		return;
+	}
+	// Wait until start edge event occurred
+	if (I2C_CheckEvent(I2C3, I2C_EVENT_MASTER_MODE_SELECT)){
+		// Select device to talk to
+		I2C_Send7bitAddress(I2C3, deviceAddr, I2C_Direction_Transmitter);
+		return;
+	}
+	if (!I2C_CheckEvent(I2C3, I2C_EVENT_MASTER_TRANSMITTER_MODE_SELECTED) && 
+		I2C_GetLastEvent(I2C3) == I2C_EVENT_MASTER_MODE_SELECT){
 		if(I2C3->SR1 & 0x0400) {
 			I2C3->SR1 &= ~0x0400;
 			I2C_GenerateSTOP(I2C3, ENABLE);
-			I2C_GenerateSTART(I2C3, ENABLE);
-			timeout_count++;
-			// Returns and breaks after timeout threshold
-			if(timeout_count > TIMEOUT_THRESHOLD) return;
 		}
+		return;
+	}
+	if (I2C_CheckEvent(I2C3, I2C_EVENT_MASTER_MODE_SELECT) && 
+		(I2C_GetLastEvent(I2C3) != I2C_EVENT_MASTER_TRANSMITTER_MODE_SELECTED)){
+		// Select device to talk to
+		I2C_Send7bitAddress(I2C3, deviceAddr, I2C_Direction_Transmitter);
+		return;
+	}
+	if (I2C_CheckEvent(I2C3, I2C_EVENT_MASTER_TRANSMITTER_MODE_SELECTED)){
+		uint16_t* addrPtr = OSQPend(&I2Ctx, 0, OS_OPT_PEND_BLOCKING, 1, &time, &err);
+		uint32_t* lenPtr = OSQPend(&I2Ctx, 0, OS_OPT_PEND_BLOCKING, 1, &time, &err);
+		uint16_t regAddress = *addrPtr;
+		uint16_t txLength = *lenPtr;
+		// Send start address (MSB first)
+		I2C_SendData(I2C3, (uint8_t)((regAddress & 0xFF00) >> 8));
+		return;
+	}
+	//if LSB transmit event has occurred
+	if (I2C_CheckEvent(I2C3, I2C_EVENT_MASTER_BYTE_TRANSMITTING) && 
+		I2C_GetLastEvent(I2C3) == I2C_EVENT_MASTER_TRANSMITTER_MODE_SELECTED){
+		I2C_SendData(I2C3, (uint8_t)(regAddress & 0x00FF));
+		return;
+	}
+	//if byte has been transmitted
+	if(I2C_GetFlagStatus(I2C3, I2C_FLAG_BTF) == RESET){
+		uint8_t* txData = OSQPend(&I2Ctx, 0, OS_OPT_PEND_BLOCKING, 1, &time, &err);
+		I2C_SendData(I2C3, txData);
+		txLength--; //decrement counter
+		if (txLength == 0) I2C_GenerateSTOP(I2C3, ENABLE);
 	}
 }
 //Interrupt Service Handler for Bare-Metal code
@@ -80,22 +126,24 @@ void I2C3_ISR(void){
 
 /**
  * @brief   Transmits data onto the I2C bus.
- * @param   deviceAddr : the device/IC that the data is intended for.
  * @param   regAddr : the register address to write to in the IC's memory.
  * @param   txData : the data array to be sent onto the bus.
  * @param   txLen : the length of the data array.
  * @return  error status, 0 if fail, 1 if success
  */
-uint8_t BSP_I2C_Write(uint8_t deviceAddr, uint16_t regAddr, uint8_t *txData, uint32_t txLen) {
-    int timeout_count = 0;
-	/*while(I2C_GetFlagStatus(I2C3, I2C_FLAG_BUSY)){
+uint8_t BSP_I2C_Write(uint16_t regAddr, uint8_t *txData, uint32_t txLen) {
+	OSQPost(&I2Ctx, &regAddr, 1, OS_OPT_POST_FIFO, &err); //store register address
+	OSQPost(&I2Ctx, &txLen, 1, OS_OPT_POST_FIFO, &err);
+	OSQPost(&I2Ctx, txData, txLen, OS_OPT_POST_FIFO, &err);
+    /*int timeout_count = 0;
+	while(I2C_GetFlagStatus(I2C3, I2C_FLAG_BUSY)){
 		// Assume running at 80 MHz
 		timeout_count++;
 		// Returns and breaks after timeout threshold
 		if(timeout_count > TIMEOUT_THRESHOLD) {
 			return ERROR;
 		}
-	}*/
+	}
 
 	I2C_AcknowledgeConfig(I2C3, ENABLE);
 
@@ -105,7 +153,7 @@ uint8_t BSP_I2C_Write(uint8_t deviceAddr, uint16_t regAddr, uint8_t *txData, uin
 	// Since no one is using the I2C bus, take control
 	I2C_GenerateSTART(I2C3, ENABLE);
 	// Wait until start edge event occurred
-	/*timeout_count = 0;
+	timeout_count = 0;
 	while(!I2C_CheckEvent(I2C3, I2C_EVENT_MASTER_MODE_SELECT)) {
 		// Assume running at 80 MHz
 		timeout_count++;
@@ -113,12 +161,9 @@ uint8_t BSP_I2C_Write(uint8_t deviceAddr, uint16_t regAddr, uint8_t *txData, uin
 		if(timeout_count > TIMEOUT_THRESHOLD) {
 			return ERROR;
 		}
-	}*/
-
+	}
 	// Select device to talk to
 	I2C_Send7bitAddress(I2C3, deviceAddr, I2C_Direction_Transmitter);		// Sets RW bit to 0
-	
-
 	// THIS IS WHERE WE GOT STUCK
 	timeout_count = 0;
 	while(!I2C_CheckEvent(I2C3, I2C_EVENT_MASTER_TRANSMITTER_MODE_SELECTED)) {
@@ -189,19 +234,18 @@ uint8_t BSP_I2C_Write(uint8_t deviceAddr, uint16_t regAddr, uint8_t *txData, uin
 		}
 	}
 
-	I2C_GenerateSTOP(I2C3, ENABLE);
+	I2C_GenerateSTOP(I2C3, ENABLE);*/
 	return SUCCESS;
 }
 
 /**
  * @brief   Gets the data from a device through the I2C bus.
- * @param   deviceAddr : the device/IC that the data needs to be read from.
  * @param   regAddr : the register address to read from the IC's memory.
  * @param   rxData : the data array to store the data that is received.
  * @param   rxLen : the length of the data array.
  * @return  error status, 0 if fail, other if success
  */
-uint8_t BSP_I2C_Read(uint8_t deviceAddr, uint16_t regAddr, uint8_t *rxData, uint32_t rxLen) {
+uint8_t BSP_I2C_Read(uint16_t regAddr, uint8_t *rxData, uint32_t rxLen) {
     int timeout_count = 0;
 	while(I2C_GetFlagStatus(I2C3, I2C_FLAG_BUSY)){
 		// Assume running at 80 MHz
