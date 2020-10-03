@@ -26,7 +26,7 @@ void Task_FaultState(void *p_arg) {
     BSP_Contactor_Off();
     // Turn Strobe Light On
     // Turn LEDs On and logs Error into EEPROM
-    BSP_Light_Off(RUN); //turn of run light
+    BSP_Light_Off(RUN); //turn off run light
     BSP_Light_On(FAULT);
     if (Voltage_CheckStatus() == OVERVOLTAGE){
         BSP_Light_On(OVOLT);
