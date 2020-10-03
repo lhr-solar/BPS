@@ -53,6 +53,7 @@ OS_SEM Fault_Sem4;
 /**
  * Mutexes
  */
+OS_MUTEX WDog_Mutex;
 
 /**
  * Global Variables
