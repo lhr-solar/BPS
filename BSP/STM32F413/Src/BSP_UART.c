@@ -112,7 +112,7 @@ void BSP_UART_Init(void) {
     OSMutexCreate(&tx3Mutex, "TX 3 Mutex", &err);
     #endif
 }
-//***********THE FOLLOWING CODE IS FOR THE BM VERSION OF THE BPS***********
+//********THE FOLLOWING CODE IS FOR THE Bare Metal VERSION OF THE BPS********
 #ifdef BM
 /**
  * @brief   Gets one line of ASCII text that was received.

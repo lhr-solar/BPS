@@ -84,7 +84,7 @@ uint32_t BSP_UART_ReadLine(char *str, UART_Port usart) {
         return recvd;
     }
     if(lineReceived2 && (usart == UART_BLE)) {
-        pthread_mutex_lock(&rx_mutex2); //NEED TO CHANGE THIS **********
+        pthread_mutex_lock(&rx_mutex2);
         RxFifo_Peek(&data, UART_BLE);
         while(!RxFifo_IsEmpty(UART_BLE) && data != '\r' && data != '\n') {
             recvd += RxFifo_Get((uint8_t *)str++, UART_BLE);
@@ -93,7 +93,7 @@ uint32_t BSP_UART_ReadLine(char *str, UART_Port usart) {
         RxFifo_Get(&data, UART_BLE);
         *str = 0;
         lineReceived2 = false;
-        pthread_mutex_unlock(&rx_mutex2);//NEED TO CHANG THIS *********
+        pthread_mutex_unlock(&rx_mutex2);
         return recvd;
     }
     return 0;
@@ -154,12 +154,12 @@ void *ScanThread2(void *arg) {
 }
 
 static bool RxFifo_Get(uint8_t *data, UART_Port usart) {
-    if(!RxFifo_IsEmpty(UART_USB)) {
+    if(!RxFifo_IsEmpty(UART_USB) && usart == UART_USB) {
         *data = rxBuffer3[rxGet3];
         rxGet3 = (rxGet3 + 1) % RX_SIZE;
         return true;
     }
-    if(!RxFifo_IsEmpty(UART_BLE)) {
+    if(!RxFifo_IsEmpty(UART_BLE) && usart == UART_BLE) {
         *data = rxBuffer2[rxGet2];
         rxGet2 = (rxGet2 + 1) % RX_SIZE;
         return true;
@@ -168,12 +168,12 @@ static bool RxFifo_Get(uint8_t *data, UART_Port usart) {
 }
 
 static bool RxFifo_Put(uint8_t data, UART_Port usart) {
-    if(!RxFifo_IsFull(UART_USB)) {
+    if(!RxFifo_IsFull(UART_USB) && usart == UART_USB) {
         rxBuffer3[rxPut3] = data;
         rxPut3 = (rxPut3 + 1) % RX_SIZE;
         return true;
     }
-    if(!RxFifo_IsFull(UART_BLE)) {
+    if(!RxFifo_IsFull(UART_BLE) && usart == UART_BLE) {
         rxBuffer2[rxPut2] = data;
         rxPut2 = (rxPut2 + 1) % RX_SIZE;
         return true;
@@ -182,11 +182,11 @@ static bool RxFifo_Put(uint8_t data, UART_Port usart) {
 }
 
 static bool RxFifo_Peek(uint8_t *data, UART_Port usart) {
-    if(!RxFifo_IsEmpty(UART_USB)) {
+    if(!RxFifo_IsEmpty(UART_USB) && usart == UART_USB) {
         *data = rxBuffer3[rxGet3];
         return true;
     }
-    if(!RxFifo_IsEmpty(UART_BLE)) {
+    if(!RxFifo_IsEmpty(UART_BLE) && usart == UART_BLE) {
         *data = rxBuffer2[rxGet2];
         return true;
     }
