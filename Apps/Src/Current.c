@@ -45,7 +45,6 @@ ErrorStatus Current_UpdateMeasurements(void){
  * @return SAFE or DANGER
  */
 SafetyStatus Current_CheckStatus(bool override) {
-
 	if((LowPrecisionCurrent > MAX_CHARGING_CURRENT)&&(LowPrecisionCurrent < MAX_CURRENT_LIMIT)&&(!override))
 		return SAFE;
 	else if((LowPrecisionCurrent <= 0)&&(LowPrecisionCurrent > MAX_CHARGING_CURRENT)&&override)
