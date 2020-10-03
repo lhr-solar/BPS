@@ -54,7 +54,24 @@ void I2C3_EV_IRQHandler(void){
 //Interrupt Service Handler for RTOS
 void StorageIO_ISR(void){
 	asm("CPSID"); //disable all interrupts
-	OSIntEnter();
+	//all cpu registers are supposed to be saved here
+	//but that happens when the ISR is called
+	OSIntEnter(); //increments value of nested interrupt counter
+	unsigned * ptr asm("SP");
+	if (OSIntNestingCtr == 1) (*OSTCBCurPtr).StkPtr = ptr; //store stack ptr in ostcbptr
+	int timeout_count = 0;
+	I2C_AcknowledgeConfig(I2C3, ENABLE);
+	I2C_GenerateSTART(I2C3, ENABLE);
+	while (!I2C_CheckEvent(I2C3, I2C_EVENT_MASTER_TRANSMITTER_MODE_SELECTED)) {
+		if(I2C3->SR1 & 0x0400) {
+			I2C3->SR1 &= ~0x0400;
+			I2C_GenerateSTOP(I2C3, ENABLE);
+			I2C_GenerateSTART(I2C3, ENABLE);
+			timeout_count++;
+			// Returns and breaks after timeout threshold
+			if(timeout_count > TIMEOUT_THRESHOLD) return;
+		}
+	}
 }
 //Interrupt Service Handler for Bare-Metal code
 void I2C3_ISR(void){
@@ -71,14 +88,14 @@ void I2C3_ISR(void){
  */
 uint8_t BSP_I2C_Write(uint8_t deviceAddr, uint16_t regAddr, uint8_t *txData, uint32_t txLen) {
     int timeout_count = 0;
-	while(I2C_GetFlagStatus(I2C3, I2C_FLAG_BUSY)){
+	/*while(I2C_GetFlagStatus(I2C3, I2C_FLAG_BUSY)){
 		// Assume running at 80 MHz
 		timeout_count++;
 		// Returns and breaks after timeout threshold
 		if(timeout_count > TIMEOUT_THRESHOLD) {
 			return ERROR;
 		}
-	}
+	}*/
 
 	I2C_AcknowledgeConfig(I2C3, ENABLE);
 
@@ -88,7 +105,7 @@ uint8_t BSP_I2C_Write(uint8_t deviceAddr, uint16_t regAddr, uint8_t *txData, uin
 	// Since no one is using the I2C bus, take control
 	I2C_GenerateSTART(I2C3, ENABLE);
 	// Wait until start edge event occurred
-	timeout_count = 0;
+	/*timeout_count = 0;
 	while(!I2C_CheckEvent(I2C3, I2C_EVENT_MASTER_MODE_SELECT)) {
 		// Assume running at 80 MHz
 		timeout_count++;
@@ -96,7 +113,7 @@ uint8_t BSP_I2C_Write(uint8_t deviceAddr, uint16_t regAddr, uint8_t *txData, uin
 		if(timeout_count > TIMEOUT_THRESHOLD) {
 			return ERROR;
 		}
-	}
+	}*/
 
 	// Select device to talk to
 	I2C_Send7bitAddress(I2C3, deviceAddr, I2C_Direction_Transmitter);		// Sets RW bit to 0
