@@ -378,6 +378,7 @@ uint32_t BSP_UART_ReadLine(char *str, UART_Port usart) {
         USART_ITConfig(USART3, USART_IT_RXNE, SET);
         return recvd;
     }
+    OSMutexPost(&rx3Mutex, OS_OPT_POST_NONE, &err);
     //lineRecieved2 is used by rx and tx but only rx mutex will be used for access
     OSMutexPend(&rx2Mutex, 0, OS_OPT_PEND_BLOCKING, &time, &err);
     if(lineReceived2 && (usart == UART_BLE)) { //read from usart 2
@@ -396,6 +397,7 @@ uint32_t BSP_UART_ReadLine(char *str, UART_Port usart) {
         USART_ITConfig(USART2, USART_IT_RXNE, SET);
         return recvd;
     }
+    OSMutexPost(&rx2Mutex, OS_OPT_POST_NONE, &err);
     return 0;
 }
 
