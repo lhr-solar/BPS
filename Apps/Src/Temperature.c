@@ -116,10 +116,10 @@ ErrorStatus Temperature_ChannelConfig(uint8_t tempChannel) {
   	OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
   	assertOSError(err);
     LTC6811_wrcomm(NUM_MINIONS, Minions);
+    LTC6811_stcomm();
 	//release mutex
   	OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
   	assertOSError(err);
-    LTC6811_stcomm();
         
 	//take control of mutex
   	OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
@@ -143,20 +143,14 @@ ErrorStatus Temperature_ChannelConfig(uint8_t tempChannel) {
 		Minions[board].com.tx_data[4] = (AUX_I2C_NO_TRANSMIT << 4) + 0xF;
 		Minions[board].com.tx_data[5] = (0xF << 4) + AUX_I2C_NACK_STOP;
     }
-	//release mutex
-  	OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
-  	assertOSError(err);
 
     // Send data
     wakeup_sleep(NUM_MINIONS);
-	//take control of mutex
-  	OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
-  	assertOSError(err);
     LTC6811_wrcomm(NUM_MINIONS, Minions);
+    LTC6811_stcomm();
 	//release mutex
   	OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
   	assertOSError(err);
-    LTC6811_stcomm();
 
 	return SUCCESS;
 }
