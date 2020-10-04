@@ -14,10 +14,10 @@ Welcome to the BeVolt BPS documentation!
    :maxdepth: 2
    :caption: Overview
 
+   Overview/useful-software
    Overview/design-requirements
    Overview/design-overview
-   Overview/getting-started
-   Overview/hardware-overview
+   HardwareOverview/hardware-overview
 
 .. toctree::
    :hidden:

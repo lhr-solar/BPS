@@ -1,5 +1,5 @@
 ***************
-Getting Started
+Useful Software
 ***************
 
 To work with the BPS, download the following software: 
