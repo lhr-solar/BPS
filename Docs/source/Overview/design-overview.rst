@@ -25,6 +25,8 @@ The Amperes minion board only measures the current of the whole battery pack. Th
 The leader board analyzes all the data and determines whether the batteries are safe. 
 It also controls the contactor, which can connects the battery to the rest of the car and can disconnect it if needed, which shuts down the car.
 
+The STM32F413 microcontroller runs the BPS software.
+
 Communications
 ==============
 

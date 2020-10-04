@@ -31,22 +31,22 @@ The Amperes minion board is connected to the main power cable that powers the el
 Leader board
 ------------
 
-The Leader board uses the STM32F413 microcontroller. The board requires nine connectors:
+The Leader board uses the STM32F413 microcontroller. The board requires seven connectors:
 
 * One 2-pin power connector (+12V, PWRGND)
-* One 2-pin error light connector (+, -)
-* One 4-pin contactor connector (+, -, aux1, aux2)
-* One 4-pin current board connector (+5V, GND, Analog signal 1, Analog signal 2)
-* One 4-pin CAN connector (isolated1 +5V, isolated1 GND, CAN high, CAN low)
-* One 2-pin Voltage connector (IP, IM)
-* Two 2x4-pin fan connectors (+12V, PWRGND)
+* One 2-pin error light connector (+12V, PWRGND)
+* One 4-pin contactor connector (+12V, PWRGND, aux1, aux2)
+* One 4-pin Amperes board connector (+12V, PWRGND, IP, IM)
+* One 4-pin CAN connector (isolated +5V, isolated GND, CAN high, CAN low)
+* One 2-pin Minion connector (IP, IM)
+* One 2x4-pin fan connector (4x +12V, 4x PWRGND)
 
 The STM32F413 requires bypass capacitors and uses an 8MHz clock. To program the STM32F413, pins are connected to a 1x4 header to use the :abbr:`SWD (Serial Wire Debug)` programming protocol. 
 
-The reset button allows us to avoid powering the BPS off to reset it.
+The reset button allows you to avoid powering the BPS off to reset it.
 
 .. note::
     You can configure the system to reset every time you use the Keil IDE to program it. 
 
-For more information, see the STM32F413 datasheet.
+For more information, see the `STM32F413 datasheet <https://www.st.com/resource/en/reference_manual/dm00305666-stm32f413-423-advanced-arm-based-32-bit-mcus-stmicroelectronics.pdf>`__.
 
