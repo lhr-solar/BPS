@@ -22,6 +22,7 @@ Welcome to the BeVolt BPS documentation!
 .. toctree::
    :hidden:
    :maxdepth: 1
-   :caption: Glossary
+   :caption: Terms and Definitions
    
    glossary
+   abbreviations
