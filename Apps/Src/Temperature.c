@@ -217,6 +217,10 @@ SafetyStatus Temperature_CheckStatus(uint8_t isCharging){
 		for (int j = 0; j < MAX_TEMP_SENSORS_PER_MINION_BOARD; j++) {
 			if (i * MAX_TEMP_SENSORS_PER_MINION_BOARD + j >= NUM_TEMPERATURE_SENSORS) break;
 			if (ModuleTemperatures[i][j] > temperatureLimit) {
+				OSMutexPost(&TemperatureBuffer_Mutex,
+							OS_OPT_POST_1,
+							&err);
+				// assert
 				return DANGER;
 			}
 		}
