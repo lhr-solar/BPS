@@ -8,8 +8,9 @@ const OS_MSG_QTY AMT = 1028;
 OS_ERR err;
 CPU_TS time;
 const uint8_t deviceAddr; //make this EEPROM address
-uint16_t regAddress;
-uint32_t txLength;
+uint16_t regAddresstx, regAddressrx;
+uint32_t txLength, rxLength;
+bool sending = false, receiving = false;
 
 void* ISRPTR; //pointer to function that will be running ISR
 
@@ -84,9 +85,14 @@ void StorageIO_ISR(void){
 	}
 	if (!I2C_CheckEvent(I2C3, I2C_EVENT_MASTER_TRANSMITTER_MODE_SELECTED) && 
 		I2C_GetLastEvent(I2C3) == I2C_EVENT_MASTER_MODE_SELECT){
-		if(I2C3->SR1 & 0x0400) {
+		if(I2C3->SR1 & 0x0400 && (receiving == false)) {
 			I2C3->SR1 &= ~0x0400;
 			I2C_GenerateSTOP(I2C3, ENABLE);
+		}
+		if (receiving){
+			while (rxLength > 0){
+				
+			}
 		}
 		return;
 	}
@@ -97,26 +103,42 @@ void StorageIO_ISR(void){
 		return;
 	}
 	if (I2C_CheckEvent(I2C3, I2C_EVENT_MASTER_TRANSMITTER_MODE_SELECTED)){
-		uint16_t* addrPtr = OSQPend(&I2Ctx, 0, OS_OPT_PEND_BLOCKING, 1, &time, &err);
-		uint32_t* lenPtr = OSQPend(&I2Ctx, 0, OS_OPT_PEND_BLOCKING, 1, &time, &err);
-		uint16_t regAddress = *addrPtr;
-		uint16_t txLength = *lenPtr;
-		// Send start address (MSB first)
-		I2C_SendData(I2C3, (uint8_t)((regAddress & 0xFF00) >> 8));
+		if (/*txbuffer has data send it first*/){
+			regAddresstx = OSQPend(&I2Ctx, 0, OS_OPT_PEND_BLOCKING, 1, &time, &err);
+			uint16_t *lenPtr = OSQPend(&I2Ctx, 0, OS_OPT_PEND_BLOCKING, 1, &time, &err);
+			txLength = *lenPtr;
+			// Send start address (MSB first)
+			I2C_SendData(I2C3, (uint8_t)((regAddresstx & 0xFF00) >> 8));
+			sending = true;
+		}
+		if(/*rxbuffer has data and sending is false*/){
+			regAddressrx = OSQPend(&I2Crx, 0, OS_OPT_PEND_BLOCKING, 1, &time, &err);
+			uint16_t *lenPtr = OSQPend(&I2Crx, 0, OS_OPT_PEND_BLOCKING, 1, &time, &err);
+			rxLength = *lenPtr;
+			I2C_SendData(I2C3, (uint8_t)((regAddressrx & 0xFF00) >> 8));
+			receiving = true;
+		}
 		return;
 	}
-	//if LSB transmit event has occurred
+	//send rest of start address (LSB)
 	if (I2C_CheckEvent(I2C3, I2C_EVENT_MASTER_BYTE_TRANSMITTING) && 
 		I2C_GetLastEvent(I2C3) == I2C_EVENT_MASTER_TRANSMITTER_MODE_SELECTED){
-		I2C_SendData(I2C3, (uint8_t)(regAddress & 0x00FF));
+		if (sending) I2C_SendData(I2C3, (uint8_t)(regAddresstx & 0x00FF));
+		if (receiving && (sending = false)) I2C_SendData(I2C3, (uint8_t)(regAddressrx & 0x00FF));
 		return;
 	}
 	//if byte has been transmitted
 	if(I2C_GetFlagStatus(I2C3, I2C_FLAG_BTF) == RESET){
-		uint8_t* txData = OSQPend(&I2Ctx, 0, OS_OPT_PEND_BLOCKING, 1, &time, &err);
-		I2C_SendData(I2C3, txData);
-		txLength--; //decrement counter
-		if (txLength == 0) I2C_GenerateSTOP(I2C3, ENABLE);
+		if (sending){
+			uint8_t *txData = OSQPend(&I2Ctx, 0, OS_OPT_PEND_BLOCKING, 1, &time, &err);
+			I2C_SendData(I2C3, txData);
+			txLength--; //decrement counter
+			if (txLength == 0){
+				I2C_GenerateSTOP(I2C3, ENABLE);
+				sending = false;
+			}
+		}
+		if (receiving && (sending == false)) I2C_GenerateSTART(I2C3, ENABLE);
 	}
 }
 //Interrupt Service Handler for Bare-Metal code
@@ -133,9 +155,9 @@ void I2C3_ISR(void){
  */
 uint8_t BSP_I2C_Write(uint16_t regAddr, uint8_t *txData, uint32_t txLen) {
 	OSQPost(&I2Ctx, &regAddr, 1, OS_OPT_POST_FIFO, &err); //store register address
-	OSQPost(&I2Ctx, &txLen, 1, OS_OPT_POST_FIFO, &err);
-	OSQPost(&I2Ctx, txData, txLen, OS_OPT_POST_FIFO, &err);
-    /*int timeout_count = 0;
+	OSQPost(&I2Ctx, &txLen, 1, OS_OPT_POST_FIFO, &err); //store length of array
+	OSQPost(&I2Ctx, txData, txLen, OS_OPT_POST_FIFO, &err); //store address of array
+    int timeout_count = 0;
 	while(I2C_GetFlagStatus(I2C3, I2C_FLAG_BUSY)){
 		// Assume running at 80 MHz
 		timeout_count++;
@@ -234,7 +256,7 @@ uint8_t BSP_I2C_Write(uint16_t regAddr, uint8_t *txData, uint32_t txLen) {
 		}
 	}
 
-	I2C_GenerateSTOP(I2C3, ENABLE);*/
+	I2C_GenerateSTOP(I2C3, ENABLE);
 	return SUCCESS;
 }
 
@@ -246,6 +268,9 @@ uint8_t BSP_I2C_Write(uint16_t regAddr, uint8_t *txData, uint32_t txLen) {
  * @return  error status, 0 if fail, other if success
  */
 uint8_t BSP_I2C_Read(uint16_t regAddr, uint8_t *rxData, uint32_t rxLen) {
+	OSQPost(&I2Crx, &regAddr, 1, OS_OPT_POST_FIFO, &err); //store address to read from
+	OSQPost(&I2Crx, rxData, 1, OS_OPT_POST_FIFO, &err); //store address to store data in
+	OSQPost(&I2Crx, &rxLen, 1, OS_OPT_POST_FIFO, &err);
     int timeout_count = 0;
 	while(I2C_GetFlagStatus(I2C3, I2C_FLAG_BUSY)){
 		// Assume running at 80 MHz
