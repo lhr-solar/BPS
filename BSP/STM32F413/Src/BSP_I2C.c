@@ -9,8 +9,9 @@ OS_ERR err;
 CPU_TS time;
 const uint8_t deviceAddr; //make this EEPROM address
 uint16_t regAddresstx, regAddressrx;
+uint8_t* readStore;
 uint32_t txLength, rxLength;
-bool sending = false, receiving = false;
+bool sending = false, receiving = false, startreceiving = false;
 
 void* ISRPTR; //pointer to function that will be running ISR
 
@@ -89,12 +90,6 @@ void StorageIO_ISR(void){
 			I2C3->SR1 &= ~0x0400;
 			I2C_GenerateSTOP(I2C3, ENABLE);
 		}
-		if (receiving){
-			while (rxLength > 0){
-				
-			}
-		}
-		return;
 	}
 	if (I2C_CheckEvent(I2C3, I2C_EVENT_MASTER_MODE_SELECT) && 
 		(I2C_GetLastEvent(I2C3) != I2C_EVENT_MASTER_TRANSMITTER_MODE_SELECTED)){
@@ -103,20 +98,24 @@ void StorageIO_ISR(void){
 		return;
 	}
 	if (I2C_CheckEvent(I2C3, I2C_EVENT_MASTER_TRANSMITTER_MODE_SELECTED)){
-		if (/*txbuffer has data send it first*/){
-			regAddresstx = OSQPend(&I2Ctx, 0, OS_OPT_PEND_BLOCKING, 1, &time, &err);
+		//regAddresstx will be 0 if there is no data in the fifo
+		regAddresstx = OSQPend(&I2Ctx, 1, OS_OPT_PEND_BLOCKING, 1, &time, &err);
+		if (regAddresstx){ // if there is data
 			uint16_t *lenPtr = OSQPend(&I2Ctx, 0, OS_OPT_PEND_BLOCKING, 1, &time, &err);
 			txLength = *lenPtr;
 			// Send start address (MSB first)
 			I2C_SendData(I2C3, (uint8_t)((regAddresstx & 0xFF00) >> 8));
 			sending = true;
 		}
-		if(/*rxbuffer has data and sending is false*/){
-			regAddressrx = OSQPend(&I2Crx, 0, OS_OPT_PEND_BLOCKING, 1, &time, &err);
-			uint16_t *lenPtr = OSQPend(&I2Crx, 0, OS_OPT_PEND_BLOCKING, 1, &time, &err);
-			rxLength = *lenPtr;
-			I2C_SendData(I2C3, (uint8_t)((regAddressrx & 0xFF00) >> 8));
-			receiving = true;
+		if(sending == false){
+			regAddressrx = OSQPend(&I2Crx, 1, OS_OPT_PEND_BLOCKING, 1, &time, &err); //get address to read from
+			if (regAddressrx){
+				readStore = OSQPend(&I2Crx, 0, OS_OPT_PEND_BLOCKING, 1, &time, &err);		 //get address to store in
+				uint16_t *lenPtr = OSQPend(&I2Crx, 0, OS_OPT_PEND_BLOCKING, 1, &time, &err); //get length of data
+				rxLength = *lenPtr;
+				I2C_SendData(I2C3, (uint8_t)((regAddressrx & 0xFF00) >> 8));
+				receiving = true;
+			}
 		}
 		return;
 	}
@@ -128,7 +127,7 @@ void StorageIO_ISR(void){
 		return;
 	}
 	//if byte has been transmitted
-	if(I2C_GetFlagStatus(I2C3, I2C_FLAG_BTF) == RESET){
+	if(I2C_GetFlagStatus(I2C3, I2C_FLAG_BTF) == SET){
 		if (sending){
 			uint8_t *txData = OSQPend(&I2Ctx, 0, OS_OPT_PEND_BLOCKING, 1, &time, &err);
 			I2C_SendData(I2C3, txData);
@@ -138,8 +137,35 @@ void StorageIO_ISR(void){
 				sending = false;
 			}
 		}
-		if (receiving && (sending == false)) I2C_GenerateSTART(I2C3, ENABLE);
+		if (receiving && (sending == false)){
+			if (!startreceiving){
+				I2C_GenerateSTART(I2C3, ENABLE);
+				startreceiving = true;
+			}
+			if(startreceiving){
+				while (rxLength > 0){
+					if (rxLength > 1){
+						*readStore = I2C_ReceiveData(I2C3);
+						readStore++;
+						rxLength--;
+					}
+					else{
+						// Disable ack, since this is the last byte
+						I2C_AcknowledgeConfig(I2C3, DISABLE);
+						*readStore = I2C_ReceiveData(I2C3);
+						readStore++;
+						rxLength = 0;
+					}
+					// Generate the stop
+					receiving = false;
+					startreceiving = false;
+					I2C_GenerateSTOP(I2C3, ENABLE);
+				}
+			}
+		}
 	}
+	OSIntExit();
+	asm("CPSIE"); //enable interrupts
 }
 //Interrupt Service Handler for Bare-Metal code
 void I2C3_ISR(void){
