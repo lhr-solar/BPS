@@ -36,15 +36,9 @@ ErrorStatus Temperature_Init(cell_asic *boards){
   	assertOSError(err);
 	// Write Configuration Register
 	LTC6811_wrcfg(NUM_MINIONS, Minions);
-	//release mutex
-  	OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
-  	assertOSError(err);
 
 	// Read Configuration Register
 	wakeup_sleep(NUM_MINIONS);
-	//take control of mutex
-  	OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
-  	assertOSError(err);
 	int8_t error = LTC6811_rdcfg(NUM_MINIONS, Minions);
 	//release mutex
   	OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
@@ -117,13 +111,6 @@ ErrorStatus Temperature_ChannelConfig(uint8_t tempChannel) {
   	assertOSError(err);
     LTC6811_wrcomm(NUM_MINIONS, Minions);
     LTC6811_stcomm();
-	//release mutex
-  	OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
-  	assertOSError(err);
-        
-	//take control of mutex
-  	OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
-  	assertOSError(err);
 
 	for (int board = 0; board < NUM_MINIONS; board++) {
 		/* Open channel on mux */
