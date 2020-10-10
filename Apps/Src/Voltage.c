@@ -99,7 +99,14 @@ SafetyStatus Voltage_CheckStatus(void){
  */
 SafetyStatus *Voltage_GetModulesInDanger(void){
 	static SafetyStatus checks[NUM_BATTERY_MODULES];
-	uint32_t open_wires = Voltage_GetOpenWire();
+	uint32_t ignore = Voltage_GetOpenWire();
+	uint32_t open_wires = 0;
+
+	//put all the bits from each minion's system_open_wire variable into one variable
+	for(int k = 0; k < NUM_MINIONS; k++){
+		open_wires += Minions[k].system_open_wire & 0x0FF;	//there are at most 8 modules per IC 
+		open_wires = open_wires << 8;
+	}
 	
 	for (int i = 0; i < NUM_BATTERY_MODULES; i++) {	
 		// Check if battery is in range of voltage limit
@@ -132,10 +139,12 @@ SafetyStatus Voltage_OpenWire(void){
 	LTC6811_run_openwire_multi(NUM_MINIONS, Minions, false);
 
 	for(int32_t i = 0; i < NUM_MINIONS; i++) {
-
+		if(Minions[i].system_open_wire != 0){
+			return DANGER;
+		}
 	}
 
-	return DANGER;
+	return SAFE;
 }
 
 /** Voltage_GetOpenWire

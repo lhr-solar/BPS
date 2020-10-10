@@ -38,12 +38,12 @@ int main() {
             break;
         }
 
-        Voltage_OpenWire();
+        //Voltage_OpenWire();
 
-        // if(Voltage_OpenWire() != SAFE) {
-        //     printf("DANGER!! There is an open wire :(\r\n");
-        //     break;
-        // }
+        if(Voltage_OpenWire() != SAFE) {
+            printf("DANGER!! There is an open wire :(\r\n");
+            break;
+        }
 
     }
 
