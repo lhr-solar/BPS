@@ -10,10 +10,12 @@
 #include "config.h"
 #include "LTC6811.h"
 #include "common.h"
+#include "os.h"
 
 /** Voltage_Init
  * Initializes all device drivers including LTC6811 and GPIO to begin Voltage Monitoring
  * @param boards LTC6811 data structure that contains the values of each register
+ * @param voltageMutex pointer to mutex, meant to pass pointer to VoltageBuffer_Mutex 
  * @return SUCCESS or ERROR
  */
 ErrorStatus Voltage_Init(cell_asic *boards);
