@@ -1,7 +1,6 @@
 #include "BSP_UART.h"
 #include "stm32f4xx.h"
 //Written by Sijin and Revised by Manthan Upadhyaya: 10/2020
-
 #define TX_SIZE     128
 #define RX_SIZE     64
 //These variables are for USART 2 which is used for the BLE
@@ -112,7 +111,7 @@ void BSP_UART_Init(void) {
     #endif
 }
 //********THE FOLLOWING CODE IS FOR THE Bare Metal VERSION OF THE BPS********
-#ifdef BAREMMETAL
+#ifdef BAREMETAL
 /**
  * @brief   Gets one line of ASCII text that was received.
  * @pre     str should be at least 128bytes long.
@@ -433,6 +432,13 @@ uint32_t BSP_UART_Write(char *str, uint32_t len, UART_Port usart) {
 }
 
 void USART2_IRQHandler(void) {
+    asm("CPSID I"); //disable all interrupts
+	//all cpu registers are supposed to be saved here
+	//but that happens when the ISR is called
+	OSIntEnter(); //increments value of nested interrupt counter
+	unsigned int *address = 0;
+	asm volatile ("STR SP, [%0]\n\t": "=r" ( address)); //Store SP in address
+	if (OSIntNestingCtr == 1) OSTCBCurPtr->StkPtr = address;
     if(USART_GetITStatus(USART2, USART_IT_RXNE) != RESET) {
         uint8_t data = USART2->DR;
         bool removeSuccess = 1;
@@ -460,6 +466,8 @@ void USART2_IRQHandler(void) {
         if(!TxFifo_Get((uint8_t *)&(USART2->DR),UART_BLE)) USART_ITConfig(USART2, USART_IT_TC, RESET);
     }
     if(USART_GetITStatus(USART2, USART_IT_ORE) != RESET);
+    OSIntExit();
+	asm("CPSIE I"); //enable interrupts
 }
 
 void USART3_IRQHandler(void) {
@@ -547,7 +555,7 @@ static bool TxFifo_IsFull(UART_Port usart) {
 }
 
 static bool TxFifo_IsEmpty(UART_Port usart) {
-    bool value;
+    bool value = false;
     if (usart == UART_USB){
         OSMutexPend(&tx3Mutex, 0, OS_OPT_PEND_BLOCKING, &time, &err);
         value = (txGet3 == txPut3);
@@ -634,7 +642,7 @@ static bool RxFifo_Peek(uint8_t *data, UART_Port usart) {
 }
 
 static bool RxFifo_IsFull(UART_Port usart) {
-    bool value;
+    bool value = false;
     if (usart == UART_USB){
         OSMutexPend(&rx3Mutex, 0, OS_OPT_PEND_BLOCKING, &time, &err);
         value = (rxPut3 + 1) % RX_SIZE == rxGet3;
@@ -649,7 +657,7 @@ static bool RxFifo_IsFull(UART_Port usart) {
 }
 
 static bool RxFifo_IsEmpty(UART_Port usart) {
-    bool value;
+    bool value = false;
     if (usart == UART_USB){
         OSMutexPend(&rx3Mutex, 0, OS_OPT_PEND_BLOCKING, &time, &err);
         value = (rxGet3 == rxPut3);
@@ -660,6 +668,6 @@ static bool RxFifo_IsEmpty(UART_Port usart) {
         value = (rxGet2 == rxPut2);
         OSMutexPost(&rx2Mutex, OS_OPT_POST_NONE, &err);
     }
-    return 0;
+    return value;
 }
 #endif
