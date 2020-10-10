@@ -60,6 +60,16 @@ OS_SEM Fault_Sem4;
 cell_asic Minions[NUM_MINIONS];
 uint32_t WDog_BitMap = 0;
 
+/**
+ * Used to assert if there has been an error in one of the OS functions
+ * Kills the car if there is an OS error
+ **/
+void assertOSError(OS_ERR err){
+    if(err != OS_ERR_NONE) {
+        OSSemPost(&Fault_Sem4, OS_OPT_POST_1, &err);
+    }
+} 
+
 //leaving these functions in the code for now, so it is easier to rebase this into other people's branches
 /*
 void Task_Init(void *p_arg) {
