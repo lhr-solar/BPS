@@ -99,7 +99,7 @@ SafetyStatus Voltage_CheckStatus(void){
  */
 SafetyStatus *Voltage_GetModulesInDanger(void){
 	static SafetyStatus checks[NUM_BATTERY_MODULES];
-	uint32_t ignore = Voltage_GetOpenWire();
+	Voltage_GetOpenWire();
 	uint32_t open_wires = 0;
 
 	//put all the bits from each minion's system_open_wire variable into one variable
