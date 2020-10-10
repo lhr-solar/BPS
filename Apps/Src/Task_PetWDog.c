@@ -1,5 +1,6 @@
 #include "Tasks.h"
 #include "os.h"
+#include <stdlib.h>
 
 void Task_PetWDog(void *p_arg) {
     (void)p_arg;

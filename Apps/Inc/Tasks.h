@@ -2,6 +2,7 @@
 #define __TASKS_H
 
 #include "os.h"
+#include <stdint.h>
 
 #define TASK_INIT_PRIO                      0
 #define TASK_FAULT_STATE_PRIO               1

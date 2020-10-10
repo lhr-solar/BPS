@@ -1,5 +1,6 @@
 #include "os.h"
 #include "Tasks.h"
+#include <stdlib.h>
 
 void Task_BatteryBalance(void *p_arg) {
     (void)p_arg;
