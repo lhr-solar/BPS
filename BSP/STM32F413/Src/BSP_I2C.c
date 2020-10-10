@@ -2,7 +2,7 @@
 #include "stm32f4xx.h"
 
 #define TIMEOUT_THRESHOLD   1200000 // 15 ms delay threshold (3x the write time)
-#define BAREMETAL
+#define RTOS
 //Manthan Upadhyaya wuz here: 10/2020
 
 #ifdef RTOS
@@ -10,11 +10,13 @@ static OS_Q I2Ctx, I2Crx;
 static const OS_MSG_QTY AMT = 1028;
 static OS_ERR err;
 static CPU_TS time;
+static OS_MSG_SIZE one = 1;
 #endif
 
 const uint8_t deviceAddr = 0xA0; //make this EEPROM address
 //The variables below are to determine what process the I2C is doing
 static bool receiving = false, sending = false, startreceiving = false;
+static uint8_t* txData;
 static uint16_t regAddresstx, regAddressrx;
 static uint8_t* readStore;
 static uint32_t txLength, rxLength;
@@ -85,7 +87,6 @@ void BSP_I2C_Init(void) {
 /*****THE FOLLOWING CODE IS FOR THE BARE METAL VERSION OF THE BPS*****/
 #ifdef BAREMETAL
 void I2C3_EV_IRQHandler(void){
-	int timeout_count = 0;
 	if (!I2C_GetFlagStatus(I2C3, I2C_FLAG_BUSY)) {
 		I2C_AcknowledgeConfig(I2C3, ENABLE);
 		// Since no one is using the I2C bus, take control
@@ -115,6 +116,8 @@ void I2C3_EV_IRQHandler(void){
 		if (txFifoReceived){ // if there is data
 			txLength = I2Ctx[txFifoTail].length;
 			regAddresstx = I2Ctx[txFifoTail].regAddress;
+			txData = I2Ctx[txFifoTail].data; //read address to get data from
+			txFifoTail = (txFifoTail + 1) % FIFOSIZE;
 			// Send start address (MSB first)
 			I2C_SendData(I2C3, (uint8_t)((regAddresstx & 0xFF00) >> 8));
 			sending = true;
@@ -123,7 +126,6 @@ void I2C3_EV_IRQHandler(void){
 			readStore = I2Crx[rxFifoTail].data; //get address to store in
 			rxLength = I2Crx[rxFifoTail].length; //get length of data
 			regAddressrx = I2Crx[rxFifoTail].regAddress; //get address to read from
-			//WE MOVE THE TAIL FOR RX HERE BECAUSE WE HAVE READ ALL THE DATA FROM THIS ARRAY ELEMENT
 			rxFifoTail = (rxFifoTail + 1) % FIFOSIZE;
 			I2C_SendData(I2C3, (uint8_t)((regAddressrx & 0xFF00) >> 8));
 			receiving = true;
@@ -140,15 +142,13 @@ void I2C3_EV_IRQHandler(void){
 	//if byte has been transmitted
 	if(I2C_GetFlagStatus(I2C3, I2C_FLAG_BTF) == SET){
 		if (sending){
-			uint8_t *txData = I2Ctx[txFifoTail].data; //read address to get data from
-			I2C_SendData(I2C3, txData);
+			I2C_SendData(I2C3, *txData);
 			txLength--; //decrement counter
 			if (txLength == 0){
 				I2C_GenerateSTOP(I2C3, ENABLE);
-				//WE MOVE THE TAIL FOR TX HERE BECAUSE WE HAVE READ ALL THE DATA FROM THIS ARRAY ELEMENT
-				txFifoTail = (txFifoTail + 1) % FIFOSIZE;
 				sending = false;
 			}
+			txData++; //go to next element to send
 		}
 		if (receiving && (sending == false)){
 			if (!startreceiving){
@@ -222,13 +222,12 @@ uint8_t BSP_I2C_Read(uint16_t regAddr, uint8_t *rxData, uint32_t rxLen) {
 /********THE FOLLOWING CODE IS FOR THE RTOS VERSION OF THE BPS*********/
 #ifdef RTOS
 void I2C3_EV_IRQHandler(void){
-	asm("CPSID"); //disable all interrupts
+	asm("CPSID I"); //disable all interrupts
 	//all cpu registers are supposed to be saved here
 	//but that happens when the ISR is called
 	OSIntEnter(); //increments value of nested interrupt counter
-	unsigned * ptr asm("SP");
-	if (OSIntNestingCtr == 1) (*OSTCBCurPtr).StkPtr = ptr; //store stack ptr in ostcbptr
-	int timeout_count = 0;
+	register unsigned int *PTR = (*OSTCBCurPtr).StkPtr;
+	if (OSIntNestingCtr == 1) asm("MOV SP, PTR"); //store stack ptr in ostcbptr
 	if (!I2C_GetFlagStatus(I2C3, I2C_FLAG_BUSY)) {
 		I2C_AcknowledgeConfig(I2C3, ENABLE);
 		// Since no one is using the I2C bus, take control
@@ -256,19 +255,22 @@ void I2C3_EV_IRQHandler(void){
 	}
 	if (I2C_CheckEvent(I2C3, I2C_EVENT_MASTER_TRANSMITTER_MODE_SELECTED)){
 		//regAddresstx will be 0 if there is no data in the fifo
-		regAddresstx = OSQPend(&I2Ctx, 1, OS_OPT_PEND_BLOCKING, 1, &time, &err);
+		uint16_t* regAddress = OSQPend(&I2Ctx, 1, OS_OPT_PEND_BLOCKING, &one, &time, &err);
+		regAddresstx = *regAddress;
 		if (regAddresstx){ // if there is data
-			uint16_t *lenPtr = OSQPend(&I2Ctx, 0, OS_OPT_PEND_BLOCKING, 1, &time, &err);
+			uint16_t *lenPtr = OSQPend(&I2Ctx, 0, OS_OPT_PEND_BLOCKING, &one, &time, &err);
 			txLength = *lenPtr;
+			txData = OSQPend(&I2Ctx, 0, OS_OPT_PEND_BLOCKING, &one, &time, &err);
 			// Send start address (MSB first)
 			I2C_SendData(I2C3, (uint8_t)((regAddresstx & 0xFF00) >> 8));
 			sending = true;
 		}
 		if(sending == false){
-			regAddressrx = OSQPend(&I2Crx, 1, OS_OPT_PEND_BLOCKING, 1, &time, &err); //get address to read from
+			regAddress = OSQPend(&I2Crx, 1, OS_OPT_PEND_BLOCKING, &one, &time, &err); //get address to read from
+			regAddressrx = *regAddress;
 			if (regAddressrx){
-				readStore = OSQPend(&I2Crx, 0, OS_OPT_PEND_BLOCKING, 1, &time, &err);		 //get address to store in
-				uint16_t *lenPtr = OSQPend(&I2Crx, 0, OS_OPT_PEND_BLOCKING, 1, &time, &err); //get length of data
+				readStore = OSQPend(&I2Crx, 0, OS_OPT_PEND_BLOCKING, &one, &time, &err); //get address to store in
+				uint16_t *lenPtr = OSQPend(&I2Crx, 0, OS_OPT_PEND_BLOCKING, &one, &time, &err); //get length of data
 				rxLength = *lenPtr;
 				I2C_SendData(I2C3, (uint8_t)((regAddressrx & 0xFF00) >> 8));
 				receiving = true;
@@ -286,13 +288,13 @@ void I2C3_EV_IRQHandler(void){
 	//if byte has been transmitted
 	if(I2C_GetFlagStatus(I2C3, I2C_FLAG_BTF) == SET){
 		if (sending){
-			uint8_t *txData = OSQPend(&I2Ctx, 0, OS_OPT_PEND_BLOCKING, 1, &time, &err);
-			I2C_SendData(I2C3, txData);
+			I2C_SendData(I2C3, *txData);
 			txLength--; //decrement counter
 			if (txLength == 0){
 				I2C_GenerateSTOP(I2C3, ENABLE);
 				sending = false;
 			}
+			txData++;
 		}
 		if (receiving && (sending == false)){
 			if (!startreceiving){
@@ -322,7 +324,7 @@ void I2C3_EV_IRQHandler(void){
 		}
 	}
 	OSIntExit();
-	asm("CPSIE"); //enable interrupts
+	asm("CPSIE I"); //enable interrupts
 }
 
 /**
@@ -435,8 +437,8 @@ uint8_t BSP_I2C_Write(uint16_t regAddr, uint8_t *txData, uint32_t txLen) {
 		}
 	}
 
-	I2C_GenerateSTOP(I2C3, ENABLE);
-	return SUCCESS;*/
+	I2C_GenerateSTOP(I2C3, ENABLE);*/
+	return SUCCESS;
 }
 
 /**
@@ -597,9 +599,9 @@ uint8_t BSP_I2C_Read(uint16_t regAddr, uint8_t *rxData, uint32_t rxLen) {
 	}
 
 	// Generate the stop
-	I2C_GenerateSTOP(I2C3, ENABLE);
+	I2C_GenerateSTOP(I2C3, ENABLE);*/
 	
 	// Return Success if all executed properly
-	return SUCCESS;*/
+	return SUCCESS;
 }
 #endif
