@@ -4,7 +4,6 @@
 
 #define TX_SIZE     128
 #define RX_SIZE     64
-#define RTOS        //define whether using RTOS or BM
 //These variables are for USART 2 which is used for the BLE
 static char txBuffer2[TX_SIZE];
 static uint32_t txPut2 = 0;
@@ -113,7 +112,7 @@ void BSP_UART_Init(void) {
     #endif
 }
 //********THE FOLLOWING CODE IS FOR THE Bare Metal VERSION OF THE BPS********
-#ifdef BM
+#ifdef BAREMMETAL
 /**
  * @brief   Gets one line of ASCII text that was received.
  * @pre     str should be at least 128bytes long.
