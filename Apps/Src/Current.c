@@ -10,6 +10,7 @@
 #include "Current.h"
 #include "BSP_ADC.h"
 #include "os.h"
+#include "Tasks.h"
 
 int32_t HighPrecisionCurrent;	// Milliamp measurement of hall effect sensor of high precision
 int32_t LowPrecisionCurrent;	// Milliamp measurement of hall effect sensor of low precision
@@ -111,6 +112,15 @@ void Task_AmperesMonitor(void *p_arg) {
         // BLOCKING =====================
         // Update Amperes Measurements
         // Check if amperes is NOT safe:
+
+        //signal watchdog
+        OSMutexPend(&WDog_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
+        assertOSError(err);
+
+        WDog_BitMap |= WD_AMPERES;
+
+        OSMutexPost(&WDog_Mutex, OS_OPT_POST_NONE, &err);
+        assertOSError(err);
     }
 }
 

@@ -1,4 +1,6 @@
+#include "Tasks.h"
 #include "os.h"
+#include <stdlib.h>
 
 void Task_VoltTempMonitor(void *p_arg) {
     (void)p_arg;
@@ -19,5 +21,14 @@ void Task_VoltTempMonitor(void *p_arg) {
         // Check if temperature is NOT safe:
 
         // Control Fans depending on temperature
+
+        //signal watchdog
+        OSMutexPend(&WDog_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
+        assertOSError(err);
+
+        WDog_BitMap |= WD_VOLT_TEMP;
+
+        OSMutexPost(&WDog_Mutex, OS_OPT_POST_NONE, &err);
+        assertOSError(err);
     }
 }

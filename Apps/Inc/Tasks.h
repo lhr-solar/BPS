@@ -1,6 +1,9 @@
 #ifndef __TASKS_H
 #define __TASKS_H
 
+#include "os.h"
+#include <stdint.h>
+
 #define TASK_INIT_PRIO                      0
 #define TASK_FAULT_STATE_PRIO               1
 #define TASK_CRITICAL_STATE_PRIO            2
@@ -30,6 +33,15 @@
 #define TASK_CLI_STACK_SIZE                 DEFAULT_STACK_SIZE
 #define TASK_BLE_STACK_SIZE                 DEFAULT_STACK_SIZE
 #define TASK_IDLE_STACK_SIZE                DEFAULT_STACK_SIZE
+
+/**
+ * enum to keep track of which tasks correspond to each bit in WDog_BitMap
+ */
+enum WDogBits_e {
+    WD_VOLT_TEMP = 0x1,
+    WD_AMPERES = 0x2,
+    WD_BALANCING = 0x4,
+};
 
 void Task_Init(void *p_arg);
 
@@ -65,5 +77,7 @@ void assertOSError(OS_ERR err);
 
 extern OS_SEM SafetyCheck_Sem4;
 extern OS_SEM Fault_Sem4;
+extern OS_MUTEX WDog_Mutex;
+extern uint32_t WDog_BitMap;
 
 #endif

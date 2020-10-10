@@ -19,5 +19,11 @@ void Task_Init(void *p_arg) {
 
     // ASSERT err
 
+    OSMutexCreate(&WDog_Mutex,
+                "Watchdog Mutex",
+                &err);
+
+    assertOSError(err);
+
     // TODO: Initialize threads! Look at main.c for reference
 }
