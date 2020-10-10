@@ -6,9 +6,6 @@
 #include "Voltage.h"
 #include "Temperature.h"
 
-#include "../../BSP/Inc/BSP_Lights.h"
-#include "../../BSP/Inc/BSP_UART.h"
-#include "Charge.h"
 
 /*******************************************************************************
 *    Shared Resources
@@ -104,7 +101,6 @@ void Task_Init(void *p_arg) {
     // TODO: Initialize threads! Look at main.c for reference
 }
 
-char command[COMMAND_SIZE];
 void Task_FaultState(void *p_arg) {
     (void)p_arg;
 
