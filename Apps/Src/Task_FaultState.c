@@ -12,7 +12,6 @@
 #include "BSP_UART.h"
 #include "config.h"
 
-#define NOTHING
 //Manthan Upadhyaya wuz here: 10/2020
 
 void Task_FaultState(void *p_arg) {
