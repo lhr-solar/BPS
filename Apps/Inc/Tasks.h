@@ -1,6 +1,8 @@
 #ifndef __TASKS_H
 #define __TASKS_H
 
+#include "os.h"
+
 #define TASK_INIT_PRIO                      0
 #define TASK_FAULT_STATE_PRIO               1
 #define TASK_CRITICAL_STATE_PRIO            2
