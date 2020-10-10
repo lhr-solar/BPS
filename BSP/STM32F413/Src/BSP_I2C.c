@@ -226,8 +226,9 @@ void I2C3_EV_IRQHandler(void){
 	//all cpu registers are supposed to be saved here
 	//but that happens when the ISR is called
 	OSIntEnter(); //increments value of nested interrupt counter
-	register unsigned int *PTR = (*OSTCBCurPtr).StkPtr;
-	if (OSIntNestingCtr == 1) asm("MOV SP, PTR"); //store stack ptr in ostcbptr
+	int address = 0;
+	asm volatile ("STR SP, [%0]\n\t": "=r" ( address)); //Store SP in address
+	if (OSIntNestingCtr == 1) OSTCBCurPtr->StkPtr = address;
 	if (!I2C_GetFlagStatus(I2C3, I2C_FLAG_BUSY)) {
 		I2C_AcknowledgeConfig(I2C3, ENABLE);
 		// Since no one is using the I2C bus, take control
