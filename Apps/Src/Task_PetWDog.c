@@ -8,6 +8,7 @@ void Task_PetWDog(void *p_arg) {
 
     //take WDog Mutex
     OSMutexPend(&WDog_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
+    assertOSError(err);
 
     // If WDog_BitMap is all set:
     //      Reset watchdog timer
@@ -15,6 +16,5 @@ void Task_PetWDog(void *p_arg) {
 
     //release WDog Mutex
     OSMutexPost(&WDog_Mutex, OS_OPT_POST_NONE, &err);
-
-    //ASSERT err
+    assertOSError(err);
 }

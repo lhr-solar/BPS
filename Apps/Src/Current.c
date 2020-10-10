@@ -113,16 +113,14 @@ void Task_AmperesMonitor(void *p_arg) {
         // Update Amperes Measurements
         // Check if amperes is NOT safe:
 
-		//signal watchdog
+        //signal watchdog
         OSMutexPend(&WDog_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
-
-        //ASSERT err
+        assertOSError(err);
 
         WDog_BitMap |= WD_AMPERES;
 
         OSMutexPost(&WDog_Mutex, OS_OPT_POST_NONE, &err);
-
-        //ASSERT err
+        assertOSError(err);
     }
 }
 

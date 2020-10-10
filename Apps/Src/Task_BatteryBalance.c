@@ -11,13 +11,11 @@ void Task_BatteryBalance(void *p_arg) {
 
         //signal watchdog
         OSMutexPend(&WDog_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
-
-        //ASSERT err
+        assertOSError(err);
 
         WDog_BitMap |= WD_BALANCING;
 
         OSMutexPost(&WDog_Mutex, OS_OPT_POST_NONE, &err);
-
-        //ASSERT err
+        assertOSError(err);
     }
 }
