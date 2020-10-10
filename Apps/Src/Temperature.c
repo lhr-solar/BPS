@@ -40,7 +40,6 @@ ErrorStatus Temperature_Init(cell_asic *boards){
 	LTC6811_Init(Minions);
 
 	//take control of mutex
-	OS_ERR err;
   	OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
   	assertOSError(err);
 	// Write Configuration Register

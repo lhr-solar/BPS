@@ -16,7 +16,6 @@ static cell_asic *Minions;
 
 static OS_MUTEX Voltage_Mutex;
 static uint16_t VoltageVal[NUM_BATTERY_MODULES]; //Voltage values gathered
-static OS_ERR err;
 /** LTC ADC measures with resolution of 4 decimal places, 
  * But we standardized to have 3 decimal places to work with
  * millivolts
@@ -32,6 +31,7 @@ ErrorStatus Voltage_Init(cell_asic *boards){
 	// Record pointer
 	Minions = boards;
 	//initialize mutex
+	OS_ERR err;
     OSInit(&err); 
 	OSMutexCreate(&Voltage_Mutex,
 				  "Voltage Buffer Mutex",
@@ -44,7 +44,6 @@ ErrorStatus Voltage_Init(cell_asic *boards){
 	LTC6811_Init(Minions);
 	
 	//take control of mutex
-	OS_ERR err;
   	OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
   	assertOSError(err);
 	// Write Configuration Register
@@ -217,6 +216,7 @@ uint32_t Voltage_GetOpenWire(void){
  */
 uint16_t Voltage_GetModuleMillivoltage(uint8_t moduleIdx){
 	CPU_TS ts;
+	OS_ERR err;
 	// These if statements prevents a hardfault.
     if(moduleIdx >= NUM_BATTERY_MODULES) {
         return 0xFFFF;  // return -1 which indicates error voltage
