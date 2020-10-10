@@ -11,6 +11,8 @@
 #include "CANbus.h"
 #include "BSP_UART.h"
 #include "config.h"
+
+#define NOTHING
 //Manthan Upadhyaya wuz here: 10/2020
 
 void Task_FaultState(void *p_arg) {
@@ -59,7 +61,9 @@ void Task_FaultState(void *p_arg) {
     CANbus_Send(CONTACTOR_STATE, Message);
     char command[COMMAND_SIZE];
     while(1) {
+        #ifdef DEBUGMODE
         if (BSP_UART_ReadLine(command)) CLI_Handler(command); // CLI
+        #endif
         BSP_WDTimer_Reset(); // WDOG Reset
     }
 }
