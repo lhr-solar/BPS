@@ -232,12 +232,16 @@ void I2C3_EV_IRQHandler(void){
 		I2C_AcknowledgeConfig(I2C3, ENABLE);
 		// Since no one is using the I2C bus, take control
 		I2C_GenerateSTART(I2C3, ENABLE);
+		OSIntExit();
+		asm("CPSIE I"); //enable interrupts
 		return;
 	}
 	// Wait until start edge event occurred
 	if (I2C_CheckEvent(I2C3, I2C_EVENT_MASTER_MODE_SELECT)){
 		// Select device to talk to
 		I2C_Send7bitAddress(I2C3, deviceAddr, I2C_Direction_Transmitter);
+		OSIntExit();
+		asm("CPSIE I"); //enable interrupts
 		return;
 	}
 	if (!I2C_CheckEvent(I2C3, I2C_EVENT_MASTER_TRANSMITTER_MODE_SELECTED) && 
@@ -251,6 +255,8 @@ void I2C3_EV_IRQHandler(void){
 		(I2C_GetLastEvent(I2C3) != I2C_EVENT_MASTER_TRANSMITTER_MODE_SELECTED)){
 		// Select device to talk to
 		I2C_Send7bitAddress(I2C3, deviceAddr, I2C_Direction_Transmitter);
+		OSIntExit();
+		asm("CPSIE I"); //enable interrupts
 		return;
 	}
 	if (I2C_CheckEvent(I2C3, I2C_EVENT_MASTER_TRANSMITTER_MODE_SELECTED)){
@@ -276,6 +282,8 @@ void I2C3_EV_IRQHandler(void){
 				receiving = true;
 			}
 		}
+		OSIntExit();
+		asm("CPSIE I"); //enable interrupts
 		return;
 	}
 	//send rest of start address (LSB)
@@ -283,6 +291,8 @@ void I2C3_EV_IRQHandler(void){
 		I2C_GetLastEvent(I2C3) == I2C_EVENT_MASTER_TRANSMITTER_MODE_SELECTED){
 		if (sending) I2C_SendData(I2C3, (uint8_t)(regAddresstx & 0x00FF));
 		if (receiving && (sending = false)) I2C_SendData(I2C3, (uint8_t)(regAddressrx & 0x00FF));
+		OSIntExit();
+		asm("CPSIE I"); //enable interrupts
 		return;
 	}
 	//if byte has been transmitted
