@@ -23,7 +23,7 @@ void Task_Init(void *p_arg) {
                 "Watchdog Mutex",
                 &err);
 
-    //ASSERT err
+    assertOSError(err);
 
     // TODO: Initialize threads! Look at main.c for reference
 }
