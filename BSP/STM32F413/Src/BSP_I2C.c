@@ -2,7 +2,6 @@
 #include "stm32f4xx.h"
 
 #define TIMEOUT_THRESHOLD   1200000 // 15 ms delay threshold (3x the write time)
-#define RTOS
 //Manthan Upadhyaya wuz here: 10/2020
 
 #ifdef RTOS
