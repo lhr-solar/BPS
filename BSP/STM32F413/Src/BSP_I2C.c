@@ -2,18 +2,39 @@
 #include "stm32f4xx.h"
 
 #define TIMEOUT_THRESHOLD   1200000 // 15 ms delay threshold (3x the write time)
+#define BAREMETAL
+//Manthan Upadhyaya wuz here: 10/2020
 
-OS_Q I2Ctx, I2Crx;
-const OS_MSG_QTY AMT = 1028;
-OS_ERR err;
-CPU_TS time;
-const uint8_t deviceAddr; //make this EEPROM address
-uint16_t regAddresstx, regAddressrx;
-uint8_t* readStore;
-uint32_t txLength, rxLength;
-bool sending = false, receiving = false, startreceiving = false;
+#ifdef RTOS
+static OS_Q I2Ctx, I2Crx;
+static const OS_MSG_QTY AMT = 1028;
+static OS_ERR err;
+static CPU_TS time;
+#endif
 
-void* ISRPTR; //pointer to function that will be running ISR
+const uint8_t deviceAddr = 0xA0; //make this EEPROM address
+//The variables below are to determine what process the I2C is doing
+static bool receiving = false, sending = false, startreceiving = false;
+static uint16_t regAddresstx, regAddressrx;
+static uint8_t* readStore;
+static uint32_t txLength, rxLength;
+
+#ifdef BAREMETAL
+#define FIFOSIZE 100
+typedef struct I2CData{
+	uint16_t regAddress;
+	uint8_t* data;
+	uint32_t length;
+};
+static struct I2CData I2Crx[FIFOSIZE];
+static uint16_t rxFifoHead = 0;
+static uint16_t rxFifoTail = 0;
+static bool rxFifoReceived = false;
+static struct I2CData I2Ctx[FIFOSIZE];
+static uint16_t txFifoHead = 0;
+static uint16_t txFifoTail = 0;
+static bool txFifoReceived = false;
+#endif
 
 /**
  * @brief   Initializes the I2C port that interfaces with the EEPROM.
@@ -56,15 +77,151 @@ void BSP_I2C_Init(void) {
 	I2C_Init(I2C3, &I2C_InitStruct);
 	I2C_ITConfig(I2C3, I2C_IT_EVT, ENABLE); //Enable interrupts
 	I2C_Cmd(I2C3, ENABLE);
+	#ifdef RTOS
 	OSQCreate(&I2Crx, "I2C RX", AMT, &err);
 	OSQCreate(&I2Ctx, "I2C TX", AMT, &err);
+	#endif
 }
-//I2C3 Event Interrupt Request Handler
+/*****THE FOLLOWING CODE IS FOR THE BARE METAL VERSION OF THE BPS*****/
+#ifdef BAREMETAL
 void I2C3_EV_IRQHandler(void){
-
+	int timeout_count = 0;
+	if (!I2C_GetFlagStatus(I2C3, I2C_FLAG_BUSY)) {
+		I2C_AcknowledgeConfig(I2C3, ENABLE);
+		// Since no one is using the I2C bus, take control
+		I2C_GenerateSTART(I2C3, ENABLE);
+		return;
+	}
+	// Wait until start edge event occurred
+	if (I2C_CheckEvent(I2C3, I2C_EVENT_MASTER_MODE_SELECT)){
+		// Select device to talk to
+		I2C_Send7bitAddress(I2C3, deviceAddr, I2C_Direction_Transmitter);
+		return;
+	}
+	if (!I2C_CheckEvent(I2C3, I2C_EVENT_MASTER_TRANSMITTER_MODE_SELECTED) && 
+		I2C_GetLastEvent(I2C3) == I2C_EVENT_MASTER_MODE_SELECT){
+		if(I2C3->SR1 & 0x0400 && (receiving == false)) {
+			I2C3->SR1 &= ~0x0400;
+			I2C_GenerateSTOP(I2C3, ENABLE);
+		}
+	}
+	if (I2C_CheckEvent(I2C3, I2C_EVENT_MASTER_MODE_SELECT) && 
+		(I2C_GetLastEvent(I2C3) != I2C_EVENT_MASTER_TRANSMITTER_MODE_SELECTED)){
+		// Select device to talk to
+		I2C_Send7bitAddress(I2C3, deviceAddr, I2C_Direction_Transmitter);
+		return;
+	}
+	if (I2C_CheckEvent(I2C3, I2C_EVENT_MASTER_TRANSMITTER_MODE_SELECTED)){
+		if (txFifoReceived){ // if there is data
+			txLength = I2Ctx[txFifoTail].length;
+			regAddresstx = I2Ctx[txFifoTail].regAddress;
+			// Send start address (MSB first)
+			I2C_SendData(I2C3, (uint8_t)((regAddresstx & 0xFF00) >> 8));
+			sending = true;
+		}
+		if(sending == false && rxFifoReceived){
+			readStore = I2Crx[rxFifoTail].data; //get address to store in
+			rxLength = I2Crx[rxFifoTail].length; //get length of data
+			regAddressrx = I2Crx[rxFifoTail].regAddress; //get address to read from
+			//WE MOVE THE TAIL FOR RX HERE BECAUSE WE HAVE READ ALL THE DATA FROM THIS ARRAY ELEMENT
+			rxFifoTail = (rxFifoTail + 1) % FIFOSIZE;
+			I2C_SendData(I2C3, (uint8_t)((regAddressrx & 0xFF00) >> 8));
+			receiving = true;
+		}
+		return;
+	}
+	//send rest of start address (LSB)
+	if (I2C_CheckEvent(I2C3, I2C_EVENT_MASTER_BYTE_TRANSMITTING) && 
+		I2C_GetLastEvent(I2C3) == I2C_EVENT_MASTER_TRANSMITTER_MODE_SELECTED){
+		if (sending) I2C_SendData(I2C3, (uint8_t)(regAddresstx & 0x00FF));
+		if (receiving && (sending = false)) I2C_SendData(I2C3, (uint8_t)(regAddressrx & 0x00FF));
+		return;
+	}
+	//if byte has been transmitted
+	if(I2C_GetFlagStatus(I2C3, I2C_FLAG_BTF) == SET){
+		if (sending){
+			uint8_t *txData = I2Ctx[txFifoTail].data; //read address to get data from
+			I2C_SendData(I2C3, txData);
+			txLength--; //decrement counter
+			if (txLength == 0){
+				I2C_GenerateSTOP(I2C3, ENABLE);
+				//WE MOVE THE TAIL FOR TX HERE BECAUSE WE HAVE READ ALL THE DATA FROM THIS ARRAY ELEMENT
+				txFifoTail = (txFifoTail + 1) % FIFOSIZE;
+				sending = false;
+			}
+		}
+		if (receiving && (sending == false)){
+			if (!startreceiving){
+				I2C_GenerateSTART(I2C3, ENABLE);
+				startreceiving = true;
+			}
+			if(startreceiving){
+				while (rxLength > 0){
+					if (rxLength > 1){
+						*readStore = I2C_ReceiveData(I2C3);
+						readStore++;
+						rxLength--;
+					}
+					else{
+						// Disable ack, since this is the last byte
+						I2C_AcknowledgeConfig(I2C3, DISABLE);
+						*readStore = I2C_ReceiveData(I2C3);
+						readStore++;
+						rxLength = 0;
+					}
+					// Generate the stop
+					receiving = false;
+					startreceiving = false;
+					I2C_GenerateSTOP(I2C3, ENABLE);
+				}
+			}
+		}
+	}
 }
-//Interrupt Service Handler for RTOS
-void StorageIO_ISR(void){
+
+/**
+ * @brief   Transmits data onto the I2C bus.
+ * @param   regAddr : the register address to write to in the IC's memory.
+ * @param   txData : the data array to be sent onto the bus.
+ * @param   txLen : the length of the data array.
+ * @return  error status, 0 if fail, 1 if success
+ */
+uint8_t BSP_I2C_Write(uint16_t regAddr, uint8_t *txData, uint32_t txLen) {
+	//if the head isn't the same as the tail or it is empty
+	if ((txFifoHead != txFifoTail) || txFifoReceived == false){
+		I2Ctx[txFifoHead].regAddress = regAddr;
+		I2Ctx[txFifoHead].data = txData;
+		I2Ctx[txFifoHead].length = txLen;
+		txFifoHead = (txFifoHead + 1)%FIFOSIZE;
+		txFifoReceived = true;
+		return true;
+	}
+	return false; //return false if fifo is full
+}
+
+/**
+ * @brief   Gets the data from a device through the I2C bus.
+ * @param   regAddr : the register address to read from the IC's memory.
+ * @param   rxData : the data array to store the data that is received.
+ * @param   rxLen : the length of the data array.
+ * @return  error status, 0 if fail, other if success
+ */
+uint8_t BSP_I2C_Read(uint16_t regAddr, uint8_t *rxData, uint32_t rxLen) {
+	//if the head isn't the same as the tail or it is empty
+	if ((rxFifoHead != rxFifoTail) || rxFifoReceived == false){
+		I2Crx[rxFifoHead].regAddress = regAddr;
+		I2Crx[rxFifoHead].data = rxData;
+		I2Crx[rxFifoHead].length = rxLen;
+		rxFifoHead = (rxFifoHead + 1)%FIFOSIZE;
+		rxFifoReceived = true;
+		return true;
+	}
+	return false; //return false if fifo is full
+}
+#endif
+/********THE FOLLOWING CODE IS FOR THE RTOS VERSION OF THE BPS*********/
+#ifdef RTOS
+void I2C3_EV_IRQHandler(void){
 	asm("CPSID"); //disable all interrupts
 	//all cpu registers are supposed to be saved here
 	//but that happens when the ISR is called
@@ -167,10 +324,6 @@ void StorageIO_ISR(void){
 	OSIntExit();
 	asm("CPSIE"); //enable interrupts
 }
-//Interrupt Service Handler for Bare-Metal code
-void I2C3_ISR(void){
-	
-}
 
 /**
  * @brief   Transmits data onto the I2C bus.
@@ -183,7 +336,7 @@ uint8_t BSP_I2C_Write(uint16_t regAddr, uint8_t *txData, uint32_t txLen) {
 	OSQPost(&I2Ctx, &regAddr, 1, OS_OPT_POST_FIFO, &err); //store register address
 	OSQPost(&I2Ctx, &txLen, 1, OS_OPT_POST_FIFO, &err); //store length of array
 	OSQPost(&I2Ctx, txData, txLen, OS_OPT_POST_FIFO, &err); //store address of array
-    int timeout_count = 0;
+    /*int timeout_count = 0;
 	while(I2C_GetFlagStatus(I2C3, I2C_FLAG_BUSY)){
 		// Assume running at 80 MHz
 		timeout_count++;
@@ -283,7 +436,7 @@ uint8_t BSP_I2C_Write(uint16_t regAddr, uint8_t *txData, uint32_t txLen) {
 	}
 
 	I2C_GenerateSTOP(I2C3, ENABLE);
-	return SUCCESS;
+	return SUCCESS;*/
 }
 
 /**
@@ -297,7 +450,7 @@ uint8_t BSP_I2C_Read(uint16_t regAddr, uint8_t *rxData, uint32_t rxLen) {
 	OSQPost(&I2Crx, &regAddr, 1, OS_OPT_POST_FIFO, &err); //store address to read from
 	OSQPost(&I2Crx, rxData, 1, OS_OPT_POST_FIFO, &err); //store address to store data in
 	OSQPost(&I2Crx, &rxLen, 1, OS_OPT_POST_FIFO, &err);
-    int timeout_count = 0;
+    /*int timeout_count = 0;
 	while(I2C_GetFlagStatus(I2C3, I2C_FLAG_BUSY)){
 		// Assume running at 80 MHz
 		timeout_count++;
@@ -447,5 +600,6 @@ uint8_t BSP_I2C_Read(uint16_t regAddr, uint8_t *rxData, uint32_t rxLen) {
 	I2C_GenerateSTOP(I2C3, ENABLE);
 	
 	// Return Success if all executed properly
-	return SUCCESS;
+	return SUCCESS;*/
 }
+#endif
