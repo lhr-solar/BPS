@@ -66,6 +66,7 @@ Copyright 2017 Linear Technology Corp. (LTC)
 */
 
 #include <stdint.h>
+#include <stdbool.h>
 #include "LTC681x.h"
 #include "LTC6811.h"
 #include "config.h"
@@ -76,20 +77,20 @@ Copyright 2017 Linear Technology Corp. (LTC)
 /*********************************************************/
 /*** Code that was added by UTSVT. ***/
 /*********************************************************/
-static OS_MUTEX MinionsASIC_Mutex;
+OS_MUTEX MinionsASIC_Mutex;
 
 void LTC6811_Init(cell_asic *battMod){
+  //only create the mutex the first time this function is called (called by Voltage_Init() and Temperature_Init())
+  static bool mutexExists = false;
   OS_ERR err;
-  OSMutexCreate(&MinionsASIC_Mutex,
+  if (mutexExists == false){
+    OSMutexCreate(&MinionsASIC_Mutex,
                 "Minions ASIC Mutex",
                 &err);
 
-    // ASSERT err
-    if (err != OS_ERR_NONE){
-      //if there is an error creating the mutex, something has gone horribly wrong
-      //kill the car by scheduling FaultState_Task()
-      OSSemPost(&Fault_Sem4, OS_OPT_POST_1, &err);
-    }
+    assertOSError(err);
+    mutexExists = true;
+  }
 
 	BSP_SPI_Init();				// Initialize SPI1 for voltage board	
 	
@@ -106,6 +107,7 @@ void LTC6811_init_reg_limits(uint8_t total_ic, cell_asic ic[])
 {
   for (uint8_t cic=0; cic<total_ic; cic++)
   {
+    //already have control of mutex (only called by LTC6811_Init())
     ic[cic].ic_reg.cell_channels=12;
     ic[cic].ic_reg.stat_channels=4;
     ic[cic].ic_reg.aux_channels=6;
@@ -248,7 +250,6 @@ uint8_t LTC6811_rdcv(uint8_t reg, // Controls which cell voltage register is rea
                      cell_asic ic[] // Array of the parsed cell codes
                     )
 {
-
   int8_t pec_error = 0;
   pec_error = LTC681x_rdcv(reg,total_ic,ic);
   return(pec_error);
@@ -468,12 +469,9 @@ void LTC6811_max_min(uint8_t total_ic, cell_asic ic_cells[],
       if (ic_cells[j].cells.c_codes[i]>ic_max[j].cells.c_codes[i])ic_max[j].cells.c_codes[i]=ic_cells[j].cells.c_codes[i];
       else if (ic_cells[j].cells.c_codes[i]<ic_min[j].cells.c_codes[i])ic_min[j].cells.c_codes[i]=ic_cells[j].cells.c_codes[i];
       ic_delta[j].cells.c_codes[i] = ic_max[j].cells.c_codes[i] - ic_min[j].cells.c_codes[i];
+      
     }
   }
-
-
-
-
 }
 
 void LTC6811_init_max_min(uint8_t total_ic, cell_asic ic[],cell_asic ic_max[],cell_asic ic_min[])
@@ -486,7 +484,6 @@ void LTC6811_init_max_min(uint8_t total_ic, cell_asic ic[],cell_asic ic_max[],ce
       ic_min[j].cells.c_codes[i]=0xFFFF;
     }
   }
-
 }
 
 //Helper function that increments PEC counters
