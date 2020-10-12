@@ -39,10 +39,39 @@ typedef struct {
 void CANbus_Init(void);
 
 /**
- * @brief   Transmits data onto the CANbus
+ * @brief   Transmits data onto the CANbus.
+ *          This is non-blocking and will fail with an error if
+ * 			the CAN mailboxes are fully occupied. Be sure to
+ * 			check the return code or call CANbus_BlockAndSend.
  * @param   id : CAN id of the message
  * @param   payload : the data that will be sent.
+ * @return  0 if data wasn't sent, otherwise it was sent.
  */
 int CANbus_Send(CANId_t id, CANPayload_t payload);
+
+/**
+ * @brief   Transmits data onto the CANbus. If there are no mailboxes available,
+ *          this will put the thread to sleep until there are.
+ * @param   id : CAN id of the message
+ * @param   payload : the data that will be sent.
+ * @return  0 if error, a non-negative value otherwise
+ */
+int CANbus_BlockAndSend(CANId_t id, CANPayload_t payload);
+
+/**
+ * @brief   Receives data from the CAN bus. This is a non-blocking operation.
+ * @param   id : pointer to id variable
+ * @param   buffer : pointer to payload buffer
+ * @return  0 if there was no message, 1 otherwise.
+ */
+int CANbus_Receive(CANId_t *id, uint8_t *buffer);
+
+/**
+ * @brief   Waits for data to arrive.
+ * @param   id : pointer to id variable
+ * @param   buffer : pointer to payload buffer
+ * @return  0 if there was an error, 1 otherwise.
+ */
+int CANbus_WaitToReceive(CANId_t *id, uint8_t *buffer);
 
 #endif
