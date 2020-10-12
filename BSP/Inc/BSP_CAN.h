@@ -7,10 +7,11 @@
 
 /**
  * @brief   Initializes the CAN module that communicates with the rest of the electrical system.
- * @param   None
+ * @param   rxEvent : the function to execute when recieving a message. NULL for no action.
+ * @param   txEnd   : the function to execute after transmitting a message
  * @return  None
  */
-void BSP_CAN_Init(void);
+void BSP_CAN_Init(void (*rxEvent)(void), void (*txEnd)(void));
 
 /**
  * @brief   Transmits the data onto the CAN bus with the specified id
