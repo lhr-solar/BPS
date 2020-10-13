@@ -32,8 +32,9 @@
             "request": "launch",
             "type": "cortex-debug",
             "servertype": "stutil",
-            "device": "STM32F413ZH",
-            "v1": false
+            "device": "STM32F413RH",
+            "v1": false,
+            "runToMain": true
         }
     ]
 }

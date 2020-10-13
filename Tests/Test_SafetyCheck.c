@@ -11,9 +11,9 @@ static void Voltage_UpdateMeasurements(void) {
     printf("V0\r\n");
 
     OS_ERR err;
-    // OSTimeDly(1,
-    //         OS_OPT_TIME_DLY,
-    //         &err);
+    OSTimeDly(1,
+            OS_OPT_TIME_DLY,
+            &err);
 
     printf("V1\r\n");
 }
@@ -34,9 +34,9 @@ static SafetyStatus Voltage_OpenWire(void) {
     printf("O0\r\n");
     
     OS_ERR err;
-    // OSTimeDly(1,
-    //         OS_OPT_TIME_DLY,
-    //         &err);
+    OSTimeDly(1,
+            OS_OPT_TIME_DLY,
+            &err);
 
     printf("O1\r\n");
 
@@ -54,9 +54,9 @@ static void Temperature_UpdateAllMeasurements(void) {
     printf("T0\r\n");
 
     OS_ERR err;
-    // OSTimeDly(1,
-    //         OS_OPT_TIME_DLY,
-    //         &err);
+    OSTimeDly(1,
+            OS_OPT_TIME_DLY,
+            &err);
 
     printf("T1\r\n");
 }
@@ -78,9 +78,9 @@ static void Current_UpdateMeasurements(void) {
     printf("A0\r\n");
     
     OS_ERR err;
-    // OSTimeDly(1,
-    //         OS_OPT_TIME_DLY,
-    //         &err);
+    OSTimeDly(1,
+            OS_OPT_TIME_DLY,
+            &err);
 
     printf("A1\r\n");
 }
@@ -274,6 +274,12 @@ int main() {
     OS_ERR err;
 
     CPU_Init();
+
+    #if SIMULATION == 1
+    OS_CPU_SysTickInit();
+    #else
+    OS_CPU_SysTickInit(100000);
+    #endif
 
     OSInit(&err);
 
