@@ -32,7 +32,7 @@
             "request": "launch",
             "type": "cortex-debug",
             "servertype": "stutil",
-            "device": "STM32F413RH",
+            "device": "STM32F413ZH",
             "v1": false
         }
     ]

@@ -2,6 +2,7 @@
 #include "config.h"
 #include "os.h"
 #include "Tasks.h"
+#include "BSP_UART.h"
 
 OS_TCB Init_TCB;
 CPU_STK Init_Stk[DEFAULT_STACK_SIZE];
@@ -10,9 +11,9 @@ static void Voltage_UpdateMeasurements(void) {
     printf("V0\r\n");
 
     OS_ERR err;
-    OSTimeDly(1,
-            OS_OPT_TIME_DLY,
-            &err);
+    // OSTimeDly(1,
+    //         OS_OPT_TIME_DLY,
+    //         &err);
 
     printf("V1\r\n");
 }
@@ -33,9 +34,9 @@ static SafetyStatus Voltage_OpenWire(void) {
     printf("O0\r\n");
     
     OS_ERR err;
-    OSTimeDly(1,
-            OS_OPT_TIME_DLY,
-            &err);
+    // OSTimeDly(1,
+    //         OS_OPT_TIME_DLY,
+    //         &err);
 
     printf("O1\r\n");
 
@@ -53,9 +54,9 @@ static void Temperature_UpdateAllMeasurements(void) {
     printf("T0\r\n");
 
     OS_ERR err;
-    OSTimeDly(1,
-            OS_OPT_TIME_DLY,
-            &err);
+    // OSTimeDly(1,
+    //         OS_OPT_TIME_DLY,
+    //         &err);
 
     printf("T1\r\n");
 }
@@ -77,9 +78,9 @@ static void Current_UpdateMeasurements(void) {
     printf("A0\r\n");
     
     OS_ERR err;
-    OSTimeDly(1,
-            OS_OPT_TIME_DLY,
-            &err);
+    // OSTimeDly(1,
+    //         OS_OPT_TIME_DLY,
+    //         &err);
 
     printf("A1\r\n");
 }
@@ -272,9 +273,13 @@ void AmperesMonitor(void *p_arg) {
 int main() {
     OS_ERR err;
 
+    CPU_Init();
+
     OSInit(&err);
 
     // assert
+
+    BSP_UART_Init();
 
     OSTaskCreate(&Init_TCB,				// TCB
 				"Initialize System",	// Task Name (String)
