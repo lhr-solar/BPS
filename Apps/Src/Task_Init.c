@@ -4,9 +4,8 @@
 void Task_Init(void *p_arg) {
 
     OS_ERR err;
-
-    OSSemCreate(&SafetyCheck_Sem4,
-                "Safety Check Semaphore",
+    OSSemCreate(&Fault_Sem4,
+                "Fault/Tripped Semaphore",
                 0,
                 &err);
     assertOSError(err);
