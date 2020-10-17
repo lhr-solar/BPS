@@ -1,13 +1,9 @@
 #include "Tasks.h"
 #include "os.h"
-<<<<<<< HEAD
-#include <stdlib.h>
-=======
 #include "Tasks.h"
 #include "Voltage.h"
 #include "Temperature.h"
 #include "Current.h"
->>>>>>> Adds safety sema4 operations to amperes and volttemp tasks
 
 void Task_VoltTempMonitor(void *p_arg) {
     (void)p_arg;
@@ -24,7 +20,7 @@ void Task_VoltTempMonitor(void *p_arg) {
         // BLOCKING =====================
         // Update Voltage Measurements
         Voltage_UpdateMeasurements();
-        
+
         // Check if voltage is NOT safe:
         SafetyStatus voltage_status = Voltage_CheckStatus();
         if(voltage_status != SAFE) {
@@ -46,7 +42,6 @@ void Task_VoltTempMonitor(void *p_arg) {
         // Update Open Wire Measurements
         // Check if open wire is NOT safe:
         SafetyStatus wire_status = Voltage_OpenWire();
-        
         if(wire_status != SAFE) {
             OSSemPost(&Fault_Sem4,
                         OS_OPT_POST_1,
@@ -63,7 +58,7 @@ void Task_VoltTempMonitor(void *p_arg) {
         // BLOCKING =====================
         // Update Temperature Measurements
         Temperature_UpdateAllMeasurements();
-        
+
         // Check if temperature is NOT safe:
         SafetyStatus temperature_status = Temperature_CheckStatus(Current_IsCharging());
         if(temperature_status != SAFE) {
