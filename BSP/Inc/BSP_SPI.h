@@ -3,6 +3,7 @@
 
 #include "common.h"
 
+#ifdef BAREMETAL
 /**
  * @note    If other ICs need to be connected onto the SPI line, this code will have to be modified.
  */
@@ -16,6 +17,23 @@
  * @return  None
  */
 void BSP_SPI_Init(void);
+#endif
+
+#ifdef RTOS
+/**
+ * @note    If other ICs need to be connected onto the SPI line, this code will have to be modified.
+ */
+
+/**
+ * @brief   Initializes the SPI port connected to the LTC6820.
+ *          This port communicates with the LTC6811 voltage and temperature
+ *          monitoring IC. The LTC6820 converts the SPI pins to 2-wire isolated SPI.
+ *          Look at analog devices website and LTC6811's or LTC6820's datasheets.
+ * @param   None
+ * @return  None
+ */
+void BSP_SPI_Init(bsp_os_t *spi_os);
+#endif
 
 /**
  * @brief   Transmits data to through SPI.
