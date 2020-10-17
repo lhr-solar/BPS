@@ -11,6 +11,9 @@
 #include "LTC6811.h"
 #include "common.h"
 
+#define TOTAL_PINS 35
+#define NUM_PINS_PER_IC 9
+
 /** Voltage_Init
  * Initializes all device drivers including LTC6811 and GPIO to begin Voltage Monitoring
  * @param boards LTC6811 data structure that contains the values of each register

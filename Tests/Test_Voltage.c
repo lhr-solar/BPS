@@ -59,7 +59,7 @@ int main() {
 
     printf("Printing modules that failed.\r\n");
     SafetyStatus *dangerBatt = Voltage_GetModulesInDanger();
-    for(int i = 0; i < NUM_BATTERY_MODULES; i++) {
+    for(int i = 0; i < TOTAL_PINS; i++) {
         printf("\t%d: ", i);
         if(dangerBatt[i] == SAFE) {
             printf("SAFE\r\n");
