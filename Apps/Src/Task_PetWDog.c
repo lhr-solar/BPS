@@ -14,7 +14,10 @@ void Task_PetWDog(void *p_arg) {
     // If WDog_BitMap is all set:
     //      Reset watchdog timer
 
-
+     if (WDog_BitMap == 7) {     
+         BSP_WDTimer_Reset();
+     }
+   
     //release WDog Mutex
     OSMutexPost(&WDog_Mutex, OS_OPT_POST_NONE, &err);
     assertOSError(err);
