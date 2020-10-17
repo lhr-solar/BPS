@@ -4,22 +4,19 @@
 void Task_Init(void *p_arg) {
 
     OS_ERR err;
-
-    OSSemCreate(&SafetyCheck_Sem4,
-                "Safety Check Semaphore",
-                0,
-                &err);
-
-    // ASSERT err
-	void assert(int expression);
-
     OSSemCreate(&Fault_Sem4,
                 "Fault/Tripped Semaphore",
                 0,
                 &err);
 
-    // ASSERT err
-	void assert(int expression);
+	assertOSError(err);
+    
+    OSSemCreate(&SafetyCheck_Sem4,
+                "Safety Check Semaphore",
+                0,
+                &err);
+
+	assertOSError(err);
 
     OSMutexCreate(&WDog_Mutex,
                 "Watchdog Mutex",
