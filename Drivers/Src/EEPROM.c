@@ -254,12 +254,12 @@ void EEPROM_Tester(void){
  * @param unsigned byte of data
  */
 void EEPROM_WriteByte(uint16_t address, uint8_t data){
-	BSP_I2C_Write(address, &data, 1);
+	BSP_I2C_Write(EEPROM_ADDRESS, address, &data, 1);
 	DelayMs(5);
 }
 
 void EEPROM_WriteMultipleBytes(uint16_t address, uint32_t bytes, uint8_t* buffer){
-	BSP_I2C_Write(address, buffer, bytes);
+	BSP_I2C_Write(EEPROM_ADDRESS, address, buffer, bytes);
 }
 
 /** EEPROM_ReadMultipleBytes
@@ -269,7 +269,7 @@ void EEPROM_WriteMultipleBytes(uint16_t address, uint32_t bytes, uint8_t* buffer
  * @return unsigned 8-bit list of data
  */
 void EEPROM_ReadMultipleBytes(uint16_t address, uint32_t bytes, uint8_t* buffer){
-	BSP_I2C_Read(address, buffer, bytes);
+	BSP_I2C_Read(EEPROM_ADDRESS, address, buffer, bytes);
 }
 
 /** EEPROM_ReadByte
@@ -279,7 +279,7 @@ void EEPROM_ReadMultipleBytes(uint16_t address, uint32_t bytes, uint8_t* buffer)
  */
 uint8_t EEPROM_ReadByte(uint16_t address){
 	uint8_t result;
-    BSP_I2C_Read(address, &result, 1);
+    BSP_I2C_Read(EEPROM_ADDRESS, address, &result, 1);
 	//printf("read %d from %x\n\r", result, address);
 	return result;
 	//return I2C3_Read(EEPROM_ADDRESS, address);

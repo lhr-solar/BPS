@@ -3,7 +3,6 @@
 
 #define TIMEOUT_THRESHOLD   1200000 // 15 ms delay threshold (3x the write time)
 //Manthan Upadhyaya wuz here: 10/2020
-
 #ifdef RTOS
 static OS_Q I2Ctx, I2Crx;
 static const OS_MSG_QTY AMT = 1028;
@@ -12,10 +11,10 @@ static CPU_TS time;
 static OS_MSG_SIZE one = 1;
 #endif
 
-const uint8_t deviceAddr = 0xA0; //make this EEPROM address
 //The variables below are to determine what process the I2C is doing
 static bool receiving = false, sending = false, startreceiving = false;
 static uint8_t* txData;
+static uint16_t devAddresstx, devAddressrx;
 static uint16_t regAddresstx, regAddressrx;
 static uint8_t* readStore;
 static uint32_t txLength, rxLength;
@@ -23,6 +22,7 @@ static uint32_t txLength, rxLength;
 #ifdef BAREMETAL
 #define FIFOSIZE 100
 typedef struct I2CData{
+	uint16_t devAddr;
 	uint16_t regAddress;
 	uint8_t* data;
 	uint32_t length;
@@ -95,12 +95,29 @@ void I2C3_EV_IRQHandler(void){
 	// Wait until start edge event occurred
 	if (I2C_CheckEvent(I2C3, I2C_EVENT_MASTER_MODE_SELECT)){
 		// Select device to talk to
-		I2C_Send7bitAddress(I2C3, deviceAddr, I2C_Direction_Transmitter);
+		if(txFifoReceived){ //if there is data
+			devAddresstx = I2Ctx[txFifoTail].devAddr;
+			txLength = I2Ctx[txFifoTail].length;
+			regAddresstx = I2Ctx[txFifoTail].regAddress;
+			txData = I2Ctx[txFifoTail].data; //read address to get data from
+			txFifoTail = (txFifoTail + 1) % FIFOSIZE;
+			I2C_Send7bitAddress(I2C3, devAddresstx, I2C_Direction_Transmitter);
+			sending = true;
+		}
+		if (!sending && rxFifoReceived){
+			devAddressrx = I2Crx[rxFifoTail].devAddr;
+			readStore = I2Crx[rxFifoTail].data; //get address to store in
+			rxLength = I2Crx[rxFifoTail].length; //get length of data
+			regAddressrx = I2Crx[rxFifoTail].regAddress; //get address to read from
+			rxFifoTail = (rxFifoTail + 1) % FIFOSIZE;
+			I2C_Send7bitAddress(I2C3, devAddressrx, I2C_Direction_Transmitter);
+			receiving = true;
+		}
 		return;
 	}
 	if (!I2C_CheckEvent(I2C3, I2C_EVENT_MASTER_TRANSMITTER_MODE_SELECTED) && 
 		I2C_GetLastEvent(I2C3) == I2C_EVENT_MASTER_MODE_SELECT){
-		if(I2C3->SR1 & 0x0400 && (receiving == false)) {
+		if(I2C3->SR1 & 0x0400 && !receiving) {
 			I2C3->SR1 &= ~0x0400;
 			I2C_GenerateSTOP(I2C3, ENABLE);
 		}
@@ -108,34 +125,21 @@ void I2C3_EV_IRQHandler(void){
 	if (I2C_CheckEvent(I2C3, I2C_EVENT_MASTER_MODE_SELECT) && 
 		(I2C_GetLastEvent(I2C3) != I2C_EVENT_MASTER_TRANSMITTER_MODE_SELECTED)){
 		// Select device to talk to
-		I2C_Send7bitAddress(I2C3, deviceAddr, I2C_Direction_Transmitter);
+		if(sending) I2C_Send7bitAddress(I2C3, devAddresstx, I2C_Direction_Transmitter);
+		if(!sending && receiving) I2C_Send7bitAddress(I2C3, devAddressrx, I2C_Direction_Transmitter);
 		return;
 	}
 	if (I2C_CheckEvent(I2C3, I2C_EVENT_MASTER_TRANSMITTER_MODE_SELECTED)){
-		if (txFifoReceived){ // if there is data
-			txLength = I2Ctx[txFifoTail].length;
-			regAddresstx = I2Ctx[txFifoTail].regAddress;
-			txData = I2Ctx[txFifoTail].data; //read address to get data from
-			txFifoTail = (txFifoTail + 1) % FIFOSIZE;
-			// Send start address (MSB first)
-			I2C_SendData(I2C3, (uint8_t)((regAddresstx & 0xFF00) >> 8));
-			sending = true;
-		}
-		if(sending == false && rxFifoReceived){
-			readStore = I2Crx[rxFifoTail].data; //get address to store in
-			rxLength = I2Crx[rxFifoTail].length; //get length of data
-			regAddressrx = I2Crx[rxFifoTail].regAddress; //get address to read from
-			rxFifoTail = (rxFifoTail + 1) % FIFOSIZE;
-			I2C_SendData(I2C3, (uint8_t)((regAddressrx & 0xFF00) >> 8));
-			receiving = true;
-		}
+		// Send start address (MSB first)
+		if(txFifoReceived) I2C_SendData(I2C3, (uint8_t)((regAddresstx & 0xFF00) >> 8));
+		if(!sending && rxFifoReceived) I2C_SendData(I2C3, (uint8_t)((regAddressrx & 0xFF00) >> 8));
 		return;
 	}
 	//send rest of start address (LSB)
 	if (I2C_CheckEvent(I2C3, I2C_EVENT_MASTER_BYTE_TRANSMITTING) && 
 		I2C_GetLastEvent(I2C3) == I2C_EVENT_MASTER_TRANSMITTER_MODE_SELECTED){
 		if (sending) I2C_SendData(I2C3, (uint8_t)(regAddresstx & 0x00FF));
-		if (receiving && (sending = false)) I2C_SendData(I2C3, (uint8_t)(regAddressrx & 0x00FF));
+		if (receiving && !sending) I2C_SendData(I2C3, (uint8_t)(regAddressrx & 0x00FF));
 		return;
 	}
 	//if byte has been transmitted
@@ -149,7 +153,7 @@ void I2C3_EV_IRQHandler(void){
 			}
 			txData++; //go to next element to send
 		}
-		if (receiving && (sending == false)){
+		if (receiving && !sending){
 			if (!startreceiving){
 				I2C_GenerateSTART(I2C3, ENABLE);
 				startreceiving = true;
@@ -180,14 +184,16 @@ void I2C3_EV_IRQHandler(void){
 
 /**
  * @brief   Transmits data onto the I2C bus.
+ * @param	devAddr : the device address to write to
  * @param   regAddr : the register address to write to in the IC's memory.
  * @param   txData : the data array to be sent onto the bus.
  * @param   txLen : the length of the data array.
  * @return  error status, 0 if fail, 1 if success
  */
-uint8_t BSP_I2C_Write(uint16_t regAddr, uint8_t *txData, uint32_t txLen) {
+uint8_t BSP_I2C_Write(uint16_t devAddr, uint16_t regAddr, uint8_t *txData, uint32_t txLen) {
 	//if the head isn't the same as the tail or it is empty
 	if ((txFifoHead != txFifoTail) || txFifoReceived == false){
+		I2Ctx[txFifoHead].devAddr = devAddr;
 		I2Ctx[txFifoHead].regAddress = regAddr;
 		I2Ctx[txFifoHead].data = txData;
 		I2Ctx[txFifoHead].length = txLen;
@@ -200,14 +206,16 @@ uint8_t BSP_I2C_Write(uint16_t regAddr, uint8_t *txData, uint32_t txLen) {
 
 /**
  * @brief   Gets the data from a device through the I2C bus.
+ * @param	devAddr : the device address to read from
  * @param   regAddr : the register address to read from the IC's memory.
  * @param   rxData : the data array to store the data that is received.
  * @param   rxLen : the length of the data array.
  * @return  error status, 0 if fail, other if success
  */
-uint8_t BSP_I2C_Read(uint16_t regAddr, uint8_t *rxData, uint32_t rxLen) {
+uint8_t BSP_I2C_Read(uint16_t devAddr, uint16_t regAddr, uint8_t *rxData, uint32_t rxLen) {
 	//if the head isn't the same as the tail or it is empty
 	if ((rxFifoHead != rxFifoTail) || rxFifoReceived == false){
+		I2Crx[rxFifoHead].devAddr = devAddr;
 		I2Crx[rxFifoHead].regAddress = regAddr;
 		I2Crx[rxFifoHead].data = rxData;
 		I2Crx[rxFifoHead].length = rxLen;
@@ -239,14 +247,37 @@ void I2C3_EV_IRQHandler(void){
 	// Wait until start edge event occurred
 	if (I2C_CheckEvent(I2C3, I2C_EVENT_MASTER_MODE_SELECT)){
 		// Select device to talk to
-		I2C_Send7bitAddress(I2C3, deviceAddr, I2C_Direction_Transmitter);
+		//devAddresstx will be 0 if there is no data in the fifo
+		uint16_t* devAddress = OSQPend(&I2Ctx, 1, OS_OPT_PEND_BLOCKING, &one, &time, &err);
+		devAddresstx = *devAddress;
+		if (devAddresstx){
+			uint16_t* regAddress = OSQPend(&I2Ctx, 1, OS_OPT_PEND_BLOCKING, &one, &time, &err);
+			regAddresstx = *regAddress;
+			uint16_t *lenPtr = OSQPend(&I2Ctx, 0, OS_OPT_PEND_BLOCKING, &one, &time, &err);
+			txLength = *lenPtr;
+			txData = OSQPend(&I2Ctx, 0, OS_OPT_PEND_BLOCKING, &one, &time, &err);
+			I2C_Send7bitAddress(I2C3, devAddresstx, I2C_Direction_Transmitter);
+			sending = true;
+		}
+		if (!sending){
+			uint16_t* devAddress = OSQPend(&I2Crx, 1, OS_OPT_PEND_BLOCKING, &one, &time, &err);
+			devAddressrx = *devAddress;
+			if (devAddressrx){
+				uint16_t* regAddress = OSQPend(&I2Crx, 1, OS_OPT_PEND_BLOCKING, &one, &time, &err); //get address to read from
+				regAddressrx = *regAddress;
+				readStore = OSQPend(&I2Crx, 0, OS_OPT_PEND_BLOCKING, &one, &time, &err); //get address to store in
+				uint16_t *lenPtr = OSQPend(&I2Crx, 0, OS_OPT_PEND_BLOCKING, &one, &time, &err); //get length of data
+				rxLength = *lenPtr;
+				receiving = true;
+			}
+		}
 		OSIntExit();
 		asm("CPSIE I"); //enable interrupts
 		return;
 	}
 	if (!I2C_CheckEvent(I2C3, I2C_EVENT_MASTER_TRANSMITTER_MODE_SELECTED) && 
 		I2C_GetLastEvent(I2C3) == I2C_EVENT_MASTER_MODE_SELECT){
-		if(I2C3->SR1 & 0x0400 && (receiving == false)) {
+		if(I2C3->SR1 & 0x0400 && !receiving) {
 			I2C3->SR1 &= ~0x0400;
 			I2C_GenerateSTOP(I2C3, ENABLE);
 		}
@@ -254,34 +285,16 @@ void I2C3_EV_IRQHandler(void){
 	if (I2C_CheckEvent(I2C3, I2C_EVENT_MASTER_MODE_SELECT) && 
 		(I2C_GetLastEvent(I2C3) != I2C_EVENT_MASTER_TRANSMITTER_MODE_SELECTED)){
 		// Select device to talk to
-		I2C_Send7bitAddress(I2C3, deviceAddr, I2C_Direction_Transmitter);
+		if(sending) I2C_Send7bitAddress(I2C3, devAddresstx, I2C_Direction_Transmitter);
+		if(!sending && receiving) I2C_Send7bitAddress(I2C3, devAddressrx, I2C_Direction_Transmitter);
 		OSIntExit();
 		asm("CPSIE I"); //enable interrupts
 		return;
 	}
 	if (I2C_CheckEvent(I2C3, I2C_EVENT_MASTER_TRANSMITTER_MODE_SELECTED)){
-		//regAddresstx will be 0 if there is no data in the fifo
-		uint16_t* regAddress = OSQPend(&I2Ctx, 1, OS_OPT_PEND_BLOCKING, &one, &time, &err);
-		regAddresstx = *regAddress;
-		if (regAddresstx){ // if there is data
-			uint16_t *lenPtr = OSQPend(&I2Ctx, 0, OS_OPT_PEND_BLOCKING, &one, &time, &err);
-			txLength = *lenPtr;
-			txData = OSQPend(&I2Ctx, 0, OS_OPT_PEND_BLOCKING, &one, &time, &err);
-			// Send start address (MSB first)
-			I2C_SendData(I2C3, (uint8_t)((regAddresstx & 0xFF00) >> 8));
-			sending = true;
-		}
-		if(sending == false){
-			regAddress = OSQPend(&I2Crx, 1, OS_OPT_PEND_BLOCKING, &one, &time, &err); //get address to read from
-			regAddressrx = *regAddress;
-			if (regAddressrx){
-				readStore = OSQPend(&I2Crx, 0, OS_OPT_PEND_BLOCKING, &one, &time, &err); //get address to store in
-				uint16_t *lenPtr = OSQPend(&I2Crx, 0, OS_OPT_PEND_BLOCKING, &one, &time, &err); //get length of data
-				rxLength = *lenPtr;
-				I2C_SendData(I2C3, (uint8_t)((regAddressrx & 0xFF00) >> 8));
-				receiving = true;
-			}
-		}
+		// Send start address (MSB first)
+		if (sending) I2C_SendData(I2C3, (uint8_t)((regAddresstx & 0xFF00) >> 8));
+		if(!sending && receiving) I2C_SendData(I2C3, (uint8_t)((regAddressrx & 0xFF00) >> 8));
 		OSIntExit();
 		asm("CPSIE I"); //enable interrupts
 		return;
@@ -290,7 +303,7 @@ void I2C3_EV_IRQHandler(void){
 	if (I2C_CheckEvent(I2C3, I2C_EVENT_MASTER_BYTE_TRANSMITTING) && 
 		I2C_GetLastEvent(I2C3) == I2C_EVENT_MASTER_TRANSMITTER_MODE_SELECTED){
 		if (sending) I2C_SendData(I2C3, (uint8_t)(regAddresstx & 0x00FF));
-		if (receiving && (sending = false)) I2C_SendData(I2C3, (uint8_t)(regAddressrx & 0x00FF));
+		if (receiving && !sending) I2C_SendData(I2C3, (uint8_t)(regAddressrx & 0x00FF));
 		OSIntExit();
 		asm("CPSIE I"); //enable interrupts
 		return;
@@ -306,7 +319,7 @@ void I2C3_EV_IRQHandler(void){
 			}
 			txData++;
 		}
-		if (receiving && (sending == false)){
+		if (receiving && !sending){
 			if (!startreceiving){
 				I2C_GenerateSTART(I2C3, ENABLE);
 				startreceiving = true;
@@ -339,12 +352,14 @@ void I2C3_EV_IRQHandler(void){
 
 /**
  * @brief   Transmits data onto the I2C bus.
+ * @param	devAddr : the device address to write to
  * @param   regAddr : the register address to write to in the IC's memory.
  * @param   txData : the data array to be sent onto the bus.
  * @param   txLen : the length of the data array.
  * @return  error status, 0 if fail, 1 if success
  */
-uint8_t BSP_I2C_Write(uint16_t regAddr, uint8_t *txData, uint32_t txLen) {
+uint8_t BSP_I2C_Write(uint16_t devAddr, uint16_t regAddr, uint8_t *txData, uint32_t txLen) {
+	OSQPost(&I2Ctx, &devAddr, 1, OS_OPT_POST_FIFO, &err); //store device address
 	OSQPost(&I2Ctx, &regAddr, 1, OS_OPT_POST_FIFO, &err); //store register address
 	OSQPost(&I2Ctx, &txLen, 1, OS_OPT_POST_FIFO, &err); //store length of array
 	OSQPost(&I2Ctx, txData, txLen, OS_OPT_POST_FIFO, &err); //store address of array
@@ -453,12 +468,14 @@ uint8_t BSP_I2C_Write(uint16_t regAddr, uint8_t *txData, uint32_t txLen) {
 
 /**
  * @brief   Gets the data from a device through the I2C bus.
+ * @param	devAddr : the device address to read from
  * @param   regAddr : the register address to read from the IC's memory.
  * @param   rxData : the data array to store the data that is received.
  * @param   rxLen : the length of the data array.
  * @return  error status, 0 if fail, other if success
  */
-uint8_t BSP_I2C_Read(uint16_t regAddr, uint8_t *rxData, uint32_t rxLen) {
+uint8_t BSP_I2C_Read(uint16_t devAddr, uint16_t regAddr, uint8_t *rxData, uint32_t rxLen) {
+	OSQPost(&I2Crx, &devAddr, 1, OS_OPT_POST_FIFO, &err); //store device address
 	OSQPost(&I2Crx, &regAddr, 1, OS_OPT_POST_FIFO, &err); //store address to read from
 	OSQPost(&I2Crx, rxData, 1, OS_OPT_POST_FIFO, &err); //store address to store data in
 	OSQPost(&I2Crx, &rxLen, 1, OS_OPT_POST_FIFO, &err);
