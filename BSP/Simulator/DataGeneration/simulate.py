@@ -79,7 +79,7 @@ def display(battery=None):  #print watchdog countdown
     module_values = SPI.read()
     for i, module in enumerate(module_values):
         stdscr.addstr(i+2, 37, f"{i+1}")
-        stdscr.addstr(i+2, 40, f"| {'X' if module[0] else ' '} | {module[1]/10000:.4f}V | {module[2]/1000:.3f}°C | {module[3]/1000:.3f}°C |")
+        stdscr.addstr(i+2, 40, f"| {'X' if module[0] else ' '} | {module[1]/10000:.4f}V | {module[2]/1000:.3f}°C | {module[3]/1000:.3f}°C | {module[4]}")
     # Read LED values
     stdscr.addstr(0, 90, "LEDs")
     stdscr.addstr(1, 80, "=======================")
@@ -197,7 +197,7 @@ def main():
     curses.noecho()
     curses.cbreak()
     #box is for CAN messages
-    CANbox = curses.newwin(7, 21, 12, 78)
+    CANbox = curses.newwin(7, 21, 12, 80)
     CANbox.immedok(True)
     CANbox.box()
     CANbox.refresh()

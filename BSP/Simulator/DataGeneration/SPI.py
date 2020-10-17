@@ -22,6 +22,7 @@ write_file = config.directory_path + config.files['SPIR']
 wires = [1] * 31                # list of 31 modules (1 = connected; 0 = open)
 voltage_values = [0]*31         # list of 31 modules (fixed point 0.0001)
 temperature_values = [[0,0]]*31   # list of 31 pairs of sensors (fixed point 0.001)
+DCC = [0] * 31                  # list of the DCC bits for the 31 modules (1 = discharging, 0 = not discharging)
 
 # LTC6811 objects
 minions = []
@@ -209,6 +210,20 @@ def generate(state, mode, battery=None):
             fcntl.flock(csvfile.fileno(), fcntl.LOCK_UN)    # Unlock file
     except:    
         pass 
+    balance_batteries()
+
+def balance_batteries():
+    global DCC, minions
+    dcc_idx = 0
+    for i in range(0, 4):
+        #read each minion's tx_data field
+        for k in range(0, 8):
+            #store dcc bits into the global list
+            DCC[dcc_idx] = (minions[i].tx_data[4] & (1 << k)) >> k
+            if dcc_idx == 30:   #there are only 31 modules
+                break
+            else:
+                dcc_idx += 1
 
 
 def spi_task():
@@ -234,6 +249,7 @@ def read():
         row.append(voltage_values[i])
         row.append(temperature_values[i][0])
         row.append(temperature_values[i][1])
+        row.append(DCC[i])
         values.append(row)
         row = []
     return values
