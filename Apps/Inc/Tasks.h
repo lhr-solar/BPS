@@ -79,5 +79,6 @@ extern OS_SEM SafetyCheck_Sem4;
 extern OS_SEM Fault_Sem4;
 extern OS_MUTEX WDog_Mutex;
 extern uint32_t WDog_BitMap;
+extern OS_Q CANBus_MsgQ;
 
 #endif

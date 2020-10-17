@@ -9,9 +9,10 @@ void Task_CriticalState(void *p_arg) {
 
     OS_ERR err;
     CPU_TS ts;
+    CANMSG_t CANMSG;
     CANData_t CanData;
-    CANPayload_t CanMSG; 
-    CanMSG.idx = 0;
+    CANPayload_t CanPayload; 
+    CanPayload.idx = 0;
     CanData.b = 1;
     CanData.f = 0;
     CanData.h = 0;
@@ -22,8 +23,11 @@ void Task_CriticalState(void *p_arg) {
     // Turn Contactor On
     BSP_Contactor_On();
     // Push All Clear message to CAN Q
-    CANbus_Send(ALL_CLEAR, CanMSG);
+    CANMSG.id = ALL_CLEAR;
+    CANMSG.payload = CanPayload;
+    OSQPost(&CANBus_MsgQ, &CANMSG, 1, OS_OPT_POST_FIFO, &err);
     // Push Contactor State message to CAN Q
-    CANbus_Send(CONTACTOR_STATE, CanMSG);
+    CANMSG.id = CONTACTOR_STATE;
+    OSQPost(&CANBus_MsgQ, &CANMSG, 1, OS_OPT_POST_FIFO, &err);
     OSTaskDel(NULL, &err); // Delete task
 }
