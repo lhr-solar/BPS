@@ -12,7 +12,7 @@
 #include "common.h"
 
 #define NUM_PINS_PER_IC 9
-#define TOTAL_PINS NUM_PINS_PER_IC*2 - 1
+#define TOTAL_PINS NUM_PINS_PER_IC*4 - 1
 
 /** Voltage_Init
  * Initializes all device drivers including LTC6811 and GPIO to begin Voltage Monitoring
