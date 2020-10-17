@@ -12,8 +12,9 @@ void Task_PetWDog(void *p_arg) {
     assertOSError(err);
 
     // If WDog_BitMap is all set:
-    //      Reset watchdog timer
-
+    // Reset watchdog timer
+    // The three least significant bits of WDog_BitMap will be set if:
+    // temp, voltage, current tasks are set --> value = 7
      if (WDog_BitMap == 7) {     
          BSP_WDTimer_Reset();
      }
