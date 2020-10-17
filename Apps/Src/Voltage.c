@@ -122,7 +122,7 @@ SafetyStatus *Voltage_GetModulesInDanger(void){
 				checks[i] = DANGER;
 			}
 		}
-		if((open_wires[i] >> i) & 1) {
+		if(open_wires[i] == 1) {
 			checks[i] = DANGER;
 		} else {
 			checks[i] = SAFE;
