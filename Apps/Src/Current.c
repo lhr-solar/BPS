@@ -32,6 +32,7 @@ static int32_t Current_Conversion(uint32_t milliVolts, CurrentSensor s);
 void Current_Init(void){
 	BSP_ADC_Init();	// Initialize the ADCs
 	OSMutexCreate(&AmperesData_Mutex, "Amperes Mutex", &err);
+	assertOSError(err);
 }
 
 /** Current_UpdateMeasurements
@@ -40,9 +41,11 @@ void Current_Init(void){
  */
 ErrorStatus Current_UpdateMeasurements(void){
 	OSMutexPend(&AmperesData_Mutex, 0, OS_OPT_PEND_BLOCKING, &ticks, &err);
+	assertOSError(err);
 	HighPrecisionCurrent = Current_Conversion(BSP_ADC_High_GetMilliVoltage(), HIGH_PRECISION);
 	LowPrecisionCurrent  = Current_Conversion(BSP_ADC_Low_GetMilliVoltage(), LOW_PRECISION);
 	OSMutexPost(&AmperesData_Mutex, OS_OPT_POST_NONE, &err);
+	assertOSError(err);
 	return SUCCESS;	// TODO: Once this has been tested, stop returning errors
 }
 
@@ -52,16 +55,20 @@ ErrorStatus Current_UpdateMeasurements(void){
  */
 SafetyStatus Current_CheckStatus(bool override) {
 	OSMutexPend(&AmperesData_Mutex, 0, OS_OPT_PEND_BLOCKING, &ticks, &err);
+	assertOSError(err);
 	if((LowPrecisionCurrent > MAX_CHARGING_CURRENT)&&(LowPrecisionCurrent < MAX_CURRENT_LIMIT)&&(!override)){
 		OSMutexPost(&AmperesData_Mutex, OS_OPT_POST_NONE, &err);
+		assertOSError(err);
 		return SAFE;
 	}
 	else if((LowPrecisionCurrent <= 0)&&(LowPrecisionCurrent > MAX_CHARGING_CURRENT)&&override){
 		OSMutexPost(&AmperesData_Mutex, OS_OPT_POST_NONE, &err);
+		assertOSError(err);
 		return SAFE;
 	}
 	else{
 		OSMutexPost(&AmperesData_Mutex, OS_OPT_POST_NONE, &err);
+		assertOSError(err);
 		return DANGER;
 	}
 }
@@ -74,8 +81,10 @@ SafetyStatus Current_CheckStatus(bool override) {
 int8_t Current_IsCharging(void) {
 	// TODO: Make sure that the current board is installed in such a way that negative => charging
 	OSMutexPend(&AmperesData_Mutex, 0, OS_OPT_PEND_BLOCKING, &ticks, &err);
+	assertOSError(err);
 	int8_t val = LowPrecisionCurrent < 0;
 	OSMutexPost(&AmperesData_Mutex, OS_OPT_POST_NONE, &err);
+	assertOSError(err);
 	return val;
 }
 
@@ -85,8 +94,10 @@ int8_t Current_IsCharging(void) {
  */
 int32_t Current_GetHighPrecReading(void) {
 	OSMutexPend(&AmperesData_Mutex, 0, OS_OPT_PEND_BLOCKING, &ticks, &err);
+	assertOSError(err);
 	int32_t val = HighPrecisionCurrent;
 	OSMutexPost(&AmperesData_Mutex, OS_OPT_POST_NONE, &err);
+	assertOSError(err);
 	return val;
 }
 
@@ -96,8 +107,10 @@ int32_t Current_GetHighPrecReading(void) {
  */
 int32_t Current_GetLowPrecReading(void) {
 	OSMutexPend(&AmperesData_Mutex, 0, OS_OPT_PEND_BLOCKING, &ticks, &err);
+	assertOSError(err);
 	int32_t val = LowPrecisionCurrent;
 	OSMutexPost(&AmperesData_Mutex, OS_OPT_POST_NONE, &err);
+	assertOSError(err);
 	return val;
 }
 
