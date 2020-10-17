@@ -13,7 +13,7 @@
 #include "Tasks.h"
 
 static OS_ERR err;
-static CPU_TS time;
+static CPU_TS ticks;
 static OS_MUTEX AmperesData_Mutex;
 
 int32_t HighPrecisionCurrent;	// Milliamp measurement of hall effect sensor of high precision
@@ -39,7 +39,7 @@ void Current_Init(void){
  * @return SUCCESS or ERROR
  */
 ErrorStatus Current_UpdateMeasurements(void){
-	OSMutexPend(&AmperesData_Mutex, 0, OS_OPT_PEND_BLOCKING, &time, &err);
+	OSMutexPend(&AmperesData_Mutex, 0, OS_OPT_PEND_BLOCKING, &ticks, &err);
 	HighPrecisionCurrent = Current_Conversion(BSP_ADC_High_GetMilliVoltage(), HIGH_PRECISION);
 	LowPrecisionCurrent  = Current_Conversion(BSP_ADC_Low_GetMilliVoltage(), LOW_PRECISION);
 	OSMutexPost(&AmperesData_Mutex, OS_OPT_POST_NONE, &err);
@@ -51,7 +51,7 @@ ErrorStatus Current_UpdateMeasurements(void){
  * @return SAFE or DANGER
  */
 SafetyStatus Current_CheckStatus(bool override) {
-	OSMutexPend(&AmperesData_Mutex, 0, OS_OPT_PEND_BLOCKING, &time, &err);
+	OSMutexPend(&AmperesData_Mutex, 0, OS_OPT_PEND_BLOCKING, &ticks, &err);
 	if((LowPrecisionCurrent > MAX_CHARGING_CURRENT)&&(LowPrecisionCurrent < MAX_CURRENT_LIMIT)&&(!override)){
 		OSMutexPost(&AmperesData_Mutex, OS_OPT_POST_NONE, &err);
 		return SAFE;
@@ -73,7 +73,7 @@ SafetyStatus Current_CheckStatus(bool override) {
  */
 int8_t Current_IsCharging(void) {
 	// TODO: Make sure that the current board is installed in such a way that negative => charging
-	OSMutexPend(&AmperesData_Mutex, 0, OS_OPT_PEND_BLOCKING, &time, &err);
+	OSMutexPend(&AmperesData_Mutex, 0, OS_OPT_PEND_BLOCKING, &ticks, &err);
 	int8_t val = LowPrecisionCurrent < 0;
 	OSMutexPost(&AmperesData_Mutex, OS_OPT_POST_NONE, &err);
 	return val;
@@ -84,7 +84,7 @@ int8_t Current_IsCharging(void) {
  * @return milliamperes value
  */
 int32_t Current_GetHighPrecReading(void) {
-	OSMutexPend(&AmperesData_Mutex, 0, OS_OPT_PEND_BLOCKING, &time, &err);
+	OSMutexPend(&AmperesData_Mutex, 0, OS_OPT_PEND_BLOCKING, &ticks, &err);
 	int32_t val = HighPrecisionCurrent;
 	OSMutexPost(&AmperesData_Mutex, OS_OPT_POST_NONE, &err);
 	return val;
@@ -95,7 +95,7 @@ int32_t Current_GetHighPrecReading(void) {
  * @return milliamperes value
  */
 int32_t Current_GetLowPrecReading(void) {
-	OSMutexPend(&AmperesData_Mutex, 0, OS_OPT_PEND_BLOCKING, &time, &err);
+	OSMutexPend(&AmperesData_Mutex, 0, OS_OPT_PEND_BLOCKING, &ticks, &err);
 	int32_t val = LowPrecisionCurrent;
 	OSMutexPost(&AmperesData_Mutex, OS_OPT_POST_NONE, &err);
 	return val;
