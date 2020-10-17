@@ -139,22 +139,21 @@ static int32_t Current_Conversion (uint32_t milliVolts, CurrentSensor s) {
 
 void Task_AmperesMonitor(void *p_arg) {
     (void)p_arg;
-
     OS_ERR err;
+	if(Current_UpdateMeasurements() == ERROR) OSSemPost(&Fault_Sem4, OS_OPT_POST_1, &err);
+	else OSSemPost(&SafetyCheck_Sem4, OS_OPT_POST_1, &err);
+	assertOSError(err);
 
     while(1) {
         // BLOCKING =====================
         // Update Amperes Measurements
-        // Check if amperes is NOT safe:
-
+		// Check if amperes is NOT safe:
+		if(Current_UpdateMeasurements() == ERROR) OSSemPost(&Fault_Sem4, OS_OPT_POST_1, &err);
         //signal watchdog
         OSMutexPend(&WDog_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
         assertOSError(err);
-
         WDog_BitMap |= WD_AMPERES;
-
         OSMutexPost(&WDog_Mutex, OS_OPT_POST_NONE, &err);
         assertOSError(err);
     }
 }
-
