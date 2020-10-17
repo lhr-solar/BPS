@@ -12,6 +12,10 @@
 #include "os.h"
 #include "Tasks.h"
 
+static OS_ERR err;
+static CPU_TS time;
+static OS_MUTEX AmperesData_Mutex;
+
 int32_t HighPrecisionCurrent;	// Milliamp measurement of hall effect sensor of high precision
 int32_t LowPrecisionCurrent;	// Milliamp measurement of hall effect sensor of low precision
 
