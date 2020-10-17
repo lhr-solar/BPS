@@ -11,9 +11,9 @@ void Task_VoltTempMonitor(void *p_arg) {
 
     // SafetyCheck_Sem4 must only be signaled once per parameter at system boot up.
     // These flags indicate was signaled for that parameter
-    bool isfirst_voltage_check = false;
-    bool isfirst_openwire_Check = false;
-    bool isfirst_temperature_check = false;
+    bool voltageHasBeenChecked = false;
+    bool openWireHasBeenChecked = false;
+    bool temperatureHasBeenChecked = false;
 
     while(1) {
         // BLOCKING =====================
@@ -21,38 +21,38 @@ void Task_VoltTempMonitor(void *p_arg) {
         Voltage_UpdateMeasurements();
         
         // Check if voltage is NOT safe:
-        SafetyStatus voltage_status = Voltage_CheckStatus();
-        if(voltage_status != SAFE) {
+        SafetyStatus voltageStatus = Voltage_CheckStatus();
+        if(voltageStatus != SAFE) {
             OSSemPost(&Fault_Sem4,
                         OS_OPT_POST_1,
                         &err);
             // assert
         
-        } else if((voltage_status == SAFE) && (!isfirst_voltage_check)) {
+        } else if((voltageStatus == SAFE) && (!voltageHasBeenChecked)) {
             // Signal to turn on contactor but only signal once
             OSSemPost(&SafetyCheck_Sem4,
                         OS_OPT_POST_1,
                         &err);
             // assert
-            isfirst_voltage_check = true;
+            voltageHasBeenChecked = true;
         }
 
         // BLOCKING =====================
         // Update Open Wire Measurements
         // Check if open wire is NOT safe:
-        SafetyStatus wire_status = Voltage_OpenWire();
+        SafetyStatus wireStatus = Voltage_OpenWire();
         
-        if(wire_status != SAFE) {
+        if(wireStatus != SAFE) {
             OSSemPost(&Fault_Sem4,
                         OS_OPT_POST_1,
                         &err);
-        } else if((wire_status == SAFE) && (!isfirst_openwire_Check)) {
+        } else if((wireStatus == SAFE) && (!openWireHasBeenChecked)) {
             // Signal to turn on contactor but only signal once
             OSSemPost(&SafetyCheck_Sem4,
                         OS_OPT_POST_1,
                         &err);
             // assert
-            isfirst_openwire_Check = true;
+            openWireHasBeenChecked = true;
         }
 
         // BLOCKING =====================
@@ -60,18 +60,18 @@ void Task_VoltTempMonitor(void *p_arg) {
         Temperature_UpdateAllMeasurements();
         
         // Check if temperature is NOT safe:
-        SafetyStatus temperature_status = Temperature_CheckStatus(Current_IsCharging());
-        if(temperature_status != SAFE) {
+        SafetyStatus temperatureStatus = Temperature_CheckStatus(Current_IsCharging());
+        if(temperatureStatus != SAFE) {
             OSSemPost(&Fault_Sem4,
                         OS_OPT_POST_1,
                         &err);
-        } else if((temperature_status == SAFE) && (!isfirst_temperature_check)) {
+        } else if((temperatureStatus == SAFE) && (!temperatureHasBeenChecked)) {
             // Signal to turn on contactor but only signal once
             OSSemPost(&SafetyCheck_Sem4,
                         OS_OPT_POST_1,
                         &err);
             // assert
-            isfirst_temperature_check = true;
+            temperatureHasBeenChecked = true;
         }
 
         // Control Fans depending on temperature
