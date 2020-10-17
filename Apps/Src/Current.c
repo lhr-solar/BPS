@@ -45,7 +45,6 @@ ErrorStatus Current_UpdateMeasurements(void){
  * @return SAFE or DANGER
  */
 SafetyStatus Current_CheckStatus(bool override) {
-
 	if((LowPrecisionCurrent > MAX_CHARGING_CURRENT)&&(LowPrecisionCurrent < MAX_CURRENT_LIMIT)&&(!override))
 		return SAFE;
 	else if((LowPrecisionCurrent <= 0)&&(LowPrecisionCurrent > MAX_CHARGING_CURRENT)&&override)
@@ -108,7 +107,7 @@ void Task_AmperesMonitor(void *p_arg) {
 
     OS_ERR err;
 
-	bool isfirst_amperes_check = false;
+	bool amperesHasBeenChecked = false;
 
     while(1) {
         // BLOCKING =====================
@@ -116,6 +115,19 @@ void Task_AmperesMonitor(void *p_arg) {
 		Current_UpdateMeasurements();
 
         // Check if amperes is NOT safe:
+		SafetyStatus amperesStatus = Current_CheckStatus(true);
+		if(amperesStatus != SAFE) {
+            OSSemPost(&Fault_Sem4,
+                        OS_OPT_POST_1,
+                        &err);
+        } else if((amperesStatus == SAFE) && (!amperesHasBeenChecked)) {
+            // Signal to turn on contactor but only signal once
+            OSSemPost(&SafetyCheck_Sem4,
+                        OS_OPT_POST_1,
+                        &err);
+            // assert
+            amperesHasBeenChecked = true;
+        }
 
         //signal watchdog
         OSMutexPend(&WDog_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);

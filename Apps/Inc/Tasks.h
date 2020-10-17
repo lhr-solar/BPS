@@ -70,12 +70,12 @@ void Task_BLE(void *p_arg);
 void Task_Idle(void *p_arg);
 
 /**
-<<<<<<< HEAD
  * Used to assert if there has been an error in one of the OS functions
  * Kills the car if there is an OS error
  **/
 void assertOSError(OS_ERR err);
-=======
+
+/*
  * @brief   TCBs
  */
 extern OS_TCB FaultState_TCB;
@@ -109,7 +109,6 @@ extern CPU_STK Idle_Stk[TASK_IDLE_STACK_SIZE];
  * @brief   Queue for pushing and popping CAN Messages
  */
 OS_Q CANBus_MsgQ;
->>>>>>> Adds safety check semaphore test
 
 extern OS_SEM SafetyCheck_Sem4;
 extern OS_SEM Fault_Sem4;
