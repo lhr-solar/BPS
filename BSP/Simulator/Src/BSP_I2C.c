@@ -70,7 +70,7 @@ void BSP_I2C_Init(void) {
  * @param   txLen : the length of the data array.
  * @return  error status, 0 if fail, 1 if success
  */
-uint8_t  BSP_I2C_Write(uint16_t regAddr, uint8_t *txData, uint32_t txLen) {
+uint8_t  BSP_I2C_Write(uint16_t devAddr, uint16_t regAddr, uint8_t *txData, uint32_t txLen) {
     FILE *fp = fopen(file, "r+");
     if (!fp) {
         // File doesn't exit if true
@@ -111,7 +111,7 @@ uint8_t  BSP_I2C_Write(uint16_t regAddr, uint8_t *txData, uint32_t txLen) {
  * @param   rxLen : the length of the data array.
  * @return  error status, 0 if fail, 1 if success
  */
-uint8_t BSP_I2C_Read(uint16_t regAddr, uint8_t *rxData, uint32_t rxLen) {
+uint8_t BSP_I2C_Read(uint16_t devAddr, uint16_t regAddr, uint8_t *rxData, uint32_t rxLen) {
     FILE *fp = fopen(file, "r");
     if (!fp) {
         // File doesn't exit if true
