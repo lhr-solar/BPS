@@ -1,8 +1,11 @@
 #include "BSP_SPI.h"
 #include "stm32f4xx.h"
-
+#include "os.h"
+#include "BSP_OS.h"
 
 static bsp_os_t *os;
+
+
 
 
 // Use this macro function to wait until SPI communication is complete
