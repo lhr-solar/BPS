@@ -22,7 +22,7 @@ void Task_FaultState(void *p_arg) {
     // BLOCKING =====================
     // Wait until a FAULT is signaled by another task.
     OSSemPend(&Fault_Sem4, 0, OS_OPT_PEND_BLOCKING, &ts, &err);
-    OSSemPost(&Fault_Sem4, OS_OPT_PEND_BLOCKING, &err);
+    
     // Turn Contactor Off
     BSP_Contactor_Off();
     // Turn Strobe Light On

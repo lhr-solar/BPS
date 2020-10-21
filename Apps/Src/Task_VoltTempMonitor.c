@@ -27,14 +27,14 @@ void Task_VoltTempMonitor(void *p_arg) {
             OSSemPost(&Fault_Sem4,
                         OS_OPT_POST_1,
                         &err);
-            // assert
+            assertOSError(err);
         
         } else if((voltageStatus == SAFE) && (!voltageHasBeenChecked)) {
             // Signal to turn on contactor but only signal once
             OSSemPost(&SafetyCheck_Sem4,
                         OS_OPT_POST_1,
                         &err);
-            // assert
+            assertOSError(err);
 
             voltageHasBeenChecked = true;
         }
@@ -47,12 +47,15 @@ void Task_VoltTempMonitor(void *p_arg) {
             OSSemPost(&Fault_Sem4,
                         OS_OPT_POST_1,
                         &err);
+            assertOSError(err);
+
         } else if((wireStatus == SAFE) && (!openWireHasBeenChecked)) {
             // Signal to turn on contactor but only signal once
             OSSemPost(&SafetyCheck_Sem4,
                         OS_OPT_POST_1,
                         &err);
-            // assert
+            assertOSError(err);
+
             openWireHasBeenChecked = true;
         }
 
@@ -66,12 +69,15 @@ void Task_VoltTempMonitor(void *p_arg) {
             OSSemPost(&Fault_Sem4,
                         OS_OPT_POST_1,
                         &err);
+            assertOSError(err);
+
         } else if((temperatureStatus == SAFE) && (!temperatureHasBeenChecked)) {
             // Signal to turn on contactor but only signal once
             OSSemPost(&SafetyCheck_Sem4,
                         OS_OPT_POST_1,
                         &err);
-            // assert
+            assertOSError(err);
+
             temperatureHasBeenChecked = true;
         }
 
