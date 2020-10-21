@@ -142,10 +142,30 @@ void Task_AmperesMonitor(void *p_arg) {
 
     OS_ERR err;
 
+	bool amperesHasBeenChecked = false;
+
     while(1) {
         // BLOCKING =====================
         // Update Amperes Measurements
+		Current_UpdateMeasurements();
+
         // Check if amperes is NOT safe:
+		SafetyStatus amperesStatus = Current_CheckStatus(false);
+		if(amperesStatus != SAFE) {
+            OSSemPost(&Fault_Sem4,
+                        OS_OPT_POST_1,
+                        &err);
+			assertOSError(err);
+			
+        } else if((amperesStatus == SAFE) && (!amperesHasBeenChecked)) {
+            // Signal to turn on contactor but only signal once
+            OSSemPost(&SafetyCheck_Sem4,
+                        OS_OPT_POST_1,
+                        &err);
+			assertOSError(err);
+
+            amperesHasBeenChecked = true;
+        }
 
         //signal watchdog
         OSMutexPend(&WDog_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
