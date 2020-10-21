@@ -1,5 +1,9 @@
 #include "BSP_SPI.h"
 #include "stm32f4xx.h"
+#include "os.h"
+#include "BSP_OS.h"
+
+static bsp_os_t *os;
 
 // Use this macro function to wait until SPI communication is complete
 #define SPI_Wait(SPIx)		while(((SPIx)->SR & (SPI_SR_TXE | SPI_SR_RXNE)) == 0 || ((SPIx)->SR & SPI_SR_BSY))
@@ -16,6 +20,8 @@ static uint8_t SPI_WriteRead(uint8_t txData){
 	return SPI1->DR & 0x00FF;
 }
 
+
+#ifdef BAREMETAL
 /**
  * @brief   Initializes the SPI port connected to the LTC6820.
  *          This port communicates with the LTC6811 voltage and temperature
@@ -93,6 +99,7 @@ void BSP_SPI_Write(uint8_t *txBuf, uint32_t txLen) {
 		SPI_WriteRead(txBuf[i]);
 	}
 }
+#endif
 
 /**
  * @brief   Gets the data from SPI. With the way the LTC6811 communication works,
@@ -126,3 +133,88 @@ void BSP_SPI_SetStateCS(uint8_t state) {
         GPIO_ResetBits(GPIOB, GPIO_Pin_6);
     }
 }
+
+/***************THE FOLLWING CODE IS FOR THE RTOS VERSION OF THE BPS*********/
+#ifdef RTOS
+
+void SPI1_IRQHandler(void){
+	OS_ERR err;
+	// Save the CPU registers
+	CPU_SR_ALLOC();
+
+	// Protect a critical section
+	CPU_CRITICAL_ENTER();
+
+	// make the kernel aware that the interrupt has started
+	OSIntEnter();
+	CPU_CRITICAL_EXIT();
+	os->pend();
+	
+	//make the kernel aware that the interrupt has ended
+	OSIntExit();
+}
+
+void BSP_SPI_Init(bsp_os_t *spi_os){
+	 //      SPI configuration:
+    //          speed : 125kbps
+    //          CPOL : 1 (polarity of clock during idle is high)
+    //          CPHA : 1 (tx recorded during 2nd edge)
+    // Pins:
+    //      SPI1:
+    //          PB3 : SCK
+    //          PB4 : MISO
+    //          PB5 : MOSI 
+    //          PB6 : CS
+
+    GPIO_InitTypeDef GPIO_InitStruct;
+	SPI_InitTypeDef SPI_InitStruct;
+	
+	// Initialize clocks
+	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_SPI1, ENABLE);
+	
+	// Initialize pins
+	GPIO_InitStruct.GPIO_Pin = GPIO_Pin_3 | GPIO_Pin_4 | GPIO_Pin_5;
+	GPIO_InitStruct.GPIO_Mode = GPIO_Mode_AF;
+	GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_UP;
+	GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
+	GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
+	GPIO_Init(GPIOB, &GPIO_InitStruct);
+	
+	GPIO_PinAFConfig(GPIOB, GPIO_PinSource3, GPIO_AF_SPI1);
+	GPIO_PinAFConfig(GPIOB, GPIO_PinSource4, GPIO_AF_SPI1);
+	GPIO_PinAFConfig(GPIOB, GPIO_PinSource5, GPIO_AF_SPI1);
+	
+	// Initialize SPI port
+	SPI_InitStruct.SPI_Direction = SPI_Direction_2Lines_FullDuplex;
+	SPI_InitStruct.SPI_Mode = SPI_Mode_Master;
+	SPI_InitStruct.SPI_DataSize = SPI_DataSize_8b;
+	SPI_InitStruct.SPI_CPOL = SPI_CPOL_High;
+	SPI_InitStruct.SPI_CPHA = SPI_CPHA_2Edge;
+	SPI_InitStruct.SPI_NSS = SPI_NSS_Soft;
+	SPI_InitStruct.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_64;
+	SPI_InitStruct.SPI_FirstBit = SPI_FirstBit_MSB;
+	SPI_InitStruct.SPI_CRCPolynomial = 0;	
+	SPI_Init(SPI1, &SPI_InitStruct);
+	SPI_Cmd(SPI1, ENABLE);
+
+    // Initialize CS pin
+    GPIO_InitStruct.GPIO_Pin = GPIO_Pin_6;
+    GPIO_InitStruct.GPIO_Mode = GPIO_Mode_OUT;
+    GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_UP;
+	GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
+	GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
+    GPIO_Init(GPIOB, &GPIO_InitStruct);
+	
+	os = spi_os;
+}
+
+void BSP_SPI_Write(uint8_t txBuf, uint32_t txLen){
+	for(int32_t i = 0; i < txLen; i++){
+		SPI_WriteRead(txBuf[i]);
+		os->pend();
+	}
+}
+
+
+#endif
