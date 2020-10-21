@@ -15,8 +15,7 @@ int main() {
 	OS_ERR err;
 
 	OSInit(&err);
-
-	// ASSERT err
+	assertOSError(err);
 
 	OSTaskCreate(&Init_TCB,				// TCB
 				"Initialize System",	// Task Name (String)
@@ -31,8 +30,7 @@ int main() {
 				(void *)0,				// Extension pointer (not needed)
 				OS_OPT_TASK_STK_CHK | OS_OPT_TASK_SAVE_FP,	// Options
 				&err);					// return err code
-
-	// ASSERT err
+	assertOSError(err);
 
 	OSStart(&err);
 
