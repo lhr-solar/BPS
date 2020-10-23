@@ -81,8 +81,7 @@ Copyright 2017 Linear Technology Corp. (LTC)
 OS_MUTEX MinionsASIC_Mutex;
 bsp_os_t spi_os;
 OS_SEM MinionsIO_Sem4;
-
-#define RTOS 
+ 
 // RTOS Setup
 void LTC6811_Pend(void) {
     CPU_TS ts;
@@ -92,6 +91,7 @@ void LTC6811_Pend(void) {
                         OS_OPT_PEND_BLOCKING,
                         &ts,
                         &err);
+    assertOSError(err);
 }
 
 void LTC6811_Post(void) {
@@ -99,6 +99,7 @@ void LTC6811_Post(void) {
     OSSemPost(&MinionsIO_Sem4,
                         OS_OPT_POST_1,
                         &err);
+    assertOSError(err);
 }
 
 void LTC6811_Init(cell_asic *battMod){
