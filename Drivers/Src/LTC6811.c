@@ -81,7 +81,10 @@ Copyright 2017 Linear Technology Corp. (LTC)
 OS_MUTEX MinionsASIC_Mutex;
 bsp_os_t spi_os;
 OS_SEM MinionsIO_Sem4;
+<<<<<<< HEAD
 
+=======
+>>>>>>> Removed #define RTOS in LTC6811.c. RTOS version of SPI_Write() now pends before loop and posts after. No longer a version of BSP_SPI_Init() for RTOS, there is just one such function now.
  
 // RTOS Setup
 #ifdef RTOS
