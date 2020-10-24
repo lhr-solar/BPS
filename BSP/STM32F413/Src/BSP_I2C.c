@@ -184,16 +184,16 @@ void I2C3_EV_IRQHandler(void){
 
 /**
  * @brief   Transmits data onto the I2C bus.
- * @param	devAddr : the device address to write to
+ * @param	deviceAddr : the device address to write to
  * @param   regAddr : the register address to write to in the IC's memory.
  * @param   txData : the data array to be sent onto the bus.
  * @param   txLen : the length of the data array.
  * @return  error status, 0 if fail, 1 if success
  */
-uint8_t BSP_I2C_Write(uint16_t devAddr, uint16_t regAddr, uint8_t *txData, uint32_t txLen) {
+uint8_t BSP_I2C_Write(uint16_t deviceAddr, uint16_t regAddr, uint8_t *txData, uint32_t txLen) {
 	//if the head isn't the same as the tail or it is empty
 	if ((txFifoHead != txFifoTail) || txFifoReceived == false){
-		I2Ctx[txFifoHead].devAddr = devAddr;
+		I2Ctx[txFifoHead].devAddr = deviceAddr;
 		I2Ctx[txFifoHead].regAddress = regAddr;
 		I2Ctx[txFifoHead].data = txData;
 		I2Ctx[txFifoHead].length = txLen;
@@ -206,16 +206,16 @@ uint8_t BSP_I2C_Write(uint16_t devAddr, uint16_t regAddr, uint8_t *txData, uint3
 
 /**
  * @brief   Gets the data from a device through the I2C bus.
- * @param	devAddr : the device address to read from
+ * @param	deviceAddr : the device address to read from
  * @param   regAddr : the register address to read from the IC's memory.
  * @param   rxData : the data array to store the data that is received.
  * @param   rxLen : the length of the data array.
  * @return  error status, 0 if fail, other if success
  */
-uint8_t BSP_I2C_Read(uint16_t devAddr, uint16_t regAddr, uint8_t *rxData, uint32_t rxLen) {
+uint8_t BSP_I2C_Read(uint16_t deviceAddr, uint16_t regAddr, uint8_t *rxData, uint32_t rxLen) {
 	//if the head isn't the same as the tail or it is empty
 	if ((rxFifoHead != rxFifoTail) || rxFifoReceived == false){
-		I2Crx[rxFifoHead].devAddr = devAddr;
+		I2Crx[rxFifoHead].devAddr = deviceAddr;
 		I2Crx[rxFifoHead].regAddress = regAddr;
 		I2Crx[rxFifoHead].data = rxData;
 		I2Crx[rxFifoHead].length = rxLen;
@@ -352,14 +352,14 @@ void I2C3_EV_IRQHandler(void){
 
 /**
  * @brief   Transmits data onto the I2C bus.
- * @param	devAddr : the device address to write to
+ * @param	deviceAddr : the device address to write to
  * @param   regAddr : the register address to write to in the IC's memory.
  * @param   txData : the data array to be sent onto the bus.
  * @param   txLen : the length of the data array.
  * @return  error status, 0 if fail, 1 if success
  */
-uint8_t BSP_I2C_Write(uint16_t devAddr, uint16_t regAddr, uint8_t *txData, uint32_t txLen) {
-	OSQPost(&I2Ctx, &devAddr, 1, OS_OPT_POST_FIFO, &err); //store device address
+uint8_t BSP_I2C_Write(uint16_t deviceAddr, uint16_t regAddr, uint8_t *txData, uint32_t txLen) {
+	OSQPost(&I2Ctx, &deviceAddr, 1, OS_OPT_POST_FIFO, &err); //store device address
 	OSQPost(&I2Ctx, &regAddr, 1, OS_OPT_POST_FIFO, &err); //store register address
 	OSQPost(&I2Ctx, &txLen, 1, OS_OPT_POST_FIFO, &err); //store length of array
 	OSQPost(&I2Ctx, txData, txLen, OS_OPT_POST_FIFO, &err); //store address of array
@@ -468,14 +468,14 @@ uint8_t BSP_I2C_Write(uint16_t devAddr, uint16_t regAddr, uint8_t *txData, uint3
 
 /**
  * @brief   Gets the data from a device through the I2C bus.
- * @param	devAddr : the device address to read from
+ * @param	deviceAddr : the device address to read from
  * @param   regAddr : the register address to read from the IC's memory.
  * @param   rxData : the data array to store the data that is received.
  * @param   rxLen : the length of the data array.
  * @return  error status, 0 if fail, other if success
  */
-uint8_t BSP_I2C_Read(uint16_t devAddr, uint16_t regAddr, uint8_t *rxData, uint32_t rxLen) {
-	OSQPost(&I2Crx, &devAddr, 1, OS_OPT_POST_FIFO, &err); //store device address
+uint8_t BSP_I2C_Read(uint16_t deviceAddr, uint16_t regAddr, uint8_t *rxData, uint32_t rxLen) {
+	OSQPost(&I2Crx, &deviceAddr, 1, OS_OPT_POST_FIFO, &err); //store device address
 	OSQPost(&I2Crx, &regAddr, 1, OS_OPT_POST_FIFO, &err); //store address to read from
 	OSQPost(&I2Crx, rxData, 1, OS_OPT_POST_FIFO, &err); //store address to store data in
 	OSQPost(&I2Crx, &rxLen, 1, OS_OPT_POST_FIFO, &err);
