@@ -1,9 +1,9 @@
 #include "BSP_SPI.h"
 #include "stm32f4xx.h"
-#include "os.h"
-#include "BSP_OS.h"
+
 
 static bsp_os_t *os;
+
 
 // Use this macro function to wait until SPI communication is complete
 #define SPI_Wait(SPIx)		while(((SPIx)->SR & (SPI_SR_TXE | SPI_SR_RXNE)) == 0 || ((SPIx)->SR & SPI_SR_BSY))
@@ -21,7 +21,6 @@ static uint8_t SPI_WriteRead(uint8_t txData){
 }
 
 
-#ifdef BAREMETAL
 /**
  * @brief   Initializes the SPI port connected to the LTC6820.
  *          This port communicates with the LTC6811 voltage and temperature
@@ -85,6 +84,7 @@ void BSP_SPI_Init(bsp_os_t *spi_os){
 	os = spi_os;
 }
 
+#ifdef BAREMETAL
 /**
  * @brief   Transmits data to through SPI.
  *          With the way the LTC6811 communication works, the LTC6811 will not send
@@ -156,7 +156,7 @@ void SPI1_IRQHandler(void){
 	OSIntExit();
 }
 
-void BSP_SPI_Write(uint8_t txBuf, uint32_t txLen){
+void BSP_SPI_Write(uint8_t *txBuf, uint32_t txLen){
 	os->pend();
 	for(int32_t i = 0; i < txLen; i++){
 		SPI_WriteRead(txBuf[i]);
