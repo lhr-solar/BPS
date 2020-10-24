@@ -6,7 +6,6 @@
 #include "BSP_OS.h"
 
 
-#ifdef BAREMETAL
 /**
  * @note    If other ICs need to be connected onto the SPI line, this code will have to be modified.
  */
