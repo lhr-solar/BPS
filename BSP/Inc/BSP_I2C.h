@@ -21,7 +21,7 @@ void BSP_I2C_Init(void);
  * @param   txLen : the length of the data array.
  * @return  error status, 0 if fail, 1 if success
  */
-uint8_t BSP_I2C_Write(uint16_t deviceAddr, uint16_t regAddr, uint8_t *txData, uint32_t txLen);
+uint8_t BSP_I2C_Write(uint8_t deviceAddr, uint16_t regAddr, uint8_t *txData, uint32_t txLen);
 
 /**
  * @brief   Gets the data from a device through the I2C bus.
@@ -31,6 +31,6 @@ uint8_t BSP_I2C_Write(uint16_t deviceAddr, uint16_t regAddr, uint8_t *txData, ui
  * @param   rxLen : the length of the data array.
  * @return  error status, 0 if fail, 1 if success
  */
-uint8_t BSP_I2C_Read(uint16_t deviceAddr, uint16_t regAddr, uint8_t *rxData, uint32_t rxLen);
+uint8_t BSP_I2C_Read(uint8_t deviceAddr, uint16_t regAddr, uint8_t *rxData, uint32_t rxLen);
 
 #endif

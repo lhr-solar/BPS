@@ -22,7 +22,7 @@ static uint32_t txLength, rxLength;
 #ifdef BAREMETAL
 #define FIFOSIZE 100
 typedef struct I2CData{
-	uint16_t devAddr;
+	uint8_t devAddr;
 	uint16_t regAddress;
 	uint8_t* data;
 	uint32_t length;
@@ -190,7 +190,7 @@ void I2C3_EV_IRQHandler(void){
  * @param   txLen : the length of the data array.
  * @return  error status, 0 if fail, 1 if success
  */
-uint8_t BSP_I2C_Write(uint16_t deviceAddr, uint16_t regAddr, uint8_t *txData, uint32_t txLen) {
+uint8_t BSP_I2C_Write(uint8_t deviceAddr, uint16_t regAddr, uint8_t *txData, uint32_t txLen) {
 	//if the head isn't the same as the tail or it is empty
 	if ((txFifoHead != txFifoTail) || txFifoReceived == false){
 		I2Ctx[txFifoHead].devAddr = deviceAddr;
@@ -212,7 +212,7 @@ uint8_t BSP_I2C_Write(uint16_t deviceAddr, uint16_t regAddr, uint8_t *txData, ui
  * @param   rxLen : the length of the data array.
  * @return  error status, 0 if fail, other if success
  */
-uint8_t BSP_I2C_Read(uint16_t deviceAddr, uint16_t regAddr, uint8_t *rxData, uint32_t rxLen) {
+uint8_t BSP_I2C_Read(uint8_t deviceAddr, uint16_t regAddr, uint8_t *rxData, uint32_t rxLen) {
 	//if the head isn't the same as the tail or it is empty
 	if ((rxFifoHead != rxFifoTail) || rxFifoReceived == false){
 		I2Crx[rxFifoHead].devAddr = deviceAddr;
@@ -358,111 +358,11 @@ void I2C3_EV_IRQHandler(void){
  * @param   txLen : the length of the data array.
  * @return  error status, 0 if fail, 1 if success
  */
-uint8_t BSP_I2C_Write(uint16_t deviceAddr, uint16_t regAddr, uint8_t *txData, uint32_t txLen) {
+uint8_t BSP_I2C_Write(uint8_t deviceAddr, uint16_t regAddr, uint8_t *txData, uint32_t txLen) {
 	OSQPost(&I2Ctx, &deviceAddr, 1, OS_OPT_POST_FIFO, &err); //store device address
 	OSQPost(&I2Ctx, &regAddr, 1, OS_OPT_POST_FIFO, &err); //store register address
 	OSQPost(&I2Ctx, &txLen, 1, OS_OPT_POST_FIFO, &err); //store length of array
 	OSQPost(&I2Ctx, txData, txLen, OS_OPT_POST_FIFO, &err); //store address of array
-    /*int timeout_count = 0;
-	while(I2C_GetFlagStatus(I2C3, I2C_FLAG_BUSY)){
-		// Assume running at 80 MHz
-		timeout_count++;
-		// Returns and breaks after timeout threshold
-		if(timeout_count > TIMEOUT_THRESHOLD) {
-			return ERROR;
-		}
-	}
-
-	I2C_AcknowledgeConfig(I2C3, ENABLE);
-
-	// First write address that you want to read from
-
-	writePoll:
-	// Since no one is using the I2C bus, take control
-	I2C_GenerateSTART(I2C3, ENABLE);
-	// Wait until start edge event occurred
-	timeout_count = 0;
-	while(!I2C_CheckEvent(I2C3, I2C_EVENT_MASTER_MODE_SELECT)) {
-		// Assume running at 80 MHz
-		timeout_count++;
-		// Returns and breaks after timeout threshold
-		if(timeout_count > TIMEOUT_THRESHOLD) {
-			return ERROR;
-		}
-	}
-	// Select device to talk to
-	I2C_Send7bitAddress(I2C3, deviceAddr, I2C_Direction_Transmitter);		// Sets RW bit to 0
-	// THIS IS WHERE WE GOT STUCK
-	timeout_count = 0;
-	while(!I2C_CheckEvent(I2C3, I2C_EVENT_MASTER_TRANSMITTER_MODE_SELECTED)) {
-		if(I2C3->SR1 & 0x0400) {
-			I2C3->SR1 &= ~0x0400;
-			I2C_GenerateSTOP(I2C3, ENABLE);
-			goto writePoll;
-		}
-		// Assume running at 80 MHz
-		timeout_count++;
-		// Returns and breaks after timeout threshold
-		if(timeout_count > TIMEOUT_THRESHOLD) {
-			return ERROR;
-		}
-	}
-
-	// Send start address (MSB first)
-	I2C_SendData(I2C3, (uint8_t)((regAddr & 0xFF00) >> 8));
-	// Wait until transmit event occurred.
-	timeout_count = 0;
-	while(!I2C_CheckEvent(I2C3, I2C_EVENT_MASTER_BYTE_TRANSMITTING)) {
-		// Assume running at 80 MHz
-		timeout_count++;
-		// Returns and breaks after timeout threshold
-		if(timeout_count > TIMEOUT_THRESHOLD) {
-			return ERROR;
-		}
-	}
-	// Send rest of start address (LSB)
-	I2C_SendData(I2C3, (uint8_t)(regAddr & 0x00FF));
-	// Wait until transmit event occurred.
-	timeout_count = 0;
-	while(!I2C_CheckEvent(I2C3, I2C_EVENT_MASTER_BYTE_TRANSMITTING)) {
-		// Assume running at 80 MHz
-		timeout_count++;
-		// Returns and breaks after timeout threshold
-		if(timeout_count > TIMEOUT_THRESHOLD) {
-			return ERROR;
-		}
-	}
-
-	// Wait until byte transmission finished
-	timeout_count = 0;
-	while(I2C_GetFlagStatus(I2C3, I2C_FLAG_BTF) == RESET) {
-		// Assume running at 80 MHz
-		timeout_count++;
-		// Returns and breaks after timeout threshold
-		if(timeout_count > TIMEOUT_THRESHOLD) {
-			return ERROR;
-		}
-	}
-
-	// Start writing data sequentially
-	while(txLen > 0){
-
-		// Wait until BTF flag is set
-		timeout_count = 0;
-		while(I2C_GetFlagStatus(I2C3, I2C_FLAG_BTF) == RESET);
-		I2C_SendData(I2C3, *txData);
-		txData++;
-		txLen--;
-		
-		// Assume running at 80 MHz
-		timeout_count++;
-		// Returns and breaks after timeout threshold
-		if(timeout_count > TIMEOUT_THRESHOLD) {
-			return ERROR;
-		}
-	}
-
-	I2C_GenerateSTOP(I2C3, ENABLE);*/
 	return SUCCESS;
 }
 
@@ -474,160 +374,11 @@ uint8_t BSP_I2C_Write(uint16_t deviceAddr, uint16_t regAddr, uint8_t *txData, ui
  * @param   rxLen : the length of the data array.
  * @return  error status, 0 if fail, other if success
  */
-uint8_t BSP_I2C_Read(uint16_t deviceAddr, uint16_t regAddr, uint8_t *rxData, uint32_t rxLen) {
+uint8_t BSP_I2C_Read(uint8_t deviceAddr, uint16_t regAddr, uint8_t *rxData, uint32_t rxLen) {
 	OSQPost(&I2Crx, &deviceAddr, 1, OS_OPT_POST_FIFO, &err); //store device address
 	OSQPost(&I2Crx, &regAddr, 1, OS_OPT_POST_FIFO, &err); //store address to read from
 	OSQPost(&I2Crx, rxData, 1, OS_OPT_POST_FIFO, &err); //store address to store data in
 	OSQPost(&I2Crx, &rxLen, 1, OS_OPT_POST_FIFO, &err);
-    /*int timeout_count = 0;
-	while(I2C_GetFlagStatus(I2C3, I2C_FLAG_BUSY)){
-		// Assume running at 80 MHz
-		timeout_count++;
-		// Returns and breaks after timeout threshold
-		if(timeout_count > TIMEOUT_THRESHOLD) {
-			return ERROR;
-		}
-	}
-	
-	I2C_AcknowledgeConfig(I2C3, ENABLE);
-
-	// First write address that you want to read from
-
-	readPoll:
-	// Since no one is using the I2C bus, take control
-	I2C_GenerateSTART(I2C3, ENABLE);
-	// Wait until start edge event occurred
-	timeout_count = 0;
-	while(!I2C_CheckEvent(I2C3, I2C_EVENT_MASTER_MODE_SELECT)) {
-		// Assume running at 80 MHz
-		timeout_count++;
-		// Returns and breaks after timeout threshold
-		if(timeout_count > TIMEOUT_THRESHOLD) {
-			return ERROR;
-		}
-	}
-
-	// Select device to talk to
-	I2C_Send7bitAddress(I2C3, deviceAddr, I2C_Direction_Transmitter);		// Sets RW bit to 0
-	// Wait until finished sending
-	timeout_count = 0;
-	while(!I2C_CheckEvent(I2C3, I2C_EVENT_MASTER_TRANSMITTER_MODE_SELECTED)) {
-		if(I2C3->SR1 & 0x0400) {
-			I2C3->SR1 &= ~0x0400;
-			I2C_GenerateSTOP(I2C3, ENABLE);
-			goto readPoll;
-		}
-		// Assume running at 80 MHz
-		timeout_count++;
-		// Returns and breaks after timeout threshold
-		if(timeout_count > TIMEOUT_THRESHOLD) {
-			return ERROR;
-		}
-	}
-
-	// Send start address (MSB first)
-	I2C_SendData(I2C3, (uint8_t)((regAddr & 0xFF00) >> 8));
-	// Wait until transmit event occurred.
-	timeout_count = 0;
-	while(!I2C_CheckEvent(I2C3, I2C_EVENT_MASTER_BYTE_TRANSMITTING)) {
-		// Assume running at 80 MHz
-		timeout_count++;
-		// Returns and breaks after timeout threshold
-		if(timeout_count > TIMEOUT_THRESHOLD) {
-			return ERROR;
-		}
-	}
-	// Send rest of start address (LSB)
-	I2C_SendData(I2C3, (uint8_t)(regAddr & 0x00FF));
-	// Wait until transmit event occurred.
-	timeout_count = 0;
-	while(!I2C_CheckEvent(I2C3, I2C_EVENT_MASTER_BYTE_TRANSMITTING)) {
-		// Assume running at 80 MHz
-		timeout_count++;
-		// Returns and breaks after timeout threshold
-		if(timeout_count > TIMEOUT_THRESHOLD) {
-			return ERROR;
-		}
-	}
-
-	// Wait until byte transmission finished
-	timeout_count = 0;
-	while(I2C_GetFlagStatus(I2C3, I2C_FLAG_BTF) == RESET) {
-		// Assume running at 80 MHz
-		timeout_count++;
-		// Returns and breaks after timeout threshold
-		if(timeout_count > TIMEOUT_THRESHOLD) {
-			return ERROR;
-		}
-	}
-
-
-	// Now read data starting from address that was sent
-
-	// Since no one is using the I2C bus, take control
-	I2C_GenerateSTART(I2C3, ENABLE);
-	// Wait until start edge event occurred
-	timeout_count = 0;
-	while(!I2C_CheckEvent(I2C3, I2C_EVENT_MASTER_MODE_SELECT)) {
-		// Assume running at 80 MHz
-		timeout_count++;
-		// Returns and breaks after timeout threshold
-		if(timeout_count > TIMEOUT_THRESHOLD) {
-			return ERROR;
-		}
-	}
-
-	// Select device to talk to
-	I2C_Send7bitAddress(I2C3, deviceAddr, I2C_Direction_Receiver);		// Sets RW bit to 1
-	// Wait until finished sending
-	timeout_count = 0;
-	while(!I2C_CheckEvent(I2C3, I2C_EVENT_MASTER_RECEIVER_MODE_SELECTED)) {
-		// Assume running at 80 MHz
-		timeout_count++;
-		// Returns and breaks after timeout threshold
-		if(timeout_count > TIMEOUT_THRESHOLD) {
-			return ERROR;
-		}
-	}
-
-	while(rxLen > 0){
-		if(rxLen > 1){
-			// Wait until byte transmission finished
-			timeout_count = 0;
-			while(I2C_GetFlagStatus(I2C3, I2C_FLAG_BTF) == RESET) {
-				// Assume running at 80 MHz
-				timeout_count++;
-				// Returns and breaks after timeout threshold
-				if(timeout_count > TIMEOUT_THRESHOLD) {
-					return ERROR;
-				}
-			}
-			*rxData = I2C_ReceiveData(I2C3);
-			rxData++;
-			rxLen--;
-		} else {
-			// Disable ack, since this is the last byte
-			I2C_AcknowledgeConfig(I2C3, DISABLE);
-		
-			timeout_count = 0;
-			while(I2C_GetFlagStatus(I2C3, I2C_FLAG_RXNE) == RESET) {
-				// Assume running at 80 MHz
-				timeout_count++;
-				// Returns and breaks after timeout threshold
-				if(timeout_count > TIMEOUT_THRESHOLD) {
-					return ERROR;
-				}
-			}
-
-			*rxData = I2C_ReceiveData(I2C3);
-			rxData++;
-			rxLen = 0;
-		}
-	}
-
-	// Generate the stop
-	I2C_GenerateSTOP(I2C3, ENABLE);*/
-	
 	// Return Success if all executed properly
 	return SUCCESS;
 }
