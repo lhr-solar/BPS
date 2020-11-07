@@ -6,6 +6,7 @@
 #include "BSP_OS.h"
 
 
+#ifdef BAREMETAL
 /**
  * @note    This is for the RTOS version of the BPS 
  */
