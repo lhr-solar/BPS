@@ -18,7 +18,7 @@
 #include "BSP_Lights.h"
 #include "BSP_WDTimer.h"
 
-cell_asic Minions[NUM_MINIONS];
+static cell_asic minions[NUM_MINIONS];
 bool override = false;		// This will be changed by user via CLI
 char command[COMMAND_SIZE];
 
@@ -102,9 +102,9 @@ void initialize(void){
 	EEPROM_Init();
 	Charge_Init();
 	Current_Init();
-	Voltage_Init(Minions);
-	Temperature_Init(Minions);
-	CLI_Init(Minions);
+	Voltage_Init(minions);
+	Temperature_Init(minions);
+	CLI_Init(minions);
 
 	// __enable_irq();
 	CLI_Startup();

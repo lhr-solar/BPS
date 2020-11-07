@@ -33,6 +33,12 @@ void BSP_UART_Init(void) {
     setvbuf(stdin, NULL, _IONBF, 0);
     setvbuf(stdout, NULL, _IONBF, 0);
 
+    err = pthread_mutex_init(&rx_mutex, NULL);
+    if(err != 0) {
+        perror("pthread_mutex_init");
+        exit(EXIT_FAILURE);
+    }
+
     // Get thread attributes to create a thread
     err = pthread_attr_init(&attr);
     if(err != 0) {
@@ -112,6 +118,8 @@ void *ScanThread(void *arg) {
 
             pthread_mutex_unlock(&rx_mutex);
         }
+
+        pthread_yield();
 
     } while (1);
 
