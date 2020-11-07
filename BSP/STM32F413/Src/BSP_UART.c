@@ -471,6 +471,13 @@ void USART2_IRQHandler(void) {
 }
 
 void USART3_IRQHandler(void) {
+    asm("CPSID I"); //disable all interrupts
+	//all cpu registers are supposed to be saved here
+	//but that happens when the ISR is called
+	OSIntEnter(); //increments value of nested interrupt counter
+	unsigned int *address = 0;
+	asm volatile ("STR SP, [%0]\n\t": "=r" ( address)); //Store SP in address
+	if (OSIntNestingCtr == 1) OSTCBCurPtr->StkPtr = address;
     if(USART_GetITStatus(USART3, USART_IT_RXNE) != RESET) {
         uint8_t data = USART3->DR;
         bool removeSuccess = 1;
@@ -499,6 +506,8 @@ void USART3_IRQHandler(void) {
         if(!TxFifo_Get((uint8_t *)&(USART3->DR),UART_USB)) USART_ITConfig(USART3, USART_IT_TC, RESET);
     }
     if(USART_GetITStatus(USART3, USART_IT_ORE) != RESET);
+    OSIntExit();
+	asm("CPSIE I"); //enable interrupts
 }
 
 
