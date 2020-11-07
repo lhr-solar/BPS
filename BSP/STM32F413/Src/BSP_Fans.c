@@ -8,8 +8,6 @@ Uses Pins PC6,7 and PB14,15
 #include "stm32f4xx_tim.h"
 #include "stm32f4xx_rcc.h"
 
-#define DIVIDER 500 //Speed increments
-#define TOPSPEED 4000/DIVIDER //top speed achievable
 GPIO_InitTypeDef GPIO_INIT_STRUCT; //struct used to initialize pins
 TIM_OCInitTypeDef TIMER_STRUCT; //struct used to configure timers
 TIM_TimeBaseInitTypeDef TIMER_INIT_STRUCT; //struct used to initialize PWM timers

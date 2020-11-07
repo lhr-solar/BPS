@@ -8,6 +8,9 @@ Uses Pins PC6,7 and PB14,15
 #include "common.h"
 #include "config.h"
 
+#define DIVIDER 500 //Speed increments
+#define TOPSPEED 4000/DIVIDER //top speed achievable
+
 /**
  * @brief   Initialize all the GPIO pins connected to each Fan
  * @param   None
