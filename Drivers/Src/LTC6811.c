@@ -81,13 +81,8 @@ Copyright 2017 Linear Technology Corp. (LTC)
 OS_MUTEX MinionsASIC_Mutex;
 bsp_os_t spi_os;
 OS_SEM MinionsIO_Sem4;
-<<<<<<< HEAD
 
-=======
->>>>>>> Removed #define RTOS in LTC6811.c. RTOS version of SPI_Write() now pends before loop and posts after. No longer a version of BSP_SPI_Init() for RTOS, there is just one such function now.
- 
 // RTOS Setup
-#ifdef RTOS
 void LTC6811_Pend(void) {
     CPU_TS ts;
     OS_ERR err;
@@ -106,17 +101,6 @@ void LTC6811_Post(void) {
                         &err);
     assertOSError(err);
 }
-#endif
-
-#ifdef BAREMETAL
-void LTC6811_Pend(void) {
-    return;
-}
-
-void LTC6811_Post(void) {
-    return;
-}
-#endif
 
 void LTC6811_Init(cell_asic *battMod){
   //only create the mutex the first time this function is called (called by Voltage_Init() and Temperature_Init())

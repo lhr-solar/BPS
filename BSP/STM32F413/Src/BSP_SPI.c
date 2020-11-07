@@ -6,7 +6,6 @@
 static bsp_os_t *os;
 static bsp_os_t *os3;
 
-
 // Use this macro function to wait until SPI communication is complete
 #ifdef BAREMETAL
 #define SPI_Wait(SPIx)		while(((SPIx)->SR & (SPI_SR_TXE | SPI_SR_RXNE)) == 0 || ((SPIx)->SR & SPI_SR_BSY))
@@ -36,6 +35,7 @@ static uint8_t SPI_WriteRead(uint8_t txData){
 }
 
 
+#ifdef BAREMETAL
 /**
  * @brief   Initializes the SPI port connected to the LTC6820.
  *          This port communicates with the LTC6811 voltage and temperature
@@ -174,6 +174,7 @@ void SPI1_IRQHandler(void){
 	OSIntExit();
 }
 
+<<<<<<< HEAD
 void SPI3_Handler(){
 	OS_ERR err;
 	// Save the CPU registers
@@ -189,6 +190,14 @@ void SPI3_Handler(){
 	
 	//make the kernel aware that the interrupt has ended
 	OSIntExit();
+=======
+void BSP_SPI_Write(uint8_t txBuf, uint32_t txLen){
+	os->pend();
+	for(int32_t i = 0; i < txLen; i++){
+		SPI_WriteRead(txBuf[i]);
+	}
+	os->post();
+>>>>>>> parent of 830f9be0... Added baremetal versions of LTC6811 pend and post functions. Fixed #ifdef issues
 }
 
 
