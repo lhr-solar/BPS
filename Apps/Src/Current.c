@@ -11,10 +11,14 @@
 #include "BSP_ADC.h"
 #include "os.h"
 #include "Tasks.h"
+#include "BSP_SPI.h"
 
 static OS_ERR err;
 static CPU_TS ticks;
 static OS_MUTEX AmperesData_Mutex;
+static OS_SEM AmperesIO_Sem;
+
+static bsp_os_t spi3;
 
 int32_t HighPrecisionCurrent;	// Milliamp measurement of hall effect sensor of high precision
 int32_t LowPrecisionCurrent;	// Milliamp measurement of hall effect sensor of low precision
@@ -26,6 +30,37 @@ typedef enum {
 
 static int32_t Current_Conversion(uint32_t milliVolts, CurrentSensor s);
 
+#ifdef RTOS
+void Amperes_Pend(){
+	CPU_TS ts;
+    OS_ERR err;
+    OSSemPend(&AmperesIO_Sem,
+                        0,
+                        OS_OPT_PEND_BLOCKING,
+                        &ts,
+                        &err);
+    assertOSError(err);
+}
+
+void Amperes_Post(){
+	OS_ERR err;
+    OSSemPost(&AmperesIO_Sem,
+                        OS_OPT_POST_1,
+                        &err);
+    assertOSError(err);
+}
+#endif
+
+#ifdef BAREMETAL
+void Amperes_Pend(void) {
+    return;
+}
+
+void Amperes_Post(void) {
+    return;
+}
+#endif
+
 /** Current_Init
  * Initializes two ADCs to begin current monitoring.
  */
@@ -33,6 +68,9 @@ void Current_Init(void){
 	BSP_ADC_Init();	// Initialize the ADCs
 	OSMutexCreate(&AmperesData_Mutex, "Amperes Mutex", &err);
 	assertOSError(err);
+	spi3.pend = Amperes_Pend;
+  	spi3.post = Amperes_Post;
+	SPI3_Init(&spi3);
 }
 
 /** Current_UpdateMeasurements

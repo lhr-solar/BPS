@@ -1,8 +1,26 @@
 #include "BSP_SPI.h"
 #include "stm32f4xx.h"
+#include "os.h"
+#include "BSP_OS.h"
+
+static bsp_os_t *os;
+static bsp_os_t *os3;
 
 // Use this macro function to wait until SPI communication is complete
+#ifdef BAREMETAL
 #define SPI_Wait(SPIx)		while(((SPIx)->SR & (SPI_SR_TXE | SPI_SR_RXNE)) == 0 || ((SPIx)->SR & SPI_SR_BSY))
+#endif
+
+#ifdef RTOS
+#define SPI_Wait(SPIx)		if(((SPIx)->SR & (SPI_SR_TXE | SPI_SR_RXNE)) == 0 || ((SPIx)->SR & SPI_SR_BSY)){ \
+								if(SPIx == SPI1){	\
+									os->pend();	\
+								}	\	
+								else if(SPIx == SPI3){	\
+									os3->pend();	\
+								}	\
+							} 
+#endif
 
 /** SPI1_WriteRead
  * @brief   Sends and receives a byte of data on the SPI line.
@@ -16,6 +34,7 @@ static uint8_t SPI_WriteRead(uint8_t txData){
 	return SPI1->DR & 0x00FF;
 }
 
+
 /**
  * @brief   Initializes the SPI port connected to the LTC6820.
  *          This port communicates with the LTC6811 voltage and temperature
@@ -24,8 +43,8 @@ static uint8_t SPI_WriteRead(uint8_t txData){
  * @param   None
  * @return  None
  */
-void BSP_SPI_Init(void) {
-    //      SPI configuration:
+void BSP_SPI_Init(bsp_os_t *spi_os){
+	 //      SPI configuration:
     //          speed : 125kbps
     //          CPOL : 1 (polarity of clock during idle is high)
     //          CPHA : 1 (tx recorded during 2nd edge)
@@ -75,6 +94,8 @@ void BSP_SPI_Init(void) {
 	GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
 	GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
     GPIO_Init(GPIOB, &GPIO_InitStruct);
+	
+	os = spi_os;
 }
 
 /**
@@ -108,6 +129,7 @@ void BSP_SPI_Read(uint8_t *rxBuf, uint32_t rxLen) {
     for(uint32_t i = 0; i < rxLen; i++){
 		rxBuf[i] = SPI_WriteRead(0x00);
 	}
+
 }
 
 /**
@@ -126,3 +148,49 @@ void BSP_SPI_SetStateCS(uint8_t state) {
         GPIO_ResetBits(GPIOB, GPIO_Pin_6);
     }
 }
+
+void SPI3_Init(bsp_os_t *spi3_os){
+	os3 = spi3_os;
+}
+
+/***************THE FOLLWING CODE IS FOR THE RTOS VERSION OF THE BPS*********/
+#ifdef RTOS
+
+void SPI1_IRQHandler(void){
+	OS_ERR err;
+	// Save the CPU registers
+	CPU_SR_ALLOC();
+
+	// Protect a critical section
+	CPU_CRITICAL_ENTER();
+
+	// make the kernel aware that the interrupt has started
+	OSIntEnter();
+	CPU_CRITICAL_EXIT();
+	os->post();
+	
+	//make the kernel aware that the interrupt has ended
+	OSIntExit();
+}
+
+void SPI3_Handler(){
+	OS_ERR err;
+	// Save the CPU registers
+	CPU_SR_ALLOC();
+
+	// Protect a critical section
+	CPU_CRITICAL_ENTER();
+
+	// make the kernel aware that the interrupt has started
+	OSIntEnter();
+	CPU_CRITICAL_EXIT();
+	os3->post();
+	
+	//make the kernel aware that the interrupt has ended
+	OSIntExit();
+}
+
+
+
+
+#endif
