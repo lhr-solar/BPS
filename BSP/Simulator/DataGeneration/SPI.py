@@ -229,7 +229,7 @@ def balance_batteries():
 def spi_task():
     logging.info('Starting SPI Task')
     while True:
-        generate('discharging', 'normal', None)
+        generate(st, md, batt)
 
 spi_thread = threading.Thread(target=spi_task)
 
