@@ -38,6 +38,14 @@ void BSP_UART_Init(void) {
     // Configure stdin to not use a buffer. May not be needed.
     setvbuf(stdin, NULL, _IONBF, 0);
     setvbuf(stdout, NULL, _IONBF, 0);
+
+    err = pthread_mutex_init(&rx_mutex2, NULL);
+    err = pthread_mutex_init(&rx_mutex3, NULL);
+    if(err != 0) {
+        perror("pthread_mutex_init");
+        exit(EXIT_FAILURE);
+    }
+
     // Get thread attributes to create a thread
     err = pthread_attr_init(&attr);
     if(err != 0) {
@@ -149,6 +157,9 @@ void *ScanThread2(void *arg) {
             RxFifo_Put((uint8_t)data, UART_BLE);
             pthread_mutex_unlock(&rx_mutex2);
         }
+
+        pthread_yield();
+
     } while (1);
     // Should not get here
     int retval = 1;
