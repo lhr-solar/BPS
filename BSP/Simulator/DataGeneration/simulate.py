@@ -205,6 +205,7 @@ def main():
     timerThread.start()
     spiThread = SPI.spi_thread
     spiThread.start()
+
     while True:
         try:
             # Generate all values

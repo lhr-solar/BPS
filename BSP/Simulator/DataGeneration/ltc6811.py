@@ -435,9 +435,13 @@ class LTC6811:
             if self.curr_cmd_code == command_codes[cmd_key]['code']:
                 cmd_handler = command_codes[cmd_key]['handler']
                 
+                # print(cmd_key)
+
                 # Execute only if handler exists
                 if cmd_handler is not None:
                     cmd_handler(self)
+
+                # print(self.tx_data)
 
 
     def set_voltage(self, voltages):

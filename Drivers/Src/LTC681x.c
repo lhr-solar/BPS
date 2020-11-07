@@ -45,6 +45,7 @@ Copyright 2017 Linear Technology Corp. (LTC)
 #include "LTC6811.h"
 #include "BSP_SPI.h"
 #include "BSP_PLL.h"
+#include "config.h"
 
 static uint8_t spi_read8(void){
     uint8_t data = 0;
@@ -546,7 +547,7 @@ int8_t parse_cells(uint8_t current_ic, uint8_t cell_reg, uint8_t cell_data[], ui
   uint16_t parsed_cell;
   uint16_t received_pec;
   uint16_t data_pec;
-  uint8_t data_counter = current_ic*LTC681X_NUM_RX_BYT; //data counter
+  uint8_t data_counter = current_ic*LTC681X_NUM_RX_BYTE; //data counter
 
   for (uint8_t current_cell = 0; current_cell<CELL_IN_REG; current_cell++)  // This loop parses the read back data into cell voltages, it
   {
@@ -558,10 +559,10 @@ int8_t parse_cells(uint8_t current_ic, uint8_t cell_reg, uint8_t cell_data[], ui
     data_counter = data_counter + 2;                       //Because cell voltage codes are two bytes the data counter
     //must increment by two for each parsed cell code
   }
-
+  
   received_pec = (cell_data[data_counter] << 8) | cell_data[data_counter+1]; //The received PEC for the current_ic is transmitted as the 7th and 8th
   //after the 6 cell voltage data bytes
-  data_pec = pec15_calc(BYT_IN_REG, &cell_data[(current_ic) * LTC681X_NUM_RX_BYT]);
+  data_pec = pec15_calc(BYT_IN_REG, &cell_data[(current_ic) * LTC681X_NUM_RX_BYTE]);
 
   if (received_pec != data_pec)
   {
@@ -728,7 +729,7 @@ uint8_t LTC681x_rdcv(uint8_t reg, // Controls which cell voltage register is rea
                     )
 {
   int8_t pec_error = 0;
-  uint8_t cell_data[LTC681X_NUM_RX_BYT*total_ic];;
+  static uint8_t cell_data[LTC681X_NUM_RX_BYTE*NUM_MINIONS];;
   uint8_t c_ic = 0;
 
   if (reg == 0)
@@ -788,7 +789,7 @@ int8_t LTC681x_rdaux(uint8_t reg, //Determines which GPIO voltage register is re
                      cell_asic ic[]//A two dimensional array of the gpio voltage codes.
                     )
 {
-  uint8_t data[LTC681X_NUM_RX_BYT*total_ic];
+  uint8_t data[LTC681X_NUM_RX_BYTE*NUM_MINIONS];
   int8_t pec_error = 0;
   uint8_t c_ic =0;
 
@@ -849,7 +850,7 @@ int8_t LTC681x_rdstat(uint8_t reg, //Determines which Stat  register is read bac
   const uint8_t BYT_IN_REG = 6;
   const uint8_t GPIO_IN_REG = 3;
 
-  uint8_t data[LTC681X_NUM_RX_BYT*total_ic];
+  uint8_t data[LTC681X_NUM_RX_BYTE*NUM_MINIONS];
   uint8_t data_counter = 0;
   int8_t pec_error = 0;
   uint16_t parsed_stat;
@@ -902,7 +903,7 @@ int8_t LTC681x_rdstat(uint8_t reg, //Determines which Stat  register is read bac
 
         received_pec = (data[data_counter]<<8)+ data[data_counter+1];          //The received PEC for the current_ic is transmitted as the 7th and 8th
         //after the 6 gpio voltage data bytes
-        data_pec = pec15_calc(BYT_IN_REG, &data[current_ic*LTC681X_NUM_RX_BYT]);
+        data_pec = pec15_calc(BYT_IN_REG, &data[current_ic*LTC681X_NUM_RX_BYTE]);
 
         if (received_pec != data_pec)
         {
@@ -967,7 +968,7 @@ int8_t LTC681x_rdstat(uint8_t reg, //Determines which Stat  register is read bac
 
       received_pec = (data[data_counter]<<8)+ data[data_counter+1];          //The received PEC for the current_ic is transmitted as the 7th and 8th
       //after the 6 gpio voltage data bytes
-      data_pec = pec15_calc(BYT_IN_REG, &data[current_ic*LTC681X_NUM_RX_BYT]);
+      data_pec = pec15_calc(BYT_IN_REG, &data[current_ic*LTC681X_NUM_RX_BYTE]);
       if (received_pec != data_pec)
       {
         pec_error = -1;                             //The pec_error variable is simply set negative if any PEC errors

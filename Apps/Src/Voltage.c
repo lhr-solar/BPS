@@ -11,6 +11,7 @@
 static cell_asic *Minions;
 static uint16_t VoltageVal[NUM_BATTERY_MODULES]; //Voltage values gathered
 static uint32_t openWires[TOTAL_VOLT_WIRES];
+
 /** LTC ADC measures with resolution of 4 decimal places, 
  * But we standardized to have 3 decimal places to work with
  * millivolts
@@ -63,7 +64,9 @@ ErrorStatus Voltage_UpdateMeasurements(void){
 	//copies values from cells.c_codes to private array
 	for(int i = 0; i < NUM_BATTERY_MODULES; i++){
 		VoltageVal[i] = Minions[i / MAX_VOLT_SENSORS_PER_MINION_BOARD].cells.c_codes[i % MAX_VOLT_SENSORS_PER_MINION_BOARD];
+		printf("%d, ", VoltageVal[i]);
 	}
+	printf("\r\n");
 	
 	if(error == 0){
 		return SUCCESS;
@@ -100,7 +103,6 @@ SafetyStatus Voltage_CheckStatus(void){
  */
 SafetyStatus *Voltage_GetModulesInDanger(void){
 	static SafetyStatus checks[TOTAL_VOLT_WIRES];
-	Voltage_GetOpenWire();
 	uint32_t wires;
 	uint32_t openWireIdx = 0;
 	//put all the bits from each minion's system_open_wire variable into one variable
@@ -111,7 +113,7 @@ SafetyStatus *Voltage_GetModulesInDanger(void){
 				break;	//the last IC has only 7 modules 
 			}
 			openWires[openWireIdx] = (wires >> s) & 1;
-			openWireIdx++; 
+			openWireIdx++;
 		}
 	}
 	

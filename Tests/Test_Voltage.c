@@ -35,14 +35,14 @@ int main() {
 
         if(Voltage_CheckStatus() != SAFE) {
             printf("DANGER!! Voltage Levels in Danger :(\r\n");
-            break;
+            //break;
         }
 
         //Voltage_OpenWire();
 
         if(Voltage_OpenWire() != SAFE) {
             printf("DANGER!! There is an open wire :(\r\n");
-            break;
+            //break;
         }
 
     }
@@ -69,4 +69,6 @@ int main() {
             printf("DANGER\r\n");
         }
     }
+
+    while(1);
 }
