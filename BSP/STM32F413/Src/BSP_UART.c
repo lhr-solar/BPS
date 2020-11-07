@@ -1,3 +1,5 @@
+/* Copyright (c) 2020 UT Longhorn Racing Solar */
+
 #include "BSP_UART.h"
 #include "stm32f4xx.h"
 //Written by Sijin and Revised by Manthan Upadhyaya: 10/2020
