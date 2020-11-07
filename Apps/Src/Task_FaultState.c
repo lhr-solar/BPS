@@ -13,12 +13,6 @@
 #include "config.h"
 //Manthan Upadhyaya wuz here: 10/2020
 
-//Manthan Upadhyaya wuz here: 10/2020
-
-//Manthan Upadhyaya wuz here: 10/2020
-
-//Manthan Upadhyaya wuz here: 10/2020
-
 void Task_FaultState(void *p_arg) {
     (void)p_arg;
     OS_ERR err;
