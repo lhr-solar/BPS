@@ -66,8 +66,7 @@ def display(battery=None):  #print watchdog countdown
     CANbox.addstr(4, 0, textwrap.fill(text, 40))
     CANbox.addstr(3, 2, "CAN ID and Message:")
     # Display Watchdog ticks
-    #ticks = WDTimer.Tick()
-    ticks = 0
+    ticks = WDTimer.Tick()
     stdscr.addstr(10, 0, f"                              ") #clear previous tick
     stdscr.addstr(10, 0, f"WDTimer Countdown: {ticks}")
     #Display current frequency
