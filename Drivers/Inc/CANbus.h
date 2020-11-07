@@ -31,6 +31,12 @@ typedef struct {
 	CANData_t data;
 } CANPayload_t;
 
+/*This data type is used to push messages onto the queue*/
+typedef struct {
+    CANId_t id;
+    CANPayload_t payload;
+}CANMSG_t;
+
 /**
  * @brief   Initializes the CAN system
  * @param   None

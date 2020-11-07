@@ -3,6 +3,11 @@
  * battery pack.
  */
 #include "Temperature.h"
+#include "os.h"
+#include "Tasks.h"
+
+extern OS_MUTEX MinionsASIC_Mutex;
+
 
 // Holds the temperatures in Celsius (Fixed Point with .001 resolution) for each sensor on each board
 int32_t ModuleTemperatures[NUM_MINIONS][MAX_TEMP_SENSORS_PER_MINION_BOARD];
@@ -14,6 +19,8 @@ static uint8_t ChargingState;
 // Temperature.c uses auxiliary registers to view ADC data and COM register for I2C with LTC1380 MUX
 static cell_asic *Minions;
 
+static OS_MUTEX TemperatureBuffer_Mutex;
+
 /** Temperature_Init
  * Initializes device drivers including SPI inside LTC6811_init and LTC6811 for Temperature Monitoring
  * @param boards LTC6811 data structure that contains the values of each register
@@ -22,16 +29,28 @@ ErrorStatus Temperature_Init(cell_asic *boards){
 	// Record pointer
 	Minions = boards;
 
+	OS_ERR err;
+	OSMutexCreate(&TemperatureBuffer_Mutex,
+					"Temperature Data Buffer",
+					&err);
+	// assert
+
 	// Initialize peripherals
 	wakeup_sleep(NUM_MINIONS);
 	LTC6811_Init(Minions);
 
+	//take control of mutex
+  	OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
+  	assertOSError(err);
 	// Write Configuration Register
 	LTC6811_wrcfg(NUM_MINIONS, Minions);
 
 	// Read Configuration Register
 	wakeup_sleep(NUM_MINIONS);
 	int8_t error = LTC6811_rdcfg(NUM_MINIONS, Minions);
+	//release mutex
+  	OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
+  	assertOSError(err);
 
 	return error == 0 ? SUCCESS : ERROR;
 }
@@ -66,6 +85,11 @@ ErrorStatus Temperature_ChannelConfig(uint8_t tempChannel) {
 	// Second 2 bytes: 4 LSB of Mux Address + END_CODE
 	// Third 2 bytes: START_CODE + 4 MSB of data
 	// Fourth 2 bytes: 4 LSB of data + END_CODE
+
+	//take control of mutex
+	OS_ERR err;
+  	OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
+  	assertOSError(err);
 	
 	for (int board = 0; board < NUM_MINIONS; board++) {
 		/* Clear other mux */
@@ -84,12 +108,18 @@ ErrorStatus Temperature_ChannelConfig(uint8_t tempChannel) {
 		Minions[board].com.tx_data[5] = (0xF << 4) + AUX_I2C_NACK_STOP;
 
     }
+	//release mutex
+  	OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
+  	assertOSError(err);
 
     // Send data
     wakeup_sleep(NUM_MINIONS);
+	//take control of mutex
+  	OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
+  	assertOSError(err);
     LTC6811_wrcomm(NUM_MINIONS, Minions);
     LTC6811_stcomm();
-        
+
 	for (int board = 0; board < NUM_MINIONS; board++) {
 		/* Open channel on mux */
 		
@@ -113,6 +143,9 @@ ErrorStatus Temperature_ChannelConfig(uint8_t tempChannel) {
     wakeup_sleep(NUM_MINIONS);
     LTC6811_wrcomm(NUM_MINIONS, Minions);
     LTC6811_stcomm();
+	//release mutex
+  	OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
+  	assertOSError(err);
 
 	return SUCCESS;
 }
@@ -141,6 +174,9 @@ int milliVoltToCelsius(float milliVolt){
  * @return SUCCESS or ERROR
  */
 ErrorStatus Temperature_UpdateSingleChannel(uint8_t channel){
+	OS_ERR err;
+	CPU_TS ts;
+
 	// Configure correct channel
 	if (ERROR == Temperature_ChannelConfig(channel)) {
 		return ERROR;
@@ -149,6 +185,17 @@ ErrorStatus Temperature_UpdateSingleChannel(uint8_t channel){
 	// Sample ADC channel
 	Temperature_SampleADC(MD_422HZ_1KHZ);
 	
+	//take control of mutex
+  OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
+	assertOSError(err);
+
+	OSMutexPend(&TemperatureBuffer_Mutex,
+				0,
+				OS_OPT_PEND_BLOCKING,
+				&ts,
+				&err);
+	// assert
+
 	// Convert to Celsius
 	for(int board = 0; board < NUM_MINIONS; board++) {
 		
@@ -156,6 +203,15 @@ ErrorStatus Temperature_UpdateSingleChannel(uint8_t channel){
 		// a_codes[0] is fixed point with .001 resolution in volts -> multiply by .001 * 1000 to get mV in double form
 		ModuleTemperatures[board][channel] = milliVoltToCelsius(Minions[board].aux.a_codes[0]*0.1);
 	}
+	//release mutex
+  	OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
+  	assertOSError(err);
+
+	OSMutexPost(&TemperatureBuffer_Mutex,
+				OS_OPT_POST_1,
+				&err);
+	// assert
+
 	return SUCCESS;
 }
 
@@ -176,17 +232,35 @@ ErrorStatus Temperature_UpdateAllMeasurements(){
  * @return SAFE or DANGER
  */
 SafetyStatus Temperature_CheckStatus(uint8_t isCharging){
+	OS_ERR err;
+	CPU_TS ts;
 	int32_t temperatureLimit = isCharging == 1 ? MAX_CHARGE_TEMPERATURE_LIMIT : MAX_DISCHARGE_TEMPERATURE_LIMIT;
 	temperatureLimit *= MILLI_SCALING_FACTOR;
+
+	OSMutexPend(&TemperatureBuffer_Mutex,
+				0,
+				OS_OPT_PEND_BLOCKING,
+				&ts,
+				&err);
+	// assert
 
 	for (int i = 0; i < NUM_MINIONS; i++) {
 		for (int j = 0; j < MAX_TEMP_SENSORS_PER_MINION_BOARD; j++) {
 			if (i * MAX_TEMP_SENSORS_PER_MINION_BOARD + j >= NUM_TEMPERATURE_SENSORS) break;
 			if (ModuleTemperatures[i][j] > temperatureLimit) {
+				OSMutexPost(&TemperatureBuffer_Mutex,
+							OS_OPT_POST_1,
+							&err);
+				// assert
 				return DANGER;
 			}
 		}
 	}
+
+	OSMutexPost(&TemperatureBuffer_Mutex,
+				OS_OPT_POST_1,
+				&err);
+	// assert
 	return SAFE;
 }
 
@@ -207,8 +281,18 @@ void Temperature_SetChargeState(uint8_t isCharging){
  * @return pointer to index of modules that are in danger
  */
 uint8_t *Temperature_GetModulesInDanger(void){
+	OS_ERR err;
+	CPU_TS ts;
+
 	static uint8_t ModuleTempStatus[NUM_BATTERY_MODULES];
 	int32_t temperatureLimit = ChargingState == 1 ? MAX_CHARGE_TEMPERATURE_LIMIT : MAX_DISCHARGE_TEMPERATURE_LIMIT;
+
+	OSMutexPend(&TemperatureBuffer_Mutex,
+				0,
+				OS_OPT_PEND_BLOCKING,
+				&ts,
+				&err);
+	// assert
 
 	for (int i = 0; i < NUM_MINIONS-1; i++) {
 		for (int j = 0; j < MAX_TEMP_SENSORS_PER_MINION_BOARD; j++) {
@@ -218,6 +302,12 @@ uint8_t *Temperature_GetModulesInDanger(void){
 			}
 		}
 	}
+
+	OSMutexPost(&TemperatureBuffer_Mutex,
+				OS_OPT_POST_1,
+				&err);
+	// assert
+
 	return ModuleTempStatus;
 }
 /** Temperature_GetSingleTempSensor
@@ -239,15 +329,32 @@ int32_t Temperature_GetSingleTempSensor(uint8_t board, uint8_t sensorIdx) {
  * @return temperature of the battery module at specified index
  */
 int32_t Temperature_GetModuleTemperature(uint8_t moduleIdx){
+	OS_ERR err;
+	CPU_TS ts;
 	int32_t total = 0;
 	uint8_t board = (moduleIdx * 2) / MAX_TEMP_SENSORS_PER_MINION_BOARD;
 	uint8_t sensor = moduleIdx % (MAX_TEMP_SENSORS_PER_MINION_BOARD / 2);
 	
+	OSMutexPend(&TemperatureBuffer_Mutex,
+				0,
+				OS_OPT_PEND_BLOCKING,
+				&ts,
+				&err);
+	// assert
+
 	total += ModuleTemperatures[board][sensor];
 	
 	// Get temperature from other sensor on other side
 	total += ModuleTemperatures[board][sensor + MAX_TEMP_SENSORS_PER_MINION_BOARD / 2];
+
+	OSMutexPost(&TemperatureBuffer_Mutex,
+				OS_OPT_POST_1,
+				&err);
+	// assert
+
 	total /= 2;
+
+	
 	return total;
 }
 
@@ -274,6 +381,13 @@ ErrorStatus Temperature_SampleADC(uint8_t ADCMode) {
 	LTC6811_pollAdc();
 
 	wakeup_sleep(NUM_MINIONS);
+	//take control of mutex
+	OS_ERR err;
+  	OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
+  	assertOSError(err);
 	int8_t error = LTC6811_rdaux(AUX_CH_GPIO1, NUM_MINIONS, Minions);   // Update Minions with fresh values
+	//release mutex
+  	OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
+  	assertOSError(err);
 	return error != -1 ? SUCCESS : ERROR;
 }

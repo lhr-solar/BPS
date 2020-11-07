@@ -10,6 +10,11 @@
 #include "Current.h"
 #include "BSP_ADC.h"
 #include "os.h"
+#include "Tasks.h"
+
+static OS_ERR err;
+static CPU_TS ticks;
+static OS_MUTEX AmperesData_Mutex;
 
 int32_t HighPrecisionCurrent;	// Milliamp measurement of hall effect sensor of high precision
 int32_t LowPrecisionCurrent;	// Milliamp measurement of hall effect sensor of low precision
@@ -26,6 +31,8 @@ static int32_t Current_Conversion(uint32_t milliVolts, CurrentSensor s);
  */
 void Current_Init(void){
 	BSP_ADC_Init();	// Initialize the ADCs
+	OSMutexCreate(&AmperesData_Mutex, "Amperes Mutex", &err);
+	assertOSError(err);
 }
 
 /** Current_UpdateMeasurements
@@ -33,9 +40,12 @@ void Current_Init(void){
  * @return SUCCESS or ERROR
  */
 ErrorStatus Current_UpdateMeasurements(void){
+	OSMutexPend(&AmperesData_Mutex, 0, OS_OPT_PEND_BLOCKING, &ticks, &err);
+	assertOSError(err);
 	HighPrecisionCurrent = Current_Conversion(BSP_ADC_High_GetMilliVoltage(), HIGH_PRECISION);
 	LowPrecisionCurrent  = Current_Conversion(BSP_ADC_Low_GetMilliVoltage(), LOW_PRECISION);
-
+	OSMutexPost(&AmperesData_Mutex, OS_OPT_POST_NONE, &err);
+	assertOSError(err);
 	return SUCCESS;	// TODO: Once this has been tested, stop returning errors
 }
 
@@ -44,13 +54,23 @@ ErrorStatus Current_UpdateMeasurements(void){
  * @return SAFE or DANGER
  */
 SafetyStatus Current_CheckStatus(bool override) {
-
-	if((LowPrecisionCurrent > MAX_CHARGING_CURRENT)&&(LowPrecisionCurrent < MAX_CURRENT_LIMIT)&&(!override))
+	OSMutexPend(&AmperesData_Mutex, 0, OS_OPT_PEND_BLOCKING, &ticks, &err);
+	assertOSError(err);
+	if((LowPrecisionCurrent > MAX_CHARGING_CURRENT)&&(LowPrecisionCurrent < MAX_CURRENT_LIMIT)&&(!override)){
+		OSMutexPost(&AmperesData_Mutex, OS_OPT_POST_NONE, &err);
+		assertOSError(err);
 		return SAFE;
-	else if((LowPrecisionCurrent <= 0)&&(LowPrecisionCurrent > MAX_CHARGING_CURRENT)&&override)
+	}
+	else if((LowPrecisionCurrent <= 0)&&(LowPrecisionCurrent > MAX_CHARGING_CURRENT)&&override){
+		OSMutexPost(&AmperesData_Mutex, OS_OPT_POST_NONE, &err);
+		assertOSError(err);
 		return SAFE;
-	else
+	}
+	else{
+		OSMutexPost(&AmperesData_Mutex, OS_OPT_POST_NONE, &err);
+		assertOSError(err);
 		return DANGER;
+	}
 }
 
 /** Current_IsCharging
@@ -60,7 +80,12 @@ SafetyStatus Current_CheckStatus(bool override) {
  */
 int8_t Current_IsCharging(void) {
 	// TODO: Make sure that the current board is installed in such a way that negative => charging
-	return LowPrecisionCurrent < 0;
+	OSMutexPend(&AmperesData_Mutex, 0, OS_OPT_PEND_BLOCKING, &ticks, &err);
+	assertOSError(err);
+	int8_t val = LowPrecisionCurrent < 0;
+	OSMutexPost(&AmperesData_Mutex, OS_OPT_POST_NONE, &err);
+	assertOSError(err);
+	return val;
 }
 
 /** Current_GetHighPrecReading
@@ -68,7 +93,12 @@ int8_t Current_IsCharging(void) {
  * @return milliamperes value
  */
 int32_t Current_GetHighPrecReading(void) {
-	return HighPrecisionCurrent;
+	OSMutexPend(&AmperesData_Mutex, 0, OS_OPT_PEND_BLOCKING, &ticks, &err);
+	assertOSError(err);
+	int32_t val = HighPrecisionCurrent;
+	OSMutexPost(&AmperesData_Mutex, OS_OPT_POST_NONE, &err);
+	assertOSError(err);
+	return val;
 }
 
 /** Current_GetLowPrecReading
@@ -76,7 +106,12 @@ int32_t Current_GetHighPrecReading(void) {
  * @return milliamperes value
  */
 int32_t Current_GetLowPrecReading(void) {
-	return LowPrecisionCurrent;
+	OSMutexPend(&AmperesData_Mutex, 0, OS_OPT_PEND_BLOCKING, &ticks, &err);
+	assertOSError(err);
+	int32_t val = LowPrecisionCurrent;
+	OSMutexPost(&AmperesData_Mutex, OS_OPT_POST_NONE, &err);
+	assertOSError(err);
+	return val;
 }
 
 /** Current_Conversion
@@ -107,10 +142,39 @@ void Task_AmperesMonitor(void *p_arg) {
 
     OS_ERR err;
 
+	bool amperesHasBeenChecked = false;
+
     while(1) {
         // BLOCKING =====================
         // Update Amperes Measurements
+		Current_UpdateMeasurements();
+
         // Check if amperes is NOT safe:
+		SafetyStatus amperesStatus = Current_CheckStatus(false);
+		if(amperesStatus != SAFE) {
+            OSSemPost(&Fault_Sem4,
+                        OS_OPT_POST_1,
+                        &err);
+			assertOSError(err);
+			
+        } else if((amperesStatus == SAFE) && (!amperesHasBeenChecked)) {
+            // Signal to turn on contactor but only signal once
+            OSSemPost(&SafetyCheck_Sem4,
+                        OS_OPT_POST_1,
+                        &err);
+			assertOSError(err);
+
+            amperesHasBeenChecked = true;
+        }
+
+        //signal watchdog
+        OSMutexPend(&WDog_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
+        assertOSError(err);
+
+        WDog_BitMap |= WD_AMPERES;
+
+        OSMutexPost(&WDog_Mutex, OS_OPT_POST_NONE, &err);
+        assertOSError(err);
     }
 }
 

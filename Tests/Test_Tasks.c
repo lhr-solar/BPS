@@ -25,7 +25,9 @@ void Task1(void *p_arg) {
                     &ts,
                     &err);
         }
-        
+        OSTimeDly(1,
+                OS_OPT_TIME_DLY,
+                &err);
         printf("1\r\n");
     }
 }
@@ -39,6 +41,10 @@ void Task2(void *p_arg) {
         OSSemPost(&SafetyCheck_Sem4,
                     OS_OPT_POST_ALL,
                     &err);
+
+        OSTimeDly(1,
+                OS_OPT_TIME_DLY,
+                &err);
 
         printf("2\r\n");
     }
