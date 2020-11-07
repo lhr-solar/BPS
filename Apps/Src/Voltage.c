@@ -10,7 +10,7 @@
 
 static cell_asic *Minions;
 static uint16_t VoltageVal[NUM_BATTERY_MODULES]; //Voltage values gathered
-static uint32_t openWires[TOTAL_PINS];
+static uint32_t openWires[TOTAL_VOLT_WIRES];
 /** LTC ADC measures with resolution of 4 decimal places, 
  * But we standardized to have 3 decimal places to work with
  * millivolts
@@ -99,15 +99,15 @@ SafetyStatus Voltage_CheckStatus(void){
  * @return pointer to index of modules that are in danger
  */
 SafetyStatus *Voltage_GetModulesInDanger(void){
-	static SafetyStatus checks[TOTAL_PINS];
+	static SafetyStatus checks[TOTAL_VOLT_WIRES];
 	Voltage_GetOpenWire();
 	uint32_t wires;
 	uint32_t openWireIdx = 0;
 	//put all the bits from each minion's system_open_wire variable into one variable
 	for(int k = 0; k < NUM_MINIONS; k++){
 		wires = (Minions[k].system_open_wire & 0x1FF);	//there are at most 8 modules per IC, bit 0 is GND
-		for(int s = 0; s < NUM_PINS_PER_IC; s++){
-			if(k == 3 && s == NUM_PINS_PER_IC-1){
+		for(int s = 0; s < NUM_PINS_PER_LTC; s++){
+			if(k == 3 && s == NUM_PINS_PER_LTC-1){
 				break;	//the last IC has only 7 modules 
 			}
 			openWires[openWireIdx] = (wires >> s) & 1;
@@ -115,7 +115,7 @@ SafetyStatus *Voltage_GetModulesInDanger(void){
 		}
 	}
 	
-	for (int i = 0; i < TOTAL_PINS; i++) {	
+	for (int i = 0; i < TOTAL_VOLT_WIRES; i++) {	
 		if(i < NUM_BATTERY_MODULES){
 			// Check if battery is in range of voltage limit
 			if(Voltage_GetModuleMillivoltage(i) > MAX_VOLTAGE_LIMIT * MILLI_SCALING_FACTOR || Voltage_GetModuleMillivoltage(i) < MIN_VOLTAGE_LIMIT * MILLI_SCALING_FACTOR) {

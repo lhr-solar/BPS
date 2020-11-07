@@ -48,8 +48,8 @@ typedef enum {SAFE = 0, DANGER = 1, OVERVOLTAGE = 2, UNDERVOLTAGE = 3} SafetySta
 // Voltage Sensor Configurations
 // Defines how many voltage sensors are connected to each board
 #define MAX_VOLT_SENSORS_PER_MINION_BOARD	8	// User defined. The LTC6811 can actually measure 12 modules.
-#define NUM_PINS_PER_IC 					9
-#define TOTAL_PINS 							NUM_MINIONS*4 - 1
+#define NUM_PINS_PER_LTC 					9
+#define TOTAL_VOLT_WIRES					NUM_MINIONS*4 - 1
 
 //--------------------------------------------------------------------------------
 // Temperature Sensor Configurations
