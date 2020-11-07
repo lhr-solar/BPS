@@ -6,6 +6,7 @@
 #include "Voltage.h"
 #include "Temperature.h"
 
+
 /*******************************************************************************
 *    Shared Resources
 *******************************************************************************/
@@ -126,6 +127,8 @@ void Task_FaultState(void *p_arg) {
 
     // Push Contactor State message to CAN Q
 
+    // CLI
+    // WDOG Reset
 
 void Task_CriticalState(void *p_arg) {
     (void)p_arg;
