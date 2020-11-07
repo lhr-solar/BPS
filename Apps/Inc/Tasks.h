@@ -103,6 +103,7 @@ extern CPU_STK BatteryBalance_Stk[TASK_BATTERY_BALANCE_STACK_SIZE];
 extern CPU_STK CLI_Stk[TASK_CLI_STACK_SIZE];
 extern CPU_STK BLE_Stk[TASK_BLE_STACK_SIZE];
 extern CPU_STK Idle_Stk[TASK_IDLE_STACK_SIZE];
+extern CPU_STK Init_Stk[TASK_INIT_STACK_SIZE];
 
 /**
  * @brief   Queue for pushing and popping CAN Messages
