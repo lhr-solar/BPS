@@ -27,6 +27,11 @@ void Task_FaultState(void *p_arg) {
     OSSemPost(&Fault_Sem4, OS_OPT_PEND_BLOCKING, &err);
     // Turn Contactor Off
     BSP_Contactor_Off();
+    //Set Fans to full speed
+    BSP_Fans_Set(1, 8);
+    BSP_Fans_Set(2, 8);
+    BSP_Fans_Set(3, 8);
+    BSP_Fans_Set(4, 8);
     // Turn Strobe Light On
     // Turn LEDs On and logs Error into EEPROM
     BSP_Light_Off(RUN); //turn off run light
