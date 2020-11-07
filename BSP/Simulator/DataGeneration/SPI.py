@@ -46,12 +46,14 @@ def random_voltage(mode):
     @param mode : 'low', 'normal', or 'high' ranges
     """
     global voltage_values
+    MIN = 0
+    MAX = 1
     if mode == 'low':
-        voltage_values = [random.randint(25000, 27000) for i in range(31)]
+        voltage_values = [random.randint(config.rand_volt_range['LOW'][MIN], config.rand_volt_range['LOW'][MAX]) for i in range(31)]
     elif mode == 'normal':
-        voltage_values = [random.randint(27000, 40000) for i in range(31)]
+        voltage_values = [random.randint(config.rand_volt_range['NOM'][MIN], config.rand_volt_range['NOM'][MAX]) for i in range(31)]
     elif mode == 'high':
-        voltage_values = [random.randint(40000, 42000) for i in range(31)]
+        voltage_values = [random.randint(config.rand_volt_range['HIGH'][MIN], config.rand_volt_range['HIGH'][MAX]) for i in range(31)]
 
 
 def specific_voltage(battery):
@@ -63,7 +65,6 @@ def specific_voltage(battery):
     global voltage_values
     voltage_values = [int((module.voltage*10000)+random.randint(-12, 12)) for module in battery.modules]
 
-
 def random_temperature(state, mode):
     """
     @brief generate randomized temperature values in specified ranges
@@ -71,20 +72,28 @@ def random_temperature(state, mode):
     @param mode : 'low', 'normal', or 'high' ranges respective to the state
     """
     global temperature_values
+    MIN = 0
+    MAX = 1
     if state == 'charging':
         if mode == 'low':
-            temperature_values = [(random.randint(10000, 25000), random.randint(10000, 25000)) for i in range(31)]
+            temperature_values = [(random.randint(config.rand_temp_chg_range['LOW'][MIN], config.rand_temp_chg_range['LOW'][MAX]),
+                                    random.randint(config.rand_temp_chg_range['LOW'][MIN], config.rand_temp_chg_range['LOW'][MAX])) for i in range(31)]
         elif mode == 'normal':
-            temperature_values = [(random.randint(25000, 48000), random.randint(25000, 48000)) for i in range(31)]
+            temperature_values = [(random.randint(config.rand_temp_chg_range['NOM'][MIN], config.rand_temp_chg_range['NOM'][MAX]),
+                                    random.randint(config.rand_temp_chg_range['NOM'][MIN], config.rand_temp_chg_range['NOM'][MAX])) for i in range(31)]
         elif mode == 'high':
-            temperature_values = [(random.randint(48000, 60000), random.randint(48000, 60000)) for i in range(31)]
+            temperature_values = [(random.randint(config.rand_temp_chg_range['HIGH'][MIN], config.rand_temp_chg_range['HIGH'][MAX]),
+                                    random.randint(config.rand_temp_chg_range['HIGH'][MIN], config.rand_temp_chg_range['HIGH'][MAX])) for i in range(31)]
     elif state == 'discharging':
         if mode == 'low':
-            temperature_values = [(random.randint(10000, 30000), random.randint(10000, 30000)) for i in range(31)]
+            temperature_values = [(random.randint(config.rand_temp_dischg_range['LOW'][MIN], config.rand_temp_dischg_range['LOW'][MAX]),
+                                    random.randint(config.rand_temp_dischg_range['LOW'][MIN], config.rand_temp_dischg_range['LOW'][MAX])) for i in range(31)]
         elif mode == 'normal':
-            temperature_values = [(random.randint(30000, 72000), random.randint(30000, 72000)) for i in range(31)]
+            temperature_values = [(random.randint(config.rand_temp_dischg_range['NOM'][MIN], config.rand_temp_dischg_range['NOM'][MAX]),
+                                    random.randint(config.rand_temp_dischg_range['NOM'][MIN], config.rand_temp_dischg_range['NOM'][MAX])) for i in range(31)]
         elif mode == 'high':
-            temperature_values = [(random.randint(73000, 90000), random.randint(73000, 90000)) for i in range(31)]
+            temperature_values = [(random.randint(config.rand_temp_dischg_range['HIGH'][MIN], config.rand_temp_dischg_range['HIGH'][MAX]),
+                                    random.randint(config.rand_temp_dischg_range['HIGH'][MIN], config.rand_temp_dischg_range['HIGH'][MAX])) for i in range(31)]
 
 
 def specific_temperature(battery):
@@ -98,11 +107,11 @@ def specific_temperature(battery):
                             for module in battery.modules]
 
 
-st = 'discharging'
-md = 'normal'
-batt = None
+battery_state = 'discharging'
+battery_mode = 'normal'
+battery_inst = None
 def init(state='discharging', mode='normal', battery=None):
-    global st, md, batt
+    global battery_state, battery_mode, battery_inst
     os.makedirs(os.path.dirname(read_file), exist_ok=True)
     os.makedirs(os.path.dirname(write_file), exist_ok=True)
     # Create files
@@ -111,9 +120,9 @@ def init(state='discharging', mode='normal', battery=None):
     f_w = open(write_file, 'w')
     f_w.close()
 
-    st = state
-    md = mode
-    batt = battery
+    battery_state = state
+    battery_mode = mode
+    battery_inst = battery
     
     for i in range(4):
         minions.append(ltc6811.LTC6811(battery))
@@ -227,9 +236,10 @@ def balance_batteries():
 
 
 def spi_task():
+    # global battery_state, battery_mode, battery_inst
     logging.info('Starting SPI Task')
     while True:
-        generate(st, md, batt)
+        generate(battery_state, battery_mode, battery_inst)
 
 spi_thread = threading.Thread(target=spi_task)
 

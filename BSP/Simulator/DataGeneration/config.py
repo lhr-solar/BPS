@@ -33,3 +33,23 @@ Total battery pack is calculated by the number of battery cells in parallel per 
 Capacity does not increase as you put more cells in series.
 '''
 total_batt_pack_capacity_mah = num_batt_cells_parallel_per_module * batt_cell_capacity_mah
+
+
+
+rand_volt_range = {
+    'LOW' : [25000, 27000],
+    'NOM' : [27000, 40000],
+    'HIGH' : [40000, 42000]
+}
+
+rand_temp_dischg_range = {
+    'LOW' : [10000, 30000],
+    'NOM' : [30000, 72000],
+    'HIGH' : [73000, 90000]
+}
+
+rand_temp_chg_range = {
+    'LOW' : [10000, 25000],
+    'NOM' : [25000, 48000],
+    'HIGH' : [48000, 60000]
+}
