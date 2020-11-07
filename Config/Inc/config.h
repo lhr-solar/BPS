@@ -35,8 +35,8 @@ typedef enum {SAFE = 0, DANGER = 1, OVERVOLTAGE = 2, UNDERVOLTAGE = 3, OPENWIRE 
 #define MIN_VOLTAGE_LIMIT				2.7		// Under voltage limit (Voltage)	(actual min: 2.5V)
 #define MAX_VOLTAGE_LIMIT				4.0		// Over voltage limit (Voltage)		(actual max: 4.2V)
 
-#define MAX_DISCHARGE_TEMPERATURE_LIMIT	73.00	// Max temperature limit (Celcius)	(actual max: 75C)
-#define MAX_CHARGE_TEMPERATURE_LIMIT	48.00	// Max temperature limit (Celcius)	(actual max: 50C)
+#define MAX_DISCHARGE_TEMPERATURE_LIMIT	55.00	// Max temperature limit (Celcius)	(recommended release: 60.00C)
+#define MAX_CHARGE_TEMPERATURE_LIMIT	40.00	// Max temperature limit (Celcius)	(recommended release: 45.00C)
 
 #define MAX_CURRENT_LIMIT				100000		// Max current limit (Milliamperes)		(Max continuous discharge is 15A per cell)
 #define MAX_HIGH_PRECISION_CURRENT 		50000		// Max current detectable by the high-precision current sensor (mA)
