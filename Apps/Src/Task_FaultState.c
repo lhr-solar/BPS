@@ -3,6 +3,7 @@
 #include "BSP_Contactor.h"
 #include "BSP_Lights.h"
 #include "Voltage.h"
+#include "BSP_Fans.h"
 #include "Temperature.h"
 #include "Current.h"
 #include "EEPROM.h"
