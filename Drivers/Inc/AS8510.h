@@ -36,3 +36,4 @@ uint8_t AS8510_ReadRegister(uint8_t addr);
 int16_t AS8510_GetCurrent();
 
 #endif
+

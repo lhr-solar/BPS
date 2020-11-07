@@ -204,3 +204,4 @@ int16_t AS8510_GetCurrent() {
 
     return *((int16_t*)&reading); // TODO: how does this need to be modified to be useable?
 }
+
