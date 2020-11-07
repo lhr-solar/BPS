@@ -23,6 +23,7 @@ OS_TCB BatteryBalance_TCB;
 OS_TCB CLI_TCB;
 OS_TCB BLE_TCB;
 OS_TCB Idle_TCB;
+OS_TCB &Init_TCB;
 
 /**
  * @brief   Stacks
