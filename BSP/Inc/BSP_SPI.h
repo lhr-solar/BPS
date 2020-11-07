@@ -7,6 +7,17 @@
 
 
 /**
+ * @note    This is for the RTOS version of the BPS 
+ */
+
+/**
+ * @brief   Initializes AmperesIO semaphore pending and posting
+ * @param   spi3_os pointer to struct that holds the SPI3 specific pend()/post() functions
+ * @return  None
+ */
+void SPI3_Init(bsp_os_t *spi3_os);
+
+/**
  * @note    If other ICs need to be connected onto the SPI line, this code will have to be modified.
  */
 

@@ -3,12 +3,24 @@
 
 
 static bsp_os_t *os;
-
-
+static bsp_os_t *os3;
 
 
 // Use this macro function to wait until SPI communication is complete
+#ifdef BAREMETAL
 #define SPI_Wait(SPIx)		while(((SPIx)->SR & (SPI_SR_TXE | SPI_SR_RXNE)) == 0 || ((SPIx)->SR & SPI_SR_BSY))
+#endif
+
+#ifdef RTOS
+#define SPI_Wait(SPIx)		if(((SPIx)->SR & (SPI_SR_TXE | SPI_SR_RXNE)) == 0 || ((SPIx)->SR & SPI_SR_BSY)){ \
+								if(SPIx == SPI1){	\
+									os->pend();	\
+								}	\	
+								else if(SPIx == SPI3){	\
+									os3->pend();	\
+								}	\
+							} 
+#endif
 
 /** SPI1_WriteRead
  * @brief   Sends and receives a byte of data on the SPI line.
@@ -119,6 +131,7 @@ void BSP_SPI_Read(uint8_t *rxBuf, uint32_t rxLen) {
     for(uint32_t i = 0; i < rxLen; i++){
 		rxBuf[i] = SPI_WriteRead(0x00);
 	}
+
 }
 
 /**
@@ -136,6 +149,10 @@ void BSP_SPI_SetStateCS(uint8_t state) {
     } else {
         GPIO_ResetBits(GPIOB, GPIO_Pin_6);
     }
+}
+
+void SPI3_Init(bsp_os_t *spi3_os){
+	os3 = spi3_os;
 }
 
 /***************THE FOLLWING CODE IS FOR THE RTOS VERSION OF THE BPS*********/
@@ -158,12 +175,27 @@ void SPI1_IRQHandler(void){
 	OSIntExit();
 }
 
+void SPI3_Handler(){
+	OS_ERR err;
+	// Save the CPU registers
+	CPU_SR_ALLOC();
+
+	// Protect a critical section
+	CPU_CRITICAL_ENTER();
+
+	// make the kernel aware that the interrupt has started
+	OSIntEnter();
+	CPU_CRITICAL_EXIT();
+	os3->post();
+	
+	//make the kernel aware that the interrupt has ended
+	OSIntExit();
+}
+
 void BSP_SPI_Write(uint8_t *txBuf, uint32_t txLen){
-	os->pend();
 	for(int32_t i = 0; i < txLen; i++){
 		SPI_WriteRead(txBuf[i]);
 	}
-	os->post();
 }
 
 
