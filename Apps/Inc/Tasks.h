@@ -10,13 +10,12 @@
 #define TASK_PETWDOG_PRIO                   3
 #define TASK_VOLT_TEMP_MONITOR_PRIO         4
 #define TASK_AMPERES_MONITOR_PRIO           5
-#define TASK_DASHBOARD_NOTIFY_PRIO          6
-#define TASK_LOG_INFO_PRIO                  7
-#define TASK_CANBUS_CONSUMER_PRIO           8
-#define TASK_BATTERY_BALANCE_PRIO           9
-#define TASK_CLI_PRIO                       10
-#define TASK_BLE_PRIO                       11
-#define TASK_IDLE_PRIO                      12
+#define TASK_BATTERY_BALANCE_PRIO           6 //BATTERY
+#define TASK_DASHBOARD_NOTIFY_PRIO          7 //DASH
+#define TASK_LOG_INFO_PRIO                  8 //LOGINFO
+#define TASK_CANBUS_CONSUMER_PRIO           9 //CANBUS
+#define TASK_CLI_PRIO                       10  
+#define TASK_IDLE_PRIO                      11
 
 #define DEFAULT_STACK_SIZE                  256
 #define WATERMARK_STACK_LIMIT               DEFAULT_STACK_SIZE/2
