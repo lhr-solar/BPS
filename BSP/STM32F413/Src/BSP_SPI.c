@@ -98,7 +98,6 @@ void BSP_SPI_Init(bsp_os_t *spi_os){
 	os = spi_os;
 }
 
-#ifdef BAREMETAL
 /**
  * @brief   Transmits data to through SPI.
  *          With the way the LTC6811 communication works, the LTC6811 will not send
@@ -115,7 +114,6 @@ void BSP_SPI_Write(uint8_t *txBuf, uint32_t txLen) {
 		SPI_WriteRead(txBuf[i]);
 	}
 }
-#endif
 
 /**
  * @brief   Gets the data from SPI. With the way the LTC6811 communication works,
@@ -192,11 +190,7 @@ void SPI3_Handler(){
 	OSIntExit();
 }
 
-void BSP_SPI_Write(uint8_t *txBuf, uint32_t txLen){
-	for(int32_t i = 0; i < txLen; i++){
-		SPI_WriteRead(txBuf[i]);
-	}
-}
+
 
 
 #endif
