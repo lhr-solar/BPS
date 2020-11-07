@@ -88,7 +88,7 @@ extern OS_TCB BatteryBalance_TCB;
 extern OS_TCB CLI_TCB;
 extern OS_TCB BLE_TCB;
 extern OS_TCB Idle_TCB;
-extern OS_TCB &Init_TCB;
+extern OS_TCB Init_TCB;
 /**
  * @brief   Stacks
  */

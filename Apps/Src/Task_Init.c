@@ -108,17 +108,10 @@ void Task_Init(void *p_arg) {
 				&err);					// return err code
         //6
         OSTaskCreate(&Init_TCB,				// TCB
-<<<<<<< HEAD
 				"TASK_BATTERY_BALANCE_PRIO",	// Task Name (String)
 				Task_Init,				// Task function pointer
 				(void *)0,				// Task function args
 				TASK_BATTERY_BALANCE_PRIO,			// Priority
-=======
-				"TASK_DASHBOARD_NOTIFY_PRIO",	// Task Name (String)
-				Task_Init,				// Task function pointer
-				(void *)0,				// Task function args
-				TASK_DASHBOARD_NOTIFY_PRIO,			// Priority
->>>>>>> 03afbd751ded2f51d3251710e6e789e42838ef3d
 				Init_Stk,				// Stack
 				WATERMARK_STACK_LIMIT,	// Watermark limit for debugging
 				DEFAULT_STACK_SIZE,		// Stack size
@@ -129,17 +122,10 @@ void Task_Init(void *p_arg) {
 				&err);					// return err code
         //7
         OSTaskCreate(&Init_TCB,				// TCB
-<<<<<<< HEAD
 				"TASK_DASHBOARD_NOTIFY_PRIO",	// Task Name (String)
 				Task_Init,				// Task function pointer
 				(void *)0,				// Task function args
 				TASK_DASHBOARD_NOTIFY_PRIO,			// Priority
-=======
-				"TASK_LOG_INFO_PRIO",	// Task Name (String)
-				Task_Init,				// Task function pointer
-				(void *)0,				// Task function args
-				TASK_LOG_INFO_PRIO,			// Priority
->>>>>>> 03afbd751ded2f51d3251710e6e789e42838ef3d
 				Init_Stk,				// Stack
 				WATERMARK_STACK_LIMIT,	// Watermark limit for debugging
 				DEFAULT_STACK_SIZE,		// Stack size
@@ -150,17 +136,10 @@ void Task_Init(void *p_arg) {
 				&err);					// return err code
         //8
         OSTaskCreate(&Init_TCB,				// TCB
-<<<<<<< HEAD
 				"TASK_LOG_INFO_PRIO",	// Task Name (String)
 				Task_Init,				// Task function pointer
 				(void *)0,				// Task function args
 				TASK_LOG_INFO_PRIO,			// Priority
-=======
-				"TASK_CANBUS_CONSUMER_PRIO",	// Task Name (String)
-				Task_Init,				// Task function pointer
-				(void *)0,				// Task function args
-				TASK_CANBUS_CONSUMER_PRIO,			// Priority
->>>>>>> 03afbd751ded2f51d3251710e6e789e42838ef3d
 				Init_Stk,				// Stack
 				WATERMARK_STACK_LIMIT,	// Watermark limit for debugging
 				DEFAULT_STACK_SIZE,		// Stack size
@@ -171,17 +150,10 @@ void Task_Init(void *p_arg) {
 				&err);					// return err code
         //9
         OSTaskCreate(&Init_TCB,				// TCB
-<<<<<<< HEAD
 				"TASK_CANBUS_CONSUMER_PRIO",	// Task Name (String)
 				Task_Init,				// Task function pointer
 				(void *)0,				// Task function args
 				TASK_CANBUS_CONSUMER_PRIO,			// Priority
-=======
-				"TASK_BATTERY_BALANCE_PRIO",	// Task Name (String)
-				Task_Init,				// Task function pointer
-				(void *)0,				// Task function args
-				TASK_BATTERY_BALANCE_PRIO,			// Priority
->>>>>>> 03afbd751ded2f51d3251710e6e789e42838ef3d
 				Init_Stk,				// Stack
 				WATERMARK_STACK_LIMIT,	// Watermark limit for debugging
 				DEFAULT_STACK_SIZE,		// Stack size
@@ -190,10 +162,6 @@ void Task_Init(void *p_arg) {
 				(void *)0,				// Extension pointer (not needed)
 				OS_OPT_TASK_STK_CHK | OS_OPT_TASK_SAVE_FP,	// Options
 				&err);					// return err code
-<<<<<<< HEAD
-
-=======
->>>>>>> 03afbd751ded2f51d3251710e6e789e42838ef3d
         //10
         OSTaskCreate(&Init_TCB,				// TCB
 				"TASK_CLI_PRIO",	// Task Name (String)
@@ -210,23 +178,6 @@ void Task_Init(void *p_arg) {
 				&err);					// return err code}
         //11
         OSTaskCreate(&Init_TCB,				// TCB
-<<<<<<< HEAD
-=======
-				"TASK_BLE_PRIO",	// Task Name (String)
-				Task_Init,				// Task function pointer
-				(void *)0,				// Task function args
-				TASK_BLE_PRIO,			// Priority
-				Init_Stk,				// Stack
-				WATERMARK_STACK_LIMIT,	// Watermark limit for debugging
-				DEFAULT_STACK_SIZE,		// Stack size
-				0,						// Queue size (not needed)
-				10,						// Time quanta (time slice) 10 ticks
-				(void *)0,				// Extension pointer (not needed)
-				OS_OPT_TASK_STK_CHK | OS_OPT_TASK_SAVE_FP,	// Options
-				&err);					// return err code}
-        //12
-        OSTaskCreate(&Init_TCB,				// TCB
->>>>>>> 03afbd751ded2f51d3251710e6e789e42838ef3d
 				"TASK_IDLE_PRIO",	// Task Name (String)
 				Task_Init,				// Task function pointer
 				(void *)0,				// Task function args
