@@ -130,6 +130,10 @@ static Group DetermineGroupLetter(uint16_t cmd);
  */
 static bool UpdateSimulationData(void);
 
+void SPI3_Init(bsp_os_t *spi3_os){
+	
+}
+
 /**
  * @brief   Initializes the SPI port connected to the LTC6820.
  *          This port communicates with the LTC6811 voltage and temperature
