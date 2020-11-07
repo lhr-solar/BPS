@@ -1,3 +1,5 @@
+/* Copyright (c) 2020 UT Longhorn Racing Solar */
+
 #include "BSP_I2C.h"
 #include "stm32f4xx.h"
 

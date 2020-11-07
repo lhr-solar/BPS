@@ -1,3 +1,5 @@
+/* Copyright (c) 2020 UT Longhorn Racing Solar */
+
 #include "BSP_ADC.h"
 #include "simulator_conf.h"
 #include <unistd.h>
