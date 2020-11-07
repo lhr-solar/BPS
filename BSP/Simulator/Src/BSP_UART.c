@@ -1,3 +1,5 @@
+/* Copyright (c) 2020 UT Longhorn Racing Solar */
+
 #include "BSP_UART.h"
 #include <stdint.h>
 #include <pthread.h>

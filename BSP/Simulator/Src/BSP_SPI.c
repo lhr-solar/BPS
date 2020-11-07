@@ -1,3 +1,5 @@
+/* Copyright (c) 2020 UT Longhorn Racing Solar */
+
 #include "BSP_SPI.h"
 #include "config.h"
 #include "common.h"

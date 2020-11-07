@@ -23,7 +23,7 @@ The system can also be built and deployed from a terminal, allowing you to use d
     - cortex-debug
 
 ## Building
-When calling any of the following commands, make sure you are in the BeVolt folder.
+When calling any of the following commands, make sure you are in the top most level of the directory.
 
 Call ```make bsp_type``` to compile the release version of the code. ```bsp_type``` is the system you want to compile for.
 
@@ -52,10 +52,12 @@ To build a new test, you need to use the following command:
 ## Rules
 Make sure to have fun!
 
-Commit frequently into your own branches. Create a Pull Request whenever you are ready to add you working code to the master branch. You must select 1 reviewer for approval. Follow the coding guidelines in the Solar Google Drive. The reviewers will make sure everything is up to par with the coding standards.
+Commit frequently into your own branches. Create a Pull Request whenever you are ready to add you working code to the master branch. Make sure that your code compiles without any errors or warnings before you open a pull request. You must select 1 reviewer for approval. Follow the coding guidelines in the Solar Google Drive. The reviewers will make sure everything is up to par with the coding standards.
 
 Reviewers: (More will be added)
 1. Sijin Woo
 2. Chase Block
 3. Clark Poon
 4. Rishi Ponnekanti
+5. Manthan Upadhyaya
+6. Sugam Arora

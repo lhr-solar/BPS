@@ -1,4 +1,5 @@
-import logging
+# Copyright (c) 2020 UT Longhorn Racing Solar
+
 import csv
 import random
 import os
@@ -6,6 +7,7 @@ import threading
 import fcntl
 import config
 import ltc6811
+import logging
 
 """
 This module generates Voltage and Temperature

@@ -1,3 +1,5 @@
+/* Copyright (c) 2020 UT Longhorn Racing Solar */
+
 /** config.h
  * Config file to hold any aliases/constants referenced by multiple files
  * Not specific to a single board/unit
@@ -10,7 +12,7 @@
 
 typedef enum {OFF = 0, ON} State;
 typedef enum {ERROR = 0, SUCCESS = !ERROR} ErrorStatus;
-typedef enum {SAFE = 0, DANGER = 1, OVERVOLTAGE = 2, UNDERVOLTAGE = 3} SafetyStatus;
+typedef enum {SAFE = 0, DANGER = 1, OVERVOLTAGE = 2, UNDERVOLTAGE = 3, OPENWIRE = 4} SafetyStatus;
 
 // NUCLEO or custom
 #define COMMAND_SIZE			128
