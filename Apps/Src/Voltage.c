@@ -64,9 +64,7 @@ ErrorStatus Voltage_UpdateMeasurements(void){
 	//copies values from cells.c_codes to private array
 	for(int i = 0; i < NUM_BATTERY_MODULES; i++){
 		VoltageVal[i] = Minions[i / MAX_VOLT_SENSORS_PER_MINION_BOARD].cells.c_codes[i % MAX_VOLT_SENSORS_PER_MINION_BOARD];
-		printf("%d, ", VoltageVal[i]);
 	}
-	printf("\r\n");
 	
 	if(error == 0){
 		return SUCCESS;
