@@ -138,7 +138,7 @@ static bool UpdateSimulationData(void);
  * @param   None
  * @return  None
  */
-void BSP_SPI_Init(void) {
+void BSP_SPI_Init(bsp_os_t *spi_os) {
 
     // Reset values
     memset(simulationData, 0, sizeof(simulationData));
