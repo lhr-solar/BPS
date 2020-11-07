@@ -22,8 +22,6 @@ int main() {
         printf("\t%d: %dmV\r\n", i, Voltage_GetModuleMillivoltage(i));
     }
 
-    sleep(1);
-
     printf("Testing Voltage functions in loop.\r\n");
 
     while(1) {
@@ -32,11 +30,16 @@ int main() {
 
         Voltage_UpdateMeasurements();
         
+        printf("Printing voltage values.\r\n");
+        for(int i = 0; i < NUM_BATTERY_MODULES; i++) {
+            printf("\t%d: %dmV\r\n", i, Voltage_GetModuleMillivoltage(i));
+        }
+
         if(Voltage_CheckStatus() != SAFE) {
             printf("DANGER!! Voltage Levels in Danger :(\r\n");
             break;
         }
-
+        
         if(Voltage_OpenWire() != SAFE) {
             printf("DANGER!! There is an open wire :(\r\n");
             break;
@@ -56,7 +59,7 @@ int main() {
 
     printf("Printing modules that failed.\r\n");
     SafetyStatus *dangerBatt = Voltage_GetModulesInDanger();
-    for(int i = 0; i < NUM_BATTERY_MODULES; i++) {
+    for(int i = 0; i < TOTAL_VOLT_WIRES; i++) {
         printf("\t%d: ", i);
         if(dangerBatt[i] == SAFE) {
             printf("SAFE\r\n");
@@ -66,4 +69,6 @@ int main() {
             printf("DANGER\r\n");
         }
     }
+
+    while(1);
 }

@@ -23,6 +23,7 @@ int main() {
 	EEPROM_Load();
 	EEPROM_Tester();
 	EEPROM_SerialPrintData();
+	while(1){}
 	return 0;
 }
 
