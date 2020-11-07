@@ -32,6 +32,8 @@
 #define TASK_CLI_STACK_SIZE                 DEFAULT_STACK_SIZE
 #define TASK_BLE_STACK_SIZE                 DEFAULT_STACK_SIZE
 #define TASK_IDLE_STACK_SIZE                DEFAULT_STACK_SIZE
+#define TASK_INIT_STACK_SIZE                DEFAULT_STACK_SIZE
+
 
 /**
  * enum to keep track of which tasks correspond to each bit in WDog_BitMap
@@ -67,6 +69,9 @@ void Task_CLI(void *p_arg);
 void Task_BLE(void *p_arg);
 
 void Task_Idle(void *p_arg);
+
+void Task_Init(void *p_arg);
+
 
 /**
  * Used to assert if there has been an error in one of the OS functions
