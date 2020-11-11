@@ -21,6 +21,10 @@ static uint8_t chipSelectState = 1;     // During idle, the cs pin should be hig
 static char csvBuffer[CSV_SPI_BUFFER_SIZE];
 
 
+void SPI3_Init(bsp_os_t *spi3_os){
+	
+}
+
 /**
  * @brief   Initializes the SPI port connected to the LTC6820.
  *          This port communicates with the LTC6811 voltage and temperature
@@ -29,7 +33,7 @@ static char csvBuffer[CSV_SPI_BUFFER_SIZE];
  * @param   None
  * @return  None
  */
-void BSP_SPI_Init(void) {
+void BSP_SPI_Init(bsp_os_t *spi_os) {
     // Check if simulator is running i.e. were the csv files created?
     if(access(read_file, F_OK) != 0) {
         // File doesn't exit if true
