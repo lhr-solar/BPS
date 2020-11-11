@@ -19,7 +19,7 @@ import sphinx_rtd_theme # ReadTheDocs theme. More information available at: http
 
 # -- Project information -----------------------------------------------------
 
-project = 'BPS'
+project = 'BeVolt BPS'
 copyright = '2020, LHR Solar'
 author = 'Clark Poon'
 

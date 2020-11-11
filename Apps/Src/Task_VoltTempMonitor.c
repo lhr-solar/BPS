@@ -4,11 +4,14 @@
 #include "Voltage.h"
 #include "Temperature.h"
 #include "Current.h"
+#include "BSP_Fans.h"
 
 void Task_VoltTempMonitor(void *p_arg) {
     (void)p_arg;
 
     OS_ERR err;
+
+    BSP_Fans_Init();
 
     // SafetyCheck_Sem4 must only be signaled once per parameter at system boot up.
     // These flags indicate was signaled for that parameter
@@ -82,6 +85,11 @@ void Task_VoltTempMonitor(void *p_arg) {
         }
 
         // Control Fans depending on temperature
+        // Right now this just sets them to maximum speed
+        // Once we get a thermal model of the battery box, we can replace this with someting better
+        for (uint8_t i = 0; i < 4; i++){
+            BSP_Fans_Set(i, TOPSPEED);
+        }
 
         //signal watchdog
         OSMutexPend(&WDog_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);

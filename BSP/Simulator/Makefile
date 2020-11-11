@@ -56,7 +56,7 @@ INC_DIR = \
 
 LIB = -lm -lpthread		# Standard libraries used
 
-FLAGS = -Wall -g -std=c11 $(INC_DIR)
+FLAGS = -Wall -g -std=c11 $(INC_DIR) -DSIMULATION -D_POSIX_C_SOURCE=200112L -D_GNU_SOURCE
 
 ######################################
 # Defines
