@@ -143,7 +143,7 @@ void Task_Init(void *p_arg) {
 				TASK_CANBUS_CONSUMER_PRIO,			// Priority
 				CANBusConsumer_Stk,				// Stack
 				WATERMARK_STACK_LIMIT,	// Watermark limit for debugging
-				Task_CANBusConsumer,		// Stack size
+				TASK_CANBUS_CONSUMER_STACK_SIZE,		// Stack size
 				0,						// Queue size (not needed)
 				10,						// Time quanta (time slice) 10 ticks
 				(void *)0,				// Extension pointer (not needed)
@@ -179,5 +179,4 @@ void Task_Init(void *p_arg) {
 				&err);					// return err code}
 	//delete task
 	OSTaskDel(NULL, &err); // Delete task
-	
 }
