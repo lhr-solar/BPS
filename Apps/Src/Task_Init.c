@@ -1,4 +1,5 @@
 #include "os.h"
+#include "config.h"
 #include "Tasks.h"
 
 void Task_Init(void *p_arg) {
@@ -10,8 +11,8 @@ void Task_Init(void *p_arg) {
                 &err);
     assertOSError(err);
 
-    OSSemCreate(&Fault_Sem4,
-                "Fault/Tripped Semaphore",
+    OSSemCreate(&SafetyCheck_Sem4,
+                "Safety Check Semaphore",
                 0,
                 &err);
     assertOSError(err);
@@ -22,172 +23,161 @@ void Task_Init(void *p_arg) {
     assertOSError(err);
 
     // TODO: Initialize threads! Look at main.c for reference
-        //0
-    	OSTaskCreate(&Init_TCB,				// TCB
-				"Initialize System",	// Task Name (String)
-				Task_Init,				// Task function pointer
-				(void *)0,				// Task function args
-				TASK_INIT_PRIO,			// Priority
-				Init_Stk,				// Stack
-				WATERMARK_STACK_LIMIT,	// Watermark limit for debugging
-				DEFAULT_STACK_SIZE,		// Stack size
-				0,						// Queue size (not needed)
-				10,						// Time quanta (time slice) 10 ticks
-				(void *)0,				// Extension pointer (not needed)
-				OS_OPT_TASK_STK_CHK | OS_OPT_TASK_SAVE_FP,	// Options
-				&err);					// return err code
         //1
-    	OSTaskCreate(&Init_TCB,				// TCB
+    	OSTaskCreate(&FaultState_TCB,				// TCB
 				"TASK_FAULT_STATE_PRIO",	// Task Name (String)
-				Task_Init,				// Task function pointer
+				Task_FaultState,				// Task function pointer
 				(void *)0,				// Task function args
 				TASK_FAULT_STATE_PRIO,			// Priority
-				Init_Stk,				// Stack
+				FaultState_Stk,				// Stack
 				WATERMARK_STACK_LIMIT,	// Watermark limit for debugging
-				DEFAULT_STACK_SIZE,		// Stack size
+				TASK_FAULT_STATE_STACK_SIZE,		// Stack size
 				0,						// Queue size (not needed)
 				10,						// Time quanta (time slice) 10 ticks
 				(void *)0,				// Extension pointer (not needed)
 				OS_OPT_TASK_STK_CHK | OS_OPT_TASK_SAVE_FP,	// Options
 				&err);					// return err code
         //2
-        OSTaskCreate(&Init_TCB,				// TCB
+        OSTaskCreate(&CriticalState_TCB,				// TCB
 				"TASK_CRITICAL_STATE_PRIO",	// Task Name (String)
-				Task_Init,				// Task function pointer
+				Task_CriticalState,				// Task function pointer
 				(void *)0,				// Task function args
 				TASK_CRITICAL_STATE_PRIO,			// Priority
-				Init_Stk,				// Stack
+				CriticalState_Stk,				// Stack
 				WATERMARK_STACK_LIMIT,	// Watermark limit for debugging
-				DEFAULT_STACK_SIZE,		// Stack size
+				TASK_CRITICAL_STATE_STACK_SIZE,		// Stack size
 				0,						// Queue size (not needed)
 				10,						// Time quanta (time slice) 10 ticks
 				(void *)0,				// Extension pointer (not needed)
 				OS_OPT_TASK_STK_CHK | OS_OPT_TASK_SAVE_FP,	// Options
 				&err);					// return err code
         //3
-        OSTaskCreate(&Init_TCB,				// TCB
+        OSTaskCreate(&PetWDog_TCB,				// TCB
 				"TASK_PETWDOG_PRIO",	// Task Name (String)
-				Task_Init,				// Task function pointer
+				Task_PetWDog,				// Task function pointer
 				(void *)0,				// Task function args
 				TASK_PETWDOG_PRIO,			// Priority
-				Init_Stk,				// Stack
+				PetWDog_Stk,				// Stack
 				WATERMARK_STACK_LIMIT,	// Watermark limit for debugging
-				DEFAULT_STACK_SIZE,		// Stack size
+				TASK_PETWDOG_STACK_SIZE,		// Stack size
 				0,						// Queue size (not needed)
 				10,						// Time quanta (time slice) 10 ticks
 				(void *)0,				// Extension pointer (not needed)
 				OS_OPT_TASK_STK_CHK | OS_OPT_TASK_SAVE_FP,	// Options
 				&err);					// return err code
         //4
-        OSTaskCreate(&Init_TCB,				// TCB
+        OSTaskCreate(&VoltTempMonitor_TCB,				// TCB
 				"TASK_VOLT_TEMP_MONITOR_PRIO",	// Task Name (String)
-				Task_Init,				// Task function pointer
+				Task_VoltTempMonitor,				// Task function pointer
 				(void *)0,				// Task function args
 				TASK_VOLT_TEMP_MONITOR_PRIO,			// Priority
-				Init_Stk,				// Stack
+				VoltTempMonitor_Stk,				// Stack
 				WATERMARK_STACK_LIMIT,	// Watermark limit for debugging
-				DEFAULT_STACK_SIZE,		// Stack size
+				TASK_VOLT_TEMP_MONITOR_STACK_SIZE,		// Stack size
 				0,						// Queue size (not needed)
 				10,						// Time quanta (time slice) 10 ticks
 				(void *)0,				// Extension pointer (not needed)
 				OS_OPT_TASK_STK_CHK | OS_OPT_TASK_SAVE_FP,	// Options
 				&err);					// return err code
         //5
-        OSTaskCreate(&Init_TCB,				// TCB
+        OSTaskCreate(&AmperesMonitor_TCB,				// TCB
 				"TASK_AMPERES_MONITOR_PRIO",	// Task Name (String)
-				Task_Init,				// Task function pointer
+				Task_AmperesMonitor,				// Task function pointer
 				(void *)0,				// Task function args
 				TASK_AMPERES_MONITOR_PRIO,			// Priority
-				Init_Stk,				// Stack
+				AmperesMonitor_Stk,				// Stack
 				WATERMARK_STACK_LIMIT,	// Watermark limit for debugging
-				DEFAULT_STACK_SIZE,		// Stack size
+				TASK_AMPERES_MONITOR_STACK_SIZE,		// Stack size
 				0,						// Queue size (not needed)
 				10,						// Time quanta (time slice) 10 ticks
 				(void *)0,				// Extension pointer (not needed)
 				OS_OPT_TASK_STK_CHK | OS_OPT_TASK_SAVE_FP,	// Options
 				&err);					// return err code
         //6
-        OSTaskCreate(&Init_TCB,				// TCB
+        OSTaskCreate(&BatteryBalance_TCB,				// TCB
 				"TASK_BATTERY_BALANCE_PRIO",	// Task Name (String)
-				Task_Init,				// Task function pointer
+				Task_BatteryBalance,				// Task function pointer
 				(void *)0,				// Task function args
 				TASK_BATTERY_BALANCE_PRIO,			// Priority
-				Init_Stk,				// Stack
+				BatteryBalance_Stk,				// Stack
 				WATERMARK_STACK_LIMIT,	// Watermark limit for debugging
-				DEFAULT_STACK_SIZE,		// Stack size
+				TASK_BATTERY_BALANCE_STACK_SIZE,		// Stack size
 				0,						// Queue size (not needed)
 				10,						// Time quanta (time slice) 10 ticks
 				(void *)0,				// Extension pointer (not needed)
 				OS_OPT_TASK_STK_CHK | OS_OPT_TASK_SAVE_FP,	// Options
 				&err);					// return err code
         //7
-        OSTaskCreate(&Init_TCB,				// TCB
+        OSTaskCreate(&DashboardNotify_TCB,				// TCB
 				"TASK_DASHBOARD_NOTIFY_PRIO",	// Task Name (String)
-				Task_Init,				// Task function pointer
+				Task_DashboardNotify,				// Task function pointer
 				(void *)0,				// Task function args
 				TASK_DASHBOARD_NOTIFY_PRIO,			// Priority
-				Init_Stk,				// Stack
+				DashboardNotify_Stk,				// Stack
 				WATERMARK_STACK_LIMIT,	// Watermark limit for debugging
-				DEFAULT_STACK_SIZE,		// Stack size
+				TASK_DASHBOARD_NOTIFY_STACK_SIZE,		// Stack size
 				0,						// Queue size (not needed)
 				10,						// Time quanta (time slice) 10 ticks
 				(void *)0,				// Extension pointer (not needed)
 				OS_OPT_TASK_STK_CHK | OS_OPT_TASK_SAVE_FP,	// Options
 				&err);					// return err code
         //8
-        OSTaskCreate(&Init_TCB,				// TCB
+        OSTaskCreate(&LogInfo_TCB,				// TCB
 				"TASK_LOG_INFO_PRIO",	// Task Name (String)
-				Task_Init,				// Task function pointer
+				Task_LogInfo,				// Task function pointer
 				(void *)0,				// Task function args
 				TASK_LOG_INFO_PRIO,			// Priority
 				Init_Stk,				// Stack
 				WATERMARK_STACK_LIMIT,	// Watermark limit for debugging
-				DEFAULT_STACK_SIZE,		// Stack size
+				TASK_LOG_INFO_STACK_SIZE,		// Stack size
 				0,						// Queue size (not needed)
 				10,						// Time quanta (time slice) 10 ticks
 				(void *)0,				// Extension pointer (not needed)
 				OS_OPT_TASK_STK_CHK | OS_OPT_TASK_SAVE_FP,	// Options
 				&err);					// return err code
         //9
-        OSTaskCreate(&Init_TCB,				// TCB
+        OSTaskCreate(&CANBusConsumer_TCB,				// TCB
 				"TASK_CANBUS_CONSUMER_PRIO",	// Task Name (String)
-				Task_Init,				// Task function pointer
+				Task_CANBusConsumer,				// Task function pointer
 				(void *)0,				// Task function args
 				TASK_CANBUS_CONSUMER_PRIO,			// Priority
-				Init_Stk,				// Stack
+				CANBusConsumer_Stk,				// Stack
 				WATERMARK_STACK_LIMIT,	// Watermark limit for debugging
-				DEFAULT_STACK_SIZE,		// Stack size
+				Task_CANBusConsumer,		// Stack size
 				0,						// Queue size (not needed)
 				10,						// Time quanta (time slice) 10 ticks
 				(void *)0,				// Extension pointer (not needed)
 				OS_OPT_TASK_STK_CHK | OS_OPT_TASK_SAVE_FP,	// Options
 				&err);					// return err code
         //10
-        OSTaskCreate(&Init_TCB,				// TCB
+        OSTaskCreate(&CLI_TCB,				// TCB
 				"TASK_CLI_PRIO",	// Task Name (String)
-				Task_Init,				// Task function pointer
+				Task_CLI,				// Task function pointer
 				(void *)0,				// Task function args
 				TASK_CLI_PRIO,			// Priority
-				Init_Stk,				// Stack
+				CLI_Stk,				// Stack
 				WATERMARK_STACK_LIMIT,	// Watermark limit for debugging
-				DEFAULT_STACK_SIZE,		// Stack size
+				TASK_CLI_STACK_SIZE,		// Stack size
 				0,						// Queue size (not needed)
 				10,						// Time quanta (time slice) 10 ticks
 				(void *)0,				// Extension pointer (not needed)
 				OS_OPT_TASK_STK_CHK | OS_OPT_TASK_SAVE_FP,	// Options
 				&err);					// return err code}
         //11
-        OSTaskCreate(&Init_TCB,				// TCB
+        OSTaskCreate(&Idle_TCB,				// TCB
 				"TASK_IDLE_PRIO",	// Task Name (String)
-				Task_Init,				// Task function pointer
+				Task_Idle,				// Task function pointer
 				(void *)0,				// Task function args
 				TASK_IDLE_PRIO,			// Priority
-				Init_Stk,				// Stack
+				Idle_Stk,				// Stack
 				WATERMARK_STACK_LIMIT,	// Watermark limit for debugging
-				DEFAULT_STACK_SIZE,		// Stack size
+				TASK_IDLE_STACK_SIZE,		// Stack size
 				0,						// Queue size (not needed)
 				10,						// Time quanta (time slice) 10 ticks
 				(void *)0,				// Extension pointer (not needed)
 				OS_OPT_TASK_STK_CHK | OS_OPT_TASK_SAVE_FP,	// Options
 				&err);					// return err code}
+	//delete task
+	OSTaskDel(NULL, &err); // Delete task
+	
 }
