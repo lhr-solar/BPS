@@ -5,6 +5,7 @@
 #include "Temperature.h"
 #include "Current.h"
 #include "BSP_Fans.h"
+#include "CANbus.h"
 
 void Task_VoltTempMonitor(void *p_arg) {
     (void)p_arg;
@@ -23,7 +24,16 @@ void Task_VoltTempMonitor(void *p_arg) {
         // BLOCKING =====================
         // Update Voltage Measurements
         Voltage_UpdateMeasurements();
-        
+        //Send measurements over CAN
+	    CANPayload_t VoltPayload;
+	    VoltPayload.data.b = 0;
+	    VoltPayload.data.h = 0;
+	    VoltPayload.data.w = 0;
+	    for (int i = 0; i < NUM_BATTERY_MODULES; i++){
+		    VoltPayload.idx = i;
+		    VoltPayload.data.f = (float)Voltage_GetModuleMillivoltage(i);
+		    CANbus_Send(VOLT_DATA, VoltPayload);
+	    }
         // Check if voltage is NOT safe:
         SafetyStatus voltageStatus = Voltage_CheckStatus();
         if(voltageStatus != SAFE) {
@@ -65,7 +75,15 @@ void Task_VoltTempMonitor(void *p_arg) {
         // BLOCKING =====================
         // Update Temperature Measurements
         Temperature_UpdateAllMeasurements();
-        
+        CANPayload_t TempPayload;
+	    TempPayload.data.b = 0;
+	    TempPayload.data.h = 0;
+	    TempPayload.data.w = 0;
+	    for (int i = 0; i < NUM_BATTERY_MODULES; i++){
+		    TempPayload.idx = i;
+		    TempPayload.data.f = (float)Temperature_GetModuleTemperature(i);
+		    CANbus_Send(TEMP_DATA, TempPayload);
+	    }
         // Check if temperature is NOT safe:
         SafetyStatus temperatureStatus = Temperature_CheckStatus(Current_IsCharging());
         if(temperatureStatus != SAFE) {
