@@ -810,8 +810,8 @@ void Task_CLI(void *p_arg) {
 
     OS_ERR err;
 
-	initialize();
-	__enable_irq();
+	//initialize();
+	//__enable_irq();
 	uint32_t fifo_size = 128;
 	char command[fifo_size];
 	CLI_Startup();
