@@ -34,7 +34,8 @@ typedef enum {SAFE = 0, DANGER = 1, OVERVOLTAGE = 2, UNDERVOLTAGE = 3, OPENWIRE 
 
 //--------------------------------------------------------------------------------
 // MAX and MIN limits of lithium ion cells
-#define MIN_VOLTAGE_LIMIT				2.7		// Under voltage limit (Voltage)	(actual min: 2.5V)
+#define MIN_VOLTAGE_CHARGING_LIMIT      2.7     // Under voltage limit for charging
+#define MIN_VOLTAGE_LIMIT				2.9		// Under voltage limit (Voltage)	(actual min: 2.5V)
 #define MAX_VOLTAGE_LIMIT				4.0		// Over voltage limit (Voltage)		(actual max: 4.2V)
 
 #define MAX_DISCHARGE_TEMPERATURE_LIMIT	55.00	// Max temperature limit (Celcius)	(recommended release: 60.00C)
