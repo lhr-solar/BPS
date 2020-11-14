@@ -142,8 +142,8 @@ SafetyStatus Voltage_CheckStatus(void){
  * Each module corresponds to an index of the array of SafetyStatus
  * @return pointer to index of modules that are in danger
  */
-Safety_Info Voltage_GetModulesInDanger(void){
-	static Safety_Info system;
+Voltage_Safety Voltage_GetModulesInDanger(void){
+	static Voltage_Safety system;
 	uint32_t wires;
 	uint32_t openWireIdx = 0;
 	//put all the bits from each minion's system_open_wire variable into one variable

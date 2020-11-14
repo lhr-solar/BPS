@@ -17,7 +17,7 @@
 typedef struct system_danger{
     SafetyStatus wire_checks[TOTAL_VOLT_WIRES];
     SafetyStatus module_checks[NUM_BATTERY_MODULES];
-} Safety_Info;
+} Voltage_Safety;
 
 /** Voltage_Init
  * Initializes all device drivers including LTC6811 and GPIO to begin Voltage Monitoring
@@ -46,7 +46,7 @@ SafetyStatus Voltage_CheckStatus(void);
  * array is 1, then it means that module in the index is in danger.
  * @return struct that has safety status for all wires and modules in the system
  */
-Safety_Info Voltage_GetModulesInDanger(void);
+Voltage_Safety Voltage_GetModulesInDanger(void);
  
 /** Voltage_OpenWireSummary
  * Runs the open wire method with print=true
