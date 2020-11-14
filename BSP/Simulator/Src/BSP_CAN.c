@@ -20,7 +20,8 @@ static const char* file = GET_CSV_PATH(CAN_CSV_FILE);
 
 
 
-void BSP_CAN_Init(void) {
+void BSP_CAN_Init(void (*rxEvent)(void), void (*txEnd)(void)) {
+#if 0   // TODO: replace with interrupt-capable code
     FILE* fp = fopen(file, "w");
     if(!fp) {
         perror(CAN_CSV_FILE);
@@ -30,6 +31,7 @@ void BSP_CAN_Init(void) {
     flock(fno, LOCK_EX);
     flock(fno, LOCK_UN);
     fclose(fp);
+#endif
 }
 
 
@@ -43,6 +45,7 @@ void BSP_CAN_Init(void) {
  */
 
 uint8_t BSP_CAN_Write(uint32_t id, uint8_t data[8], uint8_t length) {
+#if 0   // TODO: replace with interrupt-capable code
     FILE* fp = fopen(file, "w");
     if(!fp) {
         perror(CAN_CSV_FILE);
@@ -69,6 +72,9 @@ uint8_t BSP_CAN_Write(uint32_t id, uint8_t data[8], uint8_t length) {
     flock(fno, LOCK_UN);
     fclose(fp);
     return 1;
+#else
+    return 0;
+#endif
 }
 
 /**
@@ -81,7 +87,7 @@ uint8_t BSP_CAN_Write(uint32_t id, uint8_t data[8], uint8_t length) {
  * clear the message that was read from the file
  */
 uint8_t BSP_CAN_Read(uint32_t *id, uint8_t *data) {
-    
+#if 0   // TODO: replace with interrupt-capable code
     FILE* fp = fopen(file, "r+");
     if(!fp) {
         perror(CAN_CSV_FILE);
@@ -118,4 +124,7 @@ uint8_t BSP_CAN_Read(uint32_t *id, uint8_t *data) {
         fclose(fp);
         return 0;
     }
+#else
+    return 0;
+#endif
 }
