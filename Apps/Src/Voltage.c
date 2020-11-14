@@ -11,6 +11,7 @@
 #include <stdlib.h>
 #include "os.h"
 #include "Tasks.h"
+#include "Current.h"
 
 extern OS_MUTEX MinionsASIC_Mutex;
 
@@ -161,8 +162,11 @@ Voltage_Safety Voltage_GetModulesInDanger(void){
 	for (int i = 0; i < TOTAL_VOLT_WIRES; i++) {	
 		if(i < NUM_BATTERY_MODULES){
 			// Check if battery is in range of voltage limit
-			if(Voltage_GetModuleMillivoltage(i) > MAX_VOLTAGE_LIMIT * MILLI_SCALING_FACTOR || Voltage_GetModuleMillivoltage(i) < MIN_VOLTAGE_LIMIT * MILLI_SCALING_FACTOR) {
-				system.module_checks[i] = DANGER;
+			if(Voltage_GetModuleMillivoltage(i) > MAX_VOLTAGE_LIMIT * MILLI_SCALING_FACTOR) {
+				system.module_checks[i] = OVERVOLTAGE;
+			}
+			else if(Voltage_GetModuleMillivoltage(i) < MIN_VOLTAGE_LIMIT * MILLI_SCALING_FACTOR){
+				system.module_checks[i] = UNDERVOLTAGE;
 			}
 		}
 		if(openWires[i] == 1) {
