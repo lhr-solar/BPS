@@ -115,7 +115,7 @@ void CLI_Help(void) {
 	printf("Contactor/Switch\tCharge\t\t\tLights/LED\n\r");
 	printf("CAN\t\t\tEEPROM\t\t\tDisplay\n\r");
 	printf("LTC/Register\t\tWatchdog\t\tADC\n\r");
-	printf("Critical/Abort\t\tOpenwire\t\tAll\n\r");
+	printf("Critical/Abort\t\topenwire\t\tAll\n\r");
 	printf("Keep in mind: all values are 1-indexed\n\r");
 	printf("-----------------------------------------------------------\n\r");
 }
