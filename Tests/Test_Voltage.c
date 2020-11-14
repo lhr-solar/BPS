@@ -58,16 +58,27 @@ int main() {
     }
 
     printf("Printing modules that failed.\r\n");
-    SafetyStatus *dangerBatt = Voltage_GetModulesInDanger();
+    Safety_Info dangerBatt = Voltage_GetModulesInDanger();
     for(int i = 0; i < TOTAL_VOLT_WIRES; i++) {
         printf("\t%d: ", i);
-        if(dangerBatt[i] == SAFE) {
-            printf("SAFE\r\n");
+        if(i < NUM_BATTERY_MODULES){
+            if(dangerBatt.module_checks[i] == SAFE && dangerBatt.wire_checks[i] == SAFE){
+                printf("SAFE\r\n");
+            }
+            else{
+                printf("DANGER\r\n");
+            }
+        }
+        else{
+            if(dangerBatt.wire_checks[i] == SAFE) {
+                printf("SAFE\r\n");
 
             // TODO: once Voltage_GetModulesInDanger is updated, add the specific cases for UNDERVOLTAGE, OVERVOLTAGE, OPENWIRE
-        } else {
-            printf("DANGER\r\n");
+            } else {
+                printf("DANGER\r\n");
+            }
         }
+        
     }
 
     while(1);

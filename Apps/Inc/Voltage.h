@@ -14,6 +14,11 @@
 #include "common.h"
 #include "os.h"
 
+typedef struct system_danger{
+    SafetyStatus wire_checks[TOTAL_VOLT_WIRES];
+    SafetyStatus module_checks[NUM_BATTERY_MODULES];
+} Safety_Info;
+
 /** Voltage_Init
  * Initializes all device drivers including LTC6811 and GPIO to begin Voltage Monitoring
  * @param boards LTC6811 data structure that contains the values of each register
@@ -39,9 +44,9 @@ SafetyStatus Voltage_CheckStatus(void);
  * Finds all battery modules that in danger and stores them into a list.
  * Each battery module corresponds to and index of the array. If the element in the
  * array is 1, then it means that module in the index is in danger.
- * @return pointer to index of modules that are in danger
+ * @return struct that has safety status for all wires and modules in the system
  */
-SafetyStatus *Voltage_GetModulesInDanger(void);
+Safety_Info Voltage_GetModulesInDanger(void);
  
 /** Voltage_OpenWireSummary
  * Runs the open wire method with print=true
