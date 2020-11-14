@@ -22,7 +22,6 @@ void Task_Init(void *p_arg) {
                 &err);
     assertOSError(err);
 
-    // TODO: Initialize threads! Look at main.c for reference
         //1
     	OSTaskCreate(&FaultState_TCB,				// TCB
 				"TASK_FAULT_STATE_PRIO",	// Task Name (String)
