@@ -283,6 +283,7 @@ void CLI_LTC6811(void) {
 	OS_ERR err;
     CPU_TS ts;
 	OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, &ts, &err);
+	assertOSError(err);
 	for(uint8_t current_ic = 0; current_ic < NUM_MINIONS; current_ic++) {
 		printf("Minion board %d: ", current_ic);
 		printf("Config: \n\rTX: ");
