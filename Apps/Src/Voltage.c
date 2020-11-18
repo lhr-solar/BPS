@@ -248,8 +248,10 @@ uint16_t Voltage_GetModuleMillivoltage(uint8_t moduleIdx){
         return 0xFFFF;  // return -1 which indicates error voltage
     }
 	OSMutexPend(&Voltage_Mutex, 0, OS_OPT_PEND_BLOCKING, &ts, &err);
+	assertOSError(err);
 	uint16_t ret = VoltageVal[moduleIdx] / 10;
 	OSMutexPost(&Voltage_Mutex, OS_OPT_POST_NONE, &err);
+	assertOSError(err);
 	return ret;
 }
 
