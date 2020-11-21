@@ -27,3 +27,4 @@ void Task_PetWDog(void *p_arg) {
         OSTimeDly(40, OS_OPT_TIME_DLY, &err);
         assertOSError(err);
     }
+}
