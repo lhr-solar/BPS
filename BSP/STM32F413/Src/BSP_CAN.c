@@ -28,11 +28,11 @@ static queue_t gRxQueue = {
     true
 };
 
-// Return 0 if failure
-static uint8_t QueuePut(queue_t *target, msg_t *msg) {
+// Return ERROR if failure
+static ErrorStatus QueuePut(queue_t *target, msg_t *msg) {
     // Check to see if the queue is full
     if((target->head + 1) % QUEUE_SIZE == target->tail) {
-        return 0;
+        return ERROR;
     }
 
     // Add the msg to the queue
@@ -40,14 +40,14 @@ static uint8_t QueuePut(queue_t *target, msg_t *msg) {
     
     target->head = (target->head + 1) % QUEUE_SIZE;
 
-    return 1;
+    return SUCCESS;
 }
 
-// Return 0 if failure
-static uint8_t QueueGet(queue_t *target, msg_t *msg) {
+// Return ERROR if failure
+static ErrorStatus QueueGet(queue_t *target, msg_t *msg) {
     // Check if the queue is empty
     if(target->head == target->tail) {
-        return 0;
+        return ERROR;
     }
 
     // Get the msg from the queue
@@ -55,7 +55,7 @@ static uint8_t QueueGet(queue_t *target, msg_t *msg) {
 
     target->tail = (target->tail + 1) % QUEUE_SIZE;
 
-    return 1;
+    return SUCCESS;
 }
 
 // End Queue Functions
@@ -178,9 +178,9 @@ void BSP_CAN_Init(void (*rxEvent)(void), void (*txEnd)(void)) {
  * @param   id : Message of ID. Also indicates the priority of message. The lower the value, the higher the priority.
  * @param   data : data to be transmitted. The max is 8 bytes.
  * @param   length : num of bytes of data to be transmitted. This must be <= 8 bytes or else the rest of the message is dropped.
- * @return  0 if module was unable to transmit the data onto the CAN bus. Any other value indicates data was transmitted.
+ * @return  ERROR if module was unable to transmit the data onto the CAN bus. SUCCESS indicates data was transmitted.
  */
-uint8_t BSP_CAN_Write(uint32_t id, uint8_t data[8], uint8_t length) {
+ErrorStatus BSP_CAN_Write(uint32_t id, uint8_t data[8], uint8_t length) {
     
     gTxMessage.StdId = id;
     gTxMessage.DLC = length;
@@ -188,7 +188,7 @@ uint8_t BSP_CAN_Write(uint32_t id, uint8_t data[8], uint8_t length) {
         gTxMessage.Data[i] = data[i];
     }
 	
-    uint8_t retVal = CAN_Transmit(CAN1, &gTxMessage);
+    ErrorStatus retVal = (ErrorStatus) (CAN_Transmit(CAN1, &gTxMessage) != 0);
 
     return retVal;
 }
@@ -199,12 +199,12 @@ uint8_t BSP_CAN_Write(uint32_t id, uint8_t data[8], uint8_t length) {
  * @pre     The data parameter must be at least 8 bytes or hardfault may occur.
  * @param   id : pointer to store id of the message that was received.
  * @param   data : pointer to store data that was received. Must be 8bytes or bigger.
- * @return  0 if nothing was received so ignore id and data that was received. Any other value indicates data was received and stored.
+ * @return  ERROR if nothing was received so ignore id and data that was received. SUCCESS indicates data was received and stored.
  */
-uint8_t BSP_CAN_Read(uint32_t *id, uint8_t *data) {
+ErrorStatus BSP_CAN_Read(uint32_t *id, uint8_t *data) {
     // If the queue is empty, return err
     if(gRxQueue.head == gRxQueue.tail) {
-        return 0;
+        return ERROR;
     }
     
     // Get the message
@@ -217,7 +217,7 @@ uint8_t BSP_CAN_Read(uint32_t *id, uint8_t *data) {
     }
     *id = msg.id;
 
-    return 1;
+    return SUCCESS;
 }
 
 void CAN1_RX0_IRQHandler(void) {

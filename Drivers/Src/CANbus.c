@@ -73,7 +73,7 @@ void CANbus_Init(void) {
 }
 
 // Static method, call CANbus_Send or CANbus_BlockAndSend instead
-static int CANbus_SendMsg(CANId_t id, CANPayload_t payload) {
+static ErrorStatus CANbus_SendMsg(CANId_t id, CANPayload_t payload) {
 	uint8_t txdata[5];
 	uint8_t data_length = 0;
 	
@@ -110,7 +110,7 @@ static int CANbus_SendMsg(CANId_t id, CANPayload_t payload) {
 
 		// Handle invalid messages
 		default:
-			return 0;	// Do nothing if invalid
+			return ERROR;	// Do nothing if invalid
 	}
 
 	// The mutex is require to access the CAN bus.
@@ -124,7 +124,7 @@ static int CANbus_SendMsg(CANId_t id, CANPayload_t payload) {
 				&err);
 
 	// Write the data to the bus
-	uint8_t retVal = BSP_CAN_Write(id, txdata, data_length);
+	ErrorStatus retVal = BSP_CAN_Write(id, txdata, data_length);
 
 	OSMutexPost(&CANbus_TxMutex,
 				OS_OPT_POST_1,
@@ -138,9 +138,9 @@ static int CANbus_SendMsg(CANId_t id, CANPayload_t payload) {
  *          this will put the thread to sleep until there are.
  * @param   id : CAN id of the message
  * @param   payload : the data that will be sent.
- * @return  0 if error, a non-negative value otherwise
+ * @return  ERROR if error, SUCCESS otherwise
  */
-int CANbus_BlockAndSend(CANId_t id, CANPayload_t payload) {
+ErrorStatus CANbus_BlockAndSend(CANId_t id, CANPayload_t payload) {
 	CPU_TS ts;
 	OS_ERR err;
 
@@ -153,7 +153,7 @@ int CANbus_BlockAndSend(CANId_t id, CANPayload_t payload) {
 
 	// Check the error code
 	if(err != OS_ERR_NONE) {
-		return 0;
+		return ERROR;
 	}
 
 	return CANbus_SendMsg(id, payload);
@@ -166,9 +166,9 @@ int CANbus_BlockAndSend(CANId_t id, CANPayload_t payload) {
  * 			check the return code or call CANbus_BlockAndSend.
  * @param   id : CAN id of the message
  * @param   payload : the data that will be sent.
- * @return  0 if data wasn't sent, otherwise it was sent.
+ * @return  ERROR if data wasn't sent, otherwise it was sent.
  */
-int CANbus_Send(CANId_t id, CANPayload_t payload) {
+ErrorStatus CANbus_Send(CANId_t id, CANPayload_t payload) {
     CPU_TS ts;
 	OS_ERR err;
 	
@@ -181,14 +181,14 @@ int CANbus_Send(CANId_t id, CANPayload_t payload) {
 
 	// Check to see if the semaphore was acquired successfully
 	if(err != OS_ERR_NONE) {
-		return 0;
+		return ERROR;
 	}
 
 	// Send the message
 	return CANbus_SendMsg(id, payload);
 }
 
-static int CANbus_GetMsg(CANId_t *id, uint8_t *buffer) {
+static ErrorStatus CANbus_GetMsg(CANId_t *id, uint8_t *buffer) {
 	CPU_TS ts;
 	OS_ERR err;
 	
@@ -216,9 +216,9 @@ static int CANbus_GetMsg(CANId_t *id, uint8_t *buffer) {
  * @brief   Receives data from the CAN bus. This is a non-blocking operation.
  * @param   id : pointer to id variable
  * @param   buffer : pointer to payload buffer
- * @return  0 if there was no message, 1 otherwise.
+ * @return  ERROR if there was no message, SUCCESS otherwise.
  */
-int CANbus_Receive(CANId_t *id, uint8_t *buffer) {
+ErrorStatus CANbus_Receive(CANId_t *id, uint8_t *buffer) {
 	CPU_TS ts;
 	OS_ERR err;
 	
@@ -231,7 +231,7 @@ int CANbus_Receive(CANId_t *id, uint8_t *buffer) {
 
 	// Check to see if the semaphore was acquired successfully
 	if(err != OS_ERR_NONE) {
-		return 0;
+		return ERROR;
 	}
 
 	// Send the message
@@ -242,9 +242,9 @@ int CANbus_Receive(CANId_t *id, uint8_t *buffer) {
  * @brief   Waits for data to arrive.
  * @param   id : pointer to id variable
  * @param   buffer : pointer to payload buffer
- * @return  0 if there was an error, 1 otherwise.
+ * @return  ERROR if there was an error, SUCCESS otherwise.
  */
-int CANbus_WaitToReceive(CANId_t *id, uint8_t *buffer) {
+ErrorStatus CANbus_WaitToReceive(CANId_t *id, uint8_t *buffer) {
 	CPU_TS ts;
 	OS_ERR err;
 
@@ -257,7 +257,7 @@ int CANbus_WaitToReceive(CANId_t *id, uint8_t *buffer) {
 
 	// Check the error code
 	if(err != OS_ERR_NONE) {
-		return 0;
+		return ERROR;
 	}
 
 	return CANbus_GetMsg(id, buffer);
