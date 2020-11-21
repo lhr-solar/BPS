@@ -22,7 +22,7 @@ void Task_CANBusConsumer(void *p_arg) {
                                     &ts,    //pointer to variable that will recieve timestamp of when the message was recivied.
                                     &err);
         assertOSError(err);
-        CAN_Transmit(CAN1, &message);
+        CAN_Transmit(CAN1, message);
 
         
     }
