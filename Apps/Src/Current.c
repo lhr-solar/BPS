@@ -190,7 +190,7 @@ void Task_AmperesMonitor(void *p_arg) {
 		Current_UpdateMeasurements();
 
         // Check if amperes is NOT safe:
-		SafetyStatus amperesStatus = Current_CheckStatus(false);
+		SafetyStatus amperesStatus = Current_CheckStatus(AdminOverride);
 		if(amperesStatus != SAFE) {
             OSSemPost(&Fault_Sem4,
                         OS_OPT_POST_1,
