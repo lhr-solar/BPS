@@ -82,10 +82,9 @@ ErrorStatus BSP_CAN_Write(uint32_t id, uint8_t data[8], uint8_t length) {
  * @pre     The data parameter must be at least 8 bytes or hardfault may occur.
  * @param   id : pointer to store id of the message that was received.
  * @param   data : pointer to store data that was received. Must be 8bytes or bigger.
- * @return  0 if nothing was received so ignore id and data that was received. Any other value indicates data was received and stored.
- * clear the message that was read from the file
+ * @return  ERROR if nothing was received so ignore id and data that was received. SUCCESS indicates data was received and stored.
  */
-uint8_t BSP_CAN_Read(uint32_t *id, uint8_t *data) {
+ErrorStatus BSP_CAN_Read(uint32_t *id, uint8_t *data) {
 #if 0   // TODO: replace with interrupt-capable code
     FILE* fp = fopen(file, "r+");
     if(!fp) {
