@@ -72,12 +72,48 @@ Copyright 2017 Linear Technology Corp. (LTC)
 #include "config.h"
 #include "BSP_SPI.h"
 #include "os.h"
+#include "BSP_OS.h"
 #include "Tasks.h"
 
 /*********************************************************/
 /*** Code that was added by UTSVT. ***/
 /*********************************************************/
 OS_MUTEX MinionsASIC_Mutex;
+bsp_os_t spi_os;
+OS_SEM MinionsIO_Sem4;
+
+// RTOS Setup
+#ifdef RTOS
+void LTC6811_Pend(void) {
+    CPU_TS ts;
+    OS_ERR err;
+    OSSemPend(&MinionsIO_Sem4,
+                        0,
+                        OS_OPT_PEND_BLOCKING,
+                        &ts,
+                        &err);
+    assertOSError(err);
+}
+
+void LTC6811_Post(void) {
+    OS_ERR err;
+    OSSemPost(&MinionsIO_Sem4,
+                        OS_OPT_POST_1,
+                        &err);
+    assertOSError(err);
+}
+#endif
+
+
+#ifdef BAREMETAL
+void LTC6811_Pend(void) {
+    return;
+}
+
+void LTC6811_Post(void) {
+    return;
+}
+#endif
 
 void LTC6811_Init(cell_asic *battMod){
   //only create the mutex the first time this function is called (called by Voltage_Init() and Temperature_Init())
@@ -92,12 +128,16 @@ void LTC6811_Init(cell_asic *battMod){
     mutexExists = true;
   }
 
-	BSP_SPI_Init();				// Initialize SPI1 for voltage board	
-	
+  spi_os.pend = LTC6811_Pend;
+  spi_os.post = LTC6811_Post;
+	BSP_SPI_Init(&spi_os);				// Initialize SPI1 for voltage board	
+
+
 	LTC681x_init_cfg(NUM_MINIONS, battMod);
 	LTC6811_reset_crc_count(NUM_MINIONS, battMod);
 	LTC6811_init_reg_limits(NUM_MINIONS, battMod);
 }
+
 
 /********************************************************
 *********************************************************/
@@ -541,3 +581,5 @@ void LTC6811_set_cfgr_ov(uint8_t nIC, cell_asic ic[],uint16_t ov)
 {
   LTC681x_set_cfgr_ov( nIC, ic, ov);
 }
+
+

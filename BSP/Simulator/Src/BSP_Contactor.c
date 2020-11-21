@@ -1,3 +1,5 @@
+/* Copyright (c) 2020 UT Longhorn Racing Solar */
+
 #include "BSP_Contactor.h"
 #include "simulator_conf.h"
 #include <stdio.h>

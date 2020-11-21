@@ -49,6 +49,16 @@ Call ```make help``` for more information on how to build the project.
 
 Call ```make clean``` if the build fails for any reason other than syntax related.
 
+The BPS has an RTOS version and a bare metal version for its BSP files. To select which one to build, pass either `RTOS` or `BAREMETAL` to the `OS` argument. For example
+    ```
+    make simulator OS=BAREMETAL
+    ```
+will build the bare metal version, and  
+    ```
+    make simulator OS=RTOS
+    ```
+will build the RTOS version. The RTOS version is selected by default.
+
 For testing, please read the Testing section.
 
 ## Testing

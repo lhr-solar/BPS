@@ -1,3 +1,4 @@
+/* Copyright (c) 2020 UT Longhorn Racing Solar */
 /** Current.h
  * Current file that holds all Current (Amps) related information of BeVolt's
  * battery pack.

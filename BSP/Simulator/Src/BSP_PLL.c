@@ -1,3 +1,5 @@
+/* Copyright (c) 2020 UT Longhorn Racing Solar */
+
 #include "BSP_PLL.h"
 #include <stdint.h>
 #include <stdlib.h>

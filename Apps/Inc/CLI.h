@@ -1,3 +1,4 @@
+/* Copyright (c) 2020 UT Longhorn Racing Solar */
 /* CLI.c
  * Command Line Interface file to 
  * define and route commands
@@ -59,6 +60,8 @@
 #define CLI_WDOG_HASH           0x307F7B
 #define CLI_EXTRA_HASH          0x58C7C90
 
+#define CLI_OPENWIRE_HASH       0x8AF9D08 
+
 #define CLI_TRIP_HASH   				0x3481FB
 #define CLI_CLEAR_HASH					0x674180D
 
@@ -68,6 +71,7 @@
 
 // Useful values
 #define NUM_TEMP_SENSORS_LAST_MINION    14
+
 
 /** CLI_Init
  * Initializes the CLI with the values it needs

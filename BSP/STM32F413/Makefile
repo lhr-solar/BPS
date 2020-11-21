@@ -3,6 +3,7 @@
 ######################################
 TARGET = bps-leader
 
+DEBUG = 1
 
 ######################################
 # building variables
@@ -108,8 +109,8 @@ AS_DEFS =
 C_DEFS =  \
 -DSTM32F413_423xx	\
 -DUSE_STDPERIPH_DRIVER	\
--D__FPU_PRESENT
-
+-D__FPU_PRESENT \
+-D$(OS)
 
 # AS includes
 AS_INCLUDES = 
