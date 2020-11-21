@@ -53,6 +53,7 @@ OS_SEM Fault_Sem4;
 /**
  * Mutexes
  */
+OS_MUTEX WDog_Mutex;
 
 /**
  * Global Variables
@@ -125,11 +126,6 @@ void Task_FaultState(void *p_arg) {
 
     // Push Contactor State message to CAN Q
 
-    while(1) {
-        // CLI
-        // WDOG Reset
-    }
-}
 
 void Task_CriticalState(void *p_arg) {
     (void)p_arg;

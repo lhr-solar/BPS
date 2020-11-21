@@ -9,15 +9,18 @@ void Task_Init(void *p_arg) {
                 "Safety Check Semaphore",
                 0,
                 &err);
-
-    // ASSERT err
+    assertOSError(err);
 
     OSSemCreate(&Fault_Sem4,
                 "Fault/Tripped Semaphore",
                 0,
                 &err);
+    assertOSError(err);
 
-    // ASSERT err
+    OSMutexCreate(&WDog_Mutex,
+                "Watchdog Mutex",
+                &err);
+    assertOSError(err);
 
     // TODO: Initialize threads! Look at main.c for reference
 }

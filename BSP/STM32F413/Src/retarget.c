@@ -1,3 +1,5 @@
+/* Copyright (c) 2020 UT Longhorn Racing Solar */
+
 #include "common.h"
 #include "BSP_UART.h"
 
@@ -7,7 +9,7 @@
 
 int _write(int fd, char *buffer, unsigned int len) {
     if(buffer != NULL) {
-        BSP_UART_Write(buffer, len);
+        BSP_UART_Write(buffer, len, 3);
     }
     return len;
 }

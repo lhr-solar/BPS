@@ -1,3 +1,5 @@
+/* Copyright (c) 2020 UT Longhorn Racing Solar */
+
 #ifndef __CANBUS_H
 #define __CANBUS_H
 
@@ -30,6 +32,12 @@ typedef struct {
 	uint8_t idx : 8;
 	CANData_t data;
 } CANPayload_t;
+
+/*This data type is used to push messages onto the queue*/
+typedef struct {
+    CANId_t id;
+    CANPayload_t payload;
+}CANMSG_t;
 
 /**
  * @brief   Initializes the CAN system

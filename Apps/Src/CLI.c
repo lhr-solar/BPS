@@ -1,3 +1,5 @@
+/* Copyright (c) 2020 UT Longhorn Racing Solar */
+
 /* CLI.c
  * Command Line Interface wrapper to 
  * define and route commands
@@ -639,7 +641,7 @@ void CLI_Critical(void) {
 	printf("Please type 'shutdown' to turn the contactor off\n\r");
 	printf(">> ");
 	while(1) {
-		if(BSP_UART_ReadLine(response) > 0) {
+		if(BSP_UART_ReadLine(response, 3) > 0) {
 			if(CLI_StringHash(response) == CLI_SHUTDOWN_HASH) {
 				BSP_Contactor_Off();
 				printf("Contactor is off\n\r");

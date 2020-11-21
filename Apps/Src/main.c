@@ -1,3 +1,5 @@
+/* Copyright (c) 2020 UT Longhorn Racing Solar */
+
 /** main.c
  * Program for UTSVT BeVolt's Battery Protection System
  */
@@ -14,6 +16,9 @@ int main() {
 	
 	OS_ERR err;
 
+	OSInit(&err);
+	assertOSError(err);
+
 	OSTaskCreate(&Init_TCB,				// TCB
 				"Initialize System",	// Task Name (String)
 				Task_Init,				// Task function pointer
@@ -27,8 +32,7 @@ int main() {
 				(void *)0,				// Extension pointer (not needed)
 				OS_OPT_TASK_STK_CHK | OS_OPT_TASK_SAVE_FP,	// Options
 				&err);					// return err code
-
-	// ASSERT err
+	assertOSError(err);
 
 	OSStart(&err);
 
