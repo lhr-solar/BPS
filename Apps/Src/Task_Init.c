@@ -2,6 +2,8 @@
 #include "config.h"
 #include "Tasks.h"
 
+#define CANBUS_QUEUE_LENGTH 64
+
 void Task_Init(void *p_arg) {
 
     OS_ERR err;
@@ -179,7 +181,7 @@ void Task_Init(void *p_arg) {
         
         OSQCreate(&CANBus_MsgQ,
                 "CANBus Message Queue",
-                64,
+                CANBUS_QUEUE_LENGTH,
                 &err);
         assertOSError(err);
 	//delete task
