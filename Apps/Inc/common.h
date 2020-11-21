@@ -10,4 +10,6 @@
 #include <stdlib.h>
 #include <math.h>
 
+extern bool AdminOverride;
+
 #endif
