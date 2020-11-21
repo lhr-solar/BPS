@@ -12,6 +12,8 @@ void Task_CANBusConsumer(void *p_arg) {
     CPU_TS ts;
     CANMSG_t *message;
 
+    CANbus_Init();
+    
     while(1) {
         // BLOCKING =====================
         // Wait for CAN Q to have message
