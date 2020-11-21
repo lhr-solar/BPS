@@ -20,7 +20,8 @@ static const char* file = GET_CSV_PATH(CAN_CSV_FILE);
 
 
 
-void BSP_CAN_Init(void) {
+void BSP_CAN_Init(void (*rxEvent)(void), void (*txEnd)(void)) {
+#if 0   // TODO: replace with interrupt-capable code
     FILE* fp = fopen(file, "w");
     if(!fp) {
         perror(CAN_CSV_FILE);
@@ -30,6 +31,7 @@ void BSP_CAN_Init(void) {
     flock(fno, LOCK_EX);
     flock(fno, LOCK_UN);
     fclose(fp);
+#endif
 }
 
 
@@ -39,10 +41,10 @@ void BSP_CAN_Init(void) {
  * @param   id : Message of ID. Also indicates the priority of message. The lower the value, the higher the priority.
  * @param   data : data to be transmitted. The max is 8 bytes.
  * @param   length : num of bytes of data to be transmitted. This must be <= 8 bytes or else the rest of the message is dropped.
- * @return  0 if module was unable to transmit the data onto the CAN bus. Any other value indicates data was transmitted.
+ * @return  ERROR if module was unable to transmit the data onto the CAN bus. SUCCESS indicates data was transmitted.
  */
-
-uint8_t BSP_CAN_Write(uint32_t id, uint8_t data[8], uint8_t length) {
+ErrorStatus BSP_CAN_Write(uint32_t id, uint8_t data[8], uint8_t length) {
+#if 0   // TODO: replace with interrupt-capable code
     FILE* fp = fopen(file, "w");
     if(!fp) {
         perror(CAN_CSV_FILE);
@@ -69,6 +71,9 @@ uint8_t BSP_CAN_Write(uint32_t id, uint8_t data[8], uint8_t length) {
     flock(fno, LOCK_UN);
     fclose(fp);
     return 1;
+#else
+    return 0;
+#endif
 }
 
 /**
@@ -77,11 +82,10 @@ uint8_t BSP_CAN_Write(uint32_t id, uint8_t data[8], uint8_t length) {
  * @pre     The data parameter must be at least 8 bytes or hardfault may occur.
  * @param   id : pointer to store id of the message that was received.
  * @param   data : pointer to store data that was received. Must be 8bytes or bigger.
- * @return  0 if nothing was received so ignore id and data that was received. Any other value indicates data was received and stored.
- * clear the message that was read from the file
+ * @return  ERROR if nothing was received so ignore id and data that was received. SUCCESS indicates data was received and stored.
  */
-uint8_t BSP_CAN_Read(uint32_t *id, uint8_t *data) {
-    
+ErrorStatus BSP_CAN_Read(uint32_t *id, uint8_t *data) {
+#if 0   // TODO: replace with interrupt-capable code
     FILE* fp = fopen(file, "r+");
     if(!fp) {
         perror(CAN_CSV_FILE);
@@ -118,4 +122,7 @@ uint8_t BSP_CAN_Read(uint32_t *id, uint8_t *data) {
         fclose(fp);
         return 0;
     }
+#else
+    return 0;
+#endif
 }
