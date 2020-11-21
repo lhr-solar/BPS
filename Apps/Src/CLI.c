@@ -21,6 +21,7 @@
 #include "BSP_ADC.h"
 #include "EEPROM.h"
 #include "os.h"
+#include "Tasks.h"
 
 #define MAX_TOKEN_SIZE 4
 
@@ -809,10 +810,6 @@ void CLI_Handler(char* input) {
 void Task_CLI(void *p_arg) {
     (void)p_arg;
 
-    OS_ERR err;
-
-	//initialize();
-	//__enable_irq();
 	uint32_t fifo_size = 128;
 	char command[fifo_size];
 	CLI_Startup();

@@ -17,7 +17,7 @@ static bsp_os_t *os3;
 #define SPI_Wait(SPIx)		if(((SPIx)->SR & (SPI_SR_TXE | SPI_SR_RXNE)) == 0 || ((SPIx)->SR & SPI_SR_BSY)){ \
 								if(SPIx == SPI1){	\
 									os->pend();	\
-								}	\	
+								}	\
 								else if(SPIx == SPI3){	\
 									os3->pend();	\
 								}	\
@@ -159,7 +159,6 @@ void SPI3_Init(bsp_os_t *spi3_os){
 #ifdef RTOS
 
 void SPI1_IRQHandler(void){
-	OS_ERR err;
 	// Save the CPU registers
 	CPU_SR_ALLOC();
 
@@ -176,7 +175,6 @@ void SPI1_IRQHandler(void){
 }
 
 void SPI3_Handler(){
-	OS_ERR err;
 	// Save the CPU registers
 	CPU_SR_ALLOC();
 
