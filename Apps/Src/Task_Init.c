@@ -176,6 +176,12 @@ void Task_Init(void *p_arg) {
 				(void *)0,				// Extension pointer (not needed)
 				OS_OPT_TASK_STK_CHK | OS_OPT_TASK_SAVE_FP,	// Options
 				&err);					// return err code}
+        
+        OSQCreate(&CANBus_MsgQ,
+                "CANBus Message Queue",
+                64,
+                &err);
+        assertOSError(err);
 	//delete task
 	OSTaskDel(NULL, &err); // Delete task
 }
