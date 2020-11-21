@@ -1,6 +1,5 @@
 #include "Tasks.h"
 #include "os.h"
-#include <stdlib.h>
 #include "BSP_WDTimer.h"
 
 void Task_PetWDog(void *p_arg) {
