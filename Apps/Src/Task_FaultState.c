@@ -62,7 +62,9 @@ void Task_FaultState(void *p_arg) {
     // Push Contactor State message to CAN Q
     data.b = 0;
     CANbus_Send(CONTACTOR_STATE, Message);
+    #ifdef DEBUGMODE
     char command[COMMAND_SIZE];
+    #endif
     while(1) {
         #ifdef DEBUGMODE
         if (BSP_UART_ReadLine(command)) CLI_Handler(command); // CLI

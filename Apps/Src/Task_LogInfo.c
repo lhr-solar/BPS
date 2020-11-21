@@ -1,6 +1,7 @@
 #include "os.h"
 #include "EEPROM.h"
 #include "Charge.h"
+#include "Tasks.h"
 
 void Task_LogInfo(void *p_arg) {
     (void)p_arg;
@@ -12,7 +13,7 @@ void Task_LogInfo(void *p_arg) {
     EEPROM_LogData(DATA_SOC, Charge_GetPercent());
 
     //1 tick every 10 millisconds, so 300 ticks for a delay of 3000ms --> 3s
-    //OS_OPT_TIME_DLY specifies relative delay, so the delay is started from the “current time + dly”.
+    //OS_OPT_TIME_DLY specifies relative delay, so the delay is started from the ï¿½current time + dlyï¿½.
     OSTimeDly(300, OS_OPT_TIME_DLY, &err);
     assertOSError(err);
 
