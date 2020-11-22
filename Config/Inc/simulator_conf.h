@@ -1,3 +1,5 @@
+/* Copyright (c) 2020 UT Longhorn Racing Solar */
+
 #ifndef __SIMULATOR_CONF_H
 #define __SIMULATOR_CONF_H
 
@@ -12,9 +14,10 @@
 #define I2C_CSV_FILE            "I2C.csv"
 #define LIGHTS_CSV_FILE         "Lights.csv"
 #define PLL_CSV_FILE            "PLL.csv"
-#define SPI1_CSV_FILE           "SPI.csv"   // For compatibility purposes, omit the '1'
-#define SPI3_CSV_FILE           "SPI3.csv"
+#define SPI_R_CSV_FILE          "SPIR.csv"
+#define SPI_W_CSV_FILE          "SPIW.csv"
 #define TIMER_CSV_FILE          "Timer.csv"
 #define WDTIMER_CSV_FILE        "WDTimer.csv"
+#define FANS_CSV_FILE           "Fans.csv"
 
 #endif

@@ -2,9 +2,7 @@ name: Verify Build
 
 on:
   push:
-    branches: [ master, simulator ]
   pull_request:
-    branches: [ master, simulator ]
 
 jobs:
   build:
@@ -17,6 +15,8 @@ jobs:
       run: |
         sudo apt -y update
         sudo apt -y install gcc-arm-none-eabi
+    - name: Initialize submodules
+      run: git submodule update --init --recursive
     - name: make simulator
       run: make simulator
     - name: clean

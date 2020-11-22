@@ -1,244 +1,41 @@
+/* Copyright (c) 2020 UT Longhorn Racing Solar */
+
 /** main.c
  * Program for UTSVT BeVolt's Battery Protection System
  */
 
 #include "common.h"
 #include "config.h"
-#include "LTC6811.h"
-#include "Voltage.h"
-#include "Amps.h"
-#include "Temperature.h"
-#include "EEPROM.h"
-#include "Charge.h"
-#include "CLI.h"
-#include "BSP_UART.h"
-#include "BSP_Contactor.h"
-#include "BSP_Lights.h"
-#include "BSP_WDTimer.h"
+#include "os.h"
+#include "Tasks.h"
 
-cell_asic Minions[NUM_MINIONS];
-bool override = false;		// This will be changed by user via CLI
-char command[COMMAND_SIZE];
+OS_TCB Init_TCB;
+CPU_STK Init_Stk[DEFAULT_STACK_SIZE];
 
-void heartbeat(void);
-void initialize(void);
-void preliminaryCheck(void);
-void faultCondition(void);
-
-#ifndef SIMULATION
-static void __enable_irq() { asm("CPSIE I"); }
-static void __disable_irq(){ asm("CPSID I"); }
-#endif
-
-int main(){
-	#ifndef SIMULATION
-        __disable_irq();		// Disable all interrupts until initialization is done
-	#endif
-        
-        initialize();			// Initialize codes/pins
-	preliminaryCheck();		// Wait until all boards are powered on
+int main() {
 	
-        #ifndef SIMULATION
-        __enable_irq();			// Enable interrupts
-        #endif
+	OS_ERR err;
 
-	BSP_WDTimer_Start();
+	OSInit(&err);
+	assertOSError(err);
 
-	while(1) {
-		// First update the measurements.
-		Voltage_UpdateMeasurements();
-		Amps_UpdateMeasurements();
-    	Temperature_UpdateAllMeasurements();
+	OSTaskCreate(&Init_TCB,				// TCB
+				"Initialize System",	// Task Name (String)
+				Task_Init,				// Task function pointer
+				(void *)0,				// Task function args
+				TASK_INIT_PRIO,			// Priority
+				Init_Stk,				// Stack
+				WATERMARK_STACK_LIMIT,	// Watermark limit for debugging
+				DEFAULT_STACK_SIZE,		// Stack size
+				0,						// Queue size (not needed)
+				10,						// Time quanta (time slice) 10 ticks
+				(void *)0,				// Extension pointer (not needed)
+				OS_OPT_TASK_STK_CHK | OS_OPT_TASK_SAVE_FP,	// Options
+				&err);					// return err code
+	assertOSError(err);
 
-		// Update battery percentage
-		Charge_Calculate(Amps_GetReading());
+	OSStart(&err);
 
-		// Checks for user input to send to CLI
-		if(BSP_UART_ReadLine(command)) {
-			CLI_Handler(command);
-		}
-		
-		SafetyStatus current = Amps_CheckStatus(override);
-		SafetyStatus temp = Temperature_CheckStatus(Amps_IsCharging());
-		SafetyStatus voltage = Voltage_CheckStatus();
-
-		// Check if everything is safe (all return SAFE = 0)
-		if((current == SAFE) && (temp == SAFE) && (voltage == SAFE)) {
-			BSP_Contactor_On();
-		}
-		else if((current == SAFE) && (temp == SAFE) && (voltage == UNDERVOLTAGE) && override) {
-			BSP_Contactor_On();
-		} else {
-			break;
-		}
-
-		heartbeat();
-
-		// Update necessary
-		// CAN_SendMessageStatus()	// Most likely need to put this on a timer if sending too frequently
-
-		BSP_WDTimer_Reset();
-	}
-
-	// BPS has tripped if this line is reached
-	faultCondition();
-	return 0;
+	// Should not get here or else there is an error
 }
 
-/**
- * Initialize system.
- *	1. Initialize device drivers.
- *		- This includes communication protocols, GPIO pins, timers
- *	2. Set the current, voltage, and temperature limits.
- *		- Give wrappers (Voltage, Current, Temperature) the limits
- */
-void initialize(void){
-	BSP_Lights_Init();
-	BSP_Contactor_Init();
-	BSP_Contactor_Off();
-	BSP_WDTimer_Init();
-	EEPROM_Init();
-	Charge_Init();
-	Amps_Init();
-	Voltage_Init(Minions);
-	Temperature_Init(Minions);
-	CLI_Init(Minions);
-
-	// __enable_irq();
-	CLI_Startup();
-
-	// Checks to see if the batteries need to be charged
-	Voltage_UpdateMeasurements();
-	SafetyStatus voltage = Voltage_CheckStatus();
-	if(voltage == UNDERVOLTAGE) {
-		printf("Do you need to charge the batteries? (y/n)\n\r>> ");
-		uint32_t wait = 0;
-		while(wait < STARTUP_WAIT_TIME) {
-			if(BSP_UART_ReadLine(command)) {
-				override = command[0] == 'y' ? true : false;
-				break;
-			}
-			wait++;
-		}
-	}
-}
-
-/** preliminaryCheck
- * Before starting any data monitoring, check if all the boards are powered. If we start the data
- * collection before everything is powered on, then the system will immediately fault and not turn on
- * even though everything is safe.
- */
-void preliminaryCheck(void){
-	// Check if Watch dog timer was triggered previously
-	if (BSP_WDTimer_DidSystemReset()) {
-		BSP_Light_On(FAULT);
-		BSP_Light_On(WDOG);
-		while(1);		// Spin
-	}
-}
-
-/** heartbeat
- * Toggle heartbeat at visible frequency (RUN light)
- */
-void heartbeat(void){
-	// increment heartcount variable once per while(1) loop
-	static int heartcount;
-	heartcount = (heartcount + 1)%(HEARTBEAT_DELAY);
-	if(heartcount == 0) {
-		BSP_Light_Toggle(RUN);
-	}
-}
-
-/** faultCondition
- * This block of code will be executed whenever there is a fault.
- * If bps trips, make it spin and impossible to connect the battery to car again
- * until complete reboot is done.
- */
-void faultCondition(void){
-	BSP_Contactor_Off();
-	BSP_Light_Off(RUN);
-    BSP_Light_On(FAULT);
-
-	uint8_t error = 0;
-
-	if(Amps_CheckStatus(false) != SAFE){
-		error |= FAULT_HIGH_CURRENT;
-		BSP_Light_On(OCURR);
-	}
-
-	if(Voltage_CheckStatus() != SAFE){
-		// Toggle Voltage fault LED
-		switch(Voltage_CheckStatus()){
-			case OVERVOLTAGE:
-				error |= FAULT_HIGH_VOLT;
-				BSP_Light_On(OVOLT);
-				Charge_Calibrate(OVERVOLTAGE);
-				break;
-
-			case UNDERVOLTAGE:
-				error |= FAULT_LOW_VOLT;
-				BSP_Light_On(UVOLT);
-				Charge_Calibrate(UNDERVOLTAGE);
-				break;
-
-			default:
-				error |= FAULT_VOLT_MISC;
-				BSP_Light_On(OVOLT);
-				BSP_Light_On(UVOLT);
-				break;
-		}
-	}
-
-	if(Temperature_CheckStatus(Amps_IsCharging()) != SAFE){
-		error |= FAULT_HIGH_TEMP;
-		BSP_Light_On(OTEMP);
-	}
-
-	// Log all the errors that we have
-	for(int i = 1; i < 0x00FF; i <<= 1) {
-		if(error & i) EEPROM_LogError(i);
-	}
-
-	// Log all the relevant data for each error
-	for(int i = 1; i < 0x00FF; i <<= 1) {
-		if((error & i) == 0) continue;
-
-		SafetyStatus *voltage_modules;
-		uint8_t *temp_modules;
-		uint16_t curr;
-		switch(i) {
-		// Temperature fault handling
-		case FAULT_HIGH_TEMP:
-			temp_modules = Temperature_GetModulesInDanger();
-			for(int j = 0; j < NUM_BATTERY_MODULES; ++j)
-				if(temp_modules[j]) EEPROM_LogData(FAULT_HIGH_TEMP, j);
-			break;
-
-		// Voltage fault handling
-		case FAULT_HIGH_VOLT:
-		case FAULT_LOW_VOLT:
-		case FAULT_VOLT_MISC:
-			voltage_modules = Voltage_GetModulesInDanger();
-			for(int j = 0; j < NUM_BATTERY_MODULES; ++j)
-				if(voltage_modules[j]) EEPROM_LogData(i, j);
-			break;
-
-		// Current fault handling
-		case FAULT_HIGH_CURRENT:
-			curr = Amps_GetReading();
-			EEPROM_LogData(FAULT_HIGH_CURRENT, 0x00FF & curr);
-			EEPROM_LogData(FAULT_HIGH_CURRENT, 0x00FF & (curr >> 8));
-			break;
-		}
-	}
-
-	while(1) {
-		Amps_UpdateMeasurements();
-		if(BSP_UART_ReadLine(command)) {
-			CLI_Handler(command);
-		}
-		BSP_WDTimer_Reset();	// Even though faulted, WDTimer needs to be updated or else system will reset
-					// causing WDOG error. WDTimer can't be stopped after it starts.
-	}
-}
-	

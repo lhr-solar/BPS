@@ -1,3 +1,5 @@
+/* Copyright (c) 2020 UT Longhorn Racing Solar */
+
 /** Temperature.h
  * Temperature file that holds all Temperature related information of BeVolt's
  * battery pack.

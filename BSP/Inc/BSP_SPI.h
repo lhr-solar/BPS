@@ -1,7 +1,16 @@
+/* Copyright (c) 2020 UT Longhorn Racing Solar */
+
 #ifndef __BSP_SPI_H
 #define __BSP_SPI_H
 
 #include "common.h"
+#include "os.h"
+#include "BSP_OS.h"
+
+
+/**
+ * @note    This is for the RTOS version of the BPS 
+ */
 
 typedef enum {
     spi_ltc6811 = 0,
@@ -13,9 +22,11 @@ typedef enum {
 /**
  * @brief   Initializes the SPI port.
  * @param   port The SPI port to initialize.
+ * @param   spi_os pointer to struct that holds the SPI specific pend()/post() functions 
  * @return  None
  */
-void BSP_SPI_Init(spi_port_t port);
+void BSP_SPI_Init(spi_port_t port, bsp_os_t *spi_os);
+
 
 /**
  * @brief   Transmits data to through SPI.

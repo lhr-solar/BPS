@@ -1,3 +1,5 @@
+/* Copyright (c) 2020 UT Longhorn Racing Solar */
+
 /** config.h
  * Config file to hold any aliases/constants referenced by multiple files
  * Not specific to a single board/unit
@@ -19,7 +21,10 @@ typedef enum SafetyStatus_e {SAFE = 0, DANGER = 1, OVERVOLTAGE = 2, UNDERVOLTAGE
 //--------------------------------------------------------------------------------
 // Basic Parameters of BPS layout
 #define NUM_MINIONS	4					 // Number of minion boards
-												//
+
+//--------------------------------------------------------------------------------
+// Battery Fault Checks
+#define NUM_FAULT_POINTS				4
 
 //--------------------------------------------------------------------------------
 // Battery Pack layout
@@ -29,11 +34,12 @@ typedef enum SafetyStatus_e {SAFE = 0, DANGER = 1, OVERVOLTAGE = 2, UNDERVOLTAGE
 
 //--------------------------------------------------------------------------------
 // MAX and MIN limits of lithium ion cells
-#define MIN_VOLTAGE_LIMIT				2.7		// Under voltage limit (Voltage)	(actual min: 2.5V)
+#define MIN_VOLTAGE_CHARGING_LIMIT      2.7     // Under voltage limit for charging
+#define MIN_VOLTAGE_LIMIT				2.9		// Under voltage limit (Voltage)	(actual min: 2.5V)
 #define MAX_VOLTAGE_LIMIT				4.0		// Over voltage limit (Voltage)		(actual max: 4.2V)
 
-#define MAX_DISCHARGE_TEMPERATURE_LIMIT	73.00	// Max temperature limit (Celcius)	(actual max: 75C)
-#define MAX_CHARGE_TEMPERATURE_LIMIT	48.00	// Max temperature limit (Celcius)	(actual max: 50C)
+#define MAX_DISCHARGE_TEMPERATURE_LIMIT	55.00	// Max temperature limit (Celcius)	(recommended release: 60.00C)
+#define MAX_CHARGE_TEMPERATURE_LIMIT	40.00	// Max temperature limit (Celcius)	(recommended release: 45.00C)
 
 #define MAX_CURRENT_LIMIT				100000		// Max current limit (Milliamperes)		(Max continuous discharge is 15A per cell)
 #define MAX_HIGH_PRECISION_CURRENT 		50000		// Max current detectable by the high-precision current sensor (mA)
@@ -48,6 +54,8 @@ typedef enum SafetyStatus_e {SAFE = 0, DANGER = 1, OVERVOLTAGE = 2, UNDERVOLTAGE
 // Voltage Sensor Configurations
 // Defines how many voltage sensors are connected to each board
 #define MAX_VOLT_SENSORS_PER_MINION_BOARD	8	// User defined. The LTC6811 can actually measure 12 modules.
+#define NUM_PINS_PER_LTC 					9
+#define TOTAL_VOLT_WIRES					NUM_PINS_PER_LTC*NUM_MINIONS - 1
 
 //--------------------------------------------------------------------------------
 // Temperature Sensor Configurations

@@ -1,3 +1,5 @@
+/* Copyright (c) 2020 UT Longhorn Racing Solar */
+
 /* CLI.c
  * Command Line Interface wrapper to 
  * define and route commands
@@ -18,6 +20,7 @@
 #include "Images.h"
 #include "BSP_ADC.h"
 #include "EEPROM.h"
+#include "os.h"
 
 #define MAX_TOKEN_SIZE 4
 
@@ -25,6 +28,9 @@ static cell_asic* Minions;
 char hexString[8];
 const float MILLI_UNIT_CONVERSION = 1000;
 const float PERCENT_CONVERSION = 100;
+
+extern OS_MUTEX MinionsASIC_Mutex;
+
 
 /** CLI_Init
  * Initializes the CLI with the values it needs
@@ -109,7 +115,7 @@ void CLI_Help(void) {
 	printf("Contactor/Switch\tCharge\t\t\tLights/LED\n\r");
 	printf("CAN\t\t\tEEPROM\t\t\tDisplay\n\r");
 	printf("LTC/Register\t\tWatchdog\t\tADC\n\r");
-	printf("Critical/Abort\t\tAll\n\r");
+	printf("Critical/Abort\t\topenwire\t\tAll\n\r");
 	printf("Keep in mind: all values are 1-indexed\n\r");
 	printf("-----------------------------------------------------------\n\r");
 }
@@ -272,6 +278,10 @@ void CLI_Temperature(int* hashTokens) {
  * (tx_data, rx_date, and rx_pec_match)
  */
 void CLI_LTC6811(void) {
+	OS_ERR err;
+    CPU_TS ts;
+	OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, &ts, &err);
+	assertOSError(err);
 	for(uint8_t current_ic = 0; current_ic < NUM_MINIONS; current_ic++) {
 		printf("Minion board %d: ", current_ic);
 		printf("Config: \n\rTX: ");
@@ -320,6 +330,9 @@ void CLI_LTC6811(void) {
 		}
 		printf("\n\rPEC: %d\n\r", Minions[current_ic].sctrlb.rx_pec_match);
 	}
+	//release mutex
+  	OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
+  	assertOSError(err);
 }
 
 /** CLI_Contactor
@@ -636,7 +649,7 @@ void CLI_Critical(void) {
 	printf("Please type 'shutdown' to turn the contactor off\n\r");
 	printf(">> ");
 	while(1) {
-		if(BSP_UART_ReadLine(response) > 0) {
+		if(BSP_UART_ReadLine(response, 3) > 0) {
 			if(CLI_StringHash(response) == CLI_SHUTDOWN_HASH) {
 				BSP_Contactor_Off();
 				printf("Contactor is off\n\r");
@@ -649,9 +662,16 @@ void CLI_Critical(void) {
 	}
 }
 
+/** CLI_OpenWire
+ * Displays open wire status for the BPS system
+ */
+void CLI_OpenWire(void){
+	Voltage_OpenWireSummary();
+}
+
 /** CLI_All
  * Displays all information about BPS modules
- * (voltage, current, temperature, charge, contactor)
+ * (voltage, current, temperature, charge, contactor, open wires)
  */
 void CLI_All(void) {
 	int hashTokens[MAX_TOKEN_SIZE];
@@ -671,6 +691,8 @@ void CLI_All(void) {
 	printf("Contactor: \n\r");
 	hashTokens[0] = CLI_CONTACTOR_HASH;
 	CLI_Contactor(hashTokens);
+	hashTokens[0] = CLI_OPENWIRE_HASH;
+	CLI_OpenWire();
 }
 
 /** CLI_Handler
@@ -766,6 +788,10 @@ void CLI_Handler(char* input) {
 		case CLI_ABORT_HASH:
 			CLI_Critical();
 			break;
+		//Open wire command
+		case CLI_OPENWIRE_HASH:
+			CLI_OpenWire();
+			break;
 		// All
 		case CLI_ALL_HASH:
 			CLI_All();
@@ -776,3 +802,25 @@ void CLI_Handler(char* input) {
 	}
 	printf(">> ");
 }
+
+
+void Task_CLI(void *p_arg) {
+    (void)p_arg;
+
+    OS_ERR err;
+
+	//initialize();
+	//__enable_irq();
+	uint32_t fifo_size = 128;
+	char command[fifo_size];
+	CLI_Startup();
+
+    while(1) {
+        // BLOCKING =====================
+        // Wait for command
+		if(BSP_UART_ReadLine(command, UART_USB) > 0){
+			CLI_Handler(command);	//handle command
+		}
+    }
+}
+

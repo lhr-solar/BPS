@@ -1,7 +1,46 @@
 #include "CANbus.h"
 #include "BSP_CAN.h"
+#include "os.h"
 
-static void floatTo4Bytes(uint8_t f, uint8_t bytes[4]);
+/* Locking mechanism for the CAN bus.
+ * 
+ * The mutexes gate access to the BSP layer.
+ * 
+ * The mail sem4 counts the number of mailboxes
+ * in use, so that we can block if we can't get
+ * a hold of one.
+ * 
+ * The receive sem4 counts the number of messages
+ * currently in the receiving queue.
+ */
+static OS_MUTEX CANbus_TxMutex;
+static OS_MUTEX CANbus_RxMutex;
+static OS_SEM	CANbus_MailSem4;
+static OS_SEM	CANbus_ReceiveSem4;
+
+/**
+ * @brief   Releases hold of the mailbox semaphore.
+ * @note	Do not call directly.
+ */
+static void CANbus_Release(void) {
+	OS_ERR err;
+
+	OSSemPost(&CANbus_MailSem4,
+			  OS_OPT_POST_1,
+			  &err);
+}
+
+/**
+ * @brief	Increments the receive semaphore.
+ * @note	Do not call directly.
+ */
+static void CANbus_CountIncoming(void) {
+	OS_ERR err;
+
+	OSSemPost(&CANbus_ReceiveSem4,
+			  OS_OPT_POST_1,
+			  &err);
+}
 
 /**
  * @brief   Initializes the CAN system
@@ -9,67 +48,217 @@ static void floatTo4Bytes(uint8_t f, uint8_t bytes[4]);
  * @return  None
  */
 void CANbus_Init(void) {
-    BSP_CAN_Init();
+	OS_ERR err;
+
+	OSMutexCreate(&CANbus_TxMutex,
+				  "CAN TX Lock",
+				  &err);
+
+	OSMutexCreate(&CANbus_RxMutex,
+				  "CAN RX Lock",
+				  &err);
+
+	OSSemCreate(&CANbus_MailSem4,
+                "CAN Mailbox Semaphore",
+                3,	// Number of mailboxes
+                &err);
+
+	OSSemCreate(&CANbus_ReceiveSem4,
+                "CAN Queue Counter Semaphore",
+                0,
+                &err);
+
+	// Initialize and pass interrupt hooks
+    BSP_CAN_Init(CANbus_CountIncoming, CANbus_Release);
+}
+
+// Static method, call CANbus_Send or CANbus_BlockAndSend instead
+static ErrorStatus CANbus_SendMsg(CANId_t id, CANPayload_t payload) {
+	uint8_t txdata[5];
+	uint8_t data_length = 0;
+	
+	OS_ERR err;
+	CPU_TS ts;
+
+	// TODO: is it really best to keep the list of
+	//		 valid messages to be sending in the driver?
+	switch (id) {
+		// Handle messages with one byte of data
+		case TRIP:
+		case ALL_CLEAR:
+		case CONTACTOR_STATE:
+		case WDOG_TRIGGERED:
+		case CAN_ERROR:
+			data_length = 1;
+			memcpy(txdata, &payload.data.b, sizeof(payload.data.b));
+			break;
+
+		// Handle messages with float data
+		case CURRENT_DATA:
+		case SOC_DATA:
+			data_length = 4;
+			memcpy(txdata, &payload.data.f, sizeof(payload.data.f));
+			break;
+
+		// Handle messages with idx + float data
+		case VOLT_DATA:
+		case TEMP_DATA:
+			data_length = 5;
+			txdata[0] = payload.idx;
+			memcpy(&txdata[1], &payload.data.f, sizeof(payload.data.f));
+			break;
+
+		// Handle invalid messages
+		default:
+			return ERROR;	// Do nothing if invalid
+	}
+
+	// The mutex is require to access the CAN bus.
+	// This is because the software is responsible for
+	// choosing the mailbox to put the message into,
+	// leaving a possible race condition if not protected.
+	OSMutexPend(&CANbus_TxMutex,
+				0,
+				OS_OPT_PEND_BLOCKING,
+				&ts,
+				&err);
+
+	// Write the data to the bus
+	ErrorStatus retVal = BSP_CAN_Write(id, txdata, data_length);
+
+	OSMutexPost(&CANbus_TxMutex,
+				OS_OPT_POST_1,
+				&err);
+
+	return retVal;
 }
 
 /**
- * @brief   Transmits data onto the CANbus
+ * @brief   Transmits data onto the CANbus. If there are no mailboxes available,
+ *          this will put the thread to sleep until there are.
  * @param   id : CAN id of the message
  * @param   payload : the data that will be sent.
- * @return  0 if data wasn't sent, otherwise it was sent.
+ * @return  ERROR if error, SUCCESS otherwise
  */
-int CANbus_Send(CANId_t id, CANPayload_t payload) {
-    uint8_t txdata[5];
-	
-	switch (id) {
-		case TRIP:
-			return BSP_CAN_Write(id, &payload.data.b, 1);
+ErrorStatus CANbus_BlockAndSend(CANId_t id, CANPayload_t payload) {
+	CPU_TS ts;
+	OS_ERR err;
 
-		case ALL_CLEAR:
-			return BSP_CAN_Write(id, &payload.data.b, 1);
+	// Pend for a mailbox (blocking)
+	OSSemPend(&CANbus_MailSem4,
+			  0,
+			  OS_OPT_PEND_BLOCKING,
+			  &ts,
+			  &err);
 
-		case CONTACTOR_STATE:
-			return BSP_CAN_Write(id, &payload.data.b, 1);
-
-		case CURRENT_DATA:
-			floatTo4Bytes(payload.data.f, &txdata[0]);
-			return BSP_CAN_Write(id, txdata, 4);
-
-		case VOLT_DATA:
-		case TEMP_DATA:
-			txdata[0] = payload.idx;
-			floatTo4Bytes(payload.data.f, &txdata[1]);
-			return BSP_CAN_Write(id, txdata, 5);
-
-		case SOC_DATA:
-			floatTo4Bytes(payload.data.f, &txdata[0]);
-			return BSP_CAN_Write(id, txdata, 4);
-
-		case WDOG_TRIGGERED:
-			return BSP_CAN_Write(id, &payload.data.b, 1);
-
-		case CAN_ERROR:
-			return BSP_CAN_Write(id, &payload.data.b, 1);
+	// Check the error code
+	if(err != OS_ERR_NONE) {
+		return ERROR;
 	}
-	return 0;
+
+	return CANbus_SendMsg(id, payload);
 }
 
+/**
+ * @brief   Transmits data onto the CANbus.
+ *          This is non-blocking and will fail with an error if
+ * 			the CAN mailboxes are fully occupied. Be sure to
+ * 			check the return code or call CANbus_BlockAndSend.
+ * @param   id : CAN id of the message
+ * @param   payload : the data that will be sent.
+ * @return  ERROR if data wasn't sent, otherwise it was sent.
+ */
+ErrorStatus CANbus_Send(CANId_t id, CANPayload_t payload) {
+    CPU_TS ts;
+	OS_ERR err;
+	
+	// Check to see if a mailbox is available
+	OSSemPend(&CANbus_MailSem4,
+			  0,
+			  OS_OPT_PEND_NON_BLOCKING,
+			  &ts,
+			  &err);
 
-static void floatTo4Bytes(uint8_t val, uint8_t bytes_array[4]) {
-	uint8_t temp;
-	// Create union of shared memory space
-	union {
-			float float_variable;
-			uint8_t temp_array[4];
-	} u;
-	// Overite bytes of union with float variable
-	u.float_variable = val;
-	// Assign bytes to input array
-	memcpy(bytes_array, u.temp_array, 4);
-	temp = bytes_array[3];
-	bytes_array[3] = bytes_array[0];
-	bytes_array[0] = temp;
-	temp = bytes_array[2];
-	bytes_array[2] = bytes_array[1];
-	bytes_array[1] = temp;	
+	// Check to see if the semaphore was acquired successfully
+	if(err != OS_ERR_NONE) {
+		return ERROR;
+	}
+
+	// Send the message
+	return CANbus_SendMsg(id, payload);
+}
+
+static ErrorStatus CANbus_GetMsg(CANId_t *id, uint8_t *buffer) {
+	CPU_TS ts;
+	OS_ERR err;
+	
+	// The mutex is require to access the CAN receive queue.
+	OSMutexPend(&CANbus_RxMutex,
+				0,
+				OS_OPT_PEND_BLOCKING,
+				&ts,
+				&err);
+
+	// Write the data to the bus
+	uint32_t id_int;
+	uint8_t retVal = BSP_CAN_Read(&id_int, buffer);
+
+	*id = id_int;
+
+	OSMutexPost(&CANbus_RxMutex,
+				OS_OPT_POST_1,
+				&err);
+
+	return retVal;
+}
+
+/**
+ * @brief   Receives data from the CAN bus. This is a non-blocking operation.
+ * @param   id : pointer to id variable
+ * @param   buffer : pointer to payload buffer
+ * @return  ERROR if there was no message, SUCCESS otherwise.
+ */
+ErrorStatus CANbus_Receive(CANId_t *id, uint8_t *buffer) {
+	CPU_TS ts;
+	OS_ERR err;
+	
+	// Check to see if a mailbox is available
+	OSSemPend(&CANbus_ReceiveSem4,
+			  0,
+			  OS_OPT_PEND_NON_BLOCKING,
+			  &ts,
+			  &err);
+
+	// Check to see if the semaphore was acquired successfully
+	if(err != OS_ERR_NONE) {
+		return ERROR;
+	}
+
+	// Send the message
+	return CANbus_GetMsg(id, buffer);
+}
+
+/**
+ * @brief   Waits for data to arrive.
+ * @param   id : pointer to id variable
+ * @param   buffer : pointer to payload buffer
+ * @return  ERROR if there was an error, SUCCESS otherwise.
+ */
+ErrorStatus CANbus_WaitToReceive(CANId_t *id, uint8_t *buffer) {
+	CPU_TS ts;
+	OS_ERR err;
+
+	// Pend for a mailbox (blocking)
+	OSSemPend(&CANbus_ReceiveSem4,
+			  0,
+			  OS_OPT_PEND_BLOCKING,
+			  &ts,
+			  &err);
+
+	// Check the error code
+	if(err != OS_ERR_NONE) {
+		return ERROR;
+	}
+
+	return CANbus_GetMsg(id, buffer);
 }

@@ -2,10 +2,24 @@
 This repo contains all code related to UTSVT's Battery Protection System
 
 ## Setup
-There are two options for developing the BPS system. One option is to use the Keil IDE, which includes some basic debugging tools. The other option is to use a terminal in a linux environment to build and flash the program.
+Development is done in a linux environment to build and flash the BPS program.
 
-### Setup for Keil Development
-There is a tool called Keil that ARM produces for development on its microcontrollers. Download the most recent version of the Keil IDE: https://www.keil.com/demo/eval/arm.htm
+### Cloning the Repo
+Cloning repos onto your machine is usually straightforwward, but our RTOS project depend on uCOS-III-Simulator and uCOS-III-STM32F4 repos. Extra steps must be taken to correctly pull submodules. [Submodules](https://git-scm.com/book/en/v2/Git-Tools-Submodules) are repos that are inside a repo.
+
+The most common way to clone repos is to use the HTTPS link, but the most secure way is to clone with SSH. The submodules use SSH, so you must generate and add an SSH key to your GitHub acoount. Follow the instructions in this tutorial. If this is your first time doing this, you can start at the [Generating a new SSH key and adding it to the ssh-agent](https://docs.github.com/en/github/authenticating-to-github/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent) step, but reading everything is beneficial.
+
+Once you're able to use Git with SSH, go to the green "Code" button of the repo, and click "Use SSH" to get the url link. Copy the `git@hithub.com:repo-name` link. Then, enter the following command to the terminal but with the correct url link:
+
+```
+git clone --recurse-submodules git@github.com:repo-name
+```
+If you already cloned the repo but don't have the submodules, enter the following commands:
+
+```
+git submodule init
+git submodule update --remote
+```
 
 ### Setup for Terminal Development
 The system can also be built and deployed from a terminal, allowing you to use different development tools than Keil.
@@ -21,15 +35,29 @@ The system can also be built and deployed from a terminal, allowing you to use d
     - C/C++
     - ARM
     - cortex-debug
+5. OPTIONAL: If you are testing on the simulator, you must add the following line in `/etc/security/limits.conf` then restart your machine:
+    ```
+    <username> - rtprio unlimited
+    ```
 
 ## Building
-When calling any of the following commands, make sure you are in the top most level of the directory.
+When calling any of the following commands, make sure you are in the top level of the repo.
 
 Call ```make bsp_type``` to compile the release version of the code. ```bsp_type``` is the system you want to compile for.
 
 Call ```make help``` for more information on how to build the project.
 
 Call ```make clean``` if the build fails for any reason other than syntax related.
+
+The BPS has an RTOS version and a bare metal version for its BSP files. To select which one to build, pass either `RTOS` or `BAREMETAL` to the `OS` argument. For example
+    ```
+    make simulator OS=BAREMETAL
+    ```
+will build the bare metal version, and  
+    ```
+    make simulator OS=RTOS
+    ```
+will build the RTOS version. The RTOS version is selected by default.
 
 For testing, please read the Testing section.
 

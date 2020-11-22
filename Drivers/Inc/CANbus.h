@@ -1,7 +1,10 @@
+/* Copyright (c) 2020 UT Longhorn Racing Solar */
+
 #ifndef __CANBUS_H
 #define __CANBUS_H
 
 #include "common.h"
+#include "config.h"
 
 typedef enum {
     TRIP = 0x02,
@@ -31,6 +34,12 @@ typedef struct {
 	CANData_t data;
 } CANPayload_t;
 
+/*This data type is used to push messages onto the queue*/
+typedef struct {
+    CANId_t id;
+    CANPayload_t payload;
+}CANMSG_t;
+
 /**
  * @brief   Initializes the CAN system
  * @param   None
@@ -39,10 +48,39 @@ typedef struct {
 void CANbus_Init(void);
 
 /**
- * @brief   Transmits data onto the CANbus
+ * @brief   Transmits data onto the CANbus.
+ *          This is non-blocking and will fail with an error if
+ * 			the CAN mailboxes are fully occupied. Be sure to
+ * 			check the return code or call CANbus_BlockAndSend.
  * @param   id : CAN id of the message
  * @param   payload : the data that will be sent.
+ * @return  ERROR if data wasn't sent, otherwise it was sent.
  */
-int CANbus_Send(CANId_t id, CANPayload_t payload);
+ErrorStatus CANbus_Send(CANId_t id, CANPayload_t payload);
+
+/**
+ * @brief   Transmits data onto the CANbus. If there are no mailboxes available,
+ *          this will put the thread to sleep until there are.
+ * @param   id : CAN id of the message
+ * @param   payload : the data that will be sent.
+ * @return  ERROR if error, SUCCESS otherwise
+ */
+ErrorStatus CANbus_BlockAndSend(CANId_t id, CANPayload_t payload);
+
+/**
+ * @brief   Receives data from the CAN bus. This is a non-blocking operation.
+ * @param   id : pointer to id variable
+ * @param   buffer : pointer to payload buffer
+ * @return  ERROR if there was no message, SUCCESS otherwise.
+ */
+ErrorStatus CANbus_Receive(CANId_t *id, uint8_t *buffer);
+
+/**
+ * @brief   Waits for data to arrive.
+ * @param   id : pointer to id variable
+ * @param   buffer : pointer to payload buffer
+ * @return  ERROR if there was an error, SUCCESS otherwise.
+ */
+ErrorStatus CANbus_WaitToReceive(CANId_t *id, uint8_t *buffer);
 
 #endif

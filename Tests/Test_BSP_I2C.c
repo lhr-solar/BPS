@@ -1,3 +1,5 @@
+/* Copyright (c) 2020 UT Longhorn Racing Solar */
+
 #include "common.h"
 #include "config.h"
 #include "BSP_I2C.h"
@@ -21,6 +23,7 @@ int main() {
 	EEPROM_Load();
 	EEPROM_Tester();
 	EEPROM_SerialPrintData();
+	while(1){}
 	return 0;
 }
 

@@ -3,6 +3,7 @@
 ######################################
 TARGET = bps-leader
 
+DEBUG = 1
 
 ######################################
 # building variables
@@ -13,34 +14,54 @@ OPT = -Og
 #######################################
 # paths
 #######################################
+# Top Level
+TOP_DIR = ../..
 # Build path
-BUILD_DIR = ../../Objects
+BUILD_DIR = $(TOP_DIR)/Objects
+# RTOS path
+RTOS_DIR = $(TOP_DIR)/RTOS/uCOS-III-STM32F4
 
 ######################################
 # source
 ######################################
 # C sources
-# since current path is in the BSP folder, go to the top level with ../../
+# since current path is in the BSP folder, go to the top level with $(TOP_DIR)/
 C_SOURCES =  \
-$(wildcard ../../Drivers/Src/*.c)	\
-$(wildcard ../../BSP/STM32F413/Src/*.c)	\
-$(wildcard ../../CMSIS/DSP_Lib/Source/*.c)	\
-$(wildcard ../../BSP/STM32F413/STM32F4xx_StdPeriph_Driver/Src/*.c)	
+$(wildcard $(TOP_DIR)/Drivers/Src/*.c)	\
+$(wildcard $(TOP_DIR)/BSP/STM32F413/Src/*.c)	\
+$(wildcard $(TOP_DIR)/CMSIS/DSP_Lib/Source/*.c)	\
+$(wildcard $(TOP_DIR)/Config/Src/*.c)	\
+$(wildcard $(TOP_DIR)/BSP/STM32F413/STM32F4xx_StdPeriph_Driver/Src/*.c)	\
+$(wildcard $(RTOS_DIR)/uCOS-III/Source/*.c)	\
+$(wildcard $(RTOS_DIR)/uCOS-III/Ports/ARM-Cortex-M4/Generic/GNU/*.c)	\
+$(wildcard $(RTOS_DIR)/uC-CPU/*.c)	\
+$(wildcard $(RTOS_DIR)/uC-CPU/ARM-Cortex-M4/GNU/*.c)	\
+$(wildcard $(RTOS_DIR)/uC-LIB/*.c)	\
+$(wildcard $(RTOS_DIR)/uC-LIB/Ports/ARM-Cortex-M4/GNU/*.c)	\
+$(wildcard $(RTOS_DIR)/uC-Serial/Driver/ST/*.c)	\
+$(wildcard $(RTOS_DIR)/uC-Serial/Line/*.c)	\
+$(wildcard $(RTOS_DIR)/uC-Serial/OS/*.c)	\
+$(wildcard $(RTOS_DIR)/uC-Serial/OS/uCOS-III/*.c)	\
+$(wildcard $(RTOS_DIR)/uC-Serial/Source/*.c)	
+
 
 
 ifneq ($(TEST), none)
 TEST_FILE := Test_$(TEST).c
 # This line adds everything in Apps/Src/*.c except for main.c
 C_SOURCES += \
-$(filter-out ../../Apps/Src/main.c, $(wildcard ../../Apps/Src/*.c))	\
-$(wildcard ../../Tests/$(TEST_FILE))
+$(filter-out $(TOP_DIR)/Apps/Src/main.c, $(wildcard $(TOP_DIR)/Apps/Src/*.c))	\
+$(wildcard $(TOP_DIR)/Tests/$(TEST_FILE))
 else
-C_SOURCES += $(wildcard ../../Apps/Src/*.c)
+C_SOURCES += $(wildcard $(TOP_DIR)/Apps/Src/*.c)
 endif
 
 # ASM sources
 ASM_SOURCES =  \
-../../BSP/STM32F413/Src/startup_stm32f413xx.s
+$(TOP_DIR)/BSP/STM32F413/Src/startup_stm32f413xx.s	\
+$(wildcard $(RTOS_DIR)/uC-CPU/ARM-Cortex-M4/GNU/*.s)	\
+$(wildcard $(RTOS_DIR)/uC-LIB/Ports/ARM-Cortex-M4/GNU/*.s)	\
+$(wildcard $(RTOS_DIR)/uCOS-III/Ports/ARM-Cortex-M4/Generic/GNU/*.s)	
 
 
 #######################################
@@ -88,22 +109,33 @@ AS_DEFS =
 C_DEFS =  \
 -DSTM32F413_423xx	\
 -DUSE_STDPERIPH_DRIVER	\
--D__FPU_PRESENT
-
+-D__FPU_PRESENT \
+-D$(OS)
 
 # AS includes
 AS_INCLUDES = 
 
 # C includes
-# since current path is in the BSP folder, go to the top level with ../../
+# since current path is in the BSP folder, go to the top level with $(TOP_DIR)/
 C_INCLUDES =  \
--I../../Apps/Inc	\
--I../../Drivers/Inc	\
--I../../Config/Inc	\
--I../../BSP/Inc	\
--I../../CMSIS/Device/ST/STM32F4xx/Include	\
--I../../CMSIS/Include	\
--I../../BSP/STM32F413/STM32F4xx_StdPeriph_Driver/Inc
+-I$(TOP_DIR)/Apps/Inc	\
+-I$(TOP_DIR)/Drivers/Inc	\
+-I$(TOP_DIR)/Config/Inc	\
+-I$(TOP_DIR)/BSP/Inc	\
+-I$(TOP_DIR)/CMSIS/Device/ST/STM32F4xx/Include	\
+-I$(TOP_DIR)/CMSIS/Include	\
+-I$(TOP_DIR)/BSP/STM32F413/STM32F4xx_StdPeriph_Driver/Inc	\
+-I$(RTOS_DIR)/uCOS-III/Source	\
+-I$(RTOS_DIR)/uCOS-III/Ports/ARM-Cortex-M4/Generic/GNU	\
+-I$(RTOS_DIR)/uC-CPU	\
+-I$(RTOS_DIR)/uC-CPU/ARM-Cortex-M4/GNU	\
+-I$(RTOS_DIR)/uC-LIB	\
+-I$(RTOS_DIR)/uC-LIB/Ports/ARM-Cortex-M4/GNU	\
+-I$(RTOS_DIR)/uC-Serial/Driver/ST	\
+-I$(RTOS_DIR)/uC-Serial/Line	\
+-I$(RTOS_DIR)/uC-Serial/OS	\
+-I$(RTOS_DIR)/uC-Serial/OS/uCOS-III	\
+-I$(RTOS_DIR)/uC-Serial/Source	
 
 
 # compile gcc flags
