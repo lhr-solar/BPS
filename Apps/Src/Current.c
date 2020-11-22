@@ -14,6 +14,7 @@
 #include "os.h"
 #include "Tasks.h"
 #include "BSP_SPI.h"
+#include "CANbus.h"
 
 static OS_ERR err;
 static CPU_TS ticks;
@@ -188,7 +189,8 @@ void Task_AmperesMonitor(void *p_arg) {
         // BLOCKING =====================
         // Update Amperes Measurements
 		Current_UpdateMeasurements();
-
+		int32_t current = Amps_GetReading();
+		OSQPost(&CANBus_MsgQ, &current, 4, OS_OPT_POST_FIFO, &err); //Send data to Can
         // Check if amperes is NOT safe:
 		SafetyStatus amperesStatus = Current_CheckStatus(false);
 		if(amperesStatus != SAFE) {

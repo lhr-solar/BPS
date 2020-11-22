@@ -5,6 +5,7 @@
 #include "Temperature.h"
 #include "Current.h"
 #include "BSP_Fans.h"
+#include "CANbus.h"
 
 void Task_VoltTempMonitor(void *p_arg) {
     (void)p_arg;
@@ -19,11 +20,21 @@ void Task_VoltTempMonitor(void *p_arg) {
     bool openWireHasBeenChecked = false;
     bool temperatureHasBeenChecked = false;
 
+    CANData_t CanData;
+    CanData.b = 0;
+    CanData.h = 0;
+    CanData.w = 0;
+    CANPayload_t CanPayload;
     while(1) {
         // BLOCKING =====================
         // Update Voltage Measurements
         Voltage_UpdateMeasurements();
-        
+        for (int i = 0; i < NUM_BATTERY_MODULES; i++){ //send all battery module voltage data
+            CanPayload.idx = i;
+            CanData.f = Voltage_GetModuleMillivoltage(i);
+            CanPayload.data = CanData;
+            OSQPost(&CANBus_MsgQ, &CanPayload, sizeof(CanPayload), OS_OPT_POST_FIFO, &err);
+        }
         // Check if voltage is NOT safe:
         SafetyStatus voltageStatus = Voltage_CheckStatus();
         if(voltageStatus != SAFE) {
@@ -65,7 +76,12 @@ void Task_VoltTempMonitor(void *p_arg) {
         // BLOCKING =====================
         // Update Temperature Measurements
         Temperature_UpdateAllMeasurements();
-        
+        for (int i = 0; i < NUM_BATTERY_MODULES; i++){ //send all battery module temp data
+            CanPayload.idx = i;
+            CanData.f = Temperature_GetModuleTemperature(i);
+            CanPayload.data = CanData;
+            OSQPost(&CANBus_MsgQ, &CanPayload, sizeof(CanPayload), OS_OPT_POST_FIFO, &err);
+        }
         // Check if temperature is NOT safe:
         SafetyStatus temperatureStatus = Temperature_CheckStatus(Current_IsCharging());
         if(temperatureStatus != SAFE) {
