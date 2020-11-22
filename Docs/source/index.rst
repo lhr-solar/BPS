@@ -16,7 +16,15 @@ Welcome to the BeVolt BPS documentation!
 
    Overview/design-requirements
    Overview/design-overview
-   Manthan
+
+.. toctree::
+   :hidden:
+   :maxdepth: 2
+   :caption: Software
+
+   Software/Tasks
+   Software/BSP
+   Software/Apps
 
 .. toctree::
    :hidden:

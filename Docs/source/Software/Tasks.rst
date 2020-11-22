@@ -1,9 +1,9 @@
-**********************
-Manthan Upadhyaya
-**********************
+********************************
+Real Time Operating System Tasks
+********************************
 
-Fault State Task
-=================
+Fault State Task: Manthan Upadhyaya
+===================================
 
 The Fault State Task is called when a fault condition is set off in the BPS. 
 These fault conditions can be found here(place link to fault conditions).
@@ -23,13 +23,13 @@ Process:
     
     7) The WatchDog timer is continually reset to prevent the BPS from going into fault again.
 
-Amperes Task
-============
+Amperes Task: Manthan Upadhyaya
+===============================
 
 All I did was add the amperes mutex, I am not sure if this is something I should document.
 
-Critical State Task
-===================
+Critical State Task: Manthan Upadhyaya
+======================================
 
 The Critical State Task initializes the BPS when it first turns on.
 
