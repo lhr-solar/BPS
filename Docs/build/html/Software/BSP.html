@@ -91,7 +91,9 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="Tasks.html">Real Time Operating System Tasks</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Battery Support Package</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#i2c-bsp-driver">I2C BSP Driver</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#i2c-driver-manthan-upadhyaya">I2C Driver: Manthan Upadhyaya</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#uart-driver-manthan-upadhyaya">UART Driver: Manthan Upadhyaya</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#fans-driver-manthan-upadhyaya">Fans Driver: Manthan Upadhyaya</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="Apps.html">Application Drivers</a></li>
@@ -166,12 +168,25 @@
             
   <div class="section" id="battery-support-package">
 <h1>Battery Support Package<a class="headerlink" href="#battery-support-package" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="i2c-bsp-driver">
-<h2>I2C BSP Driver<a class="headerlink" href="#i2c-bsp-driver" title="Permalink to this headline">¶</a></h2>
-<p>The I2C driver is interrupt driven and has a special format. There are multiple definitions of the same functions,
-one for the RTOS and one for the Bare-Metal version of the BPS. There are #defines that ecompass
-these functions that are set when compiled. The default #define is “RTOS” but it can be changed to
-compile the Bare-Metal code if necessary.</p>
+<div class="section" id="i2c-driver-manthan-upadhyaya">
+<h2>I2C Driver: Manthan Upadhyaya<a class="headerlink" href="#i2c-driver-manthan-upadhyaya" title="Permalink to this headline">¶</a></h2>
+<p>The I2C driver is interrupt driven and uses I2C3 for communicating with the EEPROM.
+There are multiple definitions of the same functions within this library. They are split into 2
+categories, one for the RTOS and one for the Bare-Metal version of the BPS. There are #defines that
+ecompass these functions that are set when compiled. The default #define is “RTOS” but it can be
+changed to compile the Bare-Metal code if necessary.</p>
+</div>
+<div class="section" id="uart-driver-manthan-upadhyaya">
+<h2>UART Driver: Manthan Upadhyaya<a class="headerlink" href="#uart-driver-manthan-upadhyaya" title="Permalink to this headline">¶</a></h2>
+<p>The UART driver is interrupt driven and initializes 2 serial transmission lines(UART 2 and 3). One
+is for the Bluetooth module and the other is for the USB. This driver is also split into two
+sections just like the I2C driver. One is for RTOS and the other is for Bare-Metal.</p>
+</div>
+<div class="section" id="fans-driver-manthan-upadhyaya">
+<h2>Fans Driver: Manthan Upadhyaya<a class="headerlink" href="#fans-driver-manthan-upadhyaya" title="Permalink to this headline">¶</a></h2>
+<p>The Fans driver is used to control the speed of the fans depending on the temperature of the Battery
+Pack. It allows for as many speeds as needed and can change the speed of individual fans. It supports
+four fans and uses PWM to change the speed and hopefully save energy.</p>
 </div>
 </div>
 
