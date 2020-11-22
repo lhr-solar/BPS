@@ -13,42 +13,10 @@
 static OS_ERR err;
 static CPU_TS ticks;
 static OS_MUTEX AmperesData_Mutex;
-static OS_SEM AmperesIO_Sem;
 
 static bsp_os_t spi3;
 
 static int16_t latestMeasureMilliAmps;
-
-#ifdef RTOS
-void Amperes_Pend(){
-	CPU_TS ts;
-    OS_ERR err;
-    OSSemPend(&AmperesIO_Sem,
-                        0,
-                        OS_OPT_PEND_BLOCKING,
-                        &ts,
-                        &err);
-    assertOSError(err);
-}
-
-void Amperes_Post(){
-	OS_ERR err;
-    OSSemPost(&AmperesIO_Sem,
-                        OS_OPT_POST_1,
-                        &err);
-    assertOSError(err);
-}
-#endif
-
-#ifdef BAREMETAL
-void Amperes_Pend(void) {
-    return;
-}
-
-void Amperes_Post(void) {
-    return;
-}
-#endif
 
 /** Amps_Init
  * Initializes hardware to begin current monitoring.

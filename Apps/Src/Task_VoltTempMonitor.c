@@ -3,7 +3,6 @@
 #include "Tasks.h"
 #include "Voltage.h"
 #include "Temperature.h"
-#include "Current.h"
 #include "BSP_Fans.h"
 
 void Task_VoltTempMonitor(void *p_arg) {
@@ -67,7 +66,7 @@ void Task_VoltTempMonitor(void *p_arg) {
         Temperature_UpdateAllMeasurements();
         
         // Check if temperature is NOT safe:
-        SafetyStatus temperatureStatus = Temperature_CheckStatus(Current_IsCharging());
+        SafetyStatus temperatureStatus = Temperature_CheckStatus(Amps_IsCharging());
         if(temperatureStatus != SAFE) {
             OSSemPost(&Fault_Sem4,
                         OS_OPT_POST_1,

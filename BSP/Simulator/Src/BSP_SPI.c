@@ -109,7 +109,7 @@ void BSP_SPI_Write(spi_port_t port, uint8_t *txBuf, uint32_t txLen) {
  * @param   rxLen   length of data array.
  * @return  None
  */
-void BSP_SPI_Read(uint8_t *rxBuf, uint32_t rxLen) {
+void BSP_SPI_Read(spi_port_t port, uint8_t *rxBuf, uint32_t rxLen) {
 
     if(rxLen == 1) {
         rxBuf[0] = 1;
@@ -186,7 +186,8 @@ void BSP_SPI_Read(uint8_t *rxBuf, uint32_t rxLen) {
  * @param   state   0 for select, 1 to deselect
  * @return  None
  */
-void BSP_SPI_SetStateCS(uint8_t state) {
+void BSP_SPI_SetStateCS(spi_port_t port, uint8_t state) {
+    //TODO: make this do something different based on which port you pass it
     chipSelectState = state;
 }
 

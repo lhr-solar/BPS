@@ -33,12 +33,48 @@
 #define AS8510_DEC_R2_V      0x46
 #define AS8510_FIR_CTL_REG_V 0x47
 
+static OS_SEM AmperesIO_Sem;
+static bsp_os_t spi_os;
+
+#ifdef RTOS
+void Amperes_Pend(){
+	CPU_TS ts;
+    OS_ERR err;
+    OSSemPend(&AmperesIO_Sem,
+                        0,
+                        OS_OPT_PEND_BLOCKING,
+                        &ts,
+                        &err);
+    assertOSError(err);
+}
+
+void Amperes_Post(){
+	OS_ERR err;
+    OSSemPost(&AmperesIO_Sem,
+                        OS_OPT_POST_1,
+                        &err);
+    assertOSError(err);
+}
+#endif
+
+#ifdef BAREMETAL
+void Amperes_Pend(void) {
+    return;
+}
+
+void Amperes_Post(void) {
+    return;
+}
+#endif
+
 /* Initialize communication with the AS8510
  * to begin measurement of electrical current.
  */
 void AS8510_Init() 
 {
-    BSP_SPI_Init(spi_as8510);
+    spi_os.pend = Amperes_Pend;
+    spi_os.post = Amperes_Post;
+    BSP_SPI_Init(spi_as8510, &spi_os);
 
     // TODO: verify that this initialization is correct once
     //       we have the hardware that we need
