@@ -25,15 +25,18 @@ void Task_VoltTempMonitor(void *p_arg) {
     CanData.h = 0;
     CanData.w = 0;
     CANPayload_t CanPayload;
+    CANMSG_t CanMsg;
     while(1) {
         // BLOCKING =====================
         // Update Voltage Measurements
         Voltage_UpdateMeasurements();
+        CanMsg.id = VOLT_DATA;
         for (int i = 0; i < NUM_BATTERY_MODULES; i++){ //send all battery module voltage data
             CanPayload.idx = i;
             CanData.f = Voltage_GetModuleMillivoltage(i);
             CanPayload.data = CanData;
-            OSQPost(&CANBus_MsgQ, &CanPayload, sizeof(CanPayload), OS_OPT_POST_FIFO, &err);
+            CanMsg.payload = CanPayload;
+            OSQPost(&CANBus_MsgQ, &CanMsg, sizeof(CanMsg), OS_OPT_POST_FIFO, &err);
         }
         // Check if voltage is NOT safe:
         SafetyStatus voltageStatus = Voltage_CheckStatus();
@@ -76,11 +79,13 @@ void Task_VoltTempMonitor(void *p_arg) {
         // BLOCKING =====================
         // Update Temperature Measurements
         Temperature_UpdateAllMeasurements();
+        CanMsg.id = TEMP_DATA;
         for (int i = 0; i < NUM_BATTERY_MODULES; i++){ //send all battery module temp data
             CanPayload.idx = i;
             CanData.f = Temperature_GetModuleTemperature(i);
             CanPayload.data = CanData;
-            OSQPost(&CANBus_MsgQ, &CanPayload, sizeof(CanPayload), OS_OPT_POST_FIFO, &err);
+            CanMsg.payload = CanPayload;
+            OSQPost(&CANBus_MsgQ, &CanMsg, sizeof(CanMsg), OS_OPT_POST_FIFO, &err);
         }
         // Check if temperature is NOT safe:
         SafetyStatus temperatureStatus = Temperature_CheckStatus(Current_IsCharging());
