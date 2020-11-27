@@ -62,7 +62,7 @@ FLAGS = -Wall -g -std=c11 $(INC_DIR) -DSIMULATION -D_GNU_SOURCE
 # Defines
 ######################################
 DEF = -D_XOPEN_SOURCE=700 -DSIMULATION -D$(OS)
-DEF += -D_POSIX_C_SOURCE=200809L
+
 
 ######################################
 # Build
