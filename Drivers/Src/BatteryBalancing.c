@@ -5,10 +5,7 @@
 #include "config.h"
 #include "Current.h"
 
-#define chargingTolerance 0
-
-
-
+#define CHARGING_TOLERANCE 0
 
 static uint16_t Balancing_Init(void) {
 	uint16_t minVoltage = 0;
@@ -30,8 +27,8 @@ void Balancing_Balance(cell_asic Minions[]){
 	Voltage_UpdateMeasurements();
 	for (uint8_t k = 0; k < NUM_BATTERY_MODULES; k++) {
 		uint16_t voltage = Voltage_GetModuleMillivoltage(k);//Get voltage of module
-		if (voltage > lowest + chargingTolerance) {//Check to see if module is greater than min
-			setDischarge(k, Minions);//Set discharge bit if module is too high
+		if (voltage > lowest + CHARGING_TOLERANCE) {//Check to see if module is greater than min
+			Balancing_SetDischarge(k, Minions);//Set discharge bit if module is too high
 		}
 		else {//Clear discharge bit of module if it reaches minimum
 			uint8_t ICIndex;
@@ -78,27 +75,4 @@ void Balancing_SetDischarge(uint8_t module, cell_asic ic[]) {
 	LTC6811_set_discharge(ModuleNumber, 4, &ic[ICNumber]); //Set discharge bit
 	LTC681x_wrcfg(4,ic);	
 	LTC681x_rdcfg(4,ic);
-}
-
-
-
-void testDischarge(cell_asic ic[]) {
-	LTC681x_rdcfg(4, ic);  
-	ic[0].config.tx_data[4] |= 0xFF;
-	ic[0].config.tx_data[5] |= 0x0F;
-	LTC681x_wrcfg(4,ic);
-	LTC681x_rdcfg(4,ic); 
-}
-
-void testStopDischarge(cell_asic ic[]) {
-	LTC681x_rdcfg(4, ic); 
-	ic[0].config.tx_data[4] &= 0x00;
-	ic[0].config.tx_data[5] &= 0xF0;
-	LTC681x_wrcfg(4,ic);
-	LTC681x_rdcfg(4,ic); 
-}
-
-void testTheirDischarge(cell_asic ic[]) {
-	bool dcc[12] = {1,1,1,1,1,1,1,1,1,1,1,1}; 
-	LTC6811_set_cfgr_dis(1, ic, dcc);
 }

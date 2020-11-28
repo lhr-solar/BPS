@@ -127,4 +127,3 @@ def read():
                 row[i] = int(row[i])
             values.append(row)
         fcntl.flock(csvfile.fileno(), fcntl.LOCK_UN)    # Unlock file
-    return values

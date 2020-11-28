@@ -51,10 +51,4 @@ void Balancing_SetDischarge(uint8_t module, cell_asic ic[]);
  */
 void Balancing_ClearDischargeBit(int Cell, uint8_t total_ic, cell_asic ic[]);
 
-void testDischarge(cell_asic ic[]);
-
-void testStopDischarge(cell_asic ic[]);
-
-void testTheirDischarge(cell_asic ic[]);
-
 #endif
