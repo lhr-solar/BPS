@@ -19,14 +19,17 @@ Process:
     
     5) The fault condition is logged into the EEPROM.
     
-    6) A message is sent along the CAN to any other system that might be operating still.
+    6) A message is sent along the CAN to the BPS display board to notify the driver that the BPS is tripped.
     
     7) The WatchDog timer is continually reset to prevent the BPS from going into fault again.
 
 Amperes Task: Manthan Upadhyaya
 ===============================
 
-All I did was add the amperes mutex, I am not sure if this is something I should document.
+The amperes mutex was added in this version of the BPS. It prevents multiple tasks from acessing the 
+global current variable at the same time for read and write operations. For example, if the LogInfo task
+is reading the current at the same time as the Amperes Task is updating it, the LogInfo task could read the
+wrong value.
 
 Critical State Task: Manthan Upadhyaya
 ======================================
@@ -34,7 +37,7 @@ Critical State Task: Manthan Upadhyaya
 The Critical State Task initializes the BPS when it first turns on.
 
 Process:
-    1) It waits for the VoltTemp and Amperes task to post the SafetyCheck semaphore 4 times. One for voltge, one for temperature, one for current, and one for open wire.
+    1) It waits for the VoltTemp and Amperes task to post the SafetyCheck semaphore 4 times. One for voltage, one for temperature, one for current, and one for open wire.
     
     2) If all of these checks are safe, the task will send the All Clear message and the Contactor On message across the CAN line.
     

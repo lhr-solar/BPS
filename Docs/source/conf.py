@@ -22,6 +22,7 @@ import sphinx_rtd_theme # ReadTheDocs theme. More information available at: http
 project = 'BeVolt BPS'
 copyright = '2020, LHR Solar'
 author = 'Clark Poon'
+author = 'Manthan Upadhyaya'
 
 # The full version, including alpha/beta/rc tags
 release = '0.0'
