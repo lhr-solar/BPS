@@ -15,6 +15,7 @@ typedef enum {
     SOC_DATA = 0x106,
     WDOG_TRIGGERED = 0x107,
     CAN_ERROR = 0x108
+    MOTOR_DISABLE = 0x10A
 } CANId_t;
 
 typedef union {
