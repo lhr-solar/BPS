@@ -4,6 +4,7 @@
 #include "CANbus.h"
 #include "Tasks.h"
 #include "BSP_UART.h"
+#include "Voltage.h"
 
 bool AdminOverride = false;
 
@@ -15,13 +16,9 @@ void Task_CriticalState(void *p_arg) {
     OS_ERR err;
     CPU_TS ts;
     CANMSG_t CANMSG;
-    CANData_t CanData;
     CANPayload_t CanPayload; 
-    CanPayload.idx = 0;
-    CanData.b = 1;
-    CanData.f = 0;
-    CanData.h = 0;
-    CanData.w = 0;
+    CanPayload.idx    = 0;
+    CanPayload.data.b = 1;
 
     Voltage_UpdateMeasurements();
 	SafetyStatus voltStatus = Voltage_CheckStatus();

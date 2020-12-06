@@ -22,6 +22,7 @@
 #include "EEPROM.h"
 #include "os.h"
 #include "Tasks.h"
+#include <string.h>
 
 #define MAX_TOKEN_SIZE 4
 
@@ -52,7 +53,7 @@ void CLI_InputParse(char* input, int* parsedTokens) {
     strcpy(inputCpy, input);
 
 	char *tokenized;
-	char *split = __strtok_r(inputCpy, " ", &tokenized);
+	char *split = strtok_r(inputCpy, " ", &tokenized);
 	for(int i = 0; i < MAX_TOKEN_SIZE && split != NULL; i++) {
 		for(int j = 0; j < strlen(split); j++) {
 			split[j] = tolower(split[j]);
@@ -60,12 +61,12 @@ void CLI_InputParse(char* input, int* parsedTokens) {
 		if(i == 3) { // CAN requires argument #3 to be in hex
 			strcpy(hexString, split);
 		}
-		if(!isalpha(split[0])) {
+		if(!isalpha((unsigned char)split[0])) {
 			sscanf(split, "%d", &parsedTokens[i]);
 		} else {
 			parsedTokens[i] = CLI_StringHash(split);
 		}
-		split = __strtok_r(NULL, " ", &tokenized);
+		split = strtok_r(NULL, " ", &tokenized);
 	}
 }
 

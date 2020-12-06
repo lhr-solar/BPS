@@ -111,4 +111,6 @@ int BSP_Fans_GetSpeed(uint8_t fan){
         return TIM8-> CCR4 / DIVIDER;
         break;
     }
+
+    return -1;
 }

@@ -209,9 +209,15 @@ static bool RxFifo_Peek(uint8_t *data, UART_Port usart) {
 static bool RxFifo_IsFull(UART_Port usart) {
     if (usart == UART_USB) return (rxPut3 + 1) % RX_SIZE == rxGet3;
     if (usart == UART_BLE) return (rxPut2 + 1) % RX_SIZE == rxGet2;
+
+    // In event of an error, assume it is full
+    return true;
 }
 
 static bool RxFifo_IsEmpty(UART_Port usart) {
     if (usart == UART_USB) return rxGet3 == rxPut3;
     if (usart == UART_BLE) return rxGet2 == rxPut2;
+
+    // In event of an error, assume it is not empty
+    return false;
 }

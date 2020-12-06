@@ -7,9 +7,9 @@
 #include <sys/file.h>
 #include <unistd.h>
 
-
+#if 0
 static const char* file = GET_CSV_PATH(CAN_CSV_FILE);
-
+#endif
 
 
 /**
