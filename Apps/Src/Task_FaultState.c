@@ -12,16 +12,13 @@
 #include "CANbus.h"
 #include "BSP_UART.h"
 #include "config.h"
-//Manthan Upadhyaya wuz here: 10/2020
 
-void Task_FaultState(void *p_arg) {
-    (void)p_arg;
-    OS_ERR err;
-    CPU_TS ts;
-
-    // BLOCKING =====================
-    // Wait until a FAULT is signaled by another task.
-    OSSemPend(&Fault_Sem4, 0, OS_OPT_PEND_BLOCKING, &ts, &err);
+/*
+ * Note: do not call this directly if it can be helped.
+ * Instead, call an RTOS function to unblock the mutex
+ * that the Fault Task is pending on.
+ */
+void EnterFaultState() {
     // Turn Contactor Off
     BSP_Contactor_Off();
     //Set Fans to full speed
@@ -62,13 +59,33 @@ void Task_FaultState(void *p_arg) {
     // Push Contactor State message to CAN Q
     data.b = 0;
     CANbus_Send(CONTACTOR_STATE, Message);
-    #ifdef DEBUGMODE
+
+#ifdef DEBUGMODE
     char command[COMMAND_SIZE];
-    #endif
+#endif
     while(1) {
-        #ifdef DEBUGMODE
+#ifdef DEBUGMODE
         if (BSP_UART_ReadLine(command)) CLI_Handler(command); // CLI
-        #endif
+#endif
         BSP_WDTimer_Reset(); // WDOG Reset
     }
 }
+
+void Task_FaultState(void *p_arg) {
+    (void)p_arg;
+    OS_ERR err;
+    CPU_TS ts;
+
+    // BLOCKING =====================
+    // Wait until a FAULT is signaled by another task.
+    OSSemPend(&Fault_Sem4, 0, OS_OPT_PEND_BLOCKING, &ts, &err);
+    
+    EnterFaultState();
+}
+
+// Rebind all the possible fault handlers to the fault state
+inline void NMI_Handler()        { EnterFaultState(); }
+inline void HardFault_Handler()  { EnterFaultState(); }
+inline void MemManage_Handler()  { EnterFaultState(); }
+inline void BusFault_Handler()   { EnterFaultState(); }
+inline void UsageFault_Handler() { EnterFaultState(); }
