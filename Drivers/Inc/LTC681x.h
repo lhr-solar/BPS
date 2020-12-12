@@ -82,7 +82,7 @@ Copyright 2015 Linear Technology Corp. (LTC)
 
 
 
-#define LTC681X_NUM_RX_BYT 8
+#define LTC681X_NUM_RX_BYTE 8
 #define LTC681X_CELL 1
 #define LTC681X_AUX 2
 #define LTC681X_STAT 3

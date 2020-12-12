@@ -1,3 +1,5 @@
+/* Copyright (c) 2020 UT Longhorn Racing Solar */
+
 /** Charge.c
  * State of Charge algorithm.
  */

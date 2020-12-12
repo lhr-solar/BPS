@@ -1,3 +1,5 @@
+/* Copyright (c) 2020 UT Longhorn Racing Solar */
+
 #include "BSP_WDTimer.h"
 #include <stdint.h>
 #include <stdlib.h>
