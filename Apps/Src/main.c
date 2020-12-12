@@ -133,7 +133,6 @@ void initialize(void){
 void preliminaryCheck(void){
 	// Check if Watch dog timer was triggered previously
 	if (BSP_WDTimer_DidSystemReset()) {
-		BSP_Light_On(FAULT);
 		BSP_Light_On(WDOG);
 		while(1);		// Spin
 	}
@@ -159,7 +158,6 @@ void heartbeat(void){
 void faultCondition(void){
 	BSP_Contactor_Off();
 	BSP_Light_Off(RUN);
-    BSP_Light_On(FAULT);
 
 	uint8_t error = 0;
 
