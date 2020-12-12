@@ -4,8 +4,11 @@
 #include "BatteryBalancing.h"
 #include "config.h"
 #include "Current.h"
+#include "os.h"
 
 #define CHARGING_TOLERANCE 0
+
+extern OS_MUTEX MinionsASIC_Mutex;
 
 static void Balancing_ClearDischargeBit(int Cell, uint8_t total_ic, cell_asic *ic);
 static void Balancing_GetICNumber(uint8_t i, uint8_t* ICNumber, uint8_t* ModuleNumber);
@@ -57,6 +60,9 @@ void Balancing_Balance(cell_asic Minions[]){
  * @return  None
  */
 static void Balancing_ClearDischargeBit(int Cell, uint8_t total_ic, cell_asic *ic){
+	OS_ERR err;
+	OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
+  	assertOSError(err);
 	for(int i=0; i<total_ic; i++){
 		if((Cell<9)&& (Cell!=0)){
 			ic[i].config.tx_data[4] = ic[i].config.tx_data[4] & ~(1<<(Cell-1));
@@ -68,6 +74,9 @@ static void Balancing_ClearDischargeBit(int Cell, uint8_t total_ic, cell_asic *i
 			break;
 		}
   	}
+	OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
+	assertOSError(err);
+
 }
 
 /**
@@ -97,12 +106,19 @@ static void Balancing_GetICNumber(uint8_t i, uint8_t* ICNumber, uint8_t* ModuleN
  * @return  None
  */
 static void Balancing_SetDischargeBit(uint8_t module, cell_asic ic[]) { 
+	OS_ERR err;
 	uint8_t ICNumber = 0; 
 	uint8_t ModuleNumber = 0;
 	Balancing_GetICNumber(module, &ICNumber, &ModuleNumber);//Get IC and ModuleInIC number
-	LTC681x_rdcfg(NUM_MINIONS, ic);
 	
+	OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
+	assertOSError(err);
+	
+	LTC681x_rdcfg(NUM_MINIONS, ic);
 	LTC6811_set_discharge(ModuleNumber, NUM_MINIONS, &ic[ICNumber]); //Set discharge bit
 	LTC681x_wrcfg(NUM_MINIONS, ic);	
 	LTC681x_rdcfg(NUM_MINIONS, ic);
+	
+	OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
+	assertOSError(err);
 }
