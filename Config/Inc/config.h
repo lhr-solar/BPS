@@ -10,9 +10,9 @@
 
 #include "common.h"
 
-typedef enum {OFF = 0, ON} State;
-typedef enum {ERROR = 0, SUCCESS = !ERROR} ErrorStatus;
-typedef enum {SAFE = 0, DANGER = 1, OVERVOLTAGE = 2, UNDERVOLTAGE = 3, OPENWIRE = 4} SafetyStatus;
+typedef enum State_e {OFF = 0, ON} State;
+typedef enum ErrorStatus_e {ERROR = 0, SUCCESS = !ERROR} ErrorStatus;
+typedef enum SafetyStatus_e {SAFE = 0, DANGER = 1, OVERVOLTAGE = 2, UNDERVOLTAGE = 3, OPENWIRE = 4} SafetyStatus;
 
 // NUCLEO or custom
 #define COMMAND_SIZE			128

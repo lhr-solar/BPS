@@ -3,7 +3,6 @@
 #include "Voltage.h"
 #include "BatteryBalancing.h"
 #include "config.h"
-#include "Current.h"
 #include "os.h"
 
 #define CHARGING_TOLERANCE 0

@@ -130,7 +130,7 @@ void LTC6811_Init(cell_asic *battMod){
 
   spi_os.pend = LTC6811_Pend;
   spi_os.post = LTC6811_Post;
-	BSP_SPI_Init(&spi_os);				// Initialize SPI1 for voltage board	
+	BSP_SPI_Init(spi_ltc6811, &spi_os);				// Initialize SPI1 for voltage board	
 
 
 	LTC681x_init_cfg(NUM_MINIONS, battMod);

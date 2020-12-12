@@ -8,11 +8,10 @@
 #include "Voltage.h"
 #include "LTC6811.h"
 #include "config.h"
-#include "Current.h"
 #include <stdlib.h>
 #include "os.h"
 #include "Tasks.h"
-#include "Current.h"
+#include "Amps.h"
 
 extern OS_MUTEX MinionsASIC_Mutex;
 
@@ -129,7 +128,7 @@ SafetyStatus Voltage_CheckStatus(void){
 		// VOLTAGE_LIMITS are in floating point. The LTC6811 sends the voltage data
 		// as unsigned 16-bit fixed point integers with a resolution of 0.00001
 		if(voltage > MAX_VOLTAGE_LIMIT * MILLI_SCALING_FACTOR) return OVERVOLTAGE;
-		if (Current_IsCharging()){
+		if (Amps_IsCharging()){
 			if(voltage < MIN_VOLTAGE_CHARGING_LIMIT * MILLI_SCALING_FACTOR) return UNDERVOLTAGE;
 		}
 		else if(voltage < MIN_VOLTAGE_LIMIT * MILLI_SCALING_FACTOR) return UNDERVOLTAGE;

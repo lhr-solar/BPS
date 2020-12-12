@@ -2,7 +2,7 @@
 #include "config.h"
 #include "os.h"
 #include "Tasks.h"
-#include "Current.h"
+#include "Amps.h"
 #include "Voltage.h"
 #include "Temperature.h"
 
