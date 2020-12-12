@@ -7,12 +7,16 @@
 
 #define CHARGING_TOLERANCE 0
 
-static uint16_t Balancing_Init(void) {
+/**
+ * @brief   Finds lowest voltage amongst the 31 modules. Meant to be called only in Balancing_Balance()
+ * @param   None
+ * @return  the  minimum voltage
+ */
+static uint16_t GetMinimumVoltage(void) {
 	uint16_t minVoltage = 0;
-	if (Current_CheckStatus(0) == 1){
-		return;//If charging, return
+	if (Current_isCharging()){
+		return;
 	}
-	Voltage_UpdateMeasurements();
 	minVoltage = Voltage_GetModuleMillivoltage(0);
 	for (uint8_t i = 1; i < NUM_BATTERY_MODULES; i++){
 		if(Voltage_GetModuleMillivoltage(i) < minVoltage) {
@@ -21,25 +25,36 @@ static uint16_t Balancing_Init(void) {
 	}
 	return minVoltage;
 }
-	
+
+/**
+ * @brief   Loops through all 31 modules, sets discharge bits for any module if its voltage is too high, and clears discharge bits for any modules with voltages that are too low
+ * @param   Minions array of the ICs that the modules are connected to
+ * @return  None
+ */	
 void Balancing_Balance(cell_asic Minions[]){ 
-	uint16_t lowest = Balancing_Init(); //get lowest voltage 
-	Voltage_UpdateMeasurements();
+	uint16_t lowest = GetMinimumVoltage(); //get lowest voltage 
 	for (uint8_t k = 0; k < NUM_BATTERY_MODULES; k++) {
-		uint16_t voltage = Voltage_GetModuleMillivoltage(k);//Get voltage of module
-		if (voltage > lowest + CHARGING_TOLERANCE) {//Check to see if module is greater than min
-			Balancing_SetDischarge(k, Minions);//Set discharge bit if module is too high
+		uint16_t voltage = Voltage_GetModuleMillivoltage(k);	
+		if (voltage > lowest + CHARGING_TOLERANCE) {	
+			Balancing_SetDischargeBit(k, Minions);	
 		}
-		else {//Clear discharge bit of module if it reaches minimum
+		else {	//Clear discharge bit of module if it reaches minimum
 			uint8_t ICIndex;
 			uint8_t MNumber;
-			Balancing_GetICNumber(k, &ICIndex, &MNumber);//Get module number and IC Board
-			Balancing_ClearDischargeBit(MNumber , 1, &Minions[ICIndex]);//Clear discharge bit
+			Balancing_GetICNumber(k, &ICIndex, &MNumber);	
+			Balancing_ClearDischargeBit(MNumber, NUM_MINIONS, &Minions[ICIndex]);	
 		}
 	}
 }
 
-void Balancing_ClearDischargeBit(int Cell, uint8_t total_ic, cell_asic *ic){
+/**
+ * @brief   Clears the discharge bit of the desired module
+ * @param   Cell cell that will stop discharging
+ * @param   total_ic total number of ICs in the system
+ * @param   ic array of ICs in the system
+ * @return  None
+ */
+static void Balancing_ClearDischargeBit(int Cell, uint8_t total_ic, cell_asic *ic){
 	for(int i=0; i<total_ic; i++){
 		if((Cell<9)&& (Cell!=0)){
 			ic[i].config.tx_data[4] = ic[i].config.tx_data[4] & ~(1<<(Cell-1));
@@ -53,7 +68,14 @@ void Balancing_ClearDischargeBit(int Cell, uint8_t total_ic, cell_asic *ic){
   	}
 }
 
-void Balancing_GetICNumber(uint8_t i, uint8_t* ICNumber, uint8_t* ModuleNumber) {
+/**
+ * @brief   Recieves module number out of 31 and stores the module number and its IC number in two buffers
+ * @param   i module number out of 31
+ * @param   ICNumber buffer for IC number
+ * @param   ModuleNumber buffer for module number
+ * @return  None
+ */
+static void Balancing_GetICNumber(uint8_t i, uint8_t* ICNumber, uint8_t* ModuleNumber) {
 	uint8_t total = 0;
 	uint8_t NUM_MODULES_PER_MINION[4] = {8,8,8,7};
 	for(int m = 0; m < NUM_MINIONS; m++) {
@@ -66,13 +88,19 @@ void Balancing_GetICNumber(uint8_t i, uint8_t* ICNumber, uint8_t* ModuleNumber) 
 	}
 }
 
-void Balancing_SetDischarge(uint8_t module, cell_asic ic[]) { 
+/**
+ * @brief   Sets the discharge bit of the desired module
+ * @param   module cell that will discharge
+ * @param   ic array of ICs in the system
+ * @return  None
+ */
+static void Balancing_SetDischargeBit(uint8_t module, cell_asic ic[]) { 
 	uint8_t ICNumber = 0; 
 	uint8_t ModuleNumber = 0;
 	Balancing_GetICNumber(module, &ICNumber, &ModuleNumber);//Get IC and ModuleInIC number
-	LTC681x_rdcfg(4,ic);
+	LTC681x_rdcfg(NUM_MINIONS, ic);
 	
-	LTC6811_set_discharge(ModuleNumber, 4, &ic[ICNumber]); //Set discharge bit
-	LTC681x_wrcfg(4,ic);	
-	LTC681x_rdcfg(4,ic);
+	LTC6811_set_discharge(ModuleNumber, NUM_MINIONS, &ic[ICNumber]); //Set discharge bit
+	LTC681x_wrcfg(NUM_MINIONS, ic);	
+	LTC681x_rdcfg(NUM_MINIONS, ic);
 }
