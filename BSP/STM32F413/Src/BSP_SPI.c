@@ -273,7 +273,6 @@ void BSP_SPI_SetStateCS(spi_port_t port, uint8_t state) {
 #ifdef RTOS
 
 void SPI1_IRQHandler(void){
-	OS_ERR err;
 	// Save the CPU registers
 	CPU_SR_ALLOC();
 
@@ -290,7 +289,6 @@ void SPI1_IRQHandler(void){
 }
 
 void SPI3_Handler(){
-	OS_ERR err;
 	// Save the CPU registers
 	CPU_SR_ALLOC();
 
