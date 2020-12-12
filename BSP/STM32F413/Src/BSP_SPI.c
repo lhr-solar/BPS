@@ -43,14 +43,12 @@ static inline void SPI_Wait(SPI_TypeDef *SPIx){
 #endif
 
 #ifdef RTOS
-	if(((SPIx)->SR & (SPI_SR_TXE | SPI_SR_RXNE)) == 0 || ((SPIx)->SR & SPI_SR_BSY)){
-		if(SPIx == SPI1){
-			SPI_os[spi_ltc6811]->pend();
-		}
-		else if(SPIx == SPI3){
-			SPI_os[spi_as8510]->pend();
-		}
-	} 
+	if(SPIx == SPI1){
+		SPI_os[spi_ltc6811]->pend();
+	}
+	else if(SPIx == SPI3){
+		SPI_os[spi_as8510]->pend();
+	}
 #endif
 }
 

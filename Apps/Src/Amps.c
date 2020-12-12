@@ -52,10 +52,15 @@ static int16_t latestMeasureMilliAmps;
  * Initializes hardware to begin current monitoring.
  */
 void Amps_Init(void) {
+	OS_ERR err;
+	OSSemCreate(&AmperesIO_Sem,
+				"AmperesIO Semaphore",
+                0,
+                &err);
+	assertOSError(err);
 	spi_os.pend = Amperes_Pend;
 	spi_os.post = Amperes_Post;
 	AS8510_Init(spi_os);
-	OS_ERR err;
 	OSMutexCreate(&AmperesData_Mutex, "Amperes Mutex", &err);
 	assertOSError(err);
 }
