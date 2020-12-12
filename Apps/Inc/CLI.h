@@ -51,7 +51,7 @@
 #define CLI_ERROR_HASH          0x67AA6C8
 
 #define CLI_FAULT_HASH          0x69581E2
-#define CLI_RUN_HASH		    		0x1AB8B
+#define CLI_RUN_HASH		    0x1AB8B
 #define CLI_UVOLT_HASH          0x6956DF6
 #define CLI_OVOLT_HASH          0x6956DF0
 #define CLI_OTEMP_HASH          0x65D5E83
