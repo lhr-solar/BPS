@@ -6,14 +6,13 @@
 
 void delay(void) {
     // Random delay loop
-    for(int i = 0; i < 10000000; i++);
+    for(volatile int i = 0; i < 1000000; i++);
 }
 
 int main() {
 
     BSP_Lights_Init();
 
-    BSP_Light_Off(FAULT);
     BSP_Light_Off(RUN);
     BSP_Light_Off(UVOLT);
     BSP_Light_Off(OVOLT);
@@ -22,9 +21,9 @@ int main() {
     BSP_Light_Off(WDOG);
     BSP_Light_Off(CAN);
     BSP_Light_Off(EXTRA);
+    BSP_Light_Off(WIRE);
 
     while(1) {
-        BSP_Light_Toggle(FAULT);
         BSP_Light_Toggle(RUN);
         BSP_Light_Toggle(UVOLT);
         BSP_Light_Toggle(OVOLT);
@@ -33,6 +32,7 @@ int main() {
         BSP_Light_Toggle(WDOG);
         BSP_Light_Toggle(CAN);
         BSP_Light_Toggle(EXTRA);
+        BSP_Light_Toggle(WIRE);
         delay();
     }
 }
