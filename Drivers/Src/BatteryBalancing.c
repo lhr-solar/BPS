@@ -7,6 +7,11 @@
 
 #define CHARGING_TOLERANCE 0
 
+static void Balancing_ClearDischargeBit(int Cell, uint8_t total_ic, cell_asic *ic);
+static void Balancing_GetICNumber(uint8_t i, uint8_t* ICNumber, uint8_t* ModuleNumber);
+static void Balancing_GetICNumber(uint8_t i, uint8_t* ICNumber, uint8_t* ModuleNumber);
+static void Balancing_SetDischargeBit(uint8_t module, cell_asic ic[]);
+
 /**
  * @brief   Finds lowest voltage amongst the 31 modules. Meant to be called only in Balancing_Balance()
  * @param   None
@@ -14,9 +19,6 @@
  */
 static uint16_t GetMinimumVoltage(void) {
 	uint16_t minVoltage = 0;
-	if (Current_isCharging()){
-		return;
-	}
 	minVoltage = Voltage_GetModuleMillivoltage(0);
 	for (uint8_t i = 1; i < NUM_BATTERY_MODULES; i++){
 		if(Voltage_GetModuleMillivoltage(i) < minVoltage) {
