@@ -10,11 +10,41 @@
 #include "Tasks.h"
 #include "BSP_SPI.h"
 
-static OS_ERR err;
-static CPU_TS ticks;
 static OS_MUTEX AmperesData_Mutex;
 
-static bsp_os_t spi3;
+static OS_SEM AmperesIO_Sem;
+static bsp_os_t spi_os;
+
+#ifdef RTOS
+void Amperes_Pend(){
+	CPU_TS ts;
+    OS_ERR err;
+    OSSemPend(&AmperesIO_Sem,
+                        0,
+                        OS_OPT_PEND_BLOCKING,
+                        &ts,
+                        &err);
+    assertOSError(err);
+}
+
+void Amperes_Post(){
+	OS_ERR err;
+    OSSemPost(&AmperesIO_Sem,
+                        OS_OPT_POST_1,
+                        &err);
+    assertOSError(err);
+}
+#endif
+
+#ifdef BAREMETAL
+void Amperes_Pend(void) {
+    return;
+}
+
+void Amperes_Post(void) {
+    return;
+}
+#endif
 
 static int16_t latestMeasureMilliAmps;
 
@@ -22,7 +52,10 @@ static int16_t latestMeasureMilliAmps;
  * Initializes hardware to begin current monitoring.
  */
 void Amps_Init(void) {
-	AS8510_Init();
+	spi_os.pend = Amperes_Pend;
+	spi_os.post = Amperes_Post;
+	AS8510_Init(spi_os);
+	OS_ERR err;
 	OSMutexCreate(&AmperesData_Mutex, "Amperes Mutex", &err);
 	assertOSError(err);
 }
@@ -32,6 +65,8 @@ void Amps_Init(void) {
  * @return SUCCESS or ERROR
  */
 ErrorStatus Amps_UpdateMeasurements(void) {
+	OS_ERR err;
+	CPU_TS ticks;
 	OSMutexPend(&AmperesData_Mutex, 0, OS_OPT_PEND_BLOCKING, &ticks, &err);
 	assertOSError(err);
 	latestMeasureMilliAmps = AS8510_GetCurrent();	// TODO: verify that there is no conversion required here
@@ -47,25 +82,23 @@ ErrorStatus Amps_UpdateMeasurements(void) {
  * @return SAFE or DANGER
  */
 SafetyStatus Amps_CheckStatus(bool chargingOnly) {
+	OS_ERR err;
+	CPU_TS ticks;
+	SafetyStatus status;
 	OSMutexPend(&AmperesData_Mutex, 0, OS_OPT_PEND_BLOCKING, &ticks, &err);
 	assertOSError(err);
 	if((latestMeasureMilliAmps > MAX_CHARGING_CURRENT)&&(latestMeasureMilliAmps < MAX_CURRENT_LIMIT)&&(!chargingOnly)){
-		OSMutexPost(&AmperesData_Mutex, OS_OPT_POST_NONE, &err);
-		assertOSError(err);
-		return SAFE;
+		status = SAFE;
 	}
 	else if((latestMeasureMilliAmps <= 0)&&(latestMeasureMilliAmps > MAX_CHARGING_CURRENT)&&chargingOnly){
-		OSMutexPost(&AmperesData_Mutex, OS_OPT_POST_NONE, &err);
-		assertOSError(err);
 		return SAFE;
 	}
 	else{
-		OSMutexPost(&AmperesData_Mutex, OS_OPT_POST_NONE, &err);
-		assertOSError(err);
-		return DANGER;
+		status = DANGER;
 	}
-
-	return DANGER;
+	OSMutexPost(&AmperesData_Mutex, OS_OPT_POST_NONE, &err);
+	assertOSError(err);
+	return status;
 }
 
 /** Amps_IsCharging
@@ -75,12 +108,7 @@ SafetyStatus Amps_CheckStatus(bool chargingOnly) {
  */
 int8_t Amps_IsCharging(void) {
 	// TODO: Make sure that the amperes board is installed in such a way that negative => charging
-	OSMutexPend(&AmperesData_Mutex, 0, OS_OPT_PEND_BLOCKING, &ticks, &err);
-	assertOSError(err);
-	int8_t val = latestMeasureMilliAmps < 0;
-	OSMutexPost(&AmperesData_Mutex, OS_OPT_POST_NONE, &err);
-	assertOSError(err);
-	return val;
+	return latestMeasureMilliAmps < 0;
 }
 
 /** Amps_GetReading
@@ -88,12 +116,7 @@ int8_t Amps_IsCharging(void) {
  * @return milliamperes value
  */
 int32_t Amps_GetReading(void) {
-	OSMutexPend(&AmperesData_Mutex, 0, OS_OPT_PEND_BLOCKING, &ticks, &err);
-	assertOSError(err);
-	int32_t val = latestMeasureMilliAmps;
-	OSMutexPost(&AmperesData_Mutex, OS_OPT_POST_NONE, &err);
-	assertOSError(err);
-	return val;
+	return latestMeasureMilliAmps;
 }
 
 void Task_AmperesMonitor(void *p_arg) {

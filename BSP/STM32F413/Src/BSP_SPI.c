@@ -5,24 +5,6 @@
 #include "os.h"
 #include "BSP_OS.h"
 
-static bsp_os_t *os;
-static bsp_os_t *os3;
-
-// Use this macro function to wait until SPI communication is complete
-#ifdef BAREMETAL
-#define SPI_Wait(SPIx)		while(((SPIx)->SR & (SPI_SR_TXE | SPI_SR_RXNE)) == 0 || ((SPIx)->SR & SPI_SR_BSY))
-#endif
-
-#ifdef RTOS
-#define SPI_Wait(SPIx)		if(((SPIx)->SR & (SPI_SR_TXE | SPI_SR_RXNE)) == 0 || ((SPIx)->SR & SPI_SR_BSY)){ \
-								if(SPIx == SPI1){	\
-									os->pend();	\
-								}	\	
-								else if(SPIx == SPI3){	\
-									os3->pend();	\
-								}	\
-							} 
-#endif
 
 /*************************************************
  *                 ==Important==				 *
@@ -51,6 +33,26 @@ static const uint16_t SPI_SELECT_PINS[NUM_SPI_BUSSES] = {
     GPIO_Pin_6,
     GPIO_Pin_15
 };
+
+static bsp_os_t *SPI_os[NUM_SPI_BUSSES];
+
+// Use this inline function to wait until SPI communication is complete
+static inline void SPI_Wait(SPI_TypeDef *SPIx){
+#ifdef BAREMETAL
+	while(((SPIx)->SR & (SPI_SR_TXE | SPI_SR_RXNE)) == 0 || ((SPIx)->SR & SPI_SR_BSY))
+#endif
+
+#ifdef RTOS
+	if(((SPIx)->SR & (SPI_SR_TXE | SPI_SR_RXNE)) == 0 || ((SPIx)->SR & SPI_SR_BSY)){
+		if(SPIx == SPI1){
+			SPI_os[spi_ltc6811]->pend();
+		}
+		else if(SPIx == SPI3){
+			SPI_os[spi_as8510]->pend();
+		}
+	} 
+#endif
+}
 
 /** SPI_WriteRead
  * @brief   Sends and receives a byte of data on the SPI line.
@@ -140,7 +142,20 @@ void BSP_SPI_Init(spi_port_t port, bsp_os_t *spi_os){
 		GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
 		GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
 		GPIO_Init(GPIOB, &GPIO_InitStruct);
-		os = spi_os;
+		SPI_os[spi_ltc6811] = spi_os;
+
+		//Configure SPI1 interrupt priority
+		NVIC_InitTypeDef NVIC_InitStruct;
+		NVIC_InitStruct.NVIC_IRQChannel = SPI1_IRQn;
+		NVIC_InitStruct.NVIC_IRQChannelPreemptionPriority = 0;
+    	NVIC_InitStruct.NVIC_IRQChannelSubPriority = 0;
+    	NVIC_InitStruct.NVIC_IRQChannelCmd = ENABLE;
+		NVIC_Init(&NVIC_InitStruct);
+
+		//Enable the Rx buffer not empty interrupt
+		SPI_I2S_ITConfig(SPI1, SPI_I2S_IT_RXNE, ENABLE);
+
+
 	} else if(port == spi_as8510) {
 		//      SPI configuration:
 		//          speed : 125kbps
@@ -190,7 +205,18 @@ void BSP_SPI_Init(spi_port_t port, bsp_os_t *spi_os){
 		GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
 		GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
 		GPIO_Init(GPIOA, &GPIO_InitStruct);
-		os3 = spi_os;
+		SPI_os[spi_as8510] = spi_os;
+
+		//Configure SPI3 interrupt priority
+		NVIC_InitTypeDef NVIC_InitStruct;
+		NVIC_InitStruct.NVIC_IRQChannel = SPI3_IRQn;
+		NVIC_InitStruct.NVIC_IRQChannelPreemptionPriority = 1;
+    	NVIC_InitStruct.NVIC_IRQChannelSubPriority = 0;
+    	NVIC_InitStruct.NVIC_IRQChannelCmd = ENABLE;
+		NVIC_Init(&NVIC_InitStruct);
+
+		//Enable the Rx buffer not empty interrupt
+		SPI_I2S_ITConfig(SPI3, SPI_I2S_IT_RXNE, ENABLE);
 	}
 }
 
@@ -259,7 +285,7 @@ void SPI1_IRQHandler(void){
 	// make the kernel aware that the interrupt has started
 	OSIntEnter();
 	CPU_CRITICAL_EXIT();
-	os->post();
+	SPI_os[spi_ltc6811]->post();
 	
 	//make the kernel aware that the interrupt has ended
 	OSIntExit();
@@ -276,7 +302,7 @@ void SPI3_Handler(){
 	// make the kernel aware that the interrupt has started
 	OSIntEnter();
 	CPU_CRITICAL_EXIT();
-	os3->post();
+	SPI_os[spi_as8510]->post();
 	
 	//make the kernel aware that the interrupt has ended
 	OSIntExit();
