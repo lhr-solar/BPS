@@ -1,3 +1,5 @@
+# Copyright (c) 2020 UT Longhorn Racing Solar
+
 import curses
 import textwrap
 import time
@@ -7,8 +9,11 @@ import Lights
 import CAN
 import SPI
 import Strobelight
+import Fans
 import WDTimer
 import PLL
+import I2C
+import logging
 
 import config
 import Timer
@@ -24,6 +29,7 @@ stdscr = None   # Output screen
 CANbox = None   #box that displays the CAN messages
 lights_names = ['EXTRA', 'CAN', 'WDOG', 'UVOLT', 'OVOLT', 'OTEMP', 'OCURR', 'RUN', 'FAULT']
 frequency = None
+maxEEPROMAddress = 0x3FFF
 
 def generate(battery=None):
     global state, mode
@@ -32,8 +38,6 @@ def generate(battery=None):
         battery.update()
     # Generate ADC values
     ADC.generate(state, mode, battery)
-    # Generate SPI values
-    SPI.generate(state, mode, battery)
     #Pet Watchdog
     WDTimer.Check_State()
     #Initialize Watchdog Timer
@@ -76,7 +80,7 @@ def display(battery=None):  #print watchdog countdown
     module_values = SPI.read()
     for i, module in enumerate(module_values):
         stdscr.addstr(i+2, 37, f"{i+1}")
-        stdscr.addstr(i+2, 40, f"| {'X' if module[0] else ' '} | {module[1]/10000:.4f}V | {module[2]/1000:.3f}°C | {module[3]/1000:.3f}°C |")
+        stdscr.addstr(i+2, 40, f"| {'X' if module[0] else ' '} | {module[1]/10000:.4f}V | {module[2]/1000:.3f}°C | {module[3]/1000:.3f}°C | {module[4]}")
     # Read LED values
     stdscr.addstr(0, 90, "LEDs")
     stdscr.addstr(1, 80, "=======================")
@@ -100,7 +104,13 @@ def display(battery=None):  #print watchdog countdown
         stdscr.addstr(11, 100, "[]", curses.color_pair(2))
     else:
         stdscr.addstr(11, 100, "[]", curses.color_pair(3))
-
+    speed = Fans.read()
+    stdscr.addstr(12, 9, "Fan Speeds")
+    stdscr.addstr(13, 0, "================================")
+    stdscr.addstr(14, 0, f"Fan 1: {speed[0]}/8")
+    stdscr.addstr(14, 15, f"Fan 2: {speed[1]}/8")
+    stdscr.addstr(15, 0, f"Fan 3: {speed[2]}/8")
+    stdscr.addstr(15, 15, f"Fan 4: {speed[3]}/8")
     stdscr.refresh()
 
 
@@ -168,15 +178,19 @@ def main():
         # Create state of the battery
         BeVolt = battery.Battery(ampere_draw, config.total_batt_pack_capacity_mah, init_capacity_mah)
         PLL.PLL_Init()
+        SPI.init(battery=BeVolt)
     else:
         BeVolt = None
         configure()
+        SPI.init(state=state, mode=mode)
     
     try:
         launch_bevolt()
     except Exception as e:
         print(repr(e))
     
+    logging.basicConfig(filename='debug.log',level=logging.DEBUG)
+
     global stdscr
     global CANbox
     stdscr = curses.initscr()
@@ -184,13 +198,16 @@ def main():
     curses.noecho()
     curses.cbreak()
     #box is for CAN messages
-    CANbox = curses.newwin(7, 21, 12, 78)
+    CANbox = curses.newwin(7, 21, 12, 80)
     CANbox.immedok(True)
     CANbox.box()
     CANbox.refresh()
     #Start background thread for timer 
     timerThread = Timer.timer_Thread
     timerThread.start()
+    spiThread = SPI.spi_thread
+    spiThread.start()
+
     while True:
         try:
             # Generate all values
@@ -201,50 +218,88 @@ def main():
         except KeyboardInterrupt:
             curses.endwin()
             if BeVolt is not None:
-                print("\n\rWould you like to change 'wires', 'quit', or 'PLL'?")
-                print(">>", end="")
-                choice = input()
-                if choice == 'wires':
-                    change_wires(BeVolt)
-                    stdscr = curses.initscr()
-                    curses.start_color()
-                elif choice == 'quit':
-                    break
-                elif choice == 'PLL':
-                    print("Enter the frequency you would like to change the clock to in Hz.")
-                    frequency = int(input())
-                    PLL.Change_Frequency(frequency)
-                else:
-                    print("That is not a valid option. Continuing simulation...")
-                    stdscr = curses.initscr()
-                    curses.start_color()
+                print("\n\rWould you like to change \n\r1. 'wires'\n\r2. 'quit'\n\r3. 'PLL'\n\r4. send a CAN message ('CAN')\n\r5. 'EEPROM'")
             else:
-                print("\n\rWould you like to change 'config', 'quit', or send a CAN message ('CAN')?")
-                choice = input()
-                if choice == 'config':
-                    configure()
-                    stdscr = curses.initscr()
-                elif choice == 'quit':
-                    break
-                elif choice == 'CAN':
-                    print("Enter the CAN ID for the system you wish to simulate. Leave out '0x'.")
+                print("\n\rWould you like to change\n\r1. 'config'\n\r2. 'quit'\n\r3. 'PLL'\n\r4. send a CAN message ('CAN')\n\r5. 'EEPROM'")
+            print(">>", end="")
+            choice = input()
+            if (choice == 'wires' or choice == '1') and BeVolt is not None:
+                change_wires(BeVolt)
+                stdscr = curses.initscr()
+                curses.start_color()
+            elif (choice == 'config' or choice == '1') and BeVolt is None:
+                configure()
+                stdscr = curses.initscr()
+            elif choice == 'quit' or choice == '2':
+                break
+            elif choice == 'PLL' or choice == '3':
+                print("Enter the frequency you would like to change the clock to in Hz.")
+                frequency = int(input())
+                PLL.Change_Frequency(frequency)
+            elif choice == 'CAN' or choice == '4':
+                print("Enter the CAN ID for the system you wish to simulate. Leave out '0x'.")
+                id = input()
+                while(CAN.Invalid_CAN_ID(id) == True):
+                    print("Invalid CAN ID. Try again.")
                     id = input()
-                    while(CAN.Invalid_CAN_ID(id) == True):
-                        print("Invalid CAN ID. Try again.")
-                        id = input()
-                    print("Enter up to 8 bytes of the CAN message that you would like to send, and separate each byte by a ','. Leave out '0x'.")
-                    message = input().split(',')
-                    CAN.Send_Message(id, message, len(message))
+                print("Enter up to 8 bytes of the CAN message that you would like to send, and separate each byte by a ','. Leave out '0x'.")
+                message = input().split(',')
+                CAN.Send_Message(id, message, len(message))
+            elif choice == 'EEPROM' or choice == '5':
+                returnErrorCodes = 0
+                print("Enter 'all' for all data or 'read' to enter specific address to read.")
+                print(">>", end="")
+                choiceEEPROM1 = input()
+                print("Enter 'raw' to read the raw hex values or 'msg' for the translated error messages.", end="\n")
+                print("If invalid response is given, default is raw data.")
+                print(">>", end="")
+                choiceEEPROM2 = input()
+                if choiceEEPROM2 == 'raw':
+                    returnErrorCodes = 0
+                elif choiceEEPROM2 == 'msg':
+                    returnErrorCodes = 1
                 else:
-                    print("That is not a valid option. Continuing simulation...")
-                    stdscr = curses.initscr()
-                    curses.start_color()
+                    print("Invalid entry...", end="\n")
+                    print("Defaulted to raw data.")
+                if choiceEEPROM1 == 'all':
+                    print(I2C.EEPROM_Dump(returnErrorCodes))
+                    print("Enter to continue simulator:")
+                    print(">>", end="")
+                    choice = input()
+                elif choiceEEPROM1 == 'read':
+                    print("Enter address to start reading faults from (in hex format).")
+                    print(">>", end="")
+                    EEPROMstartAddress = input()
+                    print("Enter address to stop reading faults from (in hex format).")
+                    print(">>", end="")
+                    EEPROMendAddress = input()
+                    EEPROMstartAddress = int(EEPROMstartAddress, 16)
+                    EEPROMendAddress = int(EEPROMendAddress, 16)
+                    if EEPROMstartAddress >= 0 and EEPROMstartAddress <= maxEEPROMAddress and EEPROMendAddress >= 0 and EEPROMendAddress <= maxEEPROMAddress:
+                        print(I2C.I2C_Read(EEPROMstartAddress,EEPROMendAddress, returnErrorCodes))
+                        print("Enter to continue simulator:")
+                        choiceEEPROM = input()
+                    else:
+                        print("Invalid address...", end="\n")
+                        print("Enter to continue simulator:")
+                        choiceEEPROM = input()
+                else:
+                    print("Invalid entry given for 1st choice (all/read)...", end="\n")
+                    print("Enter to continue simulator:")
+                    choiceEEPROM = input()
+            else:
+                print("That is not a valid option. Continuing simulation...")
+                stdscr = curses.initscr()
+                curses.start_color()
         except Exception as e:
             curses.echo()
             curses.nocbreak()
             curses.endwin()
             print("ERROR:", end=" ")
             print(repr(e), end="\r\n")
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+            print(exc_type, fname, exc_tb.tb_lineno)
             print("If addwstr() returned ERR, make your terminal window bigger.")
             print("\n\rContinue? (Y/n): ", end="")
             cont = input()

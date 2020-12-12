@@ -1,3 +1,5 @@
+/* Copyright (c) 2020 UT Longhorn Racing Solar */
+
 /** EEPROM.h
  * Driver for EEPROM (STM's M24128). Required by the American Solar Challanged
  * in the regulations, all safety critical data is stored in here. This includes'

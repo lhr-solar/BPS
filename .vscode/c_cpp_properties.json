@@ -13,6 +13,9 @@
                 "${workspaceFolder}/BSP/STM32F413/Src",
                 "${workspaceFolder}/BSP/STM32F413/STM32F4xx_StdPeriph_Driver/Src",
                 "${workspaceFolder}/BSP/STM32F413/STM32F4xx_StdPeriph_Driver/Inc",
+                "${workspaceFolder}/BSP/Simulator/Src",
+                "${workspaceFolder}/BSP/Simulator/DataGeneration",
+                "${workspaceFolder}/BSP/Simulator/DataGeneration/BSP",
                 "${workspaceFolder}/BSP/Template/Src",
                 "${workspaceFolder}/CMSIS/Include",
                 "${workspaceFolder}/CMSIS/Device/ST/STM32F4xx/Include"
