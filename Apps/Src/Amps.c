@@ -133,9 +133,6 @@ void Task_AmperesMonitor(void *p_arg) {
 	bool amperesHasBeenChecked = false;
 
 	CANData_t CanData;
-    CanData.b = 0;
-    CanData.h = 0;
-    CanData.w = 0;
     CANPayload_t CanPayload;
     CANMSG_t CanMsg;
 
@@ -143,7 +140,8 @@ void Task_AmperesMonitor(void *p_arg) {
         // BLOCKING =====================
         // Update Amperes Measurements
 		Amps_UpdateMeasurements();
-		CanData.f = (float)Amps_GetReading();
+		int current = Amps_GetReading();
+		CanData.f = (float)current/1000; //send data in Amps
 		CanPayload.data = CanData;
 		CanMsg.id = CURRENT_DATA;
 		CanMsg.payload = CanPayload;

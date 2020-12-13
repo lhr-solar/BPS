@@ -20,9 +20,6 @@ void Task_VoltTempMonitor(void *p_arg) {
     bool temperatureHasBeenChecked = false;
 
     CANData_t CanData;
-    CanData.b = 0;
-    CanData.h = 0;
-    CanData.w = 0;
     CANPayload_t CanPayload;
     CANMSG_t CanMsg;
     while(1) {
@@ -32,7 +29,8 @@ void Task_VoltTempMonitor(void *p_arg) {
         CanMsg.id = VOLT_DATA;
         for (int i = 0; i < NUM_BATTERY_MODULES; i++){ //send all battery module voltage data
             CanPayload.idx = i;
-            CanData.f = Voltage_GetModuleMillivoltage(i);
+            int voltage = Voltage_GetModuleMillivoltage(i);
+            CanData.f = (float)voltage/1000; //send data in volts
             CanPayload.data = CanData;
             CanMsg.payload = CanPayload;
             OSQPost(&CANBus_MsgQ, &CanMsg, sizeof(CanMsg), OS_OPT_POST_FIFO, &err);
@@ -81,7 +79,7 @@ void Task_VoltTempMonitor(void *p_arg) {
         CanMsg.id = TEMP_DATA;
         for (int i = 0; i < NUM_BATTERY_MODULES; i++){ //send all battery module temp data
             CanPayload.idx = i;
-            CanData.f = Temperature_GetModuleTemperature(i);
+            CanData.f = (float)Temperature_GetModuleTemperature(i);
             CanPayload.data = CanData;
             CanMsg.payload = CanPayload;
             OSQPost(&CANBus_MsgQ, &CanMsg, sizeof(CanMsg), OS_OPT_POST_FIFO, &err);
