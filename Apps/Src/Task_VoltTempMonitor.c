@@ -5,6 +5,7 @@
 #include "Temperature.h"
 #include "BSP_Fans.h"
 #include "CANbus.h"
+#include "Amps.h"
 
 void Task_VoltTempMonitor(void *p_arg) {
     (void)p_arg;
