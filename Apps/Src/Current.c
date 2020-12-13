@@ -202,7 +202,7 @@ void Task_AmperesMonitor(void *p_arg) {
 		CanMsg.payload = CanPayload;
 		OSQPost(&CANBus_MsgQ, &CanMsg, 4, OS_OPT_POST_FIFO, &err); //Send data to Can
         // Check if amperes is NOT safe:
-		SafetyStatus amperesStatus = Current_CheckStatus(false);
+		SafetyStatus amperesStatus = Current_CheckStatus(AdminOverride);
 		if(amperesStatus != SAFE) {
             OSSemPost(&Fault_Sem4,
                         OS_OPT_POST_1,
