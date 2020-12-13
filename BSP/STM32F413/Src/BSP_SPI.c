@@ -5,48 +5,78 @@
 #include "os.h"
 #include "BSP_OS.h"
 
-static bsp_os_t *os;
-static bsp_os_t *os3;
 
-// Use this macro function to wait until SPI communication is complete
+/*************************************************
+ *                 ==Important==				 *
+ * 												 *
+ * If adding new SPI busses, all you should have *
+ * to modify are the spi_port_t enum (declared   *
+ * in the header file), these three arrays, and  *
+ * the initialization code.                      *
+ *************************************************/
+
+// Lookup for the proper SPI ports
+static SPI_TypeDef * const SPI_BUSSES[NUM_SPI_BUSSES] = {
+	// These need to be in the same order as the enum 
+	// spi_port_t as declared in BSP_SPI.h.
+	SPI1,	// LTC6811
+	SPI3 	// AS8510
+};
+
+static GPIO_TypeDef * const SPI_SELECT_PORTS[NUM_SPI_BUSSES] = {
+	// Need to be in the same order as the enum spi_port_t
+	GPIOB,	// LTC6811
+	GPIOA	// AS8510
+};
+
+static const uint16_t SPI_SELECT_PINS[NUM_SPI_BUSSES] = {
+    GPIO_Pin_6,
+    GPIO_Pin_15
+};
+
+static bsp_os_t *SPI_os[NUM_SPI_BUSSES];
+
+// Use this inline function to wait until SPI communication is complete
+static inline void SPI_Wait(SPI_TypeDef *SPIx){
 #ifdef BAREMETAL
-#define SPI_Wait(SPIx)		while(((SPIx)->SR & (SPI_SR_TXE | SPI_SR_RXNE)) == 0 || ((SPIx)->SR & SPI_SR_BSY))
+	while(((SPIx)->SR & (SPI_SR_TXE | SPI_SR_RXNE)) == 0 || ((SPIx)->SR & SPI_SR_BSY))
 #endif
 
 #ifdef RTOS
-#define SPI_Wait(SPIx)		if(((SPIx)->SR & (SPI_SR_TXE | SPI_SR_RXNE)) == 0 || ((SPIx)->SR & SPI_SR_BSY)){ \
-								if(SPIx == SPI1){	\
-									os->pend();	\
-								}	\
-								else if(SPIx == SPI3){	\
-									os3->pend();	\
-								}	\
-							} 
+	if(SPIx == SPI1){
+		SPI_os[spi_ltc6811]->pend();
+	}
+	else if(SPIx == SPI3){
+		SPI_os[spi_as8510]->pend();
+	}
 #endif
+}
 
-/** SPI1_WriteRead
+/** SPI_WriteRead
  * @brief   Sends and receives a byte of data on the SPI line.
  * @param   txData single byte that will be sent to the device.
  * @return  rxData single byte that was read from the device.
  */
-static uint8_t SPI_WriteRead(uint8_t txData){
-	SPI_Wait(SPI1);
-	SPI1->DR = txData & 0x00FF;
-	SPI_Wait(SPI1);
-	return SPI1->DR & 0x00FF;
+static uint8_t SPI_WriteRead(spi_port_t port, uint8_t txData){
+    if(port >= NUM_SPI_BUSSES) return -1;
+
+	SPI_TypeDef *bus = SPI_BUSSES[port];
+	
+	SPI_Wait(bus);
+	bus->DR = txData & 0x00FF;
+	SPI_Wait(bus);
+	return bus->DR & 0x00FF;
 }
 
 
 /**
- * @brief   Initializes the SPI port connected to the LTC6820.
- *          This port communicates with the LTC6811 voltage and temperature
- *          monitoring IC. The LTC6820 converts the SPI pins to 2-wire isolated SPI.
- *          Look at analog devices website and LTC6811's or LTC6820's datasheets.
- * @param   None
+ * @brief   Initializes the SPI port.
+ * @param   port The SPI port to initialize.
+ * @param   spi_os pointer to struct that holds the SPI specific pend()/post() functions 
  * @return  None
  */
-void BSP_SPI_Init(bsp_os_t *spi_os){
-	 //      SPI configuration:
+void BSP_SPI_Init(spi_port_t port, bsp_os_t *spi_os){
+	//      SPI configuration:
     //          speed : 125kbps
     //          CPOL : 1 (polarity of clock during idle is high)
     //          CPHA : 1 (tx recorded during 2nd edge)
@@ -59,61 +89,146 @@ void BSP_SPI_Init(bsp_os_t *spi_os){
 
     GPIO_InitTypeDef GPIO_InitStruct;
 	SPI_InitTypeDef SPI_InitStruct;
-	
-	// Initialize clocks
-	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_SPI1, ENABLE);
-	
-	// Initialize pins
-	GPIO_InitStruct.GPIO_Pin = GPIO_Pin_3 | GPIO_Pin_4 | GPIO_Pin_5;
-	GPIO_InitStruct.GPIO_Mode = GPIO_Mode_AF;
-	GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_UP;
-	GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
-	GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
-	GPIO_Init(GPIOB, &GPIO_InitStruct);
-	
-	GPIO_PinAFConfig(GPIOB, GPIO_PinSource3, GPIO_AF_SPI1);
-	GPIO_PinAFConfig(GPIOB, GPIO_PinSource4, GPIO_AF_SPI1);
-	GPIO_PinAFConfig(GPIOB, GPIO_PinSource5, GPIO_AF_SPI1);
-	
-	// Initialize SPI port
-	SPI_InitStruct.SPI_Direction = SPI_Direction_2Lines_FullDuplex;
-	SPI_InitStruct.SPI_Mode = SPI_Mode_Master;
-	SPI_InitStruct.SPI_DataSize = SPI_DataSize_8b;
-	SPI_InitStruct.SPI_CPOL = SPI_CPOL_High;
-	SPI_InitStruct.SPI_CPHA = SPI_CPHA_2Edge;
-	SPI_InitStruct.SPI_NSS = SPI_NSS_Soft;
-	SPI_InitStruct.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_64;
-	SPI_InitStruct.SPI_FirstBit = SPI_FirstBit_MSB;
-	SPI_InitStruct.SPI_CRCPolynomial = 0;	
-	SPI_Init(SPI1, &SPI_InitStruct);
-	SPI_Cmd(SPI1, ENABLE);
 
-    // Initialize CS pin
-    GPIO_InitStruct.GPIO_Pin = GPIO_Pin_6;
-    GPIO_InitStruct.GPIO_Mode = GPIO_Mode_OUT;
-    GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_UP;
-	GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
-	GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
-    GPIO_Init(GPIOB, &GPIO_InitStruct);
-	
-	os = spi_os;
+	// I don't think there's any way around hardcoding this one
+
+    if(port == spi_ltc6811) {
+		//      SPI configuration:
+		//          speed : 125kbps
+		//          CPOL : 1 (polarity of clock during idle is high)
+		//          CPHA : 1 (tx recorded during 2nd edge)
+		// Pins:
+		//      SPI1:
+		//          PB3 : SCK
+		//          PB4 : MISO
+		//          PB5 : MOSI 
+		//          PB6 : CS
+		
+		// Initialize clocks
+		RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
+		RCC_APB2PeriphClockCmd(RCC_APB2Periph_SPI1, ENABLE);
+		
+		// Initialize pins
+		GPIO_InitStruct.GPIO_Pin = GPIO_Pin_3 | GPIO_Pin_4 | GPIO_Pin_5;
+		GPIO_InitStruct.GPIO_Mode = GPIO_Mode_AF;
+		GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_UP;
+		GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
+		GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
+		GPIO_Init(GPIOB, &GPIO_InitStruct);
+		
+		GPIO_PinAFConfig(GPIOB, GPIO_PinSource3, GPIO_AF_SPI1);
+		GPIO_PinAFConfig(GPIOB, GPIO_PinSource4, GPIO_AF_SPI1);
+		GPIO_PinAFConfig(GPIOB, GPIO_PinSource5, GPIO_AF_SPI1);
+		
+		// Initialize SPI port
+		SPI_InitStruct.SPI_Direction = SPI_Direction_2Lines_FullDuplex;
+		SPI_InitStruct.SPI_Mode = SPI_Mode_Master;
+		SPI_InitStruct.SPI_DataSize = SPI_DataSize_8b;
+		SPI_InitStruct.SPI_CPOL = SPI_CPOL_High;
+		SPI_InitStruct.SPI_CPHA = SPI_CPHA_2Edge;
+		SPI_InitStruct.SPI_NSS = SPI_NSS_Soft;
+		SPI_InitStruct.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_64;
+		SPI_InitStruct.SPI_FirstBit = SPI_FirstBit_MSB;
+		SPI_InitStruct.SPI_CRCPolynomial = 0;	
+		SPI_Init(SPI1, &SPI_InitStruct);
+		SPI_Cmd(SPI1, ENABLE);
+
+		// Initialize CS pin
+		GPIO_InitStruct.GPIO_Pin = GPIO_Pin_6;
+		GPIO_InitStruct.GPIO_Mode = GPIO_Mode_OUT;
+		GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_UP;
+		GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
+		GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
+		GPIO_Init(GPIOB, &GPIO_InitStruct);
+		SPI_os[spi_ltc6811] = spi_os;
+
+		//Configure SPI1 interrupt priority
+		NVIC_InitTypeDef NVIC_InitStruct;
+		NVIC_InitStruct.NVIC_IRQChannel = SPI1_IRQn;
+		NVIC_InitStruct.NVIC_IRQChannelPreemptionPriority = 0;
+    	NVIC_InitStruct.NVIC_IRQChannelSubPriority = 0;
+    	NVIC_InitStruct.NVIC_IRQChannelCmd = ENABLE;
+		NVIC_Init(&NVIC_InitStruct);
+
+		//Enable the Rx buffer not empty interrupt
+		SPI_I2S_ITConfig(SPI1, SPI_I2S_IT_RXNE, ENABLE);
+
+
+	} else if(port == spi_as8510) {
+		//      SPI configuration:
+		//          speed : 125kbps
+		//          CPOL : 1 (polarity of clock during idle is high)
+		//          CPHA : 1 (tx recorded during 2nd edge)
+		// Pins:
+		//      SPI3:
+		//          PC10 : SCK
+		//          PC11 : MISO
+		//          PC12 : MOSI 
+		//          PA15 : CS
+		
+		// Initialize clocks
+		RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC, ENABLE);
+		RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
+		RCC_APB2PeriphClockCmd(RCC_APB1Periph_SPI3, ENABLE);
+		
+		// Initialize pins
+		GPIO_InitStruct.GPIO_Pin = GPIO_Pin_10 | GPIO_Pin_11 | GPIO_Pin_12;
+		GPIO_InitStruct.GPIO_Mode = GPIO_Mode_AF;
+		GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_UP;
+		GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
+		GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
+		GPIO_Init(GPIOC, &GPIO_InitStruct);
+
+		GPIO_PinAFConfig(GPIOC, GPIO_PinSource10, GPIO_AF_SPI3);
+		GPIO_PinAFConfig(GPIOC, GPIO_PinSource11, GPIO_AF_SPI3);
+		GPIO_PinAFConfig(GPIOC, GPIO_PinSource12, GPIO_AF_SPI3);
+		
+		// Initialize SPI port
+		SPI_InitStruct.SPI_Direction = SPI_Direction_2Lines_FullDuplex;
+		SPI_InitStruct.SPI_Mode = SPI_Mode_Master;
+		SPI_InitStruct.SPI_DataSize = SPI_DataSize_8b;
+		SPI_InitStruct.SPI_CPOL = SPI_CPOL_High;
+		SPI_InitStruct.SPI_CPHA = SPI_CPHA_2Edge;
+		SPI_InitStruct.SPI_NSS = SPI_NSS_Soft;
+		SPI_InitStruct.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_64;
+		SPI_InitStruct.SPI_FirstBit = SPI_FirstBit_MSB;
+		SPI_InitStruct.SPI_CRCPolynomial = 0;	
+		SPI_Init(SPI3, &SPI_InitStruct);
+		SPI_Cmd(SPI3, ENABLE);
+
+		// Initialize CS pin
+		GPIO_InitStruct.GPIO_Pin = GPIO_Pin_15;
+		GPIO_InitStruct.GPIO_Mode = GPIO_Mode_OUT;
+		GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_UP;
+		GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
+		GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
+		GPIO_Init(GPIOA, &GPIO_InitStruct);
+		SPI_os[spi_as8510] = spi_os;
+
+		//Configure SPI3 interrupt priority
+		NVIC_InitTypeDef NVIC_InitStruct;
+		NVIC_InitStruct.NVIC_IRQChannel = SPI3_IRQn;
+		NVIC_InitStruct.NVIC_IRQChannelPreemptionPriority = 1;
+    	NVIC_InitStruct.NVIC_IRQChannelSubPriority = 0;
+    	NVIC_InitStruct.NVIC_IRQChannelCmd = ENABLE;
+		NVIC_Init(&NVIC_InitStruct);
+
+		//Enable the Rx buffer not empty interrupt
+		SPI_I2S_ITConfig(SPI3, SPI_I2S_IT_RXNE, ENABLE);
+	}
 }
 
 /**
  * @brief   Transmits data to through SPI.
- *          With the way the LTC6811 communication works, the LTC6811 will not send
- *          anything during a transmit for uC to LTC6811. This is unlike what
- *          the SPI protocol expects where a transmit and receive happen
- *          simultaneously.
  * @note    Blocking statement
+ * @param   port    the SPI port to write to
  * @param   txBuf   data array that contains the data to be sent.
  * @param   txLen   length of data array.
  * @return  None
  */
-void BSP_SPI_Write(uint8_t *txBuf, uint32_t txLen) {
+void BSP_SPI_Write(spi_port_t port, uint8_t *txBuf, uint32_t txLen) {
     for(uint32_t i = 0; i < txLen; i++){
-		SPI_WriteRead(txBuf[i]);
+		SPI_WriteRead(port, txBuf[i]);
 	}
 }
 
@@ -123,13 +238,14 @@ void BSP_SPI_Write(uint8_t *txBuf, uint32_t txLen) {
  *          The SPI protocol requires the uC to transmit data in order to receive
  *          anything so the uC will send junk data.
  * @note    Blocking statement
+ * @param   port    the SPI port to read from
  * @param   rxBuf   data array to store the data that is received.
  * @param   rxLen   length of data array.
  * @return  None
  */
-void BSP_SPI_Read(uint8_t *rxBuf, uint32_t rxLen) {
+void BSP_SPI_Read(spi_port_t port, uint8_t *rxBuf, uint32_t rxLen) {
     for(uint32_t i = 0; i < rxLen; i++){
-		rxBuf[i] = SPI_WriteRead(0x00);
+		rxBuf[i] = SPI_WriteRead(port, 0x00);
 	}
 
 }
@@ -139,20 +255,18 @@ void BSP_SPI_Read(uint8_t *rxBuf, uint32_t rxLen) {
  *          Set the state to low/0 to notify the LTC6811 that the data sent on the
  *          SPI lines are for it. Set the state to high/1 to make the LTC6811
  *          go to standby.
+ * @param   port    the SPI port to select/deselct on
  * @param   state   0 for select, 1 to deselect
  * @return  None
  */
-void BSP_SPI_SetStateCS(uint8_t state) {
-    // PB6 is the Chip Select pin for the LTC6811
-    if(state) {
-        GPIO_SetBits(GPIOB, GPIO_Pin_6);
-    } else {
-        GPIO_ResetBits(GPIOB, GPIO_Pin_6);
-    }
-}
+void BSP_SPI_SetStateCS(spi_port_t port, uint8_t state) {
+    if(port >= NUM_SPI_BUSSES) return;
 
-void SPI3_Init(bsp_os_t *spi3_os){
-	os3 = spi3_os;
+	if(state) {
+		GPIO_SetBits(SPI_SELECT_PORTS[port], SPI_SELECT_PINS[port]);
+	} else {
+		GPIO_ResetBits(SPI_SELECT_PORTS[port], SPI_SELECT_PINS[port]);
+	}
 }
 
 /***************THE FOLLWING CODE IS FOR THE RTOS VERSION OF THE BPS*********/
@@ -168,7 +282,7 @@ void SPI1_IRQHandler(void){
 	// make the kernel aware that the interrupt has started
 	OSIntEnter();
 	CPU_CRITICAL_EXIT();
-	os->post();
+	SPI_os[spi_ltc6811]->post();
 	
 	//make the kernel aware that the interrupt has ended
 	OSIntExit();
@@ -184,7 +298,7 @@ void SPI3_Handler(){
 	// make the kernel aware that the interrupt has started
 	OSIntEnter();
 	CPU_CRITICAL_EXIT();
-	os3->post();
+	SPI_os[spi_as8510]->post();
 	
 	//make the kernel aware that the interrupt has ended
 	OSIntExit();
