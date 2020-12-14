@@ -22,8 +22,11 @@ int main() {
     BSP_Light_Off(CAN);
     BSP_Light_Off(EXTRA);
     BSP_Light_Off(WIRE);
+    BSP_Light_Off(FAULT);
 
     while(1) {
+        BSP_Light_Toggle(FAULT);
+        delay();
         BSP_Light_Toggle(RUN);
         delay();
         BSP_Light_Toggle(UVOLT);

@@ -13,7 +13,8 @@ static const uint32_t LIGHT_VALS[LIGHTS_MAX] = {
 	GPIO_Pin_2,	// WDOG, 
 	GPIO_Pin_1,	// CAN, 
 	GPIO_Pin_0,	// EXTRA, 
-	GPIO_Pin_3	// WIRE
+	GPIO_Pin_3,	// WIRE,
+    GPIO_Pin_12 // STROBE
 };
 
 static GPIO_TypeDef * const LIGHT_PORTS[LIGHTS_MAX] = {
@@ -25,7 +26,8 @@ static GPIO_TypeDef * const LIGHT_PORTS[LIGHTS_MAX] = {
     GPIOC,  // WDOG, 
     GPIOC,  // CAN, 
     GPIOC,  // EXTRA, 
-    GPIOC,  // WIRE
+    GPIOC,  // WIRE,
+    GPIOB,  // STROBE
 };
 
 /**
@@ -46,11 +48,11 @@ void BSP_Lights_Init(void) {
 
 	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
 	GPIO_InitStruct.GPIO_Pin = GPIO_Pin_4 | GPIO_Pin_5 | GPIO_Pin_6| GPIO_Pin_7; 
-	GPIO_InitStruct.GPIO_Mode =  GPIO_Mode_OUT;
-	GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;	
-	GPIO_InitStruct.GPIO_PuPd =  GPIO_PuPd_NOPULL;
-	GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
 	GPIO_Init(GPIOA, &GPIO_InitStruct);
+    
+    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
+    GPIO_InitStruct.GPIO_Pin = GPIO_Pin_12;
+    GPIO_Init(GPIOB, &GPIO_InitStruct);
 }
 
 /**
