@@ -15,6 +15,7 @@ The BPS should have the following components and features:
         * the voltage of a module exceeds the safe range
         * the current through the cells exceeds the safe range
         * the temperature exceeds the maximum specified in the datasheet
+
         .. note::
             The temperature and current limits vary depending on whether the battery is charging or discharging. 
             Account for both situations in the design.
@@ -22,6 +23,7 @@ The BPS should have the following components and features:
     * Error light indicator on the dashboard
     * Strobe light indicator on the cockpit canopy
     * Emergency shutoff switch on the cockpit canopy
+    
     .. note::
         The shutoff switch connects the BPS to the power distribution board, and is closed by default. 
         When pressed, the switch disconnects the power line between the BPS and the board, shutting down the car.
