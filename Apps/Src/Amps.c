@@ -136,16 +136,12 @@ void Task_AmperesMonitor(void *p_arg) {
     CANPayload_t CanPayload;
     CANMSG_t CanMsg;
 
+	Amps_Init();
+
     while(1) {
         // BLOCKING =====================
         // Update Amperes Measurements
 		Amps_UpdateMeasurements();
-		int current = Amps_GetReading();
-		CanData.f = (float)current/1000; //send data in Amps
-		CanPayload.data = CanData;
-		CanMsg.id = CURRENT_DATA;
-		CanMsg.payload = CanPayload;
-		OSQPost(&CANBus_MsgQ, &CanMsg, 4, OS_OPT_POST_FIFO, &err); //Send data to Can
         // Check if amperes is NOT safe:
 		SafetyStatus amperesStatus = Amps_CheckStatus(AdminOverride);
 		if(amperesStatus != SAFE) {
@@ -163,6 +159,14 @@ void Task_AmperesMonitor(void *p_arg) {
 
             amperesHasBeenChecked = true;
         }
+
+		//Send measurement to CAN queue
+		int current = Amps_GetReading();
+		CanData.f = (float)current/1000; //send data in Amps
+		CanPayload.data = CanData;
+		CanMsg.id = CURRENT_DATA;
+		CanMsg.payload = CanPayload;
+		OSQPost(&CANBus_MsgQ, &CanMsg, 4, OS_OPT_POST_FIFO, &err); //Send data to Can
 
         //signal watchdog
         OSMutexPend(&WDog_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
