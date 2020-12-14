@@ -10,7 +10,7 @@
  * @note    This library also controls the strobe light.
  */
 
-typedef enum {RUN, UVOLT, OVOLT, OTEMP, OCURR, WDOG, CAN, EXTRA, WIRE, LIGHTS_MAX} Light;
+typedef enum {RUN, UVOLT, OVOLT, OTEMP, OCURR, WDOG, CAN, EXTRA, WIRE, FAULT, LIGHTS_MAX} Light;
 
 /**
  * @brief   Initialize all the GPIO pins connected to each LED/Light
