@@ -39,7 +39,7 @@ static bsp_os_t *SPI_os[NUM_SPI_BUSSES];
 // Use this inline function to wait until SPI communication is complete
 static inline void SPI_Wait(SPI_TypeDef *SPIx){
 #ifdef BAREMETAL
-	while(((SPIx)->SR & (SPI_SR_TXE | SPI_SR_RXNE)) == 0 || ((SPIx)->SR & SPI_SR_BSY))
+	while(((SPIx)->SR & (SPI_SR_TXE | SPI_SR_RXNE)) == 0 || ((SPIx)->SR & SPI_SR_BSY));
 #endif
 
 #ifdef RTOS

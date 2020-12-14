@@ -4,6 +4,7 @@
 #include "BatteryBalancing.h"
 #include "config.h"
 #include "os.h"
+#include "Tasks.h"
 
 #define CHARGING_TOLERANCE 0
 
