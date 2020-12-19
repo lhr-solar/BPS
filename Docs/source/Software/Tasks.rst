@@ -42,3 +42,17 @@ Process:
     2) If all of these checks are safe, the task will send the All Clear message and the Contactor On message across the CAN line.
     
     3) The task will then destroy itself since it is no longer needed
+
+Battery Balancing Task: Sugam Arora
+===================================
+
+This task sets any battery module with a voltage that is higher than the minimum voltage of all the modules + a charging tolerance 
+(subject to change) to discharge. Any modules that have a voltage that is equal to or less than the minimum voltage of all the 
+modules in the system will have their discharge bit cleared. When clearing discharge bits, this task will access the Minions ASIC 
+mutex.
+
+CAN Consumer Task: Sugam Arora
+==============================
+
+This task gets the message that is next up from the CAN message queue and sends it on the CAN bus. All possible CAN messages that will be sent to the rest of the car's system by the BPS
+are listed on the `CAN Bus IDs spreadsheet <https://docs.google.com/spreadsheets/d/11YWoMVZw8BFr8kyO4DIz0g-aIU_vVa0d-WioSRq85TI/edit#gid=0>`_.
