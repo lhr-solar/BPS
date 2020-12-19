@@ -63,6 +63,8 @@ OS_MUTEX WDog_Mutex;
 cell_asic Minions[NUM_MINIONS];
 uint32_t WDog_BitMap = 0;
 
+void EnterFaultState(void);
+
 /**
  * Used to assert if there has been an error in one of the OS functions
  * Kills the car if there is an OS error
@@ -70,5 +72,10 @@ uint32_t WDog_BitMap = 0;
 void assertOSError(OS_ERR err){
     if(err != OS_ERR_NONE) {
         OSSemPost(&Fault_Sem4, OS_OPT_POST_1, &err);
+    
+        // We should not get to this point if the call above worked.
+        // Thus, we need to manually enter a fault state, since the
+        // OS obviously is not functioning correctly.
+        EnterFaultState();
     }
-} 
+}

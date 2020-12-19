@@ -9,9 +9,6 @@
 #include "os.h"
 #include "Tasks.h"
 
-OS_TCB Init_TCB;
-CPU_STK Init_Stk[DEFAULT_STACK_SIZE];
-
 int main() {
 	
 	OS_ERR err;
