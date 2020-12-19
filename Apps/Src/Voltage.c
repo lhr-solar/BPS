@@ -146,6 +146,9 @@ Voltage_Safety Voltage_GetModulesInDanger(void){
 	static Voltage_Safety system;
 	uint32_t wires;
 	uint32_t openWireIdx = 0;
+	OS_ERR err;
+	OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
+  	assertOSError(err);
 	//put all the bits from each minion's system_open_wire variable into one variable
 	for(int k = 0; k < NUM_MINIONS; k++){
 		wires = (Minions[k].system_open_wire & 0x1FF);	//there are at most 8 modules per IC, bit 0 is GND
@@ -174,6 +177,8 @@ Voltage_Safety Voltage_GetModulesInDanger(void){
 			system.wire_checks[i] = SAFE;
 		}
 	}
+	OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
+  	assertOSError(err);
 	return system;
 }
 
