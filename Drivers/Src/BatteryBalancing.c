@@ -4,8 +4,9 @@
 #include "BatteryBalancing.h"
 #include "config.h"
 #include "os.h"
+#include "Tasks.h"
 
-#define CHARGING_TOLERANCE 0
+#define BALANCING_TOLERANCE 50
 
 extern OS_MUTEX MinionsASIC_Mutex;
 
@@ -39,7 +40,7 @@ void Balancing_Balance(cell_asic Minions[]){
 	uint16_t lowest = GetMinimumVoltage(); //get lowest voltage 
 	for (uint8_t k = 0; k < NUM_BATTERY_MODULES; k++) {
 		uint16_t voltage = Voltage_GetModuleMillivoltage(k);	
-		if (voltage > lowest + CHARGING_TOLERANCE) {	
+		if (voltage > lowest + BALANCING_TOLERANCE) {	
 			Balancing_SetDischargeBit(k, Minions);	
 		}
 		else {	//Clear discharge bit of module if it reaches minimum

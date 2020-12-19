@@ -109,20 +109,6 @@ void Task_Init(void *p_arg) {
 				OS_OPT_TASK_STK_CHK | OS_OPT_TASK_SAVE_FP,	// Options
 				&err);					// return err code
         //7
-        OSTaskCreate(&DashboardNotify_TCB,				// TCB
-				"TASK_DASHBOARD_NOTIFY_PRIO",	// Task Name (String)
-				Task_DashboardNotify,				// Task function pointer
-				(void *)0,				// Task function args
-				TASK_DASHBOARD_NOTIFY_PRIO,			// Priority
-				DashboardNotify_Stk,				// Stack
-				WATERMARK_STACK_LIMIT,	// Watermark limit for debugging
-				TASK_DASHBOARD_NOTIFY_STACK_SIZE,		// Stack size
-				0,						// Queue size (not needed)
-				10,						// Time quanta (time slice) 10 ticks
-				(void *)0,				// Extension pointer (not needed)
-				OS_OPT_TASK_STK_CHK | OS_OPT_TASK_SAVE_FP,	// Options
-				&err);					// return err code
-        //8
         OSTaskCreate(&LogInfo_TCB,				// TCB
 				"TASK_LOG_INFO_PRIO",	// Task Name (String)
 				Task_LogInfo,				// Task function pointer
@@ -136,7 +122,7 @@ void Task_Init(void *p_arg) {
 				(void *)0,				// Extension pointer (not needed)
 				OS_OPT_TASK_STK_CHK | OS_OPT_TASK_SAVE_FP,	// Options
 				&err);					// return err code
-        //9
+        //8
         OSTaskCreate(&CANBusConsumer_TCB,				// TCB
 				"TASK_CANBUS_CONSUMER_PRIO",	// Task Name (String)
 				Task_CANBusConsumer,				// Task function pointer
@@ -150,7 +136,7 @@ void Task_Init(void *p_arg) {
 				(void *)0,				// Extension pointer (not needed)
 				OS_OPT_TASK_STK_CHK | OS_OPT_TASK_SAVE_FP,	// Options
 				&err);					// return err code
-        //10
+        //9
         OSTaskCreate(&CLI_TCB,				// TCB
 				"TASK_CLI_PRIO",	// Task Name (String)
 				Task_CLI,				// Task function pointer
@@ -164,7 +150,7 @@ void Task_Init(void *p_arg) {
 				(void *)0,				// Extension pointer (not needed)
 				OS_OPT_TASK_STK_CHK | OS_OPT_TASK_SAVE_FP,	// Options
 				&err);					// return err code}
-        //11
+        //10
         OSTaskCreate(&Idle_TCB,				// TCB
 				"TASK_IDLE_PRIO",	// Task Name (String)
 				Task_Idle,				// Task function pointer

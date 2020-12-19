@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include "BatteryBalancing.h"
 
+//declared in Tasks.c
 extern cell_asic Minions[NUM_MINIONS];
 
 void Task_BatteryBalance(void *p_arg) {

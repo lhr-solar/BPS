@@ -34,14 +34,14 @@ typedef enum SafetyStatus_e {SAFE = 0, DANGER = 1, OVERVOLTAGE = 2, UNDERVOLTAGE
 
 //--------------------------------------------------------------------------------
 // MAX and MIN limits of lithium ion cells
-#define MIN_VOLTAGE_CHARGING_LIMIT      2.7     // Under voltage limit for charging
-#define MIN_VOLTAGE_LIMIT				2.9		// Under voltage limit (Voltage)	(actual min: 2.5V)
-#define MAX_VOLTAGE_LIMIT				4.0		// Over voltage limit (Voltage)		(actual max: 4.2V)
+#define MIN_VOLTAGE_CHARGING_LIMIT      2.55F     // Under voltage limit for charging
+#define MIN_VOLTAGE_LIMIT				2.7F		// Under voltage limit (Voltage)	(actual min: 2.5V)
+#define MAX_VOLTAGE_LIMIT				4.0F		// Over voltage limit (Voltage)		(actual max: 4.2V)
 
-#define MAX_DISCHARGE_TEMPERATURE_LIMIT	55.00	// Max temperature limit (Celcius)	(recommended release: 60.00C)
-#define MAX_CHARGE_TEMPERATURE_LIMIT	40.00	// Max temperature limit (Celcius)	(recommended release: 45.00C)
+#define MAX_DISCHARGE_TEMPERATURE_LIMIT	60.00F	// Max temperature limit (Celcius)	(recommended release: 60.00C)
+#define MAX_CHARGE_TEMPERATURE_LIMIT	45.00F	// Max temperature limit (Celcius)	(recommended release: 45.00C)
 
-#define MAX_CURRENT_LIMIT				100000		// Max current limit (Milliamperes)		(Max continuous discharge is 15A per cell)
+#define MAX_CURRENT_LIMIT				75000		// Max current limit (Milliamperes)		(Max continuous discharge is 15A per cell)
 #define MAX_HIGH_PRECISION_CURRENT 		50000		// Max current detectable by the high-precision current sensor (mA)
 #define MAX_CHARGING_CURRENT 			-20000		// Max current per cell is 1.5 Amps (Standard charge)
 
