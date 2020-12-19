@@ -147,7 +147,7 @@ Mutexes and Semaphores
 Voltage Mutex
 =============
 
-Mutually excludes accesses to the Voltage buffer in the Voltage.c library. This mutex is needed i
+Mutually excludes accesses to the Voltage buffer in the Voltage.c library. 
 
 MinionsIO Semaphore
 ===================
