@@ -21,12 +21,7 @@ typedef struct _queue {
     uint8_t tail;
 } queue_t;
 
-static queue_t gRxQueue = {
-    {0},
-    0,
-    0,
-    true
-};
+static queue_t gRxQueue;
 
 // Return ERROR if failure
 static ErrorStatus QueuePut(queue_t *target, msg_t *msg) {
@@ -84,6 +79,10 @@ void BSP_CAN_Init(void (*rxEvent)(void), void (*txEnd)(void)) {
     // Configure event handles
     gRxEvent  = rxEvent;
     gTxEnd    = txEnd;
+
+    // Configure the queue
+    gRxQueue.head = 0;
+    gRxQueue.tail = 0;
 
     /* CAN GPIOs configuration **************************************************/
 
