@@ -112,6 +112,11 @@ extern CPU_STK BLE_Stk[TASK_BLE_STACK_SIZE];
 extern CPU_STK Idle_Stk[TASK_IDLE_STACK_SIZE];
 extern CPU_STK Init_Stk[TASK_INIT_STACK_SIZE];
 
+/**	
+ * @brief   Queue for pushing and popping CAN Messages	
+ */	
+OS_Q CANBus_MsgQ;
+
 extern OS_SEM SafetyCheck_Sem4;
 extern OS_SEM Fault_Sem4;
 extern OS_MUTEX WDog_Mutex;
