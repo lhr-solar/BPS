@@ -5,7 +5,7 @@
 #include "Voltage.h"
 #include "BSP_Fans.h"
 #include "Temperature.h"
-#include "Current.h"
+#include "Amps.h"
 #include "EEPROM.h"
 #include "BSP_WDTimer.h"
 #include "CLI.h"
@@ -38,11 +38,11 @@ void EnterFaultState() {
         BSP_Light_On(UVOLT);
         EEPROM_LogError(FAULT_LOW_VOLT);
     }
-    if (Temperature_CheckStatus(Current_IsCharging()) == DANGER){
+    if (Temperature_CheckStatus(Amps_IsCharging()) == DANGER){
         BSP_Light_On(OTEMP);
         EEPROM_LogError(FAULT_HIGH_TEMP);
     }
-    if (Current_CheckStatus(false) == DANGER){
+    if (Amps_CheckStatus(false) == DANGER){
         BSP_Light_On(OCURR);
         EEPROM_LogError(FAULT_HIGH_CURRENT);
     }
