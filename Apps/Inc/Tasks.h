@@ -11,11 +11,10 @@
 #define TASK_VOLT_TEMP_MONITOR_PRIO         4
 #define TASK_AMPERES_MONITOR_PRIO           5
 #define TASK_BATTERY_BALANCE_PRIO           6 //BATTERY
-#define TASK_DASHBOARD_NOTIFY_PRIO          7 //DASH
+#define TASK_CANBUS_CONSUMER_PRIO           7 //CANBUS
 #define TASK_LOG_INFO_PRIO                  8 //LOGINFO
-#define TASK_CANBUS_CONSUMER_PRIO           9 //CANBUS
-#define TASK_CLI_PRIO                       10  
-#define TASK_IDLE_PRIO                      11
+#define TASK_CLI_PRIO                       9  
+#define TASK_IDLE_PRIO                      10
 
 #define DEFAULT_STACK_SIZE                  256
 #define WATERMARK_STACK_LIMIT               DEFAULT_STACK_SIZE/2
@@ -25,7 +24,6 @@
 #define TASK_PETWDOG_STACK_SIZE             DEFAULT_STACK_SIZE
 #define TASK_VOLT_TEMP_MONITOR_STACK_SIZE   512
 #define TASK_AMPERES_MONITOR_STACK_SIZE     DEFAULT_STACK_SIZE
-#define TASK_DASHBOARD_NOTIFY_STACK_SIZE    DEFAULT_STACK_SIZE
 #define TASK_LOG_INFO_STACK_SIZE            DEFAULT_STACK_SIZE
 #define TASK_CANBUS_CONSUMER_STACK_SIZE     DEFAULT_STACK_SIZE
 #define TASK_BATTERY_BALANCE_STACK_SIZE     512
@@ -56,8 +54,6 @@ void Task_VoltTempMonitor(void *p_arg);
 
 void Task_AmperesMonitor(void *p_arg);
 
-void Task_DashboardNotify(void *p_arg);
-
 void Task_LogInfo(void *p_arg);
 
 void Task_CANBusConsumer(void *p_arg);
@@ -87,7 +83,6 @@ extern OS_TCB CriticalState_TCB;
 extern OS_TCB PetWDog_TCB;
 extern OS_TCB VoltTempMonitor_TCB;
 extern OS_TCB AmperesMonitor_TCB;
-extern OS_TCB DashboardNotify_TCB;
 extern OS_TCB LogInfo_TCB;
 extern OS_TCB CANBusConsumer_TCB;
 extern OS_TCB BatteryBalance_TCB;
@@ -103,7 +98,6 @@ extern CPU_STK CriticalState_Stk[TASK_CANBUS_CONSUMER_STACK_SIZE];
 extern CPU_STK PetWDog_Stk[TASK_PETWDOG_STACK_SIZE];
 extern CPU_STK VoltTempMonitor_Stk[TASK_VOLT_TEMP_MONITOR_STACK_SIZE];
 extern CPU_STK AmperesMonitor_Stk[TASK_AMPERES_MONITOR_STACK_SIZE];
-extern CPU_STK DashboardNotify_Stk[TASK_DASHBOARD_NOTIFY_STACK_SIZE];
 extern CPU_STK LogInfo_Stk[TASK_LOG_INFO_STACK_SIZE];
 extern CPU_STK CANBusConsumer_Stk[TASK_CANBUS_CONSUMER_STACK_SIZE];
 extern CPU_STK BatteryBalance_Stk[TASK_BATTERY_BALANCE_STACK_SIZE];
@@ -111,6 +105,11 @@ extern CPU_STK CLI_Stk[TASK_CLI_STACK_SIZE];
 extern CPU_STK BLE_Stk[TASK_BLE_STACK_SIZE];
 extern CPU_STK Idle_Stk[TASK_IDLE_STACK_SIZE];
 extern CPU_STK Init_Stk[TASK_INIT_STACK_SIZE];
+
+/**	
+ * @brief   Queue for pushing and popping CAN Messages	
+ */	
+OS_Q CANBus_MsgQ;
 
 extern OS_SEM SafetyCheck_Sem4;
 extern OS_SEM Fault_Sem4;

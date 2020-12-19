@@ -26,34 +26,36 @@ void SPI3_Init(bsp_os_t *spi3_os){
 }
 
 /**
- * @brief   Initializes the SPI port connected to the LTC6820.
- *          This port communicates with the LTC6811 voltage and temperature
- *          monitoring IC. The LTC6820 converts the SPI pins to 2-wire isolated SPI.
- *          Look at analog devices website and LTC6811's or LTC6820's datasheets.
- * @param   None
+ * @brief   Initializes the SPI port.
+ * @param   port The SPI port to initialize.
  * @return  None
  */
-void BSP_SPI_Init(bsp_os_t *spi_os) {
+void BSP_SPI_Init(spi_port_t port, bsp_os_t *spi_os) {
     // Check if simulator is running i.e. were the csv files created?
     if(access(read_file, F_OK) != 0) {
         // File doesn't exit if true
         perror(SPI_R_CSV_FILE);
         exit(EXIT_FAILURE);
     }
+
+    // TODO: add SPI3 capabilities to the simulator
+    #if 0
+    if(access(file3, F_OK) != 0) {
+        perror(SPI3_CSV_FILE);
+        exit(EXIT_FAILURE);
+    }
+    #endif
 }
 
 /**
  * @brief   Transmits data to through SPI.
- *          With the way the LTC6811 communication works, the LTC6811 will not send
- *          anything during a transmit for uC to LTC6811. This is unlike what
- *          the SPI protocol expects where a transmit and receive happen
- *          simultaneously.
  * @note    Blocking statement
+ * @param   port    the SPI port to write to
  * @param   txBuf   data array that contains the data to be sent.
  * @param   txLen   length of data array.
  * @return  None
  */
-void BSP_SPI_Write(uint8_t *txBuf, uint32_t txLen) {
+void BSP_SPI_Write(spi_port_t port, uint8_t *txBuf, uint32_t txLen) {
     // Creates file if none exists
 	FILE* fp = fopen(write_file, "r+");
     if (!fp) {
@@ -107,7 +109,7 @@ void BSP_SPI_Write(uint8_t *txBuf, uint32_t txLen) {
  * @param   rxLen   length of data array.
  * @return  None
  */
-void BSP_SPI_Read(uint8_t *rxBuf, uint32_t rxLen) {
+void BSP_SPI_Read(spi_port_t port, uint8_t *rxBuf, uint32_t rxLen) {
 
     if(rxLen == 1) {
         rxBuf[0] = 1;
@@ -184,7 +186,8 @@ void BSP_SPI_Read(uint8_t *rxBuf, uint32_t rxLen) {
  * @param   state   0 for select, 1 to deselect
  * @return  None
  */
-void BSP_SPI_SetStateCS(uint8_t state) {
+void BSP_SPI_SetStateCS(spi_port_t port, uint8_t state) {
+    //TODO: make this do something different based on which port you pass it
     chipSelectState = state;
 }
 

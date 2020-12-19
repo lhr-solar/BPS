@@ -7,7 +7,7 @@
 
 #include "CLI.h"
 #include "Voltage.h"
-#include "Current.h"
+#include "Amps.h"
 #include "Temperature.h"
 #include "BSP_Contactor.h"
 #include "BSP_WDTimer.h"
@@ -183,20 +183,18 @@ void CLI_Voltage(int* hashTokens) {
  */
 void CLI_Current(int* hashTokens) {
 	if(hashTokens[1] == 0) {
-		printf("High: %.3fA\n\r", Current_GetHighPrecReading()/MILLI_UNIT_CONVERSION);	// Prints 4 digits, number, and A
-		printf("Low: %.3fA\n\r", Current_GetLowPrecReading()/MILLI_UNIT_CONVERSION);
+		printf("Current: %.3fA\n\r", Amps_GetReading()/MILLI_UNIT_CONVERSION);	// Prints 4 digits, number, and A
 		return;
 	}
 	switch (hashTokens[1]) {
-		case CLI_HIGH_HASH: // High precision reading
-			printf("High: %.3fA     \n\r", Current_GetHighPrecReading()/MILLI_UNIT_CONVERSION);
-			break;
-		case CLI_LOW_HASH: // Low precision reading
-			printf("Low: %.3fA     \n\r", Current_GetLowPrecReading()/MILLI_UNIT_CONVERSION);
+		// High precision and low precision don't differ now.
+		case CLI_HIGH_HASH:
+		case CLI_LOW_HASH:
+			printf("High: %.3fA     \n\r", Amps_GetReading()/MILLI_UNIT_CONVERSION);
 			break;
 		case CLI_SAFE_HASH: 
 		case CLI_SAFETY_HASH:
-			if (Current_CheckStatus(false) == SAFE) {
+			if (Amps_CheckStatus(false) == SAFE) {
 				printf("Safety Status: SAFE\n\r");
 			}
 			else {
@@ -205,7 +203,7 @@ void CLI_Current(int* hashTokens) {
 			break;
 		case CLI_CHARGE_HASH: // Whether battery is charging
 		case CLI_CHARGING_STATE:
-			if (Current_IsCharging()) {
+			if (Amps_IsCharging()) {
 				printf("Charging State: CHARGING\n\r");
 			}
 			else {
