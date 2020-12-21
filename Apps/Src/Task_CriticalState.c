@@ -6,6 +6,10 @@
 #include "BSP_UART.h"
 #include "Voltage.h"
 
+/*
+This flag is used to override the undervoltage fault condition of the BPS when we are starting
+the car(if we need to charge). If it is true, then we should be in charging state only.
+*/
 bool AdminOverride = false;
 
 static char command[COMMAND_SIZE];

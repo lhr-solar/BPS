@@ -1,3 +1,4 @@
+/* Copyright (c) 2020 UT Longhorn Racing Solar */
 #include "os.h"
 #include "Tasks.h"
 #include "BSP_Contactor.h"
@@ -30,11 +31,12 @@ void EnterFaultState() {
     // Turn LEDs On and logs Error into EEPROM
     BSP_Light_Off(RUN); //turn off run light
     BSP_Light_On(FAULT);
-    if (Voltage_CheckStatus() == OVERVOLTAGE){
+    SafetyStatus voltStatus = Voltage_CheckStatus();
+    if (voltStatus == OVERVOLTAGE){
         BSP_Light_On(OVOLT);
         EEPROM_LogError(FAULT_HIGH_VOLT);
     }
-    if (Voltage_CheckStatus() == UNDERVOLTAGE){
+    if (voltStatus == UNDERVOLTAGE){
         BSP_Light_On(UVOLT);
         EEPROM_LogError(FAULT_LOW_VOLT);
     }
