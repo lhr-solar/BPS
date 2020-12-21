@@ -1,3 +1,5 @@
+/* Copyright (c) 2020 UT Longhorn Racing Solar */
+
 /* Fans.c
 Controls speed of fans which cool down the battery pack.
 Uses Pins PC6,7 and PB14,15

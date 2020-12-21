@@ -1,3 +1,4 @@
+/* Copyright (c) 2020 UT Longhorn Racing Solar */
 #include "Tasks.h"
 #include "os.h"
 #include "Voltage.h"

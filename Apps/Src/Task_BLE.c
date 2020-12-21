@@ -1,3 +1,4 @@
+/* Copyright (c) 2020 UT Longhorn Racing Solar */
 #include "os.h"
 
 void Task_BLE(void *p_arg) {
