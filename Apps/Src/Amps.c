@@ -143,7 +143,7 @@ void Task_AmperesMonitor(void *p_arg) {
         // Update Amperes Measurements
 		Amps_UpdateMeasurements();
         // Check if amperes is NOT safe:
-		SafetyStatus amperesStatus = Amps_CheckStatus(AdminOverride);
+		SafetyStatus amperesStatus = Amps_CheckStatus(Amps_IsCharging());
 		if(amperesStatus != SAFE) {
             OSSemPost(&Fault_Sem4,
                         OS_OPT_POST_1,

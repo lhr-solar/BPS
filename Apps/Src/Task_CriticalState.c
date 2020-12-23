@@ -7,14 +7,6 @@
 #include "BSP_UART.h"
 #include "Voltage.h"
 
-/*
-This flag is used to override the undervoltage fault condition of the BPS when we are starting
-the car(if we need to charge). If it is true, then we should be in charging state only.
-*/
-bool AdminOverride = false;
-
-static char command[COMMAND_SIZE];
-
 void Task_CriticalState(void *p_arg) {
     (void)p_arg;
 
@@ -24,20 +16,6 @@ void Task_CriticalState(void *p_arg) {
     CANPayload_t CanPayload; 
     CanPayload.idx    = 0;
     CanPayload.data.b = 1;
-
-    Voltage_UpdateMeasurements();
-	SafetyStatus voltStatus = Voltage_CheckStatus();
-	if(voltStatus == UNDERVOLTAGE) {
-		printf("Do you need to charge the batteries? (y/n)\n\r>> ");
-		uint32_t wait = 0;
-		while(wait < STARTUP_WAIT_TIME) {
-			if(BSP_UART_ReadLine(command, UART_USB)) {
-				AdminOverride = command[0] == 'y' ? true : false;
-				break;
-			}
-			wait++;
-		}
-	}
 
     // BLOCKING =====================
     // Wait until voltage, open wire, temperature, and current(Amperes) are all checked and safe
