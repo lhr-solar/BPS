@@ -14,10 +14,10 @@
 #include "common.h"
 #include "os.h"
 
-typedef struct system_danger{
+typedef struct voltage_safety{
     SafetyStatus wire_checks[TOTAL_VOLT_WIRES];
     SafetyStatus module_checks[NUM_BATTERY_MODULES];
-} Voltage_Safety;
+} VoltageSafety_t;
 
 /** Voltage_Init
  * Initializes all device drivers including LTC6811 and GPIO to begin Voltage Monitoring
@@ -46,7 +46,7 @@ SafetyStatus Voltage_CheckStatus(void);
  * array is 1, then it means that module in the index is in danger.
  * @return struct that has safety status for all wires and modules in the system
  */
-Voltage_Safety Voltage_GetModulesInDanger(void);
+void Voltage_GetModulesInDanger(VoltageSafety_t* system);
  
 /** Voltage_OpenWireSummary
  * Runs the open wire method with print=true

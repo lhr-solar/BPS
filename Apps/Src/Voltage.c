@@ -141,8 +141,7 @@ SafetyStatus Voltage_CheckStatus(void){
  * Each module corresponds to an index of the array of SafetyStatus
  * @return pointer to index of modules that are in danger
  */
-Voltage_Safety Voltage_GetModulesInDanger(void){
-	static Voltage_Safety system;
+void Voltage_GetModulesInDanger(VoltageSafety_t* system){
 	uint32_t wires;
 	uint32_t openWireIdx = 0;
 	OS_ERR err;
@@ -164,21 +163,20 @@ Voltage_Safety Voltage_GetModulesInDanger(void){
 		if(i < NUM_BATTERY_MODULES){
 			// Check if battery is in range of voltage limit
 			if(Voltage_GetModuleMillivoltage(i) > MAX_VOLTAGE_LIMIT * MILLI_SCALING_FACTOR) {
-				system.module_checks[i] = OVERVOLTAGE;
+				system->module_checks[i] = OVERVOLTAGE;
 			}
 			else if(Voltage_GetModuleMillivoltage(i) < MIN_VOLTAGE_LIMIT * MILLI_SCALING_FACTOR){
-				system.module_checks[i] = UNDERVOLTAGE;
+				system->module_checks[i] = UNDERVOLTAGE;
 			}
 		}
 		if(openWires[i] == 1) {
-			system.wire_checks[i] = DANGER;
+			system->wire_checks[i] = DANGER;
 		} else {
-			system.wire_checks[i] = SAFE;
+			system->wire_checks[i] = SAFE;
 		}
 	}
 	OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
   	assertOSError(err);
-	return system;
 }
 
 /** Voltage_OpenWireSummary

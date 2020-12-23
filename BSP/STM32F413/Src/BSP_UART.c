@@ -2,7 +2,7 @@
 
 #include "BSP_UART.h"
 #include "stm32f4xx.h"
-//Written by Sijin and Revised by Manthan Upadhyaya: 10/2020
+
 #define TX_SIZE     128
 #define RX_SIZE     64
 //These variables are for USART 2 which is used for the BLE

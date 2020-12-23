@@ -58,7 +58,8 @@ int main() {
     }
 
     printf("Printing modules that failed.\r\n");
-    Voltage_Safety dangerBatt = Voltage_GetModulesInDanger();
+    Voltage_Safety dangerBatt;
+    Voltage_GetModulesInDanger(&dangerBatt);
     for(int i = 0; i < TOTAL_VOLT_WIRES; i++) {
         printf("\t%d: ", i);
         if(i < NUM_BATTERY_MODULES){

@@ -1,4 +1,4 @@
-
+/* Copyright (c) 2020 UT Longhorn Racing Solar */
 void Task_Idle(void *p_arg) {
     (void)p_arg;
 

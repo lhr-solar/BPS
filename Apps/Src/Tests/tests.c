@@ -762,7 +762,7 @@ int main(void) {
 	// First update the measurements.
 	Voltage_UpdateMeasurements();
 	SafetyStatus *voltageModulesInDanger;
-	voltageModulesInDanger = Voltage_GetModulesInDanger();
+	Voltage_GetModulesInDanger(voltageModulesInDanger);
 	printf("Voltage modules in danger: ");
 	for (uint8_t i = 0; i < NUM_BATTERY_MODULES; i++) {
 		if (voltageModulesInDanger[i] != SAFE){
