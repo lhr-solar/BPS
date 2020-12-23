@@ -6,8 +6,6 @@
 #include "os.h"
 #include "Tasks.h"
 
-#define BALANCING_TOLERANCE 50
-
 extern OS_MUTEX MinionsASIC_Mutex;
 
 static void Balancing_ClearDischargeBit(int Cell, uint8_t total_ic, cell_asic *ic);
@@ -40,10 +38,11 @@ void Balancing_Balance(cell_asic Minions[]){
 	uint16_t lowest = GetMinimumVoltage(); //get lowest voltage 
 	for (uint8_t k = 0; k < NUM_BATTERY_MODULES; k++) {
 		uint16_t voltage = Voltage_GetModuleMillivoltage(k);	
-		if (voltage > lowest + BALANCING_TOLERANCE) {	
+		if (voltage > lowest + BALANCING_TOLERANCE_START) {	
 			Balancing_SetDischargeBit(k, Minions);	
 		}
-		else {	//Clear discharge bit of module if it reaches minimum
+		//Clear discharge bit of module if it reaches minimum
+		else if(voltage < lowest + BALANCING_TOLERANCE_STOP) {
 			uint8_t ICIndex;
 			uint8_t MNumber;
 			Balancing_GetICNumber(k, &ICIndex, &MNumber);	
