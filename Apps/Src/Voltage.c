@@ -144,6 +144,9 @@ SafetyStatus Voltage_CheckStatus(void){
 void Voltage_GetModulesInDanger(VoltageSafety_t* system){
 	uint32_t wires;
 	uint32_t openWireIdx = 0;
+	OS_ERR err;
+	OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
+  	assertOSError(err);
 	//put all the bits from each minion's system_open_wire variable into one variable
 	for(int k = 0; k < NUM_MINIONS; k++){
 		wires = (Minions[k].system_open_wire & 0x1FF);	//there are at most 8 modules per IC, bit 0 is GND
@@ -172,6 +175,8 @@ void Voltage_GetModulesInDanger(VoltageSafety_t* system){
 			system->wire_checks[i] = SAFE;
 		}
 	}
+	OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
+  	assertOSError(err);
 }
 
 /** Voltage_OpenWireSummary
@@ -194,16 +199,26 @@ void Voltage_OpenWireSummary(void){
  * @return SafetyStatus
  */
 SafetyStatus Voltage_OpenWire(void){
+	SafetyStatus status = SAFE;
 	wakeup_idle(NUM_MINIONS);
+
+	OS_ERR err;
+  	OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
+	assertOSError(err);
+	
 	LTC6811_run_openwire_multi(NUM_MINIONS, Minions, false);
 
 	for(int32_t i = 0; i < NUM_MINIONS; i++) {
 		if(Minions[i].system_open_wire != 0){
-			return DANGER;
+			status = DANGER;
+			break;
 		}
 	}
 
-	return SAFE;
+	OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
+  	assertOSError(err);
+
+	return status;
 }
 
 /** Voltage_GetOpenWire
