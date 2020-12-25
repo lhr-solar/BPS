@@ -91,3 +91,96 @@ inline void HardFault_Handler()  { EnterFaultState(); }
 inline void MemManage_Handler()  { EnterFaultState(); }
 inline void BusFault_Handler()   { EnterFaultState(); }
 inline void UsageFault_Handler() { EnterFaultState(); }
+/* Copyright (c) 2020 UT Longhorn Racing Solar */
+#include "os.h"
+#include "Tasks.h"
+#include "BSP_Contactor.h"
+#include "BSP_Lights.h"
+#include "Voltage.h"
+#include "BSP_Fans.h"
+#include "Temperature.h"
+#include "Amps.h"
+#include "EEPROM.h"
+#include "BSP_WDTimer.h"
+#include "CLI.h"
+#include "CANbus.h"
+#include "BSP_UART.h"
+#include "config.h"
+
+/*
+ * Note: do not call this directly if it can be helped.
+ * Instead, call an RTOS function to unblock the mutex
+ * that the Fault Task is pending on.
+ */
+void EnterFaultState() {
+    // Turn Contactor Off
+    BSP_Contactor_Off();
+    //Set Fans to full speed
+    BSP_Fans_Set(1, 8);
+    BSP_Fans_Set(2, 8);
+    BSP_Fans_Set(3, 8);
+    BSP_Fans_Set(4, 8);
+    // Turn Strobe Light On
+    // Turn LEDs On and logs Error into EEPROM
+    BSP_Light_Off(RUN); //turn off run light
+    BSP_Light_On(FAULT);
+    SafetyStatus voltStatus = Voltage_CheckStatus();
+    if (voltStatus == OVERVOLTAGE){
+        BSP_Light_On(OVOLT);
+        EEPROM_LogError(FAULT_HIGH_VOLT);
+    }
+    if (voltStatus == UNDERVOLTAGE){
+        BSP_Light_On(UVOLT);
+        EEPROM_LogError(FAULT_LOW_VOLT);
+    }
+    if (Temperature_CheckStatus(Amps_IsCharging()) == DANGER){
+        BSP_Light_On(OTEMP);
+        EEPROM_LogError(FAULT_HIGH_TEMP);
+    }
+    if (Amps_CheckStatus(false) == DANGER){
+        BSP_Light_On(OCURR);
+        EEPROM_LogError(FAULT_HIGH_CURRENT);
+    }
+    if (BSP_WDTimer_DidSystemReset()){
+        BSP_Light_On(WDOG);
+        EEPROM_LogError(FAULT_WATCHDOG);
+    }
+    CANData_t data;
+    data.b = 1;
+    CANPayload_t Message;
+    Message.data = data;
+    // Push Trip message to CAN Q
+    CANbus_Send(TRIP, Message);
+    // Push Contactor State message to CAN Q
+    data.b = 0;
+    CANbus_Send(CONTACTOR_STATE, Message);
+
+#ifdef DEBUGMODE
+    char command[COMMAND_SIZE];
+#endif
+    while(1) {
+#ifdef DEBUGMODE
+        if (BSP_UART_ReadLine(command)) CLI_Handler(command); // CLI
+#endif
+        BSP_WDTimer_Reset(); // WDOG Reset
+    }
+}
+
+void Task_FaultState(void *p_arg) {
+    (void)p_arg;
+    OS_ERR err;
+    CPU_TS ts;
+
+    // BLOCKING =====================
+    // Wait until a FAULT is signaled by another task.
+    OSSemPend(&Fault_Sem4, 0, OS_OPT_PEND_BLOCKING, &ts, &err);
+    
+    EnterFaultState();
+}
+
+// Rebind all the possible fault handlers to the fault state
+inline void NMI_Handler()        { EnterFaultState(); }
+inline void HardFault_Handler()  { EnterFaultState(); }
+inline void MemManage_Handler()  { EnterFaultState(); }
+inline void BusFault_Handler()   { EnterFaultState(); }
+inline void UsageFault_Handler() { EnterFaultState(); }
