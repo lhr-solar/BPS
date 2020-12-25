@@ -127,11 +127,15 @@ SafetyStatus Voltage_CheckStatus(void){
 			
 		// VOLTAGE_LIMITS are in floating point. The LTC6811 sends the voltage data
 		// as unsigned 16-bit fixed point integers with a resolution of 0.00001
-		if(voltage > MAX_VOLTAGE_LIMIT * MILLI_SCALING_FACTOR) return OVERVOLTAGE;
+		if(voltage > MAX_VOLTAGE_LIMIT * MILLI_SCALING_FACTOR) {
+		    return OVERVOLTAGE;
+		}
 		if (Amps_IsCharging()){
 			if(voltage < MIN_VOLTAGE_CHARGING_LIMIT * MILLI_SCALING_FACTOR) return UNDERVOLTAGE;
 		}
-		else if(voltage < MIN_VOLTAGE_LIMIT * MILLI_SCALING_FACTOR) return UNDERVOLTAGE;
+		else if(voltage < MIN_VOLTAGE_LIMIT * MILLI_SCALING_FACTOR) {
+		    return UNDERVOLTAGE;
+		}
 	}
 	return SAFE;
 }
@@ -278,7 +282,6 @@ uint32_t Voltage_GetTotalPackVoltage(void){
 	}
 	return sum;
 }
-
 
 
 
