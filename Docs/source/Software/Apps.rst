@@ -138,6 +138,15 @@ A list of all valid CLI commands is included below.
 
 **Note**: " * " denotes a command that alters the state of the BPS. Only use these commands if you know the consequences 
 
+**Examples of Valid CLI Commands**:
+
+``voltage module 5`` - prints module 5's voltage
+
+``watchdog error`` - prints most recent watchdog errors
+
+``temperature module 6 1`` - prints temperature of sensor 1 on module 6
+
+
 
 
 **********************

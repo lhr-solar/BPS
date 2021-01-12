@@ -46,10 +46,18 @@ Process:
 Battery Balancing Task: Sugam Arora
 ===================================
 
+The solar car is powered by lithium ion cells. If these cells are overcharged, they experience accelerated degradation. This task has been 
+implemented in an effort to maintain peak performance and health for the car's battery pack. 
+
+Priority: 6 
+
+We do not want this task to interrupt any monitoring tasks or any tasks that check if the BPS is running 
+correctly.
+
 This task sets any battery module with a voltage that is higher than the minimum voltage of all the modules + a charging tolerance 
 (subject to change) to discharge. Any modules that have a voltage that is equal to or less than the minimum voltage of all the 
 modules in the system will have their discharge bit cleared. When clearing discharge bits, this task will access the Minions ASIC 
-mutex.
+mutex. This task also uses the ``WDog_Mutex`` and toggles the ``WD_BALANCING`` bit of the ``WDog_BitMap``.
 
 CAN Consumer Task: Sugam Arora
 ==============================
