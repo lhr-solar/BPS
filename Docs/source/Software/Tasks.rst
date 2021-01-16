@@ -66,7 +66,7 @@ Timing Requirements
     (To be determined)
 
 Yields
-    This task yields . 
+    This task yields for the MinionsASIC mutex, the Voltage Buffer mutex, and the MinionsIO mutex. 
 
 Additional Considerations
     N/A
