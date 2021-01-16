@@ -4,6 +4,7 @@ Board Support Package
 
 CAN BSP: Chase Block & Sijin Woo
 ================================
+
 Purpose
     The purpose of this code is to send and recieve CAN messages. It also contains a queue for 
     messages that are recieved on the CAN bus that has a depth of 10. This queue cannot be accessed
