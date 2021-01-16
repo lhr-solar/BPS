@@ -2,6 +2,21 @@
 Board Support Package
 ***********************
 
+Contactor BSP
+=============
+
+Purpose
+    The contactor BSP interfaces with the GPIO pins connected to the contactor. These pins are used to control the contactor (PB0) and to check 
+    the state of the contactor (PB1).
+
+Usage
+    The peripheral should be initialized by calling ``BSP_Contactor_Init()`` before any of the other functions are called. See ``BPS/BSP/BSP_Contactor.h`` 
+    for details on individual functions.
+
+Additional Considerations
+    The contactor is one of the most important safety features in the vehicle, so the contactor should only be turned on (closed) if the BPS is sure that the
+    battery pack is in a safe state.
+
 I2C BSP: Manthan Upadhyaya
 =================================
 

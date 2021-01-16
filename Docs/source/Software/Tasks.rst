@@ -42,3 +42,28 @@ Process:
     2) If all of these checks are safe, the task will send the All Clear message and the Contactor On message across the CAN line.
     
     3) The task will then destroy itself since it is no longer needed
+
+Idle Task
+=========
+
+Purpose
+    The scheduler always needs to have an available task to run. The purpose of this task is for it to run whenever the scheduler cannot schedule anything else.
+
+Functionality
+    The idle task runs an empty infinite loop for as long as it is scheduled to run.
+
+Priority
+    The idle task has the lowest priority in the system (10), so it will not run unless all other tasks are blocked.
+
+Shared Resources
+    The idle task does not use any shared resources.
+
+Timing Requirements
+    The idle task does not have any timing requirements.
+
+Yields
+    The idle task never yields.
+
+Additional Considerations
+    When modifying the idle task, it is important to not introduce any functionality that may affect other tasks. For example, the idle task should not pend 
+    any mutexes, since this could block more important tasks from running.
