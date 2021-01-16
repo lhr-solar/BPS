@@ -68,7 +68,7 @@ Purpose
     ``STROBE`` - A fault condition has tripped the BPS.
 
 Usage
-    In order to use it, call the init function to initialize all the GPIO's. Then you can call any
+    In order to use it, call `BSP_Lights_Init()` to initialize all the GPIO's. Then you can call any
     of the functions in ``BSP_Lights.h`` whenever needed.
 
 Additional Considerations
