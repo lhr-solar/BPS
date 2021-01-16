@@ -17,7 +17,8 @@ Blocks
 Connections
     6 Connector: 4 of these connections are the PWM signals sent by the Master board. The other 2
     are power and ground.
-    2 Connectors(4): These are the power and grounds each fan is connected to.
+    
+    2 Connector(4): These are the power and grounds each fan is connected to.
 
 Usage Considerations
     None
