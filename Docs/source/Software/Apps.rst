@@ -28,11 +28,9 @@ A list of all valid CLI commands is included below.
 "Current"
 #########
 
-| Displays current readings as measured by the high- and low-precision current sensors in Amps.
+| Displays current readings as measured by the current sensors in Amps.
 | **Argument(s)**: 
-- **none**: prints high- and low- precision current data
-- **high**: prints high-precision current data
-- **low**: prints low-precision current data
+- **none**: prints current data
 - **safety**: prints safety status
 - **charging**: prints if pack is charging or discharging
 
