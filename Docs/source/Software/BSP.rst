@@ -33,10 +33,10 @@ Usage
     other is for Bare-Metal. The ``BSP_UART.h file`` has more information on how to use each function.
 
 Additional Considerations
-    Since the BPS cannot be changed during the race, the BLE module must be disabled before the race
-    is started if it is able to change the code. This can be done through software by not initializing
-    the USART2 module or through hardware with a switch to turn off power to the BLE module, or just 
-    removing it all together. 
+    Since the BPS cannot be changed during the race according to ASC regulations(5.2.E.9), 
+    the BLE module must be disabled before the race is started if it is able to change the code. 
+    This can be done through software by not initializing the USART2 module or through hardware 
+    with a switch to turn off power to the BLE module, or just removing it all together. 
 
 Fans BSP: Manthan Upadhyaya
 ==================================

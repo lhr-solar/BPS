@@ -14,4 +14,4 @@ Usage
     set to a pattern, it remembers the pattern with on board flash memory.
 Reason
     The strobelight is used to alert other vehicles on the road that the car is dangerous and to 
-    avoid it. It is also required under the ASC regulations.
+    avoid it. It is also required under the ASC regulations(9.4.G).
