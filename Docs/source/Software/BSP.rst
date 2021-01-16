@@ -44,8 +44,8 @@ PLL BSP: Clark Poon
 ==================================
 
 Purpose
-    The PLL is used to increase the clock cycle of the STM clock. Right now, it is set to change it
-    from 16 Mhz to 80 Mhz.
+    The PLL is used to increase the clock speed of the STM32F413's clock. Right now, it is set to change it
+    from 16 MHz to 80 MHz.
 
 Usage
     Calling the init function automatically sets the clock speed to 80 Mhz. in order to verify
