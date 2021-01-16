@@ -73,7 +73,7 @@ Battery Balancing Task: Sugam Arora
 
 Purpose
     The solar car is powered by lithium ion cells. If these cells are overcharged, they may experience thermal runaway. Running the battery with unbalanced cells may lead to its accelerated degredation. This task has been 
-    implemented in an effort to maintain peak performance and health for the car's battery pack. If we did not have battery balancing and there was one module whith a high voltage, the other modules wouldn't get charged and
+    implemented in an effort to maintain peak performance and health for the car's battery pack. If we did not have battery balancing and there was one module with a high voltage, the other modules wouldn't get charged and
     the battery would have a lower state of charge overall.
 
 Functionality
