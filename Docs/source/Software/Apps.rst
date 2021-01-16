@@ -3,6 +3,8 @@ Application
 ************
 
 
+.. _CLI-app:
+
 Command Line Interface (CLI)
 ============================
 

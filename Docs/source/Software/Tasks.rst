@@ -65,7 +65,7 @@ Yields
     This task will wait until the user enters a command. This task will yield for the resources mentioned in the "Shared Resources" section for this task.
 
 Additional Considerations
-    For information on how to use the CLI and its list of valid commands, click on the CLI section in "Application" on this site.
+    For information on how to use the CLI and its list of valid commands, click on :ref:`CLI section<CLI-app>`.
 
 
 Battery Balancing Task: Sugam Arora
@@ -93,8 +93,7 @@ Yields
     This task yields for the ``MinionsASIC_Mutex``, the ``Voltage_Mutex``, and the ``MinionsIO_Mutex``. 
 
 Additional Considerations
-    N/A
-
+    None
  
 CAN Consumer Task: Sugam Arora
 ==============================
