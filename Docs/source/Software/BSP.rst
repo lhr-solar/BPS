@@ -50,7 +50,8 @@ Purpose
 
 Usage
     Function usage is declared in the ``BSP_CAN.h file``. When using these functions in the RTOS, pend
-    and post must occur before and after the functions are called.
+    and post must occur before and after the functions are called. The resources used for pend and 
+    post can be seen in the CANBus.c driver documentation(insert link here).
 
 Additional Considerations
     None
