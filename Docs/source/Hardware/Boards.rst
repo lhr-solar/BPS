@@ -20,8 +20,5 @@ Connections
     
     2 Connector(4): These are the power and grounds each fan is connected to.
 
-Usage Considerations
-    None
-
-Modification Considerations
+Additional Considerations
     None

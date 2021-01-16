@@ -10,7 +10,7 @@ Purpose
     conditions can be found here(place link to fault conditions). 
 
 Functionality:
-    1) All other tasks are not allowed to run unless they have are utilized sempahore. The other tasks will run (periodically according to the scheduler) until they post that semaphore and then they are prevented from running again. This occurs internally through the RTOS.
+    1) All other tasks are prevented from running. This occurs internally through the RTOS.
 
     2) The contactor is turned off.
     
@@ -25,41 +25,44 @@ Functionality:
     7) The WatchDog timer is continually reset to prevent the BPS from going into fault again.
 
 Priority
-    This task has the second highest priority when the Init task is running. However, after the init
-    task destroys itself, it has the highest priority.
+    This task has the second highest priority (1) when the Init task is running. However, after the 
+    init task destroys itself, it has the highest priority. It will never be interrupted because
+    we do not require any other monitoring to occur if we already know that a fault condition has 
+    occured.
 
 Shared Resources
-    It uses the Fault_Sem4 which is used to block the task from running until something sets it. It 
-    uses the ``VoltageBuffer_Sem4``, ``TemperatureBuffer_Sem4``, and ``AmperesIO_Sem4`` to log data into the 
-    EEPROM.
+    It uses the Fault_Sem4 which is used to block the task from running until something sets it.
 
 Timing Requirements
-    None
+    First thing that occurs is Contactor shuts off. So the amount of time for a context switch.
 
 Yields
-    It will yield only if it tries to collect data with a semaphore already pending. This will only
-    be at the start of the task after it turns off the contactor.
+    It will yield when waiting for a fault. After that it will never yield.
 
 Additional Considerations
     Although the BPS goes into fault state when the battery is in danger, it also goes into fault 
     state when there is an issue with the RTOS. Since the BPS must always run during the race, care 
-    must be taken to minimize the chances of this happening. 
+    must be taken to minimize the chances of this happening. It also goes into a fault state when 
+    the hard fault handler is called.
 
 Amperes Task: Manthan Upadhyaya
 ===============================
 
 Purpose
-    Monitor the current and call the Fault state task if it is dangerously high.
+    Monitor the total current through the battery pack and call the Fault state task if it 
+    is dangerously high.
 
 Functionality
-    1) First it checks the current and if it is safe, posts the ``SafetyCheck_Sem4``. This only occurs once.
+    1) First it checks the current and if it is safe, signals the critical state task. This only occurs once.
 
-    2) If the current is above 75A, it sets the ``Fault_Sem4``.
+    2) If the current is above 75A, it signals the fault state task.
 
     3) After every updated measurement, it sends the current data to the CAN queue.
 
 Priority
-    This task is the 5th priority, under the VoltTemp task.
+    This task is the 5th priority, under the VoltTemp task. This is due to professional advice the
+    BPS team was given stating and the fact that the VoltTemp task monitors 2 potentially dangerous
+    conditions while this task only monitors 1.
 
 Shared Resources
     It uses the ``Fault_Sem4``, ``SafetyCheck_Sem4``, ``AmperesData_Mutex``(when collecting data from the 
@@ -69,7 +72,8 @@ Timing Requirements
     TBD
 
 Yields
-    Never yields
+    It yields when it signals the critical state task that the current is safe, when it detects a
+    fault, when it tries to use a shared resource, and when it sends an SPI message.
 
 Additional Considerations
     None
@@ -83,12 +87,13 @@ Purpose
 Functionality:
     1) It waits for the VoltTemp and Amperes task to post the SafetyCheck semaphore 4 times. One for voltage, one for temperature, one for current, and one for open wire.
     
-    2) If all of these checks are safe, the task will send the All Clear message and the Contactor On message across the CAN line.
+    2) If all of these checks are safe, the task will send the All Clear message and the Contactor On message across the CAN line. It will also turn the contactor on.
     
     3) The task will then destroy itself since it is no longer needed
 
 Priority
-    It's priority 2, underneath the fault state task. 
+    It's priority 2, underneath the fault state task. This is because if a fault occurs during the 
+    critical state task, the fault task must be called.
 
 Shared Resources
     All it uses is the ``SafetyCheck_Sem4``.
@@ -97,7 +102,8 @@ Timing Requirements
     Runs once at BPS startup.
 
 Yields
-    After it initializes, it destroys itself.
+    While initializing, it yields to other tasks to let them check their specific fault conditions.
+    After initializing, it destroys itself and yields to the next highest priority task.
 
 Additional Considerations
     None
