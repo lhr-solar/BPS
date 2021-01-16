@@ -49,7 +49,7 @@ Purpose
     outside the file.
 
 Usage
-    Function usage is declared in the BSP_CAN.h file. When using these functions in the RTOS, pend
+    Function usage is declared in the ``BSP_CAN.h file``. When using these functions in the RTOS, pend
     and post must occur before and after the functions are called.
 
 Additional Considerations
