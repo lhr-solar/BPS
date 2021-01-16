@@ -11,7 +11,7 @@ Purpose
 
 Usage
     There are multiple definitions of the same functions within this library. They are split into 2 
-    categories, one for the RTOS and one for the Bare-Metal version of the BPS. There are ``#defines`` that 
+    categories, one for the RTOS and one for the Bare-Metal version of the BPS. There are ``#define`` that 
     encompass these functions that are set when compiled. The default ``#define`` is "RTOS" but it can be 
     changed to compile the Bare-Metal code if necessary. The ``BSP_I2C.h`` file has more information on how
     to use each function. The same function declarations are used regardless of whether it is RTOS or
