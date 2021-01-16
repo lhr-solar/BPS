@@ -1,0 +1,275 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html4" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Board Support Package &mdash; BeVolt BPS 0.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Application" href="Apps.html" />
+    <link rel="prev" title="Real Time Operating System Tasks" href="Tasks.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> BeVolt BPS
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Overview</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../Overview/design-requirements.html">Design Requirements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Overview/design-overview.html">Design Overview</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Software</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="Tasks.html">Real Time Operating System Tasks</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Board Support Package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#i2c-bsp-manthan-upadhyaya">I2C BSP: Manthan Upadhyaya</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#uart-bsp-manthan-upadhyaya">UART BSP: Manthan Upadhyaya</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#fans-bsp-manthan-upadhyaya">Fans BSP: Manthan Upadhyaya</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="Apps.html">Application</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Glossary</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../glossary.html">Glossary</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">BeVolt BPS</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Board Support Package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/Software/BSP.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="board-support-package">
+<h1>Board Support Package<a class="headerlink" href="#board-support-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="i2c-bsp-manthan-upadhyaya">
+<h2>I2C BSP: Manthan Upadhyaya<a class="headerlink" href="#i2c-bsp-manthan-upadhyaya" title="Permalink to this headline">¶</a></h2>
+<dl class="docutils">
+<dt>Purpose</dt>
+<dd>The I2C driver is interrupt driven and is used to communicate with the EEPROM to log data. It
+requires pins PA8(SCL) and PC9(SDA) for the I2C3.</dd>
+<dt>Usage</dt>
+<dd>There are multiple definitions of the same functions within this library. They are split into 2
+categories, one for the RTOS and one for the Bare-Metal version of the BPS. There are #defines that
+encompass these functions that are set when compiled. The default #define is “RTOS” but it can be
+changed to compile the Bare-Metal code if necessary. The BSP_I2C.h file has more information on how
+to use each function. The same function declarations are used regardless of whether it is RTOS or
+Bare-Metal.</dd>
+<dt>Additional Considerations</dt>
+<dd>None</dd>
+</dl>
+</div>
+<div class="section" id="uart-bsp-manthan-upadhyaya">
+<h2>UART BSP: Manthan Upadhyaya<a class="headerlink" href="#uart-bsp-manthan-upadhyaya" title="Permalink to this headline">¶</a></h2>
+<dl class="docutils">
+<dt>Purpose</dt>
+<dd>The UART driver is interrupt driven and initializes 2 serial transmission lines(UART 2 and 3).
+USART 2 is for the Bluetooth module and uses pins PA2 and PA3. USART3 is for the USB and uses pins
+PC5 and PB10.</dd>
+<dt>Usage</dt>
+<dd>This driver is also split into two sections just like the I2C driver. One is for RTOS and the
+other is for Bare-Metal. The BSP_UART.h file has more information on how to use each function.</dd>
+<dt>Additional Considerations</dt>
+<dd>Since the BPS cannot be changed during the race, the BLE module must be disabled before the race
+is started if it is able to change the code. This can be done through software by not initializing
+the USART2 module or through hardware with a switch to turn off power to the BLE module, or just
+removing it all together.</dd>
+</dl>
+</div>
+<div class="section" id="fans-bsp-manthan-upadhyaya">
+<h2>Fans BSP: Manthan Upadhyaya<a class="headerlink" href="#fans-bsp-manthan-upadhyaya" title="Permalink to this headline">¶</a></h2>
+<dl class="docutils">
+<dt>Purpose</dt>
+<dd>The Fans driver is used to control the speed of the fans depending on the temperature of the Battery
+Pack. It uses pins PC6, PC7, PB14, PB15 with the alternative function of Pulse-Width Modulation
+enabled for as many speeds as needed for a total of 4 fans.</dd>
+<dt>Usage</dt>
+<dd>It sets the speeds of individual fans and can also return the value of those speeds. The
+BSP_Fans.h file has more information on how to use each function.</dd>
+</dl>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="Apps.html" class="btn btn-neutral float-right" title="Application" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="Tasks.html" class="btn btn-neutral float-left" title="Real Time Operating System Tasks" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, LHR Solar
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
