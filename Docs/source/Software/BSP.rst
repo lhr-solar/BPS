@@ -72,6 +72,6 @@ Usage
     of the functions in ``BSP_Lights.h`` whenever needed.
 
 Additional Considerations
-    Although all of the lights are meant for debugging, the fault led light is connected directly
-    to the strobe light. This means if the fault led turns on, so will the strobe light on the car.
-    It doesn't mean that the fault led will turn on if the strobe light turns on.
+    Although all of the lights are meant for debugging, the fault LED light is connected directly
+    to the strobe light. This means if the fault LED turns on, so will the strobe light on the car.
+    It doesn't mean that the fault LED will turn on if the strobe light turns on.
