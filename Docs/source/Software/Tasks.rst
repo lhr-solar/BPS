@@ -43,30 +43,53 @@ Process:
     
     3) The task will then destroy itself since it is no longer needed
 
+CLI Task: Sugam Arora
+=====================
+
+Purpose
+    The Command Line Interface prints metrics and information about the BPS depending on what command the user has entered, and is meant to be used to debug the BPS.
+
+Functionality
+    This task initializes the CLI and polls for a command to be sent via UART (through USB). Once the user has entered a command, it is handled and the appropriate information is displayed.
+
+Priority
+    The CLI task has priority level 9 because it is the least important task (besides the idle task).
+
+Shared Resources
+    This task may use the ``MinionsASIC_Mutex`` or the ``Voltage_Mutex`` depending on what command the user enters.
+
+Timing Requirements
+    None
+
+Yields
+    This task will wait until the user enters a command. This task will yield for the resources mentioned in the "Shared Resources" section for this task.
+
+Additional Considerations
+    For information on how to use the CLI and its list of valid commands, click on the CLI section in "Application" on this site.
+
+
 Battery Balancing Task: Sugam Arora
 ===================================
 
 Purpose
-    The solar car is powered by lithium ion cells. If these cells are overcharged, they experience accelerated degradation. This task has been 
+    The solar car is powered by lithium ion cells. If these cells are overcharged, they may experience thermal runaway. Running the battery with unbalanced cells may lead to its accelerated degredation. This task has been 
     implemented in an effort to maintain peak performance and health for the car's battery pack.
 
 Functionality
     This task sets any battery module with a voltage that is higher than the minimum voltage of all the modules + a charging tolerance 
     (subject to change) to discharge. Any modules that have a voltage that is equal to or less than the minimum voltage of all the 
-    modules in the system will have their discharge bit cleared. When clearing discharge bits, this task will access the MinionsASIC 
-    mutex. This task also uses the ``WDog_Mutex`` and toggles the ``WD_BALANCING`` bit of the ``WDog_BitMap``.
+    modules in the system will no longer discharge. 
 
 Priority
     The battery balancing task has priority level 6, so it will not interrupt any monitoring tasks or any tasks that check if the BPS is running correctly.
 
 Shared Resources
-    This task uses the MinionsASIC mutex, the Voltage mutex, and the Watchdog mutex.
-
+    This task will access the ``MinionsASIC_Mutex``, the ``WDog_Mutex``, and the ``Voltage_Mutex``.
 Timing Requirements
     (To be determined)
 
 Yields
-    This task yields for the MinionsASIC mutex, the Voltage Buffer mutex, and the MinionsIO mutex. 
+    This task yields for the ``MinionsASIC_Mutex``, the ``Voltage_Mutex``, and the ``MinionsIO_Mutex``. 
 
 Additional Considerations
     N/A
@@ -85,13 +108,13 @@ Priority
     This task has priority level 7, so it will not interrupt any monitoring tasks or any tasks that check if the BPS is running correctly.
 
 Shared Resources
-    This task uses the CANBus Message Queue semaphore.
+    This task uses the ``CANBus_MsgQ`` queue.
 
 Timing Requirements
     (To be determined)
 
 Yields
-    This task will yield until there is a message in the CAN Bus queue. 
+    This task will yield until there is a message in the ``CANBus_MsgQ``. 
 
 Additional Considerations
     For information about how the message payloads are structured can be found in the documentation for the CAN driver.
