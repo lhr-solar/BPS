@@ -39,3 +39,18 @@ Fans BSP: Manthan Upadhyaya
 The Fans driver is used to control the speed of the fans depending on the temperature of the Battery
 Pack. It allows for as many speeds as needed and can change the speed of individual fans. It supports
 four fans and uses PWM to change the speed and hopefully save energy. 
+
+Lights BSP: Manthan Upadhyaya
+=================================
+
+Purpose
+    This code is used to control the LED lights that are on the master board and are used for
+    debugging. 
+
+Usage
+    In order to use it, call the init function to initialize all the GPIO's. Then you can call any
+    of the functions in BSP_Lights.h whenever needed.
+
+Additional Considerations
+    Although all of the lights are meant for debugging, the fault led light is connected directly
+    to the strobe light. This means if the fault led turns on, so will the strobe light on the car.
