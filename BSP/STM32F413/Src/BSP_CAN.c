@@ -21,6 +21,7 @@ typedef struct _queue {
     uint8_t tail;
 } queue_t;
 
+//Queue for recieving messages
 static queue_t gRxQueue;
 
 // Return ERROR if failure
