@@ -10,7 +10,7 @@ Purpose
     conditions can be found here(place link to fault conditions). 
 
 Functionality:
-    1) All other tasks are prevented from running. This occurs internally through the RTOS.
+    1) All other tasks are prevented from running. This is because this is the highest priority task.
 
     2) The contactor is turned off.
     
@@ -20,7 +20,7 @@ Functionality:
     
     5) The fault condition is logged into the EEPROM.
     
-    6) A message is sent along the CAN to the BPS display board to notify the driver that the BPS is tripped.
+    6) A message is sent along the CAN bus to the BPS display board to notify the driver that the BPS is tripped.
     
     7) The WatchDog timer is continually reset to prevent the BPS from going into fault again.
 
@@ -31,13 +31,13 @@ Priority
     occured.
 
 Shared Resources
-    It uses the Fault_Sem4 which is used to block the task from running until something sets it.
+    It uses the ``Fault_Sem4`` which is used to block the task from running until something sets it.
 
 Timing Requirements
-    First thing that occurs is Contactor shuts off. So the amount of time for a context switch.
+    The contactor must be shut off as soon as possible after a fault is detected.
 
 Yields
-    It will yield when waiting for a fault. After that it will never yield.
+    It will yield when waiting for a fault. After a fault is detected, it will never yield.
 
 Additional Considerations
     Although the BPS goes into fault state when the battery is in danger, it also goes into fault 
@@ -60,9 +60,9 @@ Functionality
     3) After every updated measurement, it sends the current data to the CAN queue.
 
 Priority
-    This task is the 5th priority, under the VoltTemp task. This is due to professional advice the
-    BPS team was given stating and the fact that the VoltTemp task monitors 2 potentially dangerous
-    conditions while this task only monitors 1.
+    This task is the 5th priority under the VoltTemp task. This is due to professional advice the
+    BPS team was given. Also the VoltTemp task monitors 2 potentially dangerous conditions while 
+    this task only monitors 1.
 
 Shared Resources
     It uses the ``Fault_Sem4``, ``SafetyCheck_Sem4``, ``AmperesData_Mutex``(when collecting data from the 
@@ -99,7 +99,7 @@ Shared Resources
     All it uses is the ``SafetyCheck_Sem4``.
 
 Timing Requirements
-    Runs once at BPS startup.
+    None
 
 Yields
     While initializing, it yields to other tasks to let them check their specific fault conditions.
