@@ -161,7 +161,7 @@ MinionsIO Semaphore
 
 Whenever the LTC driver is calling the SPI function, there's going to be some delay until the SPI transfer is complete. During that delay, we should be 
 executing some other task so once the SPI transfer starts, the system should start waiting for this semaphore. 
-Whenever the SPI transfer is complete, we must signal this semaphore so we need to have an ISR that calls the signal semaphore function whenever a transfer is complete.
+Whenever the SPI transfer is complete, we must signal this semaphore so we need to have an ISR that calls the signal semaphore function whenever a transfer is complete. This ISR is in the BSP SPI module.
 
 
 
