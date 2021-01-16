@@ -45,7 +45,27 @@ Lights BSP: Manthan Upadhyaya
 
 Purpose
     This code is used to control the LED lights that are on the master board and are used for
-    debugging. 
+    debugging. These lights mean the following:
+
+    RUN - The BPS has power and is running.
+
+    UVOLT - The BPS is reading an undervoltage condition.
+    
+    OVOLT - The BPS is reading an overvoltage condition.
+    
+    OTEMP - The BPS is reading an overtemperature condition.
+    
+    OCURR - The BPS is reading an overcurrent condition.
+    
+    WDOG - The BPS watchdog has tripped.
+    
+    CAN - The BPS is sending a CAN message.
+    
+    EXTRA - Extra usage
+    
+    WIRE - The BPS sees an open wire between the battery modules.
+    
+    STROBE - A fault condition has tripped the BPS.
 
 Usage
     In order to use it, call the init function to initialize all the GPIO's. Then you can call any
