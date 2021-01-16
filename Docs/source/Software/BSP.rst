@@ -40,7 +40,7 @@ The Fans driver is used to control the speed of the fans depending on the temper
 Pack. It allows for as many speeds as needed and can change the speed of individual fans. It supports
 four fans and uses PWM to change the speed and hopefully save energy.
 
-PLL BSP: Clark Poon
+PLL BSP: Sijin Woo
 ==================================
 
 Purpose
