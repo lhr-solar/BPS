@@ -63,10 +63,10 @@ Shared Resources
     This task uses the MinionsASIC mutex, the Voltage mutex, and the Watchdog mutex.
 
 Timing Requirements
-    This task does not have any timing requirements.
+    (To be determined)
 
 Yields
-    This task yields to the fault state task, critical state task, the Watchdog task, the Amperes monitoring task, and the voltage/temperature monitoring task. 
+    This task yields . 
 
 Additional Considerations
     N/A
@@ -76,7 +76,7 @@ CAN Consumer Task: Sugam Arora
 ==============================
 
 Purpose
-    Need to ask about this
+    The BPS must send CAN messages to the rest of the system. 
 
 Functionality
     This task gets the message that is next up from the CAN message queue and sends it on the CAN bus. 
@@ -88,10 +88,10 @@ Shared Resources
     This task uses the CANBus Message Queue semaphore.
 
 Timing Requirements
-    This task does not have any timing requirements.
+    (To be determined)
 
 Yields
-    This task yields to the fault state task, critical state task, the Watchdog task, the Amperes monitoring task, the battery balancing task, and the voltage/temperature monitoring task. 
+    This task will yield until there is a message in the CAN Bus queue. 
 
 Additional Considerations
     For information about how the message payloads are structured can be found in the documentation for the CAN driver.
