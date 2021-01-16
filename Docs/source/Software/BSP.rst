@@ -13,7 +13,7 @@ Usage
     There are multiple definitions of the same functions within this library. They are split into 2 
     categories, one for the RTOS and one for the Bare-Metal version of the BPS. There are #defines that 
     encompass these functions that are set when compiled. The default #define is "RTOS" but it can be 
-    changed to compile the Bare-Metal code if necessary. The BSP_I2C.h file has more information on how
+    changed to compile the Bare-Metal code if necessary. The ``BSP_I2C.h`` file has more information on how
     to use each function. The same function declarations are used regardless of whether it is RTOS or
     Bare-Metal.
 
@@ -30,7 +30,7 @@ Purpose
 
 Usage
     This driver is also split into two sections just like the I2C driver. One is for RTOS and the 
-    other is for Bare-Metal. The BSP_UART.h file has more information on how to use each function.
+    other is for Bare-Metal. The ``BSP_UART.h file`` has more information on how to use each function.
 
 Additional Considerations
     Since the BPS cannot be changed during the race, the BLE module must be disabled before the race
@@ -48,4 +48,4 @@ Purpose
 
 Usage
     It sets the speeds of individual fans and can also return the value of those speeds. The 
-    BSP_Fans.h file has more information on how to use each function.
+    ``BSP_Fans.h`` file has more information on how to use each function.

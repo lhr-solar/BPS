@@ -30,7 +30,7 @@ Priority
 
 Shared Resources
     It uses the Fault_Sem4 which is used to block the task from running until something sets it. It 
-    uses the VoltageBuffer_Sem4, TemperatureBuffer_Sem4, and AmperesIO_Sem4 to log data into the 
+    uses the ``VoltageBuffer_Sem4``, ``TemperatureBuffer_Sem4``, and ``AmperesIO_Sem4`` to log data into the 
     EEPROM.
 
 Timing Requirements
@@ -52,18 +52,18 @@ Purpose
     Monitor the current and call the Fault state task if it is dangerously high.
 
 Functionality
-    1) First it checks the current and if it is safe, posts the SafetyCheck_Sem4. This only occurs once.
+    1) First it checks the current and if it is safe, posts the ``SafetyCheck_Sem4``. This only occurs once.
 
-    2) If the current is above 75A, it sets the Fault_Sem4.
+    2) If the current is above 75A, it sets the ``Fault_Sem4``.
 
-    3) After every updated measurement, it sends the current data to the Can queue.
+    3) After every updated measurement, it sends the current data to the CAN queue.
 
 Priority
     This task is the 5th priority, under the VoltTemp task.
 
 Shared Resources
-    It uses the Fault_Sem4, SafetyCheck_Sem4, AmperesData_Mutex(when collecting data from the 
-    current sensor), and AmperesIO_Sem4.
+    It uses the ``Fault_Sem4``, ``SafetyCheck_Sem4``, ``AmperesData_Mutex``(when collecting data from the 
+    current sensor), and ``AmperesIO_Sem4``.
 
 Timing Requirements
     TBD
@@ -91,7 +91,7 @@ Priority
     It's priority 2, underneath the fault state task. 
 
 Shared Resources
-    All it uses is the SafetyCheck_Sem4.
+    All it uses is the ``SafetyCheck_Sem4``.
 
 Timing Requirements
     Runs once at BPS startup.
