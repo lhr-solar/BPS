@@ -7,7 +7,7 @@ Fault State Task: Manthan Upadhyaya
 
 Purpose
     The Fault State Task is called when a fault condition is set off in the BPS. These fault 
-conditions can be found here(place link to fault conditions). 
+    conditions can be found here(place link to fault conditions). 
 
 Functionality:
     1) All other tasks are not allowed to run unless they have are utilized sempahore. The other tasks will run (periodically according to the scheduler) until they post that semaphore and then they are prevented from running again. This occurs internally through the RTOS.
@@ -26,24 +26,24 @@ Functionality:
 
 Priority
     This task has the second highest priority when the Init task is running. However, after the init
-task destroys itself, it has the highest priority.
+    task destroys itself, it has the highest priority.
 
 Shared Resources
     It uses the Fault_Sem4 which is used to block the task from running until something sets it. It 
-uses the VoltageBuffer_Sem4, TemperatureBuffer_Sem4, and AmperesIO_Sem4 to log data into the 
-EEPROM.
+    uses the VoltageBuffer_Sem4, TemperatureBuffer_Sem4, and AmperesIO_Sem4 to log data into the 
+    EEPROM.
 
 Timing Requirements
     None
 
 Yields
     It will yield only if it tries to collect data with a semaphore already pending. This will only
-be at the start of the task after it turns off the contactor.
+    be at the start of the task after it turns off the contactor.
 
 Additional Considerations
     Although the BPS goes into fault state when the battery is in danger, it also goes into fault 
-state when there is an issue with the RTOS. Since the BPS must always run during the race, care 
-must be taken to minimize the chances of this happening. 
+    state when there is an issue with the RTOS. Since the BPS must always run during the race, care 
+    must be taken to minimize the chances of this happening. 
 
 Amperes Task: Manthan Upadhyaya
 ===============================
@@ -63,10 +63,10 @@ Priority
 
 Shared Resources
     It uses the Fault_Sem4, SafetyCheck_Sem4, AmperesData_Mutex(when collecting data from the 
-current sensor), and AmperesIO_Sem4.
+    current sensor), and AmperesIO_Sem4.
 
 Timing Requirements
-    .....
+    TBD
 
 Yields
     Never yields
@@ -78,7 +78,7 @@ Critical State Task: Manthan Upadhyaya
 ======================================
 
 Purpose
-The Critical State Task initializes the BPS when it first turns on.
+    The Critical State Task initializes the BPS when it first turns on.
 
 Functionality:
     1) It waits for the VoltTemp and Amperes task to post the SafetyCheck semaphore 4 times. One for voltage, one for temperature, one for current, and one for open wire.
@@ -94,7 +94,7 @@ Shared Resources
     All it uses is the SafetyCheck_Sem4.
 
 Timing Requirements
-    None
+    Runs once at BPS startup.
 
 Yields
     After it initializes, it destroys itself.
