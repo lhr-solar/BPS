@@ -110,7 +110,7 @@ extern CPU_STK Init_Stk[TASK_INIT_STACK_SIZE];
 /**	
  * @brief   Queue for pushing and popping CAN Messages	
  */	
-OS_Q CANBus_MsgQ;
+extern OS_Q CANBus_MsgQ;
 
 extern OS_SEM SafetyCheck_Sem4;
 extern OS_SEM Fault_Sem4;

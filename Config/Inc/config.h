@@ -42,7 +42,6 @@ typedef enum SafetyStatus_e {SAFE = 0, DANGER = 1, OVERVOLTAGE = 2, UNDERVOLTAGE
 #define MAX_CHARGE_TEMPERATURE_LIMIT	45.00F	// Max temperature limit (Celcius)	(recommended release: 45.00C)
 
 #define MAX_CURRENT_LIMIT				75000		// Max current limit (Milliamperes)		(Max continuous discharge is 15A per cell)
-#define MAX_HIGH_PRECISION_CURRENT 		50000		// Max current detectable by the high-precision current sensor (mA)
 #define MAX_CHARGING_CURRENT 			-20000		// Max current per cell is 1.5 Amps (Standard charge)
 
 #define BALANCING_TOLERANCE_START       50      //mV differential from lowest module that will start battery balancing
