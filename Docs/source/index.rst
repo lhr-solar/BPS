@@ -28,6 +28,14 @@ Welcome to the BeVolt BPS documentation!
 
 .. toctree::
    :hidden:
+   :maxdepth: 2
+   :caption: Hardware
+
+   Hardware/Boards
+   Hardware/Components
+
+.. toctree::
+   :hidden:
    :maxdepth: 1
    :caption: Glossary
    
