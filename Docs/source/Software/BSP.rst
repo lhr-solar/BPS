@@ -80,3 +80,40 @@ Additional Considerations
     It also contains a queue for messages that are recieved on the CAN bus that has a depth of 10. 
     This queue cannot be accessed outside the file. If the queue exceeds it's limit, we will lose
     messages.
+
+Lights BSP: Manthan Upadhyaya
+=================================
+
+Purpose
+    This code is used to control the LED lights that are on the master board and are used for
+    debugging. These lights mean the following:
+
+    ``RUN`` - The BPS has power and is running.
+
+    ``UVOLT`` - The BPS is reading an undervoltage condition.
+    
+    ``OVOLT`` - The BPS is reading an overvoltage condition.
+    
+    ``OTEMP`` - The BPS is reading an overtemperature condition.
+    
+    ``OCURR`` - The BPS is reading an overcurrent condition.
+    
+    ``WDOG`` - The BPS watchdog has tripped.
+    
+    ``CAN`` - The BPS is sending a CAN message.
+    
+    ``EXTRA`` - Extra usage
+    
+    ``WIRE`` - The BPS sees an open wire between the battery modules.
+    
+    ``STROBE`` - A fault condition has tripped the BPS.
+
+Usage
+    In order to use it, call `BSP_Lights_Init()` to initialize all the GPIO's. Then you can call any
+    of the functions in ``BSP_Lights.h`` whenever needed.
+
+Additional Considerations
+    Although all of the lights are meant for debugging, the fault LED light is connected directly
+    to the strobe light. This means if the fault LED turns on, so will the strobe light on the car.
+    It doesn't mean that the fault LED will turn on if the strobe light turns on.
+
