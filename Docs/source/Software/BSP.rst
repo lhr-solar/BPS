@@ -117,3 +117,21 @@ Additional Considerations
     to the strobe light. This means if the fault LED turns on, so will the strobe light on the car.
     It doesn't mean that the fault LED will turn on if the strobe light turns on.
 
+The Fans driver is used to control the speed of the fans depending on the temperature of the Battery
+Pack. It allows for as many speeds as needed and can change the speed of individual fans. It supports
+four fans and uses PWM to change the speed and hopefully save energy.
+
+PLL BSP: Sijin Woo
+==================================
+
+Purpose
+    The PLL is used to increase the clock speed of the STM32F413's clock. Right now, it is set to change it
+    from 16 MHz to 80 MHz.
+
+Usage
+    Calling the init function automatically sets the clock speed to 80 Mhz. in order to verify
+    that it worked, you can call BSP_PLL_GetSystemClock().
+
+Additional Considerations
+    Increasing the clock speed does take more power. Although this is minor considering how much the
+    entire BPS takes, it is worth noting.
