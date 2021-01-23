@@ -30,4 +30,4 @@ Usage
     you must call ``AS8510_GetCurrent()`` which returns the value of the current as an ``int16_t``.
 
 Additional Considerations
-    None
+    Communication with this chip is done with SPI.
