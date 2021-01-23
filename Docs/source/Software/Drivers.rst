@@ -18,6 +18,20 @@ Additional Considerations
     4 million write cycles, so we should try use less write cycles than this over the lifetime of the BPS. It takes around 5 milliseconds to write to the 
     EEPROM, so multiple writes should not be attempted within the same 5 ms time period, or some of the writes may fail.
 
+AS8510 Driver
+=============
+
+Purpose
+    This driver is used to obtain data from the AS8510 current sensor chip.
+
+Usage
+    In order to use these functions, ``AS8510_Init()`` must be called first. The rest of the 
+    functions are used to read and write to the registers in the chip. In order to read the current
+    you must call ``AS8510_GetCurrent()`` which returns the value of the current as an ``int16_t``.
+
+Additional Considerations
+    Communication with this chip is done with SPI.
+
 Battery Balancing Driver
 ========================
 
