@@ -211,3 +211,28 @@ Yields
 Additional Considerations
     When modifying the idle task, it is important to not introduce any functionality that may affect other tasks. For example, the idle task should not pend 
     any mutexes, since this could block more important tasks from running.
+                   
+Log Info Task
+=============
+
+Purpose
+   This task logs the state of charge into EEPROM every 3 seconds.
+
+Functionality
+   The log info task runs an infinite loop and is delayed by OSTimeDly every 3 seconds. 
+
+Priority
+   This task has priority 8, so it will not interrupt any monitoring tasks or any tasks that check if the BPS is running correctly.
+
+Shared Resources
+   The log info task shares battery charge data and the EEPROM, which is also shared by the Fault State Task and CLI. 
+
+Timing Requirements
+   There is a time requirement of logging into the EEPROM every 3 seconds. Writing too often to the EEPROM will exceed the EEPROM's limited erase/write         cycles, which causes the EEPROM to malfunction. Thus, writing every 3 secconds will update the EEPROM accurately enough and stay within the EEPROM's         erase/write cycles.   
+ 
+Yields
+   The log info task yields when OSTimeDly is called and when EEPROM is initialized and written to. 
+
+Additional Considerations
+   None.
+
