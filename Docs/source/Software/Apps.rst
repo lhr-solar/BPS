@@ -183,7 +183,7 @@ Purpose
 Usage
     This file uses a global ``int32_t ModuleTemperatures[][]`` 2D array that contains each sensor's temperature.
     
-    ``Temperature_Init()`` must be called before using any other temperature functions. This function will make the ``TemperatureBuffer_Mutex``.
+    ``Temperature_Init()`` must be called before using any other temperature functions. This function will create the ``TemperatureBuffer_Mutex``.
     This function will return an ``ErrorStatus`` indicating its success/failure.
 
 
