@@ -149,5 +149,9 @@ Usage
     have chosen. 
     This BSP includes IRQ Handlers for both buses that post the ``MinionsASIC_Mutex``.
 
+    ``SPI_Wait()`` has two different versions - one for the bare-metal BPS code and one for the RTOS code. 
+    To use one of the versions, the user must have a line containing ``#define BAREMETAL`` or ``#define RTOS``
+    in their code.
+
 Additional Considerations
     The ``SPI1`` and ``SPI3`` IRQs are only included in the RTOS version of the code.
