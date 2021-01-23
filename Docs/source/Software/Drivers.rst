@@ -29,15 +29,23 @@ Usage
     The header file contains data types that are used to send CAN messages. Each ``CANMSG_t`` should 
     be sent with a ``CANID_t`` and ``CANPayload_t`` initialized in a struct. ``CANPayload_t`` should
     contain the data (``CANData_t``) and id of the value if it is in an array. If it isn't in an array
-    ``idx`` should be 0. ``''CANData_t'' should only have the value of the data type being sent 
+    ``idx`` should be 0. ``CANData_t`` should only have the value of the data type being sent 
     filled in into the struct. For example, if the data is a float, only fill in ``CANData.f`` and 
     nothing else. There are two types of sending and recieving functions one can use. One is 
-    blocking and one is non-blocking. If the non-blocking functions are used:
+    blocking and one is non-blocking. 
+    
+    If the non-blocking functions are used:
+    
     ``CANbus_Send()`` will throw an error if the sending mailbox if full of messages.
+    
     ``CANbus_Receive()`` will throw an error if there is not a message to be received.
+    
     If the blocking functions are used:
+    
     ``CANbus_WaitToReceive()`` will wait for a message to be received.
+    
     ``CANbus_BlockAndSend()`` will wait for the mailbox to be available for the next message.
+    
     All of these functions return an ErrorStatus data type if there was an error or not.
 
 Additional Considerations
