@@ -30,7 +30,7 @@ Usage
     be sent with a ``CANID_t`` and ``CANPayload_t`` initialized in a struct. ``CANPayload_t`` should
     contain the data (``CANData_t``) and id of the value if it is in an array. If it isn't in an array
     ``idx`` should be 0. ``CANData_t`` should only have the value of the data type being sent 
-    filled in into the struct. For example, if the data is a float, only fill in ``CANData.f`` and 
+    filled into the union. For example, if the data is a float, only fill in ``CANData.f`` and 
     nothing else. There are two types of sending and recieving functions one can use. One is 
     blocking and one is non-blocking. 
     
