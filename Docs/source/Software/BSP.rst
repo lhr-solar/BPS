@@ -159,3 +159,21 @@ Additional Considerations
     the function names for each timer. Another thing to note is that one timer should not be used for
     multiple resources because if ``BSP_Timer_GetTicksElapsed()`` is called for one resource, it will
     interfere with the time passed for the second resource.
+
+Watchdog Timer BSP: Sijin Woo
+=================================
+
+Purpose 
+    The purpose of this timer is to make sure that the BPS has not stalled while running. If we are
+    in the Bare-Metal version of our code, that means the BPS is stuck in a loop somewhere and is not able
+    to check the data given to it. If we are in the RTOS version of our code, that means the BPS is stuck
+    in a thread (in deadlock).
+Usage
+    First you must initialize and start the timer by calling ``BSP_WDTimer_Init()`` and 
+    ``BSP_WDTimer_Start()``. After the timer is started, it must be reset before it finishes
+    counting down or else it will reset the system. In the Bare-Metal version of our system, the 
+    timer is reset once every time the entire while loop runs through. In the RTOS version, each 
+    thread sets a bit and when every bit is set, the timer resets.
+
+Additional Considerations
+    None
