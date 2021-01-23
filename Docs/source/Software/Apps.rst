@@ -161,6 +161,17 @@ A list of all valid CLI commands is included below.
 ``temperature module 6 1`` - prints temperature of sensor 1 on module 6
 
 
+Charge
+======
+
+Purpose
+    The Charge App is used to keep track of the state of charge of the battery.
+
+Usage
+    ``Charge_Init()`` must be called before calling any of the other Charge functions. Descriptions of the other functions can be found in Charge.h.
+
+Additional Considerations
+    None.
 
 
 **********************
