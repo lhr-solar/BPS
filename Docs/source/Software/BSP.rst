@@ -165,8 +165,8 @@ Watchdog Timer BSP: Sijin Woo
 
 Purpose 
     The purpose of this timer is to make sure that the BPS has not stalled while running. If we are
-    in the Bare-Metal version of our code, that means it is stuck in a loop somewhere and is not able
-    to check the data given to it. If we are in the RTOS version of our code, that means it is stuck
+    in the Bare-Metal version of our code, that means the BPS is stuck in a loop somewhere and is not able
+    to check the data given to it. If we are in the RTOS version of our code, that means the BPS is stuck
     in a thread (in deadlock).
 Usage
     First you must initialize and start the timer by calling ``BSP_WDTimer_Init()`` and 
