@@ -143,8 +143,9 @@ Purpose
     SPI is used for communication between the uC and the minion LTC6811s in the system.
 
 Usage
-    Our car uses the ``SPI1`` and ``SPI3`` busses. When calling the init function, you must specify which 
-    port you intend to use (via the ``spi_port_t`` struct). The user can read/write on whichever bus they 
+    Our car uses the ``SPI1`` and ``SPI3`` busses. The ``SPI1`` bus is for communication with the LTC6811s
+    and the ``SPI3`` bus is for communication with the AS8510 current sensor. When calling the init function, 
+    you must specify which port you intend to use (via the ``spi_port_t`` struct). The user can read/write on whichever bus they 
     have chosen. 
     This BSP includes IRQ Handlers for both buses that post the ``MinionsASIC_Mutex``.
 
