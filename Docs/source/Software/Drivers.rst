@@ -31,3 +31,20 @@ Usage
 
 Additional Considerations
     Communication with this chip is done with SPI.
+
+Battery Balancing Driver
+========================
+
+Purpose
+    The Battery Balancing Driver is used to balance charging/discharging amongst all the modules in our system. Battery Balancing is a process that prevents thermal 
+    runaway in the car's battery pack, and also allows the battery to maintain peak performance and health.
+
+
+Usage
+    ``Balancing_Balance`` is the only function from this module that you can use in other files. This function performs the complete
+    battery balancing process - any modules that have a voltage that is greater than the lowest module voltage + a tolerance limit will 
+    be set to discharge, and all other modules will remain charging.
+
+Additional Considerations
+    The functions in this module send instructions to the LTC6811 minions over SPI.
+    
