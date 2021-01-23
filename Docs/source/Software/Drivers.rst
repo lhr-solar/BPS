@@ -32,3 +32,67 @@ Usage
 
 Additional Considerations
     Most of this module is provided by Analog Devices, but the code that LHR Solar members have written is marked in the file.
+
+CAN Driver
+===========
+
+Purpose
+    This driver is meant to send and recieve CAN messages. This allows us to talk with other systems
+    in the car.
+
+Usage
+    The header file contains data types that are used to send CAN messages. Each ``CANMSG_t`` should 
+    be sent with a ``CANID_t`` and ``CANPayload_t`` initialized in a struct. ``CANPayload_t`` should
+    contain the data (``CANData_t``) and id of the value if it is in an array. If it isn't in an array
+    ``idx`` should be 0. ``CANData_t`` should only have the value of the data type being sent 
+    filled into the union. For example, if the data is a float, only fill in ``CANData.f`` and 
+    nothing else. There are two types of sending and recieving functions one can use. One is 
+    blocking and one is non-blocking. 
+    
+    If the non-blocking functions are used:
+    
+    ``CANbus_Send()`` will throw an error if the sending mailbox if full of messages.
+    
+    ``CANbus_Receive()`` will throw an error if there is not a message to be received.
+    
+    If the blocking functions are used:
+    
+    ``CANbus_WaitToReceive()`` will wait for a message to be received.
+    
+    ``CANbus_BlockAndSend()`` will wait for the mailbox to be available for the next message.
+    
+    All of these functions return an ErrorStatus data type if there was an error or not.
+
+Additional Considerations
+    Right now, this driver is optimized for the RTOS version of the BPS. It is not guaranteed that
+    it would work in the Bare Metal version of our code.
+
+AS8510 Driver
+=============
+
+Purpose
+    This driver is used to obtain data from the AS8510 current sensor chip.
+
+Usage
+    In order to use these functions, ``AS8510_Init()`` must be called first. The rest of the 
+    functions are used to read and write to the registers in the chip. In order to read the current
+    you must call ``AS8510_GetCurrent()`` which returns the value of the current as an ``int16_t``.
+
+Additional Considerations
+    Communication with this chip is done with SPI.
+
+Battery Balancing Driver
+========================
+
+Purpose
+    The Battery Balancing Driver is used to balance charging/discharging amongst all the modules in our system. Battery Balancing is a process that prevents thermal 
+    runaway in the car's battery pack, and also allows the battery to maintain peak performance and health.
+
+
+Usage
+    ``Balancing_Balance`` is the only function from this module that you can use in other files. This function performs the complete
+    battery balancing process - any modules that have a voltage that is greater than the lowest module voltage + a tolerance limit will 
+    be set to discharge, and all other modules will remain charging.
+
+Additional Considerations
+    The functions in this module send instructions to the LTC6811 minions over SPI.
