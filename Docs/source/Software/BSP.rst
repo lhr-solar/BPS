@@ -65,6 +65,9 @@ Usage
     It sets the speeds of individual fans and can also return the value of those speeds. The 
     ``BSP_Fans.h`` file has more information on how to use each function.
 
+Additional Considerations
+    None
+
 CAN BSP: Chase Block & Sijin Woo
 ================================
 
@@ -129,7 +132,7 @@ Purpose
     from 16 MHz to 80 MHz.
 
 Usage
-    Calling the init function automatically sets the clock speed to 80 Mhz. in order to verify
+    Calling the init function automatically sets the clock speed to 80 Mhz. In order to verify
     that it worked, you can call BSP_PLL_GetSystemClock().
 
 Additional Considerations
@@ -158,3 +161,42 @@ Additional Considerations
     The ``SPI1`` and ``SPI3`` IRQs are only included in the RTOS version of the code.
 
     If additonal SPI buses are needed, the user must modify the ``spi_port_t`` enum
+
+Timer BSP: Sijin Woo
+=================================
+
+Purpose
+    The purpose of this timer is to calculate the state of charge of the battery pack. This driver 
+    uses Timer 2 as a countdown timer with a period of 0xFFFF-1 that reloads when it reaches 0.
+
+Usage
+    In order to use the timer, first you must call ``BSP_Timer_Init()`` and then call 
+    ``BSP_Timer_Start()`` to start it. ``BSP_Timer_GetRunFreq()`` is used to find the frequency of
+    the timer. You can use this alongside ``BSP_Timer_GetTicksElapsed()`` to see how much real time
+    has passed since ``BSP_Timer_GetTicksElapsed()`` was called. 
+
+Additional Considerations
+    If we need another timer for another driver or application, we will need to have input parameters
+    for the functions ``BSP_Timer_Start()``(to select which timer to start), ``BSP_Timer_GetRunFreq()``
+    (to find the frequency of a given timer), & ``BSP_Timer_GetTicksElapsed()``. We could also change 
+    the function names for each timer. Another thing to note is that one timer should not be used for
+    multiple resources because if ``BSP_Timer_GetTicksElapsed()`` is called for one resource, it will
+    interfere with the time passed for the second resource.
+
+Watchdog Timer BSP: Sijin Woo
+=================================
+
+Purpose 
+    The purpose of this timer is to make sure that the BPS has not stalled while running. If we are
+    in the Bare-Metal version of our code, that means the BPS is stuck in a loop somewhere and is not able
+    to check the data given to it. If we are in the RTOS version of our code, that means the BPS is stuck
+    in a thread (in deadlock).
+Usage
+    First you must initialize and start the timer by calling ``BSP_WDTimer_Init()`` and 
+    ``BSP_WDTimer_Start()``. After the timer is started, it must be reset before it finishes
+    counting down or else it will reset the system. In the Bare-Metal version of our system, the 
+    timer is reset once every time the entire while loop runs through. In the RTOS version, each 
+    thread sets a bit and when every bit is set, the timer resets.
+
+Additional Considerations
+    None
