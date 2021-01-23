@@ -156,4 +156,6 @@ Additional Considerations
     If we need another timer for another driver or application, we will need to have input parameters
     for the functions ``BSP_Timer_Start()``(to select which timer to start), ``BSP_Timer_GetRunFreq()``
     (to find the frequency of a given timer), & ``BSP_Timer_GetTicksElapsed()``. We could also change 
-    the function names.
+    the function names for each timer. Another thing to note is that one timer should not be used for
+    multiple resources because if ``BSP_Timer_GetTicksElapsed()`` is called for one resource, it will
+    interfere with the time passed for the second resource.
