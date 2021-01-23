@@ -139,6 +139,29 @@ Additional Considerations
     Increasing the clock speed does take more power. Although this is minor considering how much the
     entire BPS takes, it is worth noting.
 
+SPI BSP: Clark Poon, Sijin Woo, and Sugam Arora
+===============================================
+
+Purpose
+    SPI is used for communication between the uC and the minion LTC6811s as well as communication between the uC and the AS8510
+    current sensor.
+
+Usage
+    Our car uses the ``SPI1`` and ``SPI3`` buses. The ``SPI1`` bus is for communication with the LTC6811s
+    and the ``SPI3`` bus is for communication with the AS8510 current sensor. When calling the init function, 
+    you must specify which port you intend to use (via the ``spi_port_t`` enum). The user can read/write on whichever bus they 
+    have chosen. 
+    This BSP includes IRQ Handlers for both buses that post the ``MinionsASIC_Mutex``.
+
+    ``SPI_Wait()`` has two different versions - one for the bare-metal BPS code and one for the RTOS code. 
+    The BPS code is automatically compiled with ``#define RTOS``. If the user wants to use the bare-metal
+    version of the code, the code must be compiled with the ``BAREMETAL`` parameter.
+
+Additional Considerations
+    The ``SPI1`` and ``SPI3`` IRQs are only included in the RTOS version of the code.
+
+    If additonal SPI buses are needed, the user must modify the ``spi_port_t`` enum
+
 Timer BSP: Sijin Woo
 =================================
 
