@@ -176,5 +176,4 @@ Usage
     thread sets a bit and when every bit is set, the timer resets.
 
 Additional Considerations
-    Rigourous testing must be done to make sure we prevent this timer from tripping during the race.
-    Issues with BSP code should not be the cause of a fault during the race. 
+    None
