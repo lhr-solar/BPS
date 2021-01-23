@@ -65,6 +65,9 @@ Usage
     It sets the speeds of individual fans and can also return the value of those speeds. The 
     ``BSP_Fans.h`` file has more information on how to use each function.
 
+Additional Considerations
+    None
+
 CAN BSP: Chase Block & Sijin Woo
 ================================
 
@@ -129,9 +132,28 @@ Purpose
     from 16 MHz to 80 MHz.
 
 Usage
-    Calling the init function automatically sets the clock speed to 80 Mhz. in order to verify
+    Calling the init function automatically sets the clock speed to 80 Mhz. In order to verify
     that it worked, you can call BSP_PLL_GetSystemClock().
 
 Additional Considerations
     Increasing the clock speed does take more power. Although this is minor considering how much the
     entire BPS takes, it is worth noting.
+
+Timer BSP: Sijin Woo
+=================================
+
+Purpose
+    The purpose of this timer is to calculate the state of charge of the battery pack. This driver 
+    uses Timer 2 as a countdown timer with a period of 0xFFFF-1 that reloads when it reaches 0.
+
+Usage
+    In order to use the timer, first you must call ``BSP_Timer_Init()`` and then call 
+    ``BSP_Timer_Start()`` to start it. ``BSP_Timer_GetRunFreq()`` is used to find the frequency of
+    the timer. You can use this alongside ``BSP_Timer_GetTicksElapsed()`` to see how much real time
+    has passed since ``BSP_Timer_GetTicksElapsed()`` was called. 
+
+Additional Considerations
+    If we need another timer for another driver or application, we will need to have input parameters
+    for the functions ``BSP_Timer_Start()``(to select which timer to start), ``BSP_Timer_GetRunFreq()``
+    (to find the frequency of a given timer), & ``BSP_Timer_GetTicksElapsed()``. We could also change 
+    the function names.
