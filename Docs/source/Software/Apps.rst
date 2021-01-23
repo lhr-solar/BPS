@@ -2,7 +2,6 @@
 Application
 ************
 
-
 .. _CLI-app:
 
 Command Line Interface (CLI)
@@ -173,6 +172,18 @@ Usage
 Additional Considerations
     None.
 
+Voltage
+========
+
+Purpose
+    This App is used to keep track of the voltages of all the modules in the battery pack.
+
+Usage
+    ``Voltage_Init()`` must be called before calling any other Voltage functions. Descriptions of
+    other functions are located in Voltage.h.
+
+Additional Considerations
+    None
 
 **********************
 Mutexes and Semaphores
