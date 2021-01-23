@@ -24,6 +24,7 @@ Welcome to the BeVolt BPS documentation!
 
    Software/Tasks
    Software/BSP
+   Software/Drivers
    Software/Apps
 
 .. toctree::
