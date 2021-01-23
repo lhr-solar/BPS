@@ -1,6 +1,7 @@
-I set this up using the instructions found at:
-docs.readthedocs.io/en/stable/intro/getting-started-with-sphinx.html
 
-List of dependencies for building the documentation:
-sphinx version 3.2.1
+
+sphinx==3.2.1
+sphinx-rtd-theme==0.5.0
+recommonmark==0.6.0
+
 
