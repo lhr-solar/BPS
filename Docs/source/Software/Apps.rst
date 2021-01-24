@@ -176,11 +176,14 @@ Voltage
 ========
 
 Purpose
-    This App is used to keep track of the voltages of all the modules in the battery pack.
+    This App is used to keep track of the voltages and open wires of all the modules in the 
+    battery pack.
 
 Usage
-    ``Voltage_Init()`` must be called before calling any other Voltage functions. Descriptions of
-    other functions are located in Voltage.h.
+    ``Voltage_Init()`` must be called before calling any other Voltage functions. All of the data
+    used by the functions is based on data collected by the function ``Voltage_UpdateMeasurements()``
+    so it might be necessary to call ``Voltage_UpdateMeasurements()`` before any other function.
+    Descriptions of other functions are located in Voltage.h.
 
 Additional Considerations
     None
