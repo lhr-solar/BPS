@@ -180,13 +180,14 @@ Purpose
     battery pack.
 
 Usage
-    ``Voltage_Init()`` must be called before calling any other Voltage functions. All of the data
+    ``Voltage_Init()`` must be called before calling any other Voltage functions. All of the voltage data
     used by the functions is based on data collected by the function ``Voltage_UpdateMeasurements()``
-    so it might be necessary to call ``Voltage_UpdateMeasurements()`` before any other function.
+    so it might be necessary to call ``Voltage_UpdateMeasurements()`` before those functions.
     Descriptions of other functions are located in Voltage.h.
 
 Additional Considerations
-    None
+    The Open Wire functions all directly contact the LTC. ``Voltage_OpenWireSummary()`` requires 
+    UART to be initialized, since it uses printf().
 
 **********************
 Mutexes and Semaphores
