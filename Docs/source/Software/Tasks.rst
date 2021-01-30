@@ -187,6 +187,38 @@ Additional Considerations
     All possible CAN messages that will be sent to the rest of the car's system by the BPS
     are listed on the `CAN Bus IDs spreadsheet <https://docs.google.com/spreadsheets/d/11YWoMVZw8BFr8kyO4DIz0g-aIU_vVa0d-WioSRq85TI/edit#gid=0>`_.
 
+Pet WatchDog Task: Harshita Gorla & Clark Poon
+==============================================
+
+Purpose
+    The purpose of this task is to recognize if the BPS RTOS has stalled. If it is stuck somewhere
+    in the code, the car must shut down.
+
+Functionality
+    This task checks the ``WDog_BitMap`` variable to see if the 3 LSB are set by the temperature,
+    voltage, balancing, and current tasks. If these tasks ran and set those bits, that means that the BPS
+    is functional and the timer is reset. If those bits are not set, the timer will keep running
+    and a fault handler will be called.
+
+Priority
+    This task is priority 3. It is above the voltage, temperature, balancing, and current monitoring tasks
+    because if they run before the WatchDog timer is reset, the BPS will fault even if it is 
+    working correctly.
+
+Shared Resources
+    The ``WDog_Mutex`` is read by this task and written to by the VoltTemp, Amperes, and
+    BatteryBalancing tasks.
+
+Timing Requirements
+    This task is set to run every 40 milliseconds.
+
+Yields
+    It doesn't yield.
+
+Additional Considerations
+    None
+
+
 Idle Task
 =========
 
