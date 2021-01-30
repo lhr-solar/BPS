@@ -18,6 +18,69 @@ Additional Considerations
     4 million write cycles, so we should try use less write cycles than this over the lifetime of the BPS. It takes around 5 milliseconds to write to the 
     EEPROM, so multiple writes should not be attempted within the same 5 ms time period, or some of the writes may fail.
 
+LTC6811 Driver
+==============
+
+Purpose
+    The LTC6811 Driver is a library of functions to be used by the uC that instruct the LTC6811 minions via SPI.
+
+Usage
+    ``LTC6811_Init()`` must be called before using any other functions from this library. This function will set the Pend/Post functions for the ``spi_os`` global
+    variable (this variable is of the ``bsp_os_t`` type). If the user compiles this code with the ``BAREMETAL`` parameter, the Pend/Post functions will do nothing. 
+    Otherwise, they will pend/post the ``MinionsASIC_Mutex``. This function will also create the ``MinionsASIC_Mutex`` if it hasn't already been created by the time ``LTC6811_Init()``
+    was called. 
+
+Additional Considerations
+    Most of this module is provided by Analog Devices, but the code that LHR Solar members have written is marked in the file.
+
+CAN Driver
+===========
+
+Purpose
+    This driver is meant to send and recieve CAN messages. This allows us to talk with other systems
+    in the car.
+
+Usage
+    The header file contains data types that are used to send CAN messages. Each ``CANMSG_t`` should 
+    be sent with a ``CANID_t`` and ``CANPayload_t`` initialized in a struct. ``CANPayload_t`` should
+    contain the data (``CANData_t``) and id of the value if it is in an array. If it isn't in an array
+    ``idx`` should be 0. ``CANData_t`` should only have the value of the data type being sent 
+    filled into the union. For example, if the data is a float, only fill in ``CANData.f`` and 
+    nothing else. There are two types of sending and recieving functions one can use. One is 
+    blocking and one is non-blocking. 
+    
+    If the non-blocking functions are used:
+    
+    ``CANbus_Send()`` will throw an error if the sending mailbox if full of messages.
+    
+    ``CANbus_Receive()`` will throw an error if there is not a message to be received.
+    
+    If the blocking functions are used:
+    
+    ``CANbus_WaitToReceive()`` will wait for a message to be received.
+    
+    ``CANbus_BlockAndSend()`` will wait for the mailbox to be available for the next message.
+    
+    All of these functions return an ErrorStatus data type if there was an error or not.
+
+Additional Considerations
+    Right now, this driver is optimized for the RTOS version of the BPS. It is not guaranteed that
+    it would work in the Bare Metal version of our code.
+
+AS8510 Driver
+=============
+
+Purpose
+    This driver is used to obtain data from the AS8510 current sensor chip.
+
+Usage
+    In order to use these functions, ``AS8510_Init()`` must be called first. The rest of the 
+    functions are used to read and write to the registers in the chip. In order to read the current
+    you must call ``AS8510_GetCurrent()`` which returns the value of the current as an ``int16_t``.
+
+Additional Considerations
+    Communication with this chip is done with SPI.
+
 Battery Balancing Driver
 ========================
 
@@ -33,4 +96,3 @@ Usage
 
 Additional Considerations
     The functions in this module send instructions to the LTC6811 minions over SPI.
-    
