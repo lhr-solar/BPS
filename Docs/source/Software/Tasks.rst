@@ -198,7 +198,7 @@ Functionality
     This task checks the ``WDog_BitMap`` variable to see if the 3 LSB are set by the temperature,
     voltage, balancing, and current tasks. If these tasks ran and set those bits, that means that the 
     BPS is functional and the timer is reset. If those bits are not set, the timer will keep running
-    and a fault handler will be called if it reaches 0. The task can be called multiple times before
+    and a reset the BPS if it reaches 0. The task can be called multiple times before
     the timer resets.
 
 Priority
