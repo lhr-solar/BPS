@@ -22,7 +22,7 @@ ErrorStatus Amps_UpdateMeasurements(void);
 
 /** Amps_CheckStatus
  * Checks if pack does not have a short circuit
- * @param isCharging is 1 if the battery pack is charging and 0 if it is not charging
+ * @param isCharging is true if the battery pack is charging and false if it is not charging
  * @return SAFE or DANGER
  */
 SafetyStatus Amps_CheckStatus(bool isCharging);
