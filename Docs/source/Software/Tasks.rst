@@ -188,7 +188,7 @@ Additional Considerations
     are listed on the `CAN Bus IDs spreadsheet <https://docs.google.com/spreadsheets/d/11YWoMVZw8BFr8kyO4DIz0g-aIU_vVa0d-WioSRq85TI/edit#gid=0>`_.
 
 Pet WatchDog Task: Harshitha Gorla & Clark Poon
-==============================================
+===============================================
 
 Purpose
     The purpose of this task is to recognize if the BPS RTOS has stalled. If it is stuck somewhere
