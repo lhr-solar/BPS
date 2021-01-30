@@ -1,11 +1,12 @@
-#ifndef AS8510_H__
-#define AS8510_H__
+#ifndef AS8510_H
+#define AS8510_H
+
+// Driver for AS8510 current sensor.
 
 #include "common.h"
 #include "config.h"
 
-/* Initialize communication with the AS8510
- * to begin measurement of electrical current.
+/* Initialize communication with the AS8510 to begin measurement of electrical current.
  */
 void AS8510_Init();
 
@@ -32,6 +33,7 @@ ErrorStatus AS8510_ReadFromAddr(uint8_t addr, uint8_t *data, uint8_t len);
 uint8_t AS8510_ReadRegister(uint8_t addr);
 
 /* Gets the current from the AS8510
+ * @return current in milliamps
  */
 int16_t AS8510_GetCurrent();
 

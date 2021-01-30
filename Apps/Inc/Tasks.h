@@ -1,6 +1,6 @@
 /* Copyright (c) 2020 UT Longhorn Racing Solar */
-#ifndef __TASKS_H
-#define __TASKS_H
+#ifndef TASKS_H
+#define TASKS_H
 
 #include "os.h"
 #include <stdint.h>
@@ -11,9 +11,9 @@
 #define TASK_PETWDOG_PRIO                   3
 #define TASK_VOLT_TEMP_MONITOR_PRIO         4
 #define TASK_AMPERES_MONITOR_PRIO           5
-#define TASK_BATTERY_BALANCE_PRIO           6 //BATTERY
-#define TASK_CANBUS_CONSUMER_PRIO           7 //CANBUS
-#define TASK_LOG_INFO_PRIO                  8 //LOGINFO
+#define TASK_BATTERY_BALANCE_PRIO           6
+#define TASK_CANBUS_CONSUMER_PRIO           7
+#define TASK_LOG_INFO_PRIO                  8 
 #define TASK_CLI_PRIO                       9  
 #define TASK_IDLE_PRIO                      10
 
@@ -77,7 +77,7 @@ void Task_Init(void *p_arg);
 void assertOSError(OS_ERR err);
 
 /*
- * @brief   TCBs
+ * Thread Control Blocks that contain information about each thread
  */
 extern OS_TCB FaultState_TCB;
 extern OS_TCB CriticalState_TCB;
@@ -92,7 +92,7 @@ extern OS_TCB BLE_TCB;
 extern OS_TCB Idle_TCB;
 extern OS_TCB Init_TCB;
 /**
- * @brief   Stacks
+ * Stacks for each thread
  */
 extern CPU_STK FaultState_Stk[TASK_FAULT_STATE_STACK_SIZE];
 extern CPU_STK CriticalState_Stk[TASK_CANBUS_CONSUMER_STACK_SIZE];
@@ -108,14 +108,16 @@ extern CPU_STK Idle_Stk[TASK_IDLE_STACK_SIZE];
 extern CPU_STK Init_Stk[TASK_INIT_STACK_SIZE];
 
 /**	
- * @brief   Queue for pushing and popping CAN Messages	
+ * Queue for pushing and popping CAN Messages	
  */	
 extern OS_Q CANBus_MsgQ;
 
+/**
+ *  Semaphores, Mutexes, & Bitmaps that are used by multiple threads
+ */
 extern OS_SEM SafetyCheck_Sem4;
 extern OS_SEM Fault_Sem4;
 extern OS_MUTEX WDog_Mutex;
 extern uint32_t WDog_BitMap;
-extern OS_Q CANBus_MsgQ;
 
 #endif

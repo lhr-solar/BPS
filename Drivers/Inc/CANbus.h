@@ -1,11 +1,12 @@
 /* Copyright (c) 2020 UT Longhorn Racing Solar */
 
-#ifndef __CANBUS_H
-#define __CANBUS_H
+#ifndef CANBUS_H
+#define CANBUS_H
 
 #include "common.h"
 #include "config.h"
 
+//Enum for ID's of all messages that can be sent across CAN bus
 typedef enum {
     TRIP = 0x02,
     ALL_CLEAR = 0x101,
@@ -19,6 +20,7 @@ typedef enum {
     MOTOR_DISABLE = 0x10A
 } CANId_t;
 
+//Union of data that can be sent across CAN bus. Only one field must be filled out
 typedef union {
 	uint8_t b;
 	uint16_t h;
@@ -49,10 +51,8 @@ typedef struct {
 void CANbus_Init(void);
 
 /**
- * @brief   Transmits data onto the CANbus.
- *          This is non-blocking and will fail with an error if
- * 			the CAN mailboxes are fully occupied. Be sure to
- * 			check the return code or call CANbus_BlockAndSend.
+ * @brief   Transmits data onto the CANbus. This is non-blocking and will fail with an error if
+ * 			the CAN mailboxes are fully occupied. Be sure to check the return code or call CANbus_BlockAndSend.
  * @param   id : CAN id of the message
  * @param   payload : the data that will be sent.
  * @return  ERROR if data wasn't sent, otherwise it was sent.

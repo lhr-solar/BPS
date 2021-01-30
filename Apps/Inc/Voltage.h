@@ -1,12 +1,11 @@
 /* Copyright (c) 2020 UT Longhorn Racing Solar */
 
 /** Voltage.h
- * Voltage file that holds all voltage related information of BeVolt's
- * battery pack.
+ * Voltage file that holds all voltage related information of BeVolt's battery pack.
  */
 
-#ifndef VOLTAGE_H__
-#define VOLTAGE_H__
+#ifndef VOLTAGE_H
+#define VOLTAGE_H
 
 #include <stdint.h>
 #include "config.h"
@@ -41,7 +40,7 @@ ErrorStatus Voltage_UpdateMeasurements(void);
 SafetyStatus Voltage_CheckStatus(void);
 
 /** Voltage_GetModulesInDanger
- * Finds all battery modules that in danger and stores them into a list.
+ * Finds all battery modules in danger and stores them into a list.
  * Each battery module corresponds to and index of the array. If the element in the
  * array is 1, then it means that module in the index is in danger.
  * @return struct that has safety status for all wires and modules in the system
