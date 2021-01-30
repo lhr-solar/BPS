@@ -189,6 +189,22 @@ Additional Considerations
     The Open Wire functions all directly contact the LTC. ``Voltage_OpenWireSummary()`` requires 
     UART to be initialized, since it uses printf().
 
+Amps
+=====
+
+Purpose
+    This app is used to check the current through the battery pack.
+
+Usage
+    In order to call any functions in this app ``Amps_Init()`` must be called first. One thing to note
+    is that if you want to read the current, you must call ``Amps_UpdateMeasurements()`` first and 
+    then call ``Amps_GetReading()``.
+
+Additional Considerations
+    To make it compatible with both Bare-Metal and RTOS, some functions meant for RTOS are left empty
+    so when it is compiled for Bare-Metal, it will not execute those functions. These functions are
+    meant for pending and posting when running in the RTOS.
+
 **********************
 Mutexes and Semaphores
 **********************
