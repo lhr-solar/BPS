@@ -211,3 +211,33 @@ Yields
 Additional Considerations
     When modifying the idle task, it is important to not introduce any functionality that may affect other tasks. For example, the idle task should not pend 
     any mutexes, since this could block more important tasks from running.
+
+Voltage Temperature Monitor Task: Sijin Woo
+==============================
+
+Purpose
+    The BPS must make sure that the battery pack's voltage, temperature, and open wires have safe values in order to protect the car and the driver. 
+    If any battery module has a temperature between 45 and 60 degrees Celsius, the car can continue running safely but it should not be charged.
+    
+
+Functionality
+    This task will check all voltage, temperature, and open wire values and sends voltage and temperature values on the CAN bus.
+    This task also sends a suggestion to not charge the battery when any module has a temperature between 45 and 60 degrees Celsius.
+
+Priority
+    This task has priority level 4, so it will not interrupt the fault state, critical state, and watchdog tasks.
+
+Shared Resources
+    This task uses the ``CANBus_MsgQ`` queue, the ``Fault_Sem4``, and the ``SafetyCheck_Sem4``.
+    
+    This task also pends the ``WDog_Mutex``.
+
+Timing Requirements
+    (To be determined)
+
+Yields
+    Since this task checks all voltage and temperature values, it will wait for the ``Voltage_Mutex`` and the ``TemperatureBuffer_Mutex``
+    to be available. 
+
+Additional Considerations
+    None
