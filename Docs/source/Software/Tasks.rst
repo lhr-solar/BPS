@@ -232,9 +232,10 @@ Priority
     This task has priority level 4, so it will not interrupt the fault state, critical state, and watchdog tasks.
 
 Shared Resources
-    This task uses the ``CANBus_MsgQ`` queue, the ``Fault_Sem4``, and the ``SafetyCheck_Sem4``.
+    This task uses the ``CANBus_MsgQ`` queue, the ``Fault_Sem4``, and the ``SafetyCheck_Sem4``. 
     
-    This task also pends the ``WDog_Mutex``.
+    This task also pends the ``WDog_Mutex`` and the ``MinionsASIC_Mutex``. Measurement data is sent on the ``SPI1`` 
+    port (this port is also used by the Battery Balancing Task).
 
 Timing Requirements
     (To be determined)
@@ -242,6 +243,8 @@ Timing Requirements
 Yields
     Since this task checks all voltage and temperature values, it will wait for the ``Voltage_Mutex`` and the ``TemperatureBuffer_Mutex``
     to be available. 
+    
+    This task will also yield whenever it sends SPI messages to the LTC6811 minions.
 
 Additional Considerations
     None
