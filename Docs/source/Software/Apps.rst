@@ -181,7 +181,8 @@ Purpose
     Each battery module has 2 temperature sensors.
 
 Usage
-    This file uses a global ``int32_t ModuleTemperatures[][]`` 2D array that contains each sensor's temperature.
+    This file uses a global ``int32_t ModuleTemperatures[][]`` 2D array that contains each sensor's temperature. 
+    ``Temperature_UpdateAllMeasurements()`` should be called to update the values of this array.
     
     ``Temperature_Init()`` must be called before using any other temperature functions. This function will create the ``TemperatureBuffer_Mutex``.
     This function will return an ``ErrorStatus`` indicating its success/failure.
