@@ -90,14 +90,6 @@ void Task_VoltTempMonitor(void *p_arg) {
                         OS_OPT_POST_1,
                         &err);
             assertOSError(err);
-            //suggest that the battery should not be charged
-            CanMsg.id = CHARGE_ENABLE;
-            CanPayload.idx = 0;
-            CanData.b = 0;
-            CanPayload.data = CanData;
-            CanMsg.payload = CanPayload;
-            OSQPost(&CANBus_MsgQ, &CanMsg, sizeof(CanMsg), OS_OPT_POST_FIFO, &err);
-
         } else if((temperatureStatus == SAFE) && (!temperatureHasBeenChecked)) {
             // Signal to turn on contactor but only signal once
             OSSemPost(&SafetyCheck_Sem4,
@@ -106,6 +98,19 @@ void Task_VoltTempMonitor(void *p_arg) {
             assertOSError(err);
 
             temperatureHasBeenChecked = true;
+        }
+        //Check if car should be allowed to charge or not
+        for(uint8_t k = 0; k < NUM_BATTERY_MODULES; k++){
+            uint32_t temp = Temperature_GetModuleTemperature(k);
+            if(temp > MAX_CHARGE_TEMPERATURE_LIMIT && temp < MAX_DISCHARGE_TEMPERATURE_LIMIT){
+                //suggest that the battery should not be charged
+                CanMsg.id = CHARGE_ENABLE;
+                CanPayload.idx = 0;
+                CanData.b = 0;
+                CanPayload.data = CanData;
+                CanMsg.payload = CanPayload;
+                OSQPost(&CANBus_MsgQ, &CanMsg, sizeof(CanMsg), OS_OPT_POST_FIFO, &err);
+            }
         }
         //Send measurements to CAN queue
         CanMsg.id = TEMP_DATA;
