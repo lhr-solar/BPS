@@ -217,7 +217,7 @@ Yields
     It doesn't yield.
 
 Additional Considerations
-    If we add more tasks(or split up tasks such as voltage and temperature) and want to have the 
+    If we add more tasks (or split up tasks such as voltage and temperature) and want to have the 
     watchdog timer look over them, we can add more bits to the timer and just check if they are set.
 
 Idle Task
