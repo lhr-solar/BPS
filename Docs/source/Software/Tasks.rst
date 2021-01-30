@@ -213,7 +213,7 @@ Additional Considerations
     any mutexes, since this could block more important tasks from running.
 
 Voltage Temperature Monitor Task: Sijin Woo
-==============================
+===========================================
 
 Purpose
     The BPS must make sure that the battery pack's voltage, temperature, and open wires have safe values in order to protect the car and the driver. 
@@ -223,6 +223,10 @@ Purpose
 Functionality
     This task will check all voltage, temperature, and open wire values and sends voltage and temperature values on the CAN bus.
     This task also sends a suggestion to not charge the battery when any module has a temperature between 45 and 60 degrees Celsius.
+    
+    If the state of the open wires or the battery pack's voltage/temperature is unsafe, then the fault state task will be signaled.
+    As each of the three (open wires, battery voltage, and battery temperature) are deemed safe, this task signals to turn the contactor on
+    once.
 
 Priority
     This task has priority level 4, so it will not interrupt the fault state, critical state, and watchdog tasks.
