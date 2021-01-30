@@ -26,7 +26,7 @@ void Charge_Calculate(int32_t milliamps);
  * Calibrates the Charge. Whenever the BPS trips, the Charge should recalibrate. If an undervoltage
  * fault occurs, the Charge calibrates to 0% and whenever there is an overvoltage, the Charge calibrates
  * to 100%.
- * @param faultType of voltage. 0 if undervoltage, 1 if overvoltage
+ * @param faultType 0 if undervoltage, 1 if overvoltage
  */
 void Charge_Calibrate(int8_t faultType);
 
