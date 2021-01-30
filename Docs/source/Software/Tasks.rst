@@ -187,7 +187,7 @@ Additional Considerations
     All possible CAN messages that will be sent to the rest of the car's system by the BPS
     are listed on the `CAN Bus IDs spreadsheet <https://docs.google.com/spreadsheets/d/11YWoMVZw8BFr8kyO4DIz0g-aIU_vVa0d-WioSRq85TI/edit#gid=0>`_.
 
-Pet WatchDog Task: Harshita Gorla & Clark Poon
+Pet WatchDog Task: Harshitha Gorla & Clark Poon
 ==============================================
 
 Purpose
