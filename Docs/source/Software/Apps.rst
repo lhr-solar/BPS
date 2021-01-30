@@ -2,7 +2,6 @@
 Application
 ************
 
-
 .. _CLI-app:
 
 Command Line Interface (CLI)
@@ -172,6 +171,23 @@ Usage
 
 Additional Considerations
     None.
+
+Voltage
+========
+
+Purpose
+    This App is used to keep track of the voltages and open wires of all the modules in the 
+    battery pack.
+
+Usage
+    ``Voltage_Init()`` must be called before calling any other Voltage functions. All of the voltage data
+    used by the functions is based on data collected by the function ``Voltage_UpdateMeasurements()``
+    so it might be necessary to call ``Voltage_UpdateMeasurements()`` before those functions.
+    Descriptions of other functions are located in Voltage.h.
+
+Additional Considerations
+    The Open Wire functions all directly contact the LTC. ``Voltage_OpenWireSummary()`` requires 
+    UART to be initialized, since it uses printf().
 
 Amps
 =====
