@@ -90,6 +90,13 @@ void Task_VoltTempMonitor(void *p_arg) {
                         OS_OPT_POST_1,
                         &err);
             assertOSError(err);
+            //suggest that the battery should not be charged
+            CanMsg.id = CHARGE_ENABLE;
+            CanPayload.idx = 0;
+            CanData.b = 0;
+            CanPayload.data = CanData;
+            CanMsg.payload = CanPayload;
+            OSQPost(&CANBus_MsgQ, &CanMsg, sizeof(CanMsg), OS_OPT_POST_FIFO, &err);
 
         } else if((temperatureStatus == SAFE) && (!temperatureHasBeenChecked)) {
             // Signal to turn on contactor but only signal once
