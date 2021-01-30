@@ -172,6 +172,24 @@ Usage
 Additional Considerations
     None.
 
+Temperature
+===========
+
+Purpose
+    The BPS must monitor the battery pack's temperature to avoid any hazardous conditions for the car and the driver.
+    Each battery module has 2 temperature sensors.
+
+Usage
+    This file uses a global ``int32_t ModuleTemperatures[][]`` 2D array that contains each sensor's temperature. 
+    ``Temperature_UpdateAllMeasurements()`` should be called to update the values of this array.
+    
+    ``Temperature_Init()`` must be called before using any other temperature functions. This function will create the ``TemperatureBuffer_Mutex``.
+    This function will return an ``ErrorStatus`` indicating its success/failure.
+
+
+Additional Considerations
+    None
+
 Voltage
 ========
 
