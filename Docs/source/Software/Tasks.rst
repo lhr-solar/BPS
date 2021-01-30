@@ -211,7 +211,7 @@ Shared Resources
     BatteryBalancing tasks.
 
 Timing Requirements
-    This task is set to run every 40 milliseconds.
+    This task is set to run every 400 milliseconds.
 
 Yields
     It doesn't yield.
