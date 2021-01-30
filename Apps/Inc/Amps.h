@@ -1,11 +1,10 @@
 /* Copyright (c) 2020 UT Longhorn Racing Solar */
 /** Amps.h
- * File that holds all electrical current related information of BeVolt's
- * battery pack.
+ * File that holds all electrical current related information of BeVolt's battery pack.
  */
 
-#ifndef AMPS_H__
-#define AMPS_H__
+#ifndef AMPS_H
+#define AMPS_H
 
 #include "common.h"
 #include "config.h"
@@ -23,9 +22,10 @@ ErrorStatus Amps_UpdateMeasurements(void);
 
 /** Amps_CheckStatus
  * Checks if pack does not have a short circuit
+ * @param isCharging is true if the battery pack is charging and false if it is not charging
  * @return SAFE or DANGER
  */
-SafetyStatus Amps_CheckStatus(bool override);
+SafetyStatus Amps_CheckStatus(bool isCharging);
 
 /** Amps_IsCharging
  * Determines if the the battery pack is being charged or discharged depending on

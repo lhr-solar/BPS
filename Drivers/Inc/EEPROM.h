@@ -7,8 +7,8 @@
  * The EEPROM is 128Kbits (16k x 8 bits) and uses I2C
  */
 
-#ifndef EEPROM_H__
-#define EEPROM_H__
+#ifndef EEPROM_H
+#define EEPROM_H
 
 #include <stdint.h>
 
@@ -31,8 +31,8 @@
 #define EEPROM_VOLT_PTR_LOC	    0x1004
 #define EEPROM_CURRENT_PTR_LOC  0x1006
 #define EEPROM_WATCHDOG_PTR_LOC 0x1008
-#define EEPROM_CAN_PTR_LOC		  0x100A
-#define EEPROM_SOC_PTR_LOC			0x100C
+#define EEPROM_CAN_PTR_LOC		0x100A
+#define EEPROM_SOC_PTR_LOC		0x100C
 
 /** EEPROM_Init
  * Initializes I2C to communicate with EEPROM (M24128)
@@ -40,32 +40,29 @@
 void EEPROM_Init(void);
 
 /** EEPROM_Load
- * Loads the pointers from memory. Should be done after
- * initialization and before reading or writing to the
- * EEPROM.
+ * Loads the pointers from memory. Should be done after initialization and before reading or 
+ * writing to the EEPROM.
  */
 void EEPROM_Load(void);
 
 /** EEPROM_Reset
- * Resets the EEPROM. This will clear all data that has
- * been logged so far.
- *
- * This is required for clearing data and setting up new
- * EEPROMs. This cmd really should be reserved for specialized
- * set-up programs and the cli.
+ * Resets the EEPROM. This will clear all data that has been logged so far. This is required for 
+ * clearing data and setting up new EEPROMs. This CMD really should be reserved for specialized
+ * set-up programs and the CLI.
  */
 void EEPROM_Reset(void);
 
 /** EEPROM_LogData
- * This logs the given data at an appropriate spot in memory.
- * This does not log an actual error, but allows more specific
- * information about failed modules to be logged.
+ * This logs the given data at an appropriate spot in memory. This does not log an actual error, 
+ * but allows more specific information about failed modules to be logged.
+ * @param logType is the type of fault that occured (fault code)
+ * @param data is the data corresponding to the logType, 0 if nothing to be logged
  */
 void EEPROM_LogData(uint8_t logType, uint8_t data);
 
 /** EEPROM_Save
  * Save some information to the EEPROM
- * logType is type of fault (fault code)
+ * @param logType is type of fault (fault code)
  */
 void EEPROM_LogError(uint8_t logType);
 
@@ -82,36 +79,37 @@ void EEPROM_Tester(void);
 
 /** EEPROM_WriteMultipleBytes
  * Saves data to the EEPROM
- * @param unsigned 16-bit address
- * @param unsigned 8-bit data
+ * @param address to write data to
+ * @param bytes number of bytes to send
+ * @param buffer pointer to buffer that contains data
  */
 void EEPROM_WriteMultipleBytes(uint16_t address, uint32_t bytes, uint8_t* buffer);
 
 /** EEPROM_Write
  * Saves data to the EEPROM at the specified address
- * @param unsigned 16-bit address
- * @param unsigned 8-bit data
+ * @param unsigned to write data to
+ * @param unsigned data to send
  */
 void EEPROM_WriteByte(uint16_t address, uint8_t data);
 
 /** EEPROM_ReadMultipleBytes
  * Gets multiple bytes of data sequentially from EEPROM beginning at specified address
- * @param unsigned 16-bit address
- * @param number of bytes to read
- * @return unsigned 8-bit list of data
+ * @param address to read data from
+ * @param bytes number of bytes to read
+ * @param buffer pointer to buffer to store data in
  */
 void EEPROM_ReadMultipleBytes(uint16_t address, uint32_t bytes, uint8_t* buffer);
 
 /** EEPROM_ReadByte
  * Gets single bytes of data sequentially from EEPROM beginning at specified address
- * @param unsigned 16-bit address
- * @return unsigned 8-bit data
+ * @param address to read data from
+ * @return unsigned 8-bit data that was read
  */
 uint8_t EEPROM_ReadByte(uint16_t address);
 
 /** DelayMS
  * Delays for specified number of milliseconds (not accurate)
- * @param input is number of milliseconds to delay
+ * @param ms is number of milliseconds to delay
  */
 void DelayMs(uint32_t ms);
 

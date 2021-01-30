@@ -1,6 +1,6 @@
 /* Copyright (c) 2020 UT Longhorn Racing Solar */
-#ifndef __BSP_OS_H
-#define __BSP_OS_H
+#ifndef BSP_OS_H
+#define BSP_OS_H
 
 typedef struct {
     void (*pend)(void);

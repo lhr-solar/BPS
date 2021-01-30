@@ -1,7 +1,7 @@
 /* Copyright (c) 2020 UT Longhorn Racing Solar */
 
-#ifndef __BSP_WDTIMER_H
-#define __BSP_WDTIMER_H
+#ifndef BSP_WDTIMER_H
+#define BSP_WDTIMER_H
 
 #include "common.h"
 

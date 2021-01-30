@@ -1,11 +1,10 @@
 /* Copyright (c) 2020 UT Longhorn Racing Solar */
 /* CLI.c
- * Command Line Interface file to 
- * define and route commands
+ * Command Line Interface file to define and route commands
  */
 
-#ifndef CLI_H__
-#define CLI_H__
+#ifndef CLI_H
+#define CLI_H
 
 #include "common.h"
 #include "config.h"
@@ -13,7 +12,7 @@
 #include "Voltage.h"
 
 // String hash values
-#define CLI_HELP_HASH						0x348B9F
+#define CLI_HELP_HASH			0x348B9F
 #define CLI_MENU_HASH           0x36D901
 #define CLI_VOLTAGE_HASH        0x1CF03ACC
 #define CLI_CURRENT_HASH        0x6FC625E
@@ -52,7 +51,7 @@
 #define CLI_ERROR_HASH          0x67AA6C8
 
 #define CLI_FAULT_HASH          0x69581E2
-#define CLI_RUN_HASH		    		0x1AB8B
+#define CLI_RUN_HASH		    0x1AB8B
 #define CLI_UVOLT_HASH          0x6956DF6
 #define CLI_OVOLT_HASH          0x6956DF0
 #define CLI_OTEMP_HASH          0x65D5E83
@@ -62,8 +61,8 @@
 
 #define CLI_OPENWIRE_HASH       0x8AF9D08 
 
-#define CLI_TRIP_HASH   				0x3481FB
-#define CLI_CLEAR_HASH					0x674180D
+#define CLI_TRIP_HASH   		0x3481FB
+#define CLI_CLEAR_HASH			0x674180D
 
 #define CLI_SHUTDOWN_HASH       0xE7D4586
 #define CLI_PARTYTIME_HASH      0x391FEB33
@@ -104,51 +103,43 @@ void CLI_Startup(void);
 void CLI_Help(void);
 
 /** CLI_Voltage
- * Checks and displays the desired
- * voltage parameter(s)
+ * Checks and displays the desired voltage parameter(s)
  * @param hashTokens is the array of hashed tokens
  */
 void CLI_Voltage(int* hashTokens);
 
 /** CLI_Current
- * Checks and displays the desired
- * current parameter(s)
+ * Checks and displays the desired current parameter(s)
  * @param hashTokens is the array of hashed tokens
  */
 void CLI_Current(int* hashTokens);
 
 /** CLI_Temperature
- * Checks and displays the desired
- * temperature parameter(s)
+ * Checks and displays the desired temperature parameter(s)
  * @param hashTokens is the array of hashed tokens
  */
 void CLI_Temperature(int* hashTokens);
 
 /** CLI_LTC6811
- * Prints register information
- * All registers are of the same type
- * Prints each register's respective three registers
- * (tx_data, rx_date, and rx_pec_match)
+ * Prints register information. All registers are of the same type
+ * Prints each register's respective three registers: tx_data, rx_date, and rx_pec_match
  */
 void CLI_LTC6811(void);
 
 /** CLI_Contactor
- * Interacts with contactor status by
- * printing the status of the contactor
+ * Interacts with contactor status by printing the status of the contactor
  * @param hashTokens is the array of hashed tokens
  */
 void CLI_Contactor(int* hashTokens);
 
 /** CLI_Charge
- * Checks and displays the desired
- * state of charge parameter(s)
+ * Checks and displays the desired state of charge parameter(s)
  * @param hashTokens is the array of hashed tokens
  */
 void CLI_Charge(int* hashTokens);
 
 /** setLED
- * Helper function for CLI_LED
- * that sets a given LED to a state
+ * Helper function for CLI_LED that sets a given LED to a state
  * @param led is the LED to toggle
  * @param state is the 'on' of 'off' state
  * 				represented by a 1/0 or hashes
@@ -156,17 +147,13 @@ void CLI_Charge(int* hashTokens);
 void setLED(Light input, int state);
 
 /** CLI_LED
- * Interacts with the LEDs by 
- * checking error light status
- * running a full LED test
- * and turning a specific LED on/off
+ * Interacts with the LEDs by checking error light status, running a full LED test, and turning a specific LED on/off
  * @param hashTokens is the array of hashed tokens
  */
 void CLI_LED(int* hashTokens);
 
 /** CLI_CAN
- * Interacts with CAN by
- * reading and writing to bus
+ * Interacts with CAN by reading and writing to bus
  * @param hashTokens is the array of hashed tokens
  */
 void CLI_CAN(int* hashTokens);
@@ -183,8 +170,7 @@ void CLI_Display(void);
 void CLI_Watchdog(int* hashTokens);
 
 /** CLI_EEPROM
- * Interacts with EEPROM
- * by reading and writing to the EEPROM
+ * Interacts with EEPROM by reading and writing to the EEPROM
  * @param hashTokens is the array of hashed tokens
  */
 void CLI_EEPROM(int* hashTokens);
@@ -201,14 +187,12 @@ void CLI_ADC(void);
 void CLI_Critical(void);
 
 /** CLI_All
- * Displays all information about BPS modules
- * (voltage, current, temperature, charge, contactor)
+ * Displays all information about BPS modules: voltage, current, temperature, charge, contactor
  */
 void CLI_All(void);
 
 /** CLI_Handler
- * Routes the command given to the proper
- * measurement method to check the desired values
+ * Routes the command given to the proper measurement method to check the desired values
  * @param input is a command string
  */
 void CLI_Handler(char* input);

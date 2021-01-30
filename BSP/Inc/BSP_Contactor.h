@@ -1,7 +1,7 @@
 /* Copyright (c) 2020 UT Longhorn Racing Solar */
 
-#ifndef __BSP_CONTACTOR_H
-#define __BSP_CONTACTOR_H
+#ifndef BSP_CONTACTOR_H
+#define BSP_CONTACTOR_H
 
 #include "common.h"
 
@@ -13,8 +13,8 @@
 /**
  * @brief   Initializes the GPIO pins that interfaces with the Contactor.
  *          Two GPIO pins are initialized. One as an output and one as an input.
- *          The output pin controls the state and the input pin views what state the contactor is through the
- *          Aux pins.
+ *          The output pin controls the state and the input pin views what state the 
+ *          contactor is through the Aux pins.
  * @param   None
  * @return  None
  */
@@ -23,8 +23,7 @@ void BSP_Contactor_Init(void);
 /**
  * @brief   Closes the Contactor switch i.e. turns on the whole electrical system.
  * @note    May be good in the future to make this return something if the contactor could not successfully close.
- * @param   None
- * @return  None
+
  */
 void BSP_Contactor_On(void);
 

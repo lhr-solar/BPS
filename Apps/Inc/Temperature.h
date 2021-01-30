@@ -1,14 +1,13 @@
 /* Copyright (c) 2020 UT Longhorn Racing Solar */
 
 /** Temperature.h
- * Temperature file that holds all Temperature related information of BeVolt's
- * battery pack.
+ * Temperature file that holds all Temperature related information of BeVolt's battery pack.
  */
 
 // NOTE: All units are in Celsius
 
-#ifndef TEMPERATURE_H__
-#define TEMPERATURE_H__
+#ifndef TEMPERATURE_H
+#define TEMPERATURE_H
 
 #include "common.h"
 #include "config.h"
@@ -25,6 +24,7 @@
 /** Temperature_Init
  * Initializes device drivers including SPI inside LTC6811_init and LTC6811 for Temperature Monitoring
  * @param boards LTC6811 data structure that contains the values of each register
+ * @return SUCCESS or ERROR
  */
 ErrorStatus Temperature_Init(cell_asic *boards);
 
@@ -34,7 +34,8 @@ ErrorStatus Temperature_Init(cell_asic *boards);
  * @precondition tempChannel should be < MAX_TEMP_SENSORS_PER_MINION_BOARD
  * @param channel number (0-indexed based)
  * @return SUCCESS or ERROR
- * @note we clear the otherMux every time a channel is switched even on the same mux; Maybe change depending on speed/optimization
+ * @note we clear the otherMux every time a channel is switched even on the same mux
+ * Maybe change depending on speed/optimization
  */
 ErrorStatus Temperature_ChannelConfig(uint8_t tempChannel);
 
@@ -70,7 +71,8 @@ SafetyStatus Temperature_CheckStatus(uint8_t isCharging);
  * Lithium Ion Cells have two separate max temperature limits. There is a limit
  * when the battery is charging and another limit when the battery is discharging.
  * We need to account for these two limits by setting which limit should be used.
- * ChargingState is used for GetModulesInDanger when we can't use the current module to check if charging or discharging
+ * ChargingState is used for GetModulesInDanger when we can't use the current module 
+ * to check if charging or discharging
  * @param 1 if pack is charging, 0 if discharging
  */
 void Temperature_SetChargeState(uint8_t isCharging);
@@ -92,8 +94,8 @@ uint8_t *Temperature_GetModulesInDanger(void);
 int32_t Temperature_GetSingleTempSensor(uint8_t board, uint8_t sensorIdx);
 
 /** Temperature_GetModuleTemperature
- * Gets the avg temperature of a certain battery module in the battery pack. Since there
- * are 2 sensors per module, the return value is the average
+ * Gets the avg temperature of a certain battery module in the battery pack. 
+ * Since there are 2 sensors per module, the return value is the average
  * @precondition: moduleIdx must be < NUM_BATTERY_MODULE
  * @param index of module (0-indexed based)
  * @return temperature of the battery module at specified index
@@ -108,7 +110,7 @@ int32_t Temperature_GetTotalPackAvgTemperature(void);
 
 /** Temperature_SampleADC
  * Starts ADC conversion on GPIO1 on LTC6811's auxiliary registers on all boards
- * @param sets the sampling rate
+ * @param ADCMode sets the sampling rate
  * @return SUCCESS or ERROR
  */
 ErrorStatus Temperature_SampleADC(uint8_t ADCMode);

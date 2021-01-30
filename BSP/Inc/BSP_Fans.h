@@ -1,11 +1,10 @@
 /* Copyright (c) 2020 UT Longhorn Racing Solar */
 
 /* Fans.h
-Controls speed of fans which cool down the battery pack.
-Uses Pins PC6,7 and PB14,15
+Controls speed of fans which cool down the battery pack. Uses Pins PC6, 7 and PB14, 15
 */
-#ifndef __BSP_FANS_H
-#define __BSP_FANS_H
+#ifndef BSP_FANS_H
+#define BSP_FANS_H
 
 #include "common.h"
 #include "config.h"
@@ -23,7 +22,7 @@ void BSP_Fans_Init(void);
 /**
  * @brief   Sets fan duty cycle
  * @param   dutyCycle: int for duty cycle amount in range 0-8
- *          fan: fan number whose speed should be changed
+ * @param   fan: fan number whose speed should be changed
  * @return  ErrorStatus
  */
 ErrorStatus BSP_Fans_Set(uint8_t fan, uint32_t speed);
