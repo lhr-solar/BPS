@@ -1,4 +1,4 @@
-# BPS Documentation Contribution Guide
+# BPS Documentation Contributors Guide
 
 The BPS Documentation can be viewed [here](bps.rtfd.io). The documentation is built using [sphinx](https://docs.readthedocs.io/en/stable/intro/getting-started-with-sphinx.html). I would recommend working in Linux or Windows Subsystem for Linux (WSL) since I have successflly built the docs in both environments. I have not tried building in Windows or Mac.
 
