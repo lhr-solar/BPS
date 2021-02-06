@@ -1,6 +1,6 @@
 # BPS Documentation Contributors Guide
 
-The BPS Documentation can be viewed [here](bps.rtfd.io). The documentation is built using [sphinx](https://docs.readthedocs.io/en/stable/intro/getting-started-with-sphinx.html). I would recommend working in Linux or Windows Subsystem for Linux (WSL) since I have successflly built the docs in both environments. I have not tried building in Windows or Mac.
+The BPS Documentation can be viewed [here](bps.rtfd.io). The documentation is built using [sphinx](https://docs.readthedocs.io/en/stable/intro/getting-started-with-sphinx.html). I would recommend working in Linux or Windows Subsystem for Linux (WSL), since I have successflly built the docs in both environments. I have not tried building in Windows or Mac.
 
 ## Tools setup instructions (Linux/WSL)
 
@@ -10,4 +10,4 @@ The BPS Documentation can be viewed [here](bps.rtfd.io). The documentation is bu
 4. To open the built docs, navigate to `BPS/Docs/build/html` and open the file called `index.html` in a web browser.
 5. To edit the content of the docs, edit the `.rst` files in `BPS/Docs/source`
 
-For any questions, contact the BPS lead (Clark Poon)
+For any questions, post in the BPS Slack channel or contact the BPS lead (Clark Poon)
