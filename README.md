@@ -2,7 +2,7 @@
 This repo contains all code related to UTSVT's Battery Protection System
 
 ## Setup
-There are two options for developing the BPS system. One option is to use the Keil IDE, which includes some basic debugging tools. The other option is to use a terminal in a linux environment to build and flash the program.
+There are two options for developing the BPS system. One option is to use the Keil IDE, which includes some basic debugging tools. The other option is to use a terminal in a linux environment to build and flash the program. If you are only contributing to the BPS Documentation and not the software, see the setup instructions in the Docs folder.
 
 ### Setup for Keil Development
 There is a tool called Keil that ARM produces for development on its microcontrollers. Download the most recent version of the Keil IDE: https://www.keil.com/demo/eval/arm.htm
