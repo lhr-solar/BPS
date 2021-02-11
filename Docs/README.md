@@ -5,15 +5,15 @@ The BPS Documentation can be viewed [here](bps.rtfd.io). The documentation is bu
 ## Tools setup instructions (Linux/WSL)
 
 1. Open up a terminal.
-2. Make sure Python and pip are installed. If they are not, you can install them by running `sudo apt install python3` and `sudo apt install pip3`
-3. Install all of the packages we are using for our docs by navigating to the `BPS/Docs` folder and running `pip3 install -r requirements.txt`
+2. Make sure Python and pip are installed. If they are not, you can install them by running `sudo apt install python3` and `sudo apt install pip3`.
+3. Install all of the packages we are using for our docs by navigating to the `BPS/Docs` folder and running `pip3 install -r requirements.txt`.
 4. To make sure everything is installed properly, run `make html` in the `BPS/Docs` folder. This will build the docs based on the code on your machine. You should get a message that ends in "The HTML pages are in build/html."
 
 ## Tools setup instructions (Windows)
 
-1. Open up command prompt (cmd.exe)
+1. Open up command prompt (cmd.exe).
 2. Make sure Python and pip are installed (you can do this by running `python --version`). If they are not, you can install them [here](https://www.python.org/downloads/). Note that pip is installed with Python.
-3. Install all of the packages we are using for our docs by navigating to the `BPS/Docs` folder and running `pip3 install -r requirements.txt`
+3. Install all of the packages we are using for our docs by navigating to the `BPS/Docs` folder and running `pip3 install -r requirements.txt`.
 4. To make sure everything is installed properly, run `make html` in the `BPS/Docs` folder. This will build the docs based on the code on your machine. You should get a message that ends in "The HTML pages are in build/html."
 
 ## Editing the docs
