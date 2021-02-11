@@ -18,7 +18,7 @@ The BPS Documentation can be viewed [here](bps.rtfd.io). The documentation is bu
 
 ## Editing the docs
 5. To open the built docs, navigate to `BPS/Docs/build/html` and open the file called `index.html` in a web browser (This can be done in your terminal or in a file explorer).
-6. To edit the content of the docs, edit the `.rst` files in `BPS/Docs/source` with a text editor of choice. If you do not have one, I recommend [VSCode](https://code.visualstudio.com/download)
+6. To edit the content of the docs, edit the `.rst` files in `BPS/Docs/source` with a text editor of choice. If you do not have one, I recommend [VSCode](https://code.visualstudio.com/download). The documentation is written in [markdown](https://www.markdownguide.org/basic-syntax/).
 7. If you want to see your changes, run `make html` in the `BPS/Docs` folder and it will rebuild the docs.
 
 
