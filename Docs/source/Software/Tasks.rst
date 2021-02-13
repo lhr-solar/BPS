@@ -187,6 +187,32 @@ Additional Considerations
     All possible CAN messages that will be sent to the rest of the car's system by the BPS
     are listed on the `CAN Bus IDs spreadsheet <https://docs.google.com/spreadsheets/d/11YWoMVZw8BFr8kyO4DIz0g-aIU_vVa0d-WioSRq85TI/edit#gid=0>`_.
 
+Log Info Task
+=============
+
+Purpose
+   This task logs the state of charge into the EEPROM every 3 seconds.
+
+Functionality
+   The log info task runs an infinite loop. Inside the loop, it sends percentage of charge left in the battery pack to the EEPROM using ``EEPROM_LogData()``    and is then delayed by ``OSTimeDly()`` every 3 seconds. 
+
+Priority
+   This task has priority 8, so it will not interrupt any monitoring tasks or any tasks that check if the BPS is running correctly. It will also have a lower   priority than sending CAN messages.
+
+Shared Resources
+   The log info task uses battery state of charge data and the EEPROM, which is also shared by the Fault State Task and CLI. 
+
+Timing Requirements
+   There is a time requirement of logging into the EEPROM every 3 seconds. Writing too often to the EEPROM will exceed the EEPROM's limited (4 million) 
+   erase/write cycles, which causes the EEPROM to malfunction. Thus, writing every 3 seconds will update the EEPROM accurately enough and stay within the
+   EEPROM's erase/write cycles.   
+ 
+Yields
+   The log info task yields when ``OSTimeDly()`` is called and when the EEPROM is initialized and written to. 
+
+Additional Considerations
+   None.
+
 Pet WatchDog Task: Harshitha Gorla & Clark Poon
 ===============================================
 
