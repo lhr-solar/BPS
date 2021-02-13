@@ -36,18 +36,18 @@ void EnterFaultState() {
         case Fault_UVOLT:
             BSP_Light_On(UVOLT);
             EEPROM_LogError(FAULT_LOW_VOLT);
-            for(int i = 0; i < 31; i++) EEPROM_LogData(FAULT_LOW_VOLT, Voltage_GetModuleMillivoltage(i));
+            for(int i = 0; i < NUM_BATTERY_MODULES; i++) EEPROM_LogData(FAULT_LOW_VOLT, Voltage_GetModuleMillivoltage(i));
             break;
         case Fault_OVOLT:
             BSP_Light_On(OVOLT);
             EEPROM_LogError(FAULT_HIGH_VOLT);
-            for(int i = 0; i < 31; i++) EEPROM_LogData(FAULT_HIGH_VOLT, Voltage_GetModuleMillivoltage(i));
+            for(int i = 0; i < NUM_BATTERY_MODULES; i++) EEPROM_LogData(FAULT_HIGH_VOLT, Voltage_GetModuleMillivoltage(i));
             break;
         case Fault_OTEMP:
             BSP_Light_On(OTEMP);
             EEPROM_LogError(FAULT_HIGH_TEMP);
             uint8_t* tempArray = Temperature_GetModulesInDanger();
-            for(int i = 0; i < 63; i++) EEPROM_LogData(FAULT_HIGH_TEMP, tempArray[i]);
+            for(int i = 0; i < NUM_TEMPERATURE_SENSORS; i++) EEPROM_LogData(FAULT_HIGH_TEMP, tempArray[i]);
             break;
         case Fault_OCURR:
             BSP_Light_On(OCURR);

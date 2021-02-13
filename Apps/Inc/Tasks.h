@@ -122,14 +122,14 @@ extern uint32_t WDog_BitMap;
 extern uint32_t Fault_BitMap;
 extern uint8_t Fault_Flag;
 typedef enum {
-    Fault_UVOLT   = 1,
-    Fault_OVOLT   = 2,
-    Fault_OTEMP   = 4,
-    Fault_OCURR   = 8,
-    Fault_OW      = 16,
-    Fault_HANDLER = 32,
-    Fault_OS      = 64,
-    Fault_WDOG    = 128,
+    Fault_UVOLT   = 0x001,
+    Fault_OVOLT   = 0x002,
+    Fault_OTEMP   = 0x004,
+    Fault_OCURR   = 0x008,
+    Fault_OW      = 0x010,
+    Fault_HANDLER = 0x020,
+    Fault_OS      = 0x040,
+    Fault_WDOG    = 0x080,
 }Fault_Set;
 
 #endif
