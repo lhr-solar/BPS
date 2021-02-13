@@ -20,6 +20,7 @@ const uint16_t EEPROM_CAN_FAULT         = 0x0800;
 const uint16_t EEPROM_SOC_DATA          = 0x0900;
 const uint16_t EEPROM_OW_FAULT			= 0x0B00;
 const uint16_t EEPROM_HANDLER_FAULT		= 0x0C00;
+const uint16_t EEPROM_OS_ERROR			= 0X0E00;
 
 static uint16_t faultCodePtr,
                 tempFaultPtr,
@@ -29,7 +30,8 @@ static uint16_t faultCodePtr,
                 canFaultPtr,
                 socDataPtr,
 				openWirePtr,
-				handlerPtr;
+				handlerPtr,
+				osPtr;
 
 /** DelayMS
  * Delays for specified number of milliseconds (not accurate)
@@ -64,6 +66,7 @@ void EEPROM_Load(void) {
 	EEPROM_ReadMultipleBytes(EEPROM_SOC_PTR_LOC,	 2, (uint8_t*)&socDataPtr);
 	EEPROM_ReadMultipleBytes(EEPROM_OW_PTR_LOC,		 2, (uint8_t*)&openWirePtr);
 	EEPROM_ReadMultipleBytes(EEPROM_HANDLER_PTR_LOC, 2, (uint8_t*)&handlerPtr);
+	EEPROM_ReadMultipleBytes(EEPROM_OS_PTR_LOC, 	 2, (uint8_t*)&osPtr);
 }
 
 /** EEPROM_Reset
@@ -82,6 +85,7 @@ void EEPROM_Reset(void) {
 	EEPROM_WriteMultipleBytes(EEPROM_SOC_PTR_LOC,	  2, (uint8_t*)&EEPROM_SOC_DATA);
 	EEPROM_WriteMultipleBytes(EEPROM_OW_PTR_LOC,	  2, (uint8_t*)&EEPROM_OW_FAULT);
 	EEPROM_WriteMultipleBytes(EEPROM_HANDLER_PTR_LOC, 2, (uint8_t*)&EEPROM_HANDLER_FAULT);
+	EEPROM_WriteMultipleBytes(EEPROM_OS_PTR_LOC, 	  2, (uint8_t*)&EEPROM_OS_ERROR);
 
 	// Reintialize pointers in the program, etc.
 	EEPROM_Load();
@@ -96,6 +100,7 @@ void EEPROM_Reset(void) {
 	EEPROM_WriteByte(socDataPtr, 	  EEPROM_TERMINATOR);
 	EEPROM_WriteByte(openWirePtr, 	  EEPROM_TERMINATOR);
 	EEPROM_WriteByte(handlerPtr, 	  EEPROM_TERMINATOR);
+	EEPROM_WriteByte(osPtr, 	  	  EEPROM_TERMINATOR);
 }
 
 /*
@@ -148,6 +153,11 @@ void EEPROM_LogData(uint8_t logType, uint8_t data) {
 		EEPROM_WriteByte(socDataPtr++, data);
 		EEPROM_WriteByte(socDataPtr, EEPROM_TERMINATOR);
 		EEPROM_WriteByte(EEPROM_CAN_PTR_LOC, socDataPtr);
+		break;
+	case FAULT_OS_ERROR:
+		EEPROM_WriteByte(osPtr++, data);
+		EEPROM_WriteByte(osPtr, EEPROM_TERMINATOR);
+		EEPROM_WriteByte(EEPROM_OS_PTR_LOC, osPtr);
 		break;
 	}
 }
@@ -232,6 +242,9 @@ void EEPROM_SerialPrintData(void){
 					data = EEPROM_ReadByte(data_ptr);
 				}
 				printf("\n\r");
+				break;
+			case FAULT_OS_ERROR:
+				printf("fault, os error\n\r");
 				break;
 			case FAULT_HANDLER:
 				printf("fault, handler\n\r");
