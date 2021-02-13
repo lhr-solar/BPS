@@ -48,7 +48,14 @@ void EnterFaultState() {
             BSP_Light_On(OCURR);
             EEPROM_LogError(FAULT_HIGH_CURRENT);
             break;
-            //NEED TO: Errors for Open Wire, WDOG trip, HardFault trip, OS Error
+        case Fault_OW:
+            break;
+        case Fault_HANDLER:
+            break;
+        case Fault_OS:
+            break;
+        case Fault_WDOG:
+            break;
         default:
             break;
     }
