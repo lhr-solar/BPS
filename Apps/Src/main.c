@@ -9,7 +9,7 @@
 #include "os.h"
 #include "Tasks.h"
 #include "BSP_WDTimer.h"
-#include "Task_FaultState.h"
+void EnterFaultState(void);
 
 int main() {
 	
