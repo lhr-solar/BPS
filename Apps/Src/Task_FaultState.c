@@ -46,7 +46,7 @@ void EnterFaultState() {
         case Fault_OTEMP:
             BSP_Light_On(OTEMP);
             EEPROM_LogError(FAULT_HIGH_TEMP);
-            uint8_t* tempArray = Temperature_GetModulesInDanger;
+            uint8_t* tempArray = Temperature_GetModulesInDanger();
             for(int i = 0; i < 63; i++) EEPROM_LogData(FAULT_HIGH_TEMP, tempArray[i]);
             break;
         case Fault_OCURR:
