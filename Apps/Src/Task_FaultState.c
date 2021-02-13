@@ -32,19 +32,19 @@ void EnterFaultState() {
     BSP_Light_Off(RUN); //turn off run light
     BSP_Light_On(FAULT);
     switch (Fault_BitMap){
-        case 1:
+        case Fault_UVOLT:
             BSP_Light_On(UVOLT);
             EEPROM_LogError(FAULT_LOW_VOLT);
             break;
-        case 2:
-            BSP_Light_On(UVOLT);
-            EEPROM_LogError(FAULT_LOW_VOLT);
+        case Fault_OVOLT:
+            BSP_Light_On(OVOLT);
+            EEPROM_LogError(FAULT_HIGH_VOLT);
             break;
-        case 4:
+        case Fault_OTEMP:
             BSP_Light_On(OTEMP);
             EEPROM_LogError(FAULT_HIGH_TEMP);
             break;
-        case 8:
+        case Fault_OCURR:
             BSP_Light_On(OCURR);
             EEPROM_LogError(FAULT_HIGH_CURRENT);
             break;
@@ -58,10 +58,10 @@ void EnterFaultState() {
     CANPayload_t Message;
     Message.data = data;
     // Push Trip message to CAN Q
-    CANbus_Send(TRIP, Message);
+    CANbus_BlockAndSend(TRIP, Message);
     // Push Contactor State message to CAN Q
     data.b = 0;
-    CANbus_Send(CONTACTOR_STATE, Message);
+    CANbus_BlockAndSend(CONTACTOR_STATE, Message);
 
 #ifdef DEBUGMODE
     char command[COMMAND_SIZE];
