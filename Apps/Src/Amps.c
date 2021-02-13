@@ -145,6 +145,7 @@ void Task_AmperesMonitor(void *p_arg) {
         // Check if amperes is NOT safe:
 		SafetyStatus amperesStatus = Amps_CheckStatus(Amps_IsCharging());
 		if(amperesStatus != SAFE) {
+			Fault_BitMap = 8;
             OSSemPost(&Fault_Sem4,
                         OS_OPT_POST_1,
                         &err);

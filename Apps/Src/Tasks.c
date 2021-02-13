@@ -63,6 +63,7 @@ OS_MUTEX WDog_Mutex;
  */
 cell_asic Minions[NUM_MINIONS];
 uint32_t WDog_BitMap = 0;
+uint32_t Fault_BitMap = 0;
 
 void EnterFaultState(void);
 
