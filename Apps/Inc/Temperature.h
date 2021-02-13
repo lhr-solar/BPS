@@ -26,7 +26,7 @@
  * Initializes device drivers including SPI inside LTC6811_init and LTC6811 for Temperature Monitoring
  * @param boards LTC6811 data structure that contains the values of each register
  */
-ErrorStatus Temperature_Init(cell_asic *boards);
+void Temperature_Init(cell_asic *boards);
 
 /** Temperature_ChannelConfig
  * Configures which temperature channel you're sampling from

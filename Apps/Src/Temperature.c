@@ -27,7 +27,7 @@ static OS_MUTEX TemperatureBuffer_Mutex;
  * Initializes device drivers including SPI inside LTC6811_init and LTC6811 for Temperature Monitoring
  * @param boards LTC6811 data structure that contains the values of each register
  */
-ErrorStatus Temperature_Init(cell_asic *boards){
+void Temperature_Init(cell_asic *boards){
 	// Record pointer
 	Minions = boards;
 
@@ -49,12 +49,11 @@ ErrorStatus Temperature_Init(cell_asic *boards){
 
 	// Read Configuration Register
 	wakeup_sleep(NUM_MINIONS);
-	int8_t error = LTC6811_rdcfg(NUM_MINIONS, Minions);
+	LTC6811_rdcfg_wrap(NUM_MINIONS, Minions);
 	//release mutex
   	OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
   	assertOSError(err);
 
-	return error == 0 ? SUCCESS : ERROR;
 }
 
 /** Temperature_ChannelConfig
