@@ -6,8 +6,6 @@
 #include "os.h"
 #include "Tasks.h"
 
-extern OS_MUTEX MinionsASIC_Mutex;
-
 static void Balancing_ClearDischargeBit(int Cell, uint8_t total_ic, cell_asic *ic);
 static void Balancing_GetICNumber(uint8_t i, uint8_t* ICNumber, uint8_t* ModuleNumber);
 static void Balancing_GetICNumber(uint8_t i, uint8_t* ICNumber, uint8_t* ModuleNumber);

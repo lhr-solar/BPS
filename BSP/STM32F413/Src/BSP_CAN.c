@@ -220,10 +220,16 @@ ErrorStatus BSP_CAN_Read(uint32_t *id, uint8_t *data) {
 }
 
 void CAN1_RX0_IRQHandler(void) {
-    asm("CPSID I");   // Disable Interrupts
-    OSIntEnter();     // Signal to uC/OS
+    #ifdef RTOS
+    asm("CPSID I"); //disable all interrupts
+	//all cpu registers are supposed to be saved here
+	//but that happens when the ISR is called
+	OSIntEnter(); //increments value of nested interrupt counter
+	unsigned int *address = 0;
+	asm volatile ("STR SP, [%0]\n\t": "=r" ( address)); //Store SP in address
+	if (OSIntNestingCtr == 1) OSTCBCurPtr->StkPtr = address;
     asm("CPSIE I");   // Re-enable interrupts
-    
+    #endif
     // Take any pending messages into a queue
     while(CAN_MessagePending(CAN1, CAN_FIFO0)) {
         CAN_Receive(CAN1, CAN_FIFO0, &gRxMessage);
@@ -241,20 +247,28 @@ void CAN1_RX0_IRQHandler(void) {
             }
         }
     }
-
+    #ifdef RTOS
     OSIntExit();      // Signal to uC/OS
+    #endif
 }
 
 void CAN1_TX_IRQHandler(void) {
-    asm("CPSID I");   // Disable Interrupts
-    OSIntEnter();     // Signal to uC/OS
+    #ifdef RTOS
+    asm("CPSID I"); //disable all interrupts
+	//all cpu registers are supposed to be saved here
+	//but that happens when the ISR is called
+	OSIntEnter(); //increments value of nested interrupt counter
+	unsigned int *address = 0;
+	asm volatile ("STR SP, [%0]\n\t": "=r" ( address)); //Store SP in address
+	if (OSIntNestingCtr == 1) OSTCBCurPtr->StkPtr = address;
     asm("CPSIE I");   // Re-enable interrupts
-
+    #endif
     // Acknowledge 
     CAN_ClearFlag(CAN1, CAN_FLAG_RQCP0 | CAN_FLAG_RQCP1 | CAN_FLAG_RQCP2);
 
     // Call the function provided
     gTxEnd();
-
+    #ifdef RTOS
     OSIntExit();      // Signal to uC/OS
+    #endif
 }

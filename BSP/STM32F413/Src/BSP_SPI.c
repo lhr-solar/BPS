@@ -273,14 +273,15 @@ void BSP_SPI_SetStateCS(spi_port_t port, uint8_t state) {
 #ifdef RTOS
 
 void SPI1_IRQHandler(void){
-	// Save the CPU registers
-	CPU_SR_ALLOC();
-
 	// Protect a critical section
 	CPU_CRITICAL_ENTER();
 
 	// make the kernel aware that the interrupt has started
 	OSIntEnter();
+	unsigned int *address = 0;
+	asm volatile ("STR SP, [%0]\n\t": "=r" ( address)); //Store SP in address
+	if (OSIntNestingCtr == 1) OSTCBCurPtr->StkPtr = address;
+	
 	CPU_CRITICAL_EXIT();
 	SPI_os[spi_ltc6811]->post();
 	
@@ -289,14 +290,15 @@ void SPI1_IRQHandler(void){
 }
 
 void SPI3_Handler(){
-	// Save the CPU registers
-	CPU_SR_ALLOC();
-
 	// Protect a critical section
 	CPU_CRITICAL_ENTER();
 
 	// make the kernel aware that the interrupt has started
 	OSIntEnter();
+	unsigned int *address = 0;
+	asm volatile ("STR SP, [%0]\n\t": "=r" ( address)); //Store SP in address
+	if (OSIntNestingCtr == 1) OSTCBCurPtr->StkPtr = address;
+
 	CPU_CRITICAL_EXIT();
 	SPI_os[spi_as8510]->post();
 	
