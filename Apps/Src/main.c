@@ -8,10 +8,17 @@
 #include "config.h"
 #include "os.h"
 #include "Tasks.h"
+#include "BSP_WDTimer.h"
+#include "Task_FaultState.h"
 
 int main() {
 	
 	OS_ERR err;
+
+	// If the WDTimer counts down to 0, then the BPS resets. If BPS has reset, enter a fault state.
+	if (BSP_WDTimer_DidSystemReset()) {
+		EnterFaultState();
+	}
 
 	OSInit(&err);
 	assertOSError(err);
