@@ -31,7 +31,19 @@ Priority
     occured.
 
 Shared Resources
-    It uses the ``Fault_Sem4`` which is used to block the task from running until something sets it.
+    It uses the ``Fault_Sem4`` which is used to block the task from running until something sets it. It also uses
+    the ``Fault_Bitmap`` variable. This variable is set by the other tasks so the Fualt task does
+    not have to call other functions to find out what caused the fault. If ``Fault_Bitmap`` is
+    
+    1: Undervoltage
+
+    2: Overvoltage
+
+    4: Over Temperature
+
+    8: Over current
+
+    Otherwise: WatchDog was tripped
 
 Timing Requirements
     The contactor must be shut off as soon as possible after a fault is detected.
