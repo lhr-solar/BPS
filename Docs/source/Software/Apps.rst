@@ -2,7 +2,6 @@
 Application
 ************
 
-
 .. _CLI-app:
 
 Command Line Interface (CLI)
@@ -22,6 +21,7 @@ A list of all valid CLI commands is included below.
 
 | Displays voltage levels (both module-specific and total voltage) in Volts and the safety of the battery.
 | **Argument(s)**: 
+
 - **none**: prints every module's voltage
 - **module [module #]**: prints specific module's voltage
 - **total**: prints total battery pack's voltage
@@ -32,6 +32,7 @@ A list of all valid CLI commands is included below.
 
 | Displays current readings as measured by the current sensors in Amps.
 | **Argument(s)**: 
+
 - **none**: prints current data
 - **safety**: prints safety status
 - **charging**: prints if pack is charging or discharging
@@ -41,6 +42,7 @@ A list of all valid CLI commands is included below.
 
 | Displays temperature readings as measured by the temperature sensors (2 per battery module) in degrees C.
 | **Argument(s)**: 
+
 - **none**: prints temperature of 31 modules
 - **all**: prints temperature of 62 temperature sensors
 - **module [module #]**: prints temperature of specific battery module
@@ -52,6 +54,7 @@ A list of all valid CLI commands is included below.
 
 | Displays register information of the LTC6811 chip.
 | **Argument(s)**: 
+
 - **none**: prints all relevant register information from the ``cell_asic`` structure
 
 
@@ -60,6 +63,7 @@ A list of all valid CLI commands is included below.
 
 | Displays current state of the contactor.
 | **Argument(s)**: 
+
 - **none**: prints current status of the contactor (enabled/disabled)
 
 "Charge"
@@ -67,6 +71,7 @@ A list of all valid CLI commands is included below.
 
 | Displays state of charge measurements/calculations.
 | **Argument(s)**: 
+
 - **none**: prints charge percentage of the battery
 - ***reset**: resets the accumulator
 - ***set [value]**: sets the accumulator to the argument value
@@ -76,6 +81,7 @@ A list of all valid CLI commands is included below.
 
 | Tests the status LEDs on the master board.
 | **Argument(s)**: 
+
 - **none**: prints the state of the error light
 - ***test**: runs a short test that flashes each status LED in sequence
 - ***[LED type] [on/off]**: sets the state of a specific LED
@@ -85,6 +91,7 @@ A list of all valid CLI commands is included below.
 
 | Reads and writes to the CANbus from the BPS
 | **Argument(s)**: 
+
 - **read**: prints messages until halted by escape sequence
 - ***write [id name] [data in hex]**: writes a specific message to CAN
 
@@ -93,6 +100,7 @@ A list of all valid CLI commands is included below.
 
 | Displays watchdog data.
 | **Argument(s)**: 
+
 - **none**: prints watchdog status
 - **error**: prints most recent errors from the watchdog
 
@@ -101,15 +109,17 @@ A list of all valid CLI commands is included below.
 
 | Reads and writes to the EEPROM.
 | **Argument(s)**: 
+
 - **none**: prints EEPROM status
 - ***reset**: resets the EEPROM
-- **error [error type]: prints error related to the given subsytem
+- **error** [error type]: prints error related to the given subsytem
 
 "ADC"
 #####
 
 | Displays raw ADC data.
 | **Argument(s)**: 
+
 - **none**: prints raw data from the ADC at the current time
 
 "Critical"/"Abort"
@@ -117,6 +127,7 @@ A list of all valid CLI commands is included below.
 
 | Shuts down the contactor.
 | **Argument(s)**: 
+
 - ***none**: prompts the user for confirmation, then turns off the contactor upon confirmation.
 
 "Openwire"
@@ -124,6 +135,7 @@ A list of all valid CLI commands is included below.
 
 | Displays open wire status.
 | **Argument(s)**:
+
 -**none**: prints open wire data for all wires in the system
 
 "All"
@@ -131,6 +143,7 @@ A list of all valid CLI commands is included below.
 
 | Displays all relevant data to the BPS.
 | **Argument(s)**: 
+
 - **none**: prints voltage, current, temperature, contactor, and state of charge data (in the same format as using each command separately)
 
 
@@ -147,7 +160,68 @@ A list of all valid CLI commands is included below.
 ``temperature module 6 1`` - prints temperature of sensor 1 on module 6
 
 
+Charge
+======
 
+Purpose
+    The Charge App is used to keep track of the state of charge of the battery.
+
+Usage
+    ``Charge_Init()`` must be called before calling any of the other Charge functions. Descriptions of the other functions can be found in Charge.h.
+
+Additional Considerations
+    None.
+
+Temperature
+===========
+
+Purpose
+    The BPS must monitor the battery pack's temperature to avoid any hazardous conditions for the car and the driver.
+    Each battery module has 2 temperature sensors.
+
+Usage
+    This file uses a global ``int32_t ModuleTemperatures[][]`` 2D array that contains each sensor's temperature. 
+    ``Temperature_UpdateAllMeasurements()`` should be called to update the values of this array.
+    
+    ``Temperature_Init()`` must be called before using any other temperature functions. This function will create the ``TemperatureBuffer_Mutex``.
+    This function will return an ``ErrorStatus`` indicating its success/failure.
+
+
+Additional Considerations
+    None
+
+Voltage
+========
+
+Purpose
+    This App is used to keep track of the voltages and open wires of all the modules in the 
+    battery pack.
+
+Usage
+    ``Voltage_Init()`` must be called before calling any other Voltage functions. All of the voltage data
+    used by the functions is based on data collected by the function ``Voltage_UpdateMeasurements()``
+    so it might be necessary to call ``Voltage_UpdateMeasurements()`` before those functions.
+    Descriptions of other functions are located in Voltage.h.
+
+Additional Considerations
+    The Open Wire functions all directly contact the LTC. ``Voltage_OpenWireSummary()`` requires 
+    UART to be initialized, since it uses printf().
+
+Amps
+=====
+
+Purpose
+    This app is used to check the current through the battery pack.
+
+Usage
+    In order to call any functions in this app ``Amps_Init()`` must be called first. One thing to note
+    is that if you want to read the current, you must call ``Amps_UpdateMeasurements()`` first and 
+    then call ``Amps_GetReading()``.
+
+Additional Considerations
+    To make it compatible with both Bare-Metal and RTOS, some functions meant for RTOS are left empty
+    so when it is compiled for Bare-Metal, it will not execute those functions. These functions are
+    meant for pending and posting when running in the RTOS.
 
 **********************
 Mutexes and Semaphores

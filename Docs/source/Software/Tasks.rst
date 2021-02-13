@@ -187,31 +187,6 @@ Additional Considerations
     All possible CAN messages that will be sent to the rest of the car's system by the BPS
     are listed on the `CAN Bus IDs spreadsheet <https://docs.google.com/spreadsheets/d/11YWoMVZw8BFr8kyO4DIz0g-aIU_vVa0d-WioSRq85TI/edit#gid=0>`_.
 
-Idle Task
-=========
-
-Purpose
-    The scheduler always needs to have an available task to run. The purpose of this task is for it to run whenever the scheduler cannot schedule anything else.
-
-Functionality
-    The idle task runs an empty infinite loop for as long as it is scheduled to run.
-
-Priority
-    The idle task has the lowest priority in the system (10), so it will not run unless all other tasks are blocked.
-
-Shared Resources
-    The idle task does not use any shared resources.
-
-Timing Requirements
-    The idle task does not have any timing requirements.
-
-Yields
-    The idle task never yields.
-
-Additional Considerations
-    When modifying the idle task, it is important to not introduce any functionality that may affect other tasks. For example, the idle task should not pend 
-    any mutexes, since this could block more important tasks from running.
-                   
 Log Info Task
 =============
 
@@ -238,3 +213,97 @@ Yields
 Additional Considerations
    None.
 
+Pet WatchDog Task: Harshitha Gorla & Clark Poon
+===============================================
+
+Purpose
+    The purpose of this task is to recognize if the BPS RTOS has stalled. If it is stuck somewhere
+    in the code, the car must shut down.
+
+Functionality
+    This task checks the ``WDog_BitMap`` variable to see if the 3 LSB are set by the temperature,
+    voltage, balancing, and current tasks. If these tasks ran and set those bits, that means that the 
+    BPS is functional and the timer is reset. If those bits are not set, the timer will keep running
+    and a reset the BPS if it reaches 0. The task can be called multiple times before
+    the timer resets.
+
+Priority
+    This task is priority 3. It is above the voltage, temperature, balancing, and current monitoring tasks
+    because if they run before the WatchDog timer is reset, the BPS will fault even if it is 
+    working correctly. We also do not want this task to be blocked by other periodic threads.
+
+Shared Resources
+    The ``WDog_Mutex`` is read by this task and written to by the VoltTemp, Amperes, and
+    BatteryBalancing tasks.
+
+Timing Requirements
+    This task is set to run every 400 milliseconds.
+
+Yields
+    It doesn't yield.
+
+Additional Considerations
+    If we add more tasks (or split up tasks such as voltage and temperature) and want to have the 
+    watchdog timer look over them, we can add more bits to the timer and just check if they are set.
+
+Idle Task
+=========
+
+Purpose
+    The scheduler always needs to have an available task to run. The purpose of this task is for it to run whenever the scheduler cannot schedule anything else.
+
+Functionality
+    The idle task runs an empty infinite loop for as long as it is scheduled to run.
+
+Priority
+    The idle task has the lowest priority in the system (10), so it will not run unless all other tasks are blocked.
+
+Shared Resources
+    The idle task does not use any shared resources.
+
+Timing Requirements
+    The idle task does not have any timing requirements.
+
+Yields
+    The idle task never yields.
+
+Additional Considerations
+    When modifying the idle task, it is important to not introduce any functionality that may affect other tasks. For example, the idle task should not pend 
+    any mutexes, since this could block more important tasks from running.
+
+Voltage Temperature Monitor Task: Sijin Woo
+===========================================
+
+Purpose
+    The BPS must make sure that the battery pack's voltage, temperature, and open wires have safe values in order to protect the car and the driver. 
+    If any battery module has a temperature between 45 and 60 degrees Celsius, the car can continue running safely but it should not be charged.
+    
+
+Functionality
+    This task will check all voltage, temperature, and open wire values and sends voltage and temperature values on the CAN bus.
+    This task also sends a suggestion to not charge the battery when any module has a temperature between 45 and 60 degrees Celsius.
+    
+    If the state of the open wires or the battery pack's voltage/temperature is unsafe, then the fault state task will be signaled.
+    As each of the three (open wires, battery voltage, and battery temperature) are deemed safe, this task signals to turn the contactor on
+    once.
+
+Priority
+    This task has priority level 4, so it will not interrupt the fault state, critical state, and watchdog tasks.
+
+Shared Resources
+    This task uses the ``CANBus_MsgQ`` queue, the ``Fault_Sem4``, and the ``SafetyCheck_Sem4``. 
+    
+    This task also pends the ``WDog_Mutex`` and the ``MinionsASIC_Mutex``. Measurement data is sent on the ``SPI1`` 
+    port (this port is also used by the Battery Balancing Task).
+
+Timing Requirements
+    (To be determined)
+
+Yields
+    Since this task checks all voltage and temperature values, it will wait for the ``Voltage_Mutex`` and the ``TemperatureBuffer_Mutex``
+    to be available. 
+    
+    This task will also yield whenever it sends SPI messages to the LTC6811 minions.
+
+Additional Considerations
+    None
