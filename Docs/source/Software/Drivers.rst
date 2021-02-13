@@ -30,6 +30,18 @@ Usage
     Otherwise, they will pend/post the ``MinionsASIC_Mutex``. This function will also create the ``MinionsASIC_Mutex`` if it hasn't already been created by the time ``LTC6811_Init()``
     was called. 
 
+    This library includes wrappers for all LTC6811 functions that return PEC (Packet Error Code) values. If too many packets are invalid in a row, the BPS will trip.
+    The wrappers are the functions that end with ``_safe()``.
+    The functions that have wrappers are:
+    ``LTC6811_rdcv()``,
+    ``LTC6811_rdaux()``,
+    ``LTC6811_rdstat()``,
+    ``LTC6811_rdcfg()``,
+    ``LTC6811_rdpwm()``,
+    and ``LTC6811_rdcomm()``.
+
+    (Ex: wrapper for ``LTC6811_rdcv()`` is ``LTC6811_rdcv_safe()``)
+
 Additional Considerations
     Most of this module is provided by Analog Devices, but the code that LHR Solar members have written is marked in the file.
 

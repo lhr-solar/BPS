@@ -57,7 +57,7 @@ Functionality
 
     2) If the current is above 75A, it signals the fault state task.
 
-    3) After every updated measurement, it sends the current data to the CAN queue.
+    3) After every updated measurement, it sends the current data to the CAN queue and updates the BPS's State of Charge.
 
 Priority
     This task is the 5th priority under the VoltTemp task. This is due to professional advice the
