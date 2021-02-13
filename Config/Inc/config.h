@@ -68,4 +68,9 @@ typedef enum SafetyStatus_e {SAFE = 0, DANGER = 1, OVERVOLTAGE = 2, UNDERVOLTAGE
 // Define heartbeatDelay as # of desired while(1) loops per toggle
 #define HEARTBEAT_DELAY 0x10
 
+//--------------------------------------------------------------------------------
+//Maximum PEC Code Errors
+//Defines the number of PEC code errors allowed before the BPS is tripped
+#define MAX_PEC_ERRORS 5
+
 #endif
