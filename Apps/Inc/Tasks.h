@@ -121,10 +121,14 @@ extern OS_MUTEX WDog_Mutex;
 extern uint32_t WDog_BitMap;
 extern uint32_t Fault_BitMap;
 typedef enum {
-    Fault_UVOLT = 1,
-    Fault_OVOLT = 2,
-    Fault_OTEMP = 4,
-    Fault_OCURR = 8,
+    Fault_UVOLT   = 1,
+    Fault_OVOLT   = 2,
+    Fault_OTEMP   = 4,
+    Fault_OCURR   = 8,
+    Fault_OW      = 16,
+    Fault_HANDLER = 32,
+    Fault_OS      = 64,
+    Fault_WDOG    = 128,
 }Fault_Set;
 
 #endif
