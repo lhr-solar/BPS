@@ -4,6 +4,17 @@ Application
 
 .. _CLI-app:
 
+
+Main
+====
+
+The main function is the entry point into the Battery Protection System. 
+
+It first checks whether the BPS has had to reset in the previous run using ``BPS_WDTimer_DidSystemRest()``. If it has, then the program will then enter a    fault state using ``EnterFaultState()``. If the BPS was not previously reset, then main will continue with the rest of the initialization.
+        
+``OSInit()`` initializes the operating system. ``AsserOSError()`` checks whether there are any errors in the RTOS functions. If there are no errors          ``OSTaskCreate()`` points the program to ``Task_Init()`` which executes the rest of the BPS startup.
+
+
 Command Line Interface (CLI)
 ============================
 
