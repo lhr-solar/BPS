@@ -12,8 +12,7 @@
         "bsp_timer.h": "c",
         "temperature.h": "c",
         "math.h": "c",
-        "bsp_adc.h": "c",
-        "canbus.h": "c"
+        "bsp_adc.h": "c"
     },
     "python.linting.pylintEnabled": true,
     "python.linting.enabled": true,
