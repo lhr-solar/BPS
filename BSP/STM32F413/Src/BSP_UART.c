@@ -434,13 +434,10 @@ uint32_t BSP_UART_Write(char *str, uint32_t len, UART_Port usart) {
 }
 
 void USART2_IRQHandler(void) {
-    asm("CPSID I"); //disable all interrupts
-	//all cpu registers are supposed to be saved here
-	//but that happens when the ISR is called
-	OSIntEnter(); //increments value of nested interrupt counter
-	unsigned int *address = 0;
-	asm volatile ("STR SP, [%0]\n\t": "=r" ( address)); //Store SP in address
-	if (OSIntNestingCtr == 1) OSTCBCurPtr->StkPtr = address;
+    CPU_SR_ALLOC();
+    CPU_CRITICAL_ENTER();
+    OSIntEnter();
+    CPU_CRITICAL_EXIT();
     if(USART_GetITStatus(USART2, USART_IT_RXNE) != RESET) {
         uint8_t data = USART2->DR;
         bool removeSuccess = 1;
@@ -473,13 +470,10 @@ void USART2_IRQHandler(void) {
 }
 
 void USART3_IRQHandler(void) {
-    asm("CPSID I"); //disable all interrupts
-	//all cpu registers are supposed to be saved here
-	//but that happens when the ISR is called
-	OSIntEnter(); //increments value of nested interrupt counter
-	unsigned int *address = 0;
-	asm volatile ("STR SP, [%0]\n\t": "=r" ( address)); //Store SP in address
-	if (OSIntNestingCtr == 1) OSTCBCurPtr->StkPtr = address;
+   CPU_SR_ALLOC();
+    CPU_CRITICAL_ENTER();
+    OSIntEnter();
+    CPU_CRITICAL_EXIT();
     if(USART_GetITStatus(USART3, USART_IT_RXNE) != RESET) {
         uint8_t data = USART3->DR;
         bool removeSuccess = 1;
