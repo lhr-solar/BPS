@@ -11,8 +11,11 @@ typedef enum {UART_USB, UART_BLE} UART_Port;
 
 /**
  * @brief   Initializes the UART peripheral
+ * @param   rxCallback The callback for when data come in to the system
+ * @param   txCallback The callback for when transmission completes
+ * @param   usart The USART to initialize
  */
-void BSP_UART_Init(void);
+void BSP_UART_Init(callback_t rxCallback, callback_t txCallback, UART_Port usart);
 
 /**
  * @brief   Gets one line of ASCII text that was received.

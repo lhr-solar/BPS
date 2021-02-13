@@ -33,14 +33,13 @@ const float PERCENT_CONVERSION = 100;
 
 extern OS_MUTEX MinionsASIC_Mutex;
 
-
 /** CLI_Init
  * Initializes the CLI with the values it needs
  * @param boards is a cell_asic struct pointer to the minion boards
  */
 void CLI_Init(cell_asic* boards) {
 	Minions = boards;
-	BSP_UART_Init();
+	BSP_UART_Init(NULL, NULL, UART_USB);
 }
 
 /** CLI_InputParse

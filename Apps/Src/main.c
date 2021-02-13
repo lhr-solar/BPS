@@ -15,6 +15,11 @@ int main() {
 
 	OSInit(&err);
 	assertOSError(err);
+#ifndef SIMULATION
+#ifdef RTOS
+	OS_CPU_SysTickInit(80000000 / (CPU_INT32U) OSCfg_TickRate_Hz);
+#endif
+#endif
 
 	OSTaskCreate(&Init_TCB,				// TCB
 				"Initialize System",	// Task Name (String)
