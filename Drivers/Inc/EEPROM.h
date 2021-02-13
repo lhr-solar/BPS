@@ -15,16 +15,16 @@
 #define EEPROM_ADDRESS (0xA0)
 
 //error codes
-#define FAULT_HIGH_TEMP			0x001
-#define FAULT_HIGH_VOLT			0x002
-#define FAULT_LOW_VOLT			0x004
-#define FAULT_HIGH_CURRENT	    0x008
-#define FAULT_WATCHDOG			0x010
-#define FAULT_CAN_BUS			0x020
-#define FAULT_VOLT_MISC			0x040
-#define DATA_SOC				0x080
-#define FAULT_OPEN_WIRE         0x100
-#define FAULT_HANDLER           0x200
+#define FAULT_HIGH_TEMP			0x01
+#define FAULT_HIGH_VOLT			0x02
+#define FAULT_LOW_VOLT			0x04
+#define FAULT_HIGH_CURRENT	    0x08
+#define FAULT_WATCHDOG			0x10
+#define FAULT_CAN_BUS			0x20
+#define FAULT_VOLT_MISC			0x40
+#define DATA_SOC				0x80
+#define FAULT_OPEN_WIRE         0x03
+#define FAULT_HANDLER           0x05
 
 #define EEPROM_TERMINATOR		0xFF
 
