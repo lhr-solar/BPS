@@ -48,9 +48,8 @@ void EnterFaultState() {
             BSP_Light_On(OCURR);
             EEPROM_LogError(FAULT_HIGH_CURRENT);
             break;
+            //NEED TO: Errors for Open Wire, WDOG trip, HardFault trip, OS Error
         default:
-            BSP_Light_On(WDOG); 
-            EEPROM_LogError(FAULT_WATCHDOG);
             break;
     }
     CANData_t data;
