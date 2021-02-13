@@ -43,7 +43,7 @@ SafetyStatus Voltage_CheckStatus(void);
  * Finds all battery modules in danger and stores them into a list.
  * Each battery module corresponds to and index of the array. If the element in the
  * array is 1, then it means that module in the index is in danger.
- * @return struct that has safety status for all wires and modules in the system
+ * @param struct that has safety status for all wires and modules in the system
  */
 void Voltage_GetModulesInDanger(VoltageSafety_t* system);
  
