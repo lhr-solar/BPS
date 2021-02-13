@@ -67,6 +67,7 @@ void Task_VoltTempMonitor(void *p_arg) {
         SafetyStatus wireStatus = Voltage_OpenWire();
         
         if(wireStatus != SAFE) {
+            Fault_BitMap = Fault_OW;
             OSSemPost(&Fault_Sem4,
                         OS_OPT_POST_1,
                         &err);
