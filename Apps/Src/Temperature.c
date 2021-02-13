@@ -49,7 +49,7 @@ void Temperature_Init(cell_asic *boards){
 
 	// Read Configuration Register
 	wakeup_sleep(NUM_MINIONS);
-	LTC6811_rdcfg_wrap(NUM_MINIONS, Minions);
+	LTC6811_rdcfg_safe(NUM_MINIONS, Minions);
 	//release mutex
   	OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
   	assertOSError(err);

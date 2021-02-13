@@ -92,17 +92,17 @@ void LTC6811_Init(cell_asic *battMod);
 
 //wrappers for LTC6811 commands that return a PEC error value. These functions will trip the BPS if packets fail too many times in a row.
 
-void LTC6811_rdcv_wrap(uint8_t reg, uint8_t total_ic, cell_asic ic[]);
+void LTC6811_rdcv_safe(uint8_t reg, uint8_t total_ic, cell_asic ic[]);
 
-void LTC6811_rdaux_wrap(uint8_t reg, uint8_t total_ic, cell_asic ic[]);
+void LTC6811_rdaux_safe(uint8_t reg, uint8_t total_ic, cell_asic ic[]);
 
-void LTC6811_rdstat_wrap(uint8_t reg, uint8_t total_ic, cell_asic ic[]);
+void LTC6811_rdstat_safe(uint8_t reg, uint8_t total_ic, cell_asic ic[]);
 
-void LTC6811_rdcfg_wrap(uint8_t total_ic, cell_asic ic[]);
+void LTC6811_rdcfg_safe(uint8_t total_ic, cell_asic ic[]);
 
-void LTC6811_rdpwm_wrap(uint8_t total_ic, uint8_t pwmReg, cell_asic ic[]);
+void LTC6811_rdpwm_safe(uint8_t total_ic, uint8_t pwmReg, cell_asic ic[]);
 
-void LTC6811_rdcomm_wrap(uint8_t total_ic, cell_asic ic[]);
+void LTC6811_rdcomm_safe(uint8_t total_ic, cell_asic ic[]);
 
 
 /********************************************************

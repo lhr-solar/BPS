@@ -60,7 +60,7 @@ void Voltage_Init(cell_asic *boards){
 	//take control of mutex
   	OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
   	assertOSError(err);
-	LTC6811_rdcfg_wrap(NUM_MINIONS, Minions);
+	LTC6811_rdcfg_safe(NUM_MINIONS, Minions);
 	//release mutex
   	OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
   	assertOSError(err);
@@ -84,7 +84,7 @@ void Voltage_UpdateMeasurements(void){
 	OS_ERR err;
   	OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
   	assertOSError(err);
-	LTC6811_rdcv_wrap(0, NUM_MINIONS, Minions); // Set to read back all cell voltage registers
+	LTC6811_rdcv_safe(0, NUM_MINIONS, Minions); // Set to read back all cell voltage registers
 	//release mutex
   	OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
   	assertOSError(err);
