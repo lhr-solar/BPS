@@ -138,6 +138,131 @@ void LTC6811_Init(cell_asic *battMod){
 	LTC6811_init_reg_limits(NUM_MINIONS, battMod);
 }
 
+// Reads and parses the LTC6811 cell voltage registers. If packets fail to be read correctly too many times in a row, the BPS is tripped.
+void LTC6811_rdcv_safe(uint8_t reg, // Controls which cell voltage register is read back.
+                     uint8_t total_ic, // the number of ICs in the system
+                     cell_asic ic[] // Array of the parsed cell codes
+                    )
+{
+  OS_ERR err;
+  uint8_t count = 0;
+  while(LTC681x_rdcv(reg,total_ic,ic) == -1){
+    if(count == MAX_PEC_ERRORS){
+      //trip BPS
+      OSSemPost(&Fault_Sem4, OS_OPT_POST_1, &err);
+      assertOSError(err);
+    }
+    count++;
+  }
+}
+
+/*
+ The function is used
+ to read the  parsed GPIO codes of the LTC6811. This function will send the requested
+ read commands parse the data and store the gpio voltages in aux_codes variable.
+ If packets fail to be read correctly too many times in a row, the BPS is tripped.
+*/
+void LTC6811_rdaux_safe(uint8_t reg, //Determines which GPIO voltage register is read back.
+                     uint8_t total_ic,//the number of ICs in the system
+                     cell_asic ic[]//A two dimensional array of the gpio voltage codes.
+                    )
+{
+  OS_ERR err;
+  uint8_t count = 0;
+  while(LTC681x_rdaux(reg,total_ic,ic) == -1){
+    if(count == MAX_PEC_ERRORS){
+      //trip BPS
+      OSSemPost(&Fault_Sem4, OS_OPT_POST_1, &err);
+      assertOSError(err);
+    }
+    count++;
+  }
+}
+
+/*
+ Reads and parses the LTC6811 stat registers.
+ The function is used
+ to read the  parsed stat codes of the LTC6811. This function will send the requested
+ read commands parse the data and store the stat voltages in stat_codes variable.
+If packets fail to be read correctly too many times in a row, the BPS is tripped.
+*/
+void LTC6811_rdstat_safe(uint8_t reg, //Determines which Stat  register is read back.
+                      uint8_t total_ic,//the number of ICs in the system
+                      cell_asic ic[]
+                     )
+{
+  OS_ERR err;
+  uint8_t count = 0;
+  while(LTC681x_rdstat(reg,total_ic,ic) == -1){
+    if(count == MAX_PEC_ERRORS){
+      //trip BPS
+      OSSemPost(&Fault_Sem4, OS_OPT_POST_1, &err);
+      assertOSError(err);
+    }
+    count++;
+  }
+}
+
+/*
+Reads configuration registers of a LTC6811 daisy chain.
+If packets fail to be read correctly too many times in a row, the BPS is tripped.
+*/
+void LTC6811_rdcfg_safe(uint8_t total_ic, //Number of ICs in the system
+                     cell_asic ic[] //A two dimensional array that the function stores the read configuration data.
+                    )
+{
+  OS_ERR err;
+  uint8_t count = 0;
+  while(LTC681x_rdcfg(total_ic, ic) == -1){
+    if(count == MAX_PEC_ERRORS){
+      //trip BPS
+      OSSemPost(&Fault_Sem4, OS_OPT_POST_1, &err);
+      assertOSError(err);
+    }
+    count++;
+  }
+}
+
+/*
+Reads pwm registers of a LTC6811 daisy chain.
+If packets fail to be read correctly too many times in a row, the BPS is tripped.
+*/
+void LTC6811_rdpwm_safe(uint8_t total_ic, //Number of ICs in the system
+                     uint8_t pwmReg,
+                     cell_asic ic[] //A two dimensional array that the function stores the read configuration data.
+                    )
+{
+  OS_ERR err;
+  uint8_t count = 0;
+  while(LTC681x_rdpwm(total_ic, pwmReg, ic) == -1){
+    if(count == MAX_PEC_ERRORS){
+      //trip BPS
+      OSSemPost(&Fault_Sem4, OS_OPT_POST_1, &err);
+      assertOSError(err);
+    }
+    count++;
+  }
+}
+
+/*
+Reads COMM registers of a LTC6811 daisy chain.
+If packets fail to be read correctly too many times in a row, the BPS is tripped.
+*/
+void LTC6811_rdcomm_safe(uint8_t total_ic, //Number of ICs in the system
+                      cell_asic ic[] //A two dimensional array that the function stores the read configuration data.
+                     )
+{
+  OS_ERR err;
+  uint8_t count = 0;
+  while(LTC681x_rdcomm(total_ic, ic) == -1){
+    if(count == MAX_PEC_ERRORS){
+      //trip BPS
+      OSSemPost(&Fault_Sem4, OS_OPT_POST_1, &err);
+      assertOSError(err);
+    }
+    count++;
+  }
+}
 
 /********************************************************
 *********************************************************/

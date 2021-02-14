@@ -26,7 +26,7 @@
  * @param boards LTC6811 data structure that contains the values of each register
  * @return SUCCESS or ERROR
  */
-ErrorStatus Temperature_Init(cell_asic *boards);
+void Temperature_Init(cell_asic *boards);
 
 /** Temperature_ChannelConfig
  * Configures which temperature channel you're sampling from

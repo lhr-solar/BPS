@@ -32,7 +32,7 @@ static uint32_t openWires[TOTAL_VOLT_WIRES];
  * @param voltageMutex pointer to mutex, meant to pass pointer to VoltageBuffer_Mutex
  * @return SUCCESS or ERROR
  */
-ErrorStatus Voltage_Init(cell_asic *boards){
+void Voltage_Init(cell_asic *boards){
 	// Record pointer
 	Minions = boards;
 	//initialize mutex
@@ -42,9 +42,7 @@ ErrorStatus Voltage_Init(cell_asic *boards){
 				  "Voltage Buffer Mutex",
 				  &err
 				);
-
-	int8_t error = 0;
-	
+					
 	wakeup_sleep(NUM_MINIONS);
 	LTC6811_Init(Minions);
 	
@@ -62,25 +60,18 @@ ErrorStatus Voltage_Init(cell_asic *boards){
 	//take control of mutex
   	OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
   	assertOSError(err);
-	error = LTC6811_rdcfg(NUM_MINIONS, Minions);
+	LTC6811_rdcfg_safe(NUM_MINIONS, Minions);
 	//release mutex
   	OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
   	assertOSError(err);
 	
-	if(error == 0){
-		return SUCCESS;
-	}else{
-		return ERROR;
-	}
 }
 
 /** Voltage_UpdateMeasurements
  * Stores and updates the new measurements received
  * @param pointer to new voltage measurements
- * @return SUCCESS or ERROR
  */
-ErrorStatus Voltage_UpdateMeasurements(void){
-	int8_t error = 0;
+void Voltage_UpdateMeasurements(void){
 	CPU_TS ts;
 	// Start Cell ADC Measurements
 	wakeup_idle(NUM_MINIONS);
@@ -93,9 +84,10 @@ ErrorStatus Voltage_UpdateMeasurements(void){
 	OS_ERR err;
   	OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
   	assertOSError(err);
-	error = LTC6811_rdcv(0, NUM_MINIONS, Minions); // Set to read back all cell voltage registers
+	LTC6811_rdcv_safe(0, NUM_MINIONS, Minions); // Set to read back all cell voltage registers
 	//copies values from cells.c_codes to private array
 	OSMutexPend(&Voltage_Mutex, 0, OS_OPT_PEND_BLOCKING, &ts, &err);
+  assertOSError(err);
 	for(int i = 0; i < NUM_BATTERY_MODULES; i++){
 		VoltageVal[i] = Minions[i / MAX_VOLT_SENSORS_PER_MINION_BOARD].cells.c_codes[i % MAX_VOLT_SENSORS_PER_MINION_BOARD];
 	}
@@ -104,11 +96,7 @@ ErrorStatus Voltage_UpdateMeasurements(void){
   	assertOSError(err);
 	
 	OSMutexPost(&Voltage_Mutex, OS_OPT_POST_NONE, &err);
-	if(error == 0){
-		return SUCCESS;
-	}else{
-		return ERROR;
-	}
+	assertOSError(err);
 }
 
 /** Voltage_CheckStatus

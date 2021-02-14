@@ -27,7 +27,7 @@ void Charge_Init(void){
 
 /** Charge_Calculate
  * Calculates new Charge depending on the current reading
- * @param current reading from hall effect sensors. Fixed point of 0.001 (1.500 Amps = 1500)
+ * @param current reading from current sensors. Fixed point of 0.001 (1.500 Amps = 1500)
  * not a constant samping. Add on however much from the previous
  */
 void Charge_Calculate(int32_t milliamps){ 
