@@ -10,6 +10,7 @@
 #include "Tasks.h"
 #include "BSP_SPI.h"
 #include "CANbus.h"
+#include "Charge.h"
 
 static OS_MUTEX AmperesData_Mutex;
 

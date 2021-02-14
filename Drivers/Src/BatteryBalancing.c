@@ -111,10 +111,10 @@ static void Balancing_SetDischargeBit(uint8_t module, cell_asic ic[]) {
 	OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
 	assertOSError(err);
 	
-	LTC681x_rdcfg(NUM_MINIONS, ic);
+	LTC6811_rdcfg_safe(NUM_MINIONS, ic);
 	LTC6811_set_discharge(ModuleNumber, NUM_MINIONS, &ic[ICNumber]); //Set discharge bit
-	LTC681x_wrcfg(NUM_MINIONS, ic);	
-	LTC681x_rdcfg(NUM_MINIONS, ic);
+	LTC6811_wrcfg(NUM_MINIONS, ic);	
+	LTC6811_rdcfg_safe(NUM_MINIONS, ic);
 	
 	OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
 	assertOSError(err);

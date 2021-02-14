@@ -22,16 +22,14 @@ typedef struct voltage_safety{
  * Initializes all device drivers including LTC6811 and GPIO to begin Voltage Monitoring
  * @param boards LTC6811 data structure that contains the values of each register
  * @param voltageMutex pointer to mutex, meant to pass pointer to VoltageBuffer_Mutex 
- * @return SUCCESS or ERROR
  */
-ErrorStatus Voltage_Init(cell_asic *boards);
+void Voltage_Init(cell_asic *boards);
 
 /** Voltage_UpdateMeasurements
  * Stores and updates the new measurements received
  * @param pointer to new voltage measurements
- * @return SUCCESS or ERROR
  */
-ErrorStatus Voltage_UpdateMeasurements(void);
+void Voltage_UpdateMeasurements(void);
 
 /** Voltage_CheckStatus
  * Checks if all modules are safe
