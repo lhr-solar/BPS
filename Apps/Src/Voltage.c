@@ -13,8 +13,6 @@
 #include "Tasks.h"
 #include "Amps.h"
 
-extern OS_MUTEX MinionsASIC_Mutex;
-
 static cell_asic *Minions;
 
 static OS_MUTEX Voltage_Mutex;

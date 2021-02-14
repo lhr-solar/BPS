@@ -31,8 +31,6 @@ char hexString[8];
 const float MILLI_UNIT_CONVERSION = 1000;
 const float PERCENT_CONVERSION = 100;
 
-extern OS_MUTEX MinionsASIC_Mutex;
-
 
 /** CLI_Init
  * Initializes the CLI with the values it needs

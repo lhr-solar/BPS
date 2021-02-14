@@ -8,8 +8,6 @@
 #include "os.h"
 #include "Tasks.h"
 
-extern OS_MUTEX MinionsASIC_Mutex;
-
 
 // Holds the temperatures in Celsius (Fixed Point with .001 resolution) for each sensor on each board
 int32_t ModuleTemperatures[NUM_MINIONS][MAX_TEMP_SENSORS_PER_MINION_BOARD];

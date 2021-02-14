@@ -78,7 +78,6 @@ Copyright 2017 Linear Technology Corp. (LTC)
 /*********************************************************/
 /*** Code that was added by UTSVT. ***/
 /*********************************************************/
-OS_MUTEX MinionsASIC_Mutex;
 bsp_os_t spi_os;
 OS_SEM MinionsIO_Sem4;
 

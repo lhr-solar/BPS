@@ -118,9 +118,11 @@ extern OS_Q CANBus_MsgQ;
 extern OS_SEM SafetyCheck_Sem4;
 extern OS_SEM Fault_Sem4;
 extern OS_MUTEX WDog_Mutex;
+extern OS_MUTEX MinionsASIC_Mutex;
 extern uint32_t WDog_BitMap;
 extern uint32_t Fault_BitMap;
 extern uint8_t Fault_Flag;
+
 typedef enum {
     Fault_UVOLT   = 0x001,
     Fault_OVOLT   = 0x002,
