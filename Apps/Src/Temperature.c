@@ -287,13 +287,14 @@ uint8_t *Temperature_GetModulesInDanger(void){
 
 	static uint8_t ModuleTempStatus[NUM_BATTERY_MODULES];
 	int32_t temperatureLimit = ChargingState == 1 ? MAX_CHARGE_TEMPERATURE_LIMIT : MAX_DISCHARGE_TEMPERATURE_LIMIT;
-
-	OSMutexPend(&TemperatureBuffer_Mutex,
-				0,
-				OS_OPT_PEND_BLOCKING,
-				&ts,
-				&err);
-	// assert
+	if(!Fault_Flag){
+		OSMutexPend(&TemperatureBuffer_Mutex,
+					0,
+					OS_OPT_PEND_BLOCKING,
+					&ts,
+					&err);
+		assertOSError(err);
+	}
 
 	for (int i = 0; i < NUM_MINIONS-1; i++) {
 		for (int j = 0; j < MAX_TEMP_SENSORS_PER_MINION_BOARD; j++) {
@@ -303,12 +304,12 @@ uint8_t *Temperature_GetModulesInDanger(void){
 			}
 		}
 	}
-
-	OSMutexPost(&TemperatureBuffer_Mutex,
-				OS_OPT_POST_1,
-				&err);
-	// assert
-
+	if(!Fault_Flag){
+		OSMutexPost(&TemperatureBuffer_Mutex,
+					OS_OPT_POST_1,
+					&err);
+		assertOSError(err);
+	}
 	return ModuleTempStatus;
 }
 /** Temperature_GetSingleTempSensor

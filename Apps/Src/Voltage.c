@@ -85,14 +85,9 @@ void Voltage_UpdateMeasurements(void){
   	OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
   	assertOSError(err);
 	LTC6811_rdcv_safe(0, NUM_MINIONS, Minions); // Set to read back all cell voltage registers
-	//release mutex
-  	OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
-  	assertOSError(err);
-	//take control of mutex
-  	OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
-	assertOSError(err);
 	//copies values from cells.c_codes to private array
 	OSMutexPend(&Voltage_Mutex, 0, OS_OPT_PEND_BLOCKING, &ts, &err);
+  assertOSError(err);
 	for(int i = 0; i < NUM_BATTERY_MODULES; i++){
 		VoltageVal[i] = Minions[i / MAX_VOLT_SENSORS_PER_MINION_BOARD].cells.c_codes[i % MAX_VOLT_SENSORS_PER_MINION_BOARD];
 	}
@@ -101,7 +96,7 @@ void Voltage_UpdateMeasurements(void){
   	assertOSError(err);
 	
 	OSMutexPost(&Voltage_Mutex, OS_OPT_POST_NONE, &err);
-	
+	assertOSError(err);
 }
 
 /** Voltage_CheckStatus
@@ -220,12 +215,16 @@ uint32_t Voltage_GetOpenWire(void){
 	wakeup_idle(NUM_MINIONS);
 	//take control of mutex
 	OS_ERR err;
-  	OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
-  	assertOSError(err);
+	if(!Fault_Flag){
+  		OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
+  		assertOSError(err);
+	}
 	uint32_t result = LTC6811_run_openwire_multi(NUM_MINIONS, Minions, false);
-	//release mutex
-  	OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
-  	assertOSError(err);
+	//release 
+	if (!Fault_Flag){
+  		OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
+  		assertOSError(err);
+	}
 	return result;
 }
 
@@ -250,11 +249,15 @@ uint16_t Voltage_GetModuleMillivoltage(uint8_t moduleIdx){
     if((moduleIdx / MAX_VOLT_SENSORS_PER_MINION_BOARD) >= NUM_MINIONS) {
         return 0xFFFF;  // return -1 which indicates error voltage
     }
-	OSMutexPend(&Voltage_Mutex, 0, OS_OPT_PEND_BLOCKING, &ts, &err);
-	assertOSError(err);
+	if (!Fault_Flag){
+		OSMutexPend(&Voltage_Mutex, 0, OS_OPT_PEND_BLOCKING, &ts, &err);
+		assertOSError(err);
+	}
 	uint16_t ret = VoltageVal[moduleIdx] / 10;
-	OSMutexPost(&Voltage_Mutex, OS_OPT_POST_NONE, &err);
-	assertOSError(err);
+	if (!Fault_Flag){
+		OSMutexPost(&Voltage_Mutex, OS_OPT_POST_NONE, &err);
+		assertOSError(err);
+	}
 	return ret;
 }
 
