@@ -84,7 +84,9 @@ typedef struct FIFO_STRUCT_NAME {
  */
 static inline FIFO_TYPE_NAME __attribute__((unused))
 NEW () {
-    return (FIFO_TYPE_NAME) {{0}, 0, 0};
+    FIFO_TYPE_NAME fifo;
+    memset(&fifo, 0, sizeof(fifo));
+    return fifo;
 }
 
 /**
