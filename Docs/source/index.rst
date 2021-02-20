@@ -14,8 +14,10 @@ Welcome to the BeVolt BPS documentation!
    :maxdepth: 2
    :caption: Overview
 
+   Overview/useful-software
    Overview/design-requirements
    Overview/design-overview
+   HardwareOverview/hardware-overview
 
 .. toctree::
    :hidden:
@@ -38,6 +40,7 @@ Welcome to the BeVolt BPS documentation!
 .. toctree::
    :hidden:
    :maxdepth: 1
-   :caption: Glossary
+   :caption: Terms and Definitions
    
    glossary
+   abbreviations
