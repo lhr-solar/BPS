@@ -3,9 +3,17 @@
 #include "config.h"
 #include "Tasks.h"
 
+#ifndef SIMULATION
+#include "stm32f4xx.h"
+#endif
+
 #define CANBUS_QUEUE_LENGTH 64
 
 void Task_Init(void *p_arg) {
+
+#ifndef SIMULATION
+	OS_CPU_SysTickInit(SystemCoreClock / (CPU_INT32U) OSCfg_TickRate_Hz);
+#endif
 
     OS_ERR err;
     OSSemCreate(&Fault_Sem4,

@@ -2,6 +2,8 @@
 #include "config.h"
 #include "os.h"
 #include "Tasks.h"
+#include "BSP_UART.h"
+#include "stm32f4xx.h"
 
 OS_TCB Task1_TCB;
 CPU_STK Task1_Stk[256];
@@ -11,20 +13,48 @@ CPU_STK Task2_Stk[256];
 
 OS_SEM SafetyCheck_Sem4;
 
+void Task1(void *p_arg);
+void Task2(void *p_arg);
+
 void Task1(void *p_arg) {
     (void)p_arg;
 
     OS_ERR err;
     CPU_TS ts;
     
+    OS_CPU_SysTickInit(SystemCoreClock / (CPU_INT32U) OSCfg_TickRate_Hz);
+
+    BSP_UART_Init(NULL, NULL, UART_USB);
+    printf("Checkpoint A\n");
+
+    OSTimeDly(1, OS_OPT_TIME_DLY, &err);
+    while(err != OS_ERR_NONE);
+
+    // Create Task 2
+    OSTaskCreate(&Task2_TCB,
+                "Task 2",
+                Task2,
+                (void *)0,
+                2,
+                Task2_Stk,
+                16,
+                256,
+                0,
+                0,
+                (void *)0,
+                OS_OPT_TASK_SAVE_FP | OS_OPT_TASK_STK_CHK,
+                &err);
+    while(err != OS_ERR_NONE);
+
     while(1) {
         for(int i = 0; i < 4; i++) {
-        OSSemPend(&SafetyCheck_Sem4,
-                    0,
-                    OS_OPT_PEND_BLOCKING,
-                    &ts,
-                    &err);
+            OSSemPend(&SafetyCheck_Sem4,
+                      0,
+                      OS_OPT_PEND_BLOCKING,
+                      &ts,
+                      &err);
         }
+
         OSTimeDly(1,
                 OS_OPT_TIME_DLY,
                 &err);
@@ -53,7 +83,10 @@ void Task2(void *p_arg) {
 int main(void) {
     OS_ERR err;
 
+    __disable_irq();
+
     OSInit(&err);
+    while(err != OS_ERR_NONE);
 
     OSSemCreate(&SafetyCheck_Sem4,
                 "Safety Check Semaphore",
@@ -66,27 +99,16 @@ int main(void) {
                 (void *)0,
                 1,
                 Task1_Stk,
-                128,
+                16,
                 256,
                 0,
                 0,
                 (void *)0,
                 OS_OPT_TASK_SAVE_FP | OS_OPT_TASK_STK_CHK,
                 &err);
+    while(err != OS_ERR_NONE);
 
-    OSTaskCreate(&Task2_TCB,
-                "Task 2",
-                Task2,
-                (void *)0,
-                2,
-                Task2_Stk,
-                128,
-                256,
-                0,
-                0,
-                (void *)0,
-                OS_OPT_TASK_SAVE_FP | OS_OPT_TASK_STK_CHK,
-                &err);
+    __enable_irq();
 
     OSStart(&err);
 }

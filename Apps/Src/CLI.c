@@ -31,14 +31,13 @@ char hexString[8];
 const float MILLI_UNIT_CONVERSION = 1000;
 const float PERCENT_CONVERSION = 100;
 
-
 /** CLI_Init
  * Initializes the CLI with the values it needs
  * @param boards is a cell_asic struct pointer to the minion boards
  */
 void CLI_Init(cell_asic* boards) {
 	Minions = boards;
-	BSP_UART_Init();
+	BSP_UART_Init(NULL, NULL, UART_USB);
 }
 
 /** CLI_InputParse

@@ -31,7 +31,9 @@ void *ScanThread2(void *arg);
 /**
  * @brief   Initializes the UART peripheral
  */
-void BSP_UART_Init(void) {
+void BSP_UART_Init(__attribute__((unused)) callback_t rxCallback,   // I can't be bother to figure out how to use these  
+                   __attribute__((unused)) callback_t txCallback,   // callbacks in simulation, so they're just going to
+                   __attribute__((unused)) UART_Port usart) {       // be unused for now.
     int err = 0;
     pthread_attr_t attr;
     pthread_t id;
