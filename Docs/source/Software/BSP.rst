@@ -208,7 +208,7 @@ Purpose
     The BSP is meant to be compatible with the Baremetal and RTOS version of the BPS. In order to accomplish
     this, ``BSP_OS.h`` was written in order to separate the two code bases in our library.
 Usage
-    The struct of type ``bsp_os_t`` must be defined and both pend and post functions must be created for both
+    The ``struct`` of type ``bsp_os_t`` must be defined and both pend and post functions must be created for both
     versions of the BPS. The RTOS version of the BPS will have the pend and post functions initialized to
     pend and post the shared resource of that library. The baremetal version will have the pend and post 
     functions remain empty. There are multiple ways these can be used. Then ``#ifdef`` will surround both 
