@@ -200,3 +200,43 @@ Usage
 
 Additional Considerations
     None
+
+OS Header file: Sijin Woo
+=========================
+
+Purpose
+    The BSP is meant to be compatible with the Baremetal and RTOS version of the BPS. In order to accomplish
+    this, ``BSP_OS.h`` was written in order to separate the two code bases in our library.
+Usage
+    The struct of type ``bsp_os_t`` must be defined and both pend and post functions must be created for both
+    versions of the BPS. The RTOS version of the BPS will have the pend and post functions initialized to
+    pend and post the shared resource of that library. The baremetal version will have the pend and post 
+    functions remain empty. There are multiple ways these can be used. Then ``#ifdef`` will surround both 
+    initializations of this struct. If we compile with ``RTOS``, then the RTOS functions will be used. If 
+    we compile with ``BAREMETAL``, then the baremetal functions will be used. For example,
+
+    .. code-block:: c
+
+        // LTC6811.c
+        bsp_os_t spi_os;
+        OS_SEM MinionsIO_Sem4;
+        void LTC6811_Pend(void) {
+            CPU_TS ts;
+            OS_ERR err;
+            OSSemPend(&MinionsIO_Sem4, 0, OS_OPT_PEND_BLOCKING, &ts, &err);
+        }
+        void LTC6811_Post(void) {
+            OS_ERR err;
+            OSSemPost(&MinionsIO_Sem4, OS_OPT_POST_1, &err);
+        }
+        void LTC6811_Init(void) {
+            spi_os.pend = LTC6811_Pend;
+            spi_os.post = LTC6811_Post;
+            BSP_SPI_Init(&spi_os);
+        }
+
+Additional Considerations
+    There are other ways you can also use this library. The struct can be passed in to the initialization
+    function of the init function. You could even choose to not use this struct and just ``#ifdef``
+    everything in the library. This is up to the programmer's judgement to make the code look as neat
+    as possible.
