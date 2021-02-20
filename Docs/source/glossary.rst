@@ -142,6 +142,9 @@ Glossary
   Open Drain/Collector 
     A configuration of a pin on a microcontroller where typically logical '0' corresponds to '0V' while logical '1' corresponds to a high impedance state (Hi-Z). This is often used to allow multiple devices to share a single wire for communication. This stands in opposition to a "push-pull" configuration. 
 
+  Op-Amp
+    An operational amplifier is a circuit element that performs mathematical operations on input voltages. It is most commonly used to increase these inputs by a certain magnitude to make them easier to read by the microcontroller.
+
   Positive Logic 
     Logical 1/true is a high voltage/on and a logic 0/false is a low voltage/false. 
 
@@ -168,6 +171,9 @@ Glossary
 
   Semaphore 
     A variable that tracks the availability of a  resource. Threads will look here before attempting to access resources in order to avoid race conditions, and will set/unset or increment/decrement these when they acquire/release the resources. 
+
+  Shunt Resistor
+    Resistor used to measure the current through a line. Typically extremely small so power is not wasted. Voltage is measured across resistor(using an :term:`Op-Amp <Op-Amp>`) and divided by resistance to calculate the current.
 
   Silkscreen 
     Ink layer on a PCB for all the text and graphics 
