@@ -31,7 +31,12 @@ Priority
     occured.
 
 Shared Resources
-    It uses the ``Fault_Sem4`` which is used to block the task from running until something sets it.
+    It uses the ``Fault_Sem4`` which is used to block the task from running until something sets it. It also uses
+    the ``Fault_BitMap`` variable. This variable is set by the other tasks so the Fault task does
+    not have to call other functions to find out what caused the fault. The variable used to set 
+    ``Fault_BitMap`` is ``enum Fault_Set``. The description of this enum is in the file ``tasks.h``.
+    The variable ``Fault_Flag`` is also used by some functions to bypass OS functions in the case of
+    a fault. If the variable is set to 1, functions such as ``OS_SemPend`` & ``OS_SemPost`` are skipped.
 
 Timing Requirements
     The contactor must be shut off as soon as possible after a fault is detected.
