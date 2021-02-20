@@ -187,6 +187,22 @@ A list of all valid CLI commands is included below.
 
 ``temperature module 6 1`` - prints temperature of sensor 1 on module 6
 
+Fifo Header file: Chase Block
+=============================
+
+Purpose
+    Many of our BSP packages use FIFO's to send and receive data. In the old version of the BPS, a FIFO
+    was created in each package along with it's driver. This header file does all that so we have a 
+    defined FIFO "class" in our library.
+    
+Usage
+    More detailed usage instructions are in lines 8-15 of ``fifo.h``. The function names for all of the FIFO
+    drivers will be ``fifo_name_function_name`` where ``function_name`` can be anything in lines 69-75
+    of this file. The ``#define`` for the fifo types must be declared before you write ``#include fifo.h``.
+
+Additional Considerations
+    None
+
 Main
 ====
 
@@ -241,7 +257,6 @@ MinionsIO Semaphore
 Whenever the LTC driver is calling the SPI function, there's going to be some delay until the SPI transfer is complete. During that delay, we should be 
 executing some other task so once the SPI transfer starts, the system should start waiting for this semaphore. 
 Whenever the SPI transfer is complete, we must signal this semaphore so we need to have an ISR that calls the signal semaphore function whenever a transfer is complete. This ISR is in the BSP SPI module.
-
 
 Voltage Mutex
 =============
