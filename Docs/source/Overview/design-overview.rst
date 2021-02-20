@@ -47,7 +47,7 @@ which shuts down the car.
 Board functions
 ===============
 
-The minion boards will be daisy-chained to minimize wire clutter from the master board. 
+The minion boards will be daisy-chained to minimize wire clutter from the leader board. 
 The Amperes minion board uses :term:`Shunt Resistor sensors <Shunt Resistor>` to measure the current in the high-voltage line. 
 
 .. note::

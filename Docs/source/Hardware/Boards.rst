@@ -6,7 +6,7 @@ There are two temperature sensors for each battery module with a module minion b
 Each board measures up to 12 battery modules and 16 temperature sensors, but is configured for eight modules and 
 16 sensors by default.
 
-The Amperes minion board is connected to the main power cable that powers the electrical loop using the :term:`Hall effect sensor`. 
+The Amperes minion board is connected to the main power cable that powers the electrical loop using the :term:`Shunt Resistor`. 
 
 Leader board
 ============

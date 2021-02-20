@@ -17,6 +17,8 @@ The BPS should have the following components and features:
         * the temperature exceeds the maximum specified in the datasheet
         * an open wire is detected
         * the BPS RTOS stops functioning properly
+        * a hard fault occurs
+        * a lot of data is dropped from LTC boards at once
 
         .. note::
             The temperature and current limits vary depending on whether the battery is charging or discharging. 
