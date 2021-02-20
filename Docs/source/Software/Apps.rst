@@ -25,7 +25,7 @@ Purpose
     The Charge App is used to keep track of the state of charge of the battery.
 
 Usage
-    ``Charge_Init()`` must be called before calling any of the other Charge functions. Descriptions of the other functions can be found in Charge.h.
+    ``Charge_Init()`` must be called before calling any of the other Charge functions. Descriptions of the other functions can be found in ``Charge.h``.
 
 Additional Considerations
     None.
@@ -117,7 +117,7 @@ A list of all valid CLI commands is included below.
 "CAN"/ "Canbus"
 ###############
 
-| Reads and writes to the CANbus from the BPS
+| Reads and writes to the CAN bus from the BPS
 | **Argument(s)**: 
 
 - **read**: prints messages until halted by escape sequence
@@ -135,7 +135,7 @@ A list of all valid CLI commands is included below.
 "EEPROM"
 ########
 
-| Reads and writes to the EEPROM.
+| Reads and writes to the :term:`EEPROM <EEPROM>`.
 | **Argument(s)**: 
 
 - **none**: prints EEPROM status
@@ -145,7 +145,7 @@ A list of all valid CLI commands is included below.
 "ADC"
 #####
 
-| Displays raw ADC data.
+| Displays raw `ADC <https://www.electronics-tutorials.ws/combination/analogue-to-digital-converter.html>`_ data.
 | **Argument(s)**: 
 
 - **none**: prints raw data from the ADC at the current time
@@ -193,7 +193,7 @@ Fifo Header file: Chase Block
 Purpose
     Many of our BSP packages use FIFO's to send and receive data. In the old version of the BPS, a FIFO
     was created in each package along with it's driver. This header file does all that so we have a 
-    defined FIFO "class" in our library.
+    defined :term:`FIFO <Queue>` "class" in our library.
     
 Usage
     More detailed usage instructions are in lines 8-15 of ``fifo.h``. The function names for all of the FIFO
@@ -254,13 +254,12 @@ Mutexes and Semaphores
 MinionsIO Semaphore
 ===================
 
-Whenever the LTC driver is calling the SPI function, there's going to be some delay until the SPI transfer is complete. During that delay, we should be 
-executing some other task so once the SPI transfer starts, the system should start waiting for this semaphore. 
-Whenever the SPI transfer is complete, we must signal this semaphore so we need to have an ISR that calls the signal semaphore function whenever a transfer is complete. This ISR is in the BSP SPI module.
+Whenever the LTC driver is calling the :term:`SPI <SPI>` function, there's going to be some delay until the SPI transfer is complete. 
+During that delay, we should be executing some other task so once the SPI transfer starts, the system should start 
+waiting for this :term: `semaphore <Semaphore>`. Whenever the SPI transfer is complete, we must signal this semaphore so we need to 
+have an :term:`ISR <ISR>` that calls the signal semaphore function whenever a transfer is complete. This ISR is in the BSP SPI module.
 
 Voltage Mutex
 =============
 
 Mutually excludes accesses to the Voltage buffer in the Voltage.c library. 
-
-

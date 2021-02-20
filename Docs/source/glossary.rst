@@ -65,10 +65,7 @@ Glossary
     Software that handles errors in codes; software triggered 
 
   Ferrite Bead 
-    Passive component that suppresses EMI/high frequency noises 
-
-  FIFO 
-    First In First Out 
+    Passive component that suppresses EMI/high frequency noises  
 
   Galvanically Isolated 
     Two systems that do not touch the same metal contacts; usually means the ground and power connections of system A is completely separate from system B's ground and power connections; isolation should be considered in the design because if every system/electronic/board/circuit shares the same ground and if one shorts, then the whole system can short whereas if each subsystem is isolated and one shorts, then only that part needs to be replaced 
@@ -145,6 +142,9 @@ Glossary
   Op-Amp
     An operational amplifier is a circuit element that performs mathematical operations on input voltages. It is most commonly used to increase these inputs by a certain magnitude to make them easier to read by the microcontroller.
 
+  Phase Locked Loop
+    The PLL generates an output signal whose phase is related to the input signal. It is used to increase the clock speed of the STM microcontroller.
+
   Positive Logic 
     Logical 1/true is a high voltage/on and a logic 0/false is a low voltage/false. 
 
@@ -153,6 +153,9 @@ Glossary
 
   Pull-Up Resistor 
     A resistor to Vcc that pulls a wire's voltage to logical '1' when it disconnects from some other source. 
+
+  Pulse Width Modulation
+    A method of controlling the speed of a peripheral by quickly turning it on and off and controlling how long it stays on for. Used to control the speed of the fans.
 
   Push-Pull 
     A configuration of a pin on a microcontroller where typically logical '0' corresponds to 0V, which logical '1' corresponds to the operating voltage (Vcc). Using this configuration, there can only be one source on a wire that drives communication/control. It stands in opposition to an "open drain" configuration. 
@@ -203,7 +206,7 @@ Glossary
     STMicroelectronics is a company that produces various silicon chips and sensors. We also often refer to various microcontrollers produced by STMicro as STMs, since all their part IDs begin STM... 
 
   SWD 
-    Tightly coupled with ST-Link, the protocol that STM uses debugging. 
+    Serial Wire Debug protocol that is tightly coupled with ST-Link, the protocol that STM uses debugging. 
 
   Switching Regulator 
     A regulator that boosts or bucks the voltage by fast internal switching mechanisms. The switching (which usually a MOSFET toggling) introduces some noise to the system, but is typically more power efficient than a linear regulator and allows for boosting as well as bucking. 
@@ -221,5 +224,5 @@ Glossary
     A brand of 3-phase motor controller that our team uses. 
 
   UART 
-    An asynchronous communications protocol between two chips. 
+    An universal asynchronous communications protocol between two chips. 
     
