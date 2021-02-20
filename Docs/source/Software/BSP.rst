@@ -2,41 +2,21 @@
 Board Support Package
 ***********************
 
-I2C BSP: Manthan Upadhyaya
-=================================
+CAN BSP: Chase Block & Sijin Woo
+================================
 
 Purpose
-    The I2C driver is interrupt driven and is used to communicate with the EEPROM to log data. It 
-    requires pins PA8(SCL) and PC9(SDA) for the I2C3.
+    The purpose of this code is to send and recieve CAN messages. 
 
 Usage
-    There are multiple definitions of the same functions within this library. They are split into 2 
-    categories, one for the RTOS and one for the Bare-Metal version of the BPS. There are ``#define`` that 
-    encompass these functions that are set when compiled. The default ``#define`` is "RTOS" but it can be 
-    changed to compile the Bare-Metal code if necessary. The ``BSP_I2C.h`` file has more information on how
-    to use each function. The same function declarations are used regardless of whether it is RTOS or
-    Bare-Metal.
+    Function usage is declared in the ``BSP_CAN.h file``. When using these functions in the RTOS, pend
+    and post must occur before and after the functions are called. The resources used for pend and 
+    post can be seen in the CANBus.c driver documentation(insert link here).
 
 Additional Considerations
-    None
-
-UART BSP: Manthan Upadhyaya
-==================================
-
-Purpose
-    The UART driver is interrupt driven and initializes 2 serial transmission lines(UART 2 and 3). 
-    USART 2 is for the Bluetooth module and uses pins PA2 and PA3. USART3 is for the USB and uses pins
-    PC5 and PB10.
-
-Usage
-    This driver is also split into two sections just like the I2C driver. One is for RTOS and the 
-    other is for Bare-Metal. The ``BSP_UART.h file`` has more information on how to use each function.
-
-Additional Considerations
-    Since the BPS cannot be changed during the race according to ASC regulations(5.2.E.9), 
-    the BLE module must be disabled before the race is started if it is able to change the code. 
-    This can be done through software by not initializing the USART2 module or through hardware 
-    with a switch to turn off power to the BLE module, or just removing it all together. 
+    It also contains a queue for messages that are recieved on the CAN bus that has a depth of 10. 
+    This queue cannot be accessed outside the file. If the queue exceeds it's limit, we will lose
+    messages.
 
 Contactor BSP
 =============
@@ -59,7 +39,8 @@ Fans BSP: Manthan Upadhyaya
 Purpose
     The Fans driver is used to control the speed of the fans depending on the temperature of the Battery
     Pack. It uses pins PC6, PC7, PB14, PB15 with the alternative function of Pulse-Width Modulation 
-    enabled for as many speeds as needed for a total of 4 fans. 
+    enabled for as many speeds as needed for a total of 4 fans. The fans use PWM, so the speed can be 
+    reduced to save energy.
 
 Usage
     It sets the speeds of individual fans and can also return the value of those speeds. The 
@@ -68,21 +49,23 @@ Usage
 Additional Considerations
     None
 
-CAN BSP: Chase Block & Sijin Woo
-================================
+I2C BSP: Manthan Upadhyaya
+=================================
 
 Purpose
-    The purpose of this code is to send and recieve CAN messages. 
+    The I2C driver is interrupt driven and is used to communicate with the EEPROM to log data. It 
+    requires pins PA8(SCL) and PC9(SDA) for the I2C3.
 
 Usage
-    Function usage is declared in the ``BSP_CAN.h file``. When using these functions in the RTOS, pend
-    and post must occur before and after the functions are called. The resources used for pend and 
-    post can be seen in the CANBus.c driver documentation(insert link here).
+    There are multiple definitions of the same functions within this library. They are split into 2 
+    categories, one for the RTOS and one for the Bare-Metal version of the BPS. There are ``#define`` that 
+    encompass these functions that are set when compiled. The default ``#define`` is "RTOS" but it can be 
+    changed to compile the Bare-Metal code if necessary. The ``BSP_I2C.h`` file has more information on how
+    to use each function. The same function declarations are used regardless of whether it is RTOS or
+    Bare-Metal.
 
 Additional Considerations
-    It also contains a queue for messages that are recieved on the CAN bus that has a depth of 10. 
-    This queue cannot be accessed outside the file. If the queue exceeds it's limit, we will lose
-    messages.
+    None
 
 Lights BSP: Manthan Upadhyaya
 =================================
@@ -119,10 +102,6 @@ Additional Considerations
     Although all of the lights are meant for debugging, the fault LED light is connected directly
     to the strobe light. This means if the fault LED turns on, so will the strobe light on the car.
     It doesn't mean that the fault LED will turn on if the strobe light turns on.
-
-The Fans driver is used to control the speed of the fans depending on the temperature of the Battery
-Pack. It allows for as many speeds as needed and can change the speed of individual fans. It supports
-four fans and uses PWM to change the speed and hopefully save energy.
 
 PLL BSP: Sijin Woo
 ==================================
@@ -182,6 +161,24 @@ Additional Considerations
     the function names for each timer. Another thing to note is that one timer should not be used for
     multiple resources because if ``BSP_Timer_GetTicksElapsed()`` is called for one resource, it will
     interfere with the time passed for the second resource.
+
+UART BSP: Manthan Upadhyaya
+==================================
+
+Purpose
+    The UART driver is interrupt driven and initializes 2 serial transmission lines(UART 2 and 3). 
+    USART 2 is for the Bluetooth module and uses pins PA2 and PA3. USART3 is for the USB and uses pins
+    PC5 and PB10.
+
+Usage
+    This driver is also split into two sections just like the I2C driver. One is for RTOS and the 
+    other is for Bare-Metal. The ``BSP_UART.h file`` has more information on how to use each function.
+
+Additional Considerations
+    Since the BPS cannot be changed during the race according to ASC regulations(5.2.E.9), 
+    the BLE module must be disabled before the race is started if it is able to change the code. 
+    This can be done through software by not initializing the USART2 module or through hardware 
+    with a switch to turn off power to the BLE module, or just removing it all together. 
 
 Watchdog Timer BSP: Sijin Woo
 =================================
