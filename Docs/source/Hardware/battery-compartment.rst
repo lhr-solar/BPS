@@ -7,10 +7,3 @@ There are 31 modules connected in series, with eight modules a row for three row
 
 .. note::
     Battery modules are removed if judges determine that the compartment is heavier than regulations allow.
-
-.. figure:: ../_static/battery-box-xsection.png
-    :align: center
-
-    Cross-section of battery compartment
-
-The empty cavity at the right end of the compartment houses the BPS components. 

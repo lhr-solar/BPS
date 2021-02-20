@@ -48,7 +48,7 @@ Board functions
 ===============
 
 The minion boards will be daisy-chained to minimize wire clutter from the master board. 
-The Amperes minion board uses :term:`Hall effect sensors <Hall effect sensor>` to measure the current in the high-voltage line. 
+The Amperes minion board uses :term:`Shunt Resistor sensors <Shunt Resistor>` to measure the current in the high-voltage line. 
 
 .. note::
   The minion boards all use `isolated SPI <https://www.analog.com/en/products/interface-isolation/isolation/spisolator.html>`_. 
