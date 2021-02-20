@@ -259,7 +259,7 @@ Purpose
     defined FIFO "class" in our library.
 
 Usage
-    More detailed usage instructions are in lines 8-15 of this file. The function names for all of the FIFO
+    More detailed usage instructions are in lines 8-15 of ``fifo.h``. The function names for all of the FIFO
     drivers will be ``fifo_name_function_name`` where ``function_name`` can be anything in lines 69-75
     of this file.
 
