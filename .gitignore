@@ -7,5 +7,7 @@
 *.uvprojx
 *.out
 *.csv
+*.log
 RTE_Components.h
 __pycache__
+Docs/build/*

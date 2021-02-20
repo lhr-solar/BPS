@@ -1,3 +1,5 @@
+/* Copyright (c) 2020 UT Longhorn Racing Solar */
+
 #include "BSP_Lights.h"
 #include "simulator_conf.h"
 #include <unistd.h>
@@ -56,9 +58,6 @@ void BSP_Light_Toggle(Light signal) {
 
 	LEDReg = atoi(csv);
     switch(signal){
-		case FAULT:
-			LEDReg ^= 0x0100;
-			break;
 			
 		case RUN:
 			LEDReg ^= 0x0080;
@@ -144,10 +143,6 @@ void BSP_Light_On(Light signal) {
 
 	LEDReg = atoi(csv);
     switch(signal){
-		case FAULT:
-			LEDReg |= 0x0100;
-			break;
-			
 		case RUN:
 			LEDReg |= 0x0080;
 			break;
@@ -232,10 +227,6 @@ void BSP_Light_Off(Light signal) {
 
 	LEDReg = atoi(csv);
     switch(signal){
-		case FAULT:
-			LEDReg &= ~0x0100;
-			break;
-			
 		case RUN:
 			LEDReg &= ~0x0080;
 			break;
@@ -315,9 +306,6 @@ State BSP_Light_GetState(Light signal) {
 	fgets(csv, 4, fp);
 	LEDReg = atoi(csv);
     switch(signal){
-		case FAULT:
-			returnVal = (LEDReg & 0x0100) >> 8;
-			break;
 		case RUN:
 			returnVal = (LEDReg & 0x0080) >> 7;
 			break;

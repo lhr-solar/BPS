@@ -1,3 +1,5 @@
+/* Copyright (c) 2020 UT Longhorn Racing Solar */
+
 #include "BSP_Contactor.h"
 #include "stm32f4xx.h"
 
@@ -20,7 +22,7 @@ void BSP_Contactor_Init(void) {
 	GPIO_InitStruct.GPIO_Mode = GPIO_Mode_OUT;
 	GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
 	GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
-	GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_DOWN;
+	GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_UP;
 	GPIO_Init(GPIOB, &GPIO_InitStruct);
 	GPIO_InitStruct.GPIO_Pin = GPIO_Pin_1;			// Pin 1 is input
 	GPIO_InitStruct.GPIO_Mode = GPIO_Mode_IN;

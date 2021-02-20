@@ -27,6 +27,14 @@ It also controls the contactor, which can connects the battery to the rest of th
 
 The STM32F413 microcontroller runs the BPS software.
 
+BPS Software Configurations
+============================
+
+The BPS has a file inside the config folder called ``config.h`` that contains all data pertinent to the BPS.
+Most importantly, it contains all the fault conditions that can trip the BPS (e.g. ``MAX_VOLTAGE_LIMIT``). 
+It also has some hardware information that the BPS uses (e.g. ``NUM_BATTERY_MODULES``). All of these
+parameters are contained within ``#define`` and descriptions of each parameter are located in the comments.
+
 Communications
 ==============
 

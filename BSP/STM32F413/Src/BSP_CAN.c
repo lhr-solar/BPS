@@ -1,3 +1,5 @@
+/* Copyright (c) 2020 UT Longhorn Racing Solar */
+
 #include "BSP_CAN.h"
 #include "stm32f4xx.h"
 
@@ -55,7 +57,7 @@ void BSP_CAN_Init(void) {
 
     /* CAN Baudrate = 125 KBps
         * 1/(prescalar + (prescalar*(BS1+1)) + (prescalar*(BS2+1))) * Clk = CAN Baudrate
-        * The clk is currently set to 80MHz
+        * The AHB1 clk which drives CAN seems to be set to around 20MHz, but this should be verified.
     */
     CAN_InitStructure.CAN_BS1 = CAN_BS1_3tq;
     CAN_InitStructure.CAN_BS2 = CAN_BS2_4tq; 

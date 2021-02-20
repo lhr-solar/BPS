@@ -22,6 +22,8 @@ import sphinx_rtd_theme # ReadTheDocs theme. More information available at: http
 project = 'BeVolt BPS'
 copyright = '2020, LHR Solar'
 author = 'Clark Poon'
+author = 'Manthan Upadhyaya'
+author = 'Sugam Arora'
 
 # The full version, including alpha/beta/rc tags
 release = '0.0'
@@ -34,7 +36,8 @@ release = '0.0'
 # ones.
 extensions = [
 	"recommonmark",
-	"sphinx_rtd_theme" # RTD theme extension
+	"sphinx_rtd_theme", # RTD theme extension
+	"sphinx.ext.autosectionlabel" # extension for hyperlinks
 ]
 
 # Add any paths that contain templates here, relative to this directory.

@@ -1,3 +1,5 @@
+/* Copyright (c) 2020 UT Longhorn Racing Solar */
+
 /** main.c
  * Program for UTSVT BeVolt's Battery Protection System
  */
@@ -16,7 +18,7 @@
 #include "BSP_Lights.h"
 #include "BSP_WDTimer.h"
 
-cell_asic Minions[NUM_MINIONS];
+static cell_asic minions[NUM_MINIONS];
 bool override = false;		// This will be changed by user via CLI
 char command[COMMAND_SIZE];
 
@@ -55,7 +57,7 @@ int main(){
 
 		// Checks for user input to send to CLI
 		if(BSP_UART_ReadLine(command)) {
-			CLI_Handler(command);
+			CLI_Handler(command);				
 		}
 		
 		SafetyStatus current = Current_CheckStatus(override);
@@ -100,9 +102,9 @@ void initialize(void){
 	EEPROM_Init();
 	Charge_Init();
 	Current_Init();
-	Voltage_Init(Minions);
-	Temperature_Init(Minions);
-	CLI_Init(Minions);
+	Voltage_Init(minions);
+	Temperature_Init(minions);
+	CLI_Init(minions);
 
 	// __enable_irq();
 	CLI_Startup();
@@ -131,7 +133,6 @@ void initialize(void){
 void preliminaryCheck(void){
 	// Check if Watch dog timer was triggered previously
 	if (BSP_WDTimer_DidSystemReset()) {
-		BSP_Light_On(FAULT);
 		BSP_Light_On(WDOG);
 		while(1);		// Spin
 	}
@@ -157,7 +158,6 @@ void heartbeat(void){
 void faultCondition(void){
 	BSP_Contactor_Off();
 	BSP_Light_Off(RUN);
-    BSP_Light_On(FAULT);
 
 	uint8_t error = 0;
 

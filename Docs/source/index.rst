@@ -21,6 +21,24 @@ Welcome to the BeVolt BPS documentation!
 
 .. toctree::
    :hidden:
+   :maxdepth: 2
+   :caption: Software
+
+   Software/Tasks
+   Software/BSP
+   Software/Drivers
+   Software/Apps
+
+.. toctree::
+   :hidden:
+   :maxdepth: 2
+   :caption: Hardware
+
+   Hardware/Boards
+   Hardware/Components
+
+.. toctree::
+   :hidden:
    :maxdepth: 1
    :caption: Terms and Definitions
    

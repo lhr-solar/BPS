@@ -1,3 +1,5 @@
+/* Copyright (c) 2020 UT Longhorn Racing Solar */
+
 #include "BSP_UART.h"
 #include <stdint.h>
 #include <pthread.h>
@@ -30,6 +32,12 @@ void BSP_UART_Init(void) {
     // Configure stdin to not use a buffer. May not be needed.
     setvbuf(stdin, NULL, _IONBF, 0);
     setvbuf(stdout, NULL, _IONBF, 0);
+
+    err = pthread_mutex_init(&rx_mutex, NULL);
+    if(err != 0) {
+        perror("pthread_mutex_init");
+        exit(EXIT_FAILURE);
+    }
 
     // Get thread attributes to create a thread
     err = pthread_attr_init(&attr);
@@ -110,6 +118,8 @@ void *ScanThread(void *arg) {
 
             pthread_mutex_unlock(&rx_mutex);
         }
+
+        pthread_yield();
 
     } while (1);
 
