@@ -2,18 +2,35 @@
 Application
 ************
 
+Amps
+=====
+
+Purpose
+    This app is used to check the current through the battery pack.
+
+Usage
+    In order to call any functions in this app ``Amps_Init()`` must be called first. One thing to note
+    is that if you want to read the current, you must call ``Amps_UpdateMeasurements()`` first and 
+    then call ``Amps_GetReading()``.
+
+Additional Considerations
+    To make it compatible with both Bare-Metal and RTOS, some functions meant for RTOS are left empty
+    so when it is compiled for Bare-Metal, it will not execute those functions. These functions are
+    meant for pending and posting when running in the RTOS.
+
+Charge
+======
+
+Purpose
+    The Charge App is used to keep track of the state of charge of the battery.
+
+Usage
+    ``Charge_Init()`` must be called before calling any of the other Charge functions. Descriptions of the other functions can be found in Charge.h.
+
+Additional Considerations
+    None.
+
 .. _CLI-app:
-
-
-Main
-====
-
-The main function is the entry point into the Battery Protection System. 
-
-It first checks whether the BPS has had to reset in the previous run using ``BPS_WDTimer_DidSystemRest()``. If it has, then the program will then enter a    fault state using ``EnterFaultState()``. If the BPS was not previously reset, then main will continue with the rest of the initialization.
-        
-``OSInit()`` initializes the operating system. ``AsserOSError()`` checks whether there are any errors in the RTOS functions. If there are no errors          ``OSTaskCreate()`` points the program to ``Task_Init()`` which executes the rest of the BPS startup.
-
 
 Command Line Interface (CLI)
 ============================
@@ -170,18 +187,30 @@ A list of all valid CLI commands is included below.
 
 ``temperature module 6 1`` - prints temperature of sensor 1 on module 6
 
-
-Charge
-======
+Fifo Header file: Chase Block
+=============================
 
 Purpose
-    The Charge App is used to keep track of the state of charge of the battery.
-
+    Many of our BSP packages use FIFO's to send and receive data. In the old version of the BPS, a FIFO
+    was created in each package along with it's driver. This header file does all that so we have a 
+    defined FIFO "class" in our library.
+    
 Usage
-    ``Charge_Init()`` must be called before calling any of the other Charge functions. Descriptions of the other functions can be found in Charge.h.
+    More detailed usage instructions are in lines 8-15 of ``fifo.h``. The function names for all of the FIFO
+    drivers will be ``fifo_name_function_name`` where ``function_name`` can be anything in lines 69-75
+    of this file. The ``#define`` for the fifo types must be declared before you write ``#include fifo.h``.
 
 Additional Considerations
-    None.
+    None
+
+Main
+====
+
+The main function is the entry point into the Battery Protection System. 
+
+It first checks whether the BPS has had to reset in the previous run using ``BPS_WDTimer_DidSystemRest()``. If it has, then the program will then enter a    fault state using ``EnterFaultState()``. If the BPS was not previously reset, then main will continue with the rest of the initialization.
+        
+``OSInit()`` initializes the operating system. ``AsserOSError()`` checks whether there are any errors in the RTOS functions. If there are no errors          ``OSTaskCreate()`` points the program to ``Task_Init()`` which executes the rest of the BPS startup.
 
 Temperature
 ===========
@@ -218,30 +247,9 @@ Additional Considerations
     The Open Wire functions all directly contact the LTC. ``Voltage_OpenWireSummary()`` requires 
     UART to be initialized, since it uses printf().
 
-Amps
-=====
-
-Purpose
-    This app is used to check the current through the battery pack.
-
-Usage
-    In order to call any functions in this app ``Amps_Init()`` must be called first. One thing to note
-    is that if you want to read the current, you must call ``Amps_UpdateMeasurements()`` first and 
-    then call ``Amps_GetReading()``.
-
-Additional Considerations
-    To make it compatible with both Bare-Metal and RTOS, some functions meant for RTOS are left empty
-    so when it is compiled for Bare-Metal, it will not execute those functions. These functions are
-    meant for pending and posting when running in the RTOS.
-
 **********************
 Mutexes and Semaphores
 **********************
-
-Voltage Mutex
-=============
-
-Mutually excludes accesses to the Voltage buffer in the Voltage.c library. 
 
 MinionsIO Semaphore
 ===================
@@ -250,18 +258,9 @@ Whenever the LTC driver is calling the SPI function, there's going to be some de
 executing some other task so once the SPI transfer starts, the system should start waiting for this semaphore. 
 Whenever the SPI transfer is complete, we must signal this semaphore so we need to have an ISR that calls the signal semaphore function whenever a transfer is complete. This ISR is in the BSP SPI module.
 
-Fifo Header file: Chase Block
-=============================
+Voltage Mutex
+=============
 
-Purpose
-    Many of our BSP packages use FIFO's to send and receive data. In the old version of the BPS, a FIFO
-    was created in each package along with it's driver. This header file does all that so we have a 
-    defined FIFO "class" in our library.
+Mutually excludes accesses to the Voltage buffer in the Voltage.c library. 
 
-Usage
-    More detailed usage instructions are in lines 8-15 of ``fifo.h``. The function names for all of the FIFO
-    drivers will be ``fifo_name_function_name`` where ``function_name`` can be anything in lines 69-75
-    of this file. The ``#define`` for the fifo types must be declared before you write ``#include fifo.h``.
 
-Additional Considerations
-    None
