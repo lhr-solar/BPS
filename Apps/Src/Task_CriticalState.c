@@ -7,6 +7,7 @@
 #include "BSP_UART.h"
 #include "Voltage.h"
 
+
 void Task_CriticalState(void *p_arg) {
     (void)p_arg;
 
@@ -30,4 +31,5 @@ void Task_CriticalState(void *p_arg) {
     CANMSG.id = CONTACTOR_STATE;
     OSQPost(&CANBus_MsgQ, &CANMSG, 1, OS_OPT_POST_FIFO, &err);
     OSTaskDel(NULL, &err); // Delete task
+    
 }
