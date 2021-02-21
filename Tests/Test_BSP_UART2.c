@@ -1,21 +1,17 @@
 #include "common.h"
 #include "config.h"
 #include "BSP_UART.h"
+#include "BSP_PLL.h"
 
 void foo(void){
     return;
 }
 
 int main() {
-
+    BSP_PLL_Init();
     BSP_UART_Init(foo, foo, UART_USB);
 
-    char str[256];
-
     while(1) {
-        int num = BSP_UART_ReadLine(str, UART_USB);
-        if(num > 0) {
-            printf("%s\n\r", str);
-        }
+        printf("12345678");
     }
 }
