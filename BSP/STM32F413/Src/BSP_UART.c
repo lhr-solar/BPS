@@ -150,7 +150,7 @@ void BSP_UART_Init(callback_t rxCallback, callback_t txCallback, UART_Port usart
 }
 
 /**
- * @brief   Gets one line of ASCII text that was received.
+ * @brief   Gets one line of ASCII text that was received. The '\n' and '\r' characters will not be stored (tested on Putty on Windows)
  * @pre     str should be at least 128bytes long.
  * @param   str : pointer to buffer to store the string. This buffer should be initialized
  *                  before hand.
