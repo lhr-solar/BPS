@@ -23,6 +23,9 @@
 #define FAULT_CAN_BUS			0x20
 #define FAULT_VOLT_MISC			0x40
 #define DATA_SOC				0x80
+#define FAULT_OPEN_WIRE         0x03
+#define FAULT_HANDLER           0x05
+#define FAULT_OS_ERROR          0x06
 
 #define EEPROM_TERMINATOR		0xFF
 
@@ -33,6 +36,9 @@
 #define EEPROM_WATCHDOG_PTR_LOC 0x1008
 #define EEPROM_CAN_PTR_LOC		0x100A
 #define EEPROM_SOC_PTR_LOC		0x100C
+#define EEPROM_OW_PTR_LOC       0X100E
+#define EEPROM_HANDLER_PTR_LOC  0X1010
+#define EEPROM_OS_PTR_LOC       0x1012
 
 /** EEPROM_Init
  * Initializes I2C to communicate with EEPROM (M24128)

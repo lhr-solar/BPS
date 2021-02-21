@@ -35,6 +35,8 @@ void Task_VoltTempMonitor(void *p_arg) {
         // Check if voltage is NOT safe:
         SafetyStatus voltageStatus = Voltage_CheckStatus();
         if(voltageStatus != SAFE) {
+            if (voltageStatus == UNDERVOLTAGE) Fault_BitMap = Fault_UVOLT;
+            if (voltageStatus == OVERVOLTAGE) Fault_BitMap = Fault_OVOLT;
             OSSemPost(&Fault_Sem4,
                         OS_OPT_POST_1,
                         &err);
@@ -65,6 +67,7 @@ void Task_VoltTempMonitor(void *p_arg) {
         SafetyStatus wireStatus = Voltage_OpenWire();
         
         if(wireStatus != SAFE) {
+            Fault_BitMap = Fault_OW;
             OSSemPost(&Fault_Sem4,
                         OS_OPT_POST_1,
                         &err);
@@ -86,6 +89,7 @@ void Task_VoltTempMonitor(void *p_arg) {
         // Check if temperature is NOT safe:
         SafetyStatus temperatureStatus = Temperature_CheckStatus(Amps_IsCharging());
         if(temperatureStatus != SAFE) {
+            Fault_BitMap = Fault_OTEMP;
             OSSemPost(&Fault_Sem4,
                         OS_OPT_POST_1,
                         &err);

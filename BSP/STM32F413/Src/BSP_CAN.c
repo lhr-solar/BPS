@@ -187,7 +187,7 @@ void CAN1_RX0_IRQHandler(void) {
     OSIntEnter();
     CPU_CRITICAL_EXIT();
     #endif
-    
+
     // Take any pending messages into a queue
     while(CAN_MessagePending(CAN1, CAN_FIFO0)) {
         CAN_Receive(CAN1, CAN_FIFO0, &gRxMessage);

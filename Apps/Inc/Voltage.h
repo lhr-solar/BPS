@@ -22,16 +22,14 @@ typedef struct voltage_safety{
  * Initializes all device drivers including LTC6811 and GPIO to begin Voltage Monitoring
  * @param boards LTC6811 data structure that contains the values of each register
  * @param voltageMutex pointer to mutex, meant to pass pointer to VoltageBuffer_Mutex 
- * @return SUCCESS or ERROR
  */
-ErrorStatus Voltage_Init(cell_asic *boards);
+void Voltage_Init(cell_asic *boards);
 
 /** Voltage_UpdateMeasurements
  * Stores and updates the new measurements received
  * @param pointer to new voltage measurements
- * @return SUCCESS or ERROR
  */
-ErrorStatus Voltage_UpdateMeasurements(void);
+void Voltage_UpdateMeasurements(void);
 
 /** Voltage_CheckStatus
  * Checks if all modules are safe
@@ -43,7 +41,7 @@ SafetyStatus Voltage_CheckStatus(void);
  * Finds all battery modules in danger and stores them into a list.
  * Each battery module corresponds to and index of the array. If the element in the
  * array is 1, then it means that module in the index is in danger.
- * @return struct that has safety status for all wires and modules in the system
+ * @param struct that has safety status for all wires and modules in the system
  */
 void Voltage_GetModulesInDanger(VoltageSafety_t* system);
  

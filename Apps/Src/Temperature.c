@@ -8,8 +8,6 @@
 #include "os.h"
 #include "Tasks.h"
 
-extern OS_MUTEX MinionsASIC_Mutex;
-
 
 // Holds the temperatures in Celsius (Fixed Point with .001 resolution) for each sensor on each board
 int32_t ModuleTemperatures[NUM_MINIONS][MAX_TEMP_SENSORS_PER_MINION_BOARD];
@@ -27,7 +25,7 @@ static OS_MUTEX TemperatureBuffer_Mutex;
  * Initializes device drivers including SPI inside LTC6811_init and LTC6811 for Temperature Monitoring
  * @param boards LTC6811 data structure that contains the values of each register
  */
-ErrorStatus Temperature_Init(cell_asic *boards){
+void Temperature_Init(cell_asic *boards){
 	// Record pointer
 	Minions = boards;
 
@@ -49,12 +47,11 @@ ErrorStatus Temperature_Init(cell_asic *boards){
 
 	// Read Configuration Register
 	wakeup_sleep(NUM_MINIONS);
-	int8_t error = LTC6811_rdcfg(NUM_MINIONS, Minions);
+	LTC6811_rdcfg_safe(NUM_MINIONS, Minions);
 	//release mutex
   	OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
   	assertOSError(err);
 
-	return error == 0 ? SUCCESS : ERROR;
 }
 
 /** Temperature_ChannelConfig
@@ -288,13 +285,14 @@ uint8_t *Temperature_GetModulesInDanger(void){
 
 	static uint8_t ModuleTempStatus[NUM_BATTERY_MODULES];
 	int32_t temperatureLimit = ChargingState == 1 ? MAX_CHARGE_TEMPERATURE_LIMIT : MAX_DISCHARGE_TEMPERATURE_LIMIT;
-
-	OSMutexPend(&TemperatureBuffer_Mutex,
-				0,
-				OS_OPT_PEND_BLOCKING,
-				&ts,
-				&err);
-	// assert
+	if(!Fault_Flag){
+		OSMutexPend(&TemperatureBuffer_Mutex,
+					0,
+					OS_OPT_PEND_BLOCKING,
+					&ts,
+					&err);
+		assertOSError(err);
+	}
 
 	for (int i = 0; i < NUM_MINIONS-1; i++) {
 		for (int j = 0; j < MAX_TEMP_SENSORS_PER_MINION_BOARD; j++) {
@@ -304,12 +302,12 @@ uint8_t *Temperature_GetModulesInDanger(void){
 			}
 		}
 	}
-
-	OSMutexPost(&TemperatureBuffer_Mutex,
-				OS_OPT_POST_1,
-				&err);
-	// assert
-
+	if(!Fault_Flag){
+		OSMutexPost(&TemperatureBuffer_Mutex,
+					OS_OPT_POST_1,
+					&err);
+		assertOSError(err);
+	}
 	return ModuleTempStatus;
 }
 /** Temperature_GetSingleTempSensor
