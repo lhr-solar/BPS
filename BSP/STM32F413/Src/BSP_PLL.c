@@ -51,6 +51,8 @@ void BSP_PLL_Init(void) {
 		// Select the main PLL as system clock source
 		RCC_SYSCLKConfig(RCC_SYSCLKSource_PLLCLK);
 		
+		// Update the system clock variable
+		SystemCoreClockUpdate();
 	}else{
 		while(1);	// Spin for error
 	}
