@@ -1,16 +1,15 @@
 #include "common.h"
 #include "config.h"
 #include "BSP_UART.h"
+#include "BSP_PLL.h"
+#include "stm32f4xx.h"
 
 void foo(void){
     return;
 }
 
 int main() {
-
     BSP_UART_Init(foo, foo, UART_USB);
-
-    char str[256];
 
     while(1) {
         int num = BSP_UART_ReadLine(str, UART_USB);

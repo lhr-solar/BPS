@@ -4,59 +4,21 @@
 #include "stm32f4xx.h"
 #include "os.h"
 
-#define CAN_MODE        CAN_Mode_Normal
-
-// Queue functions
-
+// The message information that we care to receive
 typedef struct _msg {
     uint32_t id;
     uint8_t data[8];
 } msg_t;
 
-#define QUEUE_SIZE 10
-typedef struct _queue {
-    msg_t msgs[QUEUE_SIZE];
-    
-    uint8_t head;
-    uint8_t tail;
-} queue_t;
+// Set up a fifo for receiving
+#define FIFO_TYPE msg_t
+#define FIFO_SIZE 10
+#define FIFO_NAME msg_queue
+#include "fifo.h"
 
-static queue_t gRxQueue;
+static msg_queue_t gRxQueue;
 
-// Return ERROR if failure
-static ErrorStatus QueuePut(queue_t *target, msg_t *msg) {
-    // Check to see if the queue is full
-    if((target->head + 1) % QUEUE_SIZE == target->tail) {
-        return ERROR;
-    }
-
-    // Add the msg to the queue
-    target->msgs[target->head] = *msg;
-    
-    target->head = (target->head + 1) % QUEUE_SIZE;
-
-    return SUCCESS;
-}
-
-// Return ERROR if failure
-static ErrorStatus QueueGet(queue_t *target, msg_t *msg) {
-    // Check if the queue is empty
-    if(target->head == target->tail) {
-        return ERROR;
-    }
-
-    // Get the msg from the queue
-    *msg = target->msgs[target->tail];
-
-    target->tail = (target->tail + 1) % QUEUE_SIZE;
-
-    return SUCCESS;
-}
-
-// End Queue Functions
-
-// CAN BSP
-
+// Required for receiving CAN messages
 static CanTxMsg gTxMessage;
 static CanRxMsg gRxMessage;
 
@@ -80,9 +42,8 @@ void BSP_CAN_Init(void (*rxEvent)(void), void (*txEnd)(void)) {
     gRxEvent  = rxEvent;
     gTxEnd    = txEnd;
 
-    // Configure the queue
-    gRxQueue.head = 0;
-    gRxQueue.tail = 0;
+    // Initialize the queue
+    gRxQueue = msg_queue_new();
 
     /* CAN GPIOs configuration **************************************************/
 
@@ -115,16 +76,16 @@ void BSP_CAN_Init(void (*rxEvent)(void), void (*txEnd)(void)) {
     CAN_InitStructure.CAN_NART = DISABLE;
     CAN_InitStructure.CAN_RFLM = DISABLE;
     CAN_InitStructure.CAN_TXFP = DISABLE;
-    CAN_InitStructure.CAN_Mode = CAN_MODE;
+    CAN_InitStructure.CAN_Mode = CAN_Mode_Normal;
     CAN_InitStructure.CAN_SJW  = CAN_SJW_1tq;
 
     /* CAN Baudrate = 125 KBps
-        * 1/(prescalar + (prescalar*(BS1+1)) + (prescalar*(BS2+1))) * Clk = CAN Baudrate
-        * The clk is currently set to 80MHz
+        * 1/(prescalar + (prescalar*BS1) + (prescalar*BS2)) * Clk = CAN Baudrate
+        * The CAN clk is currently set to 20MHz (APB1 clock set to 20MHz in BSP_PLL_Init())
     */
     CAN_InitStructure.CAN_BS1 = CAN_BS1_3tq;
     CAN_InitStructure.CAN_BS2 = CAN_BS2_4tq; 
-    CAN_InitStructure.CAN_Prescaler = 16;
+    CAN_InitStructure.CAN_Prescaler = 20;
     CAN_Init(CAN1, &CAN_InitStructure);
 
     /* CAN filter init */
@@ -202,13 +163,13 @@ ErrorStatus BSP_CAN_Write(uint32_t id, uint8_t data[8], uint8_t length) {
  */
 ErrorStatus BSP_CAN_Read(uint32_t *id, uint8_t *data) {
     // If the queue is empty, return err
-    if(gRxQueue.head == gRxQueue.tail) {
+    if(msg_queue_is_empty(&gRxQueue)) {
         return ERROR;
     }
     
     // Get the message
     msg_t msg;
-    QueueGet(&gRxQueue, &msg);
+    msg_queue_get(&gRxQueue, &msg);
 
     // Transfer the message to the provided pointers
     for(int i = 0; i < 8; i++){
@@ -226,6 +187,7 @@ void CAN1_RX0_IRQHandler(void) {
     OSIntEnter();
     CPU_CRITICAL_EXIT();
     #endif
+
     // Take any pending messages into a queue
     while(CAN_MessagePending(CAN1, CAN_FIFO0)) {
         CAN_Receive(CAN1, CAN_FIFO0, &gRxMessage);
@@ -235,14 +197,18 @@ void CAN1_RX0_IRQHandler(void) {
         memcpy(&rxMsg.data[0], gRxMessage.Data, 8);
 
         // Place the message in the queue
-        if(QueuePut(&gRxQueue, &rxMsg)) {
+        if(msg_queue_put(&gRxQueue, rxMsg)) {
             // If the queue was not already full...
             // Call the driver-provided function, if it is not null
             if(gRxEvent != NULL) {
                 gRxEvent();
             }
+        } else {
+            // If the queue is already full, then we can't really do anything else
+            break;
         }
     }
+
     #ifdef RTOS
     OSIntExit();      // Signal to uC/OS
     #endif
@@ -255,11 +221,13 @@ void CAN1_TX_IRQHandler(void) {
     OSIntEnter();
     CPU_CRITICAL_EXIT();
     #endif
+
     // Acknowledge 
     CAN_ClearFlag(CAN1, CAN_FLAG_RQCP0 | CAN_FLAG_RQCP1 | CAN_FLAG_RQCP2);
 
     // Call the function provided
     gTxEnd();
+
     #ifdef RTOS
     OSIntExit();      // Signal to uC/OS
     #endif
