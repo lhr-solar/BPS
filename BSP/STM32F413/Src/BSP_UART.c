@@ -277,7 +277,6 @@ void USART3_IRQHandler(void) {
     OSIntEnter();
     CPU_CRITICAL_EXIT();
 #endif
-
     if(USART_GetITStatus(USART3, USART_IT_RXNE) != RESET) {
         uint8_t data = USART3->DR;
         bool removeSuccess = 1;

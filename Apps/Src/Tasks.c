@@ -57,12 +57,15 @@ OS_SEM Fault_Sem4;
  * Mutexes
  */
 OS_MUTEX WDog_Mutex;
+OS_MUTEX MinionsASIC_Mutex;
 
 /**
  * Global Variables
  */
 cell_asic Minions[NUM_MINIONS];
 uint32_t WDog_BitMap = 0;
+uint32_t Fault_BitMap = 0; //This is a variable that sets certain bits based on what caused the fault
+uint8_t Fault_Flag    = 0; //This is a flag that replaces the semaphore in case the OS fails
 
 void EnterFaultState(void);
 
@@ -72,8 +75,9 @@ void EnterFaultState(void);
  **/
 void assertOSError(OS_ERR err){
     if(err != OS_ERR_NONE) {
+        Fault_BitMap = Fault_OS;
+        Fault_Flag = 1;
         OSSemPost(&Fault_Sem4, OS_OPT_POST_1, &err);
-    
         // We should not get to this point if the call above worked.
         // Thus, we need to manually enter a fault state, since the
         // OS obviously is not functioning correctly.
