@@ -7,7 +7,7 @@
 #include "os.h"
 
 //enum to describe what UART port you are trying to access
-typedef enum {UART_USB, UART_BLE} UART_Port;
+typedef enum {UART_USB, UART_BLE, NUM_UART} UART_Port;
 
 /**
  * @brief   Initializes the UART peripheral
@@ -27,11 +27,16 @@ void BSP_UART_Init(callback_t rxCallback, callback_t txCallback, UART_Port usart
 uint32_t BSP_UART_ReadLine(char *str, UART_Port usart);
 
 /**
- * @brief   Transmits data through UART line
+ * @brief   Transmits data to through UART line
  * @param   str : pointer to buffer with data to send.
  * @param   len : size of buffer
- * @param   usart : which usart to read from (USB or BLE)
+ * @param   usart : which usart to read from (2 or 3)
  * @return  number of bytes that were sent
+ * 
+ * @note This function uses a fifo to buffer the write. If that
+ *       fifo is full, this function may block while waiting for
+ *       space to open up. Do not call from timing-critical
+ *       sections of code.
  */
 uint32_t BSP_UART_Write(char *str, uint32_t len, UART_Port usart);
 

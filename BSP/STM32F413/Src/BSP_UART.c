@@ -30,35 +30,10 @@ static callback_t usbTxCallback = NULL;
 static callback_t bleRxCallback = NULL;
 static callback_t bleTxCallback = NULL;
 
-static inline rxfifo_t* getRxFifo(UART_Port usart) {
-    switch(usart) {
-    case UART_USB:
-        return &usbRxFifo;
-    case UART_BLE:
-        return &bleRxFifo;
-    default:
-        return NULL;
-    }
-}
-
-static inline txfifo_t* getTxFifo(UART_Port usart) {
-    switch(usart) {
-    case UART_USB:
-        return &usbTxFifo;
-    case UART_BLE:
-        return &bleTxFifo;
-    default:
-        return NULL;
-    }
-}
-
-static bool* lineReceived(UART_Port usart) {
-    return usart == UART_USB ? &usbLineReceived : &bleLineReceived;
-}
-
-static USART_TypeDef* getUSART(UART_Port usart) {
-    return usart == UART_USB ? USART3 : USART2;
-}
+static rxfifo_t *rx_fifos[NUM_UART]     = {&usbRxFifo, &bleRxFifo};
+static txfifo_t *tx_fifos[NUM_UART]     = {&usbTxFifo, &bleTxFifo};
+static bool     *lineRecvd[NUM_UART]    = {&usbLineReceived, &bleLineReceived};
+static USART_TypeDef *handles[NUM_UART] = {USART3, USART2};
 
 static void USART_BLE_Init() {
     bleTxFifo = txfifo_new();
@@ -186,13 +161,13 @@ uint32_t BSP_UART_ReadLine(char *str, UART_Port usart) {
     char data = 0;
     uint32_t recvd = 0;
 
-    bool *line_recvd = lineReceived(usart);
+    bool *line_recvd = lineRecvd[usart];
     if(*line_recvd) {
-        USART_TypeDef *usart_handle = getUSART(usart);
+        USART_TypeDef *usart_handle = handles[usart];
 
         USART_ITConfig(usart_handle, USART_IT_RXNE, RESET);
         
-        rxfifo_t *fifo = getRxFifo(usart);
+        rxfifo_t *fifo = rx_fifos[usart];
         
         rxfifo_peek(fifo, &data);
         while(!rxfifo_is_empty(fifo) && data != '\r') {
@@ -215,20 +190,32 @@ uint32_t BSP_UART_ReadLine(char *str, UART_Port usart) {
  * @param   len : size of buffer
  * @param   usart : which usart to read from (2 or 3)
  * @return  number of bytes that were sent
+ * 
+ * @note This function uses a fifo to buffer the write. If that
+ *       fifo is full, this function may block while waiting for
+ *       space to open up. Do not call from timing-critical
+ *       sections of code.
  */
 uint32_t BSP_UART_Write(char *str, uint32_t len, UART_Port usart) {
     uint32_t sent = 0;
 
-    USART_TypeDef *usart_handle = getUSART(usart);
+    USART_TypeDef *usart_handle = handles[usart];
 
     USART_ITConfig(usart_handle, USART_IT_TC, RESET);
 
-    txfifo_t *fifo = getTxFifo(usart);
+    txfifo_t *fifo = tx_fifos[usart];
 
-    while(len > 0) {
-        sent += txfifo_put(fifo, *str);
-        str++;
-        len--;
+    while(sent < len) {
+        if(!txfifo_put(fifo, str[sent])) {
+            // Allow the interrupt to fire
+            USART_ITConfig(usart_handle, USART_IT_TC, SET);
+            // Wait for space to open up
+            while(txfifo_is_full(fifo));
+            // Disable the interrupt again
+            USART_ITConfig(usart_handle, USART_IT_TC, RESET);
+        } else {
+            sent++;  
+        }
     }
 
     USART_ITConfig(usart_handle, USART_IT_TC, SET);
