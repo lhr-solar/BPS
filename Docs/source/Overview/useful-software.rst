@@ -9,4 +9,4 @@ To work with the BPS, download the following software:
 * `STM32F413 Drivers <https://www.st.com/en/development-tools/stsw-link009.html>`_
 * `PuTTY <https://www.putty.org/>`_ - Debug the BPS
 * `Ubuntu <https://ubuntu.com/#download>`_ - Windows Subsystem for Linux to compile code and use github
-* `VsCode <https://code.visualstudio.com/>`_ - IDE to program STM32F413 microcontroller
+* `VsCode <https://code.visualstudio.com/>`_ - Text Editor to program STM32F413 microcontroller

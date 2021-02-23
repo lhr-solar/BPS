@@ -14,7 +14,7 @@ Usage
     post can be seen in the ``CANBus.c`` driver :ref:`documentation <CAN Driver>`.
 
 Additional Considerations
-    It also contains a :term:`queue <Queue>` for messages that are recieved on the CAN bus that has a depth of 10. 
+    It also contains a :term:`queue <Queue>` for messages that are received on the CAN bus that has a depth of 10. 
     This queue cannot be accessed outside the file. If the queue exceeds it's limit, we will lose
     messages.
 
@@ -53,8 +53,8 @@ I2C BSP: Manthan Upadhyaya
 =================================
 
 Purpose
-    The :term:`I2C <I2C>` driver is interrupt driven and is used to communicate with the :term:`EEPROM <EEPROM>` to log data. It 
-    requires pins PA8(SCL) and PC9(SDA) for the I2C3.
+    The :term:`I2C <I2C>` driver is based on polling and is used to communicate with the 
+    :term:`EEPROM <EEPROM>` to log data. It requires pins PA8(SCL) and PC9(SDA) for the I2C3.
 
 Usage
     There are multiple definitions of the same functions within this library. They are split into 2 
@@ -103,6 +103,46 @@ Additional Considerations
     to the strobe light. This means if the fault LED turns on, so will the strobe light on the car.
     It doesn't mean that the fault LED will turn on if the strobe light turns on.
 
+OS Header file: Sijin Woo
+=========================
+
+Purpose
+    The BSP is meant to be compatible with the Baremetal and RTOS version of the BPS. In order to accomplish
+    this, ``BSP_OS.h`` was written in order to separate the two code bases in our library.
+Usage
+    The ``struct`` of type ``bsp_os_t`` must be defined and both pend and post functions must be created for both
+    versions of the BPS. The RTOS version of the BPS will have the pend and post functions initialized to
+    pend and post the shared resource of that library. The baremetal version will have the pend and post 
+    functions remain empty. There are multiple ways these can be used. Then ``#ifdef`` will surround both 
+    initializations of this struct. If we compile with ``RTOS``, then the RTOS functions will be used. If 
+    we compile with ``BAREMETAL``, then the baremetal functions will be used. For example,
+
+    .. code-block:: c
+
+        // LTC6811.c
+        bsp_os_t spi_os;
+        OS_SEM MinionsIO_Sem4;
+        void LTC6811_Pend(void) {
+            CPU_TS ts;
+            OS_ERR err;
+            OSSemPend(&MinionsIO_Sem4, 0, OS_OPT_PEND_BLOCKING, &ts, &err);
+        }
+        void LTC6811_Post(void) {
+            OS_ERR err;
+            OSSemPost(&MinionsIO_Sem4, OS_OPT_POST_1, &err);
+        }
+        void LTC6811_Init(void) {
+            spi_os.pend = LTC6811_Pend;
+            spi_os.post = LTC6811_Post;
+            BSP_SPI_Init(&spi_os);
+        }
+
+Additional Considerations
+    There are other ways you can also use this library. The struct can be passed in to the initialization
+    function of the init function. You could even choose to not use this struct and just ``#ifdef``
+    everything in the library. This is up to the programmer's judgement to make the code look as neat
+    as possible.
+
 PLL BSP: Sijin Woo
 ==================================
 
@@ -116,7 +156,8 @@ Usage
 
 Additional Considerations
     Increasing the clock speed does take more power. Although this is minor considering how much the
-    entire BPS takes, it is worth noting.
+    entire BPS takes, it is worth noting. It should also be initialized before anything else that is 
+    dependent on the clock speed (e.g UART).
 
 SPI BSP: Clark Poon, Sijin Woo, and Sugam Arora
 ===============================================
@@ -196,43 +237,3 @@ Usage
 
 Additional Considerations
     None
-
-OS Header file: Sijin Woo
-=========================
-
-Purpose
-    The BSP is meant to be compatible with the Baremetal and RTOS version of the BPS. In order to accomplish
-    this, ``BSP_OS.h`` was written in order to separate the two code bases in our library.
-Usage
-    The ``struct`` of type ``bsp_os_t`` must be defined and both pend and post functions must be created for both
-    versions of the BPS. The RTOS version of the BPS will have the pend and post functions initialized to
-    pend and post the shared resource of that library. The baremetal version will have the pend and post 
-    functions remain empty. There are multiple ways these can be used. Then ``#ifdef`` will surround both 
-    initializations of this struct. If we compile with ``RTOS``, then the RTOS functions will be used. If 
-    we compile with ``BAREMETAL``, then the baremetal functions will be used. For example,
-
-    .. code-block:: c
-
-        // LTC6811.c
-        bsp_os_t spi_os;
-        OS_SEM MinionsIO_Sem4;
-        void LTC6811_Pend(void) {
-            CPU_TS ts;
-            OS_ERR err;
-            OSSemPend(&MinionsIO_Sem4, 0, OS_OPT_PEND_BLOCKING, &ts, &err);
-        }
-        void LTC6811_Post(void) {
-            OS_ERR err;
-            OSSemPost(&MinionsIO_Sem4, OS_OPT_POST_1, &err);
-        }
-        void LTC6811_Init(void) {
-            spi_os.pend = LTC6811_Pend;
-            spi_os.post = LTC6811_Post;
-            BSP_SPI_Init(&spi_os);
-        }
-
-Additional Considerations
-    There are other ways you can also use this library. The struct can be passed in to the initialization
-    function of the init function. You could even choose to not use this struct and just ``#ifdef``
-    everything in the library. This is up to the programmer's judgement to make the code look as neat
-    as possible.

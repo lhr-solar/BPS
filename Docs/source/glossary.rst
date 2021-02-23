@@ -7,6 +7,9 @@ Glossary
   Alternate Function
     Microcontroller pins can be used as regular digital GPIO pins but they could be configured to have some alternate function such as SPI, UART, CAN, etc.
 
+  Analog to Digital Converter
+    An `ADC <https://www.electronics-tutorials.ws/combination/analogue-to-digital-converter.html>`_ is a way for a microcontroller to read real world data by converting the analog inputs to digital values.
+
   ARM
     Computer Architect company that creates commonly used ARM microcontrollers/processors
 

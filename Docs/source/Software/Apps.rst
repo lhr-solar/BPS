@@ -145,7 +145,7 @@ A list of all valid CLI commands is included below.
 "ADC"
 #####
 
-| Displays raw `ADC <https://www.electronics-tutorials.ws/combination/analogue-to-digital-converter.html>`_ data.
+| Displays raw :term:`ADC <Analog to Digital Converter>` data.
 | **Argument(s)**: 
 
 - **none**: prints raw data from the ADC at the current time
