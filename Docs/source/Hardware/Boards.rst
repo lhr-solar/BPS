@@ -55,7 +55,9 @@ The Leader board uses the STM32F413 microcontroller. The board requires seven co
 
     Leader Board Block Diagram 
 
-The STM32F413 requires bypass capacitors and uses an 8MHz clock. To program the STM32F413, pins are 
+Microcontroller
+^^^^^^^^^^^^^^^
+The :term:`STM32F413 <STM>` requires bypass capacitors and uses an 8MHz clock. To program the STM32F413, pins are 
 connected to a 1x4 header to use the :term:`SWD <SWD>` programming protocol. 
 
 The reset button allows you to avoid powering the BPS off to reset it.
@@ -69,6 +71,7 @@ For more information, see the `STM32F413 datasheet <https://www.st.com/resource/
     :align: center
 
     STM32F413 bypass capacitors 
+
 Clock
 ^^^^^
 The system's :abbr:`RTC (Real Time Clock)` is sourced from a low-power crystal oscillator. The crystal 
@@ -80,6 +83,7 @@ at the cost of precision. Since this system is safety critical, the external 8MH
 
 .. note::
     The internal and external clocks were not tested against each other.
+
 Capacitors
 ^^^^^^^^^^
 Capacitor values are set based on the crystal’s load capacitance and the capacitance of the whole 
