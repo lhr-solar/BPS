@@ -152,7 +152,8 @@ Glossary
     Logical 1/true is a high voltage/on and a logic 0/false is a low voltage/false. 
 
   Printed Circuit Board
-    PCB's electrically connect our systems together and allow us a hardware to run our programs on.
+    PCB's are copper circuits printed onto non-conductive boards that electrically connect our electronic
+    components together and allow us hardware to run our programs on.
 
   Pull-Down Resistor 
     A resistor to gnd that pulls a wire's voltage to logical '0' when it disconnects from some other source. 
