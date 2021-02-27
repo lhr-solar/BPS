@@ -208,7 +208,7 @@ void BSP_SPI_Init(spi_port_t port, bsp_os_t *spi_os){
 		//Configure SPI3 interrupt priority
 		NVIC_InitTypeDef NVIC_InitStruct;
 		NVIC_InitStruct.NVIC_IRQChannel = SPI3_IRQn;
-		NVIC_InitStruct.NVIC_IRQChannelPreemptionPriority = 1;
+		NVIC_InitStruct.NVIC_IRQChannelPreemptionPriority = 0;
     	NVIC_InitStruct.NVIC_IRQChannelSubPriority = 0;
     	NVIC_InitStruct.NVIC_IRQChannelCmd = ENABLE;
 		NVIC_Init(&NVIC_InitStruct);
