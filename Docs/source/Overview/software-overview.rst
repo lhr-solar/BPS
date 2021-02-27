@@ -65,7 +65,7 @@ The following tasks make up the BPS' engine:
 - Amperes monitor
 - Battery Balancing
 - Log Information
-- Can Message Consumer
+- CAN Message Consumer
 - Command Line Interface (CLI)
 - Idle  
 
