@@ -83,9 +83,9 @@ Schematic
             * Reset button
             * :term:`SWD <SWD>` Programming Pins
     * Logic Analyzer Pins (2.54 mm headers) 
-        * Description: The logic analyzer pins serve to easily test the board to check proper 
+        * **Description:** The logic analyzer pins serve to easily test the board to check proper 
           functionality of the board.  
-        * Why is it necessary: This allows for testing to be much easier since we can monitor 
+        * **Why is it necessary:** This allows for testing to be much easier since we can monitor 
           what occurs to these signal lines through these pins  
         * Justification for selection of specific part: Standard component 
         * Associated passives/components:  
@@ -94,22 +94,22 @@ Schematic
             * USART Analyzer Pins 1x3: PC6, PC7, GND 
             * CAN Analyzer Pins 1x3: PB12, PB13, GND 
     * E-Ink Display: 
-        * Description: Display screen. 
-        * Why is it necessary: CAN messages will be displayed on this screen.  
+        * **Description:** Display screen. 
+        * **Why is it necessary:** CAN messages will be displayed on this screen.  
         * Justification for selection of specific part: This display doesn't consume much power. 
         * Associated passives/components: 
             * 2x20 Connector 
     * 2x20 Connector (2.54mm) 
-        * Description: Connects the STM to the E-Ink display. 
-        * Why is it necessary: Allows the E-Ink display to show CAN messages. 
+        * **Description:** Connects the STM to the E-Ink display. 
+        * **Why is it necessary:** Allows the E-Ink display to show CAN messages. 
         * Justification for selection of specific part: Standard component 
         * Associated passives/components: 
             * Buttons: PB0, PB1, PB2, PB3 
             * SPIO: PA5, PA6, PA7, PA8 
             * GEN: PA9, PA10, PA11 
     * Reset button 
-        * Description: Resets the STM microcontroller. 
-        * Why is it necessary: Used in case the board needs to be reset. 
+        * **Description:** Resets the STM microcontroller. 
+        * **Why is it necessary:** Used in case the board needs to be reset. 
         * Justification for selection of specific part: Standard component 
 
 *List of Subsheet I/O*
