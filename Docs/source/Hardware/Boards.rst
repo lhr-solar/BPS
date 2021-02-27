@@ -69,7 +69,7 @@ Schematic
     This circuit makes connections from the microcontroller to the E-Ink Display and logic 
     analyzer pins.  
 *Why do we need it?*
-    We need this circuit in order for debugging (:term: `CAN <CAN Bus>` messages on the E-Ink 
+    We need this circuit in order for debugging (:term:`CAN <CAN Bus>` messages on the E-Ink 
     display and logic analyzer pins).  
 *List of Circuit Components*
     * STM32F413RHTx 
