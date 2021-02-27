@@ -134,11 +134,10 @@ Schematic
         * Why is it necessary: so the fans can be supplied power 
         * Justification for selection of specific part: this connector provides the right amount 
           of power and connections for all fans being used 
-        * Datasheet link: N/A 
         * Associated passives/components:  
             * 4 different BUK9M34-100EX 
     * BUK9M34-100EX(4) 
-        * Description: a MOSFET that will switch the fans off and on 
+        * Description: a :term: `MOSFET <MOSFET>` that will switch the fans off and on 
         * Why is it necessary: so the fans can turn off and on 
         * Justification for selection of specific part: this part is used over others because of 
           Q101 compliant, its suitable for thermally demanding environments, and true logic gate 
