@@ -8,6 +8,124 @@ Each board measures up to 12 battery modules and 16 temperature sensors, but is 
 
 The Amperes minion board is connected to the main power cable that powers the electrical loop using the :term:`Shunt Resistor`. 
 
+Display Board
+=============
+
+Overview
+^^^^^^^^
+`GitHub Link <https://github.com/lhr-solar/BPS-DisplayPCB>`__
+
+`BOM Link <https://www.mouser.com/ProjectManager/ProjectDetail.aspx?State=EDIT&ProjectGUID=11b675c5-b15b-46bd-a790-bb450819a4d3>`__ 
+
+Brief Description/Purpose:
+    The purpose of this board is to display messages from the CAN interface on the E-Ink display 
+    for debugging.
+
+Pertinent Regulations
+^^^^^^^^^^^^^^^^^^^^^
+========== ============================================== ===============================================
+Regulation Description of Regulation                      How Regulation is Met
+
+8.3.B.2    | All supplemental batteries must have at a    The "SUPP CHECK" (Supplemental Check) LED
+           | minimum Passive Protection for under voltage 
+           | where charging occurs remote to the solar 
+           | vehicle unless they are primary cells. 
+           | Active Protection is required if charging is 
+           | within the solar vehicle. No Secondary 
+           | Lithium battery types shall be used for the 
+           | Supplemental Battery unless the Supplemental 
+           | Battery is powering a commercially procured 
+           | component such as a cell phone or laptop and 
+           | the Supplemental Battery was intended for 
+           | this purpose.
+========== ============================================== ===============================================
+
+Context
+^^^^^^^
+**Location of the Board:** On a movable arm mount attached to the south end of the board. Mounted near the driver.  
+
+List of I/O and Connections: 
+    [List of all the inputs and outputs from this board and where it is connected to. 
+    List all power signals first]
+    
+    * [Signal/Power] 
+        * [Input/Output/Bidirectional] [from/to/with] [Board/Hardware/etc.] 
+    * Power GNDPWR 
+        * Input from car power connector 
+    * Power +12V 
+        * Input from car power connector 
+    * Power +5V 
+        * Output from power distribution subsheet 
+    * Power +3.3V 
+        * Output from power distribution subsheet 
+
+Schematic
+^^^^^^^^^
+*What does this circuit do?*
+    This circuit makes connections from the microcontroller to the E-Ink Display and logic 
+    analyzer pins.  
+*Why do we need it?*
+    We need this circuit in order for debugging (CAN messages on the E-Ink display and logic 
+    analyzer pins).  
+*List of Circuit Components*
+    * STM32F413RHTx 
+        * Description: Microcontroller 
+        * Justification for selection of specific part: Standard component  
+        * `Datasheet link <https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=&cad=rja&uact=8&ved=2ahUKEwiqg4WM6NXuAhXULc0KHcHbAzIQFjABegQIAhAC&url=https%3A%2F%2Fwww.st.com%2Fresource%2Fen%2Fdatasheet%2Fstm32f413rg.pdf&usg=AOvVaw3U9MV6EuhEcmJpsEYCrU52>`__
+        * Associated passives/components:
+            * Bypass capacitors 
+            * 8 MHz External Crystal Oscillator: used to set the Phase Lock Loop (PLL) and the 
+            system core frequency (CPU processor speed) 
+                * Using an external clock ensures for precision, which is important in a safety-critical system like the BPS.  
+            * Reset button
+            * :term:`SWD <SWD>` Programming Pins
+    * BUK9M34-100EX(4) 
+        * Description: a MOSFET that will switch the fans off and on 
+        * Why is it necessary: so the fans can turn off and on 
+        * Justification for selection of specific part: this part is used over others because of 
+          Q101 compliant, its suitable for thermally demanding environments, and true logic gate 
+          with VGS(th) rating of greather than 0.5V at 175°C 
+        * Datasheet https://assets.nexperia.com/documents/data-sheet/BUK9M34-100E.pdf 
+        * Associated passives/components:  
+            * 4 different diodes, Molex_MicroFit3.0_1x2xP3.00mm_PolarizingPeg_Vertical and the 
+              LDRBDConn above. 
+
+*List of Subsheet I/O*
+
+* Power +12 V 
+    * Input from BPS Leader Board 
+* Power GNDPWR 
+    * Input from BPS Leader Board 
+* FAN 1 
+    * Input from BPS Leader Board 
+* FAN 2 
+    * Input from BPS Leader Board 
+* FAN 3 
+    * Input from BPS Leader Board 
+* Fan 4 
+    * Input from BPS Leader Board 
+
+.. figure:: ../_static/FanBrdSch.png
+    :align: center
+
+    Fan Board Schematic
+
+**Dimensions: 45.00mm by 34.50mm**
+
+Requirements/Constraints:  
+    We chose mosfet body diodes to be used as the transistor to prevent voltage spikes from entering 
+    into the master board (since the fan speeds can change and that could cause the spikes).
+    
+.. figure:: ../_static/FanBrdLayout.png
+    :align: center
+
+    Fan Board Layout
+
+.. figure:: ../_static/FanBrdRender.png
+    :align: center
+
+    Fan Board Render
+
 Leader board
 ============
 
