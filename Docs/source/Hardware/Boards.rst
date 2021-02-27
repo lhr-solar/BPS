@@ -113,13 +113,13 @@ List of I/O and Connections:
     * Power GNDPWR 
         * Input from BPS Leader Board 
     * FAN 1 
-        * :term:`PWM <PWM>` Input from BPS Leader Board 
+        * :term:`PWM <Pulse Width Modulation>` Input from BPS Leader Board 
     * FAN 2 
-        * :term:`PWM <PWM>` Input from BPS Leader Board 
+        * :term:`PWM <Pulse Width Modulation>` Input from BPS Leader Board 
     * FAN 3 
-        * :term:`PWM <PWM>` Input from BPS Leader Board 
+        * :term:`PWM <Pulse Width Modulation>` Input from BPS Leader Board 
     * Fan 4 
-        * :term:`PWM <PWM>` Input from BPS Leader Board 
+        * :term:`PWM <Pulse Width Modulation>` Input from BPS Leader Board 
 
 Schematic
 ^^^^^^^^^
@@ -152,15 +152,15 @@ Schematic
 * Power +12 V 
     * Input from BPS Leader Board 
 * Power GNDPWR 
-    * :term:`PWM <PWM>` Input from BPS Leader Board 
+    * Input from BPS Leader Board 
 * FAN 1 
-    * :term:`PWM <PWM>` Input from BPS Leader Board 
+    * :term:`PWM <Pulse Width Modulation>` Input from BPS Leader Board 
 * FAN 2 
-    * :term:`PWM <PWM>` Input from BPS Leader Board 
+    * :term:`PWM <Pulse Width Modulation>` Input from BPS Leader Board 
 * FAN 3 
-    * :term:`PWM <PWM>` Input from BPS Leader Board 
+    * :term:`PWM <Pulse Width Modulation>` Input from BPS Leader Board 
 * Fan 4 
-    * :term:`PWM <PWM>` Input from BPS Leader Board 
+    * :term:`PWM <Pulse Width Modulation>` Input from BPS Leader Board 
 
 .. figure:: ../_static/FanBrdSch.png
     :align: center
