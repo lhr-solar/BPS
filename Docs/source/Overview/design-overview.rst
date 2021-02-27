@@ -65,3 +65,25 @@ The BPS will also power the fans in the battery box.
    :align: center
 
    Overview of system
+
+Interrupts
+==========
+
+SPI
+###
+
+| These interrupts have premption priority level 0.
+| ``SPI1`` - for sending commands to LTC6811 minions, has subpriority level 0
+| ``SPI3`` - for sending current data to AS8510, has subpriority level 1
+
+UART 
+####
+
+| These interrupts have preemption priority level 1.
+| ``UART2`` - for BLE/CLI, has subpriority level 1
+| ``UART3`` - for USB, has subpriority level 0
+
+**Note**: The OS interrupts (``PendSV`` and ``Systick``) should have the lowest priority amongst all other interrupts. 
+
+
+

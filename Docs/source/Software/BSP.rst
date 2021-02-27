@@ -179,7 +179,9 @@ Usage
 Additional Considerations
     The ``SPI1`` and ``SPI3`` IRQs are only included in the RTOS version of the code.
 
-    If additonal SPI buses are needed, the user must modify the ``spi_port_t`` enum
+    If additonal SPI buses are needed, the user must modify the ``spi_port_t`` enum.
+
+    SPI interrupts (preemption priority level 0) have the highest priority amongst all NVIC interrupts. ``SPI1`` has a higher subpriority than ``SPI3``.
 
 Timer BSP: Sijin Woo
 =================================
@@ -219,6 +221,8 @@ Additional Considerations
     the BLE module must be disabled before the race is started if it is able to change the code. 
     This can be done through software by not initializing the USART2 module or through hardware 
     with a switch to turn off power to the BLE module, or just removing it all together. 
+
+    ``UART3`` has a higher subpriority (subpriority level 0) than ``UART2`` (subpriority level 1). ``UART2`` and ``UART3`` (preemption priority level 1) both have a lower priority than the SPI interrupts (preemption priority level 0).
 
 Watchdog Timer BSP: Sijin Woo
 =================================
