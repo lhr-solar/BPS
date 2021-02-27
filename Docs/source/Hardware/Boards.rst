@@ -79,7 +79,7 @@ Overview
 
 Brief Description/Purpose:
     The purpose of this board is to set the speed of the fans that will be used to cool the battery 
-    pack. It receives signals from the Master Board and sends them across a MOSFET that switches 
+    pack. It receives signals from the Leader Board and sends them across a MOSFET that switches 
     the fan on or off. 
 
 Pertinent Regulations
