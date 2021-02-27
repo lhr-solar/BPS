@@ -141,7 +141,7 @@ Additional Considerations
 
     If additonal SPI buses are needed, the user must modify the ``spi_port_t`` enum.
 
-    SPI interrupts have the highest priority amongst all NVIC interrupts. ``SPI1`` has a higher subpriority than ``SPI3``.
+    SPI interrupts (preemption priority level 0) have the highest priority amongst all NVIC interrupts. ``SPI1`` has a higher subpriority than ``SPI3``.
 
 Timer BSP: Sijin Woo
 =================================
@@ -182,7 +182,7 @@ Additional Considerations
     This can be done through software by not initializing the USART2 module or through hardware 
     with a switch to turn off power to the BLE module, or just removing it all together. 
 
-    ``UART3`` has a higher subpriority than ``UART2``. ``UART2`` and ``UART3`` both have a lower priority than the SPI interrupts.
+    ``UART3`` has a higher subpriority (subpriority level 0) than ``UART2`` (subpriority level 1). ``UART2`` and ``UART3`` (preemption priority level 1) both have a lower priority than the SPI interrupts (preemption priority level 0).
 
 Watchdog Timer BSP: Sijin Woo
 =================================
