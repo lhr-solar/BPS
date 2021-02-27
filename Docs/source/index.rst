@@ -17,6 +17,7 @@ Welcome to the BeVolt BPS documentation!
    Overview/useful-software
    Overview/design-requirements
    Overview/design-overview
+   Overview/software-overview
 
 .. toctree::
    :hidden:
