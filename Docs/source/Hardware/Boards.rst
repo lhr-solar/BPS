@@ -113,21 +113,21 @@ List of I/O and Connections:
     * Power GNDPWR 
         * Input from BPS Leader Board 
     * FAN 1 
-        * Input from BPS Leader Board 
+        * :term:`PWM <PWM>` Input from BPS Leader Board 
     * FAN 2 
-        * Input from BPS Leader Board 
+        * :term:`PWM <PWM>` Input from BPS Leader Board 
     * FAN 3 
-        * Input from BPS Leader Board 
+        * :term:`PWM <PWM>` Input from BPS Leader Board 
     * Fan 4 
-        * Input from BPS Leader Board 
+        * :term:`PWM <PWM>` Input from BPS Leader Board 
 
 Schematic
 ^^^^^^^^^
 *What does this circuit do?*
     They control the fan's speed for cooling the battery pack. 
 *Why do we need it?*
-    This board makes sure the batteries don’t heat up by receiving power from the leader board 
-    and shows status of the board with an LED. 
+    This board makes sure the batteries don’t heat up by controlling the speed of the fans based on
+    the temperature. 
 *List of Circuit Components*
     * Connector_Molex:Molex_Micro-Fit_3.0_43045-0612_2x03_P3.00mm_Vertical (LDRBRDConn) 
         * Description: connects the leader board to fan board 
@@ -137,12 +137,12 @@ Schematic
         * Associated passives/components:  
             * 4 different BUK9M34-100EX 
     * BUK9M34-100EX(4) 
-        * Description: a :term: `MOSFET <MOSFET>` that will switch the fans off and on 
-        * Why is it necessary: so the fans can turn off and on 
+        * Description: a :term:`MOSFET <MOSFET>` that will switch the fans off and on 
+        * Why is it necessary: so the fans can be set to certain speeds by turning them on and off at varying rates
         * Justification for selection of specific part: this part is used over others because of 
           Q101 compliant, its suitable for thermally demanding environments, and true logic gate 
           with VGS(th) rating of greather than 0.5V at 175°C 
-        * Datasheet https://assets.nexperia.com/documents/data-sheet/BUK9M34-100E.pdf 
+        * `Datasheet <https://assets.nexperia.com/documents/data-sheet/BUK9M34-100E.pdf>`__ 
         * Associated passives/components:  
             * 4 different diodes, Molex_MicroFit3.0_1x2xP3.00mm_PolarizingPeg_Vertical and the 
               LDRBDConn above. 
@@ -152,15 +152,15 @@ Schematic
 * Power +12 V 
     * Input from BPS Leader Board 
 * Power GNDPWR 
-    * Input from BPS Leader Board 
+    * :term:`PWM <PWM>` Input from BPS Leader Board 
 * FAN 1 
-    * Input from BPS Leader Board 
+    * :term:`PWM <PWM>` Input from BPS Leader Board 
 * FAN 2 
-    * Input from BPS Leader Board 
+    * :term:`PWM <PWM>` Input from BPS Leader Board 
 * FAN 3 
-    * Input from BPS Leader Board 
+    * :term:`PWM <PWM>` Input from BPS Leader Board 
 * Fan 4 
-    * Input from BPS Leader Board 
+    * :term:`PWM <PWM>` Input from BPS Leader Board 
 
 .. figure:: ../_static/FanBrdSch.png
     :align: center
