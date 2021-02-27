@@ -170,7 +170,7 @@ Schematic
 **Dimensions: 45.00mm by 34.50mm**
 
 Requirements/Constraints:  
-    We chose mosfet body diodes to be used as the transistor to prevent voltage spikes from entering 
+    We chose :term:`MOSFET <MOSFET>` body diodes to be used as the transistor to prevent voltage spikes from entering 
     into the master board (since the fan speeds can change and that could cause the spikes).
     
 .. figure:: ../_static/FanBrdLayout.png
