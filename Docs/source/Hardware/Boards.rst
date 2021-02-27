@@ -68,8 +68,8 @@ A switching regulator (NCP1117) converts the +5V input to +3.3V. This does not n
 
     Leader board power distribution
 
-Fan Board: Manthan Upadhyaya
-=============================
+Fan Board
+=========
 
 Overview
 ^^^^^^^^
