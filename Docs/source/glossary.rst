@@ -155,7 +155,7 @@ Glossary
     A resistor to Vcc that pulls a wire's voltage to logical '1' when it disconnects from some other source. 
 
   Pulse Width Modulation
-    A method of controlling the speed of a peripheral by quickly turning it on and off and controlling how long it stays on for. Used to control the speed of the fans.
+    A method of controlling the power usage of a peripheral by quickly turning it on and off and controlling how long it stays on for. Used to control the speed of the fans.
 
   Push-Pull 
     A configuration of a pin on a microcontroller where typically logical '0' corresponds to 0V, which logical '1' corresponds to the operating voltage (Vcc). Using this configuration, there can only be one source on a wire that drives communication/control. It stands in opposition to an "open drain" configuration. 
