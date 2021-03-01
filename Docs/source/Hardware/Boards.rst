@@ -18,8 +18,8 @@ Overview
 `BOM Link <https://www.mouser.com/ProjectManager/ProjectDetail.aspx?State=EDIT&ProjectGUID=11b675c5-b15b-46bd-a790-bb450819a4d3>`__ 
 
 Brief Description/Purpose:
-    The purpose of this board is to display messages from the CAN interface on the E-Ink display 
-    for debugging.
+    The purpose of this board is to display messages from the :term:`CAN <CAN Bus>` interface on 
+    the E-Ink display for debugging.
 
 Pertinent Regulations
 ^^^^^^^^^^^^^^^^^^^^^
@@ -45,11 +45,7 @@ Context
 **Location of the Board:** On a movable arm mount attached to the south end of the board. Mounted near the driver.  
 
 List of I/O and Connections: 
-    [List of all the inputs and outputs from this board and where it is connected to. 
-    List all power signals first]
     
-    * [Signal/Power] 
-        * [Input/Output/Bidirectional] [from/to/with] [Board/Hardware/etc.] 
     * Power GNDPWR 
         * Input from car power connector 
     * Power +12V 
