@@ -171,7 +171,7 @@ Schematic
 
 Requirements/Constraints:  
     We chose :term:`MOSFET <MOSFET>` body diodes to be used as the transistor to prevent voltage spikes from entering 
-    into the master board (since the fan speeds can change and that could cause the spikes).
+    into the leader board (since the fan speeds can change and that could cause the spikes).
     
 .. figure:: ../_static/FanBrdLayout.png
     :align: center
