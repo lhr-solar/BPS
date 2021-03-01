@@ -79,7 +79,7 @@ Overview
 
 Brief Description/Purpose:
     The purpose of this board is to set the speed of the fans that will be used to cool the battery 
-    pack. It receives signals from the Leader Board and sends them across a MOSFET that switches 
+    pack. It receives signals from the Leader Board and sends them across a :term:`MOSFET <MOSFET>` that switches 
     the fan on or off. 
 
 Pertinent Regulations
@@ -105,8 +105,6 @@ Context
 **Location of the Board:** With the BPS in the battery box 
 
 List of I/O and Connections: 
-    [List of all the inputs and outputs from this board and where it is connected to. 
-    List all power signals first]
     
     * Power +12 V 
         * Input from BPS Leader Board 
