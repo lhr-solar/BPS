@@ -132,7 +132,6 @@ Schematic
 *Why do we need it?*
     We need this circuit in order for debugging messages to be transmitted between microcontrollers.  
 *List of Circuit Components*
-
     * ADM3055E: 
         * Description: This is an isolated CAN physical layer transceiver with integrated isolated 
           DC to DC converters.  
@@ -170,7 +169,6 @@ Schematic
 *Why do we need it?*
     We need this circuit in order to have stable +5V and +3.3V power lines for the rest of the board.  
 *List of Circuit Components*
-
     * PDS1-S12-S5: 
         * Description: DC-DC converter. 
         * Why is it necessary: Converts DC +12V to DC +5V.  
