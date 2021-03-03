@@ -131,7 +131,6 @@ Schematic
     This circuit sets up the CAN interface between microcontrollers.
 *Why do we need it?*
     We need this circuit in order for debugging messages to be transmitted between microcontrollers.  
-
 *List of Circuit Components*
 
     * ADM3055E: 
@@ -170,7 +169,6 @@ Schematic
     and +3.3V.  
 *Why do we need it?*
     We need this circuit in order to have stable +5V and +3.3V power lines for the rest of the board.  
-
 *List of Circuit Components*
 
     * PDS1-S12-S5: 
@@ -190,6 +188,7 @@ Schematic
             * Bypass capacitors 
 
 *List of Subsheet I/O*
+
     * Power +12V: 
         * Input from car power connector 
     * Power +5V: 
