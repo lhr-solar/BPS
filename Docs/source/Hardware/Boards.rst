@@ -104,7 +104,7 @@ Context
 ^^^^^^^
 **Location of the Board:** With the BPS in the battery box 
 
-List of I/O and Connections: 
+**List of I/O and Connections:**
     
     * Power +12 V 
         * Input from BPS Leader Board 
@@ -145,7 +145,7 @@ Schematic
             * 4 different diodes, Molex_MicroFit3.0_1x2xP3.00mm_PolarizingPeg_Vertical and the 
               LDRBDConn above. 
 
-*List of Subsheet I/O*
+**List of Subsheet I/O**
 
 * Power +12 V 
     * Input from BPS Leader Board 
@@ -168,8 +168,8 @@ Schematic
 **Dimensions: 45.00mm by 34.50mm**
 
 Requirements/Constraints:  
-    We chose :term:`MOSFET <MOSFET>` body diodes to be used as the transistor to prevent voltage spikes from entering 
-    into the leader board (since the fan speeds can change and that could cause the spikes).
+    We chose flyback diodes to be used to prevent voltage spikes from entering into the leader 
+    board (since the pulsing fans can cause the spikes).
     
 .. figure:: ../_static/FanBrdLayout.png
     :align: center
