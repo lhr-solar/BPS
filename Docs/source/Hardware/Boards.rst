@@ -13,27 +13,118 @@ the :term:`Shunt Resistor`.
 
     AS8510 Block Diagram 
 
-Fan Board: Manthan Upadhyaya
-=============================
+Fan Board
+=========
 
-Purpose
+Overview
+^^^^^^^^
+`GitHub Link <https://github.com/lhr-solar/BPS-FanPCB>`__
+
+`BOM Link <https://www.mouser.com/ProjectManager/ProjectDetail.aspx?AccessID=272bad62cd>`__ 
+
+Brief Description/Purpose:
     The purpose of this board is to set the speed of the fans that will be used to cool the battery 
-    pack. It recieves signals from the Master Board and sends them across a :term:`MOSFET <MOSFET>` 
-    that switches the fan on or off.
+    pack. It receives signals from the Leader Board and sends them across a :term:`MOSFET <MOSFET>` that switches 
+    the fan on or off. 
 
-Blocks
-    Mosfets - Each mosfet is between the power provided by the Master Board and power provided to the
-    fans. When the :term:`PWM <Pulse Width Modulation>` signal is set, it switches the fan on or off 
-    at a certain duty cycle.
+Pertinent Regulations
+^^^^^^^^^^^^^^^^^^^^^
+========== ============================================== ===============================================
+Regulation Description of Regulation                      How Regulation is Met
 
-Connections
-    6 Connector: 4 of these connections are the PWM signals sent by the Master board. The other 2
-    are power and ground.
+**8.4.D**  | Battery enclosures may be equipped with a    | The BPS fan board is powered by the battery 
+           | forced ventilation system. Such ventilation  | system and in the event of a battery protection 
+           | systems must pull exhaust to the exterior of | fault it's powered by the supplemental battery.
+           | the solar car and must be directly connected 
+           | to the exterior of the vehicle away from any 
+           | airstream that may reach the driver. The 
+           | ventilation system shall be powered by the 
+           | battery system. In the event of a Battery 
+           | Protection Fault, provisions should be made 
+           | to power this fan from the Supplemental 
+           | battery.
+========== ============================================== ===============================================
+
+Context
+^^^^^^^
+**Location of the Board:** With the BPS in the battery box 
+
+**List of I/O and Connections:**
     
-    2 Connector(4): These are the power and grounds each fan is connected to.
+    * Power +12 V 
+        * Input from BPS Leader Board 
+    * Power GNDPWR 
+        * Input from BPS Leader Board 
+    * FAN 1 
+        * :term:`PWM <Pulse Width Modulation>` Input from BPS Leader Board 
+    * FAN 2 
+        * :term:`PWM <Pulse Width Modulation>` Input from BPS Leader Board 
+    * FAN 3 
+        * :term:`PWM <Pulse Width Modulation>` Input from BPS Leader Board 
+    * Fan 4 
+        * :term:`PWM <Pulse Width Modulation>` Input from BPS Leader Board 
 
-Additional Considerations
-    None
+Schematic
+^^^^^^^^^
+*What does this circuit do?*
+    They control the fan's speed for cooling the battery pack. 
+*Why do we need it?*
+    This board makes sure the batteries don’t heat up by controlling the speed of the fans based on
+    the temperature. 
+*List of Circuit Components*
+    * Connector_Molex:Molex_Micro-Fit_3.0_43045-0612_2x03_P3.00mm_Vertical (LDRBRDConn) 
+        * Description: connects the leader board to fan board 
+        * Why is it necessary: so the fans can be supplied power 
+        * Justification for selection of specific part: this connector provides the right amount 
+          of power and connections for all fans being used 
+        * Associated passives/components:  
+            * 4 different BUK9M34-100EX 
+    * BUK9M34-100EX(4) 
+        * Description: a :term:`MOSFET <MOSFET>` that will switch the fans off and on 
+        * Why is it necessary: so the fans can be set to certain speeds by turning them on and off at varying rates
+        * Justification for selection of specific part: this part is used over others because of 
+          Q101 compliant, its suitable for thermally demanding environments, and true logic gate 
+          with VGS(th) rating of greather than 0.5V at 175°C 
+        * `Datasheet <https://assets.nexperia.com/documents/data-sheet/BUK9M34-100E.pdf>`__ 
+        * Associated passives/components:  
+            * 4 different diodes, Molex_MicroFit3.0_1x2xP3.00mm_PolarizingPeg_Vertical and the 
+              LDRBDConn above. 
+
+**List of Subsheet I/O**
+
+* Power +12 V 
+    * Input from BPS Leader Board 
+* Power GNDPWR 
+    * Input from BPS Leader Board 
+* FAN 1 
+    * :term:`PWM <Pulse Width Modulation>` Input from BPS Leader Board 
+* FAN 2 
+    * :term:`PWM <Pulse Width Modulation>` Input from BPS Leader Board 
+* FAN 3 
+    * :term:`PWM <Pulse Width Modulation>` Input from BPS Leader Board 
+* Fan 4 
+    * :term:`PWM <Pulse Width Modulation>` Input from BPS Leader Board 
+
+.. figure:: ../_static/FanBrdSch.png
+    :align: center
+
+    Fan Board Schematic
+
+**Dimensions: 45.00mm by 34.50mm**
+
+Requirements/Constraints:  
+    We chose flyback diodes to be used to prevent voltage spikes from entering into the leader 
+    board (since the pulsing fans can cause the spikes).
+    
+.. figure:: ../_static/FanBrdLayout.png
+    :align: center
+
+    Fan Board Layout
+
+.. figure:: ../_static/FanBrdRender.png
+    :align: center
+
+    Fan Board Render
 
 Display Board
 =============

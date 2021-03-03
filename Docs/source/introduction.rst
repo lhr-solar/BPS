@@ -1,5 +1,5 @@
-Overview 
-=========
+System Overview 
+===============
 
 A Battery Protection System (BPS) is a system that makes sure that a battery stays within safe operating conditions.
 
