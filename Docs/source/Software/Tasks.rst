@@ -8,7 +8,7 @@ Initialization Task: Alex Koo
 Purpose
     Create tasks by calling "OSTaskCreate()" and provide argument specifying to RTOS how the task will be managed.
     The order of the semaphore Initialization matters because if the fault semaphore isn't initialized first and a fault is called we do not go into the fault state.
-    Initialization Task also creates :term: 'Semaphores <Semaphore>' which are used when a task wants exclusive 
+    Initialization Task also creates :term:`Semaphores <Semaphore>` which are used when a task wants exclusive 
     access to a resource, needs to synchronize its activities with an ISR or a task, or is waiting until an event occurs.
 
 
