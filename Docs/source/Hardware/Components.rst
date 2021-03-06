@@ -15,3 +15,15 @@ Usage
 Reason
     The strobelight is used to alert other vehicles on the road that the car is dangerous and to 
     avoid it. It is also required under the ASC regulations(9.4.G).
+
+Fuse
+====
+Description
+    This fuse is meant to protect the battery in the event of a short circuit in case the BPS cannot
+    react fast enough. This `fuse <https://www.allfuses.com/pub/media/documents/Ferraz%20A15QS.pdf>`__
+    is rated for 70A and 150VDC and is what is used in the BPS.
+Usage
+    It is placed on the high voltage line between the contactor and battery pack.
+Reason
+    According to the ASC regulations(8.5.A), the fuse must be rated for less than 200% of the maximum
+    expected current draw(which for this system is around 60A).
