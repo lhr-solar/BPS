@@ -8,10 +8,10 @@ Initialization Task: Alex Koo
 Purpose
     Create tasks by calling "OSTaskCreate()" and provide argument specifying to RTOS how the task will be managed.
     Initialization Task also creates the semaphores which is a programming construct that helps us achieve concurrency 
-    by implementing both synchronization and mutual exclusion. Semaphores are used when a task wants exclusive 
+    by implementing both synchronization and mutual exclusion. :termword`<Semaphores>`are used when a task wants exclusive 
     access to a resource, needs to synchronize its activities with an ISR or a task, or is waiting until an event occurs.
-    The semaphores deletes itself at the end and saves the contents of floating point registers whenever there is a context switch. 
-    The order of the semaphore matters as the priority sets whats task to be prioritized.  
+    The task deletes itself after running the time requirements and saves the contents of floating point registers whenever there is a context switch. 
+    The order of the semaphore matters because if the fault semaphore isn't initialized first and a fault is called we do not go into the fault state.  
 
 
 Functionality
