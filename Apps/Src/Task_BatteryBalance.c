@@ -22,5 +22,10 @@ void Task_BatteryBalance(void *p_arg) {
 
         OSMutexPost(&WDog_Mutex, OS_OPT_POST_NONE, &err);
         assertOSError(err);
+
+
+        //delay of 100ms
+        OSTimeDly(10, OS_OPT_TIME_DLY, &err);
+        assertOSError(err);
     }
 }
