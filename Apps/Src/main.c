@@ -17,7 +17,7 @@ int main() {
 	
 	OS_ERR err;
 
-	BPS_PLL_Init();
+	BSP_PLL_Init();
 
 	//Resetting the contactor
 	BSP_Contactor_Init();
