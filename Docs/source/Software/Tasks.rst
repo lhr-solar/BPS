@@ -86,7 +86,8 @@ Shared Resources
     This task uses the ``CANBus_MsgQ`` queue.
 
 Timing Requirements
-    (To be determined)
+    This task is not safety critical and no safety critical tasks depend on this task, so there is no set timing requirement. This task
+    runs whenever there is a message in the CAN message queue as long as no higher priority tasks are running at the time. 
 
 Yields
     This task will yield until there is a message in the ``CANBus_MsgQ``. 
