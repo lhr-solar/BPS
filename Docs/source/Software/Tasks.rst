@@ -25,7 +25,7 @@ Priority
     The initialization has the highest priority. 
 
 Timing Requirements
-    The task deletes itself after running the time requirements and saves the contents of floating point registers whenever there is a context switch. 
+    The task deletes itself after running.
 
 Yields
    There is no yield.
