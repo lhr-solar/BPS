@@ -140,5 +140,9 @@ void Task_VoltTempMonitor(void *p_arg) {
         //signal watchdog
         OSMutexPend(&WDog_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
         assertOSError(err);
+
+        //delay of 100ms
+        OSTimeDly(10, OS_OPT_TIME_DLY, &err);
+        assertOSError(err);
     }
 }
