@@ -35,15 +35,15 @@ Drivers
 Drivers interface with external hardware.
 The software for the BPS has drivers for:
 
-- CAN
-- EEPROM
+- :term:`CAN <CAN Bus>`
+- :term:`EEPROM <EEPROM>`
 - LTC6811 (Voltage and Temperature)
 - AS8510 (Amperes)
 
 Real Time Operating System (RTOS)
 =================================
 
-The RTOS uses a scheduler to run multiple threads. 
+The :term:`RTOS <RTOS>` uses a scheduler to run multiple threads. 
 Running these threads creates "psuedo-concurrency".
 
 The RTOS ensures that safety critical tasks will not be blocked by non-safety
@@ -57,17 +57,17 @@ Applications (Apps)
 The BPS Apps consist of threads/tasks and functions that interpret measurements.
 The following tasks make up the BPS' engine:
 
-- Initialization
-- Fault State
-- Critical State
-- Pet Watchdog
-- Voltage/Temperature monitor
-- Amperes monitor
-- Battery Balancing
-- Log Information
-- CAN Message Consumer
-- Command Line Interface (CLI)
-- Idle  
+- Initialization Task
+- :ref:`Fault State <Fault State Task: Manthan Upadhyaya>`
+- :ref:`Critical State <Critical state Task: Manthan Upadhyaya>`
+- :ref:`Pet Watchdog <Pet WatchDog Task: Harshitha Gorla & Clark Poon>`
+- :ref:`Voltage/Temperature monitor <Voltage Temperature Monitor Task: Sijin Woo>`
+- :ref:`Amperes monitor <Amperes Task: Manthan Upadhyaya>`
+- :ref:`Battery Balancing <Battery Balancing Task: Sugam Arora>`
+- :ref:`Log Information <Log Info Task>`
+- :ref:`CAN Message Consumer <CAN Consumer Task: Sugam Arora>`
+- :ref:`Command Line Interface (CLI) <CLI Task: Sugam Arora>`
+- :ref:`Idle <Idle Task>`
 
 Descriptions of what each task does can be found in the Tasks section.
 
