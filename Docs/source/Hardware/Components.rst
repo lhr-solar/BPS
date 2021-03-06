@@ -26,4 +26,5 @@ Usage
     It is placed on the high voltage line between the contactor and battery pack.
 Reason
     According to the ASC regulations(8.5.A), the fuse must be rated for less than 200% of the maximum
-    expected current draw(which for this system is around 60A).
+    expected current draw(which for this system is around 60A). The rating must also be for more than
+    75% of the maximum current capacity of the wire(tbd).
