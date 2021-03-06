@@ -26,7 +26,9 @@ Shared Resources
     current sensor), and ``AmperesIO_Sem4``.
 
 Timing Requirements
-    TBD
+    According to Dr. Judy Jeevarajan, current through the Lithium-ion battery pack needs to be monitored at least once every couple minutes
+    to maintain safety and accuracy. For scrutineering and testing purposes, this task is monitored more frequently at once every 100 
+    milliseconds. 
 
 Yields
     It yields when it signals the critical state task that the current is safe, when it detects a
@@ -58,7 +60,8 @@ Shared Resources
     This task will access the ``MinionsASIC_Mutex``, the ``WDog_Mutex``, and the ``Voltage_Mutex``.
 
 Timing Requirements
-    (To be determined)
+    According to Dr. Judy Jeevarajan, Lithium-ion batteries need to be monitored at least once every couple minutes to maintain safety
+    and accuracy. For scrutineering and testing purposes, this task is monitored more frequently at once every 100 milliseconds. 
 
 Yields
     This task yields for the ``MinionsASIC_Mutex``, the ``Voltage_Mutex``, and the ``MinionsIO_Mutex``. 
@@ -317,7 +320,9 @@ Shared Resources
     on the ``SPI1`` port (this port is also used by the Battery Balancing Task).
 
 Timing Requirements
-    (To be determined)
+    According to Dr. Judy Jeevarajan, voltage and tempterature of Lithium-ion batteries need to be monitored at least once every couple
+    minutes to maintain safety and accuracy. For scrutineering and testing purposes, this task is updated more frequently at once every 100
+    milliseconds.
 
 Yields
     Since this task checks all voltage and temperature values, it will wait for the ``Voltage_Mutex`` and the ``TemperatureBuffer_Mutex``
