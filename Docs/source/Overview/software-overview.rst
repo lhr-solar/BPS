@@ -44,7 +44,7 @@ Real Time Operating System (RTOS)
 =================================
 
 The :term:`RTOS <RTOS>` uses a scheduler to run multiple threads. 
-Running these threads creates "psuedo-concurrency".
+Running these threads creates "pseudo-concurrency".
 
 The RTOS ensures that safety critical tasks will not be blocked by non-safety
 critical tasks.
@@ -70,5 +70,4 @@ The following tasks make up the BPS' engine:
 - :ref:`Idle <Idle Task>`
 
 Descriptions of what each task does can be found in the Tasks section.
-
 
