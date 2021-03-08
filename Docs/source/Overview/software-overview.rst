@@ -49,13 +49,13 @@ Running these threads creates "pseudo-concurrency".
 The RTOS ensures that safety critical tasks will not be blocked by non-safety
 critical tasks.
 
-We use the Micrium uC/OS-III RTOS. 
+We use the `Micrium uC/OS-III RTOS <https://docs.silabs.com/micrium/latest/micrium-general-concepts/>`__. 
 
 Applications (Apps)
 ===================
 
 The BPS Apps consist of threads/tasks and functions that interpret measurements.
-The following tasks make up the BPS' engine:
+The following tasks make up the BPS' engine and are shown from highest to lowest priority:
 
 - Initialization Task
 - :ref:`Fault State <Fault State Task: Manthan Upadhyaya>`
@@ -70,4 +70,3 @@ The following tasks make up the BPS' engine:
 - :ref:`Idle <Idle Task>`
 
 Descriptions of what each task does can be found in the Tasks section.
-
