@@ -6,20 +6,18 @@ Initialization Task: Alex Koo
 ===============================
 
 Purpose
-    Create tasks by calling "OSTaskCreate()" and provide argument specifying to RTOS how the task will be managed.
+    Create tasks by calling ``OSTaskCreate()`` and provide argument specifying to RTOS how the task will be managed.
     The order of the semaphore Initialization matters because if the fault semaphore isn't initialized first and a fault is called we do not go into the fault state.
     Initialization Task also creates :term:`Semaphores <Semaphore>` which are used when a task wants exclusive 
     access to a resource, needs to synchronize its activities with an ISR or a task, or is waiting until an event occurs.
 
 
-Functionality
-    1) The TCB, Task name, Task function argument, Priority, Stack, Watermark limit for debugging, Stack size, 
-    Queue size, Time quanta, Extension pointer, Options, Return err code is provided. 
-
+Functionality:
+    1) The TCB, Task name, Task function argument, Priority, Stack, Watermark limit forr debugging, Stack size, Queue size, Time quanta, Extension pointer, Options, Return err code is provided
+    
     2) Defines the priority level for the tasks
     
-    3) Specifies the size of the task's stack in number of elements which corresponds to the number of bytes available
-    on the stack 
+    3) Specifies the size of the task's stack in bytes
 
 Priority
     The initialization has the highest priority. 
