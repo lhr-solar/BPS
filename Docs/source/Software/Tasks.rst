@@ -13,7 +13,7 @@ Purpose
 
 
 Functionality:
-    1) The TCB, Task name, Task function argument, Priority, Stack, Watermark limit forr debugging, Stack size, Queue size, Time quanta, Extension pointer, Options, Return err code is provided
+    1) The TCB, Task name, Task function argument, Priority, Stack, Watermark limit for debugging, Stack size, Queue size, Time quanta, Extension pointer, Options, Return err code is provided
     
     2) Defines the priority level for the tasks
     
