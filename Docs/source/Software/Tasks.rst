@@ -229,6 +229,31 @@ Additional Considerations
     When modifying the idle task, it is important to not introduce any functionality that may affect 
     other tasks. For example, the idle task should not pend any mutexes, since this could block more important tasks from running.
 
+Initialization Task: Alex Koo
+===============================
+
+Purpose
+    Create tasks by calling ``OSTaskCreate()`` and provide argument specifying to RTOS how the task will be managed.
+    The order of the semaphore Initialization matters because if the fault semaphore isn't initialized first and a fault is called we do not go into the fault state.
+    Initialization Task also creates :term:`Semaphores <Semaphore>` which are used when a task wants exclusive 
+    access to a resource, needs to synchronize its activities with an ISR or a task, or is waiting until an event occurs.
+
+Functionality:
+    1) The TCB, Task name, Task function argument, Priority, Stack, Watermark limit for debugging, Stack size, Queue size, Time quanta, Extension pointer, Options, Return err code is provided
+    
+    2) Defines the priority level for the tasks
+    
+    3) Specifies the size of the task's stack in bytes
+
+Priority
+    The initialization has the highest priority. 
+
+Timing Requirements
+    The task deletes itself after running.
+
+Yields
+   There is no yield.
+
 Log Info Task
 =============
 
