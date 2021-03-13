@@ -64,3 +64,6 @@ html_static_path = ['_static']
 
 #use index.rst
 master_doc = 'index'
+
+def setup(app):
+    app.add_css_file('my_theme.css')

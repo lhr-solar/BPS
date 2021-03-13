@@ -2,39 +2,165 @@
 Real Time Operating System Tasks
 ********************************
 
-Initialization Task: Alex Koo
+Amperes Task: Manthan Upadhyaya
 ===============================
 
 Purpose
-    Create tasks by calling ``OSTaskCreate()`` and provide argument specifying to RTOS how the task will be managed.
-    The order of the semaphore Initialization matters because if the fault semaphore isn't initialized first and a fault is called we do not go into the fault state.
-    Initialization Task also creates :term:`Semaphores <Semaphore>` which are used when a task wants exclusive 
-    access to a resource, needs to synchronize its activities with an ISR or a task, or is waiting until an event occurs.
+    Monitor the total current through the battery pack and call the Fault state task if it 
+    is dangerously high.
 
+Functionality
+    1) First it checks the current and if it is safe, signals the critical state task. This only occurs once.
 
-Functionality:
-    1) The TCB, Task name, Task function argument, Priority, Stack, Watermark limit for debugging, Stack size, Queue size, Time quanta, Extension pointer, Options, Return err code is provided
-    
-    2) Defines the priority level for the tasks
-    
-    3) Specifies the size of the task's stack in bytes
+    2) If the current is above 75A, it signals the fault state task.
+
+    3) After every updated measurement, it sends the current data to the CAN queue and updates the BPS's State of Charge.
 
 Priority
-    The initialization has the highest priority. 
+    This task is the 5th priority under the VoltTemp task. This is due to professional advice the
+    BPS team was given. Also the VoltTemp task monitors 2 potentially dangerous conditions while 
+    this task only monitors 1.
+
+Shared Resources
+    It uses the ``Fault_Sem4``, ``SafetyCheck_Sem4``, ``AmperesData_Mutex``(when collecting data from the 
+    current sensor), and ``AmperesIO_Sem4``.
 
 Timing Requirements
-    The task deletes itself after running.
+    According to Dr. Judy Jeevarajan, current through the Lithium-ion battery pack needs to be monitored at least once every couple minutes
+    to maintain safety and accuracy. For scrutineering and testing purposes, this task is monitored more frequently at once every 100 
+    milliseconds. 
 
 Yields
-   There is no yield.
+    It yields when it signals the critical state task that the current is safe, when it detects a
+    fault, when it tries to use a shared resource, and when it sends an :term:`SPI <SPI>` message.
 
+Additional Considerations
+    None
+
+Battery Balancing Task: Sugam Arora
+===================================
+
+Purpose
+    The solar car is powered by lithium ion cells. If these cells are overcharged, they may experience 
+    thermal runaway. Running the battery with unbalanced cells may lead to its accelerated degredation. 
+    This task has been implemented in an effort to maintain peak performance and health for the car's 
+    battery pack. If we did not have battery balancing and there was one module with a high voltage, 
+    the other modules wouldn't get charged and the battery would have a lower state of charge overall.
+
+Functionality
+    This task sets any battery module with a voltage that is higher than the minimum voltage of all 
+    the modules + a charging tolerance (subject to change) to discharge. Any modules that have a 
+    voltage that is equal to or less than the minimum voltage of all the modules in the system will no longer discharge. 
+
+Priority
+    The battery balancing task has priority level 6, so it will not interrupt any monitoring tasks 
+    or any tasks that check if the BPS is running correctly.
+
+Shared Resources
+    This task will access the ``MinionsASIC_Mutex``, the ``WDog_Mutex``, and the ``Voltage_Mutex``.
+
+Timing Requirements
+    According to Dr. Judy Jeevarajan, Lithium-ion batteries need to be monitored at least once every couple minutes to maintain safety
+    and accuracy. For scrutineering and testing purposes, this task is monitored more frequently at once every 100 milliseconds. 
+
+Yields
+    This task yields for the ``MinionsASIC_Mutex``, the ``Voltage_Mutex``, and the ``MinionsIO_Mutex``. 
+
+Additional Considerations
+    None
+
+CAN Consumer Task: Sugam Arora
+==============================
+
+Purpose
+    The BPS must send :term:`CAN <CAN Bus>` messages to the rest of the system. 
+
+Functionality
+    This task gets the message that is next up from the CAN message queue and sends it on the CAN bus. 
+
+Priority
+    This task has priority level 7, so it will not interrupt any monitoring tasks or any tasks that 
+    check if the BPS is running correctly.
+
+Shared Resources
+    This task uses the ``CANBus_MsgQ`` queue.
+
+Timing Requirements
+    This task is not safety critical and no safety critical tasks depend on this task, so there is no set timing requirement. This task
+    runs whenever there is a message in the CAN message queue as long as no higher priority tasks are running at the time. 
+
+Yields
+    This task will yield until there is a message in the ``CANBus_MsgQ``. 
+
+Additional Considerations
+    For information about how the message payloads are structured can be found in the documentation for the CAN driver.
+    
+    All possible CAN messages that will be sent to the rest of the car's system by the BPS
+    are listed on the `CAN Bus IDs spreadsheet <https://docs.google.com/spreadsheets/d/11YWoMVZw8BFr8kyO4DIz0g-aIU_vVa0d-WioSRq85TI/edit#gid=0>`_.
+
+CLI Task: Sugam Arora
+=====================
+
+Purpose
+    The Command Line Interface prints metrics and information about the BPS depending on what command 
+    the user has entered, and is meant to be used to debug the BPS.
+
+Functionality
+    This task initializes the CLI and polls for a command to be sent via UART (through USB). Once the 
+    user has entered a command, it is handled and the appropriate information is displayed.
+
+Priority
+    The CLI task has priority level 9 because it is the least important task (besides the idle task).
+
+Shared Resources
+    This task may use the ``MinionsASIC_Mutex`` or the ``Voltage_Mutex`` depending on what command the user enters.
+
+Timing Requirements
+    None
+
+Yields
+    This task will wait until the user enters a command. This task will yield for the resources mentioned 
+    in the "Shared Resources" section for this task.
+
+Additional Considerations
+    For information on how to use the CLI and its list of valid commands, click on :ref:`CLI section<CLI-app>`.
+
+Critical State Task: Manthan Upadhyaya
+======================================
+
+Purpose
+    The Critical State Task initializes the BPS when it first turns on.
+
+Functionality:
+    1) It waits for the VoltTemp and Amperes task to post the SafetyCheck :term:`semaphore <Semaphore>` 4 times. One for voltage, one for temperature, one for current, and one for open wire.
+    
+    2) If all of these checks are safe, the task will send the All Clear message and the Contactor On message across the CAN line. It will also turn the contactor on.
+    
+    3) The task will then destroy itself since it is no longer needed
+
+Priority
+    It's priority 2, underneath the fault state task. This is because if a fault occurs during the 
+    critical state task, the fault task must be called.
+
+Shared Resources
+    All it uses is the ``SafetyCheck_Sem4``.
+
+Timing Requirements
+    None
+
+Yields
+    While initializing, it yields to other tasks to let them check their specific fault conditions.
+    After initializing, it destroys itself and yields to the next highest priority task.
+
+Additional Considerations
+    None
 
 Fault State Task: Manthan Upadhyaya
 ===================================
 
 Purpose
     The Fault State Task is called when a fault condition is set off in the BPS. These fault 
-    conditions can be found here(place link to fault conditions). 
+    conditions can be found :ref:`here <Design Requirements>`. 
 
 Functionality:
     1) All other tasks are prevented from running. This is because this is the highest priority task.
@@ -58,7 +184,12 @@ Priority
     occured.
 
 Shared Resources
-    It uses the ``Fault_Sem4`` which is used to block the task from running until something sets it.
+    It uses the ``Fault_Sem4`` which is used to block the task from running until something sets it. It also uses
+    the ``Fault_BitMap`` variable. This variable is set by the other tasks so the Fault task does
+    not have to call other functions to find out what caused the fault. The variable used to set 
+    ``Fault_BitMap`` is ``enum Fault_Set``. The description of this enum is in the file ``tasks.h``.
+    The variable ``Fault_Flag`` is also used by some functions to bypass OS functions in the case of
+    a fault. If the variable is set to 1, functions such as ``OS_SemPend`` & ``OS_SemPost`` are skipped.
 
 Timing Requirements
     The contactor must be shut off as soon as possible after a fault is detected.
@@ -72,147 +203,87 @@ Additional Considerations
     must be taken to minimize the chances of this happening. It also goes into a fault state when 
     the hard fault handler is called.
 
-Amperes Task: Manthan Upadhyaya
+Idle Task
+=========
+
+Purpose
+    The scheduler always needs to have an available task to run. The purpose of this task is for it 
+    to run whenever the scheduler cannot schedule anything else.
+
+Functionality
+    The idle task runs an empty infinite loop for as long as it is scheduled to run.
+
+Priority
+    The idle task has the lowest priority in the system (10), so it will not run unless all other tasks are blocked.
+
+Shared Resources
+    The idle task does not use any shared resources.
+
+Timing Requirements
+    The idle task does not have any timing requirements.
+
+Yields
+    The idle task never yields.
+
+Additional Considerations
+    When modifying the idle task, it is important to not introduce any functionality that may affect 
+    other tasks. For example, the idle task should not pend any mutexes, since this could block more important tasks from running.
+
+Initialization Task: Alex Koo
 ===============================
 
 Purpose
-    Monitor the total current through the battery pack and call the Fault state task if it 
-    is dangerously high.
-
-Functionality
-    1) First it checks the current and if it is safe, signals the critical state task. This only occurs once.
-
-    2) If the current is above 75A, it signals the fault state task.
-
-    3) After every updated measurement, it sends the current data to the CAN queue.
-
-Priority
-    This task is the 5th priority under the VoltTemp task. This is due to professional advice the
-    BPS team was given. Also the VoltTemp task monitors 2 potentially dangerous conditions while 
-    this task only monitors 1.
-
-Shared Resources
-    It uses the ``Fault_Sem4``, ``SafetyCheck_Sem4``, ``AmperesData_Mutex``(when collecting data from the 
-    current sensor), and ``AmperesIO_Sem4``.
-
-Timing Requirements
-    TBD
-
-Yields
-    It yields when it signals the critical state task that the current is safe, when it detects a
-    fault, when it tries to use a shared resource, and when it sends an SPI message.
-
-Additional Considerations
-    None
-
-Critical State Task: Manthan Upadhyaya
-======================================
-
-Purpose
-    The Critical State Task initializes the BPS when it first turns on.
+    Create tasks by calling ``OSTaskCreate()`` and provide argument specifying to RTOS how the task will be managed.
+    The order of the semaphore Initialization matters because if the fault semaphore isn't initialized first and a fault is called we do not go into the fault state.
+    Initialization Task also creates :term:`Semaphores <Semaphore>` which are used when a task wants exclusive 
+    access to a resource, needs to synchronize its activities with an ISR or a task, or is waiting until an event occurs.
 
 Functionality:
-    1) It waits for the VoltTemp and Amperes task to post the SafetyCheck semaphore 4 times. One for voltage, one for temperature, one for current, and one for open wire.
+    1) The TCB, Task name, Task function argument, Priority, Stack, Watermark limit for debugging, Stack size, Queue size, Time quanta, Extension pointer, Options, Return err code is provided
     
-    2) If all of these checks are safe, the task will send the All Clear message and the Contactor On message across the CAN line. It will also turn the contactor on.
+    2) Defines the priority level for the tasks
     
-    3) The task will then destroy itself since it is no longer needed
+    3) Specifies the size of the task's stack in bytes
 
 Priority
-    It's priority 2, underneath the fault state task. This is because if a fault occurs during the 
-    critical state task, the fault task must be called.
-
-Shared Resources
-    All it uses is the ``SafetyCheck_Sem4``.
+    The initialization has the highest priority. 
 
 Timing Requirements
-    None
+    The task deletes itself after running.
 
 Yields
-    While initializing, it yields to other tasks to let them check their specific fault conditions.
-    After initializing, it destroys itself and yields to the next highest priority task.
+   There is no yield.
 
-Additional Considerations
-    None
-
-CLI Task: Sugam Arora
-=====================
+Log Info Task
+=============
 
 Purpose
-    The Command Line Interface prints metrics and information about the BPS depending on what command the user has entered, and is meant to be used to debug the BPS.
+   This task logs the state of charge into the EEPROM every 3 seconds.
 
 Functionality
-    This task initializes the CLI and polls for a command to be sent via UART (through USB). Once the user has entered a command, it is handled and the appropriate information is displayed.
+   The log info task runs an infinite loop. Inside the loop, it sends percentage of charge left in 
+   the battery pack to the EEPROM using ``EEPROM_LogData()`` and is then delayed by ``OSTimeDly()`` 
+   every 3 seconds. 
 
 Priority
-    The CLI task has priority level 9 because it is the least important task (besides the idle task).
+   This task has priority 8, so it will not interrupt any monitoring tasks or any tasks that check 
+   if the BPS is running correctly. It will also have a lower priority than sending :term:`CAN <CAN Bus>` messages.
 
 Shared Resources
-    This task may use the ``MinionsASIC_Mutex`` or the ``Voltage_Mutex`` depending on what command the user enters.
+   The log info task uses battery state of charge data and the :term:`EEPROM <EEPROM>`, which is also 
+   shared by the Fault State Task and CLI. 
 
 Timing Requirements
-    None
-
-Yields
-    This task will wait until the user enters a command. This task will yield for the resources mentioned in the "Shared Resources" section for this task.
-
-Additional Considerations
-    For information on how to use the CLI and its list of valid commands, click on :ref:`CLI section<CLI-app>`.
-
-
-Battery Balancing Task: Sugam Arora
-===================================
-
-Purpose
-    The solar car is powered by lithium ion cells. If these cells are overcharged, they may experience thermal runaway. Running the battery with unbalanced cells may lead to its accelerated degredation. This task has been 
-    implemented in an effort to maintain peak performance and health for the car's battery pack. If we did not have battery balancing and there was one module with a high voltage, the other modules wouldn't get charged and
-    the battery would have a lower state of charge overall.
-
-Functionality
-    This task sets any battery module with a voltage that is higher than the minimum voltage of all the modules + a charging tolerance 
-    (subject to change) to discharge. Any modules that have a voltage that is equal to or less than the minimum voltage of all the 
-    modules in the system will no longer discharge. 
-
-Priority
-    The battery balancing task has priority level 6, so it will not interrupt any monitoring tasks or any tasks that check if the BPS is running correctly.
-
-Shared Resources
-    This task will access the ``MinionsASIC_Mutex``, the ``WDog_Mutex``, and the ``Voltage_Mutex``.
-Timing Requirements
-    (To be determined)
-
-Yields
-    This task yields for the ``MinionsASIC_Mutex``, the ``Voltage_Mutex``, and the ``MinionsIO_Mutex``. 
-
-Additional Considerations
-    None
+   There is a time requirement of logging into the EEPROM every 3 seconds. Writing too often to the 
+   EEPROM will exceed the EEPROM's limited (4 million) erase/write cycles, which causes the EEPROM 
+   to malfunction. Thus, writing every 3 seconds will update the EEPROM accurately enough and stay 
+   within the EEPROM's erase/write cycles.   
  
-CAN Consumer Task: Sugam Arora
-==============================
-
-Purpose
-    The BPS must send CAN messages to the rest of the system. 
-
-Functionality
-    This task gets the message that is next up from the CAN message queue and sends it on the CAN bus. 
-
-Priority
-    This task has priority level 7, so it will not interrupt any monitoring tasks or any tasks that check if the BPS is running correctly.
-
-Shared Resources
-    This task uses the ``CANBus_MsgQ`` queue.
-
-Timing Requirements
-    (To be determined)
-
 Yields
-    This task will yield until there is a message in the ``CANBus_MsgQ``. 
+   The log info task yields when ``OSTimeDly()`` is called and when the EEPROM is initialized and written to. 
 
 Additional Considerations
-    For information about how the message payloads are structured can be found in the documentation for the CAN driver.
-    
-    All possible CAN messages that will be sent to the rest of the car's system by the BPS
-    are listed on the `CAN Bus IDs spreadsheet <https://docs.google.com/spreadsheets/d/11YWoMVZw8BFr8kyO4DIz0g-aIU_vVa0d-WioSRq85TI/edit#gid=0>`_.
+   None.
 
 Pet WatchDog Task: Harshitha Gorla & Clark Poon
 ===============================================
@@ -247,46 +318,23 @@ Additional Considerations
     If we add more tasks (or split up tasks such as voltage and temperature) and want to have the 
     watchdog timer look over them, we can add more bits to the timer and just check if they are set.
 
-Idle Task
-=========
-
-Purpose
-    The scheduler always needs to have an available task to run. The purpose of this task is for it to run whenever the scheduler cannot schedule anything else.
-
-Functionality
-    The idle task runs an empty infinite loop for as long as it is scheduled to run.
-
-Priority
-    The idle task has the lowest priority in the system (10), so it will not run unless all other tasks are blocked.
-
-Shared Resources
-    The idle task does not use any shared resources.
-
-Timing Requirements
-    The idle task does not have any timing requirements.
-
-Yields
-    The idle task never yields.
-
-Additional Considerations
-    When modifying the idle task, it is important to not introduce any functionality that may affect other tasks. For example, the idle task should not pend 
-    any mutexes, since this could block more important tasks from running.
-
 Voltage Temperature Monitor Task: Sijin Woo
 ===========================================
 
 Purpose
-    The BPS must make sure that the battery pack's voltage, temperature, and open wires have safe values in order to protect the car and the driver. 
-    If any battery module has a temperature between 45 and 60 degrees Celsius, the car can continue running safely but it should not be charged.
+    The BPS must make sure that the battery pack's voltage, temperature, and open wires have safe 
+    values in order to protect the car and the driver. If any battery module has a temperature between 
+    45 and 60 degrees Celsius, the car can continue running safely but it should not be charged.
     
 
 Functionality
-    This task will check all voltage, temperature, and open wire values and sends voltage and temperature values on the CAN bus.
-    This task also sends a suggestion to not charge the battery when any module has a temperature between 45 and 60 degrees Celsius.
+    This task will check all voltage, temperature, and open wire values and sends voltage and 
+    temperature values on the :term:`CAN <CAN Bus>` bus. This task also sends a suggestion to not 
+    charge the battery when any module has a temperature between 45 and 60 degrees Celsius.
     
-    If the state of the open wires or the battery pack's voltage/temperature is unsafe, then the fault state task will be signaled.
-    As each of the three (open wires, battery voltage, and battery temperature) are deemed safe, this task signals to turn the contactor on
-    once.
+    If the state of the open wires or the battery pack's voltage/temperature is unsafe, then the 
+    fault state task will be signaled. As each of the three (open wires, battery voltage, and battery 
+    temperature) are deemed safe, this task signals to turn the contactor on once.
 
 Priority
     This task has priority level 4, so it will not interrupt the fault state, critical state, and watchdog tasks.
@@ -294,11 +342,13 @@ Priority
 Shared Resources
     This task uses the ``CANBus_MsgQ`` queue, the ``Fault_Sem4``, and the ``SafetyCheck_Sem4``. 
     
-    This task also pends the ``WDog_Mutex`` and the ``MinionsASIC_Mutex``. Measurement data is sent on the ``SPI1`` 
-    port (this port is also used by the Battery Balancing Task).
+    This task also pends the ``WDog_Mutex`` and the ``MinionsASIC_Mutex``. Measurement data is sent 
+    on the ``SPI1`` port (this port is also used by the Battery Balancing Task).
 
 Timing Requirements
-    (To be determined)
+    According to Dr. Judy Jeevarajan, voltage and tempterature of Lithium-ion batteries need to be monitored at least once every couple
+    minutes to maintain safety and accuracy. For scrutineering and testing purposes, this task is updated more frequently at once every 100
+    milliseconds.
 
 Yields
     Since this task checks all voltage and temperature values, it will wait for the ``Voltage_Mutex`` and the ``TemperatureBuffer_Mutex``

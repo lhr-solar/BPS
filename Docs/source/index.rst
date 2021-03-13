@@ -14,8 +14,10 @@ Welcome to the BeVolt BPS documentation!
    :maxdepth: 2
    :caption: Overview
 
+   Overview/useful-software
    Overview/design-requirements
    Overview/design-overview
+   Overview/software-overview
 
 .. toctree::
    :hidden:
@@ -34,10 +36,12 @@ Welcome to the BeVolt BPS documentation!
 
    Hardware/Boards
    Hardware/Components
+   Hardware/battery-compartment.rst
 
 .. toctree::
    :hidden:
    :maxdepth: 1
-   :caption: Glossary
+   :caption: Terms and Definitions
    
    glossary
+   abbreviations
