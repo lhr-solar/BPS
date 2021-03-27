@@ -439,3 +439,183 @@ and the mux switches between all of them.
     :align: center
 
     LTC6811 Block Diagram 
+
+
+
+BPS Minion Board
+================
+
+Overview
+^^^^^^^^
+`GitHub Link <https://github.com/lhr-solar/BPS-MinionPCB>`__
+
+
+
+Brief Description/Purpose:
+    The BPS Minion Board measures the voltage and temperature of the batteries and sends the data to the BPS Leader Board. 
+    There are four temperature connector minion boards. Each board can measure 12 modules and 16 temperature sensors. 
+
+Pertinent Regulations
+^^^^^^^^^^^^^^^^^^^^^
+===========  ============================================== ===========================================================
+Regulation   Description of Regulation                      How Regulation is Met
+
+**8.3.A.5**  | System in which measurements are constantly  | The Minion board constantly takes voltage and temperature 
+             | and where actions are taken immediately      | measurements of the battery modules and transmits data
+             | without operator intervention to open the    | back to the leader board.
+             | Main Power Switch should a battery  
+             | Protection Fault occur. 
+===========  ============================================== ===========================================================
+
+Context
+^^^^^^^
+**Location of the Board:** Battery box 
+
+**List of I/O and Connections:**
+    
+    * Leaderboard Input
+        * Input from BPS Leader Board, tells the Minion board when to gather measurments form the batteries. 
+    * LeaderBoard Output 
+        * Outputs to the leaderboard, transmits voltage and temperature readings from the battery modules.
+    * Voltage Connectors 
+        * Input from the battery modules, transmit voltage from each battery module. The IC also uses this 
+          voltages to power itself. 
+    * Minion Shield Power  
+        * 5V output from the LTC6811 to the Minion Shield board. This is used to power the temperature sensors.
+    * Temperature Input
+        * Input from the Minion Shield board, transmits temperature data.
+
+Schematic
+^^^^^^^^^
+
+**Main**
+++++++++
+
+*What does this circuit do?*
+    This circuit measures the voltages and temperatures of each battery module 
+    and sends the data to the leader board when prompted. 
+*Why do we need it?*
+    Regulations stipulate that the voltages and temperatures of the battery 
+    modules must be monitored at all times. 
+*List of Circuit Components*
+    * 2 Molex Micro-fit 3.0 1x07 3.00mm Horizontal  
+        * Description: Each connector allows for eight connections to the battery modules 
+        * Why is it necessary: Sends the voltages of the battery modules to the IC
+        * Justification for selection of specific part: Standard component
+        * `Datasheet link <https://cdn-reichelt.de/documents/datenblatt/C100/MOLEX_43650XXX2_DB_EN.pdf>`__ 
+        * Associated passives/components:  
+            * 12 bypass capacitors  
+            * 12 inductors 
+            * 12 PMOS transistors
+            * 12 resistors connecting to the source of the PMOS transistors 
+    * 2 Molex Micro-fit 3.0 1x10 2.54mm Vertical  
+        * Description: Connects to temperature sensors on the Minion Shield board  
+        * Why is it necessary:  Allows the Minion Board to retrieve temperature data from Minion Shield board
+        * Justification for selection of specific part: Standard component 
+        * Associated passives/components:  
+            * LTC1380   
+            * 100 nF decoupling capacitor   
+    * LTC1380  
+        * Description: Analog 1:8 MUX. There are 2 on the board, one for each temperature sensor connector. 
+        * Why is it necessary:  Since there are a limited number of AUX pins, 
+          an analog MUX connects the temperature sensors to GPIO1 of the ADC. 
+        * Justification for selection of specific part: This part is a single-ended 8-channel MUX,
+          which fits the need for a 1:8 MUX.  
+        * `Datasheet link <https://www.analog.com/media/en/technical-documentation/data-sheets/138093f.pdf>`__ 
+        * Associated passives/components:  
+            * Two 4.7kohm resistors, one 10kohm resistor   
+            * LTC6255  
+    * LTC6255   
+        * Description: Op Amp 
+        * Why is it necessary:   
+        * Justification for selection of specific part: This op amp is listed in the datasheet for LTC6811 as 
+          a component to  use to amplify the signal (from the sensors) ahead of its transmission to LTC6811.   
+        * `Datasheet link <https://www.analog.com/media/en/technical-documentation/data-sheets/625567fd.pdf>`__ 
+        * Associated passives/components:  
+            * 100 ohm resistor    
+            * Decoupling capacitor          
+    * LTC6811    
+        * Description:  Integrated circuit that measures the voltages and temperatures of the battery modules  
+        * Why is it necessary: Takes the voltage and temperature inputs and transmits the data to the leader board 
+        * Justification for selection of specific part:  Standard IC for battery management systems in industry    
+        * `Datasheet link <https://www.analog.com/media/en/technical-documentation/data-sheets/LTC6811-1-6811-2.pdf>`__ 
+        * Associated passives/components:  
+            * Switch (If the IC won't be used for an extended period of time, it can be turned off with this switch.)    
+            * Resistors: 806 ohm, 1.2kohm, Two 100 ohm 
+            * Bypass capacitors     
+            * HX1188FNL 
+            * LTC6255     
+            * Regular SPI Connector (1x5 2.54mm Vertical) 
+            * DTEN Configuration Connector (1x3 2.54mm Vertical)     
+            * Iso Configuration Connector (1x3 2.54mm Vertical) 
+    * HX1188FNL     
+        * Description: Single port surface mount magnetics 
+        * Why is it necessary:  Connects to the input and output connectors to the IPA and IMA connections, 
+          respectively, on the LTC6811.    
+        * Justification for selection of specific part:    
+        * `Datasheet link <https://www.mouser.com/datasheet/2/336/H329-1199189.pdf>`__ 
+        * Associated passives/components:  
+            * Two 120 ohm resistors     
+            * LTC6811  
+    * 1 Molex Micro-fit 3.0 1x5 2.54mm Vertical      
+        * Description: Connector for the Regular SPI connection. 
+        * Why is it necessary: Connects to the IPA, IMA, SDI, and SDO connections on the LTC6811.    
+        * Justification for selection of specific part: Standard component.   
+        * Associated passives/components:  
+            * 5.1k pull-up resistor (for SDO)      
+            * LTC6811  
+    * 2 Molex Micro-fit 3.0 1x3 2.54mm Vertical      
+        * Description:  One connector is for Iso configuration and one connector is for DTEN configuration. 
+        * Why is it necessary: Connects to the ISO and DTEN connections on the LTC6811.     
+        * Justification for selection of specific part: Standard component   
+        * Associated passives/components:     
+            * LTC6811                  
+
+
+
+**List of I/O and Connections:**
+    
+    * Leaderboard Input
+        * Input from BPS Leader Board, tells the Minion board when to gather measurments form the batteries. 
+    * LeaderBoard Output 
+        * Outputs to the leaderboard, transmits voltage and temperature readings from the battery modules.
+    * Voltage Connectors 
+        * Input from the battery modules, transmit voltage from each battery module. The IC also uses this 
+          voltages to power itself. 
+    * Minion Shield Power  
+        * 5V output from the LTC6811 to the Minion Shield board. This is used to power the temperature sensors.
+    * Temperature Input
+        * Input from the Minion Shield board, transmits temperature data.
+
+.. figure:: ../_static/MinionSchematic.png
+    :align: center
+
+    Minion Board Schematic
+
+**Dimensions: 66.00mm by 85.00mm**
+
+Requirements/Constraints:  
+    * Connectors to the battery modules are placed vertically on the right to make use the 
+      connections sequential and more intuitive. 
+    * Communication connections to the Leader Board are placed on the right side opposite the battery connections.
+Design Choices:
+    * The MUXs and connectors to the temperature sensors were placed on the Minion Shield board to keep the board 
+      smaller and more compact 
+    * LTC 6811 was placed at the center of the board to minimize distance to the outlying components. 
+
+.. figure:: ../_static/MinionPCB.png
+    :align: center
+
+    Minion Board PCB
+
+.. figure:: ../_static/Minion3DFront.png
+    :align: center
+
+    Minion Board front render 
+
+.. figure:: ../_static/Minion3DBack.png
+    :align: center
+
+    Minion Board back render
+
+    
