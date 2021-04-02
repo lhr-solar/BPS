@@ -13,20 +13,25 @@ Uses Pins PC6,7 and PB14,15
 GPIO_InitTypeDef GPIO_INIT_STRUCT; //struct used to initialize pins
 TIM_OCInitTypeDef TIMER_STRUCT; //struct used to configure timers
 TIM_TimeBaseInitTypeDef TIMER_INIT_STRUCT; //struct used to initialize PWM timers
+TIM_BDTRInitTypeDef BDTR_INIT_STRUCT; //struct to configure timer 8 specific features
 
 void BSP_Fans_Init(void){
+    //enable Timer 8 peripheral
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM8, ENABLE);
+
     //Enable Port Clocks
     RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC, ENABLE); 
     RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE); 
+
     //Configure Pins to Timers
     GPIO_PinAFConfig(GPIOC, GPIO_PinSource6, GPIO_AF_TIM8);
     GPIO_PinAFConfig(GPIOC, GPIO_PinSource7, GPIO_AF_TIM8);
     GPIO_PinAFConfig(GPIOB, GPIO_PinSource14, GPIO_AF_TIM8);
     GPIO_PinAFConfig(GPIOB, GPIO_PinSource15, GPIO_AF_TIM8);
-    //All pins will be initialized postivie logic, pull up/pull down, 2Mhz, and alternate function
+    //All pins will be initialized postivie logic, no pull up/pull down, 2Mhz, and alternate function
     GPIO_INIT_STRUCT.GPIO_Mode = GPIO_Mode_AF;
     GPIO_INIT_STRUCT.GPIO_OType = GPIO_OType_PP; 
-    GPIO_INIT_STRUCT.GPIO_PuPd = GPIO_PuPd_DOWN;
+    GPIO_INIT_STRUCT.GPIO_PuPd = GPIO_PuPd_NOPULL;
     GPIO_INIT_STRUCT.GPIO_Speed = GPIO_Speed_2MHz;
     //Initialize Pin PC6, PC7
     GPIO_INIT_STRUCT.GPIO_Pin = GPIO_Pin_6 | GPIO_Pin_7;
@@ -34,8 +39,9 @@ void BSP_Fans_Init(void){
     //Initialize Pin PB14, PB15
     GPIO_INIT_STRUCT.GPIO_Pin = GPIO_Pin_14 | GPIO_Pin_15;
     GPIO_Init(GPIOB, &GPIO_INIT_STRUCT); 
-    //enable Timer 8 peripheral
-    RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM8, ENABLE);
+    
+    //set values to default
+    TIM_TimeBaseStructInit(&TIMER_INIT_STRUCT);
     //TIM8CLK = 2 * PLCK2(40MHz) = 80MHz
     //Initialize at 20 KHz, means 20KHz = TIM8CLK(80MHz)/((Prescaler(0)+1) * Period)
     //Duty Cycle = Pulse/Period * 100, Period = 4000
@@ -44,17 +50,34 @@ void BSP_Fans_Init(void){
     TIMER_INIT_STRUCT.TIM_CounterMode = TIM_CounterMode_Up; //count up
     TIMER_INIT_STRUCT.TIM_Period = 4000;
     TIM_TimeBaseInit(TIM8, &TIMER_INIT_STRUCT); //Initialize Timer 8
-    //Initialize all channels to 50% duty cycle
+
+    //Initialize all channels to 100% duty cycle
     //Polarity is high: duty cycle is amount of time output is high
     TIMER_STRUCT.TIM_OCMode = TIM_OCMode_PWM1; //enable PWM with Timer 8
     TIMER_STRUCT.TIM_OutputState = TIM_OutputState_Enable;
-    TIMER_STRUCT.TIM_Pulse = 2000;
+    TIMER_STRUCT.TIM_Pulse = 4000;
     TIMER_STRUCT.TIM_OCPolarity = TIM_OCPolarity_High;
     //Initalize all channels
     TIM_OC1Init(TIM8, &TIMER_STRUCT);
     TIM_OC2Init(TIM8, &TIMER_STRUCT);
     TIM_OC3Init(TIM8, &TIMER_STRUCT);
     TIM_OC4Init(TIM8, &TIMER_STRUCT);
+
+    //Enable TIM8 counter
+    TIM_Cmd(TIM8, ENABLE);
+
+    //Select PWM1 as output compare mode on channel 1
+    TIM_SelectOCxM(TIM8, TIM_Channel_1, TIM_OCMode_PWM1);
+    TIM_SelectOCxM(TIM8, TIM_Channel_2, TIM_OCMode_PWM1);
+    TIM_SelectOCxM(TIM8, TIM_Channel_3, TIM_OCMode_PWM1);
+    TIM_SelectOCxM(TIM8, TIM_Channel_4, TIM_OCMode_PWM1);
+
+    //Configure output compare for active high
+    TIM_OC1PolarityConfig(TIM8, TIM_OCPolarity_High);
+    TIM_OC2PolarityConfig(TIM8, TIM_OCPolarity_High);
+    TIM_OC3PolarityConfig(TIM8, TIM_OCPolarity_High);
+    TIM_OC4PolarityConfig(TIM8, TIM_OCPolarity_High);
+
     //Enable Preload register for timer (Pulse)
     TIM_OC1PreloadConfig(TIM8, TIM_OCPreload_Enable);
     TIM_OC2PreloadConfig(TIM8, TIM_OCPreload_Enable);
@@ -62,6 +85,17 @@ void BSP_Fans_Init(void){
     TIM_OC4PreloadConfig(TIM8, TIM_OCPreload_Enable);
     //Enable Automatic Reload Register (Period)
     TIM_ARRPreloadConfig(TIM8, ENABLE);
+
+    /*
+    //Designate break polarity
+    TIM_BDTRStructInit(&BDTR_INIT_STRUCT); // I hope we can just use the defaults
+
+    //Configure timer
+    TIM_BDTRConfig(TIM8, &BDTR_INIT_STRUCT);
+
+    //Enable PWM main output
+    TIM_CtrlPWMOutputs(TIM8, ENABLE);
+    */
     }
 
 /*This function will change the speed of the fans
