@@ -15,7 +15,7 @@ TIM_OCInitTypeDef TIMER_OC_STRUCT; //struct used to configure output compare for
 TIM_TimeBaseInitTypeDef TIMER_INIT_STRUCT; //struct used to initialize PWM timers
 TIM_BDTRInitTypeDef BDTR_INIT_STRUCT; //struct to configure timer 8 specific features
 
-#define PWM_PERIOD 4000
+#define PWM_PERIOD 100
 
 /*
 void BSP_Fans_Init(void){
@@ -101,17 +101,24 @@ void BSP_Fans_Init(void){
 */
 
 void BSP_Fans_Init(void){
-    //Enable TIM3 clock
+    //Enable TIM8 clock
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM8, ENABLE);
+    RCC_APB2PeriphClockCmd(RCC_APB1Periph_TIM12, ENABLE);
+
+    //Enable Port Clocks
+    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC, ENABLE); 
+    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
 
     //Configure TIM pins by configuring corresponding GPIO pins
     GPIO_PinAFConfig(GPIOC, GPIO_PinSource6, GPIO_AF_TIM8);
     GPIO_PinAFConfig(GPIOC, GPIO_PinSource7, GPIO_AF_TIM8);
-    GPIO_PinAFConfig(GPIOB, GPIO_PinSource14, GPIO_AF_TIM8);
-    GPIO_PinAFConfig(GPIOB, GPIO_PinSource15, GPIO_AF_TIM8);
+    GPIO_PinAFConfig(GPIOB, GPIO_PinSource14, GPIO_AF_TIM12);
+    GPIO_PinAFConfig(GPIOB, GPIO_PinSource15, GPIO_AF_TIM12);
     //All pins will be initialized for alternate function
     GPIO_StructInit(&GPIO_INIT_STRUCT);
     GPIO_INIT_STRUCT.GPIO_Mode = GPIO_Mode_AF;
+    GPIO_INIT_STRUCT.GPIO_PuPd = GPIO_PuPd_UP;
+    GPIO_INIT_STRUCT.GPIO_Speed = GPIO_Speed_100MHz;
     //Initialize Pin PC6, PC7
     GPIO_INIT_STRUCT.GPIO_Pin = GPIO_Pin_6 | GPIO_Pin_7;
     GPIO_Init(GPIOC, &GPIO_INIT_STRUCT);
@@ -121,31 +128,37 @@ void BSP_Fans_Init(void){
 
     //Configure Time base unit
     TIM_TimeBaseStructInit(&TIMER_INIT_STRUCT);
-    TIMER_INIT_STRUCT.TIM_CounterMode = PWM_PERIOD;
-    TIMER_INIT_STRUCT.TIM_Period = TIM_CounterMode_Down;
-    TIM_TimeBaseInit(TIM3, &TIMER_INIT_STRUCT);
+    TIMER_INIT_STRUCT.TIM_CounterMode = TIM_CounterMode_Up;
+    TIMER_INIT_STRUCT.TIM_Period = PWM_PERIOD;
+    TIM_TimeBaseInit(TIM8, &TIMER_INIT_STRUCT);
+    TIM_TimeBaseInit(TIM12, &TIMER_INIT_STRUCT);
 
     //Fill in TIM_OCInitStruct with desired parameters
     TIM_OCStructInit(&TIMER_OC_STRUCT);
     TIMER_OC_STRUCT.TIM_OCMode = TIM_OCMode_PWM1;
     TIMER_OC_STRUCT.TIM_OutputState = TIM_OutputState_Enable;
-    TIMER_OC_STRUCT.TIM_Pulse = PWM_PERIOD / 2;     //TODO: verify if this should have a -1
+    TIMER_OC_STRUCT.TIM_Pulse = PWM_PERIOD / 2;
     TIMER_OC_STRUCT.TIM_OCPolarity = TIM_OCPolarity_High;
 
     //Configure all channels
     TIM_OC1Init(TIM8, &TIMER_OC_STRUCT);
     TIM_OC2Init(TIM8, &TIMER_OC_STRUCT);
-    TIM_OC2Init(TIM8, &TIMER_OC_STRUCT);
-    TIM_OC2Init(TIM8, &TIMER_OC_STRUCT);
-
-    //Enable the TIM3 counter
-    TIM_Cmd(TIM8, ENABLE);
+    TIM_OC1Init(TIM12, &TIMER_OC_STRUCT);
+    TIM_OC2Init(TIM12, &TIMER_OC_STRUCT);
 
     //Enable the output compare preload on all channels
     TIM_OC1PreloadConfig(TIM8, TIM_OCPreload_Enable);
     TIM_OC2PreloadConfig(TIM8, TIM_OCPreload_Enable);
-    TIM_OC3PreloadConfig(TIM8, TIM_OCPreload_Enable);
-    TIM_OC4PreloadConfig(TIM8, TIM_OCPreload_Enable);
+    TIM_OC1PreloadConfig(TIM12, TIM_OCPreload_Enable);
+    TIM_OC2PreloadConfig(TIM12, TIM_OCPreload_Enable);
+
+    TIM_ARRPreloadConfig(TIM12, ENABLE);
+
+    TIM_CtrlPWMOutputs(TIM8, ENABLE);
+
+    //Enable the TIM8 counter
+    TIM_Cmd(TIM8, ENABLE);
+    TIM_Cmd(TIM12, ENABLE);
 }
 
 

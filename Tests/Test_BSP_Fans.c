@@ -13,8 +13,9 @@ int main()
 {
     BSP_PLL_Init();
     BSP_UART_Init(NULL, NULL, UART_USB);
-    BSP_Fans_Init();
     BSP_Lights_Init();
+    BSP_Fans_Init();
+    
     /*
     BSP_Fans_Set(1,2);
     BSP_Fans_Set(2,4);
