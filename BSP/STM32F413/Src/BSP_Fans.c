@@ -39,11 +39,11 @@ void BSP_Fans_Init(void){
     //TIM8CLK = 2 * PLCK2(40MHz) = 80MHz
     //Initialize at 20 KHz, means 20KHz = TIM8CLK(80MHz)/((Prescaler(0)+1) * Period)
     //Duty Cycle = Pulse/Period * 100, Period = 4000
-    TIMER_INIT_STRUCT.TIM_Prescaler = 0x0001; //clock frequency not prescaled for timer
+    TIMER_INIT_STRUCT.TIM_Prescaler = 0x0000; //clock frequency not prescaled for timer
     TIMER_INIT_STRUCT.TIM_ClockDivision = TIM_CKD_DIV1; //don't divide timer
     TIMER_INIT_STRUCT.TIM_CounterMode = TIM_CounterMode_Up; //count up
     TIMER_INIT_STRUCT.TIM_Period = 4000;
-    TIMER_INIT_STRUCT.TIM_RepetitionCounter = 0x01;
+    TIMER_INIT_STRUCT.TIM_RepetitionCounter = 0x00;
     TIM_TimeBaseInit(TIM8, &TIMER_INIT_STRUCT); //Initialize Timer 8
     //Initialize all channels to 50% duty cycle
     //Polarity is high: duty cycle is amount of time output is high
