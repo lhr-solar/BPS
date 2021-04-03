@@ -63,9 +63,9 @@ void BSP_Fans_Init(void){
     TIM_OC4PreloadConfig(TIM8, TIM_OCPreload_Enable);
     //Enable Capture Control Channels
     TIM_CCxCmd(TIM8, TIM_Channel_1, TIM_CCx_Enable);
-    TIM_CCxCmd(TIM8, TIM_Channel_1, TIM_CCx_Enable);
-    TIM_CCxCmd(TIM8, TIM_Channel_1, TIM_CCx_Enable);
-    TIM_CCxCmd(TIM8, TIM_Channel_1, TIM_CCx_Enable);
+    TIM_CCxCmd(TIM8, TIM_Channel_2, TIM_CCx_Enable);
+    TIM_CCxCmd(TIM8, TIM_Channel_3, TIM_CCx_Enable);
+    TIM_CCxCmd(TIM8, TIM_Channel_4, TIM_CCx_Enable);
     //Enable Automatic Reload Register (Period)
     TIM_ARRPreloadConfig(TIM8, ENABLE);
     TIM_Cmd(TIM8,ENABLE);
