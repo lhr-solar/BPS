@@ -13,6 +13,6 @@ int main() {
     TIM_SetCompare3(TIM8, 4000);
     TIM_SetCompare4(TIM8, 4000);
     while(1){
-        
+        printf("Timer 8 value: %d", TIM_GetCounter(TIM8));
     };
 }
