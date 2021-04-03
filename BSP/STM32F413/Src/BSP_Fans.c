@@ -11,10 +11,13 @@ Uses Pins PC6,7 and PB14,15
 #include "stm32f4xx_rcc.h"
 
 GPIO_InitTypeDef GPIO_INIT_STRUCT; //struct used to initialize pins
-TIM_OCInitTypeDef TIMER_STRUCT; //struct used to configure timers
+TIM_OCInitTypeDef TIMER_OC_STRUCT; //struct used to configure output compare for timers
 TIM_TimeBaseInitTypeDef TIMER_INIT_STRUCT; //struct used to initialize PWM timers
 TIM_BDTRInitTypeDef BDTR_INIT_STRUCT; //struct to configure timer 8 specific features
 
+#define PWM_PERIOD 4000
+
+/*
 void BSP_Fans_Init(void){
     //enable Timer 8 peripheral
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM8, ENABLE);
@@ -86,17 +89,65 @@ void BSP_Fans_Init(void){
     //Enable Automatic Reload Register (Period)
     TIM_ARRPreloadConfig(TIM8, ENABLE);
 
-    /*
     //Designate break polarity
-    TIM_BDTRStructInit(&BDTR_INIT_STRUCT); // I hope we can just use the defaults
+    //TIM_BDTRStructInit(&BDTR_INIT_STRUCT); // I hope we can just use the defaults
 
     //Configure timer
-    TIM_BDTRConfig(TIM8, &BDTR_INIT_STRUCT);
+    //TIM_BDTRConfig(TIM8, &BDTR_INIT_STRUCT);
 
     //Enable PWM main output
-    TIM_CtrlPWMOutputs(TIM8, ENABLE);
-    */
-    }
+    //TIM_CtrlPWMOutputs(TIM8, ENABLE);
+}
+*/
+
+void BSP_Fans_Init(void){
+    //Enable TIM3 clock
+    RCC_APB2PeriphClockCmd(RCC_APB1Periph_TIM3, ENABLE);
+
+    //Configure TIM pins by configuring corresponding GPIO pins
+    GPIO_PinAFConfig(GPIOC, GPIO_PinSource6, GPIO_AF_TIM3);
+    GPIO_PinAFConfig(GPIOC, GPIO_PinSource7, GPIO_AF_TIM3);
+    GPIO_PinAFConfig(GPIOB, GPIO_PinSource14, GPIO_AF_TIM3);
+    GPIO_PinAFConfig(GPIOB, GPIO_PinSource15, GPIO_AF_TIM3);
+    //All pins will be initialized for alternate function
+    GPIO_StructInit(&GPIO_INIT_STRUCT);
+    GPIO_INIT_STRUCT.GPIO_Mode = GPIO_Mode_AF;
+    //Initialize Pin PC6, PC7
+    GPIO_INIT_STRUCT.GPIO_Pin = GPIO_Pin_6 | GPIO_Pin_7;
+    GPIO_Init(GPIOC, &GPIO_INIT_STRUCT);
+    //Initialize Pin PB14, PB15
+    GPIO_INIT_STRUCT.GPIO_Pin = GPIO_Pin_14 | GPIO_Pin_15;
+    GPIO_Init(GPIOB, &GPIO_INIT_STRUCT); 
+
+    //Configure Time base unit
+    TIM_TimeBaseStructInit(&TIMER_INIT_STRUCT);
+    TIMER_INIT_STRUCT.TIM_CounterMode = PWM_PERIOD;
+    TIMER_INIT_STRUCT.TIM_Period = TIM_CounterMode_Down;
+    TIM_TimeBaseInit(TIM3, &TIMER_INIT_STRUCT);
+
+    //Fill in TIM_OCInitStruct with desired parameters
+    TIM_OCStructInit(&TIMER_OC_STRUCT);
+    TIMER_OC_STRUCT.TIM_OCMode = TIM_OCMode_PWM1;
+    TIMER_OC_STRUCT.TIM_OutputState = TIM_OutputState_Enable;
+    TIMER_OC_STRUCT.TIM_Pulse = PWM_PERIOD;     //TODO: verify if this should have a -1
+    TIMER_OC_STRUCT.TIM_OCPolarity = TIM_OCPolarity_High;
+
+    //Configure all channels
+    TIM_OC1Init(TIM3, &TIMER_OC_STRUCT);
+    TIM_OC2Init(TIM3, &TIMER_OC_STRUCT);
+    TIM_OC2Init(TIM3, &TIMER_OC_STRUCT);
+    TIM_OC2Init(TIM3, &TIMER_OC_STRUCT);
+
+    //Enable the TIM3 counter
+    TIM_Cmd(TIM3, ENABLE);
+
+    //Enable the output compare preload on all channels
+    TIM_OC1PreloadConfig(TIM3, TIM_OCPreload_Enable);
+    TIM_OC2PreloadConfig(TIM3, TIM_OCPreload_Enable);
+    TIM_OC3PreloadConfig(TIM3, TIM_OCPreload_Enable);
+    TIM_OC4PreloadConfig(TIM3, TIM_OCPreload_Enable);
+}
+
 
 /*This function will change the speed of the fans
 Inputs: Number of fan to change speed (1-4)
@@ -110,19 +161,19 @@ ErrorStatus BSP_Fans_Set(uint8_t fan, uint32_t speed){
     switch (fan)
     {
     case 1:
-        TIM8->CCR1 = (speed * DIVIDER);
+        TIM_SetCompare1(TIM3, (speed * DIVIDER));
         return SUCCESS;
         break;
     case 2:
-        TIM8->CCR2 = (speed * DIVIDER);
+        TIM_SetCompare2(TIM3, (speed * DIVIDER));
         return SUCCESS;
         break;
     case 3:
-        TIM8->CCR3 = (speed * DIVIDER);
+        TIM_SetCompare3(TIM3, (speed * DIVIDER));
         return SUCCESS;
         break;
     case 4:
-        TIM8->CCR4 = (speed * DIVIDER);
+        TIM_SetCompare4(TIM3, (speed * DIVIDER));
         return SUCCESS;
         break;
     default:
@@ -135,16 +186,16 @@ int BSP_Fans_GetSpeed(uint8_t fan){
     switch (fan)
     {
     case 1:
-        return TIM8-> CCR1 / DIVIDER;
+        return TIM3-> CCR1 / DIVIDER;
         break;
     case 2:
-        return TIM8-> CCR2 / DIVIDER;
+        return TIM3-> CCR2 / DIVIDER;
         break;
     case 3:
-        return TIM8-> CCR3 / DIVIDER;
+        return TIM3-> CCR3 / DIVIDER;
         break;
     case 4:
-        return TIM8-> CCR4 / DIVIDER;
+        return TIM3-> CCR4 / DIVIDER;
         break;
     }
 
