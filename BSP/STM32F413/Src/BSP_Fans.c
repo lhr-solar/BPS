@@ -64,6 +64,11 @@ void BSP_Fans_Init(void){
     TIM_OC4PreloadConfig(TIM8, TIM_OCPreload_Enable);
     //Enable Automatic Reload Register (Period)
     TIM_ARRPreloadConfig(TIM8, ENABLE);
+    //Enable NVIC interrupts
+    TIM_ITConfig(TIM8, TIM_IT_CC1, ENABLE);
+    TIM_ITConfig(TIM8, TIM_IT_CC2, ENABLE);
+    TIM_ITConfig(TIM8, TIM_IT_CC3, ENABLE);
+    TIM_ITConfig(TIM8, TIM_IT_CC4, ENABLE);
     }
 
 /*This function will change the speed of the fans
