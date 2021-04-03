@@ -9,8 +9,9 @@ Controls speed of fans which cool down the battery pack. Uses Pins PC6, 7 and PB
 #include "common.h"
 #include "config.h"
 
+#define PWM_PERIOD 4000
 #define DIVIDER 500 //Speed increments
-#define TOPSPEED 4000/DIVIDER //top speed achievable
+#define TOPSPEED PWM_PERIOD/DIVIDER //top speed achievable
 
 /**
  * @brief   Initialize all the GPIO pins connected to each Fan
