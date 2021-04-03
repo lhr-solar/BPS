@@ -21,6 +21,8 @@ int main()
     BSP_Fans_Set(3,6);
     BSP_Fans_Set(4,8);
     */
+
+   /*
     // initialize gpio pins connected to fans as normal outputs
     RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC, ENABLE); 
     RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE); 
@@ -36,6 +38,9 @@ int main()
     // set fans to max
     GPIOB->ODR |= (0x3 << 14);
     GPIOC->ODR |= (0x3 << 6);
+    */
+
+   
 
     while(1){
         BSP_Light_Toggle(FAULT);

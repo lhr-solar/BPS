@@ -102,13 +102,13 @@ void BSP_Fans_Init(void){
 
 void BSP_Fans_Init(void){
     //Enable TIM3 clock
-    RCC_APB2PeriphClockCmd(RCC_APB1Periph_TIM3, ENABLE);
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM8, ENABLE);
 
     //Configure TIM pins by configuring corresponding GPIO pins
-    GPIO_PinAFConfig(GPIOC, GPIO_PinSource6, GPIO_AF_TIM3);
-    GPIO_PinAFConfig(GPIOC, GPIO_PinSource7, GPIO_AF_TIM3);
-    GPIO_PinAFConfig(GPIOB, GPIO_PinSource14, GPIO_AF_TIM3);
-    GPIO_PinAFConfig(GPIOB, GPIO_PinSource15, GPIO_AF_TIM3);
+    GPIO_PinAFConfig(GPIOC, GPIO_PinSource6, GPIO_AF_TIM8);
+    GPIO_PinAFConfig(GPIOC, GPIO_PinSource7, GPIO_AF_TIM8);
+    GPIO_PinAFConfig(GPIOB, GPIO_PinSource14, GPIO_AF_TIM8);
+    GPIO_PinAFConfig(GPIOB, GPIO_PinSource15, GPIO_AF_TIM8);
     //All pins will be initialized for alternate function
     GPIO_StructInit(&GPIO_INIT_STRUCT);
     GPIO_INIT_STRUCT.GPIO_Mode = GPIO_Mode_AF;
@@ -129,23 +129,23 @@ void BSP_Fans_Init(void){
     TIM_OCStructInit(&TIMER_OC_STRUCT);
     TIMER_OC_STRUCT.TIM_OCMode = TIM_OCMode_PWM1;
     TIMER_OC_STRUCT.TIM_OutputState = TIM_OutputState_Enable;
-    TIMER_OC_STRUCT.TIM_Pulse = PWM_PERIOD;     //TODO: verify if this should have a -1
+    TIMER_OC_STRUCT.TIM_Pulse = PWM_PERIOD / 2;     //TODO: verify if this should have a -1
     TIMER_OC_STRUCT.TIM_OCPolarity = TIM_OCPolarity_High;
 
     //Configure all channels
-    TIM_OC1Init(TIM3, &TIMER_OC_STRUCT);
-    TIM_OC2Init(TIM3, &TIMER_OC_STRUCT);
-    TIM_OC2Init(TIM3, &TIMER_OC_STRUCT);
-    TIM_OC2Init(TIM3, &TIMER_OC_STRUCT);
+    TIM_OC1Init(TIM8, &TIMER_OC_STRUCT);
+    TIM_OC2Init(TIM8, &TIMER_OC_STRUCT);
+    TIM_OC2Init(TIM8, &TIMER_OC_STRUCT);
+    TIM_OC2Init(TIM8, &TIMER_OC_STRUCT);
 
     //Enable the TIM3 counter
-    TIM_Cmd(TIM3, ENABLE);
+    TIM_Cmd(TIM8, ENABLE);
 
     //Enable the output compare preload on all channels
-    TIM_OC1PreloadConfig(TIM3, TIM_OCPreload_Enable);
-    TIM_OC2PreloadConfig(TIM3, TIM_OCPreload_Enable);
-    TIM_OC3PreloadConfig(TIM3, TIM_OCPreload_Enable);
-    TIM_OC4PreloadConfig(TIM3, TIM_OCPreload_Enable);
+    TIM_OC1PreloadConfig(TIM8, TIM_OCPreload_Enable);
+    TIM_OC2PreloadConfig(TIM8, TIM_OCPreload_Enable);
+    TIM_OC3PreloadConfig(TIM8, TIM_OCPreload_Enable);
+    TIM_OC4PreloadConfig(TIM8, TIM_OCPreload_Enable);
 }
 
 
