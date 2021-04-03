@@ -26,7 +26,7 @@ void BSP_Fans_Init(void){
     //All pins will be initialized postivie logic, pull up/pull down, 2Mhz, and alternate function
     GPIO_INIT_STRUCT.GPIO_Mode = GPIO_Mode_AF;
     GPIO_INIT_STRUCT.GPIO_OType = GPIO_OType_PP; 
-    GPIO_INIT_STRUCT.GPIO_PuPd = GPIO_PuPd_DOWN;
+    GPIO_INIT_STRUCT.GPIO_PuPd = GPIO_PuPd_NOPULL;
     GPIO_INIT_STRUCT.GPIO_Speed = GPIO_Speed_2MHz;
     //Initialize Pin PC6, PC7
     GPIO_INIT_STRUCT.GPIO_Pin = GPIO_Pin_6 | GPIO_Pin_7;
@@ -56,7 +56,6 @@ void BSP_Fans_Init(void){
     TIM_OC2Init(TIM8, &TIMER_STRUCT);
     TIM_OC3Init(TIM8, &TIMER_STRUCT);
     TIM_OC4Init(TIM8, &TIMER_STRUCT);
-    TIM_Cmd(TIM8,ENABLE);
     //Enable Preload register for timer (Pulse)
     TIM_OC1PreloadConfig(TIM8, TIM_OCPreload_Enable);
     TIM_OC2PreloadConfig(TIM8, TIM_OCPreload_Enable);
@@ -64,11 +63,7 @@ void BSP_Fans_Init(void){
     TIM_OC4PreloadConfig(TIM8, TIM_OCPreload_Enable);
     //Enable Automatic Reload Register (Period)
     TIM_ARRPreloadConfig(TIM8, ENABLE);
-    //Enable NVIC interrupts
-    TIM_ITConfig(TIM8, TIM_IT_CC1, ENABLE);
-    TIM_ITConfig(TIM8, TIM_IT_CC2, ENABLE);
-    TIM_ITConfig(TIM8, TIM_IT_CC3, ENABLE);
-    TIM_ITConfig(TIM8, TIM_IT_CC4, ENABLE);
+    TIM_Cmd(TIM8,ENABLE);
     }
 
 /*This function will change the speed of the fans
