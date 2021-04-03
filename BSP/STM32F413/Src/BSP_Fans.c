@@ -61,6 +61,11 @@ void BSP_Fans_Init(void){
     TIM_OC2PreloadConfig(TIM8, TIM_OCPreload_Enable);
     TIM_OC3PreloadConfig(TIM8, TIM_OCPreload_Enable);
     TIM_OC4PreloadConfig(TIM8, TIM_OCPreload_Enable);
+    //Enable Capture Control Channels
+    TIM_CCxCmd(TIM8, TIM_Channel_1, TIM_CCx_Enable);
+    TIM_CCxCmd(TIM8, TIM_Channel_1, TIM_CCx_Enable);
+    TIM_CCxCmd(TIM8, TIM_Channel_1, TIM_CCx_Enable);
+    TIM_CCxCmd(TIM8, TIM_Channel_1, TIM_CCx_Enable);
     //Enable Automatic Reload Register (Period)
     TIM_ARRPreloadConfig(TIM8, ENABLE);
     TIM_Cmd(TIM8,ENABLE);
@@ -78,19 +83,19 @@ ErrorStatus BSP_Fans_Set(uint8_t fan, uint32_t speed){
     switch (fan)
     {
     case 1:
-        TIM8->CCR1 = (speed * DIVIDER);
+        TIM_SetCompare1(TIM8, speed * DIVIDER);
         return SUCCESS;
         break;
     case 2:
-        TIM8->CCR2 = (speed * DIVIDER);
+        TIM_SetCompare2(TIM8, speed * DIVIDER);
         return SUCCESS;
         break;
     case 3:
-        TIM8->CCR3 = (speed * DIVIDER);
+        TIM_SetCompare3(TIM8, speed * DIVIDER);
         return SUCCESS;
         break;
     case 4:
-        TIM8->CCR4 = (speed * DIVIDER);
+        TIM_SetCompare4(TIM8, speed * DIVIDER);
         return SUCCESS;
         break;
     default:
@@ -103,16 +108,16 @@ int BSP_Fans_GetSpeed(uint8_t fan){
     switch (fan)
     {
     case 1:
-        return TIM8-> CCR1 / DIVIDER;
+        return TIM_GetCapture1(TIM8) / DIVIDER;
         break;
     case 2:
-        return TIM8-> CCR2 / DIVIDER;
+        return TIM_GetCapture2(TIM8) / DIVIDER;
         break;
     case 3:
-        return TIM8-> CCR3 / DIVIDER;
+        return TIM_GetCapture3(TIM8) / DIVIDER;
         break;
     case 4:
-        return TIM8-> CCR4 / DIVIDER;
+        return TIM_GetCapture4(TIM8) / DIVIDER;
         break;
     }
 

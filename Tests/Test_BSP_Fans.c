@@ -8,9 +8,11 @@
 
 int main() {
     BSP_Fans_Init();
-    TIM8 -> CCR1 = 4000;
-    TIM8 -> CCR2 = 4000;
-    TIM8 -> CCR3 = 4000;
-    TIM8 -> CCR4 = 4000;
-    while(1);
+    TIM_SetCompare1(TIM8, 4000);
+    TIM_SetCompare2(TIM8, 4000);
+    TIM_SetCompare3(TIM8, 4000);
+    TIM_SetCompare4(TIM8, 4000);
+    while(1){
+        
+    };
 }
