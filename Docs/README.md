@@ -11,6 +11,16 @@ The BPS Documentation can be viewed [here](bps.rtfd.io). The documentation is bu
 3. Install all of the packages we are using for our docs by navigating to the `BPS/Docs` folder and running `pip3 install -r requirements.txt`.
 4. To make sure everything is installed properly, run `make html` in the `BPS/Docs` folder. This will build the docs based on the code on your machine. You should get a message that ends in "The HTML pages are in build/html."
 
+### Common Issues (Linux/WSL)
+- If you need to add sphinx to your path, you can do it by:
+    - Open your .bashrc file. You can do this by running `vim $HOME/.bashrc` or `nano $HOME/.bashrc` for example.
+    - Scroll to the bottom and add the directory containing `sphinx-build`, `sphinx-quickstart`, etc to your path by adding
+      the following line: `export PATH="$PATH:<your path>"`
+    - For example, if the path you want to add is `$HOME/.local/bin` (I think this is the default on Linux/WSL), write
+      `export PATH="$PATH:$HOME/.local/bin`
+    - Save and exit the file
+    - Launch a new instance of your shell (run `bash`)
+
 ## Tools setup instructions (Windows)
 
 1. Open up command prompt (cmd.exe).
@@ -19,6 +29,7 @@ The BPS Documentation can be viewed [here](bps.rtfd.io). The documentation is bu
 4. To make sure everything is installed properly, run `make html` in the `BPS/Docs` folder. This will build the docs based on the code on your machine. You should get a message that ends in "The HTML pages are in build/html."
 
 ### Common Issues (Windows)
+
 - If you get a message similar to the following:
 ```
 WARNING: The scripts sphinx-apidoc.exe, sphinx-autogen.exe, sphinx-build.exe and sphinx-quickstart.exe are installed in 'C:\Users\clark\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.9_qbz5n2kfra8p0\LocalCache\local-packages\Python39\Scripts' which is not on PATH.
