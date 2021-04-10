@@ -56,11 +56,11 @@ Context
         * Input from BPS Leader Board 
     * Power GNDPWR 
         * Input from BPS Leader Board 
-    * Signal ETS  
+    * Signal ETS  (External Temperature Sensor)
         * Input from Shunt Resistor Board 
-    * Signal RSHL  
+    * Signal RSHL (Negative Differential input for current channel)
         * Input from Shunt Resistor Board 
-    * Signal RSHH  
+    * Signal RSHH (Positive Differential input for current channel)  
         * Input from Shunt Resistor Board  
     * Signal TX+/TX-  
         * Output to BPS Leader Board  
@@ -608,7 +608,7 @@ Schematic
     modules must be monitored at all times. 
 *List of Circuit Components*
     * 2 Molex Micro-fit 3.0 1x07 3.00mm Horizontal  
-        * Description: Each connector allows for eight connections to the battery modules 
+        * Description: Each connector allows for seven connections to the battery modules 
         * Why is it necessary: Sends the voltages of the battery modules to the IC
         * Justification for selection of specific part: Standard component
         * `Datasheet link <https://cdn-reichelt.de/documents/datenblatt/C100/MOLEX_43650XXX2_DB_EN.pdf>`__ 
@@ -962,7 +962,7 @@ Context
 
 **List of I/O and Connections:**
     
-    * +5V
+    * Power +5V
         * Input from power bench
     * GND 
         * Input from power bench 
