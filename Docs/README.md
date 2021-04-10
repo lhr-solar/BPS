@@ -17,7 +17,7 @@ The BPS Documentation can be viewed [here](bps.rtfd.io). The documentation is bu
     - Scroll to the bottom and add the directory containing `sphinx-build`, `sphinx-quickstart`, etc to your path by adding
       the following line: `export PATH="$PATH:<your path>"`
     - For example, if the path you want to add is `$HOME/.local/bin` (I think this is the default on Linux/WSL), write
-      `export PATH="$PATH:$HOME/.local/bin`
+      `export PATH="$PATH:$HOME/.local/bin"`
     - Save and exit the file
     - Launch a new instance of your shell (run `bash`)
 
