@@ -29,7 +29,6 @@ The BPS Documentation can be viewed [here](bps.rtfd.io). The documentation is bu
 4. To make sure everything is installed properly, run `make html` in the `BPS/Docs` folder. This will build the docs based on the code on your machine. You should get a message that ends in "The HTML pages are in build/html."
 
 ### Common Issues (Windows)
-
 - If you get a message similar to the following:
 ```
 WARNING: The scripts sphinx-apidoc.exe, sphinx-autogen.exe, sphinx-build.exe and sphinx-quickstart.exe are installed in 'C:\Users\clark\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.9_qbz5n2kfra8p0\LocalCache\local-packages\Python39\Scripts' which is not on PATH.
