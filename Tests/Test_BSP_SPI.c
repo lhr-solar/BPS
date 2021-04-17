@@ -25,18 +25,23 @@ int main() {
     
 
     uint8_t data[4+NUM_MINIONS*8] = {0x00, 0x01, 0x3D, 0x6E};   // 0x00, 0x02, 0x2B, 0x0A
-    BSP_Light_On(FAULT);
+    //BSP_Light_On(FAULT);
 
-    BSP_SPI_Write(spi_ltc6811, data, 4);
+    //BSP_SPI_Write(spi_ltc6811, data, 4);
     
-    
+    /*
     BSP_SPI_Read(spi_ltc6811, data, 4+NUM_MINIONS*8);
 
     for(int i = 0; i < NUM_MINIONS*8; i++) {
         printf("%d,", data[i]);
     }
+    */
+    //BSP_Light_On(OVOLT);
 
     while(1) {
+        BSP_Light_Toggle(FAULT);
 
+        BSP_SPI_Write(spi_ltc6811, data, 4);
+        for (volatile int i = 0; i < 1000000; i++);
     }
 }

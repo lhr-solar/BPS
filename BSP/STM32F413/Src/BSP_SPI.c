@@ -5,6 +5,7 @@
 #include "os.h"
 #include "BSP_OS.h"
 
+#include "BSP_Lights.h"
 
 /*************************************************
  *                 ==Important==				 *
@@ -61,10 +62,14 @@ static uint8_t SPI_WriteRead(spi_port_t port, uint8_t txData){
     if(port >= NUM_SPI_BUSSES) return -1;
 
 	SPI_TypeDef *bus = SPI_BUSSES[port];
+	BSP_SPI_SetStateCS(port, 0);
+	SPI_Wait(bus);
+	
+	bus->DR = txData & 0x00FF;
 	
 	SPI_Wait(bus);
-	bus->DR = txData & 0x00FF;
-	SPI_Wait(bus);
+	BSP_Light_On(OVOLT);
+	BSP_SPI_SetStateCS(port, 1);
 	return bus->DR & 0x00FF;
 }
 
@@ -85,7 +90,7 @@ void BSP_SPI_Init(spi_port_t port, bsp_os_t *spi_os){
     //          PB3 : SCK
     //          PB4 : MISO
     //          PB5 : MOSI 
-    //          PB6 : CS
+    //          PD2 : CS
 
     GPIO_InitTypeDef GPIO_InitStruct;
 	SPI_InitTypeDef SPI_InitStruct;
@@ -102,10 +107,11 @@ void BSP_SPI_Init(spi_port_t port, bsp_os_t *spi_os){
 		//          PB3 : SCK
 		//          PB4 : MISO
 		//          PB5 : MOSI 
-		//          PB6 : CS
+		//          PD2 : CS
 		
 		// Initialize clocks
 		RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
+		RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, ENABLE);
 		RCC_APB2PeriphClockCmd(RCC_APB2Periph_SPI1, ENABLE);
 		
 		// Initialize pins
@@ -134,12 +140,12 @@ void BSP_SPI_Init(spi_port_t port, bsp_os_t *spi_os){
 		SPI_Cmd(SPI1, ENABLE);
 
 		// Initialize CS pin
-		GPIO_InitStruct.GPIO_Pin = GPIO_Pin_6;
+		GPIO_InitStruct.GPIO_Pin = GPIO_Pin_2;
 		GPIO_InitStruct.GPIO_Mode = GPIO_Mode_OUT;
 		GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_UP;
 		GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
 		GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
-		GPIO_Init(GPIOB, &GPIO_InitStruct);
+		GPIO_Init(GPIOD, &GPIO_InitStruct);
 		SPI_os[spi_ltc6811] = spi_os;
 
 		//Configure SPI1 interrupt priority

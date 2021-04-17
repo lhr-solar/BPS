@@ -14,7 +14,8 @@
         "math.h": "c",
         "bsp_adc.h": "c",
         "canbus.h": "c",
-        "tasks.h": "c"
+        "tasks.h": "c",
+        "bsp_spi.h": "c"
     },
     "python.linting.pylintEnabled": true,
     "python.linting.enabled": true,
