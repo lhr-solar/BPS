@@ -31,7 +31,7 @@ static GPIO_TypeDef * const SPI_SELECT_PORTS[NUM_SPI_BUSSES] = {
 };
 
 static const uint16_t SPI_SELECT_PINS[NUM_SPI_BUSSES] = {
-    GPIO_Pin_6,
+    GPIO_Pin_2,
     GPIO_Pin_15
 };
 
@@ -148,6 +148,7 @@ void BSP_SPI_Init(spi_port_t port, bsp_os_t *spi_os){
 		GPIO_Init(GPIOD, &GPIO_InitStruct);
 		SPI_os[spi_ltc6811] = spi_os;
 
+		#ifdef RTOS
 		//Configure SPI1 interrupt priority
 		NVIC_InitTypeDef NVIC_InitStruct;
 		NVIC_InitStruct.NVIC_IRQChannel = SPI1_IRQn;
@@ -158,6 +159,7 @@ void BSP_SPI_Init(spi_port_t port, bsp_os_t *spi_os){
 
 		//Enable the Rx buffer not empty interrupt
 		SPI_I2S_ITConfig(SPI1, SPI_I2S_IT_RXNE, ENABLE);
+		#endif
 
 
 	} else if(port == spi_as8510) {
