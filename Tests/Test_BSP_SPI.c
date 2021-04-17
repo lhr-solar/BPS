@@ -11,6 +11,8 @@
 
 void doNothing(void){return;}
 
+// NOTE: This code only runs on the BAREMETAL version of BPS
+
 int main() {
     BSP_PLL_Init();
     BSP_Lights_Init();

@@ -213,6 +213,7 @@ void BSP_SPI_Init(spi_port_t port, bsp_os_t *spi_os){
 		GPIO_Init(GPIOA, &GPIO_InitStruct);
 		SPI_os[spi_as8510] = spi_os;
 
+		#ifdef RTOS
 		//Configure SPI3 interrupt priority
 		NVIC_InitTypeDef NVIC_InitStruct;
 		NVIC_InitStruct.NVIC_IRQChannel = SPI3_IRQn;
@@ -223,6 +224,7 @@ void BSP_SPI_Init(spi_port_t port, bsp_os_t *spi_os){
 
 		//Enable the Rx buffer not empty interrupt
 		SPI_I2S_ITConfig(SPI3, SPI_I2S_IT_RXNE, ENABLE);
+		#endif
 	}
 }
 
