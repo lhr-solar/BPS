@@ -7,6 +7,21 @@
 
 #include "BSP_Lights.h"
 
+// TODO: verify that the RX is large enough to support the
+//		 largest transfer of data back from the minions
+#define TX_SIZE 128
+#define RX_SIZE 64
+
+#define FIFO_TYPE uint8_t
+#define FIFO_SIZE TX_SIZE
+#define FIFO_NAME txfifo
+#include "fifo.h"
+
+#define FIFO_TYPE uint8_t
+#define FIFO_SIZE RX_SIZE
+#define FIFO_NAME rxfifo
+#include "fifo.h"
+
 /*************************************************
  *                 ==Important==				 *
  * 												 *
@@ -34,6 +49,9 @@ static const uint16_t SPI_SELECT_PINS[NUM_SPI_BUSSES] = {
     GPIO_Pin_2,
     GPIO_Pin_15
 };
+
+static txfifo_t spiTxFifos[NUM_SPI_BUSSES];
+static rxfifo_t spiRxFifos[NUM_SPI_BUSSES];
 
 static bsp_os_t *SPI_os[NUM_SPI_BUSSES];
 
@@ -81,6 +99,7 @@ static inline void SPI_WaitTx(SPI_TypeDef *SPIx){
  * @param   txData single byte that will be sent to the device.
  * @return  rxData single byte that was read from the device.
  */
+__attribute__((unused))
 static uint8_t SPI_WriteRead(spi_port_t port, uint8_t txData){
     if(port >= NUM_SPI_BUSSES) return -1;
 
@@ -116,6 +135,11 @@ void BSP_SPI_Init(spi_port_t port, bsp_os_t *spi_os){
 
     GPIO_InitTypeDef GPIO_InitStruct;
 	SPI_InitTypeDef SPI_InitStruct;
+
+	for(int i = 0; i < NUM_SPI_BUSSES; i++) {
+		spiTxFifos[i] = txfifo_new();
+		spiRxFifos[i] = rxfifo_new();
+	}
 
 	// I don't think there's any way around hardcoding this one
 
@@ -253,8 +277,16 @@ void BSP_SPI_Init(spi_port_t port, bsp_os_t *spi_os){
  * @return  None
  */
 void BSP_SPI_Write(spi_port_t port, uint8_t *txBuf, uint32_t txLen) {
-    for(uint32_t i = 0; i < txLen; i++){
-		SPI_WriteRead(port, txBuf[i]);
+	// Fill as much of the fifo as possible
+	size_t i = 0;
+	while(i < txLen) {
+		// Put as much data into the fifo as can fit
+		while(i < txLen && txfifo_put(&spiTxFifos[port], txBuf[i])) {
+			i++;
+		}
+
+		// Wait for the transmission to complete
+		SPI_WaitTx(SPI_BUSSES[port]);
 	}
 }
 
@@ -270,10 +302,26 @@ void BSP_SPI_Write(spi_port_t port, uint8_t *txBuf, uint32_t txLen) {
  * @return  None
  */
 void BSP_SPI_Read(spi_port_t port, uint8_t *rxBuf, uint32_t rxLen) {
-    for(uint32_t i = 0; i < rxLen; i++){
-		rxBuf[i] = SPI_WriteRead(port, 0x00);
-	}
+    // Fill the fifo with zeros to read
+	size_t i = 0, r = 0;
+	// Empty the fifo
+	rxfifo_renew(&spiRxFifos[port]);
+	// Read the data
+	while(i < rxLen) {
+		// Keep filling the fifo with data until we have read everything
+		while(i < rxLen && txfifo_put(&spiTxFifos[port], 0)) {
+			i++;
+		}
 
+		// Wait for the transmission to complete
+		SPI_WaitTx(SPI_BUSSES[port]);
+		// Busy wait the last bit, just to ensure all bytes have been received
+
+		// Copy the data out of the fifo
+		while(r < i && rxfifo_get(&spiRxFifos[port], &rxBuf[r])) {
+			r++;
+		}
+	}
 }
 
 /**
@@ -309,21 +357,26 @@ void SPI1_IRQHandler(void){
 	OSIntEnter();
 	CPU_CRITICAL_EXIT();
 
-	
-
-	// disable SPI interrupt
+	// Handle the interrupts
 	if (SPI_I2S_GetITStatus(SPI1, SPI_I2S_IT_TXE) == SET){
-		BSP_Light_Toggle(OVOLT);
-		SPI_I2S_ITConfig(SPI1, SPI_I2S_IT_TXE, DISABLE);
+		BSP_Light_Toggle(OVOLT);	// TODO: remove this line
+		
+		// Get the incoming data, put it in the fifo
+		// If this overflows, it's the user's fault.
+		rxfifo_put(&spiRxFifos[spi_ltc6811], SPI1->DR);	// TODO: first byte received might (probably) be incorrect
+
+		// Check to see if there is any data awaiting transmission
+		if(!txfifo_get(&spiTxFifos[spi_ltc6811], (uint8_t*)&SPI1->DR)) {
+			// We are out of data, so turn off the interrupt and post the semaphore
+			SPI_I2S_ITConfig(SPI1, SPI_I2S_IT_TXE, DISABLE);
+			SPI_os[spi_ltc6811]->post();
+		}
 	}
 	if (SPI_I2S_GetITStatus(SPI1, SPI_I2S_IT_RXNE) == SET){
+		// TODO: do we even need this?
 		SPI_I2S_ITConfig(SPI1, SPI_I2S_IT_RXNE, DISABLE);
+		SPI_os[spi_ltc6811]->post();
 	}
-
-	// post semaphore
-	SPI_os[spi_ltc6811]->post();
-
-	
 
 	//make the kernel aware that the interrupt has ended
 	OSIntExit();
