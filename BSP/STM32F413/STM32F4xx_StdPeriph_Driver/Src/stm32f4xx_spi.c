@@ -1137,7 +1137,7 @@ void SPI_I2S_ITConfig(SPI_TypeDef* SPIx, uint8_t SPI_I2S_IT, FunctionalState New
   assert_param(IS_SPI_ALL_PERIPH_EXT(SPIx));
   assert_param(IS_FUNCTIONAL_STATE(NewState));
   assert_param(IS_SPI_I2S_CONFIG_IT(SPI_I2S_IT));
-
+  
   /* Get the SPI IT index */
   itpos = SPI_I2S_IT >> 4;
 

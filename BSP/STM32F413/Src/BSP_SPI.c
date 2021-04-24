@@ -39,11 +39,34 @@ static bsp_os_t *SPI_os[NUM_SPI_BUSSES];
 
 // Use this inline function to wait until SPI communication is complete
 static inline void SPI_Wait(SPI_TypeDef *SPIx){
-#ifdef BAREMETAL
 	while(((SPIx)->SR & (SPI_SR_TXE | SPI_SR_RXNE)) == 0 || ((SPIx)->SR & SPI_SR_BSY));
+}
+
+// Use this inline function to wait until SPI communication is complete
+static inline void SPI_WaitRx(SPI_TypeDef *SPIx){
+#ifdef BAREMETAL
+	SPI_Wait(SPIx);
 #endif
 
 #ifdef RTOS
+	SPI_I2S_ITConfig(SPIx, SPI_I2S_IT_RXNE, ENABLE);
+	if(SPIx == SPI1){
+		SPI_os[spi_ltc6811]->pend();
+	}
+	else if(SPIx == SPI3){
+		SPI_os[spi_as8510]->pend();
+	}
+#endif
+}
+
+// Use this inline function to wait until SPI communication is complete
+static inline void SPI_WaitTx(SPI_TypeDef *SPIx){
+#ifdef BAREMETAL
+	SPI_Wait(SPIx);
+#endif
+
+#ifdef RTOS
+	SPI_I2S_ITConfig(SPIx, SPI_I2S_IT_TXE, ENABLE);
 	if(SPIx == SPI1){
 		SPI_os[spi_ltc6811]->pend();
 	}
@@ -63,12 +86,11 @@ static uint8_t SPI_WriteRead(spi_port_t port, uint8_t txData){
 
 	SPI_TypeDef *bus = SPI_BUSSES[port];
 	BSP_SPI_SetStateCS(port, 0);
-	SPI_Wait(bus);
+	SPI_WaitTx(bus);
 	
 	bus->DR = txData & 0x00FF;
 	
-	SPI_Wait(bus);
-	BSP_Light_On(OVOLT);
+	SPI_WaitTx(bus);
 	BSP_SPI_SetStateCS(port, 1);
 	return bus->DR & 0x00FF;
 }
@@ -156,9 +178,6 @@ void BSP_SPI_Init(spi_port_t port, bsp_os_t *spi_os){
     	NVIC_InitStruct.NVIC_IRQChannelSubPriority = 0;
     	NVIC_InitStruct.NVIC_IRQChannelCmd = ENABLE;
 		NVIC_Init(&NVIC_InitStruct);
-
-		//Enable the Rx buffer not empty interrupt
-		SPI_I2S_ITConfig(SPI1, SPI_I2S_IT_RXNE, ENABLE);
 		#endif
 
 
@@ -221,9 +240,6 @@ void BSP_SPI_Init(spi_port_t port, bsp_os_t *spi_os){
     	NVIC_InitStruct.NVIC_IRQChannelSubPriority = 1;
     	NVIC_InitStruct.NVIC_IRQChannelCmd = ENABLE;
 		NVIC_Init(&NVIC_InitStruct);
-
-		//Enable the Rx buffer not empty interrupt
-		SPI_I2S_ITConfig(SPI3, SPI_I2S_IT_RXNE, ENABLE);
 		#endif
 	}
 }
@@ -292,8 +308,23 @@ void SPI1_IRQHandler(void){
 	// make the kernel aware that the interrupt has started
 	OSIntEnter();
 	CPU_CRITICAL_EXIT();
-	SPI_os[spi_ltc6811]->post();
+
 	
+
+	// disable SPI interrupt
+	if (SPI_I2S_GetITStatus(SPI1, SPI_I2S_IT_TXE) == SET){
+		BSP_Light_Toggle(OVOLT);
+		SPI_I2S_ITConfig(SPI1, SPI_I2S_IT_TXE, DISABLE);
+	}
+	if (SPI_I2S_GetITStatus(SPI1, SPI_I2S_IT_RXNE) == SET){
+		SPI_I2S_ITConfig(SPI1, SPI_I2S_IT_RXNE, DISABLE);
+	}
+
+	// post semaphore
+	SPI_os[spi_ltc6811]->post();
+
+	
+
 	//make the kernel aware that the interrupt has ended
 	OSIntExit();
 }
