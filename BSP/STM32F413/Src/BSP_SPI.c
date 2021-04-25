@@ -7,8 +7,9 @@
 
 #include "BSP_Lights.h"
 
-// TODO: verify that the RX is large enough to support the
-//		 largest transfer of data back from the minions
+// These are the sizes of the fifos.
+// You can write/read more than this at once,
+// but performance will degrade slightly.
 #define TX_SIZE 128
 #define RX_SIZE 64
 
@@ -27,8 +28,8 @@
  * 												 *
  * If adding new SPI busses, all you should have *
  * to modify are the spi_port_t enum (declared   *
- * in the header file), these three arrays, and  *
- * the initialization code.                      *
+ * in the header file), these arrays, and the    *
+ * initialization code.                          *
  *************************************************/
 
 // Lookup for the proper SPI ports
@@ -41,7 +42,7 @@ static SPI_TypeDef * const SPI_BUSSES[NUM_SPI_BUSSES] = {
 
 static GPIO_TypeDef * const SPI_SELECT_PORTS[NUM_SPI_BUSSES] = {
 	// Need to be in the same order as the enum spi_port_t
-	GPIOB,	// LTC6811
+	GPIOD,	// LTC6811
 	GPIOA	// AS8510
 };
 
@@ -58,23 +59,6 @@ static bsp_os_t *SPI_os[NUM_SPI_BUSSES];
 // Use this inline function to wait until SPI communication is complete
 static inline void SPI_Wait(SPI_TypeDef *SPIx){
 	while(((SPIx)->SR & (SPI_SR_TXE | SPI_SR_RXNE)) == 0 || ((SPIx)->SR & SPI_SR_BSY));
-}
-
-// Use this inline function to wait until SPI communication is complete
-static inline void SPI_WaitRx(SPI_TypeDef *SPIx){
-#ifdef BAREMETAL
-	SPI_Wait(SPIx);
-#endif
-
-#ifdef RTOS
-	SPI_I2S_ITConfig(SPIx, SPI_I2S_IT_RXNE, ENABLE);
-	if(SPIx == SPI1){
-		SPI_os[spi_ltc6811]->pend();
-	}
-	else if(SPIx == SPI3){
-		SPI_os[spi_as8510]->pend();
-	}
-#endif
 }
 
 // Use this inline function to wait until SPI communication is complete
@@ -99,21 +83,16 @@ static inline void SPI_WaitTx(SPI_TypeDef *SPIx){
  * @param   txData single byte that will be sent to the device.
  * @return  rxData single byte that was read from the device.
  */
-__attribute__((unused))
 static uint8_t SPI_WriteRead(spi_port_t port, uint8_t txData){
     if(port >= NUM_SPI_BUSSES) return -1;
 
 	SPI_TypeDef *bus = SPI_BUSSES[port];
-	BSP_SPI_SetStateCS(port, 0);
-	SPI_WaitTx(bus);
 	
+	SPI_Wait(bus);
 	bus->DR = txData & 0x00FF;
-	
-	SPI_WaitTx(bus);
-	BSP_SPI_SetStateCS(port, 1);
+	SPI_Wait(bus);
 	return bus->DR & 0x00FF;
 }
-
 
 /**
  * @brief   Initializes the SPI port.
@@ -145,7 +124,7 @@ void BSP_SPI_Init(spi_port_t port, bsp_os_t *spi_os){
 
     if(port == spi_ltc6811) {
 		//      SPI configuration:
-		//          speed : 125kbps
+		//          speed : 
 		//          CPOL : 1 (polarity of clock during idle is high)
 		//          CPHA : 1 (tx recorded during 2nd edge)
 		// Pins:
@@ -179,7 +158,7 @@ void BSP_SPI_Init(spi_port_t port, bsp_os_t *spi_os){
 		SPI_InitStruct.SPI_CPOL = SPI_CPOL_High;
 		SPI_InitStruct.SPI_CPHA = SPI_CPHA_2Edge;
 		SPI_InitStruct.SPI_NSS = SPI_NSS_Soft;
-		SPI_InitStruct.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_64;
+		SPI_InitStruct.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_256;
 		SPI_InitStruct.SPI_FirstBit = SPI_FirstBit_MSB;
 		SPI_InitStruct.SPI_CRCPolynomial = 0;	
 		SPI_Init(SPI1, &SPI_InitStruct);
@@ -203,7 +182,6 @@ void BSP_SPI_Init(spi_port_t port, bsp_os_t *spi_os){
     	NVIC_InitStruct.NVIC_IRQChannelCmd = ENABLE;
 		NVIC_Init(&NVIC_InitStruct);
 		#endif
-
 
 	} else if(port == spi_as8510) {
 		//      SPI configuration:
@@ -277,16 +255,24 @@ void BSP_SPI_Init(spi_port_t port, bsp_os_t *spi_os){
  * @return  None
  */
 void BSP_SPI_Write(spi_port_t port, uint8_t *txBuf, uint32_t txLen) {
-	// Fill as much of the fifo as possible
-	size_t i = 0;
-	while(i < txLen) {
-		// Put as much data into the fifo as can fit
-		while(i < txLen && txfifo_put(&spiTxFifos[port], txBuf[i])) {
-			i++;
+	// If we're below an experimentally-determined value, just use polling
+	if(txLen < 8) { 
+		for(int i = 0; i < txLen; i++) {
+			SPI_WriteRead(port, txBuf[i]);
 		}
+	} else {
+		// If we have a lot of data, we use interrupts to mitigate it
+		// Fill as much of the fifo as possible
+		size_t i = 0;
+		while(i < txLen) {
+			// Put as much data into the fifo as can fit
+			while(i < txLen && txfifo_put(&spiTxFifos[port], txBuf[i])) {
+				i++;
+			}
 
-		// Wait for the transmission to complete
-		SPI_WaitTx(SPI_BUSSES[port]);
+			// Wait for the transmission to complete
+			SPI_WaitTx(SPI_BUSSES[port]);
+		}
 	}
 }
 
@@ -302,25 +288,38 @@ void BSP_SPI_Write(spi_port_t port, uint8_t *txBuf, uint32_t txLen) {
  * @return  None
  */
 void BSP_SPI_Read(spi_port_t port, uint8_t *rxBuf, uint32_t rxLen) {
-    // Fill the fifo with zeros to read
-	size_t i = 0, r = 0;
-	// Empty the fifo
-	rxfifo_renew(&spiRxFifos[port]);
-	// Read the data
-	while(i < rxLen) {
-		// Keep filling the fifo with data until we have read everything
-		while(i < rxLen && txfifo_put(&spiTxFifos[port], 0)) {
-			i++;
-		}
+	// bool first = true;
 
-		// Wait for the transmission to complete
-		SPI_WaitTx(SPI_BUSSES[port]);
-		// Busy wait the last bit, just to ensure all bytes have been received
-
-		// Copy the data out of the fifo
-		while(r < i && rxfifo_get(&spiRxFifos[port], &rxBuf[r])) {
-			r++;
+	// If we have only a little amount of data, just use polling
+	if(rxLen < 8) {
+		for(int i = 0; i < rxLen; i++) {
+			rxBuf[i] = SPI_WriteRead(port, 0x00);
 		}
+	} else {
+		SPI_I2S_ITConfig(SPI_BUSSES[port], SPI_I2S_IT_RXNE, ENABLE);
+		// Fill the fifo with zeros to read
+		size_t i = 0, r = 0;
+		// Empty the fifo
+		rxfifo_renew(&spiRxFifos[port]);
+		// Read the data
+		while(i < rxLen) {
+			// Keep filling the fifo with data until we have read everything
+			while(i < rxLen && txfifo_put(&spiTxFifos[port], 0)) {
+				i++;
+			}
+
+			// Wait for the transmission to complete
+			SPI_WaitTx(SPI_BUSSES[port]);
+			// Busy wait the last bit, just to ensure all bytes have been received
+
+			SPI_Wait(SPI_BUSSES[spi_ltc6811]);
+
+			// Copy the data out of the fifo
+			while(r < i && rxfifo_get(&spiRxFifos[port], &rxBuf[r])) {
+				r++;
+			}
+		}
+		SPI_I2S_ITConfig(SPI_BUSSES[port], SPI_I2S_IT_RXNE, DISABLE);
 	}
 }
 
@@ -359,12 +358,6 @@ void SPI1_IRQHandler(void){
 
 	// Handle the interrupts
 	if (SPI_I2S_GetITStatus(SPI1, SPI_I2S_IT_TXE) == SET){
-		BSP_Light_Toggle(OVOLT);	// TODO: remove this line
-		
-		// Get the incoming data, put it in the fifo
-		// If this overflows, it's the user's fault.
-		rxfifo_put(&spiRxFifos[spi_ltc6811], SPI1->DR);	// TODO: first byte received might (probably) be incorrect
-
 		// Check to see if there is any data awaiting transmission
 		if(!txfifo_get(&spiTxFifos[spi_ltc6811], (uint8_t*)&SPI1->DR)) {
 			// We are out of data, so turn off the interrupt and post the semaphore
@@ -373,9 +366,9 @@ void SPI1_IRQHandler(void){
 		}
 	}
 	if (SPI_I2S_GetITStatus(SPI1, SPI_I2S_IT_RXNE) == SET){
-		// TODO: do we even need this?
-		SPI_I2S_ITConfig(SPI1, SPI_I2S_IT_RXNE, DISABLE);
-		SPI_os[spi_ltc6811]->post();
+		// Get the incoming data, put it in the fifo
+		// If this overflows, it's the user's fault.
+		rxfifo_put(&spiRxFifos[spi_ltc6811], SPI1->DR);
 	}
 
 	//make the kernel aware that the interrupt has ended
@@ -392,7 +385,21 @@ void SPI3_Handler(){
 	// make the kernel aware that the interrupt has started
 	OSIntEnter();
 	CPU_CRITICAL_EXIT();
-	SPI_os[spi_as8510]->post();
+	
+	// Handle the interrupts
+	if (SPI_I2S_GetITStatus(SPI3, SPI_I2S_IT_TXE) == SET){
+		// Check to see if there is any data awaiting transmission
+		if(!txfifo_get(&spiTxFifos[spi_as8510], (uint8_t*)&SPI3->DR)) {
+			// We are out of data, so turn off the interrupt and post the semaphore
+			SPI_I2S_ITConfig(SPI3, SPI_I2S_IT_TXE, DISABLE);
+			SPI_os[spi_as8510]->post();
+		}
+	}
+	if (SPI_I2S_GetITStatus(SPI3, SPI_I2S_IT_RXNE) == SET){
+		// Get the incoming data, put it in the fifo
+		// If this overflows, it's the user's fault.
+		rxfifo_put(&spiRxFifos[spi_as8510], SPI3->DR);
+	}
 	
 	//make the kernel aware that the interrupt has ended
 	OSIntExit();

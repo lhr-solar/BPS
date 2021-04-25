@@ -40,6 +40,8 @@ void Task1(void *p_arg){
     BSP_Lights_Init();
     BSP_UART_Init(NULL, NULL, UART_USB);    // Initialize UART to use printf
 
+    OS_CPU_SysTickInit(SystemCoreClock / (CPU_INT32U) OSCfg_TickRate_Hz);
+
     bsp_os_t spi_os;
     OS_ERR err;
     OSSemCreate(&semaphore,
@@ -51,14 +53,14 @@ void Task1(void *p_arg){
 
     BSP_SPI_Init(spi_ltc6811, &spi_os);
 
-    uint8_t data[4+NUM_MINIONS*8] = {0xAB, 0xCD, 0xEF, 0x6E};  
+    uint8_t data[32/*4+NUM_MINIONS*8*/] = {0xAB, 0xCD, 0xEF, 0x6E, 0x00, 0x00};  
 
     while(1) {
         BSP_Light_Toggle(FAULT);
 
-        BSP_SPI_Write(spi_ltc6811, data, 4);
-        //for (volatile int i = 0; i < 1000000; i++);
-        OSTimeDly(15, OS_OPT_TIME_DLY, &err);
+        BSP_SPI_Write(spi_ltc6811, data, 27);
+        for (volatile int i = 0; i < 1000000; i++);
+        // OSTimeDly(15, OS_OPT_TIME_DLY, &err);
     }
 
     exit(0);
@@ -66,11 +68,11 @@ void Task1(void *p_arg){
 
 // Idle task for this test case
 void Task2(void *p_arg){
-    //BSP_Lights_Init();
-    //BSP_UART_Init(NULL, NULL, UART_USB);
+    __attribute__((unused)) OS_ERR err;
     while(1){
         BSP_Light_Toggle(UVOLT);
-        for (volatile int i = 0; i < 1000000; i++);
+        // for (volatile int i = 0; i < 1000000; i++);
+        OSTimeDly(15, OS_OPT_TIME_DLY, &err);
     }
 }
 
