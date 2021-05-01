@@ -122,7 +122,11 @@ void LTC6811_Init(cell_asic *battMod){
     OSMutexCreate(&MinionsASIC_Mutex,
                 "Minions ASIC Mutex",
                 &err);
-
+    assertOSError(err);
+    OSSemCreate(&MinionsIO_Sem4,
+                "Minions Sem4",
+                0,
+                &err);
     assertOSError(err);
     mutexExists = true;
   }

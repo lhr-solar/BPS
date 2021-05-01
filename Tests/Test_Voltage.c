@@ -10,7 +10,7 @@ cell_asic minions[NUM_MINIONS];
 
 int main() {
 
-    BSP_UART_Init();    // Initialize printf
+    BSP_UART_Init(NULL, NULL, UART_USB);    // Initialize printf
 
     printf("Testing Voltage functions.\r\n");
 
