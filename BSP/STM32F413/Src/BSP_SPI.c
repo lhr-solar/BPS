@@ -385,6 +385,8 @@ void SPI3_Handler(){
 	// make the kernel aware that the interrupt has started
 	OSIntEnter();
 	CPU_CRITICAL_EXIT();
+
+	BSP_Light_Off(EXTRA);
 	
 	// Handle the interrupts
 	if (SPI_I2S_GetITStatus(SPI3, SPI_I2S_IT_TXE) == SET){
