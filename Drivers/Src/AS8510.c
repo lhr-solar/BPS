@@ -40,6 +40,8 @@
 void AS8510_Init(bsp_os_t spi_os) 
 {
     BSP_SPI_Init(spi_as8510, &spi_os);
+
+    
     
 
     // TODO: verify that this initialization is correct once
@@ -56,7 +58,7 @@ void AS8510_Init(bsp_os_t spi_os)
     cfg = 0x45;
     AS8510_WriteToAddr(AS8510_DEC_REG_R1_I, &cfg, 1);
 
-    BSP_Light_Off(EXTRA);
+    
 
     // Enable I-channel, disable V-channel, mask interrupt
     cfg = 0x95;
@@ -154,6 +156,8 @@ ErrorStatus AS8510_WriteToAddr(uint8_t addr, uint8_t *data, uint8_t len)
 
     // Write the data to the registers
     BSP_SPI_Write(spi_as8510, txdata, len + 1);
+
+    BSP_Light_Off(EXTRA);
 
     BSP_SPI_SetStateCS(spi_as8510, 1);
 
