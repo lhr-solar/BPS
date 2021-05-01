@@ -32,7 +32,7 @@ void BSP_Fans_Init(void){
     GPIO_StructInit(&GPIO_INIT_STRUCT);
     GPIO_INIT_STRUCT.GPIO_Mode = GPIO_Mode_AF;
     GPIO_INIT_STRUCT.GPIO_PuPd = GPIO_PuPd_UP;
-    GPIO_INIT_STRUCT.GPIO_Speed = GPIO_Speed_50MHz;
+    GPIO_INIT_STRUCT.GPIO_Speed = GPIO_Speed_2MHz;
     //Initialize Pin PC6, PC7
     GPIO_INIT_STRUCT.GPIO_Pin = GPIO_Pin_6 | GPIO_Pin_7;
     GPIO_Init(GPIOC, &GPIO_INIT_STRUCT);
@@ -113,16 +113,16 @@ int BSP_Fans_GetSpeed(uint8_t fan){
     switch (fan)
     {
     case 1:
-        return TIM8-> CCR1 / DIVIDER;
+        return TIM_GetCapture1(TIM8) / DIVIDER;
         break;
     case 2:
-        return TIM8-> CCR2 / DIVIDER;
+        return TIM_GetCapture2(TIM8) / DIVIDER;
         break;
     case 3:
-        return TIM12-> CCR1 / DIVIDER;
+        return TIM_GetCapture1(TIM12) / DIVIDER;
         break;
     case 4:
-        return TIM12-> CCR2 / DIVIDER;
+        return TIM_GetCapture2(TIM12) / DIVIDER;
         break;
     }
 
