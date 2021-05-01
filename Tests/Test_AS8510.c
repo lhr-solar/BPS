@@ -15,16 +15,18 @@ CPU_STK Task1_Stk[256];
 
 void Task1(void *p_arg){
     OS_CPU_SysTickInit(SystemCoreClock / (CPU_INT32U) OSCfg_TickRate_Hz);
-    //OS_CPU_SysTickInit();
     
     BSP_Lights_Init();
     BSP_UART_Init(NULL, NULL, UART_USB);
     Amps_Init(); // I could write this out, but it just initializes the semaphore and mutex and calls AS8510_Init()
    
     while(1) {
-        int16_t current = AS8510_GetCurrent();
-        printf("current: %d\n\r", current);
+        //int16_t current = AS8510_GetCurrent();
+        uint8_t data;
+        AS8510_ReadFromAddr(0x47, &data, 1);
+        printf("current: %d\n\r", data);
         BSP_Light_Toggle(EXTRA);
+        for (volatile int i = 0; i < 1000000; i++);
     }
 
     exit(0);
