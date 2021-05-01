@@ -52,6 +52,7 @@ void Task1(void *p_arg){
     spi_os.post = post;
 
     BSP_SPI_Init(spi_as8510, &spi_os);
+    
 
     uint8_t data[32/*4+NUM_MINIONS*8*/] = {0xAB, 0xCD, 0xEF, 0x6E, 0x00, 0x00};  
 

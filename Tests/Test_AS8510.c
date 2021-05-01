@@ -19,9 +19,7 @@ void Task1(void *p_arg){
     
     BSP_Lights_Init();
     BSP_UART_Init(NULL, NULL, UART_USB);
-    BSP_Light_On(EXTRA);
     Amps_Init(); // I could write this out, but it just initializes the semaphore and mutex and calls AS8510_Init()
-    BSP_Light_Off(EXTRA);
    
     while(1) {
         int16_t current = AS8510_GetCurrent();

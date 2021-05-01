@@ -5,8 +5,6 @@
 #include "os.h"
 #include "BSP_OS.h"
 
-#include "BSP_Lights.h"
-
 // These are the sizes of the fifos.
 // You can write/read more than this at once,
 // but performance will degrade slightly.
@@ -198,7 +196,7 @@ void BSP_SPI_Init(spi_port_t port, bsp_os_t *spi_os){
 		// Initialize clocks
 		RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC, ENABLE);
 		RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
-		RCC_APB2PeriphClockCmd(RCC_APB1Periph_SPI3, ENABLE);
+		RCC_APB1PeriphClockCmd(RCC_APB1Periph_SPI3, ENABLE);
 		
 		// Initialize pins
 		GPIO_InitStruct.GPIO_Pin = GPIO_Pin_10 | GPIO_Pin_11 | GPIO_Pin_12;
@@ -219,7 +217,7 @@ void BSP_SPI_Init(spi_port_t port, bsp_os_t *spi_os){
 		SPI_InitStruct.SPI_CPOL = SPI_CPOL_High;
 		SPI_InitStruct.SPI_CPHA = SPI_CPHA_2Edge;
 		SPI_InitStruct.SPI_NSS = SPI_NSS_Soft;
-		SPI_InitStruct.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_64;
+		SPI_InitStruct.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_256;
 		SPI_InitStruct.SPI_FirstBit = SPI_FirstBit_MSB;
 		SPI_InitStruct.SPI_CRCPolynomial = 0;	
 		SPI_Init(SPI3, &SPI_InitStruct);
@@ -375,7 +373,7 @@ void SPI1_IRQHandler(void){
 	OSIntExit();
 }
 
-void SPI3_Handler(){
+void SPI3_IRQHandler(){
 	// Save the CPU registers
 	CPU_SR_ALLOC();
 
@@ -386,7 +384,6 @@ void SPI3_Handler(){
 	OSIntEnter();
 	CPU_CRITICAL_EXIT();
 
-	BSP_Light_Off(EXTRA);
 	
 	// Handle the interrupts
 	if (SPI_I2S_GetITStatus(SPI3, SPI_I2S_IT_TXE) == SET){

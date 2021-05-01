@@ -157,8 +157,6 @@ ErrorStatus AS8510_WriteToAddr(uint8_t addr, uint8_t *data, uint8_t len)
     // Write the data to the registers
     BSP_SPI_Write(spi_as8510, txdata, len + 1);
 
-    BSP_Light_Off(EXTRA);
-
     BSP_SPI_SetStateCS(spi_as8510, 1);
 
     return SUCCESS;
