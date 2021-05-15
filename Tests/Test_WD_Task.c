@@ -23,7 +23,7 @@ void Task2(void *p_arg){
    
     while(1) {
         BSP_Light_Toggle(EXTRA);
-        OSTimeDly(10, OS_OPT_TIME_DLY, &err);
+        OSTimeDly(25, OS_OPT_TIME_DLY, &err);
         // Comment out the following lines to test watchdog timeout
         OSMutexPend(&WDog_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
         WDog_BitMap = 7;
