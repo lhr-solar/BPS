@@ -21,16 +21,20 @@
  */
 void EnterFaultState() {
     // Turn Contactor Off
+    BSP_Contactor_Init();
     BSP_Contactor_Off();
     //Set Fans to full speed
+    BSP_Fans_Init();
     BSP_Fans_Set(1, 8);
     BSP_Fans_Set(2, 8);
     BSP_Fans_Set(3, 8);
     BSP_Fans_Set(4, 8);
     // Turn Strobe Light On
     // Turn LEDs On and logs Error into EEPROM
+    BSP_Lights_Init();
     BSP_Light_Off(RUN); //turn off run light
     BSP_Light_On(FAULT);
+    EEPROM_Init();
     if (BSP_WDTimer_DidSystemReset()) Fault_BitMap = Fault_WDOG;
     switch (Fault_BitMap){
         case Fault_UVOLT:
@@ -103,8 +107,8 @@ void Task_FaultState(void *p_arg) {
 }
 
 // Rebind all the possible fault handlers to the fault state
-inline void NMI_Handler()        { Fault_BitMap = Fault_HANDLER; EnterFaultState(); }
-inline void HardFault_Handler()  { Fault_BitMap = Fault_HANDLER; EnterFaultState(); }
-inline void MemManage_Handler()  { Fault_BitMap = Fault_HANDLER; EnterFaultState(); }
-inline void BusFault_Handler()   { Fault_BitMap = Fault_HANDLER; EnterFaultState(); }
-inline void UsageFault_Handler() { Fault_BitMap = Fault_HANDLER; EnterFaultState(); }
+void NMI_Handler()        { Fault_BitMap = Fault_HANDLER; EnterFaultState(); }
+void HardFault_Handler()  { Fault_BitMap = Fault_HANDLER; EnterFaultState(); }
+void MemManage_Handler()  { Fault_BitMap = Fault_HANDLER; EnterFaultState(); }
+void BusFault_Handler()   { Fault_BitMap = Fault_HANDLER; EnterFaultState(); }
+void UsageFault_Handler() { Fault_BitMap = Fault_HANDLER; EnterFaultState(); }
