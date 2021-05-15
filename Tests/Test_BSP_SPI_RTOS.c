@@ -58,7 +58,9 @@ void Task1(void *p_arg){
     while(1) {
         BSP_Light_Toggle(FAULT);
 
+        BSP_SPI_SetStateCS(spi_ltc6811, 0);
         BSP_SPI_Write(spi_ltc6811, data, 27);
+        BSP_SPI_SetStateCS(spi_ltc6811, 1);
         for (volatile int i = 0; i < 1000000; i++);
         // OSTimeDly(15, OS_OPT_TIME_DLY, &err);
     }
