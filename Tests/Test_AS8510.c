@@ -23,7 +23,7 @@ void Task1(void *p_arg){
     while(1) {
         //int16_t current = AS8510_GetCurrent();
         uint8_t data;
-        AS8510_ReadFromAddr(0x47, &data, 1);
+        AS8510_ReadFromAddr(0x46, &data, 1);
         printf("current: %d\n\r", data);
         BSP_Light_Toggle(EXTRA);
         for (volatile int i = 0; i < 1000000; i++);

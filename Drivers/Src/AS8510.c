@@ -1,6 +1,8 @@
 #include "AS8510.h"
 #include "BSP_SPI.h"
 #include "BSP_Lights.h"
+#include "os.h"
+#include "Tasks.h"
 
 // Addresses of the registers in the AS8510
 #define AS8510_DREG_I1       0x00   // Current data registers
