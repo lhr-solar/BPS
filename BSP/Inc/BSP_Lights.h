@@ -1,7 +1,7 @@
 /* Copyright (c) 2020 UT Longhorn Racing Solar */
 
-#ifndef BSP_LIGHTS_H
-#define BSP_LIGHTS_H
+#ifndef __BSP_LIGHTS_H
+#define __BSP_LIGHTS_H
 
 #include "common.h"
 #include "config.h"
@@ -10,7 +10,7 @@
  * @note    This library also controls the strobe light.
  */
 
-typedef enum {FAULT, RUN, UVOLT, OVOLT, OTEMP, OCURR, WDOG, CAN, EXTRA} Light;
+typedef enum {RUN, UVOLT, OVOLT, OTEMP, OCURR, WDOG, CAN, EXTRA, WIRE, FAULT, LIGHTS_MAX} Light;
 
 /**
  * @brief   Initialize all the GPIO pins connected to each LED/Light
