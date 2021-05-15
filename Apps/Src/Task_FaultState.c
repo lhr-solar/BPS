@@ -21,14 +21,17 @@
  */
 void EnterFaultState() {
     // Turn Contactor Off
+    BSP_Contactor_Init();
     BSP_Contactor_Off();
     //Set Fans to full speed
+    BSP_Fans_Init();
     BSP_Fans_Set(1, 8);
     BSP_Fans_Set(2, 8);
     BSP_Fans_Set(3, 8);
     BSP_Fans_Set(4, 8);
     // Turn Strobe Light On
     // Turn LEDs On and logs Error into EEPROM
+    BSP_Lights_Init();
     BSP_Light_Off(RUN); //turn off run light
     BSP_Light_On(FAULT);
     if (BSP_WDTimer_DidSystemReset()) Fault_BitMap = Fault_WDOG;
