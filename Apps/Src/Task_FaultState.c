@@ -59,6 +59,7 @@ void EnterFaultState() {
             EEPROM_LogData(FAULT_HIGH_CURRENT, Amps_GetReading());
             break;
         case Fault_OW:
+            BSP_Light_On(WIRE);
             EEPROM_LogError(FAULT_OPEN_WIRE);
             EEPROM_LogData(FAULT_OPEN_WIRE, Voltage_GetOpenWire());
             break;
