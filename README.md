@@ -1,14 +1,8 @@
 # Battery Protection System Code
-This repo contains all code related to UTSVT's Battery Protection System
+This repo contains all code related to LHR Solar's Battery Protection System (BPS)
 
 ## Setup
-There are two options for developing the BPS system. One option is to use the Keil IDE, which includes some basic debugging tools. The other option is to use a terminal in a linux environment to build and flash the program. If you are only contributing to the BPS Documentation and not the software, see the setup instructions in the Docs folder.
-
-### Setup for Keil Development
-There is a tool called Keil that ARM produces for development on its microcontrollers. Download the most recent version of the Keil IDE: https://www.keil.com/demo/eval/arm.htm
-
-### Setup for Terminal Development
-The system can also be built and deployed from a terminal, allowing you to use different development tools than Keil.
+The BPS is designed be built and deployed from a linux terminal, allowing you to use your choice of text editor/IDE.
 1. Ensure that you have some type of linux machine such as Ubuntu, Windows Subsystem for Linux, etc. Windows will not work.
 2. The BPS code supports multiple microcontrollers and different architectures. Depending on which on you're using, make sure you have the correct toolchain.
     - STM32F413: Follow the instructions in this [repo](https://github.com/SijWoo/ARM-Toolchain-Setup) to setup the toolchains for the current BPS.
@@ -16,8 +10,8 @@ The system can also be built and deployed from a terminal, allowing you to use d
         ```
         sudo apt install gcc gdb
         ```
-3. Download [VSCode](https://code.visualstudio.com/)
-4. In VSCode, download the following extensions (Click on the block icon on the left column):
+3. (Optional) Download [VSCode](https://code.visualstudio.com/)
+4. (Optional) In VSCode, download the following extensions (Click on the block icon on the left column):
     - C/C++
     - ARM
     - cortex-debug
@@ -32,6 +26,13 @@ Call ```make help``` for more information on how to build the project.
 Call ```make clean``` if the build fails for any reason other than syntax related.
 
 For testing, please read the Testing section.
+
+## Flashing
+When calling any of the following commands, make sure you are in the top most level of the directory.
+
+1. Install `st-util`
+2. Connect your computer to the BPS using a nucleo programmer
+3. Call `make flash` to flash the most recently built BPS code. You may need to run this with `sudo`.
 
 ## Testing
 The following testing information is speficially for terminal development.
@@ -54,10 +55,11 @@ Make sure to have fun!
 
 Commit frequently into your own branches. Create a Pull Request whenever you are ready to add you working code to the master branch. Make sure that your code compiles without any errors or warnings before you open a pull request. You must select 1 reviewer for approval. Follow the coding guidelines in the Solar Google Drive. The reviewers will make sure everything is up to par with the coding standards.
 
-Reviewers: (More will be added)
+Reviewers:
 1. Sijin Woo
 2. Chase Block
 3. Clark Poon
 4. Rishi Ponnekanti
 5. Manthan Upadhyaya
 6. Sugam Arora
+7. Matthew Yu
