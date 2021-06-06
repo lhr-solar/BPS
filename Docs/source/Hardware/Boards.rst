@@ -36,7 +36,7 @@ Regulation  Description of Regulation                      How Regulation is Met
             | the battery enclosure per Reg 8.4. 
 
 **8.3.A.5** | System in which measurements are constantly  | This board sends current and temperature    
-            | monitored and where actions are taken        | measurement back to the BOS leader 
+            | monitored and where actions are taken        | measurement back to the BPS leader 
             | immediately without operator intervention    | periodically. This helps the BPS Leader board 
             | to open the Main Power Switch should a       | determine when a Battery protection Fault 
             | battery Protection Fault occur. Any          | occurs and take appropriate actions.
@@ -313,7 +313,7 @@ Schematic
     * Logic Analyzer Pins (2.54 mm headers) 
         * **Description:** The logic analyzer pins serve to easily test the board to check proper 
           functionality of the board.  
-        * **Why is it necessary:** This allows for testing to be much easier since we can monitor 
+        * **Why is it necessary:** This allows for testing to be much easier since we can monitor.
           what occurs to these signal lines through these pins  
         * Justification for selection of specific part: Standard component 
         * Associated passives/components:  
