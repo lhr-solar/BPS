@@ -1,7 +1,10 @@
 /* Copyright (c) 2021 UT Longhorn Racing Solar */
 
 #include "BatteryBalancing.h"
+#include "Voltage.h"
+#include "BSP_PLL.h"
 #include "Tasks.h"
+#include "stm32f4xx.h"
 
 /******************************************************************************
  * BatteryBalancing Task Test Plan
@@ -12,9 +15,30 @@
  * 4. Connect the BPS test board
  * 5. Keep all modules at half voltage except one (of your choice) and keep that at full
  * 6. Reset the BPS by pressing and releasing the reset button
- * 7. Probe the balancing transistor to ensure it is turned on
+ * 7. Measure the voltage across the appropriate resistor to ensure there is a voltage drop
  * 8. Repeat 5-7 for different modules
+ * 9. Put all modules to full voltage except one (leaving it at half)
+ * 10. Measure the voltage across each of the resistors besides the half voltage module
  ****************************************************************************/
+
+// Task1
+OS_TCB Task1_TCB;
+CPU_STK Task1_Stk[DEFAULT_STACK_SIZE];
+
+// Task_UpdateVoltage
+OS_TCB UpdateVoltage_TCB;
+CPU_STK UpdateVoltage_Stk[DEFAULT_STACK_SIZE];
+
+void Task_UpdateVoltage(void* p_arg) {
+    (void) p_arg;
+    OS_ERR err;
+
+    while (1) {
+        Voltage_UpdateMeasurements();
+        OSTimeDly(5, OS_OPT_TIME_DLY, &err);
+        assertOSError(err);
+    }
+}
 
 void Task1(void* p_arg) {
 	OS_CPU_SysTickInit(SystemCoreClock / (CPU_INT32U) OSCfg_TickRate_Hz);
@@ -35,9 +59,27 @@ void Task1(void* p_arg) {
         OS_OPT_TASK_STK_CHK | OS_OPT_TASK_SAVE_FP,	// Options
         &err
     );					// return err code}
+
+    OSTaskCreate(
+        &UpdateVoltage_TCB,				// TCB
+        "TASK_UPDATE_VOLTAGE",	// Task Name (String)
+        Task_UpdateVoltage,				// Task function pointer
+        (void *)0,				// Task function args
+        5,			            // Priority
+        UpdateVoltage_Stk,				// Stack
+        WATERMARK_STACK_LIMIT,	// Watermark limit for debugging
+        DEFAULT_STACK_SIZE,		// Stack size
+        0,						// Queue size (not needed)
+        10,						// Time quanta (time slice) 10 ticks
+        (void *)0,				// Extension pointer (not needed)
+        OS_OPT_TASK_STK_CHK | OS_OPT_TASK_SAVE_FP,	// Options
+        &err
+    );					// return err code}
+
+    OSTaskDel(NULL, &err);
 }
 
-void main(void) {
+int main(void) {
     OS_ERR err;
     BSP_PLL_Init();
 
@@ -60,4 +102,5 @@ void main(void) {
     assertOSError(err);
 
     OSStart(&err);
+    return 0;
 }
