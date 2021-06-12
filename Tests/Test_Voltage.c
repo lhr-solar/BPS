@@ -10,7 +10,7 @@ cell_asic minions[NUM_MINIONS];
 
 int main() {
 
-    BSP_UART_Init();    // Initialize printf
+    BSP_UART_Init(NULL, NULL, UART_USB);    // Initialize printf
 
     printf("Testing Voltage functions.\r\n");
 
@@ -58,7 +58,7 @@ int main() {
     }
 
     printf("Printing modules that failed.\r\n");
-    Voltage_Safety dangerBatt;
+    VoltageSafety_t dangerBatt;
     Voltage_GetModulesInDanger(&dangerBatt);
     for(int i = 0; i < TOTAL_VOLT_WIRES; i++) {
         printf("\t%d: ", i);
