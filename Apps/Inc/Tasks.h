@@ -33,6 +33,7 @@
 #define TASK_IDLE_STACK_SIZE                DEFAULT_STACK_SIZE
 #define TASK_INIT_STACK_SIZE                DEFAULT_STACK_SIZE
 
+#define CANBUS_QUEUE_LENGTH 128
 
 /**
  * enum to keep track of which tasks correspond to each bit in WDog_BitMap
