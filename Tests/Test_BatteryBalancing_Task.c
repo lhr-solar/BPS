@@ -5,6 +5,7 @@
 #include "BSP_PLL.h"
 #include "Tasks.h"
 #include "stm32f4xx.h"
+#include "config.h"
 
 /******************************************************************************
  * BatteryBalancing Task Test Plan
@@ -29,9 +30,13 @@ CPU_STK Task1_Stk[DEFAULT_STACK_SIZE];
 OS_TCB UpdateVoltage_TCB;
 CPU_STK UpdateVoltage_Stk[DEFAULT_STACK_SIZE];
 
+extern cell_asic Minions[NUM_MINIONS];
+
 void Task_UpdateVoltage(void* p_arg) {
     (void) p_arg;
     OS_ERR err;
+
+    Voltage_Init(Minions);
 
     while (1) {
         Voltage_UpdateMeasurements();
