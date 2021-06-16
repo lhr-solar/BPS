@@ -12,8 +12,7 @@ Getting Started
 
 First Steps
 ***********
-1. If you are running Linux, that's great. If you are running Windows, `install Windows Subsystem for Linux <https://docs.microsoft.com/en-us/windows/wsl/install-win10>`_.
-If you are running Mac OS, talk to Clark. (I don't see why our tools couldn't be set up on Mac, but I have never tried.)
+1. If you are running Linux, that's great. If you are running Windows, `install Windows Subsystem for Linux <https://docs.microsoft.com/en-us/windows/wsl/install-win10>`_. If you are running Mac OS, talk to Clark. (I don't see why our tools couldn't be set up on Mac, but I have never tried.)
 2. Ask for access to the Github, Google Drive, Slack, Discord, OneDrive, and Monday.
 3. Check the README (scroll down) in the `BPS repository <https://github.com/lhr-solar/BPS>`_ for instructions on how to set up your environment.
 4. Check out our starter projects. These are designed to introduce new members to the BPS architecture and C programming.
@@ -35,11 +34,10 @@ Approach #1: Look it up
 ***********************
 Sometimes the best approach is to consult the documentation, datasheet, reference manual, or your favorite search engine. Of course, this only works
 if someone else who has experienced a similar problem has documented their solution. This approach is usually the way to go when your problem is related to:
+
 1. Programming language syntax (How do I do X in C?)
 2. Programming language features (eg. ``printf()`` or any other standard library function)
-3. The behavior of a commonly used tool (eg. git, gcc, make, VSCode, etc.). For most terminal commands, you can get access to documentation by running the command with 
-``<command> --help`` or ``man <command>``. ``man`` pages and the ``--help`` command are especially useful because they were written by the people who
-made the tools.
+3. The behavior of a commonly used tool (eg. git, gcc, make, VSCode, etc.). For most terminal commands, you can get access to documentation by running the command with ``<command> --help`` or ``man <command>``. ``man`` pages and the ``--help`` command are especially useful because they were written by the people who made the tools.
 4. Common error messages (paste them into Google and see if anything comes up)
 5. The behavior of a specific part (eg. why does the STM32F413, LTC6811, etc. not behave how I think it should?)
 6. Anything else that is documented somewhere.
@@ -50,8 +48,8 @@ When you can't find your problem in some documentation or online, the easiest so
 for help are people who have worked on similar parts of the project before. For example, if you need help figuring out how a specific function in the BPS codebase
 works, you can check the ``git blame`` and see who wrote that function. They will probably be able to help you understand their code. This approach is generally
 the way to go when your problem is related to:
-1. Something specific to our vehicle that is not documented anywhere. (Even if it is documented somewhere, if you can't find where it's documented or 
-the documentation is not helpful, please ask someone for help. I will be the first to admit that are docs aren't perfect.)
+
+1. Something specific to our vehicle that is not documented anywhere. (Even if it is documented somewhere, if you can't find where it's documented or the documentation is not helpful, please ask someone for help. I will be the first to admit that are docs aren't perfect.)
 2. The requirements for the task you are working on. (eg. I don't understand/I forgot what Clark wants me to work on)
 3. Something that you don't know how to look up. This tends to happen if you don't know the proper search terms to get google to give you the answer. 
 4. Something that comes up in a meeting that you don't understand. (eg. Wtf is a "thread" or a "can"? I thought this was engineering, not arts and crafts!)
