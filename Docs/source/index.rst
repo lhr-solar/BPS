@@ -40,6 +40,13 @@ Welcome to the BeVolt BPS documentation!
 
 .. toctree::
    :hidden:
+   :maxdepth: 2
+   :caption: How To
+
+   How_To/Onboarding
+
+.. toctree::
+   :hidden:
    :maxdepth: 1
    :caption: Terms and Definitions
    
