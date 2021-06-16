@@ -1,5 +1,8 @@
 #include "AS8510.h"
 #include "BSP_SPI.h"
+#include "BSP_Lights.h"
+#include "os.h"
+#include "Tasks.h"
 
 // Addresses of the registers in the AS8510
 #define AS8510_DREG_I1       0x00   // Current data registers
@@ -40,6 +43,9 @@ void AS8510_Init(bsp_os_t spi_os)
 {
     BSP_SPI_Init(spi_as8510, &spi_os);
 
+    
+    
+
     // TODO: verify that this initialization is correct once
     //       we have the hardware that we need
 
@@ -53,6 +59,8 @@ void AS8510_Init(bsp_os_t spi_os)
 
     cfg = 0x45;
     AS8510_WriteToAddr(AS8510_DEC_REG_R1_I, &cfg, 1);
+
+    
 
     // Enable I-channel, disable V-channel, mask interrupt
     cfg = 0x95;
