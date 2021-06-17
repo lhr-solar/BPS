@@ -1094,7 +1094,7 @@ Schematic
         * Description: This switch can be used to individually disconnect a battery module so that a 
           power supply can be connected instead.   
         * Why is it necessary: This is to ensure that the batteries are not impacted in any way by the connection to a power supply.
-        * Justification for selection of specific part: TThis had the appropriate number of connections and met the team's
+        * Justification for selection of specific part: This had the appropriate number of connections and met the team's
           needs in terms of functionality.  
         * `Datasheet link <https://www.mouser.com/datasheet/2/307/en-a6s-1224092.pdf>`__
         * Associated passives/components:  
