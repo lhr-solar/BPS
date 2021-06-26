@@ -19,10 +19,8 @@ CPU_STK Task2_Stk[256];
  * 
  * 1. Build the BPS code for the stm32f413 for this test file (see README.md)
  * 2. Flash the BPS (see README.md)
- * 3. Connect the BPS UART USB to your laptop and open PuTTY (or comparable)
- * 4. Connect the BPS test board
- * 5. Run the code in this file
- * 6. Make sure the contactor stays closed
+ * 3. Run the code in this file
+ * 4. Make sure the contactor stays closed
 ****************************************************************************/
 
 void Task2(void *p_arg){    //This task is meant to allow contactor to close
@@ -54,7 +52,7 @@ void Task2(void *p_arg){    //This task is meant to allow contactor to close
     BSP_Lights_Init();
    
     while(1) {
-        
+        BSP_Light_Toggle(EXTRA);
         OSTimeDly(25, OS_OPT_TIME_DLY, &err);
     }
 

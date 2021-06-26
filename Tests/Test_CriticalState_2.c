@@ -46,7 +46,7 @@ void Task2(void *p_arg){    //This task is meant to cause contactor to remain op
     BSP_Lights_Init();
    
     while(1) {
-        
+        BSP_Light_Toggle(EXTRA);
         OSTimeDly(25, OS_OPT_TIME_DLY, &err);
     }
 
