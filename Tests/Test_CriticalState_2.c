@@ -22,7 +22,7 @@ CPU_STK Task2_Stk[256];
  * 3. Connect the BPS UART USB to your laptop and open PuTTY (or comparable)
  * 4. Connect the BPS test board
  * 5. Run the code in this file
- * 6. Make sure the contactor stays open
+ * 6. Make sure the contactor stays open. Use an ohmmeter to check the resistance across the contactor's terminals to determine the state of the contactor.
 ****************************************************************************/
 
 
