@@ -5,10 +5,11 @@
 
 #include "common.h"
 #include "config.h"
+#include "BSP_OS.h"
 
 /* Initialize communication with the AS8510 to begin measurement of electrical current.
  */
-void AS8510_Init();
+void AS8510_Init(bsp_os_t spi_os);
 
 /* Writes to a register on the AS8510
  * @param addr the address to write to
