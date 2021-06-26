@@ -48,7 +48,7 @@ void Amperes_Post(void) {
 }
 #endif
 
-static int16_t latestMeasureMilliAmps;
+static int32_t latestMeasureMilliAmps;
 
 /** Amps_Init
  * Initializes hardware to begin current monitoring.
@@ -111,9 +111,9 @@ SafetyStatus Amps_CheckStatus(bool chargingOnly) {
 /** Amps_IsCharging
  * Determines if the the battery pack is being charged or discharged depending on
  * the sign of the current
- * @return 1 if charge, 0 if discharge
+ * @return true if charge, false if discharge
  */
-int8_t Amps_IsCharging(void) {
+bool Amps_IsCharging(void) {
 	// TODO: Make sure that the amperes board is installed in such a way that negative => charging
 	return latestMeasureMilliAmps < 0;
 }
