@@ -16,7 +16,7 @@ CPU_STK Task2_Stk[256];
 
 //This test is for the situation where not all 4 tasks have posted the SafetyCheck_Sem4
 
-void Task2(void *p_arg){    //This task is meant to allow contactor to close
+void Task2(void *p_arg){    //This task is meant to cause contactor to remain open
     OS_ERR err;
 
     OSTimeDly(250, OS_OPT_TIME_DLY, &err);
