@@ -14,7 +14,17 @@ CPU_STK Task1_Stk[256];
 OS_TCB Task2_TCB;
 CPU_STK Task2_Stk[256];
 
-//This test is for the situation where not all 4 tasks have posted the SafetyCheck_Sem4
+/******************************************************************************
+ * Critical State Task Test Plan
+ * 
+ * 1. Build the BPS code for the stm32f413 for this test file (see README.md)
+ * 2. Flash the BPS (see README.md)
+ * 3. Connect the BPS UART USB to your laptop and open PuTTY (or comparable)
+ * 4. Connect the BPS test board
+ * 5. Run the code in this file
+ * 6. Make sure the contactor stays open
+****************************************************************************/
+
 
 void Task2(void *p_arg){    //This task is meant to cause contactor to remain open
     OS_ERR err;
