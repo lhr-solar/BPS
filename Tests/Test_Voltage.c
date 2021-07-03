@@ -109,6 +109,8 @@ void test(void) {
 
     printf("\r\nTesting Voltage_GetTotalPackVoltage...\r\n");
     printf("Total pack voltage: %lu millivolts\r\n", Voltage_GetTotalPackVoltage());
+
+    while(1);
 }
 
 // keeping this for now, since the system was previously verified for bare-metal with this test
