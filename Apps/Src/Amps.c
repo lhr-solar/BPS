@@ -48,7 +48,7 @@ void Amperes_Post(void) {
 }
 #endif
 
-static int16_t latestMeasureMilliAmps;
+static int32_t latestMeasureMilliAmps;
 
 /** Amps_Init
  * Initializes hardware to begin current monitoring.
