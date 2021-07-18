@@ -36,8 +36,7 @@ void Task1(void *p_arg){
 	OS_CPU_SysTickInit(SystemCoreClock / (CPU_INT32U) OSCfg_TickRate_Hz);
 
     OS_ERR err;
-
-    OS_ERR err;
+    
     OSSemCreate(&Fault_Sem4,
                 "Fault/Tripped Semaphore",
                 0,
