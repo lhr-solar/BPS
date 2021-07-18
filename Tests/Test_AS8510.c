@@ -40,7 +40,7 @@ void Task1(void *p_arg){
    
     while(1) {
         int32_t current = AS8510_GetCurrent();
-        printf("current (milliAmps): %d\n\r", current);
+        printf("current (milliAmps): %d\n\r", (int)current);
         BSP_Light_Toggle(EXTRA);
         for (volatile int i = 0; i < 1000000; i++);
     }
