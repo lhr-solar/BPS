@@ -36,7 +36,7 @@ uint8_t AS8510_ReadRegister(uint8_t addr);
 /* Gets the current from the AS8510
  * @return current in milliamps
  */
-int16_t AS8510_GetCurrent();
+int32_t AS8510_GetCurrent();
 
 #endif
 

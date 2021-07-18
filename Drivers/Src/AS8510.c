@@ -201,15 +201,31 @@ uint8_t AS8510_ReadRegister(uint8_t addr)
 }
 
 /* Gets the current from the AS8510
- * TODO: is this given by the AS8510 in amps?
+ * TODO: is this conversion correct?
  */
-int16_t AS8510_GetCurrent() {
+int32_t AS8510_GetCurrent() {
     uint8_t dreg[2];
 
     AS8510_ReadFromAddr(0, dreg, 2);
 
     uint16_t reading = ((uint16_t)(dreg[0]) << 8) | (uint16_t)(dreg[1]);
 
-    return *((int16_t*)&reading); // TODO: how does this need to be modified to be useable?
+    // We are measuring in I200 mode (Gain = 40). The datasheet suggests the ADC reference voltage will typically be around 1.225 V, 
+    // although it will be affected by temperature. For now, I will ignore drift and see how well the BPS can measure temperature.
+
+    // 1.225 V divided by 16 bits => 0.0000186920166015625 V of precision
+    // Gain of 40 => 0.0000004673004150390625 V drop across shunt changes the ADC by one bit
+    // 100 uOhm shunt => 0.004673004150390625 A of precision in our measurement (4.673004150390625 mA per step)
+    // The datasheet states that a chopper gets rid of the offset in the input voltage, so I will assume
+    // that the ADC is centered on 0 Amps (a reading of 0x8000 will be 0 Amps)
+
+    // Used for converting ADC reading into milliamps
+    const int32_t OFFSET = 0x8000;
+    const int32_t NUMERATOR = 4673;
+    const int32_t DENOMINATOR = 1000;
+    
+    int32_t milliamps = (((int32_t) reading) - OFFSET) * NUMERATOR / DENOMINATOR;
+
+    return milliamps; // TODO: how does this need to be modified to be useable?
 }
 

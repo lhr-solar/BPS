@@ -10,6 +10,24 @@
 #include "BSP_UART.h"
 #include "Amps.h"
 
+/******************************************************************************
+ * AS8510 Driver Test Plan
+ * 
+ * 1. Set up BPS Leader, Amperes, and Shunt Resistor boards so that they are connected properly.
+ * 2. Power on the system.
+ * 3. Build this test program and flash it onto the BPS.
+ * 4. Connect your computer to the BPS's UART-USB port and open it in Putty.
+ * 5. Reset the BPS.
+ * 6. Apply +100 mV to the shunt resistor. The BPS should read a positive current.
+ * 7. Apply -100 mV to the shunt resistor. The BPS should read a negative current.
+ * 8. Use a power supply to run a known positive current through the shunt resistor.
+ *    Verify that the BPS UART output agrees with the power supply (fail the test if we are more than 200mA off)
+ * 9. Repeat step 8 with a negative current.
+ * 10. Use a Lithium-Ion battery module from the pack with a current-limiting resistor to run a large current (>75 Amps)
+ *     through the shunt resistor. Verify that the BPS UART output (fail the test if we are more than 200mA off)
+ * 11. Repeat step 10 with a large negative current (<-20 Amps)
+ ******************************************************************************/
+
 OS_TCB Task1_TCB;
 CPU_STK Task1_Stk[256];
 
@@ -21,10 +39,8 @@ void Task1(void *p_arg){
     Amps_Init(); // I could write this out, but it just initializes the semaphore and mutex and calls AS8510_Init()
    
     while(1) {
-        //int16_t current = AS8510_GetCurrent();
-        uint8_t data;
-        AS8510_ReadFromAddr(0x46, &data, 1);
-        printf("current: %d\n\r", data);
+        int32_t current = AS8510_GetCurrent();
+        printf("current (milliAmps): %d\n\r", (int)current);
         BSP_Light_Toggle(EXTRA);
         for (volatile int i = 0; i < 1000000; i++);
     }
