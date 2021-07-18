@@ -30,9 +30,9 @@ SafetyStatus Amps_CheckStatus(bool isCharging);
 /** Amps_IsCharging
  * Determines if the the battery pack is being charged or discharged depending on
  * the sign of the current
- * @return 1 if charge, 0 if discharge
+ * @return true if charge, false if discharge
  */
-int8_t Amps_IsCharging(void);
+bool Amps_IsCharging(void);
 
 /** Amps_GetReading
  * Measures the electrical current from the Ampere minion board

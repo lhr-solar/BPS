@@ -7,8 +7,6 @@
 #include "stm32f4xx.h"
 #endif
 
-#define CANBUS_QUEUE_LENGTH 64
-
 void Task_Init(void *p_arg) {
 
 #ifndef SIMULATION
