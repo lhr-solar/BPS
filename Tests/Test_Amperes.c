@@ -15,7 +15,7 @@
  * 2. Connect the BPS's voltage probes to the BPS test board
  * 3. Build the BPS code for the stm32f413 for this test file (see README.md)
  * 4. Flash the BPS (see README.md)
- * 5. Replace the shunt resistor board with a breadboard and connnect it to the amperes board. Use this breadboard to input the desired test voltages into the current board.
+ * 5. Replace the shunt resistor board with a breadboard and connnect it to the amperes board. Use this breadboard to input the desired test current into the current board.
  * 6. Connect your computer to the BPS's UART-USB port and open a COM port terminal
  * 7. Reset the BPS by pressing and releasing the reset button
  * 8. Check the terminal output
