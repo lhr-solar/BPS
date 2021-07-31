@@ -58,11 +58,11 @@ void Task_Spam(void *p_arg){
 
         //Send fake voltage measurements to CAN queue
         CanMsg.id = VOLT_DATA;
-        int voltage = 2500;
+        uint32_t voltage = 2500;
         for (int i = 0; i < NUM_BATTERY_MODULES; i++){ //send all battery module voltage data
             CanPayload.idx = i;
             voltage += 50; // create fake voltages
-            CanData.f = (float)voltage/1000; //send data in volts
+            CanData.w = voltage; //send data in millivolts
             CanPayload.data = CanData;
             CanMsg.payload = CanPayload;
             OSQPost(&CANBus_MsgQ, &CanMsg, sizeof(CanMsg), OS_OPT_POST_FIFO, &err);

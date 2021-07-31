@@ -21,6 +21,14 @@ static cell_asic *Minions;
 
 static OS_MUTEX TemperatureBuffer_Mutex;
 
+static uint32_t uintSqrt(uint32_t n) {
+	uint32_t i;
+	for (i = 0; i * i <= n; i++) {
+		if (i * i == n) return i;
+	}
+	return ((i * i - n) <= ((i-1) * (i-1) - n)) ? i : i - 1; // sketchy rounding
+}
+
 /** Temperature_Init
  * Initializes device drivers including SPI inside LTC6811_init and LTC6811 for Temperature Monitoring
  * @param boards LTC6811 data structure that contains the values of each register
@@ -155,15 +163,24 @@ ErrorStatus Temperature_ChannelConfig(uint8_t tempChannel) {
  * @param mV from ADC
  * @return temperature in Celsius (Fixed Point with .001 resolution) 
  */
-int milliVoltToCelsius(float milliVolt){
+int milliVoltToCelsius(uint32_t milliVolt){
+	// Adapted from: 
+	/*
 	// Typecasting to get rid of warnings
 	float sumInRt = (float)(-13.582)*(float)(-13.582) + (float)4.0 * (float)0.00433 * ((float)2230.8 - milliVolt);
 	float rt = sqrt(sumInRt);				
 	float numerator = (float)13.582 - rt;
 	float denom = (2.0 * - 0.00433);		
 	float frac = numerator/denom;			
-	float retVal = frac + 30;			
-	
+	float retVal = frac + 30;	
+	*/
+
+	uint32_t sumInRt = (184471 + 17 * (2230800 - milliVolt * 1000)) / 1000;
+	uint32_t rt = uintSqrt(sumInRt);
+	int32_t numerator = 13582000 - rt * 1000000;
+	int32_t denominator = -8660;
+	int32_t retVal = numerator / denominator + 30;
+
 	return retVal * 1000;
 }
 
@@ -200,7 +217,7 @@ ErrorStatus Temperature_UpdateSingleChannel(uint8_t channel){
 		
 		// update adc value from GPIO1 stored in a_codes[0]; 
 		// a_codes[0] is fixed point with .001 resolution in volts -> multiply by .001 * 1000 to get mV in double form
-		ModuleTemperatures[board][channel] = milliVoltToCelsius(Minions[board].aux.a_codes[0]*0.1);
+		ModuleTemperatures[board][channel] = milliVoltToCelsius(Minions[board].aux.a_codes[0] / 10);
 	}
 	//release mutex
   	OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);

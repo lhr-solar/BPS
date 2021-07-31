@@ -92,11 +92,8 @@ SF = st-flash
 # cpu
 CPU = -mcpu=cortex-m4
 
-# fpu
-FPU = -mfpu=fpv4-sp-d16
-
 # float-abi
-FLOAT-ABI = -mfloat-abi=hard
+FLOAT-ABI = -mfloat-abi=soft
 
 # mcu
 MCU = $(CPU) -mthumb $(FPU) $(FLOAT-ABI)
@@ -109,7 +106,6 @@ AS_DEFS =
 C_DEFS =  \
 -DSTM32F413_423xx	\
 -DUSE_STDPERIPH_DRIVER	\
--D__FPU_PRESENT \
 -D$(OS)
 
 # AS includes

@@ -1,4 +1,5 @@
 /* Copyright (c) 2020 UT Longhorn Racing Solar */
+#include <string.h>
 #include "Tasks.h"
 #include "os.h"
 #include "Voltage.h"
@@ -56,7 +57,7 @@ void Task_VoltTempMonitor(void *p_arg) {
         for (int i = 0; i < NUM_BATTERY_MODULES; i++){ //send all battery module voltage data
             CanPayload.idx = i;
             int voltage = Voltage_GetModuleMillivoltage(i);
-            CanData.f = (float)voltage/1000; //send data in volts
+            memcpy(&CanData.w, &voltage, sizeof(CanData.w));
             CanPayload.data = CanData;
             CanMsg.payload = CanPayload;
             OSQPost(&CANBus_MsgQ, &CanMsg, sizeof(CanMsg), OS_OPT_POST_FIFO, &err);
@@ -122,7 +123,8 @@ void Task_VoltTempMonitor(void *p_arg) {
             for (uint8_t j = 0; j < MAX_TEMP_SENSORS_PER_MINION_BOARD; j++){
                 if (i * MAX_TEMP_SENSORS_PER_MINION_BOARD + j < NUM_TEMPERATURE_SENSORS){
                     CanPayload.idx = i * MAX_TEMP_SENSORS_PER_MINION_BOARD + j;
-                    CanData.f = (float)Temperature_GetSingleTempSensor(i, j);
+                    int32_t temp = Temperature_GetSingleTempSensor(i, j);
+                    memcpy(&CanData.w, &temp, sizeof(CanData.w));
                     CanPayload.data = CanData;
                     CanMsg.payload = CanPayload;
                     OSQPost(&CANBus_MsgQ, &CanMsg, sizeof(CanMsg), OS_OPT_POST_FIFO, &err);

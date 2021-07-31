@@ -93,19 +93,19 @@ static ErrorStatus CANbus_SendMsg(CANId_t id, CANPayload_t payload) {
 			memcpy(txdata, &payload.data.b, sizeof(payload.data.b));
 			break;
 
-		// Handle messages with float data
+		// Handle messages with 4 byte data
 		case CURRENT_DATA:
 		case SOC_DATA:
 			data_length = 4;
-			memcpy(txdata, &payload.data.f, sizeof(payload.data.f));
+			memcpy(txdata, &payload.data.w, sizeof(payload.data.w));
 			break;
 
-		// Handle messages with idx + float data
+		// Handle messages with idx + 4 byte data
 		case VOLT_DATA:
 		case TEMP_DATA:
 			data_length = 5;
 			txdata[0] = payload.idx;
-			memcpy(&txdata[1], &payload.data.f, sizeof(payload.data.f));
+			memcpy(&txdata[1], &payload.data.w, sizeof(payload.data.w));
 			break;
 
 		// Handle invalid messages
