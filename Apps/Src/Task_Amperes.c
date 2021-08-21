@@ -46,7 +46,7 @@ void Task_AmperesMonitor(void *p_arg) {
 
 		//Send measurement to CAN queue
 		int current = Amps_GetReading();
-		memcpy(&(CanData.w), &current, sizeof(CanData.w));
+		CanData.w = (uint32_t) current;
 		CanPayload.data = CanData;
 		CanMsg.id = CURRENT_DATA;
 		CanMsg.payload = CanPayload;

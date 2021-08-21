@@ -8,6 +8,8 @@
 #include "os.h"
 #include "Tasks.h"
 
+// lookup table for converting ADC voltages to temperatures
+extern int32_t voltToTemp[];
 
 // Holds the temperatures in Celsius (Fixed Point with .001 resolution) for each sensor on each board
 int32_t ModuleTemperatures[NUM_MINIONS][MAX_TEMP_SENSORS_PER_MINION_BOARD];
@@ -21,13 +23,6 @@ static cell_asic *Minions;
 
 static OS_MUTEX TemperatureBuffer_Mutex;
 
-static uint32_t uintSqrt(uint32_t n) {
-	uint32_t i;
-	for (i = 0; i * i <= n; i++) {
-		if (i * i == n) return i;
-	}
-	return ((i * i - n) <= ((i-1) * (i-1) - n)) ? i : i - 1; // sketchy rounding
-}
 
 /** Temperature_Init
  * Initializes device drivers including SPI inside LTC6811_init and LTC6811 for Temperature Monitoring
@@ -164,24 +159,7 @@ ErrorStatus Temperature_ChannelConfig(uint8_t tempChannel) {
  * @return temperature in Celsius (Fixed Point with .001 resolution) 
  */
 int milliVoltToCelsius(uint32_t milliVolt){
-	// Adapted from: 
-	/*
-	// Typecasting to get rid of warnings
-	float sumInRt = (float)(-13.582)*(float)(-13.582) + (float)4.0 * (float)0.00433 * ((float)2230.8 - milliVolt);
-	float rt = sqrt(sumInRt);				
-	float numerator = (float)13.582 - rt;
-	float denom = (2.0 * - 0.00433);		
-	float frac = numerator/denom;			
-	float retVal = frac + 30;	
-	*/
-
-	uint32_t sumInRt = (184471 + 17 * (2230800 - milliVolt * 1000)) / 1000;
-	uint32_t rt = uintSqrt(sumInRt);
-	int32_t numerator = 13582000 - rt * 1000000;
-	int32_t denominator = -8660;
-	int32_t retVal = numerator / denominator + 30;
-
-	return retVal * 1000;
+	return voltToTemp[milliVolt];
 }
 
 /** Temperature_UpdateSingleChannel
