@@ -35,7 +35,7 @@ if __name__ == "__main__":
 */
 
 // lookup table for converting ADC voltages to temperatures
-int32_t voltToTemp[] = {
+const int32_t voltToTemp[] = {
     186444,
     186377,
     186310,
