@@ -2,6 +2,7 @@
 #include "os.h"
 #include "config.h"
 #include "Tasks.h"
+#include "CAN_Queue.h"
 
 #ifndef SIMULATION
 #include "stm32f4xx.h"
@@ -172,10 +173,7 @@ void Task_Init(void *p_arg) {
 				OS_OPT_TASK_STK_CHK | OS_OPT_TASK_SAVE_FP,	// Options
 				&err);					// return err code}
         
-        OSQCreate(&CANBus_MsgQ,
-                "CANBus Message Queue",
-                CANBUS_QUEUE_LENGTH,
-                &err);
+		CAN_Queue_Init();
         assertOSError(err);
 	//delete task
 	OSTaskDel(NULL, &err); // Delete task

@@ -33,8 +33,6 @@
 #define TASK_IDLE_STACK_SIZE                DEFAULT_STACK_SIZE
 #define TASK_INIT_STACK_SIZE                DEFAULT_STACK_SIZE
 
-#define CANBUS_QUEUE_LENGTH 128
-
 /**
  * enum to keep track of which tasks correspond to each bit in WDog_BitMap
  */
@@ -107,11 +105,6 @@ extern CPU_STK CLI_Stk[TASK_CLI_STACK_SIZE];
 extern CPU_STK BLE_Stk[TASK_BLE_STACK_SIZE];
 extern CPU_STK Idle_Stk[TASK_IDLE_STACK_SIZE];
 extern CPU_STK Init_Stk[TASK_INIT_STACK_SIZE];
-
-/**	
- * Queue for pushing and popping CAN Messages	
- */	
-extern OS_Q CANBus_MsgQ;
 
 /**
  *  Semaphores, Mutexes, & Bitmaps that are used by multiple threads

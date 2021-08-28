@@ -8,6 +8,7 @@
 #include "stm32f4xx.h"
 #include "BSP_Lights.h"
 #include "BSP_PLL.h"
+#include "CAN_Queue.h"
 
 /******************************************************************************
  * CAN Task Test Plan
@@ -65,7 +66,7 @@ void Task_Spam(void *p_arg){
             CanData.w = voltage; //send data in millivolts
             CanPayload.data = CanData;
             CanMsg.payload = CanPayload;
-            OSQPost(&CANBus_MsgQ, &CanMsg, sizeof(CanMsg), OS_OPT_POST_FIFO, &err);
+            CAN_Queue_Post(CanMsg);
         }
 
         // Send message if car should be allowed to charge or not
@@ -75,7 +76,7 @@ void Task_Spam(void *p_arg){
         CanData.b = false;
         CanPayload.data = CanData;
         CanMsg.payload = CanPayload;
-        OSQPost(&CANBus_MsgQ, &CanMsg, sizeof(CanMsg), OS_OPT_POST_FIFO, &err);
+        CAN_Queue_Post(CanMsg);
 
         //Send fake temperature measurements to CAN queue
         CanMsg.id = TEMP_DATA;
@@ -87,7 +88,7 @@ void Task_Spam(void *p_arg){
                     CanData.w += 500; // generate fake temperatures
                     CanPayload.data = CanData;
                     CanMsg.payload = CanPayload;
-                    OSQPost(&CANBus_MsgQ, &CanMsg, sizeof(CanMsg), OS_OPT_POST_FIFO, &err);
+                    CAN_Queue_Post(CanMsg);
                 }
             }
         }
@@ -137,10 +138,7 @@ void Task1(void *p_arg){
             &err);					// return err code
         
         // Initialize CAN queue
-        OSQCreate(&CANBus_MsgQ,
-                "CANBus Message Queue",
-                CANBUS_QUEUE_LENGTH,
-                &err);
+        CAN_Queue_Init();
         assertOSError(err);
 	//delete task
 	OSTaskDel(NULL, &err); // Delete task

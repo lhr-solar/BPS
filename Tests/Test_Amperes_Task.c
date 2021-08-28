@@ -8,6 +8,7 @@
 #include "stm32f4xx.h"
 #include "BSP_Lights.h"
 #include "BSP_PLL.h"
+#include "CAN_Queue.h"
 
 /******************************************************************************
  * Amperes Task Test Plan
@@ -115,10 +116,7 @@ void Task1(void *p_arg){
             &err);					// return err code
         
     // Initialize CAN queue
-    OSQCreate(&CANBus_MsgQ,
-            "CANBus Message Queue",
-            CANBUS_QUEUE_LENGTH,
-            &err);
+    CAN_Queue_Init();
     assertOSError(err);
 
     // get contactor to close without temperature or voltage readings
