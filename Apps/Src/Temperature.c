@@ -8,6 +8,8 @@
 #include "os.h"
 #include "Tasks.h"
 
+// lookup table for converting ADC voltages to temperatures
+extern const int32_t voltToTemp[];
 
 // Holds the temperatures in Celsius (Fixed Point with .001 resolution) for each sensor on each board
 int32_t ModuleTemperatures[NUM_MINIONS][MAX_TEMP_SENSORS_PER_MINION_BOARD];
@@ -20,6 +22,7 @@ static uint8_t ChargingState;
 static cell_asic *Minions;
 
 static OS_MUTEX TemperatureBuffer_Mutex;
+
 
 /** Temperature_Init
  * Initializes device drivers including SPI inside LTC6811_init and LTC6811 for Temperature Monitoring
@@ -155,16 +158,8 @@ ErrorStatus Temperature_ChannelConfig(uint8_t tempChannel) {
  * @param mV from ADC
  * @return temperature in Celsius (Fixed Point with .001 resolution) 
  */
-int milliVoltToCelsius(float milliVolt){
-	// Typecasting to get rid of warnings
-	float sumInRt = (float)(-13.582)*(float)(-13.582) + (float)4.0 * (float)0.00433 * ((float)2230.8 - milliVolt);
-	float rt = sqrt(sumInRt);				
-	float numerator = (float)13.582 - rt;
-	float denom = (2.0 * - 0.00433);		
-	float frac = numerator/denom;			
-	float retVal = frac + 30;			
-	
-	return retVal * 1000;
+int milliVoltToCelsius(uint32_t milliVolt){
+	return voltToTemp[milliVolt];
 }
 
 /** Temperature_UpdateSingleChannel
@@ -200,7 +195,7 @@ ErrorStatus Temperature_UpdateSingleChannel(uint8_t channel){
 		
 		// update adc value from GPIO1 stored in a_codes[0]; 
 		// a_codes[0] is fixed point with .001 resolution in volts -> multiply by .001 * 1000 to get mV in double form
-		ModuleTemperatures[board][channel] = milliVoltToCelsius(Minions[board].aux.a_codes[0]*0.1);
+		ModuleTemperatures[board][channel] = milliVoltToCelsius(Minions[board].aux.a_codes[0] / 10);
 	}
 	//release mutex
   	OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);

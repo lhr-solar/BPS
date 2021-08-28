@@ -34,17 +34,14 @@ void Charge_Calculate(int32_t milliamps){
 	
 	uint32_t counter = BSP_Timer_GetTicksElapsed();
 	
-	float timeElapsed = (0xFFFF - counter) / 60;
-	timeElapsed /= BSP_Timer_GetRunFreq();  // Time in seconds
-    timeElapsed /= 60;  			        // time in minutes
-    timeElapsed /= 60;                      // time in hours
-	
-	float fAmps = ((float) milliamps) * 0.001;
-	
-	float accumulatedAmpHrs = timeElapsed * fAmps;
-	
+	uint32_t ticksElapsed = 0xFFFF - counter;	// I hate this, but fixing BSP_Timer_GetTicksElapsed() is beyond the scope of this PR. Opened issue #389 for this
+
+	uint32_t clockFrequency = BSP_Timer_GetRunFreq();
+
 	/* Update Charge, units of 0.01% */
-	charge += (uint32_t) (CHARGE_RESOLUTION_SCALE * (100 * (accumulatedAmpHrs / MAX_CHARGE_AMP_HRS)));
+	// TODO: I am preserving the existing math to make this PR easier to follow. Fixing it is a problem for issue #390
+	charge += (uint32_t) (CHARGE_RESOLUTION_SCALE * 100 * ticksElapsed * milliamps 
+							/ clockFrequency / 1000 / 60 / 60 / 60 / MAX_CHARGE_AMP_HRS);
 }
 
 /** Charge_Calibrate

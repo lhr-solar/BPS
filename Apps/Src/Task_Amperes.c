@@ -1,5 +1,6 @@
 /* Copyright (c) 2020 UT Longhorn Racing Solar */
 
+#include <string.h>
 #include "Amps.h"
 #include "AS8510.h"
 #include "os.h"
@@ -45,7 +46,7 @@ void Task_AmperesMonitor(void *p_arg) {
 
 		//Send measurement to CAN queue
 		int current = Amps_GetReading();
-		CanData.f = (float)current/1000; //send data in Amps
+		CanData.w = (uint32_t) current;
 		CanPayload.data = CanData;
 		CanMsg.id = CURRENT_DATA;
 		CanMsg.payload = CanPayload;

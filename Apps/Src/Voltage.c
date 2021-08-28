@@ -111,9 +111,9 @@ SafetyStatus Voltage_CheckStatus(void){
 		    return OVERVOLTAGE;
 		}
 		if (Amps_IsCharging()){
-			if(voltage < MIN_VOLTAGE_CHARGING_LIMIT * MILLI_SCALING_FACTOR) return UNDERVOLTAGE;
+			if(voltage < MIN_VOLTAGE_CHARGING_LIMIT) return UNDERVOLTAGE;
 		}
-		else if(voltage < MIN_VOLTAGE_LIMIT * MILLI_SCALING_FACTOR) {
+		else if(voltage < MIN_VOLTAGE_LIMIT) {
 		    return UNDERVOLTAGE;
 		}
 	}
@@ -149,7 +149,7 @@ void Voltage_GetModulesInDanger(VoltageSafety_t* system){
 			if(Voltage_GetModuleMillivoltage(i) > MAX_VOLTAGE_LIMIT * MILLI_SCALING_FACTOR) {
 				system->module_checks[i] = OVERVOLTAGE;
 			}
-			else if(Voltage_GetModuleMillivoltage(i) < MIN_VOLTAGE_LIMIT * MILLI_SCALING_FACTOR){
+			else if(Voltage_GetModuleMillivoltage(i) < MIN_VOLTAGE_LIMIT){
 				system->module_checks[i] = UNDERVOLTAGE;
 			}
 		}
