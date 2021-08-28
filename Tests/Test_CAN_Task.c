@@ -79,12 +79,12 @@ void Task_Spam(void *p_arg){
 
         //Send fake temperature measurements to CAN queue
         CanMsg.id = TEMP_DATA;
-        CanData.f = 40.0;
+        CanData.w = 40000;
         for (uint8_t i = 0; i < NUM_MINIONS; i++){ //send all temperature readings
             for (uint8_t j = 0; j < MAX_TEMP_SENSORS_PER_MINION_BOARD; j++){
                 if (i * MAX_TEMP_SENSORS_PER_MINION_BOARD + j < NUM_TEMPERATURE_SENSORS){
                     CanPayload.idx = i * MAX_TEMP_SENSORS_PER_MINION_BOARD + j;
-                    CanData.f += 0.5; // generate fake temperatures
+                    CanData.w += 500; // generate fake temperatures
                     CanPayload.data = CanData;
                     CanMsg.payload = CanPayload;
                     OSQPost(&CANBus_MsgQ, &CanMsg, sizeof(CanMsg), OS_OPT_POST_FIFO, &err);
