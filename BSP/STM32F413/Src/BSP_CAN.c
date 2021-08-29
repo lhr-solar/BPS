@@ -3,7 +3,6 @@
 #include "BSP_CAN.h"
 #include "stm32f4xx.h"
 #include "os.h"
-#include "BSP_Lights.h"
 
 // The message information that we care to receive
 typedef struct _msg {

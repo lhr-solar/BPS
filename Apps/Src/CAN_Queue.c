@@ -15,48 +15,49 @@
 #include "fifo.h"
 
 static CAN_fifo_t canFifo;
-static OS_SEM canFifoSem;
-static OS_MUTEX canFifoMutex;
+static OS_SEM canFifo_Sem4;
+static OS_MUTEX canFifo_Mutex;
 
 void CAN_Queue_Init(void) {
     OS_ERR err;
     CPU_TS ticks;
-    OSMutexCreate(&canFifoMutex, "CAN queue mutex", &err);
+    OSMutexCreate(&canFifo_Mutex, "CAN queue mutex", &err);
     assertOSError(err);
-    OSSemCreate(&canFifoSem,
+    OSSemCreate(&canFifo_Sem4,
                 "CAN queue semaphore",
                 0,
                 &err);
     assertOSError(err);
-    OSMutexPend(&canFifoMutex, 0, OS_OPT_POST_NONE, &ticks, &err);
+    OSMutexPend(&canFifo_Mutex, 0, OS_OPT_POST_NONE, &ticks, &err);
     assertOSError(err);
     CAN_fifo_renew(&canFifo);
-    OSMutexPost(&canFifoMutex, OS_OPT_POST_NONE, &err);
+    OSMutexPost(&canFifo_Mutex, OS_OPT_POST_NONE, &err);
     assertOSError(err);
 }
 
-void CAN_Queue_Post(CANMSG_t message) {
+ErrorStatus CAN_Queue_Post(CANMSG_t message) {
     OS_ERR err;
     CPU_TS ticks;
-    OSMutexPend(&canFifoMutex, 0, OS_OPT_POST_NONE, &ticks, &err);
+    OSMutexPend(&canFifo_Mutex, 0, OS_OPT_POST_NONE, &ticks, &err);
     assertOSError(err);
-    CAN_fifo_put(&canFifo, message);
-    OSMutexPost(&canFifoMutex, OS_OPT_POST_NONE, &err);
+    bool success = CAN_fifo_put(&canFifo, message);
+    OSMutexPost(&canFifo_Mutex, OS_OPT_POST_NONE, &err);
     assertOSError(err);
-    OSSemPost(&canFifoSem, OS_OPT_POST_1, &err);
+    OSSemPost(&canFifo_Sem4, OS_OPT_POST_1, &err);
     assertOSError(err);
+    return success ? SUCCESS : ERROR;
 }
 
 ErrorStatus CAN_Queue_Pend(CANMSG_t *message) {
     OS_ERR err;
 	CPU_TS ticks;
     
-    OSSemPend(&canFifoSem, 0, OS_OPT_PEND_BLOCKING, &ticks, &err);
+    OSSemPend(&canFifo_Sem4, 0, OS_OPT_PEND_BLOCKING, &ticks, &err);
     assertOSError(err);
-    OSMutexPend(&canFifoMutex, 0, OS_OPT_POST_NONE, &ticks, &err);
+    OSMutexPend(&canFifo_Mutex, 0, OS_OPT_POST_NONE, &ticks, &err);
     assertOSError(err);
     bool result = CAN_fifo_get(&canFifo, message);
-    OSMutexPost(&canFifoMutex, OS_OPT_POST_NONE, &err);
+    OSMutexPost(&canFifo_Mutex, OS_OPT_POST_NONE, &err);
     assertOSError(err);
     return result ? SUCCESS : ERROR;
 }

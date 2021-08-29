@@ -10,7 +10,7 @@
 
 void CAN_Queue_Init(void);
 
-void CAN_Queue_Post(CANMSG_t message);
+ErrorStatus CAN_Queue_Post(CANMSG_t message);
 
 ErrorStatus CAN_Queue_Pend(CANMSG_t *message);
 
