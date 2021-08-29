@@ -104,7 +104,7 @@ void Task1(void *p_arg){
     OSTaskCreate(&CANBusConsumer_TCB,				// TCB
             "TASK_CANBUS_CONSUMER_PRIO",	// Task Name (String)
             Task_CANBusConsumer,				// Task function pointer
-            (void *)0,				// Task function args
+            (void *)true,				// Use loopback mode
             TASK_CANBUS_CONSUMER_PRIO,			// Priority
             CANBusConsumer_Stk,				// Stack
             WATERMARK_STACK_LIMIT,	// Watermark limit for debugging
