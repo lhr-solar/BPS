@@ -17,7 +17,6 @@ typedef enum {
     SOC_DATA = 0x106,
     WDOG_TRIGGERED = 0x107,
     CAN_ERROR = 0x108,
-    MOTOR_DISABLE = 0x10A,
     CHARGE_ENABLE = 0x10C
 } CANId_t;
 
@@ -46,10 +45,10 @@ typedef struct {
 
 /**
  * @brief   Initializes the CAN system
- * @param   None
+ * @param   loopback	: if we should use loopback mode (for testing)	
  * @return  None
  */
-void CANbus_Init(void);
+void CANbus_Init(bool loopback);
 
 /**
  * @brief   Transmits data onto the CANbus. This is non-blocking and will fail with an error if

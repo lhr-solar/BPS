@@ -7,6 +7,7 @@
 #include "BSP_Fans.h"
 #include "CANbus.h"
 #include "Amps.h"
+#include "CAN_Queue.h"
 
 //declared in Tasks.c
 extern cell_asic Minions[NUM_MINIONS];
@@ -60,7 +61,7 @@ void Task_VoltTempMonitor(void *p_arg) {
             CanData.w = voltage;
             CanPayload.data = CanData;
             CanMsg.payload = CanPayload;
-            OSQPost(&CANBus_MsgQ, &CanMsg, sizeof(CanMsg), OS_OPT_POST_FIFO, &err);
+            CAN_Queue_Post(CanMsg);
         }
 
         // BLOCKING =====================
@@ -114,7 +115,7 @@ void Task_VoltTempMonitor(void *p_arg) {
                 CanData.b = 0;
                 CanPayload.data = CanData;
                 CanMsg.payload = CanPayload;
-                OSQPost(&CANBus_MsgQ, &CanMsg, sizeof(CanMsg), OS_OPT_POST_FIFO, &err);
+                CAN_Queue_Post(CanMsg);
             }
         }
         //Send measurements to CAN queue
@@ -126,7 +127,7 @@ void Task_VoltTempMonitor(void *p_arg) {
                     CanData.w = (uint32_t)Temperature_GetSingleTempSensor(i, j);
                     CanPayload.data = CanData;
                     CanMsg.payload = CanPayload;
-                    OSQPost(&CANBus_MsgQ, &CanMsg, sizeof(CanMsg), OS_OPT_POST_FIFO, &err);
+                    CAN_Queue_Post(CanMsg);
                 }
             }
         }

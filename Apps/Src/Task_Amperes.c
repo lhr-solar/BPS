@@ -5,6 +5,7 @@
 #include "AS8510.h"
 #include "os.h"
 #include "Tasks.h"
+#include "CAN_Queue.h"
 #include "BSP_SPI.h"
 #include "CANbus.h"
 
@@ -50,7 +51,7 @@ void Task_AmperesMonitor(void *p_arg) {
 		CanPayload.data = CanData;
 		CanMsg.id = CURRENT_DATA;
 		CanMsg.payload = CanPayload;
-		OSQPost(&CANBus_MsgQ, &CanMsg, 4, OS_OPT_POST_FIFO, &err); //Send data to Can
+        CAN_Queue_Post(CanMsg);         // send data to CAN
 
         //signal watchdog
         OSMutexPend(&WDog_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);

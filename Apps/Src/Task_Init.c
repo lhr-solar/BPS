@@ -2,6 +2,7 @@
 #include "os.h"
 #include "config.h"
 #include "Tasks.h"
+#include "CAN_Queue.h"
 
 #ifndef SIMULATION
 #include "stm32f4xx.h"
@@ -133,7 +134,7 @@ void Task_Init(void *p_arg) {
         OSTaskCreate(&CANBusConsumer_TCB,				// TCB
 				"TASK_CANBUS_CONSUMER_PRIO",	// Task Name (String)
 				Task_CANBusConsumer,				// Task function pointer
-				(void *)0,				// Task function args
+				(void *)false,				// don't use loopback mode
 				TASK_CANBUS_CONSUMER_PRIO,			// Priority
 				CANBusConsumer_Stk,				// Stack
 				WATERMARK_STACK_LIMIT,	// Watermark limit for debugging
@@ -172,10 +173,7 @@ void Task_Init(void *p_arg) {
 				OS_OPT_TASK_STK_CHK | OS_OPT_TASK_SAVE_FP,	// Options
 				&err);					// return err code}
         
-        OSQCreate(&CANBus_MsgQ,
-                "CANBus Message Queue",
-                CANBUS_QUEUE_LENGTH,
-                &err);
+		CAN_Queue_Init();
         assertOSError(err);
 	//delete task
 	OSTaskDel(NULL, &err); // Delete task

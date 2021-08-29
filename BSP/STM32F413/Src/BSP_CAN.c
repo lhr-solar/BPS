@@ -28,11 +28,12 @@ static void (*gTxEnd)(void);
 
 /**
  * @brief   Initializes the CAN module that communicates with the rest of the electrical system.
- * @param   rxEvent : the function to execute when recieving a message. NULL for no action.
- * @param   txEnd   : the function to execute after transmitting a message. NULL for no action.
+ * @param   rxEvent     : the function to execute when recieving a message. NULL for no action.
+ * @param   txEnd       : the function to execute after transmitting a message. NULL for no action.
+ * @param   loopback    : if we should use loopback mode (for testing)
  * @return  None
  */
-void BSP_CAN_Init(void (*rxEvent)(void), void (*txEnd)(void)) {
+void BSP_CAN_Init(void (*rxEvent)(void), void (*txEnd)(void), bool loopback) {
     GPIO_InitTypeDef GPIO_InitStructure;
     CAN_InitTypeDef CAN_InitStructure;
     NVIC_InitTypeDef NVIC_InitStructure;
@@ -76,7 +77,7 @@ void BSP_CAN_Init(void (*rxEvent)(void), void (*txEnd)(void)) {
     CAN_InitStructure.CAN_NART = DISABLE;
     CAN_InitStructure.CAN_RFLM = DISABLE;
     CAN_InitStructure.CAN_TXFP = DISABLE;
-    CAN_InitStructure.CAN_Mode = CAN_Mode_Normal;
+    CAN_InitStructure.CAN_Mode = (loopback ? CAN_Mode_LoopBack: CAN_Mode_Normal);
     CAN_InitStructure.CAN_SJW  = CAN_SJW_1tq;
 
     /* CAN Baudrate = 125 KBps
@@ -118,15 +119,18 @@ void BSP_CAN_Init(void (*rxEvent)(void), void (*txEnd)(void)) {
 
     // Enable Rx interrupts
     NVIC_InitStructure.NVIC_IRQChannel = CAN1_RX0_IRQn;
-    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x0;
-    NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x0;
+    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x1;
+    NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x1;
     NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
     NVIC_Init(&NVIC_InitStructure);	
 
     if(NULL != txEnd) {
+        // set up CAN Tx interrupts
+        CAN_ITConfig(CAN1, CAN_IT_TME, ENABLE);
+
         // Enable Tx Interrupts
         NVIC_InitStructure.NVIC_IRQChannel = CAN1_TX_IRQn;
-        NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x0; // TODO: assess both of these priority settings
+        NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x1; // TODO: assess both of these priority settings
         NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x0;
         NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
         NVIC_Init(&NVIC_InitStructure);
@@ -180,6 +184,8 @@ ErrorStatus BSP_CAN_Read(uint32_t *id, uint8_t *data) {
     return SUCCESS;
 }
 
+// This probably doesn't work because it's missing the equivalent fixes to the Tx Handler,
+// but it isn't part of the BPS requirements, so I'm not going to mess with it until I need it 
 void CAN1_RX0_IRQHandler(void) {
     #ifdef RTOS
     CPU_SR_ALLOC();

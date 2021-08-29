@@ -6,6 +6,7 @@
 #include "Tasks.h"
 #include "BSP_UART.h"
 #include "Voltage.h"
+#include "CAN_Queue.h"
 
 
 void Task_CriticalState(void *p_arg) {
@@ -28,10 +29,10 @@ void Task_CriticalState(void *p_arg) {
     // Push All Clear message to CAN Q
     CANMSG.id = ALL_CLEAR;
     CANMSG.payload = CanPayload;
-    OSQPost(&CANBus_MsgQ, &CANMSG, 1, OS_OPT_POST_FIFO, &err);
+    CAN_Queue_Post(CANMSG);
     // Push Contactor State message to CAN Q
     CANMSG.id = CONTACTOR_STATE;
-    OSQPost(&CANBus_MsgQ, &CANMSG, 1, OS_OPT_POST_FIFO, &err);
+    CAN_Queue_Post(CANMSG);
     OSTaskDel(NULL, &err); // Delete task
     
 }

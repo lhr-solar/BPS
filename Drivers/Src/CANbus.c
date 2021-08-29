@@ -1,6 +1,7 @@
 #include "CANbus.h"
 #include "BSP_CAN.h"
 #include "os.h"
+#include "Tasks.h"
 
 /* Locking mechanism for the CAN bus.
  * 
@@ -28,6 +29,7 @@ static void CANbus_Release(void) {
 	OSSemPost(&CANbus_MailSem4,
 			  OS_OPT_POST_1,
 			  &err);
+	assertOSError(err);
 }
 
 /**
@@ -40,36 +42,41 @@ static void CANbus_CountIncoming(void) {
 	OSSemPost(&CANbus_ReceiveSem4,
 			  OS_OPT_POST_1,
 			  &err);
+	assertOSError(err);
 }
 
 /**
  * @brief   Initializes the CAN system
- * @param   None
+ * @param   loopback	: if we should use loopback mode (for testing)	
  * @return  None
  */
-void CANbus_Init(void) {
+void CANbus_Init(bool loopback) {
 	OS_ERR err;
 
 	OSMutexCreate(&CANbus_TxMutex,
 				  "CAN TX Lock",
 				  &err);
+	assertOSError(err);
 
 	OSMutexCreate(&CANbus_RxMutex,
 				  "CAN RX Lock",
 				  &err);
+	assertOSError(err);
 
 	OSSemCreate(&CANbus_MailSem4,
                 "CAN Mailbox Semaphore",
                 3,	// Number of mailboxes
                 &err);
+	assertOSError(err);
 
 	OSSemCreate(&CANbus_ReceiveSem4,
                 "CAN Queue Counter Semaphore",
                 0,
                 &err);
+	assertOSError(err);
 
 	// Initialize and pass interrupt hooks
-    BSP_CAN_Init(CANbus_CountIncoming, CANbus_Release);
+    BSP_CAN_Init(CANbus_CountIncoming, CANbus_Release, loopback);
 }
 
 // Static method, call CANbus_Send or CANbus_BlockAndSend instead
@@ -89,6 +96,7 @@ static ErrorStatus CANbus_SendMsg(CANId_t id, CANPayload_t payload) {
 		case CONTACTOR_STATE:
 		case WDOG_TRIGGERED:
 		case CAN_ERROR:
+		case CHARGE_ENABLE:
 			data_length = 1;
 			memcpy(txdata, &payload.data.b, sizeof(payload.data.b));
 			break;
@@ -122,6 +130,7 @@ static ErrorStatus CANbus_SendMsg(CANId_t id, CANPayload_t payload) {
 				OS_OPT_PEND_BLOCKING,
 				&ts,
 				&err);
+	assertOSError(err);
 
 	// Write the data to the bus
 	ErrorStatus retVal = BSP_CAN_Write(id, txdata, data_length);
@@ -129,6 +138,7 @@ static ErrorStatus CANbus_SendMsg(CANId_t id, CANPayload_t payload) {
 	OSMutexPost(&CANbus_TxMutex,
 				OS_OPT_POST_1,
 				&err);
+	assertOSError(err);
 
 	return retVal;
 }
@@ -150,13 +160,18 @@ ErrorStatus CANbus_BlockAndSend(CANId_t id, CANPayload_t payload) {
 			  OS_OPT_PEND_BLOCKING,
 			  &ts,
 			  &err);
+	assertOSError(err);
 
 	// Check the error code
 	if(err != OS_ERR_NONE) {
 		return ERROR;
 	}
 
-	return CANbus_SendMsg(id, payload);
+	ErrorStatus result = CANbus_SendMsg(id, payload);
+	if (result == ERROR) {
+		CANbus_Release();
+	}
+	return result;
 }
 
 /**
@@ -178,6 +193,7 @@ ErrorStatus CANbus_Send(CANId_t id, CANPayload_t payload) {
 			  OS_OPT_PEND_NON_BLOCKING,
 			  &ts,
 			  &err);
+	assertOSError(err);
 
 	// Check to see if the semaphore was acquired successfully
 	if(err != OS_ERR_NONE) {
@@ -185,7 +201,11 @@ ErrorStatus CANbus_Send(CANId_t id, CANPayload_t payload) {
 	}
 
 	// Send the message
-	return CANbus_SendMsg(id, payload);
+	ErrorStatus result = CANbus_SendMsg(id, payload);
+	if (result == ERROR) {
+		CANbus_Release();
+	}
+	return result;
 }
 
 static ErrorStatus CANbus_GetMsg(CANId_t *id, uint8_t *buffer) {
@@ -198,6 +218,7 @@ static ErrorStatus CANbus_GetMsg(CANId_t *id, uint8_t *buffer) {
 				OS_OPT_PEND_BLOCKING,
 				&ts,
 				&err);
+	assertOSError(err);
 
 	// Write the data to the bus
 	uint32_t id_int;
@@ -208,6 +229,7 @@ static ErrorStatus CANbus_GetMsg(CANId_t *id, uint8_t *buffer) {
 	OSMutexPost(&CANbus_RxMutex,
 				OS_OPT_POST_1,
 				&err);
+	assertOSError(err);
 
 	return retVal;
 }
@@ -228,6 +250,7 @@ ErrorStatus CANbus_Receive(CANId_t *id, uint8_t *buffer) {
 			  OS_OPT_PEND_NON_BLOCKING,
 			  &ts,
 			  &err);
+	assertOSError(err);
 
 	// Check to see if the semaphore was acquired successfully
 	if(err != OS_ERR_NONE) {
@@ -254,6 +277,7 @@ ErrorStatus CANbus_WaitToReceive(CANId_t *id, uint8_t *buffer) {
 			  OS_OPT_PEND_BLOCKING,
 			  &ts,
 			  &err);
+	assertOSError(err);
 
 	// Check the error code
 	if(err != OS_ERR_NONE) {
