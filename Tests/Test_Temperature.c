@@ -7,11 +7,42 @@
 #include "BSP_UART.h"
 #include <unistd.h>
 
+/******************************************************************************
+ * Temperature App Test Plan
+ * 
+ * 1. The datasheet has a list of mappings from temperatures to millivoltages.
+ * I have listed a few of them below. Apply the following voltages to the 
+ * temperatures sensor probes, and verify the the relationship holds.
+ * 
+ * Temperature (Degrees C)      Voltage (mV)
+ * 20	                        2365
+ * 25	                        2298
+ * 30	                        2231
+ * 35	                        2163
+ * 40	                        2095
+ * 45	                        2026
+ * 50	                        1958
+ * 55	                        1888
+ * 60	                        1819
+ * 65	                        1749
+ * 70	                        1679
+ * 75	                        1609
+ * 80	                        1539
+ * 85	                        1469
+ * 
+ * 2. Connect the temperature sensors and see if the measurements match the
+ * ambient temperature (verify with a themometer or by checking the thermostat).
+ * 
+ * 3. Put the temperature sensors in the oven? and see if they match the 
+ * temperature at 45 degrees C, 60 degrees C, and 75 degrees C
+ * 
+ *****************************************************************************/
+
 cell_asic minions[NUM_MINIONS];
 
 int main() {
 
-    BSP_UART_Init();    // Initialize printf
+    BSP_UART_Init(NULL, NULL, UART_USB);    // Initialize printf
 
     printf("Testing Temperature functions.\r\n");
 
