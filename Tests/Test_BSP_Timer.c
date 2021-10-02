@@ -13,13 +13,13 @@ int main(void){
     BSP_Timer_Init();
     BSP_Timer_Start();
     uint32_t freq = BSP_Timer_GetRunFreq();
-    printf("Timer frequency: %d\n\r", freq);
+    printf("Timer frequency: %ld\n\r", freq);
     
     while(1){
         test = BSP_Timer_GetTicksElapsed();
-        printf("Ticks elapsed : %d\n\r", test);
+        printf("Ticks elapsed : %ld\n\r", test);
         freq = BSP_Timer_GetRunFreq();
-        printf("Timer frequency: %d\n\r", freq);  
+        printf("Timer frequency: %ld\n\r", freq);  
         while(time){                        //this is a delay to prevent the elapsed time being negligible
             delay = 150000000;
             while(delay){

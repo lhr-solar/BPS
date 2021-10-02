@@ -32,10 +32,10 @@ void Charge_Init(void){
  */
 void Charge_Calculate(int32_t milliamps){ 
 	
-	uint32_t counter = BSP_Timer_GetTicksElapsed();
+	//uint32_t counter = BSP_Timer_GetTicksElapsed();
 	
-	uint32_t ticksElapsed = 0xFFFF - counter;	// I hate this, but fixing BSP_Timer_GetTicksElapsed() is beyond the scope of this PR. Opened issue #389 for this
-
+	//uint32_t ticksElapsed = 0xFFFF - counter;	// I hate this, but fixing BSP_Timer_GetTicksElapsed() is beyond the scope of this PR. Opened issue #389 for this
+	uint32_t ticksElapsed = BSP_Timer_GetTicksElapsed(); // BSP_Timer_GetTicks now counts up from 0, so return value is accurate
 	uint32_t clockFrequency = BSP_Timer_GetRunFreq();
 
 	/* Update Charge, units of 0.01% */

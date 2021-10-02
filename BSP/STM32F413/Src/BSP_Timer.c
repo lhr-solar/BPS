@@ -14,7 +14,7 @@ void BSP_Timer_Init(void) {
 	TIM_TimeBaseInitTypeDef Init_TIM2;
 	
 	Init_TIM2.TIM_Prescaler = 1;
-	Init_TIM2.TIM_CounterMode = TIM_CounterMode_Down;
+	Init_TIM2.TIM_CounterMode = TIM_CounterMode_Up;
 	Init_TIM2.TIM_Period = 0xFFFF-1;
 	Init_TIM2.TIM_ClockDivision = TIM_CKD_DIV1;
 	Init_TIM2.TIM_RepetitionCounter = 0;
