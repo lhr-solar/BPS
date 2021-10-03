@@ -5,7 +5,6 @@
 #include "Temperature.h"
 #include "LTC6811.h"
 #include "BSP_UART.h"
-#include <unistd.h>
 
 /******************************************************************************
  * Temperature App Test Plan
@@ -40,6 +39,10 @@
 
 cell_asic minions[NUM_MINIONS];
 
+static void sleep(int n) {
+    for (volatile int i = 0; i < n * 1000000; ++i);
+}
+
 int main() {
 
     BSP_UART_Init(NULL, NULL, UART_USB);    // Initialize printf
@@ -55,7 +58,7 @@ int main() {
         printf("\tTemperature:\r\n");
 
         for(int j = 0; j < MAX_TEMP_SENSORS_PER_MINION_BOARD; j++) {
-            printf("\t%d: %dmC\r\n", j, Temperature_GetSingleTempSensor(i, j));
+            printf("\t%d: %ldmC\r\n", j, Temperature_GetSingleTempSensor(i, j));
         }
     }
 
@@ -82,7 +85,7 @@ int main() {
         printf("\tTemperature:\r\n");
 
         for(int j = 0; j < MAX_TEMP_SENSORS_PER_MINION_BOARD; j++) {
-            printf("\t%d: %dmC\r\n", j, Temperature_GetSingleTempSensor(i, j));
+            printf("\t%d: %ldmC\r\n", j, Temperature_GetSingleTempSensor(i, j));
         }
     }
 }
