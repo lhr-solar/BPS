@@ -5,7 +5,7 @@
  */
 
 #include "Amps.h"
-#include "AS8510.h"
+#include "ADS7042.h"
 #include "os.h"
 #include "Tasks.h"
 #include "BSP_SPI.h"
@@ -62,7 +62,7 @@ void Amps_Init(void) {
 	assertOSError(err);
 	spi_os.pend = Amperes_Pend;
 	spi_os.post = Amperes_Post;
-	AS8510_Init(spi_os);
+	ADS7042_Init(spi_os);
 	OSMutexCreate(&AmperesData_Mutex, "Amperes Mutex", &err);
 	assertOSError(err);
 }
@@ -76,7 +76,7 @@ ErrorStatus Amps_UpdateMeasurements(void) {
 	CPU_TS ticks;
 	OSMutexPend(&AmperesData_Mutex, 0, OS_OPT_PEND_BLOCKING, &ticks, &err);
 	assertOSError(err);
-	latestMeasureMilliAmps = AS8510_GetCurrent();	// TODO: verify that there is no conversion required here
+	latestMeasureMilliAmps = ADS7042_GetCurrent();	// TODO: verify that there is no conversion required here
 	OSMutexPost(&AmperesData_Mutex, OS_OPT_POST_NONE, &err);
 	assertOSError(err);
 	return SUCCESS;		//TODO: Once this has been tested, stop returning errors
