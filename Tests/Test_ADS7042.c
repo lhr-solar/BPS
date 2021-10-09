@@ -11,7 +11,7 @@
 #include "Amps.h"
 
 /******************************************************************************
- * ADS7042 Driver Test Plan
+ * ADS7042 Driver and Amperes App Test Plan
  * 
  * 1. Set up BPS Leader, Amperes, and Shunt Resistor boards so that they are connected properly.
  * 2. Power on the system.
@@ -26,6 +26,12 @@
  * 10. Use a Lithium-Ion battery module from the pack with a current-limiting resistor to run a large current (>75 Amps)
  *     through the shunt resistor. Verify that the BPS UART output (fail the test if we are more than 200mA off)
  * 11. Repeat step 10 with a large negative current (<-20 Amps)
+ * 
+ * Expected Output:
+ * Current (milliAmps): <Positive or Negative value for step 6/7>
+ * Is charging: <"true" if Negative current, "false" if Positive current>
+ * Status: <"SAFE" if current is between (-20000, 75000)mA, "DANGER" if outside of range>
+ * 
  ******************************************************************************/
 
 OS_TCB Task1_TCB;
@@ -37,10 +43,17 @@ void Task1(void *p_arg){
     BSP_Lights_Init();
     BSP_UART_Init(NULL, NULL, UART_USB);
     Amps_Init(); // I could write this out, but it just initializes the semaphore and mutex and calls ADS7042_Init()
-   
+    
+    char *statuses[2] = {"SAFE", "DANGER", "OVERVOLTAGE", "UNDERVOLTAGE"};
+
     while(1) {
-        int32_t current = ADS7042_GetCurrent();
-        printf("current (milliAmps): %d\n\r", (int)current);
+        Amps_UpdateMeasurements();
+        printf("Current (milliAmps): %d\n\r", Amps_GetReading();
+
+        bool check = Amps_IsCharging();
+        printf("Is charging: %s\n\r", (check ? "true" : "false"));
+        printf("Status: %s\n\r", statuses[Amps_CheckStatus(check)]);
+
         BSP_Light_Toggle(EXTRA);
         for (volatile int i = 0; i < 1000000; i++);
     }
