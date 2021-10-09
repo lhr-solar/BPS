@@ -47,7 +47,7 @@ void Task1(void *p_arg){
         printf("\tVoltages:\r\n");
 
         for(int j = 0; j < 12; j++) {
-            printf("\t%d: %dmV\r\n", j, minions[i].cells.c_codes[j]/10);
+            printf("\t%d: %dmV\r\n", j, minions[i].cells.c_codes[j]/*/10*/);
         }
     }
 

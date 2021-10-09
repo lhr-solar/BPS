@@ -46,6 +46,7 @@ Copyright 2017 Linear Technology Corp. (LTC)
 #include "BSP_SPI.h"
 #include "BSP_PLL.h"
 #include "config.h"
+#include "BSP_UART.h"
 
 static uint8_t spi_read8(void){
   uint8_t data = 0;
@@ -222,7 +223,7 @@ uint16_t pec15_calc(int32_t len, //Number of bytes that will be used to calculat
   for (uint8_t i = 0; i<len; i++) // loops for each byte in data array
   {
     addr = ((remainder>>7)^data[i])&0xff;//calculate PEC table address
-
+    //printf("ADDR: %d\r\n", addr);
     remainder = (remainder<<8)^crc15Table[addr];
   }
   return(remainder*2);//The CRC15 has a 0 in the LSB so the remainder must be multiplied by 2
