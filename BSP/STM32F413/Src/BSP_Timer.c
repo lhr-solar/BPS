@@ -3,6 +3,8 @@
 #include "BSP_Timer.h"
 #include "stm32f4xx.h"
 
+static const PRESCALER = 2000;
+
 /**
  * @brief   Initialize the timer for time measurements.
  * @param   None
@@ -13,7 +15,7 @@ void BSP_Timer_Init(void) {
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE);
 	TIM_TimeBaseInitTypeDef Init_TIM2;
 	
-	Init_TIM2.TIM_Prescaler = 1;
+	Init_TIM2.TIM_Prescaler = PRESCALER;
 	Init_TIM2.TIM_CounterMode = TIM_CounterMode_Up;
 	Init_TIM2.TIM_Period = 0xFFFF-1;
 	Init_TIM2.TIM_ClockDivision = TIM_CKD_DIV1;
@@ -54,4 +56,9 @@ uint32_t BSP_Timer_GetRunFreq(void) {
 	RCC_GetClocksFreq(&RCC_Clocks);
 
     return RCC_Clocks.SYSCLK_Frequency;
+}
+
+// TODO: add function description
+uint32_t BSP_Timer_GetMicrosElapsed(void) {
+	// TODO: implement this
 }

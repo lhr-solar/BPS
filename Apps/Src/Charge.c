@@ -7,9 +7,8 @@
 #include "BSP_Timer.h"
 
 #define CHARGE_RESOLUTION_SCALE 100     // What we need to multiply 100% by before storing
-#define MAX_CHARGE_AMP_HRS 1000*1000    // In amp-hours (Ah), for now it is a dummy value
-
-static uint32_t charge;  // % of charge left with 0.01% resolution
+#define MAX_CHARGE_MILLI_AMP_HRS 41300    // In miliamp-hours (mAh), calculated from 12950(mah)*14 bats in parallel
+static int32_t charge;  // % of charge left with 0.01% resolution
 
 /** Charge_Init
  * Initializes necessary timer and values to begin state of charge
@@ -40,8 +39,8 @@ void Charge_Calculate(int32_t milliamps){
 
 	/* Update Charge, units of 0.01% */
 	// TODO: I am preserving the existing math to make this PR easier to follow. Fixing it is a problem for issue #390
-	charge += (uint32_t) (CHARGE_RESOLUTION_SCALE * 100 * ticksElapsed * milliamps 
-							/ clockFrequency / 1000 / 60 / 60 / 60 / MAX_CHARGE_AMP_HRS);
+	charge -= (int32_t) (CHARGE_RESOLUTION_SCALE * 100 * ticksElapsed * milliamps
+							/ clockFrequency / 60 / 60 / MAX_CHARGE_MILLI_AMP_HRS);
 }
 
 /** Charge_Calibrate

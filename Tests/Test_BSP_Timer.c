@@ -3,17 +3,18 @@
 #include "common.h"
 #include "config.h"
 #include "BSP_Timer.h"
-
+#include "BSP_UART.h"
 
 int main(void){
     uint32_t test;
-    uint32_t delay = 150000000;
-    uint32_t time = 40;        
+    uint32_t delay = 10000000;
+    uint32_t time = 1;        
     
     BSP_Timer_Init();
+    BSP_UART_Init(NULL, NULL, UART_USB);
     BSP_Timer_Start();
     uint32_t freq = BSP_Timer_GetRunFreq();
-    printf("Timer frequency: %ld\n\r", freq);
+    printf("New version \n\r");
     
     while(1){
         test = BSP_Timer_GetTicksElapsed();
@@ -21,13 +22,14 @@ int main(void){
         freq = BSP_Timer_GetRunFreq();
         printf("Timer frequency: %ld\n\r", freq);  
         while(time){                        //this is a delay to prevent the elapsed time being negligible
-            delay = 150000000;
+            delay = 10000000;
             while(delay){
                 delay--;
             }
             time--;
+            printf("Decrement \n\r");
         }
-        time = 40;
+        time = 1;
     }
    
 }
