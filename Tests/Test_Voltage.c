@@ -12,7 +12,7 @@
 /******************************************************************************
  * Voltage App Test Plan
  * 
- * 1. Set up the BPS test board such that the voltages for each simulated module are between 0 and 6 Volts
+ * 1. Set up the BPS test board such that the voltages for each simulated module are between 0 and 11 Volts
  * 2. Connect the BPS's voltage probes to the BPS test board
  * 3. Modify NUM_MINIONS and NUM_BATTERY_MODULES in Config/Inc/config.h to match your testing setup (probably 1 and 8)
  * 4. Build the BPS code for the stm32f413 for this test file (see README.md)

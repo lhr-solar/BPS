@@ -229,7 +229,6 @@ SafetyStatus Temperature_CheckStatus(uint8_t isCharging){
 	OS_ERR err;
 	CPU_TS ts;
 	int32_t temperatureLimit = isCharging == 1 ? MAX_CHARGE_TEMPERATURE_LIMIT : MAX_DISCHARGE_TEMPERATURE_LIMIT;
-	temperatureLimit *= MILLI_SCALING_FACTOR;
 
 	OSMutexPend(&TemperatureBuffer_Mutex,
 				0,
