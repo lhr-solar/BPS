@@ -11,7 +11,7 @@
 #include "CAN_Queue.h"
 
 /******************************************************************************
- * Amperes Task Test Plan
+ * VoltTempMonitor Task Test Plan
  * 
  * 1. Build the BPS code for the stm32f413 for this test file (see README.md)
  * 2. Set up the BPS leader, Minion boards, and Contactor.
