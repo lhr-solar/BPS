@@ -85,6 +85,9 @@ void Voltage_UpdateMeasurements(void){
 	//copies values from cells.c_codes to private array
 	OSMutexPend(&Voltage_Mutex, 0, OS_OPT_PEND_BLOCKING, &ts, &err);
   	assertOSError(err);
+	for(int i = 0; i < NUM_BATTERY_MODULES; i++){
+		VoltageVal[i] = Minions[i / MAX_VOLT_SENSORS_PER_MINION_BOARD].cells.c_codes[i % MAX_VOLT_SENSORS_PER_MINION_BOARD];
+	}
 	//release mutex
   	OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
   	assertOSError(err);
