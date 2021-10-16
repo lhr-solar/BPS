@@ -20,7 +20,7 @@ typedef enum SafetyStatus_e {SAFE = 0, DANGER = 1, OVERVOLTAGE = 2, UNDERVOLTAGE
 
 //--------------------------------------------------------------------------------
 // Basic Parameters of BPS layout
-#define NUM_MINIONS	2//4					 // Number of minion boards
+#define NUM_MINIONS 4					 // Number of minion boards
 
 //--------------------------------------------------------------------------------
 // Battery Fault Checks
@@ -28,7 +28,7 @@ typedef enum SafetyStatus_e {SAFE = 0, DANGER = 1, OVERVOLTAGE = 2, UNDERVOLTAGE
 
 //--------------------------------------------------------------------------------
 // Battery Pack layout
-#define NUM_BATTERY_MODULES				16//31		// Number of battery modules
+#define NUM_BATTERY_MODULES				31		// Number of battery modules
 #define NUM_TEMPERATURE_SENSORS			62		// Number of temperature sensors
 #define NUM_TEMP_SENSORS_PER_MOD		2		// Number of temperature sensors per battery module
 
@@ -48,8 +48,7 @@ typedef enum SafetyStatus_e {SAFE = 0, DANGER = 1, OVERVOLTAGE = 2, UNDERVOLTAGE
 #define BALANCING_TOLERANCE_STOP        20      //mV differential from lowest module that will stop battery balancing
 //--------------------------------------------------------------------------------
 // Helpers
-#define MILLI_SCALING_FACTOR			1000
-#define STARTUP_WAIT_TIME					100000 // Number of iterations to wait for battery charging instructions on startup
+#define STARTUP_WAIT_TIME				100000 // Number of iterations to wait for battery charging instructions on startup
 
 //--------------------------------------------------------------------------------
 // Voltage Sensor Configurations
