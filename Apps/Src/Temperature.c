@@ -189,7 +189,7 @@ ErrorStatus Temperature_UpdateSingleChannel(uint8_t channel){
 	Temperature_SampleADC(MD_422HZ_1KHZ);
 	
 	//take control of mutex
-  OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
+  	OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
 	assertOSError(err);
 
 	OSMutexPend(&TemperatureBuffer_Mutex,
@@ -322,6 +322,7 @@ uint8_t *Temperature_GetModulesInDanger(void){
  * @return temperature of the battery module at specified index
  */
 int32_t Temperature_GetSingleTempSensor(uint8_t board, uint8_t sensorIdx) {
+	//TODO: Add pend/post here
 	return ModuleTemperatures[board][sensorIdx];
 }
 
