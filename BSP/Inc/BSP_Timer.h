@@ -38,6 +38,6 @@ uint32_t BSP_Timer_GetRunFreq(void);
  * @param   None
  * @return  Microseconds
  */
-uint32_t BSP_Timer_GetMicrosElapsed();
+uint32_t BSP_Timer_GetMicrosElapsed(void);
 
 #endif
