@@ -33,4 +33,11 @@ uint32_t BSP_Timer_GetTicksElapsed(void);
  */
 uint32_t BSP_Timer_GetRunFreq(void);
 
+/**
+ * @brief   Calculates the microseconds passed since last calling BSP_TimerGetTicksElapsed()
+ * @param   None
+ * @return  Microseconds
+ */
+uint32_t BSP_Timer_GetMicrosElapsed();
+
 #endif

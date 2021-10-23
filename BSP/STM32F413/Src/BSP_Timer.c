@@ -3,8 +3,8 @@
 #include "BSP_Timer.h"
 #include "stm32f4xx.h"
 
-static const PRESCALER = 2000;
-static const MICROSEC_CON = 1000000;
+static const int PRESCALER = 2000;
+static const int MICROSEC_CON = 1000000;
 
 /**
  * @brief   Initialize the timer for time measurements.
