@@ -38,24 +38,26 @@ OS_TCB Task1_TCB;
 CPU_STK Task1_Stk[256];
 
 void Task1(void *p_arg){
+    OS_ERR err;
     OS_CPU_SysTickInit(SystemCoreClock / (CPU_INT32U) OSCfg_TickRate_Hz);
     
     BSP_Lights_Init();
     BSP_UART_Init(NULL, NULL, UART_USB);
     Amps_Init(); // I could write this out, but it just initializes the semaphore and mutex and calls ADS7042_Init()
     
-    char *statuses[2] = {"SAFE", "DANGER", "OVERVOLTAGE", "UNDERVOLTAGE"};
+    char *statuses[4] = {"SAFE", "DANGER", "OVERVOLTAGE", "UNDERVOLTAGE"};
 
     while(1) {
         Amps_UpdateMeasurements();
-        printf("Current (milliAmps): %d\n\r", Amps_GetReading();
+        printf("Current (milliAmps): %ld\n\r", Amps_GetReading());
 
         bool check = Amps_IsCharging();
         printf("Is charging: %s\n\r", (check ? "true" : "false"));
         printf("Status: %s\n\r", statuses[Amps_CheckStatus(check)]);
 
         BSP_Light_Toggle(EXTRA);
-        for (volatile int i = 0; i < 1000000; i++);
+        
+        OSTimeDly(300, OS_OPT_TIME_DLY, &err);
     }
 
     exit(0);
