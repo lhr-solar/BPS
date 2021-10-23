@@ -60,7 +60,7 @@ uint32_t BSP_Timer_GetRunFreq(void) {
 }
 
 /**
- * @brief   Gives a standard unit for time elapsed in microseconds since calling BSP_Timer_GetRunFreq()
+ * @brief   Gives a standard unit for time elapsed in microseconds since calling BSP_Timer_GetTicksElapsed()
  * @param   None
  * @return  Microseconds 
  */
