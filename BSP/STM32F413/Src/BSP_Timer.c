@@ -4,6 +4,7 @@
 #include "stm32f4xx.h"
 
 static const PRESCALER = 2000;
+static const MICROSEC_CON = 1000000;
 
 /**
  * @brief   Initialize the timer for time measurements.
@@ -58,7 +59,14 @@ uint32_t BSP_Timer_GetRunFreq(void) {
     return RCC_Clocks.SYSCLK_Frequency;
 }
 
-// TODO: add function description
+/**
+ * @brief   Gives a standard unit for time elapsed in microseconds since calling BSP_Timer_GetRunFreq()
+ * @param   None
+ * @return  Microseconds 
+ */
 uint32_t BSP_Timer_GetMicrosElapsed(void) {
-	// TODO: implement this
+	uint32_t freq = BSP_Timer_GetRunFreq();
+	uint32_t ticks = BSP_Timer_GetTicksElapsed();
+	uint32_t micros_elap = MICROSEC_CON * ticks * PRESCALER / freq;
+	return micros_elap;
 }

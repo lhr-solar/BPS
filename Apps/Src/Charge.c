@@ -6,7 +6,7 @@
 #include "Charge.h"
 #include "BSP_Timer.h"
 
-#define CHARGE_RESOLUTION_SCALE 100     // What we need to multiply 100% by before storing
+#define CHARGE_RESOLUTION_SCALE 1000000     // What we need to multiply 100% by before storing. Ensure it is >= 10,000 to avoid depleted charge calculation issues
 #define MAX_CHARGE_MILLI_AMP_HRS 41300    // In miliamp-hours (mAh), calculated from 12950(mah)*14 bats in parallel
 static int32_t charge;  // % of charge left with 0.01% resolution
 
@@ -30,17 +30,15 @@ void Charge_Init(void){
  * not a constant samping. Add on however much from the previous
  */
 void Charge_Calculate(int32_t milliamps){ 
-	
-	//uint32_t counter = BSP_Timer_GetTicksElapsed();
-	
-	//uint32_t ticksElapsed = 0xFFFF - counter;	// I hate this, but fixing BSP_Timer_GetTicksElapsed() is beyond the scope of this PR. Opened issue #389 for this
-	uint32_t ticksElapsed = BSP_Timer_GetTicksElapsed(); // BSP_Timer_GetTicks now counts up from 0, so return value is accurate
-	uint32_t clockFrequency = BSP_Timer_GetRunFreq();
-
 	/* Update Charge, units of 0.01% */
 	// TODO: I am preserving the existing math to make this PR easier to follow. Fixing it is a problem for issue #390
-	charge -= (int32_t) (CHARGE_RESOLUTION_SCALE * 100 * ticksElapsed * milliamps
-							/ clockFrequency / 60 / 60 / MAX_CHARGE_MILLI_AMP_HRS);
+	//charge -= (int32_t) (CHARGE_RESOLUTION_SCALE * 100 * ticksElapsed * milliamps
+	//						/ clockFrequency / 60 / 60 / MAX_CHARGE_MILLI_AMP_HRS);
+
+	uint32_t micro_sec = BSP_Timer_GetMicrosElapsed();
+	charge -= (int32_t) (micro_sec * milliamps
+						* ((100 * CHARGE_RESOLUTION_SCALE) / 1000000)
+						/ 3600 / MAX_CHARGE_MILLI_AMP_HRS);
 }
 
 /** Charge_Calibrate
