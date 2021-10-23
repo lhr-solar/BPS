@@ -45,7 +45,7 @@ ErrorStatus Temperature_ChannelConfig(uint8_t tempChannel);
  * @param mV from ADC
  * @return temperature in Celsius (Fixed Point with .001 resolution) 
  */
-int milliVoltToCelsius(uint32_t milliVolt);
+int32_t milliVoltToCelsius(uint32_t milliVolt);
 
 /** Temperature_UpdateSingleChannel
  * Stores and updates the new measurements received on one particular temperature sensor

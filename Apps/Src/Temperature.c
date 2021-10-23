@@ -12,7 +12,7 @@
 extern const int32_t voltToTemp[];
 
 // Holds the temperatures in Celsius (Fixed Point with .001 resolution) for each sensor on each board
-int32_t ModuleTemperatures[NUM_MINIONS][MAX_TEMP_SENSORS_PER_MINION_BOARD];
+static int32_t ModuleTemperatures[NUM_MINIONS][MAX_TEMP_SENSORS_PER_MINION_BOARD];
 
 // 0 if discharging 1 if charging
 static uint8_t ChargingState;
@@ -47,9 +47,13 @@ void Temperature_Init(cell_asic *boards){
   	assertOSError(err);
 	// Write Configuration Register
 	LTC6811_wrcfg(NUM_MINIONS, Minions);
+	OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
+  	assertOSError(err);
 
 	// Read Configuration Register
 	wakeup_sleep(NUM_MINIONS);
+	OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
+  	assertOSError(err);
 	LTC6811_rdcfg_safe(NUM_MINIONS, Minions);
 	//release mutex
   	OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
@@ -158,7 +162,8 @@ ErrorStatus Temperature_ChannelConfig(uint8_t tempChannel) {
  * @param mV from ADC
  * @return temperature in Celsius (Fixed Point with .001 resolution) 
  */
-int milliVoltToCelsius(uint32_t milliVolt){
+int32_t milliVoltToCelsius(uint32_t milliVolt){
+	// TODO: Check milliVolt is not >3300
 	return voltToTemp[milliVolt];
 }
 
@@ -195,7 +200,8 @@ ErrorStatus Temperature_UpdateSingleChannel(uint8_t channel){
 		
 		// update adc value from GPIO1 stored in a_codes[0]; 
 		// a_codes[0] is fixed point with .001 resolution in volts -> multiply by .001 * 1000 to get mV in double form
-		ModuleTemperatures[board][channel] = milliVoltToCelsius(Minions[board].aux.a_codes[0] / 10);
+		//ModuleTemperatures[board][channel] = milliVoltToCelsius(Minions[board].aux.a_codes[0] / 10);
+		ModuleTemperatures[board][channel] = Minions[board].aux.a_codes[0];
 	}
 	//release mutex
   	OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
@@ -229,7 +235,6 @@ SafetyStatus Temperature_CheckStatus(uint8_t isCharging){
 	OS_ERR err;
 	CPU_TS ts;
 	int32_t temperatureLimit = isCharging == 1 ? MAX_CHARGE_TEMPERATURE_LIMIT : MAX_DISCHARGE_TEMPERATURE_LIMIT;
-	temperatureLimit *= MILLI_SCALING_FACTOR;
 
 	OSMutexPend(&TemperatureBuffer_Mutex,
 				0,
@@ -371,11 +376,11 @@ int32_t Temperature_GetTotalPackAvgTemperature(void){
  * @return SUCCESS or ERROR
  */
 ErrorStatus Temperature_SampleADC(uint8_t ADCMode) {
-	wakeup_sleep(NUM_MINIONS);
+	wakeup_idle(NUM_MINIONS);
 	LTC6811_adax(ADCMode, AUX_CH_GPIO1);							// Start ADC conversion on GPIO1
 	LTC6811_pollAdc();
 
-	wakeup_sleep(NUM_MINIONS);
+	wakeup_idle(NUM_MINIONS);
 	//take control of mutex
 	OS_ERR err;
   	OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);

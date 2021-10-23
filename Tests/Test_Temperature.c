@@ -3,8 +3,11 @@
 #include "common.h"
 #include "config.h"
 #include "Temperature.h"
-#include "LTC6811.h"
+#include "Voltage.h"
 #include "BSP_UART.h"
+#include "Tasks.h"
+#include "BSP_PLL.h"
+#include "stm32f4xx.h"
 
 /******************************************************************************
  * Temperature App Test Plan
@@ -37,32 +40,18 @@
  * 
  *****************************************************************************/
 
+// Task1
+OS_TCB Task1_TCB;
+CPU_STK Task1_Stk[DEFAULT_STACK_SIZE];
+
 cell_asic minions[NUM_MINIONS];
 
-static void sleep(int n) {
-    for (volatile int i = 0; i < n * 1000000; ++i);
-}
-
-int main() {
+void test(void) {
+    OS_ERR err;
 
     BSP_UART_Init(NULL, NULL, UART_USB);    // Initialize printf
 
-    printf("Testing Temperature functions.\r\n");
-
     Temperature_Init(minions);
-
-    Temperature_UpdateAllMeasurements();
-
-    for(int i = 0; i < NUM_MINIONS; i++) {
-        printf("Minion %d:\r\n", i);
-        printf("\tTemperature:\r\n");
-
-        for(int j = 0; j < MAX_TEMP_SENSORS_PER_MINION_BOARD; j++) {
-            printf("\t%d: %ldmC\r\n", j, Temperature_GetSingleTempSensor(i, j));
-        }
-    }
-
-    sleep(1);
 
     printf("Testing Temperature functions in loop.\r\n");
 
@@ -71,21 +60,55 @@ int main() {
     while(1) {
         printf("All good!\r");
 
-        Temperature_UpdateAllMeasurements();
+        int status = Temperature_UpdateAllMeasurements();
+        printf("%s\r\n", status ? "status :^)" : "status :^(");
 
         if(Temperature_CheckStatus(isCharging) != SAFE) {
             printf("DANGER!! Temperature levels in danger :(\r\n");
-            break;
         }
-    }
+        printf("Printing temperature values.\r\n");
+        for(int i = 0; i < NUM_MINIONS; i++) {
+            printf("Minion %d:\r\n", i);
+            printf("\tTemperature:\r\n");
 
-    printf("Printing temperature values.\r\n");
-    for(int i = 0; i < NUM_MINIONS; i++) {
-        printf("Minion %d:\r\n", i);
-        printf("\tTemperature:\r\n");
-
-        for(int j = 0; j < MAX_TEMP_SENSORS_PER_MINION_BOARD; j++) {
-            printf("\t%d: %ldmC\r\n", j, Temperature_GetSingleTempSensor(i, j));
+            for(int j = 0; j < MAX_TEMP_SENSORS_PER_MINION_BOARD; j++) {
+                printf("\t%d: %ldmC\r\n", j, Temperature_GetSingleTempSensor(i, j));
+            }
         }
+
+        OSTimeDly(400, OS_OPT_TIME_DLY, &err);
     }
+}
+
+// Task for this test
+void Task1(void *p_arg){
+	OS_CPU_SysTickInit(SystemCoreClock / (CPU_INT32U) OSCfg_TickRate_Hz);
+	
+    test();
+}
+
+// Similar to the production code main. Does not check watchdog or mess with contactor 
+int main(void) {
+    OS_ERR err;
+    BSP_PLL_Init();
+
+    OSInit(&err);
+    assertOSError(err);
+
+    OSTaskCreate(&Task1_TCB,
+                "Task 1",
+                Task1,
+                (void *)0,
+                1,
+                Task1_Stk,
+                16,
+                256,
+                0,
+                0,
+                (void *)0,
+                OS_OPT_TASK_SAVE_FP | OS_OPT_TASK_STK_CHK,
+                &err);
+    assertOSError(err);
+
+    OSStart(&err);
 }

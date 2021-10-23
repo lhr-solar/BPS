@@ -35,7 +35,7 @@ void Voltage_Init(cell_asic *boards){
 	Minions = boards;
 	//initialize mutex
 	OS_ERR err;
-    OSInit(&err); 
+ 
 	OSMutexCreate(&Voltage_Mutex,
 				  "Voltage Buffer Mutex",
 				  &err
