@@ -2,7 +2,36 @@
 #include "BSP_SPI.h"
 #include "os.h"
 #include "Tasks.h"
+#include "BSP_PLL.h"
 
+/* Delay Microseconds
+ * @param micro Number of microseconds
+ */
+static void delay_u(uint16_t micro) {
+    uint32_t microsec = BSP_PLL_GetSystemClock() / 1000000;
+    for(volatile uint32_t i = 0; i < micro; i++) {
+        for(volatile uint32_t j = 0; j < microsec; j++);
+    }
+}
+
+// Guarantees isoSPI is in ready mode
+static void ADS7042_Wakeup_Idle() {
+    uint8_t rxdata[2];
+
+    BSP_SPI_SetStateCS(spi_ads7042, 0);
+    delay_u(5000);
+    BSP_SPI_Read(spi_ads7042, rxdata, 2);
+    BSP_SPI_SetStateCS(spi_ads7042, 1);
+}
+
+// Wake isoSPI from sleep
+// Guarantees isoSPI is in standby
+static void ADS7042_Wakeup_Sleep() {
+    BSP_SPI_SetStateCS(spi_ads7042, 0);
+    delay_u(500);
+    BSP_SPI_SetStateCS(spi_ads7042, 1);
+    delay_u(150);
+}
 
 /* Initialize communication ADS7042
  * and run startup offset calibration
@@ -10,8 +39,9 @@
 void ADS7042_Init(bsp_os_t spi_os) {
     BSP_SPI_Init(spi_ads7042, &spi_os);
 
-    // 2-byte read on startup for offset calibration
-    ADS7042_Read();
+    // Offset calibration is run when CS is held low for >14 cycles
+    // Wakeup Sleep should be sufficient long
+    ADS7042_Wakeup_Sleep();
 }
 
 /* Read value from ADS7042
@@ -22,6 +52,8 @@ void ADS7042_Init(bsp_os_t spi_os) {
  */
 uint16_t ADS7042_Read() {
     uint8_t rxdata[2];
+
+    ADS7042_Wakeup_Idle();
 
     BSP_SPI_SetStateCS(spi_ads7042, 0);
     BSP_SPI_Read(spi_ads7042, rxdata, 2);
