@@ -71,8 +71,7 @@ int32_t ADS7042_GetCurrent() {
      */
     int32_t reading = (int32_t)ADS7042_Read();
     const int32_t OFFSET = 0x0800;
-    const int32_t NUMERATOR = 7324;
-    const int32_t DENOMINATOR = 100;
-    int32_t milliamps = -1 * ((reading - OFFSET) * NUMERATOR) / DENOMINATOR;    // during testing, the gain seems to be inverted
+    const int32_t PRECISION_MICRO_AMPS = 73242;
+    int32_t milliamps = -1 * ((reading - OFFSET) * PRECISION_MICRO_AMPS) / 1000;    // during testing, the gain seems to be inverted
     return milliamps;
 }
