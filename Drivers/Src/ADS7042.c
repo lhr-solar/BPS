@@ -12,7 +12,7 @@ static void cs_set(uint8_t state){
 
 static void ADS7042_delay_u(uint16_t micro)
 {
-  uint32_t delay = BSP_PLL_GetSystemClock() / 1000000;
+    uint32_t delay = BSP_PLL_GetSystemClock() / 1000000;
 	for(uint32_t i = 0; i < micro; i++)
 	{
 		for(uint32_t j = 0; j < delay; j++);
@@ -20,15 +20,12 @@ static void ADS7042_delay_u(uint16_t micro)
 }
 
 //Generic wakeup command to wake the LTC6813 from sleep
-static void ADS7042_wakeup_sleep(uint8_t total_ic)
+static void ADS7042_wakeup_sleep()
 {
-  for (int i =0; i<total_ic; i++)
-  {
     cs_set(0);
     ADS7042_delay_u(500); // Guarantees the LTC6813 will be in standby
     cs_set(1);
     ADS7042_delay_u(150);
-  }
 }
 
 /* Initialize communication ADS7042
