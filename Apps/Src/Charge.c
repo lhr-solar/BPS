@@ -26,17 +26,17 @@ void Charge_Init(void){
 
 /** Charge_Calculate
  * Calculates new Charge depending on the current reading
- * @param current reading from current sensors. Fixed point of 0.001 (1.500 Amps = 1500)
+ * @param milliamps reading from current sensors. Fixed point of 0.001 (1.500 Amps = 1500)
  * not a constant samping. Add on however much from the previous
  */
 void Charge_Calculate(int32_t milliamps){ 
 	/* Update Charge, units of 0.01% */
-	// TODO: I am preserving the existing math to make this PR easier to follow. Fixing it is a problem for issue #390
-	//charge -= (int32_t) (CHARGE_RESOLUTION_SCALE * 100 * ticksElapsed * milliamps
-	//						/ clockFrequency / 60 / 60 / MAX_CHARGE_MILLI_AMP_HRS);
-
-	uint32_t micro_sec = BSP_Timer_GetMicrosElapsed();
-	charge -= (int32_t) (micro_sec * milliamps
+	
+	int64_t micro_sec = (int64_t)BSP_Timer_GetMicrosElapsed();
+	int64_t millis = (int64_t)milliamps;
+	// Test: Ensure that the microseconds elapsed are accurate
+	//printf("microseconds elapsed (should be 100,000): %ld\n\r", micro_sec);
+	charge -= (int32_t) (micro_sec * millis
 						* ((100 * CHARGE_RESOLUTION_SCALE) / 1000000)
 						/ 3600 / MAX_CHARGE_MILLI_AMP_HRS);
 }

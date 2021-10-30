@@ -67,6 +67,7 @@ uint32_t BSP_Timer_GetRunFreq(void) {
 uint32_t BSP_Timer_GetMicrosElapsed(void) {
 	uint32_t freq = BSP_Timer_GetRunFreq();
 	uint32_t ticks = BSP_Timer_GetTicksElapsed();
-	uint32_t micros_elap = MICROSEC_CON * ticks * PRESCALER / freq;
+	printf("ticks elapsed : %ld\n\r", ticks);
+	uint32_t micros_elap = ticks * PRESCALER / (freq / MICROSEC_CON); // Math to ensure that we do not overflow (16Mhz or 80Mhz)
 	return micros_elap;
-}
+} 
