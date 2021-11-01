@@ -7,6 +7,7 @@
 #include "Temperature.h"
 #include "os.h"
 #include "Tasks.h"
+#include "BSP_UART.h"
 
 // lookup table for converting ADC voltages to temperatures
 extern const int32_t voltToTemp[];
@@ -124,6 +125,9 @@ ErrorStatus Temperature_ChannelConfig(uint8_t tempChannel) {
   	OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
   	assertOSError(err);
     LTC6811_wrcomm(NUM_MINIONS, Minions);
+	int8_t x = LTC6811_rdcomm(NUM_MINIONS, Minions);
+	if (!x) printf("Yay\n\r");
+	else printf("NO!\n\r");
     LTC6811_stcomm();
 
 	for (int board = 0; board < NUM_MINIONS; board++) {
@@ -133,8 +137,6 @@ ErrorStatus Temperature_ChannelConfig(uint8_t tempChannel) {
 		Minions[board].com.tx_data[0] = (AUX_I2C_START << 4) + (muxAddress >> 4); 				
 		Minions[board].com.tx_data[1] = (muxAddress << 4) + AUX_I2C_NACK;
 
-
-		
 		// Sends what channel to open. 8 is the enable bit
 		// 8 + temp_channel
 		Minions[board].com.tx_data[2] = (AUX_I2C_BLANK << 4) + 0xF; 				// set dont cares high
@@ -148,6 +150,9 @@ ErrorStatus Temperature_ChannelConfig(uint8_t tempChannel) {
     // Send data
     wakeup_sleep(NUM_MINIONS);
     LTC6811_wrcomm(NUM_MINIONS, Minions);
+	x = LTC6811_rdcomm(NUM_MINIONS, Minions);
+	if (!x) printf("Yay\n\r");
+	else printf("NO!\n\r");
     LTC6811_stcomm();
 	//release mutex
   	OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);

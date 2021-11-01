@@ -154,7 +154,7 @@ void write_68(uint8_t total_ic , uint8_t tx_cmd[2], uint8_t data[])
 
     data_pec = (uint16_t)pec15_calc(BYTES_IN_REG, &data[(current_ic-1)*6]);    // calculating the PEC for each Iss configuration register data
     cmd[cmd_index] = (uint8_t)(data_pec >> 8);
-    cmd[cmd_index + 1] = (uint8_t)data_pec;
+    cmd[cmd_index + 1] = (uint8_t)(data_pec & 0x00FF); //CHANGED TO MIMIC LINE ABOVE
     cmd_index = cmd_index + 2;
   }
 
@@ -224,6 +224,7 @@ uint16_t pec15_calc(int32_t len, //Number of bytes that will be used to calculat
     addr = ((remainder>>7)^data[i])&0xff;//calculate PEC table address
 
     remainder = (remainder<<8)^crc15Table[addr];
+    printf("CRCTable: %X\n\r",crc15Table[addr]); // DEBUGGING PURPOSES
   }
   return(remainder*2);//The CRC15 has a 0 in the LSB so the remainder must be multiplied by 2
 }
@@ -1692,13 +1693,14 @@ void LTC681x_wrcomm(uint8_t total_ic, //The number of ICs being written to
                     cell_asic ic[]
                    )
 {
+  printf("Inside WRCOMM function*****************\n\r"); // DEBUGGING PURPOSES
   uint8_t cmd[2]= {0x07 , 0x21};
   uint8_t write_buffer[256];
   uint8_t write_count = 0;
   uint8_t c_ic = 0;
   for (uint8_t current_ic = 0; current_ic<total_ic; current_ic++)
   {
-    if (ic->isospi_reverse == true)
+    if (ic->isospi_reverse == false)
     {
       c_ic = current_ic;
     }
@@ -1723,6 +1725,7 @@ int8_t LTC681x_rdcomm(uint8_t total_ic, //Number of ICs in the system
                       cell_asic ic[]
                      )
 {
+  printf("Inside RDCOMM function*****************\n\r"); //DEBUGGING PURPOSES
   uint8_t cmd[2]= {0x07 , 0x22};
   uint8_t read_buffer[256];
   int8_t pec_error = 0;
