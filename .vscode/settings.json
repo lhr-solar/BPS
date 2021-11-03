@@ -16,7 +16,8 @@
         "canbus.h": "c",
         "tasks.h": "c",
         "voltage.h": "c",
-        "bsp_spi.h": "c"
+        "bsp_spi.h": "c",
+        "bsp_pll.h": "c"
     },
     "python.linting.pylintEnabled": true,
     "python.linting.enabled": true,

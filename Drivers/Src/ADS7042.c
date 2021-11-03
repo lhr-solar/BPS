@@ -39,9 +39,15 @@ static void ADS7042_Wakeup_Sleep() {
 void ADS7042_Init(bsp_os_t spi_os) {
     BSP_SPI_Init(spi_ads7042, &spi_os);
 
-    // Offset calibration is run when CS is held low for >14 cycles
-    // Wakeup Sleep should be sufficient long
-    ADS7042_Wakeup_Sleep();
+    // Offset calibration is run when CS is held low for >16 cycles
+    // We'll read 3 bytes just to be safe
+    uint8_t rxdata[3];
+
+    ADS7042_Wakeup_Idle();
+
+    BSP_SPI_SetStateCS(spi_ads7042, 0);
+    BSP_SPI_Read(spi_ads7042, rxdata, 3);
+    BSP_SPI_SetStateCS(spi_ads7042, 1);
 }
 
 /* Read value from ADS7042
