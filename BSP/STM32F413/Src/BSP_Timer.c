@@ -3,7 +3,7 @@
 #include "BSP_Timer.h"
 #include "stm32f4xx.h"
 
-static const int PRESCALER = 2000;
+static const int PRESCALER = 1999;
 static const int MICROSEC_CON = 1000000;
 
 /**
@@ -18,7 +18,7 @@ void BSP_Timer_Init(void) {
 	
 	Init_TIM2.TIM_Prescaler = PRESCALER;
 	Init_TIM2.TIM_CounterMode = TIM_CounterMode_Up;
-	Init_TIM2.TIM_Period = 0xFFFF-1;
+	Init_TIM2.TIM_Period = 0xFFFF;
 	Init_TIM2.TIM_ClockDivision = TIM_CKD_DIV1;
 	Init_TIM2.TIM_RepetitionCounter = 0;
 	
@@ -65,9 +65,12 @@ uint32_t BSP_Timer_GetRunFreq(void) {
  * @return  Microseconds 
  */
 uint32_t BSP_Timer_GetMicrosElapsed(void) {
-	uint32_t freq = BSP_Timer_GetRunFreq();
+	RCC_ClocksTypeDef rccClocks;
+	RCC_GetClocksFreq(&rccClocks);
+	uint32_t freq = rccClocks.PCLK2_Frequency; // Tested using UART and this appears to be the proper clock.
 	uint32_t ticks = BSP_Timer_GetTicksElapsed();
 	printf("ticks elapsed : %ld\n\r", ticks);
-	uint32_t micros_elap = ticks * PRESCALER / (freq / MICROSEC_CON); // Math to ensure that we do not overflow (16Mhz or 80Mhz)
+	uint32_t micros_elap = ticks * (PRESCALER + 1) / (freq / MICROSEC_CON); // Math to ensure that we do not overflow (16Mhz or 80Mhz)
+	printf("micros elapsed : %ld\n\r", micros_elap);
 	return micros_elap;
 } 
