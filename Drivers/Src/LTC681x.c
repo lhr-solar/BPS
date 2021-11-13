@@ -224,7 +224,7 @@ uint16_t pec15_calc(int32_t len, //Number of bytes that will be used to calculat
     addr = ((remainder>>7)^data[i])&0xff;//calculate PEC table address
 
     remainder = (remainder<<8)^crc15Table[addr];
-    printf("CRCTable: %X\n\r",crc15Table[addr]); // DEBUGGING PURPOSES
+    //printf("CRCTable: %X\n\r",crc15Table[addr]); // DEBUGGING PURPOSES
   }
   return(remainder*2);//The CRC15 has a 0 in the LSB so the remainder must be multiplied by 2
 }
@@ -1693,14 +1693,14 @@ void LTC681x_wrcomm(uint8_t total_ic, //The number of ICs being written to
                     cell_asic ic[]
                    )
 {
-  printf("Inside WRCOMM function*****************\n\r"); // DEBUGGING PURPOSES
+  //printf("Inside WRCOMM function*****************\n\r"); // DEBUGGING PURPOSES
   uint8_t cmd[2]= {0x07 , 0x21};
   uint8_t write_buffer[256];
   uint8_t write_count = 0;
   uint8_t c_ic = 0;
   for (uint8_t current_ic = 0; current_ic<total_ic; current_ic++)
   {
-    if (ic->isospi_reverse == false)
+    if (ic->isospi_reverse == true)
     {
       c_ic = current_ic;
     }
@@ -1708,7 +1708,6 @@ void LTC681x_wrcomm(uint8_t total_ic, //The number of ICs being written to
     {
       c_ic = total_ic - current_ic - 1;
     }
-
     for (uint8_t data = 0; data<6; data++)
     {
       write_buffer[write_count] = ic[c_ic].com.tx_data[data];
@@ -1725,7 +1724,7 @@ int8_t LTC681x_rdcomm(uint8_t total_ic, //Number of ICs in the system
                       cell_asic ic[]
                      )
 {
-  printf("Inside RDCOMM function*****************\n\r"); //DEBUGGING PURPOSES
+  //printf("Inside RDCOMM function*****************\n\r"); //DEBUGGING PURPOSES
   uint8_t cmd[2]= {0x07 , 0x22};
   uint8_t read_buffer[256];
   int8_t pec_error = 0;
@@ -1764,7 +1763,7 @@ Shifts data in COMM register out over LTC6811 SPI/I2C port
 */
 void LTC681x_stcomm()
 {
-
+  //printf("Inside STCOMM function*****************\n\r"); //DEBUGGING PURPOSES
   uint8_t cmd[4];
   uint16_t cmd_pec;
 

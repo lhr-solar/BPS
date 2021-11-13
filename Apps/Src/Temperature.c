@@ -8,6 +8,7 @@
 #include "os.h"
 #include "Tasks.h"
 #include "BSP_UART.h"
+#include "BSP_SPI.h"
 
 // lookup table for converting ADC voltages to temperatures
 extern const int32_t voltToTemp[];
@@ -111,53 +112,65 @@ ErrorStatus Temperature_ChannelConfig(uint8_t tempChannel) {
 		Minions[board].com.tx_data[3] = (0 << 4) + AUX_I2C_NACK_STOP;
 
 		// Rest is no transmit with all data bits set to high, makes sure there's nothing else we're sending
-		Minions[board].com.tx_data[4] = (AUX_I2C_NO_TRANSMIT << 4) + 0xF;
-		Minions[board].com.tx_data[5] = (0xF << 4) + AUX_I2C_NACK_STOP;
+		//Minions[board].com.tx_data[4] = (AUX_I2C_NO_TRANSMIT << 4) + 0xF;
+		//Minions[board].com.tx_data[5] = (0xF << 4) + AUX_I2C_NACK_STOP;
+		
+		// Send data
+    	wakeup_sleep(NUM_MINIONS);
+    	LTC6811_wrcomm(NUM_MINIONS, Minions);
+		int8_t pec_error = LTC6811_rdcomm(NUM_MINIONS, Minions);
+		LTC6811_stcomm();
 
-    }
-	//release mutex
-  	OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
-  	assertOSError(err);
-
-    // Send data
-    wakeup_sleep(NUM_MINIONS);
-	//take control of mutex
-  	OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
-  	assertOSError(err);
-    LTC6811_wrcomm(NUM_MINIONS, Minions);
-	int8_t x = LTC6811_rdcomm(NUM_MINIONS, Minions);
-	if (!x) printf("Yay\n\r");
-	else printf("NO!\n\r");
-    LTC6811_stcomm();
-
-	for (int board = 0; board < NUM_MINIONS; board++) {
 		/* Open channel on mux */
 		
-		// Send Address for a particular mux
 		Minions[board].com.tx_data[0] = (AUX_I2C_START << 4) + (muxAddress >> 4); 				
 		Minions[board].com.tx_data[1] = (muxAddress << 4) + AUX_I2C_NACK;
 
 		// Sends what channel to open. 8 is the enable bit
 		// 8 + temp_channel
 		Minions[board].com.tx_data[2] = (AUX_I2C_BLANK << 4) + 0xF; 				// set dont cares high
-		Minions[board].com.tx_data[3] = ((8 + tempChannel) << 4) + AUX_I2C_NACK_STOP;
+		Minions[board].com.tx_data[3] = ((8 + tempChannel) << 4) + AUX_I2C_NACK;
 			
 		// Rest is no transmit with all data bits set to high, makes sure there's nothing else we're sending
-		Minions[board].com.tx_data[4] = (AUX_I2C_NO_TRANSMIT << 4) + 0xF;
-		Minions[board].com.tx_data[5] = (0xF << 4) + AUX_I2C_NACK_STOP;
+		//Minions[board].com.tx_data[4] = (AUX_I2C_NO_TRANSMIT << 4) + 0xF;
+		//Minions[board].com.tx_data[5] = (0xF << 4) + AUX_I2C_NACK_STOP;
+		// Send data
+    	wakeup_sleep(NUM_MINIONS);
+    	LTC6811_wrcomm(NUM_MINIONS, Minions);
+		pec_error |= LTC6811_rdcomm(NUM_MINIONS, Minions);
+		LTC6811_stcomm();
     }
+	
+	// for (int board = 0; board < NUM_MINIONS; board++) {
+	// 	/* Open channel on mux */
+		
+	// 	// Send Address for a particular mux
+	// 	Minions[board].com.tx_data[0] = (AUX_I2C_START << 4) + (muxAddress >> 4); 				
+	// 	Minions[board].com.tx_data[1] = (muxAddress << 4) + AUX_I2C_NACK;
 
-    // Send data
-    wakeup_sleep(NUM_MINIONS);
-    LTC6811_wrcomm(NUM_MINIONS, Minions);
-	x = LTC6811_rdcomm(NUM_MINIONS, Minions);
-	if (!x) printf("Yay\n\r");
-	else printf("NO!\n\r");
-    LTC6811_stcomm();
+	// 	// Sends what channel to open. 8 is the enable bit
+	// 	// 8 + temp_channel
+	// 	Minions[board].com.tx_data[2] = (AUX_I2C_BLANK << 4) + 0xF; 				// set dont cares high
+	// 	Minions[board].com.tx_data[3] = ((8 + tempChannel) << 4) + AUX_I2C_NACK;
+			
+	// 	// Rest is no transmit with all data bits set to high, makes sure there's nothing else we're sending
+	// 	Minions[board].com.tx_data[4] = (AUX_I2C_NO_TRANSMIT << 4) + 0xF;
+	// 	Minions[board].com.tx_data[5] = (0xF << 4) + AUX_I2C_NACK_STOP;
+    // }
+	
+    // // Send data
+    // wakeup_sleep(NUM_MINIONS);
+    // LTC6811_wrcomm(NUM_MINIONS, Minions);
+	// //pec_error |= LTC6811_rdcomm(NUM_MINIONS, Minions);
+	// LTC6811_stcomm();
+	
 	//release mutex
   	OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
   	assertOSError(err);
 
+	//if (!pec_error) return SUCCESS;
+	//else return ERROR;
+	//BSP_SPI_SetStateCS(spi_ltc6811, 1);
 	return SUCCESS;
 }
 
@@ -386,15 +399,17 @@ int32_t Temperature_GetTotalPackAvgTemperature(void){
  * @return SUCCESS or ERROR
  */
 ErrorStatus Temperature_SampleADC(uint8_t ADCMode) {
-	wakeup_idle(NUM_MINIONS);
-	LTC6811_adax(ADCMode, AUX_CH_GPIO1);							// Start ADC conversion on GPIO1
-	LTC6811_pollAdc();
-
-	wakeup_idle(NUM_MINIONS);
 	//take control of mutex
 	OS_ERR err;
   	OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
   	assertOSError(err);
+	
+	wakeup_sleep(NUM_MINIONS);
+	LTC6811_adax(ADCMode, AUX_CH_GPIO1);							// Start ADC conversion on GPIO1
+	LTC6811_pollAdc();
+
+	wakeup_sleep(NUM_MINIONS);
+	
 	int8_t error = LTC6811_rdaux(AUX_CH_GPIO1, NUM_MINIONS, Minions);   // Update Minions with fresh values
 	//release mutex
   	OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);

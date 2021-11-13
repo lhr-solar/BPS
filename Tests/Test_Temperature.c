@@ -8,6 +8,7 @@
 #include "Tasks.h"
 #include "BSP_PLL.h"
 #include "stm32f4xx.h"
+#include "BSP_SPI.h"
 
 /******************************************************************************
  * Temperature App Test Plan
@@ -59,7 +60,9 @@ void test(void) {
 
     while(1) {
         printf("All good!\r");
-
+        //uint8_t data[] = {0x2C, 0x3D, 0xFF, 0xFF, 0xFF, 0xFF};
+        //uint16_t pec = pec15_calc(6, data);
+        //printf("PEC Value: %X\n\r", pec);
         int status = Temperature_UpdateAllMeasurements();
         printf("%s\r\n", status ? "status :^)" : "status :^(");
 
@@ -75,7 +78,10 @@ void test(void) {
                 printf("\t%d: %ldmC\r\n", j, Temperature_GetSingleTempSensor(i, j));
             }
         }
-
+        /*uint8_t rxbuf[8];
+        BSP_SPI_Read(spi_ltc6811, rxbuf, 8);
+        rxbuf[0] = 0;
+        */
         OSTimeDly(400, OS_OPT_TIME_DLY, &err);
     }
 }
