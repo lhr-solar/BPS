@@ -222,8 +222,8 @@ ErrorStatus Temperature_UpdateSingleChannel(uint8_t channel){
 		
 		// update adc value from GPIO1 stored in a_codes[0]; 
 		// a_codes[0] is fixed point with .001 resolution in volts -> multiply by .001 * 1000 to get mV in double form
-		//ModuleTemperatures[board][channel] = milliVoltToCelsius(Minions[board].aux.a_codes[0] / 10);
-		ModuleTemperatures[board][channel] = Minions[board].aux.a_codes[0];
+		ModuleTemperatures[board][channel] = milliVoltToCelsius(Minions[board].aux.a_codes[0] / 10);
+		//ModuleTemperatures[board][channel] = Minions[board].aux.a_codes[0];
 	}
 	//release mutex
   	OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
