@@ -129,11 +129,11 @@ ErrorStatus Temperature_ChannelConfig(uint8_t tempChannel) {
 		// Sends what channel to open. 8 is the enable bit
 		// 8 + temp_channel
 		Minions[board].com.tx_data[2] = (AUX_I2C_BLANK << 4) + 0xF; 				// set dont cares high
-		Minions[board].com.tx_data[3] = ((8 + tempChannel) << 4) + AUX_I2C_NACK;
+		Minions[board].com.tx_data[3] = ((8 + tempChannel) << 4) + AUX_I2C_NACK_STOP;
 			
 		// Rest is no transmit with all data bits set to high, makes sure there's nothing else we're sending
-		//Minions[board].com.tx_data[4] = (AUX_I2C_NO_TRANSMIT << 4) + 0xF;
-		//Minions[board].com.tx_data[5] = (0xF << 4) + AUX_I2C_NACK_STOP;
+		Minions[board].com.tx_data[4] = (AUX_I2C_NO_TRANSMIT << 4) + 0xF;
+		Minions[board].com.tx_data[5] = (0xF << 4) + AUX_I2C_NACK_STOP;
 		// Send data
     	wakeup_sleep(NUM_MINIONS);
     	LTC6811_wrcomm(NUM_MINIONS, Minions);
