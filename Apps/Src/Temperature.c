@@ -131,7 +131,7 @@ ErrorStatus Temperature_ChannelConfig(uint8_t tempChannel) {
 	// Send data
     wakeup_sleep(NUM_MINIONS);
     LTC6811_wrcomm(NUM_MINIONS, Minions);
-	LTC6811_rdcomm(NUM_MINIONS, Minions);
+	LTC6811_rdcomm_safe(NUM_MINIONS, Minions);
 	LTC6811_stcomm();
 	//release mutex
   	OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
