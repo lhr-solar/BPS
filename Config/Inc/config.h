@@ -29,8 +29,8 @@ typedef enum SafetyStatus_e {SAFE = 0, DANGER = 1, OVERVOLTAGE = 2, UNDERVOLTAGE
 
 //--------------------------------------------------------------------------------
 // Battery Pack layout
-#define NUM_BATTERY_MODULES				8		// Number of battery modules
-#define NUM_TEMPERATURE_SENSORS			16		// Number of temperature sensors
+#define NUM_BATTERY_MODULES				31		// Number of battery modules
+#define NUM_TEMPERATURE_SENSORS			62		// Number of temperature sensors
 #define NUM_TEMP_SENSORS_PER_MOD		2		// Number of temperature sensors per battery module
 
 //--------------------------------------------------------------------------------
