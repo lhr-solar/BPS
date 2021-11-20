@@ -16,6 +16,7 @@
 #define MUX1 0x90
 #define MUX2 0x92
 #define AUX_I2C_START 0x6
+#define AUX_I2C_ACK 0
 #define AUX_I2C_NACK 0x8
 #define AUX_I2C_NACK_STOP 0x9
 #define AUX_I2C_BLANK 0
@@ -45,7 +46,7 @@ ErrorStatus Temperature_ChannelConfig(uint8_t tempChannel);
  * @param mV from ADC
  * @return temperature in Celsius (Fixed Point with .001 resolution) 
  */
-int milliVoltToCelsius(uint32_t milliVolt);
+int32_t milliVoltToCelsius(uint32_t milliVolt);
 
 /** Temperature_UpdateSingleChannel
  * Stores and updates the new measurements received on one particular temperature sensor

@@ -9,6 +9,7 @@
 #include "BSP_Lights.h"
 #include "BSP_PLL.h"
 #include "CAN_Queue.h"
+#include "BSP_WDTimer.h"
 
 /******************************************************************************
  * VoltTempMonitor Task Test Plan
@@ -32,11 +33,13 @@ CPU_STK Task1_Stk[DEFAULT_STACK_SIZE];
 OS_TCB Task2_TCB;
 CPU_STK Task2_Stk[DEFAULT_STACK_SIZE];
 
+OS_ERR p_err;
+
 // Initialization task for this test
 void Task1(void *p_arg){
-    OS_CPU_SysTickInit(SystemCoreClock / (CPU_INT32U) OSCfg_TickRate_Hz);
-
     OS_ERR err;
+
+    OS_CPU_SysTickInit(SystemCoreClock / (CPU_INT32U) OSCfg_TickRate_Hz);
     
     OSSemCreate(&Fault_Sem4,
                 "Fault/Tripped Semaphore",
@@ -55,10 +58,6 @@ void Task1(void *p_arg){
                 &err);
     assertOSError(err);
 
-    OSSemPost(&SafetyCheck_Sem4,      //Set semaphore once since Amperes Task doesn't run
-                OS_OPT_POST_1,
-                &err);
-			assertOSError(err);
     // Spawn tasks needed for Amperes readings to affect contactor
     //1
     OSTaskCreate(&FaultState_TCB,				// TCB
@@ -90,7 +89,7 @@ void Task1(void *p_arg){
             &err);					// return err code
 
     //3
-    OSTaskCreate(&PetWDog_TCB,				// TCB
+    /*OSTaskCreate(&PetWDog_TCB,				// TCB
 			"TASK_PETWDOG_PRIO",	// Task Name (String)
 			Task_PetWDog,				// Task function pointer
 			(void *)0,				// Task function args
@@ -103,7 +102,7 @@ void Task1(void *p_arg){
 			(void *)0,				// Extension pointer (not needed)
 			OS_OPT_TASK_STK_CHK | OS_OPT_TASK_SAVE_FP,	// Options
 			&err);					// return err code
-    
+    */
     // Spawn Task_VoltTempMonitor with PRIO 4
     OSTaskCreate(&VoltTempMonitor_TCB,				// TCB
 			"TASK_VOLT_TEMP_MONITOR_PRIO",	// Task Name (String)
@@ -133,30 +132,47 @@ void Task1(void *p_arg){
             (void *)0,				// Extension pointer (not needed)
             OS_OPT_TASK_STK_CHK | OS_OPT_TASK_SAVE_FP,	// Options
             &err);					// return err code
-        
-    // Initialize CAN queue
-    CAN_Queue_Init();
     assertOSError(err);
 
+    // Initialize CAN queue
+    CAN_Queue_Init();
+
 	//delete task
-	OSTaskDel(NULL, &err); // Delete task
+	OSTaskDel(NULL, &p_err); // Delete task
 }
 
 //Task to prevent watchdog from tripping
 void Task2(void *p_arg){
-        OS_ERR err;
+    OS_ERR err;
+
+    OSSemPost(&SafetyCheck_Sem4,      //Set semaphore once since Amperes Task doesn't run
+                OS_OPT_POST_1,
+                &err);
+	assertOSError(err);
+    OSSemPost(&SafetyCheck_Sem4,      //Set semaphore once since Battery Balancing Task doesn't run
+                OS_OPT_POST_1,
+                &err);
+	assertOSError(err);
+
+    while(1){
         WDog_BitMap |= WD_AMPERES;
         WDog_BitMap |= WD_BALANCING;
         //delay of 100ms
         OSTimeDly(10, OS_OPT_TIME_DLY, &err);
         assertOSError(err);
+        BSP_Light_Toggle(EXTRA);
+    }
 }
 
 // Similar to the production code main. Does not check watchdog or mess with contactor 
 int main(void) {
+    if (BSP_WDTimer_DidSystemReset()) {
+		while(1);
+	}
+
     OS_ERR err;
     BSP_PLL_Init();
-
+    BSP_Lights_Init();
     OSInit(&err);
     assertOSError(err);
 
@@ -175,11 +191,12 @@ int main(void) {
                 &err);
     assertOSError(err);
 
+    //Give same priority as amperes task thread
     OSTaskCreate(&Task2_TCB,
                 "Task 2",
                 Task2,
                 (void *)0,
-                1,
+                5,
                 Task2_Stk,
                 16,
                 256,

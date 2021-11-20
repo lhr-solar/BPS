@@ -84,7 +84,7 @@ void Voltage_UpdateMeasurements(void){
 	LTC6811_rdcv_safe(0, NUM_MINIONS, Minions); // Set to read back all cell voltage registers
 	//copies values from cells.c_codes to private array
 	OSMutexPend(&Voltage_Mutex, 0, OS_OPT_PEND_BLOCKING, &ts, &err);
-  assertOSError(err);
+  	assertOSError(err);
 	for(int i = 0; i < NUM_BATTERY_MODULES; i++){
 		VoltageVal[i] = Minions[i / MAX_VOLT_SENSORS_PER_MINION_BOARD].cells.c_codes[i % MAX_VOLT_SENSORS_PER_MINION_BOARD];
 	}
@@ -106,7 +106,7 @@ SafetyStatus Voltage_CheckStatus(void){
 			
 		// VOLTAGE_LIMITS are in floating point. The LTC6811 sends the voltage data
 		// as unsigned 16-bit fixed point integers with a resolution of 0.00001
-		if(voltage > MAX_VOLTAGE_LIMIT * MILLI_SCALING_FACTOR) {
+		if(voltage > MAX_VOLTAGE_LIMIT) {
 		    return OVERVOLTAGE;
 		}
 		if (Amps_IsCharging()){
@@ -145,12 +145,13 @@ void Voltage_GetModulesInDanger(VoltageSafety_t* system){
 	for (int i = 0; i < TOTAL_VOLT_WIRES; i++) {	
 		if(i < NUM_BATTERY_MODULES){
 			// Check if battery is in range of voltage limit
-			if(Voltage_GetModuleMillivoltage(i) > MAX_VOLTAGE_LIMIT * MILLI_SCALING_FACTOR) {
+			if(Voltage_GetModuleMillivoltage(i) > MAX_VOLTAGE_LIMIT) {
 				system->module_checks[i] = OVERVOLTAGE;
 			}
 			else if(Voltage_GetModuleMillivoltage(i) < MIN_VOLTAGE_LIMIT){
 				system->module_checks[i] = UNDERVOLTAGE;
 			}
+			else system->module_checks[i] = SAFE;
 		}
 		if(openWires[i] == 1) {
 			system->wire_checks[i] = DANGER;

@@ -34,6 +34,7 @@ void Task_VoltTempMonitor(void *p_arg) {
         // BLOCKING =====================
         // Update Voltage Measurements
         Voltage_UpdateMeasurements();
+        WDog_BitMap |= WD_VOLT_TEMP; //Set watchdog bits for task
         // Check if voltage is NOT safe:
         SafetyStatus voltageStatus = Voltage_CheckStatus();
         if(voltageStatus != SAFE) {
