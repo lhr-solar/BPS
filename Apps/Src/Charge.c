@@ -8,7 +8,7 @@
 
 #define CHARGE_RESOLUTION_SCALE 1000000     // What we need to multiply 100% by before storing. Ensure it is >= 10,000 to avoid depleted charge calculation issues
 #define MAX_CHARGE_MILLI_AMP_HRS 41300    // In miliamp-hours (mAh), calculated from 12950(mah)*14 bats in parallel
-static int32_t charge;  // % of charge left with 0.01% resolution
+static int32_t charge;  // % of charge left with 0.000001% resolution
 
 /** Charge_Init
  * Initializes necessary timer and values to begin state of charge
@@ -30,12 +30,11 @@ void Charge_Init(void){
  * not a constant samping. Add on however much from the previous
  */
 void Charge_Calculate(int32_t milliamps){ 
-	/* Update Charge, units of 0.01% */
+	/* Update Charge, units of 0.000001% . 100,000,000 is charge at 100% */
 	
 	int64_t micro_sec = (int64_t)BSP_Timer_GetMicrosElapsed();
 	int64_t millis = (int64_t)milliamps;
-	// Test: Ensure that the microseconds elapsed are accurate
-	//printf("microseconds elapsed (should be 100,000): %ld\n\r", micro_sec);
+	
 	charge -= (int32_t) (micro_sec * millis
 						* ((100 * CHARGE_RESOLUTION_SCALE) / 1000000)
 						/ 3600 / MAX_CHARGE_MILLI_AMP_HRS);
@@ -57,7 +56,7 @@ void Charge_Calibrate(int8_t faultType){
 
 /** Charge_GetPercent
  * Gets the percentage of charge left in the battery pack
- * @return fixed point percentage. Resolution = 0.01 (45.55% = 4555)
+ * @return fixed point percentage. Resolution = 0.000001% (45,550,000 = 45.55%)
  */
 uint32_t Charge_GetPercent(void){
 	return charge;
@@ -66,7 +65,7 @@ uint32_t Charge_GetPercent(void){
 /** Charge_SetAccum 
  * Sets the accumulator of the coloumb counting algorithm
  * @param accumulator value in percent of total charge,
- *                    with a resolution = 0.01%
+ *                    with a resolution = 0.000001% (100,000,000 = 100%)
  */
 void Charge_SetAccum(int32_t accum){
 	charge = accum;

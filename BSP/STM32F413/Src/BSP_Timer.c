@@ -56,7 +56,7 @@ uint32_t BSP_Timer_GetRunFreq(void) {
     RCC_ClocksTypeDef RCC_Clocks;
 	RCC_GetClocksFreq(&RCC_Clocks);
 
-    return RCC_Clocks.SYSCLK_Frequency;
+    return RCC_Clocks.PCLK2_Frequency; // Tested using UART and this appears to be the proper clock used by the timer.
 }
 
 /**
@@ -65,12 +65,9 @@ uint32_t BSP_Timer_GetRunFreq(void) {
  * @return  Microseconds 
  */
 uint32_t BSP_Timer_GetMicrosElapsed(void) {
-	RCC_ClocksTypeDef rccClocks;
-	RCC_GetClocksFreq(&rccClocks);
-	uint32_t freq = rccClocks.PCLK2_Frequency; // Tested using UART and this appears to be the proper clock.
+	
 	uint32_t ticks = BSP_Timer_GetTicksElapsed();
-	printf("ticks elapsed : %ld\n\r", ticks);
+	uint32_t freq = BSP_Timer_GetRunFreq();
 	uint32_t micros_elap = ticks * (PRESCALER + 1) / (freq / MICROSEC_CON); // Math to ensure that we do not overflow (16Mhz or 80Mhz)
-	printf("micros elapsed : %ld\n\r", micros_elap);
 	return micros_elap;
 } 
