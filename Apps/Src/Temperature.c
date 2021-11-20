@@ -83,7 +83,6 @@ ErrorStatus Temperature_ChannelConfig(uint8_t tempChannel) {
 
 	//take control of mutex
 	OS_ERR err;
-	int8_t pec_error;
   	OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
   	assertOSError(err);
 	
@@ -107,7 +106,7 @@ ErrorStatus Temperature_ChannelConfig(uint8_t tempChannel) {
 	// Send data
     wakeup_sleep(NUM_MINIONS);
     LTC6811_wrcomm(NUM_MINIONS, Minions);
-	pec_error = LTC6811_rdcomm(NUM_MINIONS, Minions);
+	LTC6811_rdcomm_safe(NUM_MINIONS, Minions);
 	LTC6811_stcomm();
 
 	for (int board = 0; board < NUM_MINIONS; board++) {
@@ -132,14 +131,13 @@ ErrorStatus Temperature_ChannelConfig(uint8_t tempChannel) {
 	// Send data
     wakeup_sleep(NUM_MINIONS);
     LTC6811_wrcomm(NUM_MINIONS, Minions);
-	pec_error |= LTC6811_rdcomm(NUM_MINIONS, Minions);
+	LTC6811_rdcomm(NUM_MINIONS, Minions);
 	LTC6811_stcomm();
 	//release mutex
   	OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
   	assertOSError(err);
 
-	if (!pec_error) return SUCCESS;
-	else return ERROR;
+	return SUCCESS;
 }
 
 /** convertVoltageToTemperature
@@ -197,7 +195,7 @@ ErrorStatus Temperature_UpdateSingleChannel(uint8_t channel){
  */
 ErrorStatus Temperature_UpdateAllMeasurements(){
 	for (int sensorCh = 0; sensorCh < MAX_TEMP_SENSORS_PER_MINION_BOARD; sensorCh++) {
-		if (Temperature_UpdateSingleChannel(sensorCh) == ERROR) return ERROR;
+		Temperature_UpdateSingleChannel(sensorCh);
 	}
 	return SUCCESS;
 }
