@@ -271,6 +271,7 @@ void BSP_SPI_Write(spi_port_t port, uint8_t *txBuf, uint32_t txLen) {
 			// Wait for the transmission to complete
 			SPI_WaitTx(SPI_BUSSES[port]);
 		}
+		SPI_Wait(SPI_BUSSES[port]);
 	}
 }
 
@@ -310,7 +311,7 @@ void BSP_SPI_Read(spi_port_t port, uint8_t *rxBuf, uint32_t rxLen) {
 			SPI_WaitTx(SPI_BUSSES[port]);
 			// Busy wait the last bit, just to ensure all bytes have been received
 
-			SPI_Wait(SPI_BUSSES[spi_ltc6811]);
+			SPI_Wait(SPI_BUSSES[port]);
 
 			// Copy the data out of the fifo
 			while(r < i && rxfifo_get(&spiRxFifos[port], &rxBuf[r])) {
