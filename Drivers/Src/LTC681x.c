@@ -1760,7 +1760,6 @@ Shifts data in COMM register out over LTC6811 SPI/I2C port
 */
 void LTC681x_stcomm()
 {
-  
   uint8_t cmd[4];
   uint16_t cmd_pec;
 
