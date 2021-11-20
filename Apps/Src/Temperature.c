@@ -7,8 +7,6 @@
 #include "Temperature.h"
 #include "os.h"
 #include "Tasks.h"
-#include "BSP_UART.h"
-#include "BSP_SPI.h"
 
 // lookup table for converting ADC voltages to temperatures
 extern const int32_t voltToTemp[];
@@ -49,13 +47,9 @@ void Temperature_Init(cell_asic *boards){
   	assertOSError(err);
 	// Write Configuration Register
 	LTC6811_wrcfg(NUM_MINIONS, Minions);
-	OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
-  	assertOSError(err);
 
 	// Read Configuration Register
 	wakeup_sleep(NUM_MINIONS);
-	OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
-  	assertOSError(err);
 	LTC6811_rdcfg_safe(NUM_MINIONS, Minions);
 	//release mutex
   	OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
@@ -96,6 +90,7 @@ ErrorStatus Temperature_ChannelConfig(uint8_t tempChannel) {
 
 	//take control of mutex
 	OS_ERR err;
+	int8_t pec_error;
   	OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
   	assertOSError(err);
 	
@@ -112,19 +107,24 @@ ErrorStatus Temperature_ChannelConfig(uint8_t tempChannel) {
 		Minions[board].com.tx_data[3] = (0 << 4) + AUX_I2C_NACK_STOP;
 
 		// Rest is no transmit with all data bits set to high, makes sure there's nothing else we're sending
-		//Minions[board].com.tx_data[4] = (AUX_I2C_NO_TRANSMIT << 4) + 0xF;
-		//Minions[board].com.tx_data[5] = (0xF << 4) + AUX_I2C_NACK_STOP;
-		
-		// Send data
-    	wakeup_sleep(NUM_MINIONS);
-    	LTC6811_wrcomm(NUM_MINIONS, Minions);
-		int8_t pec_error = LTC6811_rdcomm(NUM_MINIONS, Minions);
-		LTC6811_stcomm();
+		Minions[board].com.tx_data[4] = (AUX_I2C_NO_TRANSMIT << 4) + 0xF;
+		Minions[board].com.tx_data[5] = (0xF << 4) + AUX_I2C_NACK_STOP;
+	}
 
+	// Send data
+    wakeup_sleep(NUM_MINIONS);
+    LTC6811_wrcomm(NUM_MINIONS, Minions);
+	pec_error = LTC6811_rdcomm(NUM_MINIONS, Minions);
+	LTC6811_stcomm();
+
+	for (int board = 0; board < NUM_MINIONS; board++) {
 		/* Open channel on mux */
 		
+		// Send Address for a particular mux
 		Minions[board].com.tx_data[0] = (AUX_I2C_START << 4) + (muxAddress >> 4); 				
 		Minions[board].com.tx_data[1] = (muxAddress << 4) + AUX_I2C_NACK;
+
+
 
 		// Sends what channel to open. 8 is the enable bit
 		// 8 + temp_channel
@@ -134,44 +134,19 @@ ErrorStatus Temperature_ChannelConfig(uint8_t tempChannel) {
 		// Rest is no transmit with all data bits set to high, makes sure there's nothing else we're sending
 		Minions[board].com.tx_data[4] = (AUX_I2C_NO_TRANSMIT << 4) + 0xF;
 		Minions[board].com.tx_data[5] = (0xF << 4) + AUX_I2C_NACK_STOP;
-		// Send data
-    	wakeup_sleep(NUM_MINIONS);
-    	LTC6811_wrcomm(NUM_MINIONS, Minions);
-		pec_error |= LTC6811_rdcomm(NUM_MINIONS, Minions);
-		LTC6811_stcomm();
     }
-	
-	// for (int board = 0; board < NUM_MINIONS; board++) {
-	// 	/* Open channel on mux */
-		
-	// 	// Send Address for a particular mux
-	// 	Minions[board].com.tx_data[0] = (AUX_I2C_START << 4) + (muxAddress >> 4); 				
-	// 	Minions[board].com.tx_data[1] = (muxAddress << 4) + AUX_I2C_NACK;
 
-	// 	// Sends what channel to open. 8 is the enable bit
-	// 	// 8 + temp_channel
-	// 	Minions[board].com.tx_data[2] = (AUX_I2C_BLANK << 4) + 0xF; 				// set dont cares high
-	// 	Minions[board].com.tx_data[3] = ((8 + tempChannel) << 4) + AUX_I2C_NACK;
-			
-	// 	// Rest is no transmit with all data bits set to high, makes sure there's nothing else we're sending
-	// 	Minions[board].com.tx_data[4] = (AUX_I2C_NO_TRANSMIT << 4) + 0xF;
-	// 	Minions[board].com.tx_data[5] = (0xF << 4) + AUX_I2C_NACK_STOP;
-    // }
-	
-    // // Send data
-    // wakeup_sleep(NUM_MINIONS);
-    // LTC6811_wrcomm(NUM_MINIONS, Minions);
-	// //pec_error |= LTC6811_rdcomm(NUM_MINIONS, Minions);
-	// LTC6811_stcomm();
-	
+	// Send data
+    wakeup_sleep(NUM_MINIONS);
+    LTC6811_wrcomm(NUM_MINIONS, Minions);
+	pec_error |= LTC6811_rdcomm(NUM_MINIONS, Minions);
+	LTC6811_stcomm();
 	//release mutex
   	OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
   	assertOSError(err);
 
-	//if (!pec_error) return SUCCESS;
-	//else return ERROR;
-	//BSP_SPI_SetStateCS(spi_ltc6811, 1);
-	return SUCCESS;
+	if (!pec_error) return SUCCESS;
+	else return ERROR;
 }
 
 /** convertVoltageToTemperature
@@ -223,7 +198,6 @@ ErrorStatus Temperature_UpdateSingleChannel(uint8_t channel){
 		// update adc value from GPIO1 stored in a_codes[0]; 
 		// a_codes[0] is fixed point with .001 resolution in volts -> multiply by .001 * 1000 to get mV in double form
 		ModuleTemperatures[board][channel] = milliVoltToCelsius(Minions[board].aux.a_codes[0] / 10);
-		//ModuleTemperatures[board][channel] = Minions[board].aux.a_codes[0];
 	}
 	//release mutex
   	OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
@@ -340,8 +314,12 @@ uint8_t *Temperature_GetModulesInDanger(void){
  * @return temperature of the battery module at specified index
  */
 int32_t Temperature_GetSingleTempSensor(uint8_t board, uint8_t sensorIdx) {
-	//TODO: Add pend/post here
+	OS_ERR err;
+	OSMutexPend(&TemperatureBuffer_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
+  	assertOSError(err);
 	return ModuleTemperatures[board][sensorIdx];
+	OSMutexPost(&TemperatureBuffer_Mutex, OS_OPT_POST_1, &err);
+  	assertOSError(err);
 }
 
 /** Temperature_GetModuleTemperature

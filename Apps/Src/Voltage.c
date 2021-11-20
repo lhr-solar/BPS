@@ -35,7 +35,6 @@ void Voltage_Init(cell_asic *boards){
 	Minions = boards;
 	//initialize mutex
 	OS_ERR err;
- 
 	OSMutexCreate(&Voltage_Mutex,
 				  "Voltage Buffer Mutex",
 				  &err
@@ -107,7 +106,7 @@ SafetyStatus Voltage_CheckStatus(void){
 			
 		// VOLTAGE_LIMITS are in floating point. The LTC6811 sends the voltage data
 		// as unsigned 16-bit fixed point integers with a resolution of 0.00001
-		if(voltage > MAX_VOLTAGE_LIMIT * MILLI_SCALING_FACTOR) {
+		if(voltage > MAX_VOLTAGE_LIMIT) {
 		    return OVERVOLTAGE;
 		}
 		if (Amps_IsCharging()){
@@ -146,12 +145,13 @@ void Voltage_GetModulesInDanger(VoltageSafety_t* system){
 	for (int i = 0; i < TOTAL_VOLT_WIRES; i++) {	
 		if(i < NUM_BATTERY_MODULES){
 			// Check if battery is in range of voltage limit
-			if(Voltage_GetModuleMillivoltage(i) > MAX_VOLTAGE_LIMIT * MILLI_SCALING_FACTOR) {
+			if(Voltage_GetModuleMillivoltage(i) > MAX_VOLTAGE_LIMIT) {
 				system->module_checks[i] = OVERVOLTAGE;
 			}
 			else if(Voltage_GetModuleMillivoltage(i) < MIN_VOLTAGE_LIMIT){
 				system->module_checks[i] = UNDERVOLTAGE;
 			}
+			else system->module_checks[i] = SAFE;
 		}
 		if(openWires[i] == 1) {
 			system->wire_checks[i] = DANGER;
