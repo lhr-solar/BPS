@@ -7,9 +7,7 @@
 #include "Temperature.h"
 #include "os.h"
 #include "Tasks.h"
-
-// lookup table for converting ADC voltages to temperatures
-extern const int32_t voltToTemp[];
+#include "VoltageToTemp.h"
 
 // Holds the temperatures in Celsius (Fixed Point with .001 resolution) for each sensor on each board
 static int32_t ModuleTemperatures[NUM_MINIONS][MAX_TEMP_SENSORS_PER_MINION_BOARD];
