@@ -1,6 +1,6 @@
 /* Copyright (c) 2020 UT Longhorn Racing Solar */
 #include "BSP_PLL.h"
-#include "AS8510.h"
+#include "ADS7042.h"
 #include "common.h"
 #include "config.h"
 #include "os.h"
@@ -11,38 +11,53 @@
 #include "Amps.h"
 
 /******************************************************************************
- * AS8510 Driver Test Plan
+ * ADS7042 Driver and Amperes App Test Plan
  * 
  * 1. Set up BPS Leader, Amperes, and Shunt Resistor boards so that they are connected properly.
  * 2. Power on the system.
  * 3. Build this test program and flash it onto the BPS.
  * 4. Connect your computer to the BPS's UART-USB port and open it in Putty.
  * 5. Reset the BPS.
- * 6. Apply +100 mV to the shunt resistor. The BPS should read a positive current.
- * 7. Apply -100 mV to the shunt resistor. The BPS should read a negative current.
+ * 6. Apply a small positive voltage (> 5mV, < 15mV) to the shunt resistor. The BPS should read a positive current.
+ * 7. Apply a small negative voltage (> -15mV, < -5mV) to the shunt resistor. The BPS should read a negative current.
  * 8. Use a power supply to run a known positive current through the shunt resistor.
  *    Verify that the BPS UART output agrees with the power supply (fail the test if we are more than 200mA off)
  * 9. Repeat step 8 with a negative current.
  * 10. Use a Lithium-Ion battery module from the pack with a current-limiting resistor to run a large current (>75 Amps)
  *     through the shunt resistor. Verify that the BPS UART output (fail the test if we are more than 200mA off)
  * 11. Repeat step 10 with a large negative current (<-20 Amps)
+ * 
+ * Expected Output:
+ * Current (milliAmps): <Positive or Negative value for step 6/7>
+ * Is charging: <"true" if Negative current, "false" if Positive current>
+ * Status: <"SAFE" if current is between (-20000, 75000)mA, "DANGER" if outside of range>
+ * 
  ******************************************************************************/
 
 OS_TCB Task1_TCB;
 CPU_STK Task1_Stk[256];
 
 void Task1(void *p_arg){
+    OS_ERR err;
     OS_CPU_SysTickInit(SystemCoreClock / (CPU_INT32U) OSCfg_TickRate_Hz);
     
     BSP_Lights_Init();
     BSP_UART_Init(NULL, NULL, UART_USB);
-    Amps_Init(); // I could write this out, but it just initializes the semaphore and mutex and calls AS8510_Init()
-   
+    Amps_Init(); // I could write this out, but it just initializes the semaphore and mutex and calls ADS7042_Init()
+    
+    char *statuses[4] = {"SAFE", "DANGER", "OVERVOLTAGE", "UNDERVOLTAGE"};
+
     while(1) {
-        int32_t current = AS8510_GetCurrent();
-        printf("current (milliAmps): %d\n\r", (int)current);
+        Amps_UpdateMeasurements();
+        printf("Current (milliAmps): %ld\n\r", Amps_GetReading());
+
+        bool check = Amps_IsCharging();
+        printf("Is charging: %s\n\r", (check ? "true" : "false"));
+        printf("Status: %s\n\r", statuses[Amps_CheckStatus(check)]);
+
         BSP_Light_Toggle(EXTRA);
-        for (volatile int i = 0; i < 1000000; i++);
+        
+        OSTimeDly(300, OS_OPT_TIME_DLY, &err);
     }
 
     exit(0);

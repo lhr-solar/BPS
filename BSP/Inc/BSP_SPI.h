@@ -14,7 +14,7 @@
 
 typedef enum {
     spi_ltc6811 = 0,
-    spi_as8510,
+    spi_ads7042,
 
     NUM_SPI_BUSSES
 } spi_port_t;
