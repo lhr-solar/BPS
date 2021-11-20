@@ -147,7 +147,7 @@ ErrorStatus Temperature_ChannelConfig(uint8_t tempChannel) {
  * @return temperature in Celsius (Fixed Point with .001 resolution) 
  */
 int32_t milliVoltToCelsius(uint32_t milliVolt){
-	if (milliVolt < 3301) {
+	if (milliVolt < sizeof(voltToTemp)/sizeof(voltToTemp[0])) {
 		return voltToTemp[milliVolt];
 	}
 	else {
