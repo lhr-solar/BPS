@@ -165,12 +165,12 @@ void Task2(void *p_arg){
     }
 }
 
-// Similar to the production code main. Does not check watchdog or mess with contactor 
+// Similar to the production code main. Does not mess with contactor 
 int main(void) {
-    if (BSP_WDTimer_DidSystemReset()) {
+    /*)if (BSP_WDTimer_DidSystemReset()) {
         Fault_BitMap = Fault_WDOG;
         EnterFaultState();
-	}
+	}*/
 
     OS_ERR err;
     BSP_PLL_Init();

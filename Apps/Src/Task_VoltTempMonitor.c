@@ -34,7 +34,7 @@ void Task_VoltTempMonitor(void *p_arg) {
         // BLOCKING =====================
         // Update Voltage Measurements
         Voltage_UpdateMeasurements();
-        WDog_BitMap |= WD_VOLT_TEMP; //Set watchdog bits for task
+        
         // Check if voltage is NOT safe:
         SafetyStatus voltageStatus = Voltage_CheckStatus();
         if(voltageStatus != SAFE) {
@@ -142,6 +142,11 @@ void Task_VoltTempMonitor(void *p_arg) {
 
         //signal watchdog
         OSMutexPend(&WDog_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
+        assertOSError(err);
+
+        WDog_BitMap |= WD_VOLT_TEMP; //Set watchdog bits for task
+
+        OSMutexPost(&WDog_Mutex, OS_OPT_POST_NONE, &err);
         assertOSError(err);
 
         //delay of 100ms
