@@ -20,12 +20,13 @@
  * 5. Reset the BPS.
  * 6. Apply a small positive voltage (> 5mV, < 15mV) to the shunt resistor. The BPS should read a positive current.
  * 7. Apply a small negative voltage (> -15mV, < -5mV) to the shunt resistor. The BPS should read a negative current.
- * 8. Use a power supply to run a known positive current through the shunt resistor.
+ * 8. Apply a range of small positive and negative voltages to the shunt resistor and compare with expected currents.
+ * 9. Use a power supply to run a known positive current through the shunt resistor.
  *    Verify that the BPS UART output agrees with the power supply (fail the test if we are more than 200mA off)
- * 9. Repeat step 8 with a negative current.
- * 10. Use a Lithium-Ion battery module from the pack with a current-limiting resistor to run a large current (>75 Amps)
+ * 10. Repeat step 8 with a negative current.
+ * 11. Use a Lithium-Ion battery module from the pack with a current-limiting resistor to run a large current (>75 Amps)
  *     through the shunt resistor. Verify that the BPS UART output (fail the test if we are more than 200mA off)
- * 11. Repeat step 10 with a large negative current (<-20 Amps)
+ * 12. Repeat step 10 with a large negative current (<-20 Amps)
  * 
  * Expected Output:
  * Current (milliAmps): <Positive or Negative value for step 6/7>

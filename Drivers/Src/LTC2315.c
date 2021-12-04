@@ -24,14 +24,14 @@ static void LTC2315_cs_pulse(){
     LTC2315_delay_u(16);
 }
 
-/* Power up LTC3215 from sleep mode
+/* Wake isoSPI from sleep
  */
 static void LTC2315_wakeup_sleep()
 {
     BSP_SPI_SetStateCS(spi_ltc2315, 0);
     LTC2315_delay_u(500); // Guarantees that isoSPI is awake
     BSP_SPI_SetStateCS(spi_ltc2315, 1);
-    LTC2315_delay_u(1100);
+    LTC2315_delay_u(150);
 }
 
 /* Initialize communication LTC2315
@@ -65,9 +65,7 @@ uint16_t LTC2315_Read() {
     BSP_SPI_Read(spi_ltc2315, rxdata, 2);
     BSP_SPI_SetStateCS(spi_ltc2315, 1);
 
-    //return (((uint16_t)rxdata[0] & 0x3F) << 6) | (((uint16_t)rxdata[1] >> 2) & 0x3F);
-    // 1 bit of 0 + 12 data bits + 1 bit of 0 + 2 bits of X
-    return (((uint16_t)rxdata[0] & 0x7F) << 7) | (((uint16_t)rxdata[1] >> 3) & 0x1F);
+    return (((uint16_t)(rxdata[0] & 0x7F) << 6) | (((uint16_t)(rxdata[1]) >> 2) & 0x1F));
 }
 
 /* Gets value from LTC2315
@@ -77,8 +75,8 @@ int32_t LTC2315_GetCurrent() {
     /**
      * The ADC reads: Gain * (Current * 100uOhm) + Ref
      * INA186A3 chip has Gain = 100, we are using Ref = 1.5V
-     * With 12 bits and input range [0.0V, 3.0V (AVDD)],
-     * precision is 0.732421875mV and 73.2421875mA
+     * With 12 bits and input range [0.0V, 3.0V),
+     * precision is 0.73242mV and 73.242mA
      * At Current = 0A, ADC should read 1.5V => 0x800
      * 
      * Temperature effects are ignored (for now?)
