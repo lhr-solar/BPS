@@ -15,6 +15,7 @@
  * VoltTempMonitor Task Test Plan
  * 
  * 1. Build the BPS code for the stm32f413 for this test file (see README.md)
+ *  --Remember to change Config file parameters NUM_BATTERY_MODULES, NUM_TEMPERATURE_SENSORS, & MAX_VOLT_SENSORS_PER_MINION_BOARD
  * 2. Set up the BPS leader, Minion boards, and Contactor.
  * 3. Flash the BPS (see README.md)
  * 4. Connect a logic analyzer to the BPS's CAN port
@@ -34,11 +35,12 @@ OS_TCB Task2_TCB;
 CPU_STK Task2_Stk[DEFAULT_STACK_SIZE];
 
 OS_ERR p_err;
+void EnterFaultState(void);
 
 // Initialization task for this test
 void Task1(void *p_arg){
     OS_ERR err;
-
+    
     OS_CPU_SysTickInit(SystemCoreClock / (CPU_INT32U) OSCfg_TickRate_Hz);
     
     OSSemCreate(&Fault_Sem4,
@@ -89,7 +91,7 @@ void Task1(void *p_arg){
             &err);					// return err code
 
     //3
-    /*OSTaskCreate(&PetWDog_TCB,				// TCB
+    OSTaskCreate(&PetWDog_TCB,				// TCB
 			"TASK_PETWDOG_PRIO",	// Task Name (String)
 			Task_PetWDog,				// Task function pointer
 			(void *)0,				// Task function args
@@ -102,7 +104,6 @@ void Task1(void *p_arg){
 			(void *)0,				// Extension pointer (not needed)
 			OS_OPT_TASK_STK_CHK | OS_OPT_TASK_SAVE_FP,	// Options
 			&err);					// return err code
-    */
     // Spawn Task_VoltTempMonitor with PRIO 4
     OSTaskCreate(&VoltTempMonitor_TCB,				// TCB
 			"TASK_VOLT_TEMP_MONITOR_PRIO",	// Task Name (String)
@@ -160,14 +161,15 @@ void Task2(void *p_arg){
         //delay of 100ms
         OSTimeDly(10, OS_OPT_TIME_DLY, &err);
         assertOSError(err);
-        BSP_Light_Toggle(EXTRA);
+        BSP_Light_Toggle(RUN);
     }
 }
 
 // Similar to the production code main. Does not check watchdog or mess with contactor 
 int main(void) {
     if (BSP_WDTimer_DidSystemReset()) {
-		while(1);
+        Fault_BitMap = Fault_WDOG;
+        EnterFaultState();
 	}
 
     OS_ERR err;
