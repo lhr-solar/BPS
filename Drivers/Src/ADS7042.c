@@ -53,7 +53,9 @@ uint16_t ADS7042_Read() {
     BSP_SPI_Read(spi_ads7042, rxdata, 2);
     BSP_SPI_SetStateCS(spi_ads7042, 1);
 
-    return (((uint16_t)rxdata[0] & 0x3F) << 6) | (((uint16_t)rxdata[1] >> 2) & 0x3F);
+    //return (((uint16_t)rxdata[0] & 0x3F) << 6) | (((uint16_t)rxdata[1] >> 2) & 0x3F);
+    // 1 bit of 0 + 12 data bits + 1 bit of 0 + 2 bits of X
+    return (((uint16_t)rxdata[0] & 0x7F) << 7) | (((uint16_t)rxdata[1] >> 3) & 0x1F);
 }
 
 /* Gets value from ADS7042
