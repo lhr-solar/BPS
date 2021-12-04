@@ -4,38 +4,52 @@
 #include "Tasks.h"
 #include "BSP_PLL.h"
 
+// TODO: rename every instance of "ads7042" to "ltc3215"
+
 // Helper functions copied from LTC681x.c
 
-static void cs_set(uint8_t state){
-	BSP_SPI_SetStateCS(spi_ads7042, state);
-}
-
-static void ADS7042_delay_u(uint16_t micro)
-{
+static void ADS7042_delay_u(uint16_t micro) {
     uint32_t delay = BSP_PLL_GetSystemClock() / 1000000;
-	for(uint32_t i = 0; i < micro; i++)
-	{
-		for(uint32_t j = 0; j < delay; j++);
+	for(volatile uint32_t i = 0; i < micro; i++) {
+		for(volatile uint32_t j = 0; j < delay; j++);
 	}
 }
 
-//Generic wakeup command to wake the LTC6813 from sleep
+/* Pulse CS
+ * 2 pulses to go into nap mode,
+ * 4 pulses to go into sleep mode.
+ */
+static void LTC2315_cs_pulse(){
+    BSP_SPI_SetStateCS(spi_ads7042, 0);
+    ADS7042_delay_u(16);
+    BSP_SPI_SetStateCS(spi_ads7042, 1);
+    ADS7042_delay_u(16);
+}
+
+/* Power up LTC3215 from sleep mode
+ */
 static void ADS7042_wakeup_sleep()
 {
-    cs_set(0);
-    ADS7042_delay_u(500); // Guarantees the LTC6813 will be in standby
-    cs_set(1);
-    ADS7042_delay_u(150);
+    BSP_SPI_SetStateCS(spi_ads7042, 0);
+    ADS7042_delay_u(500); // Guarantees that isoSPI is awake
+    BSP_SPI_SetStateCS(spi_ads7042, 1);
+    ADS7042_delay_u(1100);
 }
 
 /* Initialize communication ADS7042
- * and run startup offset calibration
  */
 void ADS7042_Init(bsp_os_t spi_os) {
     BSP_SPI_Init(spi_ads7042, &spi_os);
 
-    // 2-byte read on startup for offset calibration
-    ADS7042_Read();
+    ADS7042_wakeup_sleep();
+}
+
+/* Enter sleep mode
+ */
+void LTC2315_Sleep() {
+    for (uint8_t i = 0; i < 4; i++) {
+        LTC2315_cs_pulse();
+    }
 }
 
 /* Read value from ADS7042
@@ -47,7 +61,7 @@ void ADS7042_Init(bsp_os_t spi_os) {
 uint16_t ADS7042_Read() {
     uint8_t rxdata[2];
 
-    ADS7042_wakeup_sleep(1);
+    ADS7042_wakeup_sleep();
 
     BSP_SPI_SetStateCS(spi_ads7042, 0);
     BSP_SPI_Read(spi_ads7042, rxdata, 2);
