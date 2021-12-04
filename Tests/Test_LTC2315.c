@@ -1,6 +1,6 @@
 /* Copyright (c) 2020 UT Longhorn Racing Solar */
 #include "BSP_PLL.h"
-#include "ADS7042.h"
+#include "LTC2315.h"
 #include "common.h"
 #include "config.h"
 #include "os.h"
@@ -11,7 +11,7 @@
 #include "Amps.h"
 
 /******************************************************************************
- * ADS7042 Driver and Amperes App Test Plan
+ * LTC2315 Driver and Amperes App Test Plan
  * 
  * 1. Set up BPS Leader, Amperes, and Shunt Resistor boards so that they are connected properly.
  * 2. Power on the system.
@@ -43,7 +43,7 @@ void Task1(void *p_arg){
     
     BSP_Lights_Init();
     BSP_UART_Init(NULL, NULL, UART_USB);
-    Amps_Init(); // I could write this out, but it just initializes the semaphore and mutex and calls ADS7042_Init()
+    Amps_Init(); // I could write this out, but it just initializes the semaphore and mutex and calls LTC2315_Init()
     
     char *statuses[4] = {"SAFE", "DANGER", "OVERVOLTAGE", "UNDERVOLTAGE"};
 

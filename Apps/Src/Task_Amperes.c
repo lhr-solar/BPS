@@ -2,7 +2,7 @@
 
 #include <string.h>
 #include "Amps.h"
-#include "ADS7042.h"
+#include "LTC2315.h"
 #include "os.h"
 #include "Tasks.h"
 #include "CAN_Queue.h"

@@ -35,13 +35,13 @@ static SPI_TypeDef * const SPI_BUSSES[NUM_SPI_BUSSES] = {
 	// These need to be in the same order as the enum 
 	// spi_port_t as declared in BSP_SPI.h.
 	SPI1,	// LTC6811
-	SPI3 	// ADS7042
+	SPI3 	// LTC2315
 };
 
 static GPIO_TypeDef * const SPI_SELECT_PORTS[NUM_SPI_BUSSES] = {
 	// Need to be in the same order as the enum spi_port_t
 	GPIOD,	// LTC6811
-	GPIOA	// ADS7042
+	GPIOA	// LTC2315
 };
 
 static const uint16_t SPI_SELECT_PINS[NUM_SPI_BUSSES] = {
@@ -71,7 +71,7 @@ static inline void SPI_WaitTx(SPI_TypeDef *SPIx){
 		SPI_os[spi_ltc6811]->pend();
 	}
 	else if(SPIx == SPI3){
-		SPI_os[spi_ads7042]->pend();
+		SPI_os[spi_ltc2315]->pend();
 	}
 #endif
 }
@@ -181,7 +181,7 @@ void BSP_SPI_Init(spi_port_t port, bsp_os_t *spi_os){
 		NVIC_Init(&NVIC_InitStruct);
 		#endif
 
-	} else if(port == spi_ads7042) {
+	} else if(port == spi_ltc2315) {
 		//      SPI configuration:
 		//          speed : 125kbps
 		//          CPOL : 1 (polarity of clock during idle is high)
@@ -230,7 +230,7 @@ void BSP_SPI_Init(spi_port_t port, bsp_os_t *spi_os){
 		GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
 		GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
 		GPIO_Init(GPIOA, &GPIO_InitStruct);
-		SPI_os[spi_ads7042] = spi_os;
+		SPI_os[spi_ltc2315] = spi_os;
 
 		#ifdef RTOS
 		//Configure SPI3 interrupt priority
@@ -389,16 +389,16 @@ void SPI3_IRQHandler(){
 	// Handle the interrupts
 	if (SPI_I2S_GetITStatus(SPI3, SPI_I2S_IT_TXE) == SET){
 		// Check to see if there is any data awaiting transmission
-		if(!txfifo_get(&spiTxFifos[spi_ads7042], (uint8_t*)&SPI3->DR)) {
+		if(!txfifo_get(&spiTxFifos[spi_ltc2315], (uint8_t*)&SPI3->DR)) {
 			// We are out of data, so turn off the interrupt and post the semaphore
 			SPI_I2S_ITConfig(SPI3, SPI_I2S_IT_TXE, DISABLE);
-			SPI_os[spi_ads7042]->post();
+			SPI_os[spi_ltc2315]->post();
 		}
 	}
 	if (SPI_I2S_GetITStatus(SPI3, SPI_I2S_IT_RXNE) == SET){
 		// Get the incoming data, put it in the fifo
 		// If this overflows, it's the user's fault.
-		rxfifo_put(&spiRxFifos[spi_ads7042], SPI3->DR);
+		rxfifo_put(&spiRxFifos[spi_ltc2315], SPI3->DR);
 	}
 	
 	//make the kernel aware that the interrupt has ended

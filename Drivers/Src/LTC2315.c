@@ -1,14 +1,12 @@
-#include "ADS7042.h"
+#include "LTC2315.h"
 #include "BSP_SPI.h"
 #include "os.h"
 #include "Tasks.h"
 #include "BSP_PLL.h"
 
-// TODO: rename every instance of "ads7042" to "ltc3215"
-
 // Helper functions copied from LTC681x.c
 
-static void ADS7042_delay_u(uint16_t micro) {
+static void LTC2315_delay_u(uint16_t micro) {
     uint32_t delay = BSP_PLL_GetSystemClock() / 1000000;
 	for(volatile uint32_t i = 0; i < micro; i++) {
 		for(volatile uint32_t j = 0; j < delay; j++);
@@ -20,28 +18,28 @@ static void ADS7042_delay_u(uint16_t micro) {
  * 4 pulses to go into sleep mode.
  */
 static void LTC2315_cs_pulse(){
-    BSP_SPI_SetStateCS(spi_ads7042, 0);
-    ADS7042_delay_u(16);
-    BSP_SPI_SetStateCS(spi_ads7042, 1);
-    ADS7042_delay_u(16);
+    BSP_SPI_SetStateCS(spi_ltc2315, 0);
+    LTC2315_delay_u(16);
+    BSP_SPI_SetStateCS(spi_ltc2315, 1);
+    LTC2315_delay_u(16);
 }
 
 /* Power up LTC3215 from sleep mode
  */
-static void ADS7042_wakeup_sleep()
+static void LTC2315_wakeup_sleep()
 {
-    BSP_SPI_SetStateCS(spi_ads7042, 0);
-    ADS7042_delay_u(500); // Guarantees that isoSPI is awake
-    BSP_SPI_SetStateCS(spi_ads7042, 1);
-    ADS7042_delay_u(1100);
+    BSP_SPI_SetStateCS(spi_ltc2315, 0);
+    LTC2315_delay_u(500); // Guarantees that isoSPI is awake
+    BSP_SPI_SetStateCS(spi_ltc2315, 1);
+    LTC2315_delay_u(1100);
 }
 
-/* Initialize communication ADS7042
+/* Initialize communication LTC2315
  */
-void ADS7042_Init(bsp_os_t spi_os) {
-    BSP_SPI_Init(spi_ads7042, &spi_os);
+void LTC2315_Init(bsp_os_t spi_os) {
+    BSP_SPI_Init(spi_ltc2315, &spi_os);
 
-    ADS7042_wakeup_sleep();
+    LTC2315_wakeup_sleep();
 }
 
 /* Enter sleep mode
@@ -52,30 +50,30 @@ void LTC2315_Sleep() {
     }
 }
 
-/* Read value from ADS7042
- * ADS7042 outputs 2 bits of 0 + 12 data bits + 2 bits of 0
+/* Read value from LTC2315
+ * LTC2315 outputs 2 bits of 0 + 12 data bits + 2 bits of 0
  * This function returns just the data bits
  * @param data pointer to data buffer
  * @return SUCCESS or ERROR
  */
-uint16_t ADS7042_Read() {
+uint16_t LTC2315_Read() {
     uint8_t rxdata[2];
 
-    ADS7042_wakeup_sleep();
+    LTC2315_wakeup_sleep();
 
-    BSP_SPI_SetStateCS(spi_ads7042, 0);
-    BSP_SPI_Read(spi_ads7042, rxdata, 2);
-    BSP_SPI_SetStateCS(spi_ads7042, 1);
+    BSP_SPI_SetStateCS(spi_ltc2315, 0);
+    BSP_SPI_Read(spi_ltc2315, rxdata, 2);
+    BSP_SPI_SetStateCS(spi_ltc2315, 1);
 
     //return (((uint16_t)rxdata[0] & 0x3F) << 6) | (((uint16_t)rxdata[1] >> 2) & 0x3F);
     // 1 bit of 0 + 12 data bits + 1 bit of 0 + 2 bits of X
     return (((uint16_t)rxdata[0] & 0x7F) << 7) | (((uint16_t)rxdata[1] >> 3) & 0x1F);
 }
 
-/* Gets value from ADS7042
+/* Gets value from LTC2315
  * @return current in milliamps
  */
-int32_t ADS7042_GetCurrent() {
+int32_t LTC2315_GetCurrent() {
     /**
      * The ADC reads: Gain * (Current * 100uOhm) + Ref
      * INA186A3 chip has Gain = 100, we are using Ref = 1.5V
@@ -85,7 +83,7 @@ int32_t ADS7042_GetCurrent() {
      * 
      * Temperature effects are ignored (for now?)
      */
-    int32_t reading = (int32_t)ADS7042_Read();
+    int32_t reading = (int32_t)LTC2315_Read();
     const int32_t OFFSET = 0x0800;
     const int32_t PRECISION_MICRO_AMPS = 73242;
     int32_t milliamps = -1 * ((reading - OFFSET) * PRECISION_MICRO_AMPS) / 1000;    // during testing, the gain seems to be inverted
