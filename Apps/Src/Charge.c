@@ -6,10 +6,9 @@
 #include "Charge.h"
 #include "BSP_Timer.h"
 
-#define CHARGE_RESOLUTION_SCALE 100     // What we need to multiply 100% by before storing
-#define MAX_CHARGE_AMP_HRS 1000*1000    // In amp-hours (Ah), for now it is a dummy value
-
-static uint32_t charge;  // % of charge left with 0.01% resolution
+#define CHARGE_RESOLUTION_SCALE 1000000     // What we need to multiply 100% by before storing. Ensure it is >= 10,000 to avoid depleted charge calculation issues
+#define MAX_CHARGE_MILLI_AMP_HRS 41300    // In miliamp-hours (mAh), calculated from 12950(mah)*14 bats in parallel
+static int32_t charge;  // % of charge left with 0.000001% resolution
 
 /** Charge_Init
  * Initializes necessary timer and values to begin state of charge
@@ -27,21 +26,18 @@ void Charge_Init(void){
 
 /** Charge_Calculate
  * Calculates new Charge depending on the current reading
- * @param current reading from current sensors. Fixed point of 0.001 (1.500 Amps = 1500)
+ * @param milliamps reading from current sensors. Fixed point of 0.001 (1.500 Amps = 1500)
  * not a constant samping. Add on however much from the previous
  */
 void Charge_Calculate(int32_t milliamps){ 
+	/* Update Charge, units of 0.000001% . 100,000,000 is charge at 100% */
 	
-	uint32_t counter = BSP_Timer_GetTicksElapsed();
-	
-	uint32_t ticksElapsed = 0xFFFF - counter;	// I hate this, but fixing BSP_Timer_GetTicksElapsed() is beyond the scope of this PR. Opened issue #389 for this
-
-	uint32_t clockFrequency = BSP_Timer_GetRunFreq();
-
-	/* Update Charge, units of 0.01% */
-	// TODO: I am preserving the existing math to make this PR easier to follow. Fixing it is a problem for issue #390
-	charge += (uint32_t) (CHARGE_RESOLUTION_SCALE * 100 * ticksElapsed * milliamps 
-							/ clockFrequency / 1000 / 60 / 60 / 60 / MAX_CHARGE_AMP_HRS);
+	int64_t micro_sec = (int64_t)BSP_Timer_GetMicrosElapsed();
+	int64_t millis = (int64_t)milliamps;
+	                                                                   // Psuedo code that represents what this math does. In the coded math, order of operations is very important to avoid overflow 
+	charge -= (int32_t) (micro_sec * millis                            // microseconds / 1,000,000 / 3600 = hours_elapsed
+						* ((100 * CHARGE_RESOLUTION_SCALE) / 1000000)  // (milliamp * hours_elapsed) / max_amp_hour = percent_of_charge_elapsed
+						/ 3600 / MAX_CHARGE_MILLI_AMP_HRS);            // percent_charge_elapsed * 100 * charge resolution = a much larger number which represents the charge depleted
 }
 
 /** Charge_Calibrate
@@ -60,7 +56,7 @@ void Charge_Calibrate(int8_t faultType){
 
 /** Charge_GetPercent
  * Gets the percentage of charge left in the battery pack
- * @return fixed point percentage. Resolution = 0.01 (45.55% = 4555)
+ * @return fixed point percentage. Resolution = 0.000001% (45,550,000 = 45.55%)
  */
 uint32_t Charge_GetPercent(void){
 	return charge;
@@ -69,7 +65,7 @@ uint32_t Charge_GetPercent(void){
 /** Charge_SetAccum 
  * Sets the accumulator of the coloumb counting algorithm
  * @param accumulator value in percent of total charge,
- *                    with a resolution = 0.01%
+ *                    with a resolution = 0.000001% (100,000,000 = 100%)
  */
 void Charge_SetAccum(int32_t accum){
 	charge = accum;
