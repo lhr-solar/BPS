@@ -34,10 +34,10 @@ void Charge_Calculate(int32_t milliamps){
 	
 	int64_t micro_sec = (int64_t)BSP_Timer_GetMicrosElapsed();
 	int64_t millis = (int64_t)milliamps;
-	
-	charge -= (int32_t) (micro_sec * millis
-						* ((100 * CHARGE_RESOLUTION_SCALE) / 1000000)
-						/ 3600 / MAX_CHARGE_MILLI_AMP_HRS);
+	                                                                   // Psuedo code that represents what this math does. In the coded math, order of operations is very important to avoid overflow 
+	charge -= (int32_t) (micro_sec * millis                            // microseconds / 1,000,000 / 3600 = hours_elapsed
+						* ((100 * CHARGE_RESOLUTION_SCALE) / 1000000)  // (milliamp * hours_elapsed) / max_amp_hour = percent_of_charge_elapsed
+						/ 3600 / MAX_CHARGE_MILLI_AMP_HRS);            // percent_charge_elapsed * 100 * charge resolution = a much larger number which represents the charge depleted
 }
 
 /** Charge_Calibrate
