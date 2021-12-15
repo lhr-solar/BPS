@@ -7,9 +7,7 @@
 #include "Temperature.h"
 #include "os.h"
 #include "Tasks.h"
-
-// lookup table for converting ADC voltages to temperatures
-extern const int32_t voltToTemp[];
+#include "VoltageToTemp.h"
 
 // Holds the temperatures in Celsius (Fixed Point with .001 resolution) for each sensor on each board
 static int32_t ModuleTemperatures[NUM_MINIONS][MAX_TEMP_SENSORS_PER_MINION_BOARD];
@@ -131,7 +129,7 @@ ErrorStatus Temperature_ChannelConfig(uint8_t tempChannel) {
 	// Send data
     wakeup_sleep(NUM_MINIONS);
     LTC6811_wrcomm(NUM_MINIONS, Minions);
-	LTC6811_rdcomm(NUM_MINIONS, Minions);
+	LTC6811_rdcomm_safe(NUM_MINIONS, Minions);
 	LTC6811_stcomm();
 	//release mutex
   	OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
@@ -147,7 +145,7 @@ ErrorStatus Temperature_ChannelConfig(uint8_t tempChannel) {
  * @return temperature in Celsius (Fixed Point with .001 resolution) 
  */
 int32_t milliVoltToCelsius(uint32_t milliVolt){
-	if (milliVolt < 3301) {
+	if (milliVolt < sizeof(voltToTemp)/sizeof(voltToTemp[0])) {
 		return voltToTemp[milliVolt];
 	}
 	else {
