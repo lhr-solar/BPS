@@ -21,7 +21,7 @@ typedef enum SafetyStatus_e {SAFE = 0, DANGER = 1, OVERVOLTAGE = 2, UNDERVOLTAGE
 //--------------------------------------------------------------------------------
 // Basic Parameters of BPS layout
 
-#define NUM_MINIONS	1//4					 // Number of minion boards
+#define NUM_MINIONS	4					 // Number of minion boards
 
 
 //--------------------------------------------------------------------------------
@@ -30,8 +30,8 @@ typedef enum SafetyStatus_e {SAFE = 0, DANGER = 1, OVERVOLTAGE = 2, UNDERVOLTAGE
 
 //--------------------------------------------------------------------------------
 // Battery Pack layout
-#define NUM_BATTERY_MODULES				6//31		// Number of battery modules
-#define NUM_TEMPERATURE_SENSORS			12//62		// Number of temperature sensors
+#define NUM_BATTERY_MODULES				31		// Number of battery modules
+#define NUM_TEMPERATURE_SENSORS			62		// Number of temperature sensors
 #define NUM_TEMP_SENSORS_PER_MOD		2		// Number of temperature sensors per battery module
 
 //--------------------------------------------------------------------------------
@@ -55,7 +55,7 @@ typedef enum SafetyStatus_e {SAFE = 0, DANGER = 1, OVERVOLTAGE = 2, UNDERVOLTAGE
 //--------------------------------------------------------------------------------
 // Voltage Sensor Configurations
 // Defines how many voltage sensors are connected to each board
-#define MAX_VOLT_SENSORS_PER_MINION_BOARD	6	// User defined. The LTC6811 can actually measure 12 modules.
+#define MAX_VOLT_SENSORS_PER_MINION_BOARD	8	// User defined. The LTC6811 can actually measure 12 modules.
 #define NUM_PINS_PER_LTC 					(MAX_VOLT_SENSORS_PER_MINION_BOARD + 1) // one extra for ground
 #define TOTAL_VOLT_WIRES					(NUM_PINS_PER_LTC * NUM_MINIONS - 1)
 
