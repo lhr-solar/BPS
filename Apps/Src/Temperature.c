@@ -60,7 +60,7 @@ ErrorStatus Temperature_ChannelConfig(uint8_t tempChannel) {
 	uint8_t muxAddress;
 	uint8_t otherMux;
 	
-	if (tempChannel > 7) {
+	if (tempChannel >= MAX_TEMP_SENSORS_PER_MINION_BOARD/2) {
 		muxAddress = MUX2;
 		otherMux = MUX1;
 	}

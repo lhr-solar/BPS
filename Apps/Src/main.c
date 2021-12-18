@@ -25,6 +25,7 @@ int main() {
 
 	// If the WDTimer counts down to 0, then the BPS resets. If BPS has reset, enter a fault state.
 	if (BSP_WDTimer_DidSystemReset()) {
+		Fault_BitMap = Fault_WDOG; //When function called in if statement, RCC flag cleared so set bitmap here
 		EnterFaultState();
 	}
 

@@ -20,7 +20,9 @@ typedef enum SafetyStatus_e {SAFE = 0, DANGER = 1, OVERVOLTAGE = 2, UNDERVOLTAGE
 
 //--------------------------------------------------------------------------------
 // Basic Parameters of BPS layout
-#define NUM_MINIONS     4					 // Number of minion boards
+
+#define NUM_MINIONS	4					 // Number of minion boards
+
 
 //--------------------------------------------------------------------------------
 // Battery Fault Checks

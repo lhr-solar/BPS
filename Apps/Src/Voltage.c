@@ -53,12 +53,12 @@ void Voltage_Init(cell_asic *boards){
   	assertOSError(err);
 
 	// Read Configuration Register
-	wakeup_sleep(NUM_MINIONS);
-	//take control of mutex
+	// take control of mutex
   	OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
   	assertOSError(err);
+	wakeup_sleep(NUM_MINIONS);
 	LTC6811_rdcfg_safe(NUM_MINIONS, Minions);
-	//release mutex
+	// release mutex
   	OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
   	assertOSError(err);
 	
@@ -194,6 +194,9 @@ SafetyStatus Voltage_OpenWire(void){
 
 	for(int32_t i = 0; i < NUM_MINIONS; i++) {
 		if(Minions[i].system_open_wire != 0){
+			if ((i == NUM_MINIONS -1) && ((Minions[i].system_open_wire & 0xEF) != 0)) { //The last Voltage board is only connected to 7 modules
+				break; //Open Wire test runs using MAX_VOLT_SENSORS_PER_MINION_BOARD so value of last module should be cleared
+			}
 			status = DANGER;
 			break;
 		}

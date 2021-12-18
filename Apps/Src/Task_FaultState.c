@@ -74,15 +74,19 @@ void EnterFaultState() {
             EEPROM_LogError(FAULT_WATCHDOG);
             break;
     }
-    CANData_t data;
-    data.b = 1;
-    CANPayload_t Message;
-    Message.data = data;
-    // Push Trip message to CAN Q
-    CANbus_BlockAndSend(TRIP, Message);
-    // Push Contactor State message to CAN Q
-    data.b = 0;
-    CANbus_BlockAndSend(CONTACTOR_STATE, Message);
+
+    // avoid infinite recursive faults, since our CAN Driver relys on the OS to work
+    if (Fault_BitMap != Fault_OS) {
+        CANData_t data;
+        data.b = 1;
+        CANPayload_t Message;
+        Message.data = data;
+        // Push Trip message to CAN Q
+        CANbus_BlockAndSend(TRIP, Message);
+        // Push Contactor State message to CAN Q
+        data.b = 0;
+        CANbus_BlockAndSend(CONTACTOR_STATE, Message);
+    }
 
 #ifdef DEBUGMODE
     char command[COMMAND_SIZE];
