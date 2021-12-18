@@ -10,6 +10,7 @@
 #include "BSP_PLL.h"
 #include "CAN_Queue.h"
 #include "BSP_WDTimer.h"
+#include "BSP_Contactor.h"
 
 /******************************************************************************
  * VoltTempMonitor Task Test Plan
@@ -156,8 +157,12 @@ void Task2(void *p_arg){
 	assertOSError(err);
 
     while(1){
+        OSMutexPend(&WDog_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
+        assertOSError(err);
         WDog_BitMap |= WD_AMPERES;
         WDog_BitMap |= WD_BALANCING;
+        OSMutexPost(&WDog_Mutex, OS_OPT_POST_NONE, &err);
+        assertOSError(err);
         //delay of 100ms
         OSTimeDly(10, OS_OPT_TIME_DLY, &err);
         assertOSError(err);
@@ -167,10 +172,15 @@ void Task2(void *p_arg){
 
 // Similar to the production code main. Does not mess with contactor 
 int main(void) {
-    /*)if (BSP_WDTimer_DidSystemReset()) {
+
+    //Resetting the contactor
+    BSP_Contactor_Init();
+    BSP_Contactor_Off();
+
+    if (BSP_WDTimer_DidSystemReset()) {
         Fault_BitMap = Fault_WDOG;
         EnterFaultState();
-	}*/
+    }
 
     OS_ERR err;
     BSP_PLL_Init();

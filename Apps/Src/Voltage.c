@@ -53,12 +53,12 @@ void Voltage_Init(cell_asic *boards){
   	assertOSError(err);
 
 	// Read Configuration Register
-	wakeup_sleep(NUM_MINIONS);
-	//take control of mutex
+	// take control of mutex
   	OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
   	assertOSError(err);
+	wakeup_sleep(NUM_MINIONS);
 	LTC6811_rdcfg_safe(NUM_MINIONS, Minions);
-	//release mutex
+	// release mutex
   	OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
   	assertOSError(err);
 	

@@ -67,7 +67,10 @@ void Task_VoltTempMonitor(void *p_arg) {
 
         // BLOCKING =====================
         // Check if open wire is NOT safe:
-        SafetyStatus wireStatus = Voltage_OpenWire();
+	
+	// TODO: get OpenWire to not take forever and actually run this
+        // SafetyStatus wireStatus = Voltage_OpenWire();
+	SafetyStatus wireStatus = SAFE;
         
         if(wireStatus != SAFE) {
             Fault_BitMap = Fault_OW;
@@ -136,7 +139,7 @@ void Task_VoltTempMonitor(void *p_arg) {
         // Control Fans depending on temperature
         // Right now this just sets them to maximum speed
         // Once we get a thermal model of the battery box, we can replace this with someting better
-        for (uint8_t i = 0; i < 4; i++){
+        for (uint8_t i = 1; i <= 4; i++){
             BSP_Fans_Set(i, TOPSPEED);
         }
 
