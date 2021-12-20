@@ -125,16 +125,6 @@ void Task1(void *p_arg){
     CAN_Queue_Init();
     assertOSError(err);
 
-    // get contactor to close without temperature or voltage readings
-    OSSemPost(&SafetyCheck_Sem4,
-                OS_OPT_POST_1,
-                &err);
-    assertOSError(err);
-    OSSemPost(&SafetyCheck_Sem4,
-                OS_OPT_POST_1,
-                &err);
-    assertOSError(err);
-
 	//delete task
 	OSTaskDel(NULL, &err); // Delete task
 }
@@ -143,14 +133,19 @@ void Task1(void *p_arg){
 void Task2(void *p_arg){
     OS_ERR err;
 
-    OSSemPost(&SafetyCheck_Sem4,      //Set semaphore once since Amperes Task doesn't run
+    // get contactor to close without temperature, voltage, or open wire readings
+    OSSemPost(&SafetyCheck_Sem4,      
                 OS_OPT_POST_1,
                 &err);
 	assertOSError(err);
-    OSSemPost(&SafetyCheck_Sem4,      //Set semaphore once since Battery Balancing Task doesn't run
+    OSSemPost(&SafetyCheck_Sem4,      
                 OS_OPT_POST_1,
                 &err);
 	assertOSError(err);
+    OSSemPost(&SafetyCheck_Sem4,
+                OS_OPT_POST_1,
+                &err);
+    assertOSError(err);
 
     while(1){
         OSMutexPend(&WDog_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
