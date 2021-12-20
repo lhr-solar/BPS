@@ -3,6 +3,7 @@
 #include "os.h"
 #include "Tasks.h"
 #include "BSP_PLL.h"
+#include <stdio.h>
 
 // Helper functions copied from LTC681x.c
 
@@ -64,9 +65,29 @@ uint16_t LTC2315_Read() {
     BSP_SPI_SetStateCS(spi_ltc2315, 0);
     BSP_SPI_Read(spi_ltc2315, rxdata, 2);
     BSP_SPI_SetStateCS(spi_ltc2315, 1);
+    // uint16_t reading = (((uint16_t) rxdata[0] << 5) | ((uint16_t) rxdata[1] >> 3)) & 0x0fff;  // pack reading into 12 bits
+    // printf("raw ADC reading: %x\r\n", reading);
 
-    return (((uint16_t)(rxdata[0] & 0x7F) << 6) | (((uint16_t)(rxdata[1]) >> 2) & 0x1F));
+    return (((uint16_t) rxdata[0] << 5) | ((uint16_t) rxdata[1] >> 3)) & 0x0fff;  // pack reading into 12 bits
 }
+
+/*
+static void sort(int32_t *arr, uint8_t length) {
+    // insertion sort
+    for (uint8_t i = 0; i < length; ++i) {
+        int32_t min = arr[i];
+	uint8_t minIdx = i;
+        for (int32_t j = i; j < length; ++j) {
+            if (arr[min] > arr[j]) {
+                min = arr[j];
+		minIdx = j;
+	    }
+	}
+	arr[minIdx] = arr[i];
+	arr[i]      = min;
+    }
+}
+*/
 
 /* Gets value from LTC2315
  * @return current in milliamps
@@ -81,9 +102,42 @@ int32_t LTC2315_GetCurrent() {
      * 
      * Temperature effects are ignored (for now?)
      */
-    int32_t reading = (int32_t)LTC2315_Read();
-    const int32_t OFFSET = 0x0800;
+
+    // assume first reading is at 0 milliamps for calibration
+    // should be a safe assumption, since contactor will be open
+    
+    static bool calibrated = false;
+    static int32_t offset;
+    /*
+    static int32_t readings[20];
+
+    // take 20 readings
+    for (int i = 0; i < 20; ++i) {
+        readings[i] = (int32_t)LTC2315_Read();
+    }
+
+    // find averaage of middle 10 readings
+    int32_t reading = 0;
+    sort(readings, 20);
+    for (int i = 5; i < 15; ++i) {
+        reading += readings[i];
+    }
+    */
+
+    int32_t reading = 0;
+    for (int i = 0; i < 10; ++i) {
+        reading += (int32_t)LTC2315_Read();
+    }
+
+    reading /= 10;
+
+    if (!calibrated) {
+        calibrated = true;
+        offset = reading;
+    }
+    // const int32_t OFFSET = 0x0800;
     const int32_t PRECISION_MICRO_AMPS = 73242;
-    int32_t milliamps = -1 * ((reading - OFFSET) * PRECISION_MICRO_AMPS) / 1000;    // during testing, the gain seems to be inverted
+    int32_t milliamps = -1 * ((reading - offset) * PRECISION_MICRO_AMPS) / 1000;    // during testing, the gain seems to be inverted
     return milliamps;
+    // return reading;
 }

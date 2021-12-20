@@ -98,7 +98,7 @@ SafetyStatus Amps_CheckStatus(bool chargingOnly) {
 		status = SAFE;
 	}
 	else if((latestMeasureMilliAmps <= 0)&&(latestMeasureMilliAmps > MAX_CHARGING_CURRENT)&&chargingOnly){
-		return SAFE;
+		status = SAFE;
 	}
 	else{
 		status = DANGER;

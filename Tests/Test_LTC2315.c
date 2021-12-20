@@ -58,7 +58,7 @@ void Task1(void *p_arg){
 
         BSP_Light_Toggle(EXTRA);
         
-        OSTimeDly(300, OS_OPT_TIME_DLY, &err);
+        OSTimeDly(100, OS_OPT_TIME_DLY, &err);
     }
 
     exit(0);

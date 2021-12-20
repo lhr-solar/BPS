@@ -9,6 +9,8 @@
 #include "BSP_Lights.h"
 #include "BSP_PLL.h"
 #include "CAN_Queue.h"
+#include "BSP_WDTimer.h"
+#include "BSP_Contactor.h"
 
 /******************************************************************************
  * Amperes Task Test Plan
@@ -26,6 +28,8 @@
  * 9. Apply an overcurrent to the BPS (less than -20 Amps or greater than 75 Amps) and
  *    verify that the contactor opens (the contactor should have closed earlier on startup)
  *****************************************************************************/
+
+void EnterFaultState(void);
 
 // Used by Task1
 OS_TCB Task1_TCB;
@@ -136,7 +140,16 @@ void Task1(void *p_arg){
 // Similar to the production code main. Does not check watchdog or mess with contactor 
 int main(void) {
     OS_ERR err;
+
     BSP_PLL_Init();
+    //Resetting the contactor
+    BSP_Contactor_Init();
+    BSP_Contactor_Off();
+
+    // If the WDTimer counts down to 0, then the BPS resets. If BPS has reset, enter a fault state.
+    if (BSP_WDTimer_DidSystemReset()) {
+	    EnterFaultState();
+    }
 
     OSInit(&err);
     assertOSError(err);
