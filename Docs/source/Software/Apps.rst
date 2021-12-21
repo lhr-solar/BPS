@@ -245,7 +245,11 @@ Usage
 
 Additional Considerations
     The Open Wire functions all directly contact the LTC. ``Voltage_OpenWireSummary()`` requires 
-    UART to be initialized, since it uses printf().
+    UART to be initialized, since it uses printf(). Also, when using the RTOS version of the BPS, 
+    communication with the LTC should also be protected by the mutex ``MinionsASIC_Mutex``. This 
+    includes calling the function ``wakeup_sleep()`` along with all the other communication functions.
+    Finally, ``Voltage_OpenWire()`` is modified upon the fact that the last LTC module only has 7 
+    batteries connected to it. If changes to hardware are made, this function will require changes as well.
 
 **********************
 Mutexes and Semaphores
