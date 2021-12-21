@@ -18,8 +18,7 @@ void LTC2315_Sleep();
 /* Read value from LTC2315
  * LTC2315 outputs 2 bits of 0 + 12 data bits + 2 bits of 0
  * This function returns just the data bits
- * @param data pointer to data buffer
- * @return SUCCESS or ERROR
+ * @return Raw 12-bit value read from the ADC
  */
 uint16_t LTC2315_Read();
 
