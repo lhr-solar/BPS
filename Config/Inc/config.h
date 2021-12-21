@@ -33,6 +33,8 @@ typedef enum SafetyStatus_e {SAFE = 0, DANGER = 1, OVERVOLTAGE = 2, UNDERVOLTAGE
 #define NUM_BATTERY_MODULES				31		// Number of battery modules
 #define NUM_TEMPERATURE_SENSORS			62		// Number of temperature sensors
 #define NUM_TEMP_SENSORS_PER_MOD		2		// Number of temperature sensors per battery module
+#define NUM_BATTERY_MODULES_MISSING     1       // Number of battery modules less than maximum value per minion board
+#define OPEN_WIRE_MASK                  0xEF    // Mask used to ignore disconnected battery modules in Open Wire Test
 
 //--------------------------------------------------------------------------------
 // MAX and MIN limits of lithium ion cells

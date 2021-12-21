@@ -194,7 +194,8 @@ SafetyStatus Voltage_OpenWire(void){
 
 	for(int32_t i = 0; i < NUM_MINIONS; i++) {
 		if(Minions[i].system_open_wire != 0){
-			if ((i == NUM_MINIONS -1) && ((Minions[i].system_open_wire & 0xEF) != 0)) { //The last Voltage board is only connected to 7 modules
+			//The last Voltage board is only connected to 7 modules
+			if ((i == NUM_MINIONS - NUM_BATTERY_MODULES_MISSING) && ((Minions[i].system_open_wire & OPEN_WIRE_MASK) != 0)) {
 				break; //Open Wire test runs using MAX_VOLT_SENSORS_PER_MINION_BOARD so value of last module should be cleared
 			}
 			status = DANGER;
