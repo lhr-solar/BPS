@@ -52,7 +52,7 @@ void LTC2315_Sleep() {
 }
 
 /* Read value from LTC2315
- * LTC2315 outputs 2 bits of 0 + 12 data bits + 2 bits of 0
+ * LTC2315 outputs 1 bit of 0 + 12 data bits + 3 bits of 0
  * This function returns just the data bits
  * @return Raw 12-bit value read from the ADC
  */
