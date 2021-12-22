@@ -18,6 +18,7 @@ static cell_asic *Minions;
 static OS_MUTEX Voltage_Mutex;
 static uint16_t VoltageVal[NUM_BATTERY_MODULES]; //Voltage values gathered
 static uint32_t openWires[TOTAL_VOLT_WIRES];
+static long open_wire_mask = 0;
 
 /** LTC ADC measures with resolution of 4 decimal places, 
  * But we standardized to have 3 decimal places to work with
@@ -61,7 +62,12 @@ void Voltage_Init(cell_asic *boards){
 	// release mutex
   	OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
   	assertOSError(err);
-	
+
+	for (int i = 0; i < NUM_BATTERY_MODULES_PER_MINION; i++){
+		open_wire_mask <<= 1;
+		open_wire_mask = 1;
+	}
+	open_wire_mask >>= NUM_BATTERY_MODULES_MISSING; 
 }
 
 /** Voltage_UpdateMeasurements
@@ -191,14 +197,6 @@ SafetyStatus Voltage_OpenWire(void){
 	assertOSError(err);
 	
 	LTC6811_run_openwire_multi(NUM_MINIONS, Minions, false);
-
-	long open_wire_mask = 0;
-
-	for (int i = 0; i < NUM_BATTERY_MODULES_PER_MINION; i++){
-		open_wire_mask <<= 1;
-		open_wire_mask = 1;
-	}
-	open_wire_mask >>= NUM_BATTERY_MODULES_MISSING; 
 
 	for(int32_t i = 0; i < NUM_MINIONS; i++) {
 		if(Minions[i].system_open_wire != 0){
