@@ -65,7 +65,7 @@ void Voltage_Init(cell_asic *boards){
 
 	for (int i = 0; i < NUM_BATTERY_MODULES_PER_MINION; i++){
 		open_wire_mask <<= 1;
-		open_wire_mask = 1;
+		open_wire_mask |= 1;
 	}
 	open_wire_mask >>= NUM_BATTERY_MODULES_MISSING; 
 }
