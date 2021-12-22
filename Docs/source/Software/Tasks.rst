@@ -357,5 +357,5 @@ Yields
     This task will also yield whenever it sends SPI messages to the LTC6811 minions.
 
 Additional Considerations
-    As of Fall 2021, the open wire functionality of this task has been task has been removed since it takes too much time.
+    As of Fall 2021, the open wire functionality of this task has been removed since it takes too much time, and the normal voltage checks usually catch open wires.
     
