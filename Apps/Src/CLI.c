@@ -403,20 +403,9 @@ void setLED(Light input, int state) {
  * @param hashTokens is the array of hashed tokens
  */
 void CLI_LED(int* hashTokens) {
-	State error = BSP_Light_GetState(FAULT);
-	if(hashTokens[1] == 0) {
-		if(error == ON) {
-			printf("Error light is On\n\r");
-		} else {
-			printf("Error light is Off\n\r");
-		}
-		return;
-	}
 	switch(hashTokens[1]) {
 		case CLI_TEST_HASH:
 			for(int i = 0; i < 10; i++) {
-				BSP_Light_Toggle(FAULT);
-				DelayMs(100);
 				BSP_Light_Toggle(RUN);
 				DelayMs(100);
 				BSP_Light_Toggle(UVOLT);
@@ -427,6 +416,8 @@ void CLI_LED(int* hashTokens) {
 				DelayMs(100);
 				BSP_Light_Toggle(OCURR);
 				DelayMs(100);
+				BSP_Light_Toggle(WIRE);
+				DelayMs(100);
 				BSP_Light_Toggle(WDOG);
 				DelayMs(100);
 				BSP_Light_Toggle(CAN);
@@ -434,9 +425,6 @@ void CLI_LED(int* hashTokens) {
 				BSP_Light_Toggle(EXTRA);
 				DelayMs(100);
 			}
-			break;
-		case CLI_FAULT_HASH:
-			setLED(FAULT, hashTokens[2]);
 			break;
 		case CLI_RUN_HASH:
 			setLED(RUN, hashTokens[2]);

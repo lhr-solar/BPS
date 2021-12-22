@@ -51,4 +51,3 @@ int main() {
 
 	// Should not get here or else there is an error
 }
-
