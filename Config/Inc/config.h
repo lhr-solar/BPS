@@ -34,7 +34,8 @@ typedef enum SafetyStatus_e {SAFE = 0, DANGER = 1, OVERVOLTAGE = 2, UNDERVOLTAGE
 #define NUM_TEMPERATURE_SENSORS			62		// Number of temperature sensors
 #define NUM_TEMP_SENSORS_PER_MOD		2		// Number of temperature sensors per battery module
 #define NUM_BATTERY_MODULES_PER_MINION	8	// User defined. The LTC6811 can actually measure 12 modules.
-#define NUM_BATTERY_MODULES_MISSING     NUM_BATTERY_MODULES - ((NUM_MINIONS-1) * NUM_BATTERY_MODULES_PER_MINION       // Number of battery modules less than maximum value per minion board
+// Number of battery modules less than maximum value per minion board
+#define NUM_BATTERY_MODULES_MISSING     NUM_BATTERY_MODULES - ((NUM_MINIONS-1) * NUM_BATTERY_MODULES_PER_MINION)
 #define OPEN_WIRE_MASK                  0x7F    // Mask used to ignore disconnected battery modules in Open Wire Test
 
 //--------------------------------------------------------------------------------

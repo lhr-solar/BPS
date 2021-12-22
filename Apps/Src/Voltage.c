@@ -192,9 +192,17 @@ SafetyStatus Voltage_OpenWire(void){
 	
 	LTC6811_run_openwire_multi(NUM_MINIONS, Minions, false);
 
+	long open_wire_mask = 0;
+
+	for (int i = 0; i < NUM_BATTERY_MODULES_PER_MINION; i++){
+		open_wire_mask <<= 1;
+		open_wire_mask = 1;
+	}
+	open_wire_mask >>= NUM_BATTERY_MODULES_MISSING; 
+
 	for(int32_t i = 0; i < NUM_MINIONS; i++) {
 		if(Minions[i].system_open_wire != 0){
-			if ((i == NUM_MINIONS -1) && ((Minions[i].system_open_wire & 0xEF) != 0)) { //The last Voltage board is only connected to 7 modules
+			if ((i == NUM_MINIONS - 1) && ((Minions[i].system_open_wire & open_wire_mask) != 0)) { //The last Voltage board is only connected to 7 modules
 				break; //Open Wire test runs using NUM_BATTERY_MODULES_PER_MINION so value of last module should be cleared
 			}
 			status = DANGER;
