@@ -1297,7 +1297,7 @@ int16_t LTC681x_run_adc_redundancy_st(uint8_t adc_mode, uint8_t adc_reg, uint8_t
 						  )
 {              
 	uint16_t OPENWIRE_THRESHOLD = 4000;
-	const uint8_t  N_CHANNELS = MAX_VOLT_SENSORS_PER_MINION_BOARD;
+	const uint8_t  N_CHANNELS = NUM_BATTERY_MODULES_PER_MINION;
 
 	uint16_t pullUp[total_ic][N_CHANNELS];
 	uint16_t pullDwn[total_ic][N_CHANNELS];

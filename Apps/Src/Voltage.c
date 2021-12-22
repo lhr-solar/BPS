@@ -86,7 +86,7 @@ void Voltage_UpdateMeasurements(void){
 	OSMutexPend(&Voltage_Mutex, 0, OS_OPT_PEND_BLOCKING, &ts, &err);
   	assertOSError(err);
 	for(int i = 0; i < NUM_BATTERY_MODULES; i++){
-		VoltageVal[i] = Minions[i / MAX_VOLT_SENSORS_PER_MINION_BOARD].cells.c_codes[i % MAX_VOLT_SENSORS_PER_MINION_BOARD];
+		VoltageVal[i] = Minions[i / NUM_BATTERY_MODULES_PER_MINION].cells.c_codes[i % NUM_BATTERY_MODULES_PER_MINION];
 	}
 	//release mutex
   	OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
@@ -195,7 +195,7 @@ SafetyStatus Voltage_OpenWire(void){
 	for(int32_t i = 0; i < NUM_MINIONS; i++) {
 		if(Minions[i].system_open_wire != 0){
 			if ((i == NUM_MINIONS -1) && ((Minions[i].system_open_wire & 0xEF) != 0)) { //The last Voltage board is only connected to 7 modules
-				break; //Open Wire test runs using MAX_VOLT_SENSORS_PER_MINION_BOARD so value of last module should be cleared
+				break; //Open Wire test runs using NUM_BATTERY_MODULES_PER_MINION so value of last module should be cleared
 			}
 			status = DANGER;
 			break;
@@ -245,9 +245,9 @@ uint16_t Voltage_GetModuleMillivoltage(uint8_t moduleIdx){
     // Each board will measure the same number of modules except for the last board in the daisy chain.
     // To find which minion board the battery module (moduleIdx) is assigned to, we need to
     // divide the moduleIdx by how many battery modules are assigned to each minion board
-    // (indicated by MAX_VOLT_SENSORS_PER_MINION_BOARD). If the minion idx exceeds how many minion
+    // (indicated by NUM_BATTERY_MODULES_PER_MINION). If the minion idx exceeds how many minion
     // boards are currently present, then return an error voltage.
-    if((moduleIdx / MAX_VOLT_SENSORS_PER_MINION_BOARD) >= NUM_MINIONS) {
+    if((moduleIdx / NUM_BATTERY_MODULES_PER_MINION) >= NUM_MINIONS) {
         return 0xFFFF;  // return -1 which indicates error voltage
     }
 	if (!Fault_Flag){

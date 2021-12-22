@@ -33,6 +33,9 @@ typedef enum SafetyStatus_e {SAFE = 0, DANGER = 1, OVERVOLTAGE = 2, UNDERVOLTAGE
 #define NUM_BATTERY_MODULES				31		// Number of battery modules
 #define NUM_TEMPERATURE_SENSORS			62		// Number of temperature sensors
 #define NUM_TEMP_SENSORS_PER_MOD		2		// Number of temperature sensors per battery module
+#define NUM_BATTERY_MODULES_PER_MINION	8	// User defined. The LTC6811 can actually measure 12 modules.
+#define NUM_BATTERY_MODULES_MISSING     NUM_BATTERY_MODULES - ((NUM_MINIONS-1) * NUM_BATTERY_MODULES_PER_MINION       // Number of battery modules less than maximum value per minion board
+#define OPEN_WIRE_MASK                  0x7F    // Mask used to ignore disconnected battery modules in Open Wire Test
 
 //--------------------------------------------------------------------------------
 // MAX and MIN limits of lithium ion cells
@@ -55,14 +58,13 @@ typedef enum SafetyStatus_e {SAFE = 0, DANGER = 1, OVERVOLTAGE = 2, UNDERVOLTAGE
 //--------------------------------------------------------------------------------
 // Voltage Sensor Configurations
 // Defines how many voltage sensors are connected to each board
-#define MAX_VOLT_SENSORS_PER_MINION_BOARD	8	// User defined. The LTC6811 can actually measure 12 modules.
-#define NUM_PINS_PER_LTC 					(MAX_VOLT_SENSORS_PER_MINION_BOARD + 1) // one extra for ground
+#define NUM_PINS_PER_LTC 					(NUM_BATTERY_MODULES_PER_MINION + 1) // one extra for ground
 #define TOTAL_VOLT_WIRES					(NUM_PINS_PER_LTC * NUM_MINIONS - 1)
 
 //--------------------------------------------------------------------------------
 // Temperature Sensor Configurations
 // Define how many temperature sensors are connected to each board
-#define MAX_TEMP_SENSORS_PER_MINION_BOARD	(MAX_VOLT_SENSORS_PER_MINION_BOARD * NUM_TEMP_SENSORS_PER_MOD)
+#define MAX_TEMP_SENSORS_PER_MINION_BOARD	(NUM_BATTERY_MODULES_PER_MINION * NUM_TEMP_SENSORS_PER_MOD)
 
 //--------------------------------------------------------------------------------
 // HeartBeat Delay Ticks

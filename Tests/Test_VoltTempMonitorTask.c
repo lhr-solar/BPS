@@ -16,7 +16,7 @@
  * VoltTempMonitor Task Test Plan
  * 
  * 1. Build the BPS code for the stm32f413 for this test file (see README.md)
- *  --Remember to change Config file parameters NUM_BATTERY_MODULES, NUM_TEMPERATURE_SENSORS, & MAX_VOLT_SENSORS_PER_MINION_BOARD
+ *  --Remember to change Config file parameters NUM_BATTERY_MODULES, NUM_TEMPERATURE_SENSORS, & NUM_BATTERY_MODULES_PER_MINION
  * 2. Set up the BPS leader, Minion boards, and Contactor.
  * 3. Flash the BPS (see README.md)
  * 4. Connect a logic analyzer to the BPS's CAN port

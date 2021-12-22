@@ -246,12 +246,12 @@ void CLI_Temperature(int* hashTokens) {
 				if(hashTokens[3] == 0) {//temperature of module
 					printf("Module number %d: %.3f C\n\r", hashTokens[2], Temperature_GetModuleTemperature(hashTokens[2]-1)/MILLI_UNIT_CONVERSION);
 				} else if(hashTokens[3]-1 == 0 || hashTokens[3]-1 == 1) {//temperature of specific sensor in module
-					uint16_t boardNum = (hashTokens[2]-1)/MAX_VOLT_SENSORS_PER_MINION_BOARD;
+					uint16_t boardNum = (hashTokens[2]-1)/NUM_BATTERY_MODULES_PER_MINION;
 					uint16_t sensorNum;
 					if (hashTokens[3]-1) {
-						sensorNum = ((hashTokens[2]-1)%MAX_VOLT_SENSORS_PER_MINION_BOARD)+MAX_VOLT_SENSORS_PER_MINION_BOARD;
+						sensorNum = ((hashTokens[2]-1)%NUM_BATTERY_MODULES_PER_MINION)+NUM_BATTERY_MODULES_PER_MINION;
 					} else {
-						sensorNum = (hashTokens[2]-1)%MAX_VOLT_SENSORS_PER_MINION_BOARD;
+						sensorNum = (hashTokens[2]-1)%NUM_BATTERY_MODULES_PER_MINION;
 					}
 					printf("Sensor %d on module %d: %.3f C\n\r", hashTokens[3], hashTokens[2], 
 							Temperature_GetSingleTempSensor(boardNum, sensorNum)/MILLI_UNIT_CONVERSION);
