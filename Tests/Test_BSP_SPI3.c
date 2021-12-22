@@ -51,7 +51,7 @@ void Task1(void *p_arg){
     spi_os.pend = pend;
     spi_os.post = post;
 
-    BSP_SPI_Init(spi_ads7042, &spi_os);
+    BSP_SPI_Init(spi_ltc2315, &spi_os);
     
 
     uint8_t data[32/*4+NUM_MINIONS*8*/] = {0xAB, 0xCD, 0xEF, 0x6E, 0x00, 0x00};  
@@ -59,7 +59,7 @@ void Task1(void *p_arg){
     while(1) {
         BSP_Light_Toggle(FAULT);
 
-        BSP_SPI_Write(spi_ads7042, data, 27);
+        BSP_SPI_Write(spi_ltc2315, data, 27);
         for (volatile int i = 0; i < 1000000; i++);
         // OSTimeDly(15, OS_OPT_TIME_DLY, &err);
     }

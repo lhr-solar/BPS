@@ -102,6 +102,7 @@ void Task_Init(void *p_arg) {
 				(void *)0,				// Extension pointer (not needed)
 				OS_OPT_TASK_STK_CHK | OS_OPT_TASK_SAVE_FP,	// Options
 				&err);					// return err code
+	/*
         //6
         OSTaskCreate(&BatteryBalance_TCB,				// TCB
 				"TASK_BATTERY_BALANCE_PRIO",	// Task Name (String)
@@ -130,6 +131,7 @@ void Task_Init(void *p_arg) {
 				(void *)0,				// Extension pointer (not needed)
 				OS_OPT_TASK_STK_CHK | OS_OPT_TASK_SAVE_FP,	// Options
 				&err);					// return err code
+	*/
         //8
         OSTaskCreate(&CANBusConsumer_TCB,				// TCB
 				"TASK_CANBUS_CONSUMER_PRIO",	// Task Name (String)
@@ -144,6 +146,7 @@ void Task_Init(void *p_arg) {
 				(void *)0,				// Extension pointer (not needed)
 				OS_OPT_TASK_STK_CHK | OS_OPT_TASK_SAVE_FP,	// Options
 				&err);					// return err code
+	/*
         //9
         OSTaskCreate(&CLI_TCB,				// TCB
 				"TASK_CLI_PRIO",	// Task Name (String)
@@ -158,6 +161,7 @@ void Task_Init(void *p_arg) {
 				(void *)0,				// Extension pointer (not needed)
 				OS_OPT_TASK_STK_CHK | OS_OPT_TASK_SAVE_FP,	// Options
 				&err);					// return err code}
+	*/
         //10
         OSTaskCreate(&Idle_TCB,				// TCB
 				"TASK_IDLE_PRIO",	// Task Name (String)

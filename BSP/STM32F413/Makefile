@@ -202,7 +202,7 @@ clean:
 # flash
 #######################################
 flash: 
-	$(SF) write $(BUILD_DIR)/$(TARGET).bin 0x8000000
+	$(SF) --connect-under-reset write $(BUILD_DIR)/$(TARGET).bin 0x8000000
 
 #######################################
 # dependencies

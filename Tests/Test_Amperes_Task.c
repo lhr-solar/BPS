@@ -9,6 +9,8 @@
 #include "BSP_Lights.h"
 #include "BSP_PLL.h"
 #include "CAN_Queue.h"
+#include "BSP_WDTimer.h"
+#include "BSP_Contactor.h"
 
 /******************************************************************************
  * Amperes Task Test Plan
@@ -27,10 +29,14 @@
  *    verify that the contactor opens (the contactor should have closed earlier on startup)
  *****************************************************************************/
 
+void EnterFaultState(void);
+
 // Used by Task1
 OS_TCB Task1_TCB;
 CPU_STK Task1_Stk[DEFAULT_STACK_SIZE];
 
+OS_TCB Task2_TCB;
+CPU_STK Task2_Stk[DEFAULT_STACK_SIZE];
 
 // Initialization task for this test
 void Task1(void *p_arg){
@@ -119,24 +125,55 @@ void Task1(void *p_arg){
     CAN_Queue_Init();
     assertOSError(err);
 
-    // get contactor to close without temperature or voltage readings
-    OSSemPost(&SafetyCheck_Sem4,
+	//delete task
+	OSTaskDel(NULL, &err); // Delete task
+}
+
+//Task to prevent watchdog from tripping
+void Task2(void *p_arg){
+    OS_ERR err;
+
+    // get contactor to close without temperature, voltage, or open wire readings
+    OSSemPost(&SafetyCheck_Sem4,      
                 OS_OPT_POST_1,
                 &err);
-    assertOSError(err);
+	assertOSError(err);
+    OSSemPost(&SafetyCheck_Sem4,      
+                OS_OPT_POST_1,
+                &err);
+	assertOSError(err);
     OSSemPost(&SafetyCheck_Sem4,
                 OS_OPT_POST_1,
                 &err);
     assertOSError(err);
 
-	//delete task
-	OSTaskDel(NULL, &err); // Delete task
+    while(1){
+        OSMutexPend(&WDog_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
+        assertOSError(err);
+        WDog_BitMap |= WD_VOLT_TEMP;
+        WDog_BitMap |= WD_BALANCING;
+        OSMutexPost(&WDog_Mutex, OS_OPT_POST_NONE, &err);
+        assertOSError(err);
+        //delay of 100ms
+        OSTimeDly(10, OS_OPT_TIME_DLY, &err);
+        assertOSError(err);
+        BSP_Light_Toggle(RUN);
+    }
 }
 
 // Similar to the production code main. Does not check watchdog or mess with contactor 
 int main(void) {
     OS_ERR err;
+
     BSP_PLL_Init();
+    //Resetting the contactor
+    BSP_Contactor_Init();
+    BSP_Contactor_Off();
+
+    // If the WDTimer counts down to 0, then the BPS resets. If BPS has reset, enter a fault state.
+    if (BSP_WDTimer_DidSystemReset()) {
+	    EnterFaultState();
+    }
 
     OSInit(&err);
     assertOSError(err);
@@ -147,6 +184,22 @@ int main(void) {
                 (void *)0,
                 1,
                 Task1_Stk,
+                16,
+                256,
+                0,
+                0,
+                (void *)0,
+                OS_OPT_TASK_SAVE_FP | OS_OPT_TASK_STK_CHK,
+                &err);
+    assertOSError(err);
+
+    //Give same priority as volt temp task thread
+    OSTaskCreate(&Task2_TCB,
+                "Task 2",
+                Task2,
+                (void *)0,
+                4,
+                Task2_Stk,
                 16,
                 256,
                 0,

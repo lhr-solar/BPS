@@ -5,7 +5,7 @@
  */
 
 #include "Amps.h"
-#include "ADS7042.h"
+#include "LTC2315.h"
 #include "os.h"
 #include "Tasks.h"
 #include "BSP_SPI.h"
@@ -62,7 +62,7 @@ void Amps_Init(void) {
 	assertOSError(err);
 	spi_os.pend = Amperes_Pend;
 	spi_os.post = Amperes_Post;
-	ADS7042_Init(spi_os);
+	LTC2315_Init(spi_os);
 	OSMutexCreate(&AmperesData_Mutex, "Amperes Mutex", &err);
 	assertOSError(err);
 }
@@ -76,7 +76,7 @@ ErrorStatus Amps_UpdateMeasurements(void) {
 	CPU_TS ticks;
 	OSMutexPend(&AmperesData_Mutex, 0, OS_OPT_PEND_BLOCKING, &ticks, &err);
 	assertOSError(err);
-	latestMeasureMilliAmps = ADS7042_GetCurrent();	// TODO: verify that there is no conversion required here
+	latestMeasureMilliAmps = LTC2315_GetCurrent();	// TODO: verify that there is no conversion required here
 	OSMutexPost(&AmperesData_Mutex, OS_OPT_POST_NONE, &err);
 	assertOSError(err);
 	return SUCCESS;		//TODO: Once this has been tested, stop returning errors
@@ -98,7 +98,7 @@ SafetyStatus Amps_CheckStatus(bool chargingOnly) {
 		status = SAFE;
 	}
 	else if((latestMeasureMilliAmps <= 0)&&(latestMeasureMilliAmps > MAX_CHARGING_CURRENT)&&chargingOnly){
-		return SAFE;
+		status = SAFE;
 	}
 	else{
 		status = DANGER;
