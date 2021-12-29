@@ -81,8 +81,8 @@ void BSP_CAN_Init(void (*rxEvent)(void), void (*txEnd)(void), bool loopback) {
     CAN_InitStructure.CAN_SJW  = CAN_SJW_1tq;
 
     /* CAN Baudrate = 125 KBps
-        * 1/(prescalar + (prescalar*BS1) + (prescalar*BS2)) * Clk = CAN Baudrate
-        * The CAN clk is currently set to 20MHz (APB1 clock set to 20MHz in BSP_PLL_Init())
+    * 1/(prescalar + (prescalar*BS1) + (prescalar*BS2)) * Clk = CAN Baudrate
+    * The CAN clk is currently set to 20MHz (APB1 clock set to 20MHz in BSP_PLL_Init())
     */
     CAN_InitStructure.CAN_BS1 = CAN_BS1_3tq;
     CAN_InitStructure.CAN_BS2 = CAN_BS2_4tq; 
