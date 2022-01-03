@@ -116,4 +116,10 @@ int32_t Temperature_GetTotalPackAvgTemperature(void);
  */
 ErrorStatus Temperature_SampleADC(uint8_t ADCMode);
 
+/** Temperature_GetMaxTemperature
+ * Gets the maximum measured temperature in the most recent batch of temperature measurements
+ * @return the maximum measured temperature in the most recent batch of temperature measurements
+ */
+int32_t Temperature_GetMaxTemperature(void);
+
 #endif

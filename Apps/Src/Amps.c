@@ -84,11 +84,11 @@ ErrorStatus Amps_UpdateMeasurements(void) {
 
 /** Amps_CheckStatus
  * Checks if pack does not have a short circuit
- * @param chargingOnly a flag that indicates whether we should allow
- * 		  only charging or both charging and discharging.
+ * @param maxTemperature the maximum temperature measured in the most recent batch of temperature readings
  * @return SAFE or DANGER
  */
-SafetyStatus Amps_CheckStatus(bool chargingOnly) {
+SafetyStatus Amps_CheckStatus(int32_t maxTemperature) {
+	bool chargingOnly = maxTemperature > MAX_CHARGE_TEMPERATURE_LIMIT;
 	OS_ERR err;
 	CPU_TS ticks;
 	SafetyStatus status;
