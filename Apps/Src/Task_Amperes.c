@@ -8,6 +8,7 @@
 #include "CAN_Queue.h"
 #include "BSP_SPI.h"
 #include "CANbus.h"
+#include "Temperature.h"
 
 void Task_AmperesMonitor(void *p_arg) {
     (void)p_arg;
@@ -27,7 +28,7 @@ void Task_AmperesMonitor(void *p_arg) {
         // Update Amperes Measurements
 		Amps_UpdateMeasurements();
         // Check if amperes is NOT safe:
-		SafetyStatus amperesStatus = Amps_CheckStatus(Amps_IsCharging());
+		SafetyStatus amperesStatus = Amps_CheckStatus(Temperature_GetMaxTemperature());
 		if(amperesStatus != SAFE) {
 		    Fault_BitMap = Fault_OCURR;
             OSSemPost(&Fault_Sem4,

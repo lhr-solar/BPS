@@ -84,23 +84,23 @@ ErrorStatus Amps_UpdateMeasurements(void) {
 
 /** Amps_CheckStatus
  * Checks if pack does not have a short circuit
- * @param chargingOnly a flag that indicates whether we should allow
- * 		  only charging or both charging and discharging.
+ * @param maxTemperature the maximum temperature measured in the most recent batch of temperature readings
  * @return SAFE or DANGER
  */
-SafetyStatus Amps_CheckStatus(bool chargingOnly) {
+SafetyStatus Amps_CheckStatus(int32_t maxTemperature) {
 	OS_ERR err;
 	CPU_TS ticks;
 	SafetyStatus status;
+
+	// determine if we should allow charging or not
+	bool dischargingOnly = maxTemperature > MAX_CHARGE_TEMPERATURE_LIMIT;
+	int32_t chargingCurrentLimit = dischargingOnly ? 0 : MAX_CHARGING_CURRENT;
+
 	OSMutexPend(&AmperesData_Mutex, 0, OS_OPT_PEND_BLOCKING, &ticks, &err);
 	assertOSError(err);
-	if((latestMeasureMilliAmps > MAX_CHARGING_CURRENT)&&(latestMeasureMilliAmps < MAX_CURRENT_LIMIT)&&(!chargingOnly)){
+	if((latestMeasureMilliAmps > chargingCurrentLimit)&&(latestMeasureMilliAmps < MAX_CURRENT_LIMIT)){
 		status = SAFE;
-	}
-	else if((latestMeasureMilliAmps <= 0)&&(latestMeasureMilliAmps > MAX_CHARGING_CURRENT)&&chargingOnly){
-		status = SAFE;
-	}
-	else{
+	} else{
 		status = DANGER;
 	}
 	OSMutexPost(&AmperesData_Mutex, OS_OPT_POST_NONE, &err);

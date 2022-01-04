@@ -12,6 +12,9 @@
 // Holds the temperatures in Celsius (Fixed Point with .001 resolution) for each sensor on each board
 static int32_t ModuleTemperatures[NUM_MINIONS][MAX_TEMP_SENSORS_PER_MINION_BOARD];
 
+// Holds the maximum measured temperature in the most recent batch of temperature measurements
+static int32_t maxTemperature;
+
 // 0 if discharging 1 if charging
 static uint8_t ChargingState;
 
@@ -192,9 +195,25 @@ ErrorStatus Temperature_UpdateSingleChannel(uint8_t channel){
  * @return SUCCESS or ERROR
  */
 ErrorStatus Temperature_UpdateAllMeasurements(){
+	// update all measurements
 	for (int sensorCh = 0; sensorCh < MAX_TEMP_SENSORS_PER_MINION_BOARD; sensorCh++) {
 		Temperature_UpdateSingleChannel(sensorCh);
 	}
+
+	// update max temperature
+	int32_t newMaxTemperature = ModuleTemperatures[0][0];
+	for (int minion = 0; minion < NUM_MINIONS; ++minion) {
+		for (int sensor = 0; sensor < MAX_TEMP_SENSORS_PER_MINION_BOARD; ++sensor) {
+			// ignore parts of the array that are out of bounds
+			if (minion * MAX_TEMP_SENSORS_PER_MINION_BOARD + sensor >= NUM_TEMPERATURE_SENSORS) {
+				break;
+			}
+			if (ModuleTemperatures[minion][sensor] > newMaxTemperature) {
+				newMaxTemperature = ModuleTemperatures[minion][sensor];
+			}
+		}
+	}
+	maxTemperature = newMaxTemperature;
 	return SUCCESS;
 }
 
@@ -312,4 +331,12 @@ ErrorStatus Temperature_SampleADC(uint8_t ADCMode) {
   	OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
   	assertOSError(err);
 	return error != -1 ? SUCCESS : ERROR;
+}
+
+/** Temperature_GetMaxTemperature
+ * Gets the maximum measured temperature in the most recent batch of temperature measurements
+ * @return the maximum measured temperature in the most recent batch of temperature measurements
+ */
+int32_t Temperature_GetMaxTemperature(void) {
+	return maxTemperature;
 }
