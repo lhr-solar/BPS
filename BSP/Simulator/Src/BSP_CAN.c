@@ -20,7 +20,7 @@ static const char* file = GET_CSV_PATH(CAN_CSV_FILE);
 
 
 
-void BSP_CAN_Init(void (*rxEvent)(void), void (*txEnd)(void), bool loopback) {
+void BSP_CAN_Init(callback_t rxEvent, callback_t txEnd, bool loopback) {
 #if 0   // TODO: replace with interrupt-capable code
     FILE* fp = fopen(file, "w");
     if(!fp) {

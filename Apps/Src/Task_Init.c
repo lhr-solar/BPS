@@ -46,6 +46,7 @@ void Task_Init(void *p_arg) {
 				(void *)0,				// Extension pointer (not needed)
 				OS_OPT_TASK_STK_CHK | OS_OPT_TASK_SAVE_FP,	// Options
 				&err);					// return err code
+		assertOSError(err);
         //2
         OSTaskCreate(&CriticalState_TCB,				// TCB
 				"TASK_CRITICAL_STATE_PRIO",	// Task Name (String)
@@ -60,6 +61,7 @@ void Task_Init(void *p_arg) {
 				(void *)0,				// Extension pointer (not needed)
 				OS_OPT_TASK_STK_CHK | OS_OPT_TASK_SAVE_FP,	// Options
 				&err);					// return err code
+		assertOSError(err);
         //3
         OSTaskCreate(&PetWDog_TCB,				// TCB
 				"TASK_PETWDOG_PRIO",	// Task Name (String)
@@ -74,6 +76,7 @@ void Task_Init(void *p_arg) {
 				(void *)0,				// Extension pointer (not needed)
 				OS_OPT_TASK_STK_CHK | OS_OPT_TASK_SAVE_FP,	// Options
 				&err);					// return err code
+		assertOSError(err);
         //4
         OSTaskCreate(&VoltTempMonitor_TCB,				// TCB
 				"TASK_VOLT_TEMP_MONITOR_PRIO",	// Task Name (String)
@@ -88,6 +91,7 @@ void Task_Init(void *p_arg) {
 				(void *)0,				// Extension pointer (not needed)
 				OS_OPT_TASK_STK_CHK | OS_OPT_TASK_SAVE_FP,	// Options
 				&err);					// return err code
+		assertOSError(err);
         //5
         OSTaskCreate(&AmperesMonitor_TCB,				// TCB
 				"TASK_AMPERES_MONITOR_PRIO",	// Task Name (String)
@@ -102,6 +106,7 @@ void Task_Init(void *p_arg) {
 				(void *)0,				// Extension pointer (not needed)
 				OS_OPT_TASK_STK_CHK | OS_OPT_TASK_SAVE_FP,	// Options
 				&err);					// return err code
+		assertOSError(err);
 	/*
         //6
         OSTaskCreate(&BatteryBalance_TCB,				// TCB
@@ -117,6 +122,7 @@ void Task_Init(void *p_arg) {
 				(void *)0,				// Extension pointer (not needed)
 				OS_OPT_TASK_STK_CHK | OS_OPT_TASK_SAVE_FP,	// Options
 				&err);					// return err code
+		assertOSError(err);
         //7
         OSTaskCreate(&LogInfo_TCB,				// TCB
 				"TASK_LOG_INFO_PRIO",	// Task Name (String)
@@ -131,6 +137,7 @@ void Task_Init(void *p_arg) {
 				(void *)0,				// Extension pointer (not needed)
 				OS_OPT_TASK_STK_CHK | OS_OPT_TASK_SAVE_FP,	// Options
 				&err);					// return err code
+		assertOSError(err);
 	*/
         //8
         OSTaskCreate(&CANBusConsumer_TCB,				// TCB
@@ -146,6 +153,7 @@ void Task_Init(void *p_arg) {
 				(void *)0,				// Extension pointer (not needed)
 				OS_OPT_TASK_STK_CHK | OS_OPT_TASK_SAVE_FP,	// Options
 				&err);					// return err code
+		assertOSError(err);
 	/*
         //9
         OSTaskCreate(&CLI_TCB,				// TCB
@@ -160,7 +168,8 @@ void Task_Init(void *p_arg) {
 				10,						// Time quanta (time slice) 10 ticks
 				(void *)0,				// Extension pointer (not needed)
 				OS_OPT_TASK_STK_CHK | OS_OPT_TASK_SAVE_FP,	// Options
-				&err);					// return err code}
+				&err);					// return err code
+		assertOSError(err);
 	*/
         //10
         OSTaskCreate(&Idle_TCB,				// TCB
@@ -175,7 +184,8 @@ void Task_Init(void *p_arg) {
 				10,						// Time quanta (time slice) 10 ticks
 				(void *)0,				// Extension pointer (not needed)
 				OS_OPT_TASK_STK_CHK | OS_OPT_TASK_SAVE_FP,	// Options
-				&err);					// return err code}
+				&err);					// return err code
+		assertOSError(err);
         
 		CAN_Queue_Init();
         assertOSError(err);

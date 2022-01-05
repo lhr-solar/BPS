@@ -21,7 +21,7 @@ void Task_CriticalState(void *p_arg) {
 
     // BLOCKING =====================
     // Wait until voltage, open wire, temperature, and current(Amperes) are all checked and safe
-    for (int i = 0; i < 4; i++){
+    for (int i = 0; i < NUM_FAULT_POINTS; i++){
         OSSemPend(&SafetyCheck_Sem4, 0, OS_OPT_PEND_BLOCKING, &ts, &err);
     }
     // Turn Contactor On

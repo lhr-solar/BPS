@@ -16,9 +16,8 @@ void Amps_Init(void);
 
 /** Amps_UpdateMeasurements
  * Stores and updates the new measurements received
- * @return SUCCESS or ERROR
  */
-ErrorStatus Amps_UpdateMeasurements(void);
+void Amps_UpdateMeasurements(void);
 
 /** Amps_CheckStatus
  * Checks if pack does not have a short circuit
