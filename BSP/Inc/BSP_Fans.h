@@ -35,4 +35,11 @@ ErrorStatus BSP_Fans_Set(uint8_t fan, uint32_t speed);
  */
 int BSP_Fans_GetSpeed(uint8_t fan);
 
+/**
+ * @brief   Sets fan duty cycle for all fans
+ * @param   dutyCycle: int for duty cycle amount in range 0-8
+ * @return  ErrorStatus
+ */
+ErrorStatus BSP_Fans_SetAll(uint32_t speed);
+
 #endif

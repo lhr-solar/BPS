@@ -139,9 +139,7 @@ void Task_VoltTempMonitor(void *p_arg) {
         // Control Fans depending on temperature
         // Right now this just sets them to maximum speed
         // Once we get a thermal model of the battery box, we can replace this with someting better
-        for (uint8_t i = 1; i <= 4; i++){
-            BSP_Fans_Set(i, TOPSPEED);
-        }
+        BSP_Fans_SetAll(TOPSPEED);
 
         //signal watchdog
         OSMutexPend(&WDog_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);

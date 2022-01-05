@@ -69,17 +69,15 @@ void Amps_Init(void) {
 
 /** Amps_UpdateMeasurements
  * Stores and updates the new measurements received
- * @return SUCCESS or ERROR
  */
-ErrorStatus Amps_UpdateMeasurements(void) {
+void Amps_UpdateMeasurements(void) {
 	OS_ERR err;
 	CPU_TS ticks;
 	OSMutexPend(&AmperesData_Mutex, 0, OS_OPT_PEND_BLOCKING, &ticks, &err);
 	assertOSError(err);
-	latestMeasureMilliAmps = LTC2315_GetCurrent();	// TODO: verify that there is no conversion required here
+	latestMeasureMilliAmps = LTC2315_GetCurrent();
 	OSMutexPost(&AmperesData_Mutex, OS_OPT_POST_NONE, &err);
 	assertOSError(err);
-	return SUCCESS;		//TODO: Once this has been tested, stop returning errors
 }
 
 /** Amps_CheckStatus
@@ -114,7 +112,6 @@ SafetyStatus Amps_CheckStatus(int32_t maxTemperature) {
  * @return true if charge, false if discharge
  */
 bool Amps_IsCharging(void) {
-	// TODO: Make sure that the amperes board is installed in such a way that negative => charging
 	return latestMeasureMilliAmps < 0;
 }
 

@@ -33,7 +33,7 @@ static void (*gTxEnd)(void);
  * @param   loopback    : if we should use loopback mode (for testing)
  * @return  None
  */
-void BSP_CAN_Init(void (*rxEvent)(void), void (*txEnd)(void), bool loopback) {
+void BSP_CAN_Init(callback_t rxEvent, callback_t txEnd, bool loopback) {
     GPIO_InitTypeDef GPIO_InitStructure;
     CAN_InitTypeDef CAN_InitStructure;
     NVIC_InitTypeDef NVIC_InitStructure;

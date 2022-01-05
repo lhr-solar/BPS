@@ -43,8 +43,12 @@ ErrorStatus CAN_Queue_Post(CANMSG_t message) {
     bool success = CAN_fifo_put(&canFifo, message);
     OSMutexPost(&canFifo_Mutex, OS_OPT_POST_NONE, &err);
     assertOSError(err);
-    OSSemPost(&canFifo_Sem4, OS_OPT_POST_1, &err);
-    assertOSError(err);
+
+    if (success) {
+        OSSemPost(&canFifo_Sem4, OS_OPT_POST_1, &err);
+        assertOSError(err);
+    }
+
     return success ? SUCCESS : ERROR;
 }
 
