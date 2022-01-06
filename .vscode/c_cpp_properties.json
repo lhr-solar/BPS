@@ -18,7 +18,8 @@
                 "${workspaceFolder}/BSP/Simulator/DataGeneration/BSP",
                 "${workspaceFolder}/BSP/Template/Src",
                 "${workspaceFolder}/CMSIS/Include",
-                "${workspaceFolder}/CMSIS/Device/ST/STM32F4xx/Include"
+                "${workspaceFolder}/CMSIS/Device/ST/STM32F4xx/Include",
+                "${workspaceFolder}/RTOS/uCOS-III-Simulator/uCOS-III/Source"
             ],
             "defines": [
                 "STM32F413_423xx",

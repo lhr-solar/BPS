@@ -66,20 +66,205 @@ Copyright 2017 Linear Technology Corp. (LTC)
 */
 
 #include <stdint.h>
+#include <stdbool.h>
 #include "LTC681x.h"
 #include "LTC6811.h"
 #include "config.h"
 #include "BSP_SPI.h"
+#include "os.h"
+#include "BSP_OS.h"
+#include "Tasks.h"
 
 /*********************************************************/
 /*** Code that was added by UTSVT. ***/
 /*********************************************************/
-void LTC6811_Init(cell_asic *battMod){	
-	BSP_SPI_Init();				// Initialize SPI1 for voltage board	
-	
+bsp_os_t spi_os;
+OS_SEM MinionsIO_Sem4;
+
+// RTOS Setup
+#ifdef RTOS
+void LTC6811_Pend(void) {
+    CPU_TS ts;
+    OS_ERR err;
+    OSSemPend(&MinionsIO_Sem4,
+                        0,
+                        OS_OPT_PEND_BLOCKING,
+                        &ts,
+                        &err);
+    assertOSError(err);
+}
+
+void LTC6811_Post(void) {
+    OS_ERR err;
+    OSSemPost(&MinionsIO_Sem4,
+                        OS_OPT_POST_1,
+                        &err);
+    assertOSError(err);
+}
+#endif
+
+
+#ifdef BAREMETAL
+void LTC6811_Pend(void) {
+    return;
+}
+
+void LTC6811_Post(void) {
+    return;
+}
+#endif
+
+void LTC6811_Init(cell_asic *battMod){
+  //only create the mutex the first time this function is called (called by Voltage_Init() and Temperature_Init())
+  static bool mutexExists = false;
+  OS_ERR err;
+  if (mutexExists == false){
+    OSMutexCreate(&MinionsASIC_Mutex,
+                "Minions ASIC Mutex",
+                &err);
+    assertOSError(err);
+    OSSemCreate(&MinionsIO_Sem4,
+                "Minions Sem4",
+                0,
+                &err);
+    assertOSError(err);
+    mutexExists = true;
+  }
+
+  spi_os.pend = LTC6811_Pend;
+  spi_os.post = LTC6811_Post;
+	BSP_SPI_Init(spi_ltc6811, &spi_os);				// Initialize SPI1 for voltage board	
+
+
 	LTC681x_init_cfg(NUM_MINIONS, battMod);
 	LTC6811_reset_crc_count(NUM_MINIONS, battMod);
 	LTC6811_init_reg_limits(NUM_MINIONS, battMod);
+}
+
+// Reads and parses the LTC6811 cell voltage registers. If packets fail to be read correctly too many times in a row, the BPS is tripped.
+void LTC6811_rdcv_safe(uint8_t reg, // Controls which cell voltage register is read back.
+                     uint8_t total_ic, // the number of ICs in the system
+                     cell_asic ic[] // Array of the parsed cell codes
+                    )
+{
+  OS_ERR err;
+  uint8_t count = 0;
+  while(LTC681x_rdcv(reg,total_ic,ic) == -1){
+    if(count == MAX_PEC_ERRORS){
+      //trip BPS
+      OSSemPost(&Fault_Sem4, OS_OPT_POST_1, &err);
+      assertOSError(err);
+    }
+    count++;
+  }
+}
+
+/*
+ The function is used
+ to read the  parsed GPIO codes of the LTC6811. This function will send the requested
+ read commands parse the data and store the gpio voltages in aux_codes variable.
+ If packets fail to be read correctly too many times in a row, the BPS is tripped.
+*/
+void LTC6811_rdaux_safe(uint8_t reg, //Determines which GPIO voltage register is read back.
+                     uint8_t total_ic,//the number of ICs in the system
+                     cell_asic ic[]//A two dimensional array of the gpio voltage codes.
+                    )
+{
+  OS_ERR err;
+  uint8_t count = 0;
+  while(LTC681x_rdaux(reg,total_ic,ic) == -1){
+    if(count == MAX_PEC_ERRORS){
+      //trip BPS
+      OSSemPost(&Fault_Sem4, OS_OPT_POST_1, &err);
+      assertOSError(err);
+    }
+    count++;
+  }
+}
+
+/*
+ Reads and parses the LTC6811 stat registers.
+ The function is used
+ to read the  parsed stat codes of the LTC6811. This function will send the requested
+ read commands parse the data and store the stat voltages in stat_codes variable.
+If packets fail to be read correctly too many times in a row, the BPS is tripped.
+*/
+void LTC6811_rdstat_safe(uint8_t reg, //Determines which Stat  register is read back.
+                      uint8_t total_ic,//the number of ICs in the system
+                      cell_asic ic[]
+                     )
+{
+  OS_ERR err;
+  uint8_t count = 0;
+  while(LTC681x_rdstat(reg,total_ic,ic) == -1){
+    if(count == MAX_PEC_ERRORS){
+      //trip BPS
+      OSSemPost(&Fault_Sem4, OS_OPT_POST_1, &err);
+      assertOSError(err);
+    }
+    count++;
+  }
+}
+
+/*
+Reads configuration registers of a LTC6811 daisy chain.
+If packets fail to be read correctly too many times in a row, the BPS is tripped.
+*/
+void LTC6811_rdcfg_safe(uint8_t total_ic, //Number of ICs in the system
+                     cell_asic ic[] //A two dimensional array that the function stores the read configuration data.
+                    )
+{
+  OS_ERR err;
+  uint8_t count = 0;
+  while(LTC681x_rdcfg(total_ic, ic) == -1){
+    if(count == MAX_PEC_ERRORS){
+      //trip BPS
+      OSSemPost(&Fault_Sem4, OS_OPT_POST_1, &err);
+      assertOSError(err);
+    }
+    count++;
+  }
+}
+
+/*
+Reads pwm registers of a LTC6811 daisy chain.
+If packets fail to be read correctly too many times in a row, the BPS is tripped.
+*/
+void LTC6811_rdpwm_safe(uint8_t total_ic, //Number of ICs in the system
+                     uint8_t pwmReg,
+                     cell_asic ic[] //A two dimensional array that the function stores the read configuration data.
+                    )
+{
+  OS_ERR err;
+  uint8_t count = 0;
+  while(LTC681x_rdpwm(total_ic, pwmReg, ic) == -1){
+    if(count == MAX_PEC_ERRORS){
+      //trip BPS
+      OSSemPost(&Fault_Sem4, OS_OPT_POST_1, &err);
+      assertOSError(err);
+    }
+    count++;
+  }
+}
+
+/*
+Reads COMM registers of a LTC6811 daisy chain.
+If packets fail to be read correctly too many times in a row, the BPS is tripped.
+*/
+void LTC6811_rdcomm_safe(uint8_t total_ic, //Number of ICs in the system
+                      cell_asic ic[] //A two dimensional array that the function stores the read configuration data.
+                     )
+{
+  OS_ERR err;
+  uint8_t count = 0;
+  while(LTC681x_rdcomm(total_ic, ic) == -1){
+    if(count == MAX_PEC_ERRORS){
+      //trip BPS
+      OSSemPost(&Fault_Sem4, OS_OPT_POST_1, &err);
+      assertOSError(err);
+    }
+    count++;
+  }
 }
 
 /********************************************************
@@ -90,6 +275,7 @@ void LTC6811_init_reg_limits(uint8_t total_ic, cell_asic ic[])
 {
   for (uint8_t cic=0; cic<total_ic; cic++)
   {
+    //already have control of mutex (only called by LTC6811_Init())
     ic[cic].ic_reg.cell_channels=12;
     ic[cic].ic_reg.stat_channels=4;
     ic[cic].ic_reg.aux_channels=6;
@@ -232,7 +418,6 @@ uint8_t LTC6811_rdcv(uint8_t reg, // Controls which cell voltage register is rea
                      cell_asic ic[] // Array of the parsed cell codes
                     )
 {
-
   int8_t pec_error = 0;
   pec_error = LTC681x_rdcv(reg,total_ic,ic);
   return(pec_error);
@@ -248,8 +433,7 @@ int8_t LTC6811_rdaux(uint8_t reg, //Determines which GPIO voltage register is re
                      cell_asic ic[]//A two dimensional array of the gpio voltage codes.
                     )
 {
-  int8_t pec_error = 0;
-  LTC681x_rdaux(reg,total_ic,ic);
+  int8_t pec_error = LTC681x_rdaux(reg,total_ic,ic);
   return (pec_error);
 }
 
@@ -452,12 +636,9 @@ void LTC6811_max_min(uint8_t total_ic, cell_asic ic_cells[],
       if (ic_cells[j].cells.c_codes[i]>ic_max[j].cells.c_codes[i])ic_max[j].cells.c_codes[i]=ic_cells[j].cells.c_codes[i];
       else if (ic_cells[j].cells.c_codes[i]<ic_min[j].cells.c_codes[i])ic_min[j].cells.c_codes[i]=ic_cells[j].cells.c_codes[i];
       ic_delta[j].cells.c_codes[i] = ic_max[j].cells.c_codes[i] - ic_min[j].cells.c_codes[i];
+      
     }
   }
-
-
-
-
 }
 
 void LTC6811_init_max_min(uint8_t total_ic, cell_asic ic[],cell_asic ic_max[],cell_asic ic_min[])
@@ -470,7 +651,6 @@ void LTC6811_init_max_min(uint8_t total_ic, cell_asic ic[],cell_asic ic_max[],ce
       ic_min[j].cells.c_codes[i]=0xFFFF;
     }
   }
-
 }
 
 //Helper function that increments PEC counters
@@ -528,3 +708,5 @@ void LTC6811_set_cfgr_ov(uint8_t nIC, cell_asic ic[],uint16_t ov)
 {
   LTC681x_set_cfgr_ov( nIC, ic, ov);
 }
+
+

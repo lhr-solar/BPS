@@ -48,22 +48,22 @@ Copyright 2017 Linear Technology Corp. (LTC)
 #include "config.h"
 
 static uint8_t spi_read8(void){
-    uint8_t data = 0;
-    BSP_SPI_Read(&data, 1);
+  uint8_t data = 0;
+  BSP_SPI_Read(spi_ltc6811, &data, 1);
 	return data;
 }
 
 static void spi_write_multi8(uint8_t *txBuf, uint32_t txSize){
-	BSP_SPI_Write(txBuf, txSize);
+	BSP_SPI_Write(spi_ltc6811, txBuf, txSize);
 }
 
 static void spi_write_read_multi8(uint8_t *txBuf, uint32_t txSize, uint8_t *rxBuf, uint32_t rxSize){
-    BSP_SPI_Write(txBuf, txSize);
-    BSP_SPI_Read(rxBuf, rxSize);
+  BSP_SPI_Write(spi_ltc6811, txBuf, txSize);
+  BSP_SPI_Read(spi_ltc6811, rxBuf, rxSize);
 }
 
 static void cs_set(uint8_t state){
-	BSP_SPI_SetStateCS(state);
+	BSP_SPI_SetStateCS(spi_ltc6811, state);
 }
 
 void delay_u(uint16_t micro)
@@ -222,7 +222,6 @@ uint16_t pec15_calc(int32_t len, //Number of bytes that will be used to calculat
   for (uint8_t i = 0; i<len; i++) // loops for each byte in data array
   {
     addr = ((remainder>>7)^data[i])&0xff;//calculate PEC table address
-
     remainder = (remainder<<8)^crc15Table[addr];
   }
   return(remainder*2);//The CRC15 has a 0 in the LSB so the remainder must be multiplied by 2
@@ -1298,7 +1297,7 @@ int16_t LTC681x_run_adc_redundancy_st(uint8_t adc_mode, uint8_t adc_reg, uint8_t
 						  )
 {              
 	uint16_t OPENWIRE_THRESHOLD = 4000;
-	const uint8_t  N_CHANNELS = ic[0].ic_reg.cell_channels;
+	const uint8_t  N_CHANNELS = MAX_VOLT_SENSORS_PER_MINION_BOARD;
 
 	uint16_t pullUp[total_ic][N_CHANNELS];
 	uint16_t pullDwn[total_ic][N_CHANNELS];
@@ -1361,7 +1360,7 @@ int16_t LTC681x_run_adc_redundancy_st(uint8_t adc_mode, uint8_t adc_reg, uint8_t
 				}
 				else
 				{
-					openWire_delta[cic][cell] = 0;                                             
+					openWire_delta[cic][cell] = 0;                                          
 				}
 		}  
 	}
@@ -1462,7 +1461,7 @@ int16_t LTC681x_run_adc_redundancy_st(uint8_t adc_mode, uint8_t adc_reg, uint8_t
 		   
 	//Printing open cell array
 		if(print){
-			printf("OPEN CELLS: ");		
+			printf("OPEN CELLS: \n\r");		
 		}
 		if(n==0)
 		{
@@ -1761,7 +1760,6 @@ Shifts data in COMM register out over LTC6811 SPI/I2C port
 */
 void LTC681x_stcomm()
 {
-
   uint8_t cmd[4];
   uint16_t cmd_pec;
 

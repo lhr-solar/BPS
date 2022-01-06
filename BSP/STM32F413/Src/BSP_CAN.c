@@ -2,24 +2,49 @@
 
 #include "BSP_CAN.h"
 #include "stm32f4xx.h"
+#include "os.h"
 
-#define CAN_MODE        CAN_Mode_Normal
+// The message information that we care to receive
+typedef struct _msg {
+    uint32_t id;
+    uint8_t data[8];
+} msg_t;
 
-static CanTxMsg TxMessage;
-static CanRxMsg RxMessage;
+// Set up a fifo for receiving
+#define FIFO_TYPE msg_t
+#define FIFO_SIZE 10
+#define FIFO_NAME msg_queue
+#include "fifo.h"
 
-static bool RxFlag = false;
+static msg_queue_t gRxQueue;
+
+// Required for receiving CAN messages
+static CanTxMsg gTxMessage;
+static CanRxMsg gRxMessage;
+
+// User parameters for CAN events
+static void (*gRxEvent)(void);
+static void (*gTxEnd)(void);
 
 /**
  * @brief   Initializes the CAN module that communicates with the rest of the electrical system.
- * @param   None
+ * @param   rxEvent     : the function to execute when recieving a message. NULL for no action.
+ * @param   txEnd       : the function to execute after transmitting a message. NULL for no action.
+ * @param   loopback    : if we should use loopback mode (for testing)
  * @return  None
  */
-void BSP_CAN_Init(void) {
+void BSP_CAN_Init(callback_t rxEvent, callback_t txEnd, bool loopback) {
     GPIO_InitTypeDef GPIO_InitStructure;
     CAN_InitTypeDef CAN_InitStructure;
     NVIC_InitTypeDef NVIC_InitStructure;
     CAN_FilterInitTypeDef CAN_FilterInitStructure;
+
+    // Configure event handles
+    gRxEvent  = rxEvent;
+    gTxEnd    = txEnd;
+
+    // Initialize the queue
+    gRxQueue = msg_queue_new();
 
     /* CAN GPIOs configuration **************************************************/
 
@@ -52,16 +77,16 @@ void BSP_CAN_Init(void) {
     CAN_InitStructure.CAN_NART = DISABLE;
     CAN_InitStructure.CAN_RFLM = DISABLE;
     CAN_InitStructure.CAN_TXFP = DISABLE;
-    CAN_InitStructure.CAN_Mode = CAN_MODE;
+    CAN_InitStructure.CAN_Mode = (loopback ? CAN_Mode_LoopBack: CAN_Mode_Normal);
     CAN_InitStructure.CAN_SJW  = CAN_SJW_1tq;
 
     /* CAN Baudrate = 125 KBps
-        * 1/(prescalar + (prescalar*(BS1+1)) + (prescalar*(BS2+1))) * Clk = CAN Baudrate
-        * The AHB1 clk which drives CAN seems to be set to around 20MHz, but this should be verified.
+    * 1/(prescalar + (prescalar*BS1) + (prescalar*BS2)) * Clk = CAN Baudrate
+    * The CAN clk is currently set to 20MHz (APB1 clock set to 20MHz in BSP_PLL_Init())
     */
     CAN_InitStructure.CAN_BS1 = CAN_BS1_3tq;
     CAN_InitStructure.CAN_BS2 = CAN_BS2_4tq; 
-    CAN_InitStructure.CAN_Prescaler = 16;
+    CAN_InitStructure.CAN_Prescaler = 20;
     CAN_Init(CAN1, &CAN_InitStructure);
 
     /* CAN filter init */
@@ -77,27 +102,39 @@ void BSP_CAN_Init(void) {
     CAN_FilterInit(CAN1, &CAN_FilterInitStructure);
 
     /* Transmit Structure preparation */
-    TxMessage.ExtId = 0x1;
-    TxMessage.RTR = CAN_RTR_DATA;
-    TxMessage.IDE = CAN_ID_STD;
-    TxMessage.DLC = 1;
+    gTxMessage.ExtId = 0x1;
+    gTxMessage.RTR = CAN_RTR_DATA;
+    gTxMessage.IDE = CAN_ID_STD;
+    gTxMessage.DLC = 1;
 
     /* Receive Structure preparation */
-    RxMessage.StdId = 0x00;
-    RxMessage.ExtId = 0x00;
-    RxMessage.IDE = CAN_ID_STD;
-    RxMessage.DLC = 0;
-    RxMessage.FMI = 0;
+    gRxMessage.StdId = 0x00;
+    gRxMessage.ExtId = 0x00;
+    gRxMessage.IDE = CAN_ID_STD;
+    gRxMessage.DLC = 0;
+    gRxMessage.FMI = 0;
 
     /* Enable FIFO 0 message pending Interrupt */
     CAN_ITConfig(CAN1, CAN_IT_FMP0, ENABLE);
 
     // Enable Rx interrupts
     NVIC_InitStructure.NVIC_IRQChannel = CAN1_RX0_IRQn;
-    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x0;
-    NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x0;
+    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x1;
+    NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x1;
     NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
     NVIC_Init(&NVIC_InitStructure);	
+
+    if(NULL != txEnd) {
+        // set up CAN Tx interrupts
+        CAN_ITConfig(CAN1, CAN_IT_TME, ENABLE);
+
+        // Enable Tx Interrupts
+        NVIC_InitStructure.NVIC_IRQChannel = CAN1_TX_IRQn;
+        NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x1; // TODO: assess both of these priority settings
+        NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x0;
+        NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+        NVIC_Init(&NVIC_InitStructure);
+    }
 }
 
 /**
@@ -105,15 +142,19 @@ void BSP_CAN_Init(void) {
  * @param   id : Message of ID. Also indicates the priority of message. The lower the value, the higher the priority.
  * @param   data : data to be transmitted. The max is 8 bytes.
  * @param   length : num of bytes of data to be transmitted. This must be <= 8 bytes or else the rest of the message is dropped.
- * @return  0 if module was unable to transmit the data onto the CAN bus. Any other value indicates data was transmitted.
+ * @return  ERROR if module was unable to transmit the data onto the CAN bus. SUCCESS indicates data was transmitted.
  */
-uint8_t BSP_CAN_Write(uint32_t id, uint8_t data[8], uint8_t length) {
-    TxMessage.StdId = id;
-    TxMessage.DLC = length;
+ErrorStatus BSP_CAN_Write(uint32_t id, uint8_t data[8], uint8_t length) {
+    
+    gTxMessage.StdId = id;
+    gTxMessage.DLC = length;
 	for(int i = 0; i < length; i++){
-        TxMessage.Data[i] = data[i];
-	}
-	return CAN_Transmit(CAN1, &TxMessage);
+        gTxMessage.Data[i] = data[i];
+    }
+	
+    ErrorStatus retVal = (ErrorStatus) (CAN_Transmit(CAN1, &gTxMessage) != 0);
+
+    return retVal;
 }
 
 /**
@@ -122,26 +163,78 @@ uint8_t BSP_CAN_Write(uint32_t id, uint8_t data[8], uint8_t length) {
  * @pre     The data parameter must be at least 8 bytes or hardfault may occur.
  * @param   id : pointer to store id of the message that was received.
  * @param   data : pointer to store data that was received. Must be 8bytes or bigger.
- * @return  0 if nothing was received so ignore id and data that was received. Any other value indicates data was received and stored.
+ * @return  ERROR if nothing was received so ignore id and data that was received. SUCCESS indicates data was received and stored.
  */
-uint8_t BSP_CAN_Read(uint32_t *id, uint8_t *data) {
-    if(RxFlag){
-		for(int i = 0; i < 8; i++){
-			data[i] = RxMessage.Data[i];
-		}
-        *id = RxMessage.StdId;
-		RxFlag = false;
-		return 1;
-	}
-    return 0;
+ErrorStatus BSP_CAN_Read(uint32_t *id, uint8_t *data) {
+    // If the queue is empty, return err
+    if(msg_queue_is_empty(&gRxQueue)) {
+        return ERROR;
+    }
+    
+    // Get the message
+    msg_t msg;
+    msg_queue_get(&gRxQueue, &msg);
+
+    // Transfer the message to the provided pointers
+    for(int i = 0; i < 8; i++){
+        data[i] = msg.data[i];
+    }
+    *id = msg.id;
+
+    return SUCCESS;
 }
 
-void CAN1_RX0_IRQHandler(void)
-{
-    CAN_Receive(CAN1, CAN_FIFO0, &RxMessage);
+// This probably doesn't work because it's missing the equivalent fixes to the Tx Handler,
+// but it isn't part of the BPS requirements, so I'm not going to mess with it until I need it 
+void CAN1_RX0_IRQHandler(void) {
+    #ifdef RTOS
+    CPU_SR_ALLOC();
+    CPU_CRITICAL_ENTER();
+    OSIntEnter();
+    CPU_CRITICAL_EXIT();
+    #endif
 
-    if ((RxMessage.StdId == 0x001)&&(RxMessage.IDE == CAN_ID_STD) && (RxMessage.DLC == 1)){
-        // TODO: do stuff
-        RxFlag = true;
+    // Take any pending messages into a queue
+    while(CAN_MessagePending(CAN1, CAN_FIFO0)) {
+        CAN_Receive(CAN1, CAN_FIFO0, &gRxMessage);
+
+        msg_t rxMsg;
+        rxMsg.id = gRxMessage.StdId;
+        memcpy(&rxMsg.data[0], gRxMessage.Data, 8);
+
+        // Place the message in the queue
+        if(msg_queue_put(&gRxQueue, rxMsg)) {
+            // If the queue was not already full...
+            // Call the driver-provided function, if it is not null
+            if(gRxEvent != NULL) {
+                gRxEvent();
+            }
+        } else {
+            // If the queue is already full, then we can't really do anything else
+            break;
+        }
     }
+
+    #ifdef RTOS
+    OSIntExit();      // Signal to uC/OS
+    #endif
+}
+
+void CAN1_TX_IRQHandler(void) {
+    #ifdef RTOS
+    CPU_SR_ALLOC();
+    CPU_CRITICAL_ENTER();
+    OSIntEnter();
+    CPU_CRITICAL_EXIT();
+    #endif
+
+    // Acknowledge 
+    CAN_ClearFlag(CAN1, CAN_FLAG_RQCP0 | CAN_FLAG_RQCP1 | CAN_FLAG_RQCP2);
+
+    // Call the function provided
+    gTxEnd();
+
+    #ifdef RTOS
+    OSIntExit();      // Signal to uC/OS
+    #endif
 }

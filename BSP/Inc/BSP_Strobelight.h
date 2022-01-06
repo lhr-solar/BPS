@@ -1,7 +1,7 @@
 /* Copyright (c) 2020 UT Longhorn Racing Solar */
 
-#ifndef __BSP_STROBELIGHT_H
-#define __BSP_STROBELIGHT_H
+#ifndef BSP_STROBELIGHT_H
+#define BSP_STROBELIGHT_H
 
 #include "common.h"
 #include "config.h"

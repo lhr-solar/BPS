@@ -1,7 +1,7 @@
 /* Copyright (c) 2020 UT Longhorn Racing Solar */
 
-#ifndef __BSP_TIMER_H
-#define __BSP_TIMER_H
+#ifndef BSP_TIMER_H
+#define BSP_TIMER_H
 
 #include "common.h"
 
@@ -32,5 +32,12 @@ uint32_t BSP_Timer_GetTicksElapsed(void);
  * @return  frequency in Hz
  */
 uint32_t BSP_Timer_GetRunFreq(void);
+
+/**
+ * @brief   Calculates the microseconds passed since last calling BSP_TimerGetTicksElapsed()
+ * @param   None
+ * @return  Microseconds
+ */
+uint32_t BSP_Timer_GetMicrosElapsed(void);
 
 #endif

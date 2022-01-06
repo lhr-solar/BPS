@@ -7,7 +7,7 @@
 
 #include "CLI.h"
 #include "Voltage.h"
-#include "Current.h"
+#include "Amps.h"
 #include "Temperature.h"
 #include "BSP_Contactor.h"
 #include "BSP_WDTimer.h"
@@ -20,6 +20,9 @@
 #include "Images.h"
 #include "BSP_ADC.h"
 #include "EEPROM.h"
+#include "os.h"
+#include "Tasks.h"
+#include <string.h>
 
 #define MAX_TOKEN_SIZE 4
 
@@ -34,7 +37,7 @@ const float PERCENT_CONVERSION = 100;
  */
 void CLI_Init(cell_asic* boards) {
 	Minions = boards;
-	BSP_UART_Init();
+	BSP_UART_Init(NULL, NULL, UART_USB);
 }
 
 /** CLI_InputParse
@@ -47,7 +50,7 @@ void CLI_InputParse(char* input, int* parsedTokens) {
     strcpy(inputCpy, input);
 
 	char *tokenized;
-	char *split = __strtok_r(inputCpy, " ", &tokenized);
+	char *split = strtok_r(inputCpy, " ", &tokenized);
 	for(int i = 0; i < MAX_TOKEN_SIZE && split != NULL; i++) {
 		for(int j = 0; j < strlen(split); j++) {
 			split[j] = tolower(split[j]);
@@ -55,12 +58,12 @@ void CLI_InputParse(char* input, int* parsedTokens) {
 		if(i == 3) { // CAN requires argument #3 to be in hex
 			strcpy(hexString, split);
 		}
-		if(!isalpha(split[0])) {
+		if(!isalpha((unsigned char)split[0])) {
 			sscanf(split, "%d", &parsedTokens[i]);
 		} else {
 			parsedTokens[i] = CLI_StringHash(split);
 		}
-		split = __strtok_r(NULL, " ", &tokenized);
+		split = strtok_r(NULL, " ", &tokenized);
 	}
 }
 
@@ -111,7 +114,7 @@ void CLI_Help(void) {
 	printf("Contactor/Switch\tCharge\t\t\tLights/LED\n\r");
 	printf("CAN\t\t\tEEPROM\t\t\tDisplay\n\r");
 	printf("LTC/Register\t\tWatchdog\t\tADC\n\r");
-	printf("Critical/Abort\t\tAll\n\r");
+	printf("Critical/Abort\t\topenwire\t\tAll\n\r");
 	printf("Keep in mind: all values are 1-indexed\n\r");
 	printf("-----------------------------------------------------------\n\r");
 }
@@ -177,20 +180,18 @@ void CLI_Voltage(int* hashTokens) {
  */
 void CLI_Current(int* hashTokens) {
 	if(hashTokens[1] == 0) {
-		printf("High: %.3fA\n\r", Current_GetHighPrecReading()/MILLI_UNIT_CONVERSION);	// Prints 4 digits, number, and A
-		printf("Low: %.3fA\n\r", Current_GetLowPrecReading()/MILLI_UNIT_CONVERSION);
+		printf("Current: %.3fA\n\r", Amps_GetReading()/MILLI_UNIT_CONVERSION);	// Prints 4 digits, number, and A
 		return;
 	}
 	switch (hashTokens[1]) {
-		case CLI_HIGH_HASH: // High precision reading
-			printf("High: %.3fA     \n\r", Current_GetHighPrecReading()/MILLI_UNIT_CONVERSION);
-			break;
-		case CLI_LOW_HASH: // Low precision reading
-			printf("Low: %.3fA     \n\r", Current_GetLowPrecReading()/MILLI_UNIT_CONVERSION);
+		// High precision and low precision don't differ now.
+		case CLI_HIGH_HASH:
+		case CLI_LOW_HASH:
+			printf("High: %.3fA     \n\r", Amps_GetReading()/MILLI_UNIT_CONVERSION);
 			break;
 		case CLI_SAFE_HASH: 
 		case CLI_SAFETY_HASH:
-			if (Current_CheckStatus(false) == SAFE) {
+			if (Amps_CheckStatus(false) == SAFE) {
 				printf("Safety Status: SAFE\n\r");
 			}
 			else {
@@ -199,7 +200,7 @@ void CLI_Current(int* hashTokens) {
 			break;
 		case CLI_CHARGE_HASH: // Whether battery is charging
 		case CLI_CHARGING_STATE:
-			if (Current_IsCharging()) {
+			if (Amps_IsCharging()) {
 				printf("Charging State: CHARGING\n\r");
 			}
 			else {
@@ -276,6 +277,10 @@ void CLI_Temperature(int* hashTokens) {
  * (tx_data, rx_date, and rx_pec_match)
  */
 void CLI_LTC6811(void) {
+	OS_ERR err;
+    CPU_TS ts;
+	OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, &ts, &err);
+	assertOSError(err);
 	for(uint8_t current_ic = 0; current_ic < NUM_MINIONS; current_ic++) {
 		printf("Minion board %d: ", current_ic);
 		printf("Config: \n\rTX: ");
@@ -324,6 +329,9 @@ void CLI_LTC6811(void) {
 		}
 		printf("\n\rPEC: %d\n\r", Minions[current_ic].sctrlb.rx_pec_match);
 	}
+	//release mutex
+  	OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
+  	assertOSError(err);
 }
 
 /** CLI_Contactor
@@ -628,7 +636,7 @@ void CLI_Critical(void) {
 	printf("Please type 'shutdown' to turn the contactor off\n\r");
 	printf(">> ");
 	while(1) {
-		if(BSP_UART_ReadLine(response) > 0) {
+		if(BSP_UART_ReadLine(response, 3) > 0) {
 			if(CLI_StringHash(response) == CLI_SHUTDOWN_HASH) {
 				BSP_Contactor_Off();
 				printf("Contactor is off\n\r");
@@ -641,9 +649,16 @@ void CLI_Critical(void) {
 	}
 }
 
+/** CLI_OpenWire
+ * Displays open wire status for the BPS system
+ */
+void CLI_OpenWire(void){
+	Voltage_OpenWireSummary();
+}
+
 /** CLI_All
  * Displays all information about BPS modules
- * (voltage, current, temperature, charge, contactor)
+ * (voltage, current, temperature, charge, contactor, open wires)
  */
 void CLI_All(void) {
 	int hashTokens[MAX_TOKEN_SIZE];
@@ -663,6 +678,8 @@ void CLI_All(void) {
 	printf("Contactor: \n\r");
 	hashTokens[0] = CLI_CONTACTOR_HASH;
 	CLI_Contactor(hashTokens);
+	hashTokens[0] = CLI_OPENWIRE_HASH;
+	CLI_OpenWire();
 }
 
 /** CLI_Handler
@@ -758,6 +775,10 @@ void CLI_Handler(char* input) {
 		case CLI_ABORT_HASH:
 			CLI_Critical();
 			break;
+		//Open wire command
+		case CLI_OPENWIRE_HASH:
+			CLI_OpenWire();
+			break;
 		// All
 		case CLI_ALL_HASH:
 			CLI_All();
@@ -768,3 +789,21 @@ void CLI_Handler(char* input) {
 	}
 	printf(">> ");
 }
+
+
+void Task_CLI(void *p_arg) {
+    (void)p_arg;
+
+	uint32_t fifo_size = 128;
+	char command[fifo_size];
+	CLI_Startup();
+
+    while(1) {
+        // BLOCKING =====================
+        // Wait for command
+		if(BSP_UART_ReadLine(command, UART_USB) > 0){
+			CLI_Handler(command);	//handle command
+		}
+    }
+}
+

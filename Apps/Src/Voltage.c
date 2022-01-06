@@ -9,8 +9,13 @@
 #include "LTC6811.h"
 #include "config.h"
 #include <stdlib.h>
+#include "os.h"
+#include "Tasks.h"
+#include "Amps.h"
 
 static cell_asic *Minions;
+
+static OS_MUTEX Voltage_Mutex;
 static uint16_t VoltageVal[NUM_BATTERY_MODULES]; //Voltage values gathered
 static uint32_t openWires[TOTAL_VOLT_WIRES];
 
@@ -22,39 +27,49 @@ static uint32_t openWires[TOTAL_VOLT_WIRES];
 /** Voltage_Init
  * Initializes all device drivers including LTC6811 and GPIO to begin Voltage Monitoring
  * @param boards LTC6811 data structure that contains the values of each register
+ * @param voltageMutex pointer to mutex, meant to pass pointer to VoltageBuffer_Mutex
  * @return SUCCESS or ERROR
  */
-ErrorStatus Voltage_Init(cell_asic *boards){
+void Voltage_Init(cell_asic *boards){
 	// Record pointer
 	Minions = boards;
-
-	int8_t error = 0;
-	
+	//initialize mutex
+	OS_ERR err;
+	OSMutexCreate(&Voltage_Mutex,
+				  "Voltage Buffer Mutex",
+				  &err
+				);
+					
 	wakeup_sleep(NUM_MINIONS);
 	LTC6811_Init(Minions);
 	
+	//take control of mutex
+  	OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
+  	assertOSError(err);
 	// Write Configuration Register
 	LTC6811_wrcfg(NUM_MINIONS, Minions);
+	//release mutex
+  	OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
+  	assertOSError(err);
 
 	// Read Configuration Register
+	// take control of mutex
+  	OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
+  	assertOSError(err);
 	wakeup_sleep(NUM_MINIONS);
-	error = LTC6811_rdcfg(NUM_MINIONS, Minions);
+	LTC6811_rdcfg_safe(NUM_MINIONS, Minions);
+	// release mutex
+  	OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
+  	assertOSError(err);
 	
-	if(error == 0){
-		return SUCCESS;
-	}else{
-		return ERROR;
-	}
 }
 
 /** Voltage_UpdateMeasurements
  * Stores and updates the new measurements received
  * @param pointer to new voltage measurements
- * @return SUCCESS or ERROR
  */
-ErrorStatus Voltage_UpdateMeasurements(void){
-	int8_t error = 0;
-	
+void Voltage_UpdateMeasurements(void){
+	CPU_TS ts;
 	// Start Cell ADC Measurements
 	wakeup_idle(NUM_MINIONS);
 	LTC6811_adcv(ADC_CONVERSION_MODE,ADC_DCP,CELL_CH_TO_CONVERT);
@@ -62,17 +77,23 @@ ErrorStatus Voltage_UpdateMeasurements(void){
 	
 	// Read Cell Voltage Registers
 	wakeup_idle(NUM_MINIONS); // Not sure if wakeup is necessary if you start conversion then read consecutively
-	error = LTC6811_rdcv(0, NUM_MINIONS, Minions); // Set to read back all cell voltage registers
+	//take control of mutex
+	OS_ERR err;
+  	OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
+  	assertOSError(err);
+	LTC6811_rdcv_safe(0, NUM_MINIONS, Minions); // Set to read back all cell voltage registers
 	//copies values from cells.c_codes to private array
+	OSMutexPend(&Voltage_Mutex, 0, OS_OPT_PEND_BLOCKING, &ts, &err);
+  	assertOSError(err);
 	for(int i = 0; i < NUM_BATTERY_MODULES; i++){
 		VoltageVal[i] = Minions[i / MAX_VOLT_SENSORS_PER_MINION_BOARD].cells.c_codes[i % MAX_VOLT_SENSORS_PER_MINION_BOARD];
 	}
+	//release mutex
+  	OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
+  	assertOSError(err);
 	
-	if(error == 0){
-		return SUCCESS;
-	}else{
-		return ERROR;
-	}
+	OSMutexPost(&Voltage_Mutex, OS_OPT_POST_NONE, &err);
+	assertOSError(err);
 }
 
 /** Voltage_CheckStatus
@@ -85,12 +106,14 @@ SafetyStatus Voltage_CheckStatus(void){
 			
 		// VOLTAGE_LIMITS are in floating point. The LTC6811 sends the voltage data
 		// as unsigned 16-bit fixed point integers with a resolution of 0.00001
-		if(voltage > MAX_VOLTAGE_LIMIT * MILLI_SCALING_FACTOR){
-			return OVERVOLTAGE;
+		if(voltage > MAX_VOLTAGE_LIMIT) {
+		    return OVERVOLTAGE;
 		}
-		
-		else if(voltage < MIN_VOLTAGE_LIMIT * MILLI_SCALING_FACTOR){
-			return UNDERVOLTAGE;
+		if (Amps_IsCharging()){
+			if(voltage < MIN_VOLTAGE_CHARGING_LIMIT) return UNDERVOLTAGE;
+		}
+		else if(voltage < MIN_VOLTAGE_LIMIT) {
+		    return UNDERVOLTAGE;
 		}
 	}
 	return SAFE;
@@ -101,10 +124,12 @@ SafetyStatus Voltage_CheckStatus(void){
  * Each module corresponds to an index of the array of SafetyStatus
  * @return pointer to index of modules that are in danger
  */
-SafetyStatus *Voltage_GetModulesInDanger(void){
-	static SafetyStatus checks[TOTAL_VOLT_WIRES];
+void Voltage_GetModulesInDanger(VoltageSafety_t* system){
 	uint32_t wires;
 	uint32_t openWireIdx = 0;
+	OS_ERR err;
+	OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
+  	assertOSError(err);
 	//put all the bits from each minion's system_open_wire variable into one variable
 	for(int k = 0; k < NUM_MINIONS; k++){
 		wires = (Minions[k].system_open_wire & 0x1FF);	//there are at most 8 modules per IC, bit 0 is GND
@@ -120,17 +145,22 @@ SafetyStatus *Voltage_GetModulesInDanger(void){
 	for (int i = 0; i < TOTAL_VOLT_WIRES; i++) {	
 		if(i < NUM_BATTERY_MODULES){
 			// Check if battery is in range of voltage limit
-			if(Voltage_GetModuleMillivoltage(i) > MAX_VOLTAGE_LIMIT * MILLI_SCALING_FACTOR || Voltage_GetModuleMillivoltage(i) < MIN_VOLTAGE_LIMIT * MILLI_SCALING_FACTOR) {
-				checks[i] = DANGER;
+			if(Voltage_GetModuleMillivoltage(i) > MAX_VOLTAGE_LIMIT) {
+				system->module_checks[i] = OVERVOLTAGE;
 			}
+			else if(Voltage_GetModuleMillivoltage(i) < MIN_VOLTAGE_LIMIT){
+				system->module_checks[i] = UNDERVOLTAGE;
+			}
+			else system->module_checks[i] = SAFE;
 		}
 		if(openWires[i] == 1) {
-			checks[i] = DANGER;
+			system->wire_checks[i] = DANGER;
 		} else {
-			checks[i] = SAFE;
+			system->wire_checks[i] = SAFE;
 		}
 	}
-	return checks;
+	OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
+  	assertOSError(err);
 }
 
 /** Voltage_OpenWireSummary
@@ -138,7 +168,14 @@ SafetyStatus *Voltage_GetModulesInDanger(void){
  */
 void Voltage_OpenWireSummary(void){
 	wakeup_idle(NUM_MINIONS);
+	//take control of mutex
+	OS_ERR err;
+  	OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
+  	assertOSError(err);
 	LTC6811_run_openwire_multi(NUM_MINIONS, Minions, true);
+	//release mutex
+  	OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
+  	assertOSError(err);
 }
 
 /** Voltage_OpenWire
@@ -146,16 +183,29 @@ void Voltage_OpenWireSummary(void){
  * @return SafetyStatus
  */
 SafetyStatus Voltage_OpenWire(void){
+	SafetyStatus status = SAFE;
 	wakeup_idle(NUM_MINIONS);
+
+	OS_ERR err;
+  	OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
+	assertOSError(err);
+	
 	LTC6811_run_openwire_multi(NUM_MINIONS, Minions, false);
 
 	for(int32_t i = 0; i < NUM_MINIONS; i++) {
 		if(Minions[i].system_open_wire != 0){
-			return DANGER;
+			if ((i == NUM_MINIONS -1) && ((Minions[i].system_open_wire & 0xEF) != 0)) { //The last Voltage board is only connected to 7 modules
+				break; //Open Wire test runs using MAX_VOLT_SENSORS_PER_MINION_BOARD so value of last module should be cleared
+			}
+			status = DANGER;
+			break;
 		}
 	}
 
-	return SAFE;
+	OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
+  	assertOSError(err);
+
+	return status;
 }
 
 /** Voltage_GetOpenWire
@@ -164,7 +214,19 @@ SafetyStatus Voltage_OpenWire(void){
  */
 uint32_t Voltage_GetOpenWire(void){
 	wakeup_idle(NUM_MINIONS);
-	return LTC6811_run_openwire_multi(NUM_MINIONS, Minions, false);
+	//take control of mutex
+	OS_ERR err;
+	if(!Fault_Flag){
+  		OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
+  		assertOSError(err);
+	}
+	uint32_t result = LTC6811_run_openwire_multi(NUM_MINIONS, Minions, false);
+	//release 
+	if (!Fault_Flag){
+  		OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
+  		assertOSError(err);
+	}
+	return result;
 }
 
 /** Voltage_GetModuleVoltage
@@ -174,11 +236,12 @@ uint32_t Voltage_GetOpenWire(void){
  * @return voltage of module at specified index
  */
 uint16_t Voltage_GetModuleMillivoltage(uint8_t moduleIdx){
-    // These if statements prevents a hardfault.
+	CPU_TS ts;
+	OS_ERR err;
+	// These if statements prevents a hardfault.
     if(moduleIdx >= NUM_BATTERY_MODULES) {
         return 0xFFFF;  // return -1 which indicates error voltage
     }
-
     // Each board will measure the same number of modules except for the last board in the daisy chain.
     // To find which minion board the battery module (moduleIdx) is assigned to, we need to
     // divide the moduleIdx by how many battery modules are assigned to each minion board
@@ -187,8 +250,16 @@ uint16_t Voltage_GetModuleMillivoltage(uint8_t moduleIdx){
     if((moduleIdx / MAX_VOLT_SENSORS_PER_MINION_BOARD) >= NUM_MINIONS) {
         return 0xFFFF;  // return -1 which indicates error voltage
     }
-
-	return VoltageVal[moduleIdx] / 10;
+	if (!Fault_Flag){
+		OSMutexPend(&Voltage_Mutex, 0, OS_OPT_PEND_BLOCKING, &ts, &err);
+		assertOSError(err);
+	}
+	uint16_t ret = VoltageVal[moduleIdx] / 10;
+	if (!Fault_Flag){
+		OSMutexPost(&Voltage_Mutex, OS_OPT_POST_NONE, &err);
+		assertOSError(err);
+	}
+	return ret;
 }
 
 /** Voltage_GetTotalPackVoltage
@@ -202,7 +273,6 @@ uint32_t Voltage_GetTotalPackVoltage(void){
 	}
 	return sum;
 }
-
 
 
 

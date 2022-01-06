@@ -1,31 +1,35 @@
 /* Copyright (c) 2020 UT Longhorn Racing Solar */
 
 /** Voltage.h
- * Voltage file that holds all voltage related information of BeVolt's
- * battery pack.
+ * Voltage file that holds all voltage related information of BeVolt's battery pack.
  */
 
-#ifndef VOLTAGE_H__
-#define VOLTAGE_H__
+#ifndef VOLTAGE_H
+#define VOLTAGE_H
 
 #include <stdint.h>
 #include "config.h"
 #include "LTC6811.h"
 #include "common.h"
+#include "os.h"
+
+typedef struct voltage_safety{
+    SafetyStatus wire_checks[TOTAL_VOLT_WIRES];
+    SafetyStatus module_checks[NUM_BATTERY_MODULES];
+} VoltageSafety_t;
 
 /** Voltage_Init
  * Initializes all device drivers including LTC6811 and GPIO to begin Voltage Monitoring
  * @param boards LTC6811 data structure that contains the values of each register
- * @return SUCCESS or ERROR
+ * @param voltageMutex pointer to mutex, meant to pass pointer to VoltageBuffer_Mutex 
  */
-ErrorStatus Voltage_Init(cell_asic *boards);
+void Voltage_Init(cell_asic *boards);
 
 /** Voltage_UpdateMeasurements
  * Stores and updates the new measurements received
  * @param pointer to new voltage measurements
- * @return SUCCESS or ERROR
  */
-ErrorStatus Voltage_UpdateMeasurements(void);
+void Voltage_UpdateMeasurements(void);
 
 /** Voltage_CheckStatus
  * Checks if all modules are safe
@@ -34,12 +38,12 @@ ErrorStatus Voltage_UpdateMeasurements(void);
 SafetyStatus Voltage_CheckStatus(void);
 
 /** Voltage_GetModulesInDanger
- * Finds all battery modules that in danger and stores them into a list.
+ * Finds all battery modules in danger and stores them into a list.
  * Each battery module corresponds to and index of the array. If the element in the
  * array is 1, then it means that module in the index is in danger.
- * @return pointer to index of modules that are in danger
+ * @param struct that has safety status for all wires and modules in the system
  */
-SafetyStatus *Voltage_GetModulesInDanger(void);
+void Voltage_GetModulesInDanger(VoltageSafety_t* system);
  
 /** Voltage_OpenWireSummary
  * Runs the open wire method with print=true

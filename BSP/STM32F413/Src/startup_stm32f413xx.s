@@ -116,15 +116,16 @@ LoopFillZerobss:
 
 /**
  * @brief  This is the code that gets called when the processor receives an 
- *         unexpected interrupt.  This simply enters an infinite loop, preserving
- *         the system state for examination by a debugger.
+ *         unexpected interrupt. This just jumps to the fault handler, which
+ *         will then force the system into a fault state.
  * @param  None     
  * @retval None       
 */
     .section  .text.Default_Handler,"ax",%progbits
 Default_Handler:
-Infinite_Loop:
-  b  Infinite_Loop
+  // Call the fault state directly.
+  // We don't know whether the rtos is running
+  b HardFault_Handler
   .size  Default_Handler, .-Default_Handler
 /******************************************************************************
 *
@@ -153,7 +154,8 @@ g_pfnVectors:
   .word  DebugMon_Handler
   .word  0
   .word  PendSV_Handler
-  .word  SysTick_Handler
+  @ .word  SysTick_Handler
+  .word  OS_CPU_SysTickHandler
 
   /* External Interrupts */
   .word     WWDG_IRQHandler                   /* Window WatchDog                             */

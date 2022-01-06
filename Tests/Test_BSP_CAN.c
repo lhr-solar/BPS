@@ -10,11 +10,12 @@ int main(void){
    uint32_t id[1];
   
    uint8_t length = 8;
-
-   BSP_CAN_Init();   
-
+   BSP_CAN_Init(NULL, NULL, false);
+   
    while(1) {
       BSP_CAN_Write(0x10A, message, length);
       BSP_CAN_Read(id, readData);
    }
+
+   exit(0);
 }
