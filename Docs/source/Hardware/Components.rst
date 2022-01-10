@@ -21,7 +21,7 @@ Fuse
 Description
     This fuse is meant to protect the battery in the event of a short circuit in case the BPS cannot
     react fast enough. This `fuse <https://www.allfuses.com/pub/media/documents/Ferraz%20A15QS.pdf>`__
-    is rated for 70A and 150VDC and is what is used in the BPS.
+    is rated for 60A and 150VDC and is what is used in the BPS. 
 Usage
     It is placed on the high voltage line between the contactor and battery pack.
 Reason

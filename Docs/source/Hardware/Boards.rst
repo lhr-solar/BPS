@@ -943,6 +943,8 @@ Design Choices:
 
     Back of BPS Shunt Resistor Board Render
 
+Additional Considerations:
+    * The shunt resistor must be oriented such that a positive current corresponds to discharging the battery.
 
 BPS Test Board
 ==============
