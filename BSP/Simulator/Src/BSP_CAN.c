@@ -42,7 +42,7 @@ void BSP_CAN_Init(callback_t rxEvent, callback_t txEvent, bool loopback) {
  * @return  ERROR if module was unable to transmit the data onto the CAN bus. SUCCESS indicates data was transmitted.
  */
 ErrorStatus BSP_CAN_Write(uint32_t id, uint8_t data[8], uint8_t length) {
-    FILE* fp = fopen(file, "w");
+    FILE* fp = fopen(file, "a");
     if(!fp) {
         perror(CAN_CSV_FILE);
         exit(EXIT_FAILURE);
@@ -65,6 +65,7 @@ ErrorStatus BSP_CAN_Write(uint32_t id, uint8_t data[8], uint8_t length) {
         }
              
     }
+    fprintf(fp, "\n");
     flock(fno, LOCK_UN);
     fclose(fp);
 

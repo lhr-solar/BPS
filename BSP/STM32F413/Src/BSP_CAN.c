@@ -41,7 +41,7 @@ void BSP_CAN_Init(callback_t rxEvent, callback_t txEvent, bool loopback) {
 
     // Configure event handles
     gRxEvent  = rxEvent;
-    gTxEnd    = txEnd;
+    gTxEnd    = txEvent;
 
     // Initialize the queue
     gRxQueue = msg_queue_new();
