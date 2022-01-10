@@ -19,7 +19,7 @@ static const char* file = GET_CSV_PATH(CAN_CSV_FILE);
  * @return  None
  */
 void BSP_CAN_Init(callback_t rxEvent, callback_t txEvent, bool loopback) {
-    FILE* fp = fopen(file, "w");
+    FILE* fp = fopen(file, "w+");
     if(!fp) {
         perror(CAN_CSV_FILE);
         exit(EXIT_FAILURE);
