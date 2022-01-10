@@ -1,10 +1,10 @@
 #! /bin/bash 
 
-BPS_DIR=../..
+# meant to be run from the BPS directory
 
-(cd ${BPS_DIR}; ./bps-simulator.out)
+./bps-simulator.out
 
-diff ${BPS_DIR}/BSP/Simulator/DataGeneration/Data/CAN.csv expected.csv
+diff ./BSP/Simulator/DataGeneration/Data/CAN.csv ./Continuous_Integration/CANbus/expected.csv
 
 exit $?
 
