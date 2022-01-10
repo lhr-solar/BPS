@@ -26,4 +26,4 @@ jobs:
     - name: build CANbus
       run: make simulator TEST=CI_CANbus
     - name: run CANbus
-      run: ./Continuous_Integration/CANbus/Test_CANbus.sh
+      run: sudo ./Continuous_Integration/CANbus/Test_CANbus.sh
