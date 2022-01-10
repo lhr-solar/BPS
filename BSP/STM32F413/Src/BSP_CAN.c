@@ -124,7 +124,7 @@ void BSP_CAN_Init(callback_t rxEvent, callback_t txEvent, bool loopback) {
     NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
     NVIC_Init(&NVIC_InitStructure);	
 
-    if(NULL != txEnd) {
+    if(NULL != txEvent) {
         // set up CAN Tx interrupts
         CAN_ITConfig(CAN1, CAN_IT_TME, ENABLE);
 
