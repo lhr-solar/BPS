@@ -24,6 +24,6 @@ jobs:
     - name: make simulator
       run: make simulator
     - name: build CANbus
-      run: rm bps-simulator.out && make simulator TEST=CI_CANbus
+      run: make clean && make simulator TEST=CI_CANbus
     - name: run CANbus
       run: sudo ./Continuous_Integration/CANbus/Test_CANbus.sh
