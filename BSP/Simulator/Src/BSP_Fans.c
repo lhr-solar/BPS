@@ -62,3 +62,19 @@ int BSP_Fans_GetSpeed(uint8_t fan){
     fclose(fp); //Close file
     return Fans[fan - 1];                   
 }
+
+/**
+ * @brief   Sets fan duty cycle for all fans
+ * @param   dutyCycle: int for duty cycle amount in range 0-8
+ * @return  ErrorStatus
+ */
+ErrorStatus BSP_Fans_SetAll(uint32_t speed) {
+    ErrorStatus result = SUCCESS;
+    for (uint8_t i = 1; i <= 4; i++){
+        ErrorStatus e = BSP_Fans_Set(i, TOPSPEED);
+        if (e != SUCCESS) {
+            result = e;
+        }
+    }
+    return result;
+}

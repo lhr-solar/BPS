@@ -7,7 +7,7 @@ function simulate() {
     # Do a quick check for operating system.
     # Right now, the only linux shell that is supported is gnome-terminal,
     # since that's the default on Ubuntu.
-    if [[ $(uname -a | grep Microsoft) ]]; then
+    if [[ $(uname -a | grep Microsoft) ]] || [[ $(uname -a | grep microsoft) ]]; then
         echo "Launching a new WSL shell..."
         # This line makes me sad
         cmd.exe /c start cmd.exe /c "mode con: cols=103 lines=33 && wsl.exe python3 BSP/Simulator/DataGeneration/simulate.py" &

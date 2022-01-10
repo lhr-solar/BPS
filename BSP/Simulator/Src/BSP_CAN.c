@@ -7,21 +7,18 @@
 #include <sys/file.h>
 #include <unistd.h>
 
-#if 0
+static callback_t rxFunc;
+static callback_t txFunc;
 static const char* file = GET_CSV_PATH(CAN_CSV_FILE);
-#endif
-
 
 /**
  * @brief   Initializes the CAN module that communicates with the rest of the electrical system.
- * @param   None
+ * @param   rxEvent     : the function to execute when recieving a message. NULL for no action.
+ * @param   txEvent     : the function to execute after transmitting a message. NULL for no action.
+ * @param   loopback    : if we should use loopback mode (for testing)
  * @return  None
  */
-
-
-
-void BSP_CAN_Init(callback_t rxEvent, callback_t txEnd, bool loopback) {
-#if 0   // TODO: replace with interrupt-capable code
+void BSP_CAN_Init(callback_t rxEvent, callback_t txEvent, bool loopback) {
     FILE* fp = fopen(file, "w");
     if(!fp) {
         perror(CAN_CSV_FILE);
@@ -31,7 +28,8 @@ void BSP_CAN_Init(callback_t rxEvent, callback_t txEnd, bool loopback) {
     flock(fno, LOCK_EX);
     flock(fno, LOCK_UN);
     fclose(fp);
-#endif
+    rxFunc = rxEvent;
+    txFunc = txEvent;
 }
 
 
@@ -44,7 +42,6 @@ void BSP_CAN_Init(callback_t rxEvent, callback_t txEnd, bool loopback) {
  * @return  ERROR if module was unable to transmit the data onto the CAN bus. SUCCESS indicates data was transmitted.
  */
 ErrorStatus BSP_CAN_Write(uint32_t id, uint8_t data[8], uint8_t length) {
-#if 0   // TODO: replace with interrupt-capable code
     FILE* fp = fopen(file, "w");
     if(!fp) {
         perror(CAN_CSV_FILE);
@@ -70,10 +67,11 @@ ErrorStatus BSP_CAN_Write(uint32_t id, uint8_t data[8], uint8_t length) {
     }
     flock(fno, LOCK_UN);
     fclose(fp);
+
+    // spoof an interrupt
+    txFunc();
+    
     return 1;
-#else
-    return 0;
-#endif
 }
 
 /**

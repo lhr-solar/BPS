@@ -16,7 +16,6 @@ import I2C
 import logging
 
 import config
-import Timer
 
 import os
 import sys
@@ -42,8 +41,6 @@ def generate(battery=None):
     WDTimer.Check_State()
     #Initialize Watchdog Timer
     WDTimer.WD_Enable()
-    #Initialize Timer
-    Timer.Enable()
 
 
 def display(battery=None):  #print watchdog countdown 
@@ -202,9 +199,6 @@ def main():
     CANbox.immedok(True)
     CANbox.box()
     CANbox.refresh()
-    #Start background thread for timer 
-    timerThread = Timer.timer_Thread
-    timerThread.start()
     spiThread = SPI.spi_thread
     spiThread.start()
 
@@ -310,7 +304,6 @@ def main():
     curses.echo()
     curses.nocbreak()
     curses.endwin()
-    Timer.terminate(True)
 
 
 
