@@ -70,6 +70,7 @@ uint16_t LTC2315_Read() {
 
     if (count > MAX_PEC_ERRORS) {
       // trip BPS
+      Fault_BitMap |= Fault_CRC;
       OSSemPost(&Fault_Sem4, OS_OPT_POST_1, &err);
       assertOSError(err);
     }

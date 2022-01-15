@@ -26,6 +26,23 @@ void Task_CriticalState(void *p_arg) {
     }
     // Turn Contactor On
     BSP_Contactor_On();
+
+    // launch check contactor task
+    OSTaskCreate(&CheckContactor_TCB,                       // TCB
+				"Task_CheckContactor",                      // Task Name (String)
+				Task_CheckContactor,                        // Task function pointer
+				(void *)0,                                  // Task function args
+				TASK_CHECK_CONTACTOR_PRIO,                  // Priority
+				CheckContactor_Stk,                         // Stack
+				WATERMARK_STACK_LIMIT,                      // Watermark limit for debugging
+				TASK_CHECK_CONTACTOR_STACK_SIZE,            // Stack size
+				0,                                          // Queue size (not needed)
+				10,                                         // Time quanta (time slice) 10 ticks
+				(void *)0,                                  // Extension pointer (not needed)
+				OS_OPT_TASK_STK_CHK | OS_OPT_TASK_SAVE_FP,  // Options
+				&err);                                      // return err code
+    assertOSError(&err);
+
     // Push All Clear message to CAN Q
     CANMSG.id = ALL_CLEAR;
     CANMSG.payload = CanPayload;
