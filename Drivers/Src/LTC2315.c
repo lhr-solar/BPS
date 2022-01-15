@@ -111,6 +111,6 @@ int32_t LTC2315_GetCurrent() {
         offset = reading;
     }
     const int32_t PRECISION_MICRO_AMPS = 73242;
-    int32_t milliamps = -1 * ((reading - offset) * PRECISION_MICRO_AMPS) / 1000;    // during testing, the gain seems to be inverted
+    int32_t milliamps = ((reading - offset) * PRECISION_MICRO_AMPS) / 1000;    // during testing, the gain seems to be inverted
     return milliamps;
 }

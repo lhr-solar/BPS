@@ -11,6 +11,7 @@
 #include "CAN_Queue.h"
 #include "BSP_WDTimer.h"
 #include "BSP_Contactor.h"
+#include "BSP_UART.h"
 
 /******************************************************************************
  * Amperes Task Test Plan
@@ -165,7 +166,9 @@ void Task2(void *p_arg){
 int main(void) {
     OS_ERR err;
 
+
     BSP_PLL_Init();
+    BSP_UART_Init(NULL, NULL, UART_USB);
     //Resetting the contactor
     BSP_Contactor_Init();
     BSP_Contactor_Off();
