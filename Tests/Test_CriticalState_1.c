@@ -8,6 +8,7 @@
 #include "BSP_Contactor.h"
 #include "BSP_Lights.h"
 #include "BSP_PLL.h"
+#include "CAN_Queue.h"
 
 OS_TCB Task1_TCB;
 CPU_STK Task1_Stk[256];
@@ -52,7 +53,7 @@ void Task2(void *p_arg){    //This task is meant to allow contactor to close
     BSP_Lights_Init();
    
     while(1) {
-        BSP_Light_Toggle(EXTRA);
+        BSP_Light_Toggle(RUN);
         OSTimeDly(25, OS_OPT_TIME_DLY, &err);
     }
 
@@ -64,11 +65,32 @@ void Task1(void *p_arg){
 
     OS_CPU_SysTickInit(SystemCoreClock / (CPU_INT32U) OSCfg_TickRate_Hz);
 
+    OSSemCreate(&Fault_Sem4,
+                "Fault/Tripped Semaphore",
+                0,
+                &err);
+    assertOSError(err);
+
     OSSemCreate(&SafetyCheck_Sem4,
                 "Safety Check Semaphore",
                 0,
                 &err);
     assertOSError(err);
+
+    	OSTaskCreate(&FaultState_TCB,				// TCB
+				"TASK_FAULT_STATE_PRIO",	// Task Name (String)
+				Task_FaultState,				// Task function pointer
+				(void *)0,				// Task function args
+				TASK_FAULT_STATE_PRIO,			// Priority
+				FaultState_Stk,				// Stack
+				WATERMARK_STACK_LIMIT,	// Watermark limit for debugging
+				TASK_FAULT_STATE_STACK_SIZE,		// Stack size
+				0,						// Queue size (not needed)
+				10,						// Time quanta (time slice) 10 ticks
+				(void *)0,				// Extension pointer (not needed)
+				OS_OPT_TASK_STK_CHK | OS_OPT_TASK_SAVE_FP,	// Options
+				&err);					// return err code
+		assertOSError(err);
 
     OSTaskCreate(&CriticalState_TCB,				// TCB
 				"TASK_CRITICAL_STATE_PRIO",	// Task Name (String)
@@ -83,12 +105,14 @@ void Task1(void *p_arg){
 				(void *)0,				// Extension pointer (not needed)
 				OS_OPT_TASK_STK_CHK | OS_OPT_TASK_SAVE_FP,	// Options
 				&err);					// return err code
+		assertOSError(err);
+
     
     OSTaskCreate(&Task2_TCB,
                 "Task 2",
                 Task2,
                 (void *)0,
-                10,
+                4,
                 Task2_Stk,
                 16,
                 256,
@@ -97,6 +121,24 @@ void Task1(void *p_arg){
                 (void *)0,
                 OS_OPT_TASK_SAVE_FP | OS_OPT_TASK_STK_CHK,
                 &err);
+		assertOSError(err);
+
+        OSTaskCreate(&CANBusConsumer_TCB,				// TCB
+				"TASK_CANBUS_CONSUMER_PRIO",	// Task Name (String)
+				Task_CANBusConsumer,				// Task function pointer
+				(void *)false,				// don't use loopback mode
+				TASK_CANBUS_CONSUMER_PRIO,			// Priority
+				CANBusConsumer_Stk,				// Stack
+				WATERMARK_STACK_LIMIT,	// Watermark limit for debugging
+				TASK_CANBUS_CONSUMER_STACK_SIZE,		// Stack size
+				0,						// Queue size (not needed)
+				10,						// Time quanta (time slice) 10 ticks
+				(void *)0,				// Extension pointer (not needed)
+				OS_OPT_TASK_STK_CHK | OS_OPT_TASK_SAVE_FP,	// Options
+				&err);					// return err code
+		assertOSError(err);
+
+    CAN_Queue_Init();
 
     OSTaskDel(NULL, &err);
 }

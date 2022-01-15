@@ -72,7 +72,7 @@ void EnterFaultState(void);
  **/
 void assertOSError(OS_ERR err){
     if(err != OS_ERR_NONE) {
-        Fault_BitMap = Fault_OS;
+        Fault_BitMap |= Fault_OS;
         Fault_Flag = 1;
         OSSemPost(&Fault_Sem4, OS_OPT_POST_1, &err);
         // We should not get to this point if the call above worked.
