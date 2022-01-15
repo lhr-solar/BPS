@@ -77,7 +77,7 @@ void EnterFaultState() {
     }
 
     // avoid infinite recursive faults, since our CAN Driver relies on the OS to work
-    if (Fault_BitMap != Fault_OS) {
+    if ((Fault_BitMap & Fault_OS) == 0) {
         CANData_t data;
         data.b = 1;
         CANPayload_t Message;
