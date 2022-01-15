@@ -41,7 +41,7 @@ void Task_CriticalState(void *p_arg) {
 				(void *)0,                                  // Extension pointer (not needed)
 				OS_OPT_TASK_STK_CHK | OS_OPT_TASK_SAVE_FP,  // Options
 				&err);                                      // return err code
-    assertOSError(&err);
+    assertOSError(err);
 
     // Push All Clear message to CAN Q
     CANMSG.id = ALL_CLEAR;

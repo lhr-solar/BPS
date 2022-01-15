@@ -60,6 +60,8 @@ void Task_LogInfo(void *p_arg);
 
 void Task_CANBusConsumer(void *p_arg);
 
+void Task_CheckContactor(void *p_arg);
+
 void Task_BatteryBalance(void *p_arg);
 
 void Task_CLI(void *p_arg);
