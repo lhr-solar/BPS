@@ -22,6 +22,7 @@ CPU_STK Task2_Stk[256];
  * 2. Flash the BPS (see README.md)
  * 3. Run the code in this file. NOTE: This code includes a heartbeat.
  * 4. Make sure the contactor goes from open to closed. Use an ohmmeter to check the resistance across the contactor's terminals to determine the state of the contactor (this resistance should be close to 0 Ohms).
+ * 5. Unpower the contactor, while keeping the BPS powered on. Make sure the BPS goes into a fault state
 ****************************************************************************/
 
 void Task2(void *p_arg){    //This task is meant to allow contactor to close
