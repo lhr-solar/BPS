@@ -152,6 +152,7 @@ void LTC6811_rdcv_safe(uint8_t reg, // Controls which cell voltage register is r
   while(LTC681x_rdcv(reg,total_ic,ic) == -1){
     if(count == MAX_PEC_ERRORS){
       //trip BPS
+      Fault_BitMap |= Fault_CRC;
       OSSemPost(&Fault_Sem4, OS_OPT_POST_1, &err);
       assertOSError(err);
     }
@@ -175,6 +176,7 @@ void LTC6811_rdaux_safe(uint8_t reg, //Determines which GPIO voltage register is
   while(LTC681x_rdaux(reg,total_ic,ic) == -1){
     if(count == MAX_PEC_ERRORS){
       //trip BPS
+      Fault_BitMap |= Fault_CRC;
       OSSemPost(&Fault_Sem4, OS_OPT_POST_1, &err);
       assertOSError(err);
     }
@@ -199,6 +201,7 @@ void LTC6811_rdstat_safe(uint8_t reg, //Determines which Stat  register is read 
   while(LTC681x_rdstat(reg,total_ic,ic) == -1){
     if(count == MAX_PEC_ERRORS){
       //trip BPS
+      Fault_BitMap |= Fault_CRC;
       OSSemPost(&Fault_Sem4, OS_OPT_POST_1, &err);
       assertOSError(err);
     }
@@ -219,6 +222,7 @@ void LTC6811_rdcfg_safe(uint8_t total_ic, //Number of ICs in the system
   while(LTC681x_rdcfg(total_ic, ic) == -1){
     if(count == MAX_PEC_ERRORS){
       //trip BPS
+      Fault_BitMap |= Fault_CRC;
       OSSemPost(&Fault_Sem4, OS_OPT_POST_1, &err);
       assertOSError(err);
     }
@@ -240,6 +244,7 @@ void LTC6811_rdpwm_safe(uint8_t total_ic, //Number of ICs in the system
   while(LTC681x_rdpwm(total_ic, pwmReg, ic) == -1){
     if(count == MAX_PEC_ERRORS){
       //trip BPS
+      Fault_BitMap |= Fault_CRC;
       OSSemPost(&Fault_Sem4, OS_OPT_POST_1, &err);
       assertOSError(err);
     }
@@ -260,6 +265,7 @@ void LTC6811_rdcomm_safe(uint8_t total_ic, //Number of ICs in the system
   while(LTC681x_rdcomm(total_ic, ic) == -1){
     if(count == MAX_PEC_ERRORS){
       //trip BPS
+      Fault_BitMap |= Fault_CRC;
       OSSemPost(&Fault_Sem4, OS_OPT_POST_1, &err);
       assertOSError(err);
     }
