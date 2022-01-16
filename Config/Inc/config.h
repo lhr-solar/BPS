@@ -36,7 +36,6 @@ typedef enum SafetyStatus_e {SAFE = 0, DANGER = 1, OVERVOLTAGE = 2, UNDERVOLTAGE
 #define NUM_BATTERY_MODULES_PER_MINION	8	// User defined. The LTC6811 can actually measure 12 modules.
 // Number of battery modules less than maximum value per minion board
 #define NUM_BATTERY_MODULES_MISSING     NUM_BATTERY_MODULES - ((NUM_MINIONS-1) * NUM_BATTERY_MODULES_PER_MINION)
-#define OPEN_WIRE_MASK                  0x7F    // Mask used to ignore disconnected battery modules in Open Wire Test
 
 //--------------------------------------------------------------------------------
 // MAX and MIN limits of lithium ion cells

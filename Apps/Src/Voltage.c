@@ -18,7 +18,7 @@ static cell_asic *Minions;
 static OS_MUTEX Voltage_Mutex;
 static uint16_t VoltageVal[NUM_BATTERY_MODULES]; //Voltage values gathered
 static uint32_t openWires[TOTAL_VOLT_WIRES];
-static long open_wire_mask = 0;
+static long openWireMask = 0;
 
 /** LTC ADC measures with resolution of 4 decimal places, 
  * But we standardized to have 3 decimal places to work with
@@ -63,17 +63,18 @@ void Voltage_Init(cell_asic *boards){
   	OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
   	assertOSError(err);
 
-	// set the lower bits of open_wire_mask to 1, such that there are as many 1s are modules connected to the last minion
-	open_wire_mask = 1;
+	//openWireMask should be 0x7F for 7 modules in last Minion, 0x3F for 6 modules, etc.
+	// set the lower bits of openWireMask to 1, such that there are as many 1s are modules connected to the last minion
+	openWireMask = 1;
 	if  (NUM_BATTERY_MODULES % NUM_BATTERY_MODULES_PER_MINION) {
 		// handle case where the last minion has a different number of modules than the other minions
-		open_wire_mask <<= (NUM_BATTERY_MODULES % NUM_BATTERY_MODULES_PER_MINION) + 1;
+		openWireMask <<= (NUM_BATTERY_MODULES % NUM_BATTERY_MODULES_PER_MINION) + 1;
 	} else {
 		// handle case where the last minion has the same number of modules as the other minions
-		open_wire_mask <<= NUM_BATTERY_MODULES_PER_MINION + 1;
+		openWireMask <<= NUM_BATTERY_MODULES_PER_MINION + 1;
 	}
-	open_wire_mask -= 1;
-	open_wire_mask >>= NUM_BATTERY_MODULES_MISSING; 
+	openWireMask -= 1;
+	openWireMask >>= NUM_BATTERY_MODULES_MISSING; 
 }
 
 /** Voltage_UpdateMeasurements
@@ -206,7 +207,7 @@ SafetyStatus Voltage_OpenWire(void){
 
 	for(int32_t i = 0; i < NUM_MINIONS; i++) {
 		if(Minions[i].system_open_wire != 0){
-			if ((i == NUM_MINIONS - 1) && ((Minions[i].system_open_wire & open_wire_mask) != 0)) { //The last Voltage board is only connected to 7 modules
+			if ((i == NUM_MINIONS - 1) && ((Minions[i].system_open_wire & openWireMask) != 0)) { //The last Voltage board is only connected to 7 modules
 				break; //Open Wire test runs using NUM_BATTERY_MODULES_PER_MINION so value of last module should be cleared
 			}
 			status = DANGER;
