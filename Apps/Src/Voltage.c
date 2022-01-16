@@ -63,10 +63,16 @@ void Voltage_Init(cell_asic *boards){
   	OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
   	assertOSError(err);
 
-	for (int i = 0; i < NUM_BATTERY_MODULES_PER_MINION; i++){
-		open_wire_mask <<= 1;
-		open_wire_mask |= 1;
+	// set the lower bits of open_wire_mask to 1, such that there are as many 1s are modules connected to the last minion
+	open_wire_mask = 1;
+	if  (NUM_BATTERY_MODULES % NUM_BATTERY_MODULES_PER_MINION) {
+		// handle case where the last minion has a different number of modules than the other minions
+		open_wire_mask <<= (NUM_BATTERY_MODULES % NUM_BATTERY_MODULES_PER_MINION) + 1;
+	} else {
+		// handle case where the last minion has the same number of modules as the other minions
+		open_wire_mask <<= NUM_BATTERY_MODULES_PER_MINION + 1;
 	}
+	open_wire_mask -= 1;
 	open_wire_mask >>= NUM_BATTERY_MODULES_MISSING; 
 }
 
