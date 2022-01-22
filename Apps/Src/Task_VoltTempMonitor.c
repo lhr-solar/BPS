@@ -121,6 +121,15 @@ void Task_VoltTempMonitor(void *p_arg) {
                 CanMsg.payload = CanPayload;
                 CAN_Queue_Post(CanMsg);
             }
+            else {
+                //if the temperature gets low enough, suggest battery can be charged
+                CanMsg.id = CHARGE_ENABLE;
+                CanPayload.idx = 0;
+                CanData.b = 1;
+                CanPayload.data = CanData;
+                CanMsg.payload = CanPayload;
+                CAN_Queue_Post(CanMsg);
+            }
         }
         //Send measurements to CAN queue
         CanMsg.id = TEMP_DATA;

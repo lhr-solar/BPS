@@ -14,6 +14,10 @@
 #define TASK_AMPERES_MONITOR_PRIO           6
 #define TASK_BATTERY_BALANCE_PRIO           7
 #define TASK_CANBUS_CONSUMER_PRIO           8
+// #define TASK_CANBUS_CONSUMER_PRIO           5
+// #define TASK_VOLT_TEMP_MONITOR_PRIO         6
+// #define TASK_AMPERES_MONITOR_PRIO           7
+// #define TASK_BATTERY_BALANCE_PRIO           8
 #define TASK_LOG_INFO_PRIO                  9 
 #define TASK_CLI_PRIO                       10  
 #define TASK_IDLE_PRIO                      11
