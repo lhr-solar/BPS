@@ -260,10 +260,36 @@ MinionsIO Semaphore
 
 Whenever the LTC driver is calling the :term:`SPI <SPI>` function, there's going to be some delay until the SPI transfer is complete. 
 During that delay, we should be executing some other task so once the SPI transfer starts, the system should start 
-waiting for this :term: `semaphore <Semaphore>`. Whenever the SPI transfer is complete, we must signal this semaphore so we need to 
+waiting for this :term:`semaphore <Semaphore>`. Whenever the SPI transfer is complete, we must signal this semaphore so we need to 
 have an :term:`ISR <ISR>` that calls the signal semaphore function whenever a transfer is complete. This ISR is in the BSP SPI module.
+
+Safety Check Semaphore
+======================
+
+When the :ref:`Critical State <Critical state Task: Manthan Upadhyaya>` runs, it checks to see if the Amperes, Voltage, Open Wire,
+and Temperature are safe. This process is done by the Critical State Task using a blocking Pend function on the Safety Check Semaphore.
+Each time a semaphore is posted, its ``cnt`` parameter is incremented. When it is pended, the ``cnt`` parameter is decremented. The task
+uses a blocking pend (wont move past the function until the semaphore is pended ``NUM_FAULT_POINTS`` amount of times).
+
+Fault_Semaphore
+===============
+
+When the :ref:`Fault State <Fault State Task: Manthan Upadhyaya>` runs, it uses a blocking pend on this semaphore. When a task notices a
+fault condition, this semphore will be posted and the fault state task will enter the BPS fault state.
+
+Watchdog Mutex
+==============
+
+This mutex excludes access to the ``WDog_Bitmap`` variable that makes sure that the 
+:ref:`Voltage/Temperature monitor <Voltage Temperature Monitor Task: Sijin Woo>` and 
+:ref:`Amperes monitor <Amperes Task: Manthan Upadhyaya>` are not stuck.
 
 Voltage Mutex
 =============
 
 Mutually excludes accesses to the Voltage buffer in the Voltage.c library. 
+
+MinionsASIC_Mutex
+=================
+
+This mutex excluses access to the ``Minions`` struct. This struct hold voltage and temperature data that is taken from the LTC6811.

@@ -57,7 +57,7 @@ Applications (Apps)
 The BPS Apps consist of threads/tasks and functions that interpret measurements.
 The following tasks make up the BPS' engine and are shown from highest to lowest priority:
 
-- Initialization Task
+- :ref:`Initialization <Initialization Task: Alex Koo>`
 - :ref:`Fault State <Fault State Task: Manthan Upadhyaya>`
 - :ref:`Critical State <Critical state Task: Manthan Upadhyaya>`
 - :ref:`Pet Watchdog <Pet WatchDog Task: Harshitha Gorla & Clark Poon>`
