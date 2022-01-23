@@ -763,7 +763,7 @@ Context
     * GND
         * Input from Module Minion board 
     * TempSens (1-16) 
-        * input from a temperature sensor 
+        * input from a temperature sensor (using `LMT87 <https://www.ti.com/lit/ds/symlink/lmt87.pdf?ts=1642971325896&ref_url=https%253A%252F%252Fwww.google.com%252F>`_
         * output to the Module Minion board 
    
         
