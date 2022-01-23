@@ -21,7 +21,7 @@ typedef enum SafetyStatus_e {SAFE = 0, DANGER = 1, OVERVOLTAGE = 2, UNDERVOLTAGE
 //--------------------------------------------------------------------------------
 // Basic Parameters of BPS layout
 
-#define NUM_MINIONS	4					 // Number of minion boards
+#define NUM_MINIONS	1					 // Number of minion boards
 
 
 //--------------------------------------------------------------------------------
@@ -73,5 +73,10 @@ typedef enum SafetyStatus_e {SAFE = 0, DANGER = 1, OVERVOLTAGE = 2, UNDERVOLTAGE
 //Maximum PEC Code Errors
 //Defines the number of PEC code errors allowed before the BPS is tripped
 #define MAX_PEC_ERRORS 5
+
+
+//--------------------------------------------------------------------------------
+// CAN Loopback Mode
+#define CAN_LOOPBACK true
 
 #endif

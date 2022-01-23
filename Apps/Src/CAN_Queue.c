@@ -41,6 +41,9 @@ ErrorStatus CAN_Queue_Post(CANMSG_t message) {
     OSMutexPend(&canFifo_Mutex, 0, OS_OPT_POST_NONE, &ticks, &err);
     assertOSError(err);
     bool success = CAN_fifo_put(&canFifo, message);
+    if (!success) {
+        printf("failed to put into queue!\n\r");
+    }
     OSMutexPost(&canFifo_Mutex, OS_OPT_POST_NONE, &err);
     assertOSError(err);
 

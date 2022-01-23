@@ -11,6 +11,8 @@
 #include "BSP_WDTimer.h"
 #include "BSP_Contactor.h"
 #include "BSP_PLL.h"
+#include "BSP_UART.h"
+
 void EnterFaultState(void);
 
 int main() {
@@ -18,6 +20,7 @@ int main() {
 	OS_ERR err;
 
 	BSP_PLL_Init();
+	BSP_UART_Init(NULL, NULL, UART_USB);	
 
 	//Resetting the contactor
 	BSP_Contactor_Init();
