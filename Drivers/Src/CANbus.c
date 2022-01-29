@@ -81,7 +81,7 @@ void CANbus_Init(bool loopback) {
 
 // Static method, call CANbus_Send or CANbus_BlockAndSend instead
 static ErrorStatus CANbus_SendMsg(CANId_t id, CANPayload_t payload) {
-	uint8_t txdata[5];
+	uint8_t txdata[8];
 	uint8_t data_length = 0;
 	
 	OS_ERR err;

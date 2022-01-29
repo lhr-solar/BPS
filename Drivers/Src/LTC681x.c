@@ -1644,7 +1644,7 @@ void LTC681x_set_cfgr_adcopt(uint8_t nIC, cell_asic ic[], bool adcopt)
 }
 
 //Helper function to set GPIO bits
-void LTC681x_set_cfgr_gpio(uint8_t nIC, cell_asic ic[],bool gpio[5])
+void LTC681x_set_cfgr_gpio(uint8_t nIC, cell_asic ic[],bool gpio[])
 {
   for (int i =0; i<5; i++)
   {
@@ -1654,7 +1654,7 @@ void LTC681x_set_cfgr_gpio(uint8_t nIC, cell_asic ic[],bool gpio[5])
 }
 
 //Helper function to control discharge
-void LTC681x_set_cfgr_dis(uint8_t nIC, cell_asic ic[],bool dcc[12])
+void LTC681x_set_cfgr_dis(uint8_t nIC, cell_asic ic[],bool dcc[])
 {
   for (int i =0; i<8; i++)
   {
