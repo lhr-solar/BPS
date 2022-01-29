@@ -143,7 +143,7 @@ void Task_Init(void *p_arg) {
         OSTaskCreate(&CANBusConsumer_TCB,				// TCB
 				"TASK_CANBUS_CONSUMER_PRIO",	// Task Name (String)
 				Task_CANBusConsumer,				// Task function pointer
-				(void *)CAN_LOOPBACK,				// don't use loopback mode
+				(void *)false,				// don't use loopback mode
 				TASK_CANBUS_CONSUMER_PRIO,			// Priority
 				CANBusConsumer_Stk,				// Stack
 				WATERMARK_STACK_LIMIT,	// Watermark limit for debugging
