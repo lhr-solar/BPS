@@ -161,7 +161,6 @@ ErrorStatus CANbus_BlockAndSend(CANId_t id, CANPayload_t payload) {
 			  &ts,
 			  &err);
 	assertOSError(err);
-	printf("Payload id: %d\n\r", payload.idx);
 	ErrorStatus result = CANbus_SendMsg(id, payload);
 	if (result == ERROR) {
 		CANbus_Release();
