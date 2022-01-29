@@ -1,7 +1,5 @@
 /* Copyright (c) 2022 UT Longhorn Racing Solar */
 
-#include "BSP_Lights.h"
-
 void Task_Idle(void *p_arg) {
     (void)p_arg;
 

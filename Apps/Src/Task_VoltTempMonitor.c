@@ -62,7 +62,6 @@ void Task_VoltTempMonitor(void *p_arg) {
             CanData.w = voltage;
             CanPayload.data = CanData;
             CanMsg.payload = CanPayload;
-            //CANbus_BlockAndSend(VOLT_DATA, CanPayload);
             CAN_Queue_Post(CanMsg);
         }
 
@@ -125,7 +124,6 @@ void Task_VoltTempMonitor(void *p_arg) {
             CanData.b = 0;
             CanPayload.data = CanData;
             CanMsg.payload = CanPayload;
-            //CANbus_BlockAndSend(CanMsg.id, CanPayload);
             CAN_Queue_Post(CanMsg);
         }
         else {
@@ -135,7 +133,6 @@ void Task_VoltTempMonitor(void *p_arg) {
             CanData.b = 1;
             CanPayload.data = CanData;
             CanMsg.payload = CanPayload;
-            //CANbus_BlockAndSend(CanMsg.id, CanPayload);
             CAN_Queue_Post(CanMsg);
         }
         //Send measurements to CAN queue
@@ -147,7 +144,6 @@ void Task_VoltTempMonitor(void *p_arg) {
                     CanData.w = (uint32_t)Temperature_GetSingleTempSensor(i, j);
                     CanPayload.data = CanData;
                     CanMsg.payload = CanPayload;
-                    //CANbus_BlockAndSend(CanMsg.id, CanPayload);
                     CAN_Queue_Post(CanMsg);
                 }
             }
