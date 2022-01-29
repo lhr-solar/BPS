@@ -166,7 +166,7 @@ void Task2(void *p_arg){
         //delay of 100ms
         OSTimeDly(10, OS_OPT_TIME_DLY, &err);
         assertOSError(err);
-        BSP_Light_Toggle(RUN);
+        //BSP_Light_Toggle(RUN);
     }
 }
 

@@ -109,18 +109,31 @@ void Task_VoltTempMonitor(void *p_arg) {
 
             temperatureHasBeenChecked = true;
         }
+        bool charge_enable = true;
         //Check if car should be allowed to charge or not
         for(uint8_t k = 0; k < NUM_BATTERY_MODULES; k++){
             uint32_t temp = Temperature_GetModuleTemperature(k);
             if(temp > MAX_CHARGE_TEMPERATURE_LIMIT && temp < MAX_DISCHARGE_TEMPERATURE_LIMIT){
                 //suggest that the battery should not be charged
-                CanMsg.id = CHARGE_ENABLE;
-                CanPayload.idx = 0;
-                CanData.b = 0;
-                CanPayload.data = CanData;
-                CanMsg.payload = CanPayload;
-                CAN_Queue_Post(CanMsg);
+                charge_enable = false;
             }
+        }
+        if (!charge_enable){
+            CanMsg.id = CHARGE_ENABLE;
+            CanPayload.idx = 0;
+            CanData.b = 0;
+            CanPayload.data = CanData;
+            CanMsg.payload = CanPayload;
+            CAN_Queue_Post(CanMsg);
+        }
+        else {
+            //if the temperature gets low enough, suggest battery can be charged
+            CanMsg.id = CHARGE_ENABLE;
+            CanPayload.idx = 0;
+            CanData.b = 1;
+            CanPayload.data = CanData;
+            CanMsg.payload = CanPayload;
+            CAN_Queue_Post(CanMsg);
         }
         //Send measurements to CAN queue
         CanMsg.id = TEMP_DATA;

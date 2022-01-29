@@ -76,7 +76,7 @@ void BSP_CAN_Init(callback_t rxEvent, callback_t txEnd, bool loopback) {
     CAN_InitStructure.CAN_AWUM = DISABLE;
     CAN_InitStructure.CAN_NART = DISABLE;
     CAN_InitStructure.CAN_RFLM = DISABLE;
-    CAN_InitStructure.CAN_TXFP = DISABLE;
+    CAN_InitStructure.CAN_TXFP = ENABLE;    // I don't think we picked BPS CAN IDs in order of importance anyway, so I'll just make this a FIFO
     CAN_InitStructure.CAN_Mode = (loopback ? CAN_Mode_LoopBack: CAN_Mode_Normal);
     CAN_InitStructure.CAN_SJW  = CAN_SJW_1tq;
 
@@ -145,6 +145,7 @@ void BSP_CAN_Init(callback_t rxEvent, callback_t txEnd, bool loopback) {
  * @return  ERROR if module was unable to transmit the data onto the CAN bus. SUCCESS indicates data was transmitted.
  */
 ErrorStatus BSP_CAN_Write(uint32_t id, uint8_t data[8], uint8_t length) {
+    ErrorStatus retVal = SUCCESS;
     
     gTxMessage.StdId = id;
     gTxMessage.DLC = length;
@@ -152,7 +153,10 @@ ErrorStatus BSP_CAN_Write(uint32_t id, uint8_t data[8], uint8_t length) {
         gTxMessage.Data[i] = data[i];
     }
 	
-    ErrorStatus retVal = (ErrorStatus) (CAN_Transmit(CAN1, &gTxMessage) != 0);
+    uint8_t mailbox = CAN_Transmit(CAN1, &gTxMessage);
+    if (mailbox == CAN_TxStatus_NoMailBox) {
+        retVal = ERROR;
+    }
 
     return retVal;
 }

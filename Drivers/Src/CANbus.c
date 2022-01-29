@@ -81,7 +81,7 @@ void CANbus_Init(bool loopback) {
 
 // Static method, call CANbus_Send or CANbus_BlockAndSend instead
 static ErrorStatus CANbus_SendMsg(CANId_t id, CANPayload_t payload) {
-	uint8_t txdata[5];
+	uint8_t txdata[8];
 	uint8_t data_length = 0;
 	
 	OS_ERR err;
@@ -161,12 +161,6 @@ ErrorStatus CANbus_BlockAndSend(CANId_t id, CANPayload_t payload) {
 			  &ts,
 			  &err);
 	assertOSError(err);
-
-	// Check the error code
-	if(err != OS_ERR_NONE) {
-		return ERROR;
-	}
-
 	ErrorStatus result = CANbus_SendMsg(id, payload);
 	if (result == ERROR) {
 		CANbus_Release();
@@ -194,11 +188,6 @@ ErrorStatus CANbus_Send(CANId_t id, CANPayload_t payload) {
 			  &ts,
 			  &err);
 	assertOSError(err);
-
-	// Check to see if the semaphore was acquired successfully
-	if(err != OS_ERR_NONE) {
-		return ERROR;
-	}
 
 	// Send the message
 	ErrorStatus result = CANbus_SendMsg(id, payload);
@@ -252,11 +241,6 @@ ErrorStatus CANbus_Receive(CANId_t *id, uint8_t *buffer) {
 			  &err);
 	assertOSError(err);
 
-	// Check to see if the semaphore was acquired successfully
-	if(err != OS_ERR_NONE) {
-		return ERROR;
-	}
-
 	// Send the message
 	return CANbus_GetMsg(id, buffer);
 }
@@ -278,11 +262,6 @@ ErrorStatus CANbus_WaitToReceive(CANId_t *id, uint8_t *buffer) {
 			  &ts,
 			  &err);
 	assertOSError(err);
-
-	// Check the error code
-	if(err != OS_ERR_NONE) {
-		return ERROR;
-	}
 
 	return CANbus_GetMsg(id, buffer);
 }
