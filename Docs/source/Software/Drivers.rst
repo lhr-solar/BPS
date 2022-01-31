@@ -2,7 +2,7 @@
 Drivers
 *******
 
-Amps Driver
+LTC2315 Driver
 =============
 
 Purpose
