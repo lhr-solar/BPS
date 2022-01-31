@@ -295,7 +295,7 @@ CAN Mailbox Semaphore
 
 There are 3 hardware mailboxes that can hold CAN messages that will be sent along the CAN line. This semaphore is 
 initialized to a value of 3 (number of empty mailboxes). When the semaphore is posted, the count decreases (one 
-mailbox becomes full). When the semaphore is pended, the count increases (one mailbox becomes empty).
+mailbox becomes full). When the semaphore is pended, the count increases (one mailbox becomes empty). This means that the semaphore will keep track of how many CAN mailboxes are free. If we pend this semaphore before sending a CAN message and post it after sending a CAN message, we can make sure the code will block until a mailbox is free if we try to send a CAN message when no mailboxes are free.
 
 CAN FIFO Mutex
 ==============
