@@ -38,7 +38,7 @@ The software for the BPS has drivers for:
 - :term:`CAN <CAN Bus>`
 - :term:`EEPROM <EEPROM>`
 - LTC6811 (Voltage and Temperature)
-- AS8510 (Amperes)
+- LTC2315 (Amperes)
 
 Real Time Operating System (RTOS)
 =================================

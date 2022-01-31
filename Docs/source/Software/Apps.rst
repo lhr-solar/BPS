@@ -271,11 +271,41 @@ and Temperature are safe. This process is done by the Critical State Task using 
 Each time a semaphore is posted, its ``cnt`` parameter is incremented. When it is pended, the ``cnt`` parameter is decremented. The task
 uses a blocking pend (wont move past the function until the semaphore is pended ``NUM_FAULT_POINTS`` amount of times).
 
-Fault_Semaphore
+Fault Semaphore
 ===============
 
 When the :ref:`Fault State <Fault State Task: Manthan Upadhyaya>` runs, it uses a blocking pend on this semaphore. When a task notices a
 fault condition, this semphore will be posted and the fault state task will enter the BPS fault state.
+
+Amperes IO Semaphore
+====================
+
+Whenever the Amperes Driver is calling the :term:`SPI` fucntion, there is going to be some delay until the SPI
+transfer is complete. The Semaphore is pended during that time and other tasks are allowed to execute. Once the
+transfer is complete, an ISR posts the semaphore.
+
+CAN FIFO Semaphore
+==================
+
+Used in `CAN_Queue.c` to flag that there is data in the :term:`CAN` :term:`FIFO`. Posted by tasks that place data 
+in the CAN FIFO and pended when data is removed from the FIFO.
+
+CAN Mailbox Semaphore
+=====================
+
+There are 3 hardware mailboxes that can hold CAN messages that will be sent along the CAN line. This semaphore is 
+initialized to a value of 3 (number of empty mailboxes). When the semaphore is posted, the count decreases (one 
+mailbox becomes full). When the semaphore is pended, the count increases (one mailbox becomes empty).
+
+CAN FIFO Mutex
+==============
+
+Mutually excludes access to CAN FIFO in `CAN_Queue.c`.
+
+Amperes Data Mutex
+==================
+
+Mutually excluded data to Amperes data in `Amps.c` library.
 
 Watchdog Mutex
 ==============

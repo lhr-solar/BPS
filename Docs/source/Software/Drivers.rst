@@ -2,16 +2,16 @@
 Drivers
 *******
 
-AS8510 Driver
+Amps Driver
 =============
 
 Purpose
-    This driver is used to obtain data from the AS8510 current sensor chip.
+    This driver is used to obtain data from the LTC2315 current sensor chip.
 
 Usage
-    In order to use these functions, ``AS8510_Init()`` must be called first. The rest of the 
+    In order to use these functions, ``LTC2315_Init()`` must be called first. The rest of the 
     functions are used to read and write to the registers in the chip. In order to read the current
-    you must call ``AS8510_GetCurrent()`` which returns the value of the current as an ``int16_t``.
+    you must call ``LTC2315_GetCurrent()`` which returns the value of the current as an ``int16_t``.
 
 Additional Considerations
     Communication with this chip is done with :term:`SPI <SPI>`.

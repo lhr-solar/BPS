@@ -77,12 +77,12 @@ Schematic
     This board physically measures the temperature and 
     current from the Shunt Resistor Board and then, sends the measurements back to the BPS Leader Board.  
 *List of Circuit Components*
-    * AS8510-ASSM  
+    * LTC2315  
         * Description: Shunt-based sensing/processing IC
         * Why is it necessary: Measures input current and temperature and sends it to the LTC6820 using SPI. 
         * Justification for selection of specific part:This device has higher accuracy for a
           larger range, compared to other products. 
-        * `Datasheet <https://ams.com/documents/20143/36005/AS8510_DS000297_3-00.pdf/516988a9-7561-ee26-f755-b928795564ec>`__ 
+        * `Datasheet <https://www.analog.com/media/en/technical-documentation/data-sheets/231512fa.pdf>`__ 
         * Associated passives/components:  
             * J1 Shunt Conn (1x4 Connector)  
     * RO-123.3S_HP 
