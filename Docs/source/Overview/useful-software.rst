@@ -10,5 +10,5 @@ To work with the BPS, download the following software:
 * `PuTTY <https://www.putty.org/>`_ - Debug the BPS
 * `Ubuntu <https://ubuntu.com/#download>`_ - Windows Subsystem for Linux to compile code and use github
 * `VsCode <https://code.visualstudio.com/>`_ - Text Editor used to edit our code base. Used in conjunction with WSL(Ubuntu) to compile and debug our system.
-* `Virtual Box <https://www.virtualbox.org/wiki/Downloads>`_ - Allows for USB support so you can debug code using gdb. Some issues may occur when downloading.
+* `Virtual Box <https://www.virtualbox.org/wiki/Downloads>`_ - Allows for USB support so you can debug code using gdb. `Setup Instructions <https://brb.nci.nih.gov/seqtools/installUbuntu.html>`_.
   * `Guest Box Additions Help <https://docs.oracle.com/cd/E36500_01/E36502/html/qs-guest-additions.html>`_ - Sometimes when using the guest OS on virtual box, the screen size is smaller so you need this in order to use the full screen.

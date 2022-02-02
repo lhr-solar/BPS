@@ -3,7 +3,7 @@ Drivers
 *******
 
 LTC2315 Driver
-=============
+==============
 
 Purpose
     This driver is used to obtain data from the LTC2315 current sensor chip.

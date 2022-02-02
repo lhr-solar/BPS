@@ -294,7 +294,7 @@ transfer is complete, an ISR posts the semaphore.
 CAN FIFO Semaphore
 ==================
 
-Used in `CAN_Queue.c` to flag that there is data in the :term:`CAN` :term:`FIFO`. Posted by tasks that place data 
+Used in `CAN_Queue.c` to flag that there is data in the CAN FIFO. Posted by tasks that place data 
 in the CAN FIFO and pended when data is removed from the FIFO.
 
 CAN Mailbox Semaphore
