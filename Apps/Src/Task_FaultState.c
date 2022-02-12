@@ -13,6 +13,7 @@
 #include "CANbus.h"
 #include "BSP_UART.h"
 #include "config.h"
+#include "stm32f4xx.h"
 
 /*
  * Note: do not call this directly if it can be helped.
@@ -20,6 +21,9 @@
  * that the Fault Task is pending on.
  */
 void EnterFaultState() {
+
+    __disable_irq();
+
     // Turn Contactor Off
     BSP_Contactor_Init();
     BSP_Contactor_Off();
@@ -77,7 +81,9 @@ void EnterFaultState() {
     }
 
     // avoid infinite recursive faults, since our CAN Driver relies on the OS to work
-    if ((Fault_BitMap & Fault_OS) == 0) {
+    // also don't call CAN if the watchdog tripped, since CAN won't be initialized
+    /*
+    if ((Fault_BitMap & (Fault_OS | Fault_WDOG)) == 0) {
         CANData_t data;
         data.b = 1;
         CANPayload_t Message;
@@ -88,6 +94,7 @@ void EnterFaultState() {
         data.b = 0;
         CANbus_BlockAndSend(CONTACTOR_STATE, Message);
     }
+    */
 
 #ifdef DEBUGMODE
     char command[COMMAND_SIZE];

@@ -22,6 +22,8 @@
 #define AUX_I2C_BLANK 0
 #define AUX_I2C_NO_TRANSMIT 0x7
 
+#define TEMP_ERR_OUT_BOUNDS 42424242
+
 /** Temperature_Init
  * Initializes device drivers including SPI inside LTC6811_init and LTC6811 for Temperature Monitoring
  * @param boards LTC6811 data structure that contains the values of each register

@@ -10,7 +10,7 @@
 #include "VoltageToTemp.h"
 
 // Holds the temperatures in Celsius (Fixed Point with .001 resolution) for each sensor on each board
-static int32_t ModuleTemperatures[NUM_MINIONS][MAX_TEMP_SENSORS_PER_MINION_BOARD];
+static int32_t temperatures[NUM_MINIONS][MAX_TEMP_SENSORS_PER_MINION_BOARD];
 
 // Holds the maximum measured temperature in the most recent batch of temperature measurements
 static int32_t maxTemperature;
@@ -152,7 +152,7 @@ int32_t milliVoltToCelsius(uint32_t milliVolt){
 		return voltToTemp[milliVolt];
 	}
 	else {
-		return -1;
+		return TEMP_ERR_OUT_BOUNDS;
 	}
 }
 
@@ -181,7 +181,7 @@ ErrorStatus Temperature_UpdateSingleChannel(uint8_t channel){
 		
 		// update adc value from GPIO1 stored in a_codes[0]; 
 		// a_codes[0] is fixed point with .001 resolution in volts -> multiply by .001 * 1000 to get mV in double form
-		ModuleTemperatures[board][channel] = milliVoltToCelsius(Minions[board].aux.a_codes[0] / 10);
+		temperatures[board][channel] = milliVoltToCelsius(Minions[board].aux.a_codes[0] / 10);
 	}
 	//release mutex
   	OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
@@ -201,15 +201,15 @@ ErrorStatus Temperature_UpdateAllMeasurements(){
 	}
 
 	// update max temperature
-	int32_t newMaxTemperature = ModuleTemperatures[0][0];
+	int32_t newMaxTemperature = temperatures[0][0];
 	for (int minion = 0; minion < NUM_MINIONS; ++minion) {
 		for (int sensor = 0; sensor < MAX_TEMP_SENSORS_PER_MINION_BOARD; ++sensor) {
 			// ignore parts of the array that are out of bounds
 			if (minion * MAX_TEMP_SENSORS_PER_MINION_BOARD + sensor >= NUM_TEMPERATURE_SENSORS) {
 				break;
 			}
-			if (ModuleTemperatures[minion][sensor] > newMaxTemperature) {
-				newMaxTemperature = ModuleTemperatures[minion][sensor];
+			if (temperatures[minion][sensor] > newMaxTemperature) {
+				newMaxTemperature = temperatures[minion][sensor];
 			}
 		}
 	}
@@ -225,16 +225,27 @@ ErrorStatus Temperature_UpdateAllMeasurements(){
 SafetyStatus Temperature_CheckStatus(uint8_t isCharging){
 	int32_t temperatureLimit = isCharging == 1 ? MAX_CHARGE_TEMPERATURE_LIMIT : MAX_DISCHARGE_TEMPERATURE_LIMIT;
 
+	const int32_t CHANNELS_IN_LAST_MINION = MAX_VOLT_SENSORS_PER_MINION_BOARD - (NUM_MINIONS * MAX_VOLT_SENSORS_PER_MINION_BOARD - NUM_BATTERY_MODULES);
+	const int32_t MAX_TEMP_CHANNELS = MAX_VOLT_SENSORS_PER_MINION_BOARD;
+
+	volatile SafetyStatus retVal = SAFE;
+
 	for (int i = 0; i < NUM_MINIONS; i++) {
-		for (int j = 0; j < MAX_TEMP_SENSORS_PER_MINION_BOARD; j++) {
-			if (i * MAX_TEMP_SENSORS_PER_MINION_BOARD + j >= NUM_TEMPERATURE_SENSORS) break;
-			if (ModuleTemperatures[i][j] > temperatureLimit) {
-				return DANGER;
+		// if there are less than 16 temperature sensors, plug them in in order of which channel they are on
+		// for example, if there are 14 sensors, use sensor numbers (1-indexed) 1-7 and 9-15
+		int numChannels = (i + 1 < NUM_MINIONS) ? MAX_TEMP_CHANNELS : CHANNELS_IN_LAST_MINION;
+		for (int j = 0; j < numChannels; j++) {
+			// if (i * MAX_TEMP_SENSORS_PER_MINION_BOARD + j >= NUM_TEMPERATURE_SENSORS) break;
+			if ((temperatures[i][j] > temperatureLimit) || (temperatures[i][j] == TEMP_ERR_OUT_BOUNDS)) {
+				retVal = DANGER;
+			}
+			if ((temperatures[i][j + MAX_TEMP_CHANNELS] > temperatureLimit) || (temperatures[i][j + MAX_TEMP_CHANNELS] == TEMP_ERR_OUT_BOUNDS)) {
+				retVal = DANGER;
 			}
 		}
 	}
 
-	return SAFE;
+	return retVal;
 }
 
 /** Temperature_SetChargeState
@@ -260,7 +271,7 @@ uint8_t *Temperature_GetModulesInDanger(void){
 	for (int i = 0; i < NUM_MINIONS-1; i++) {
 		for (int j = 0; j < MAX_TEMP_SENSORS_PER_MINION_BOARD; j++) {
 			if (i * MAX_TEMP_SENSORS_PER_MINION_BOARD + j >= NUM_TEMPERATURE_SENSORS) break;
-			if (ModuleTemperatures[i][j] > temperatureLimit) {
+			if (temperatures[i][j] > temperatureLimit) {
 				ModuleTempStatus[(i * (NUM_TEMP_SENSORS_PER_MOD/2)) + (j % (NUM_TEMP_SENSORS_PER_MOD/2))] = 1;
 			}
 		}
@@ -275,7 +286,7 @@ uint8_t *Temperature_GetModulesInDanger(void){
  * @return temperature of the battery module at specified index
  */
 int32_t Temperature_GetSingleTempSensor(uint8_t board, uint8_t sensorIdx) {
-	return ModuleTemperatures[board][sensorIdx];
+	return temperatures[board][sensorIdx];
 }
 
 /** Temperature_GetModuleTemperature
@@ -290,9 +301,9 @@ int32_t Temperature_GetModuleTemperature(uint8_t moduleIdx){
 	uint8_t board = (moduleIdx * 2) / MAX_TEMP_SENSORS_PER_MINION_BOARD;
 	uint8_t sensor = moduleIdx % (MAX_TEMP_SENSORS_PER_MINION_BOARD / 2);
 
-	total += ModuleTemperatures[board][sensor];
+	total += temperatures[board][sensor];
 	// Get temperature from other sensor on other side
-	total += ModuleTemperatures[board][sensor + MAX_TEMP_SENSORS_PER_MINION_BOARD / 2];
+	total += temperatures[board][sensor + MAX_TEMP_SENSORS_PER_MINION_BOARD / 2];
 	total /= 2;
 	return total;
 }
