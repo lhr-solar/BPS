@@ -62,11 +62,17 @@ uint16_t LTC2315_Read() {
 
     uint8_t count = 0;
     do {
+    OSSchedLock(&err);
+    assertOSError(err);
+
     LTC2315_wakeup_sleep();
 
     BSP_SPI_SetStateCS(spi_ltc2315, 0);
     BSP_SPI_Read(spi_ltc2315, rxdata, 2);
     BSP_SPI_SetStateCS(spi_ltc2315, 1);
+
+    OSSchedUnlock(&err);
+    assertOSError(err);
 
     if ((count > MAX_PEC_ERRORS) && (rxdata[0] == 0xff) && (rxdata[1] == 0xff)) {
       // trip BPS
@@ -74,6 +80,7 @@ uint16_t LTC2315_Read() {
       OSSemPost(&Fault_Sem4, OS_OPT_POST_1, &err);
       assertOSError(err);
     }
+
     ++count;
     } while ((rxdata[0] == 0xff) && (rxdata[1] == 0xff)); // sometimes rxdata is 0xffff. I think this is caused by getting interrupted in the middle of requesting a reading from the ADC
 
