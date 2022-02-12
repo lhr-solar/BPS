@@ -96,7 +96,7 @@ SafetyStatus Amps_CheckStatus(int32_t maxTemperature) {
 
 	OSMutexPend(&AmperesData_Mutex, 0, OS_OPT_PEND_BLOCKING, &ticks, &err);
 	assertOSError(err);
-	if((latestMeasureMilliAmps > chargingCurrentLimit)&&(latestMeasureMilliAmps < MAX_CURRENT_LIMIT)){
+	if((latestMeasureMilliAmps >= chargingCurrentLimit)&&(latestMeasureMilliAmps < MAX_CURRENT_LIMIT)){
 		status = SAFE;
 	} else{
 		status = DANGER;

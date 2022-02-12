@@ -58,7 +58,7 @@ void LTC2315_Sleep() {
  */
 uint16_t LTC2315_Read() {
     OS_ERR err;
-    uint8_t rxdata[2];
+    uint8_t rxdata[2] = {0xff, 0xff};
 
     uint8_t count = 0;
     do {
@@ -68,7 +68,7 @@ uint16_t LTC2315_Read() {
     BSP_SPI_Read(spi_ltc2315, rxdata, 2);
     BSP_SPI_SetStateCS(spi_ltc2315, 1);
 
-    if (count > MAX_PEC_ERRORS) {
+    if ((count > MAX_PEC_ERRORS) && (rxdata[0] == 0xff) && (rxdata[1] == 0xff)) {
       // trip BPS
       Fault_BitMap |= Fault_CRC;
       OSSemPost(&Fault_Sem4, OS_OPT_POST_1, &err);
