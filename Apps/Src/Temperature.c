@@ -8,6 +8,7 @@
 #include "os.h"
 #include "Tasks.h"
 #include "VoltageToTemp.h"
+#include "BSP_PLL.h"
 
 // Holds the temperatures in Celsius (Fixed Point with .001 resolution) for each sensor on each board
 static int32_t temperatures[NUM_MINIONS][MAX_TEMP_SENSORS_PER_MINION_BOARD];
@@ -22,6 +23,14 @@ static uint8_t ChargingState;
 // Temperature.c uses auxiliary registers to view ADC data and COM register for I2C with LTC1380 MUX
 static cell_asic *Minions;
 
+void Temperature_delay_m(uint16_t milli)
+{
+  uint32_t delay = BSP_PLL_GetSystemClock() / 1000;
+	for(uint32_t i = 0; i < milli; i++)
+	{
+		for(uint32_t j = 0; j < delay; j++);
+	}
+}
 
 /** Temperature_Init
  * Initializes device drivers including SPI inside LTC6811_init and LTC6811 for Temperature Monitoring
@@ -117,8 +126,6 @@ ErrorStatus Temperature_ChannelConfig(uint8_t tempChannel) {
 		Minions[board].com.tx_data[0] = (AUX_I2C_START << 4) + (muxAddress >> 4); 				
 		Minions[board].com.tx_data[1] = (muxAddress << 4) + AUX_I2C_NACK;
 
-
-
 		// Sends what channel to open. 8 is the enable bit
 		// 8 + temp_channel
 		Minions[board].com.tx_data[2] = (AUX_I2C_BLANK << 4) + 0xF; 				// set dont cares high
@@ -130,7 +137,6 @@ ErrorStatus Temperature_ChannelConfig(uint8_t tempChannel) {
     }
 
 	// Send data
-    wakeup_sleep(NUM_MINIONS);
     LTC6811_wrcomm(NUM_MINIONS, Minions);
 	LTC6811_rdcomm_safe(NUM_MINIONS, Minions);
 	LTC6811_stcomm();
@@ -168,6 +174,8 @@ ErrorStatus Temperature_UpdateSingleChannel(uint8_t channel){
 	if (ERROR == Temperature_ChannelConfig(channel)) {
 		return ERROR;
 	}
+
+	// wait for channel to stabilize
 	
 	// Sample ADC channel
 	Temperature_SampleADC(MD_422HZ_1KHZ);
@@ -197,6 +205,13 @@ ErrorStatus Temperature_UpdateSingleChannel(uint8_t channel){
 ErrorStatus Temperature_UpdateAllMeasurements(){
 	// update all measurements
 	for (int sensorCh = 0; sensorCh < MAX_TEMP_SENSORS_PER_MINION_BOARD; sensorCh++) {
+		// A hack to solve a timing issue related to enabling one of the muxes
+		if(sensorCh % 8 == 0) {
+			Temperature_ChannelConfig(sensorCh);
+			Temperature_ChannelConfig(sensorCh);
+		}
+
+		// Update the measurement for this channel
 		Temperature_UpdateSingleChannel(sensorCh);
 	}
 
@@ -225,27 +240,30 @@ ErrorStatus Temperature_UpdateAllMeasurements(){
 SafetyStatus Temperature_CheckStatus(uint8_t isCharging){
 	int32_t temperatureLimit = isCharging == 1 ? MAX_CHARGE_TEMPERATURE_LIMIT : MAX_DISCHARGE_TEMPERATURE_LIMIT;
 
-	const int32_t CHANNELS_IN_LAST_MINION = MAX_VOLT_SENSORS_PER_MINION_BOARD - (NUM_MINIONS * MAX_VOLT_SENSORS_PER_MINION_BOARD - NUM_BATTERY_MODULES);
-	const int32_t MAX_TEMP_CHANNELS = MAX_VOLT_SENSORS_PER_MINION_BOARD;
+	// const int32_t CHANNELS_IN_LAST_MINION = MAX_VOLT_SENSORS_PER_MINION_BOARD - (NUM_MINIONS * MAX_VOLT_SENSORS_PER_MINION_BOARD - NUM_BATTERY_MODULES);
+	// const int32_t MAX_TEMP_CHANNELS = MAX_VOLT_SENSORS_PER_MINION_BOARD;
 
-	volatile SafetyStatus retVal = SAFE;
+	// volatile SafetyStatus retVal = SAFE;
 
 	for (int i = 0; i < NUM_MINIONS; i++) {
 		// if there are less than 16 temperature sensors, plug them in in order of which channel they are on
 		// for example, if there are 14 sensors, use sensor numbers (1-indexed) 1-7 and 9-15
-		int numChannels = (i + 1 < NUM_MINIONS) ? MAX_TEMP_CHANNELS : CHANNELS_IN_LAST_MINION;
-		for (int j = 0; j < numChannels; j++) {
-			// if (i * MAX_TEMP_SENSORS_PER_MINION_BOARD + j >= NUM_TEMPERATURE_SENSORS) break;
+		// int numChannels = (i + 1 < NUM_MINIONS) ? MAX_TEMP_CHANNELS : CHANNELS_IN_LAST_MINION;
+		// for (int j = 0; j < numChannels; j++) {
+		for (int j = 0; j < MAX_TEMP_SENSORS_PER_MINION_BOARD; j++) {
+			if (i * MAX_TEMP_SENSORS_PER_MINION_BOARD + j >= NUM_TEMPERATURE_SENSORS) break;
 			if ((temperatures[i][j] > temperatureLimit) || (temperatures[i][j] == TEMP_ERR_OUT_BOUNDS)) {
-				retVal = DANGER;
+				return DANGER;
 			}
+			/*
 			if ((temperatures[i][j + MAX_TEMP_CHANNELS] > temperatureLimit) || (temperatures[i][j + MAX_TEMP_CHANNELS] == TEMP_ERR_OUT_BOUNDS)) {
 				retVal = DANGER;
 			}
+			*/
 		}
 	}
 
-	return retVal;
+	return SAFE;
 }
 
 /** Temperature_SetChargeState
@@ -322,6 +340,7 @@ int32_t Temperature_GetTotalPackAvgTemperature(void){
 
 /** Temperature_SampleADC
  * Starts ADC conversion on GPIO1 on LTC6811's auxiliary registers on all boards
+ * NOTE: May need to call wakeup_sleep before this function.
  * @param sets the sampling rate
  * @return SUCCESS or ERROR
  */
@@ -331,11 +350,8 @@ ErrorStatus Temperature_SampleADC(uint8_t ADCMode) {
   	OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
   	assertOSError(err);
 	
-	wakeup_sleep(NUM_MINIONS);
 	LTC6811_adax(ADCMode, AUX_CH_GPIO1);							// Start ADC conversion on GPIO1
 	LTC6811_pollAdc();
-
-	wakeup_sleep(NUM_MINIONS);
 	
 	int8_t error = LTC6811_rdaux(AUX_CH_GPIO1, NUM_MINIONS, Minions);   // Update Minions with fresh values
 	//release mutex
