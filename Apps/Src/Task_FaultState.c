@@ -80,6 +80,7 @@ void EnterFaultState() {
             break;
     }
 
+    // TODO: create an interrupt-independent CAN interface, so we can use CAN from within a fault state
     // avoid infinite recursive faults, since our CAN Driver relies on the OS to work
     // also don't call CAN if the watchdog tripped, since CAN won't be initialized
     /*
