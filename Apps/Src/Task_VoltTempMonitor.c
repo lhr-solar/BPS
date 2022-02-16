@@ -167,7 +167,7 @@ void Task_VoltTempMonitor(void *p_arg) {
         assertOSError(err);
 
         //delay of 100ms
-        OSTimeDly(10, OS_OPT_TIME_DLY, &err);
+        OSTimeDly(5, OS_OPT_TIME_DLY, &err);
         assertOSError(err);
     }
 }

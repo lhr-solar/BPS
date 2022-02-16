@@ -10,6 +10,8 @@
 #include "VoltageToTemp.h"
 #include "BSP_PLL.h"
 
+void delay_u(uint16_t micro);
+
 // Holds the temperatures in Celsius (Fixed Point with .001 resolution) for each sensor on each board
 static int32_t temperatures[NUM_MINIONS][MAX_TEMP_SENSORS_PER_MINION_BOARD];
 
@@ -107,7 +109,7 @@ ErrorStatus Temperature_ChannelConfig(uint8_t tempChannel) {
 	// Send data
     wakeup_sleep(NUM_MINIONS);
     LTC6811_wrcomm(NUM_MINIONS, Minions);
-	LTC6811_rdcomm_safe(NUM_MINIONS, Minions);
+	delay_u(200);
 	LTC6811_stcomm();
 
 	for (int board = 0; board < NUM_MINIONS; board++) {
@@ -129,7 +131,7 @@ ErrorStatus Temperature_ChannelConfig(uint8_t tempChannel) {
 
 	// Send data
     LTC6811_wrcomm(NUM_MINIONS, Minions);
-	LTC6811_rdcomm_safe(NUM_MINIONS, Minions);
+	delay_u(200);
 	LTC6811_stcomm();
 	//release mutex
   	OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);

@@ -71,12 +71,11 @@ void Voltage_Init(cell_asic *boards){
 void Voltage_UpdateMeasurements(void){
 	CPU_TS ts;
 	// Start Cell ADC Measurements
-	wakeup_idle(NUM_MINIONS);
+	wakeup_sleep(NUM_MINIONS);
 	LTC6811_adcv(ADC_CONVERSION_MODE,ADC_DCP,CELL_CH_TO_CONVERT);
 	LTC6811_pollAdc();	// In case you want to time the length of the conversion time
 	
 	// Read Cell Voltage Registers
-	wakeup_idle(NUM_MINIONS); // Not sure if wakeup is necessary if you start conversion then read consecutively
 	//take control of mutex
 	OS_ERR err;
   	OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);

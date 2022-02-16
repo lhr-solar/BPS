@@ -9,7 +9,7 @@ DEBUG = 1
 # building variables
 ######################################
 # optimization
-OPT = -Og
+OPT = -O3
 
 #######################################
 # paths

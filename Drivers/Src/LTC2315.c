@@ -60,12 +60,12 @@ uint16_t LTC2315_Read() {
     OS_ERR err;
     uint8_t rxdata[2] = {0xff, 0xff};
 
+    LTC2315_wakeup_sleep();
+
     uint8_t count = 0;
     do {
     OSSchedLock(&err);
     assertOSError(err);
-
-    LTC2315_wakeup_sleep();
 
     BSP_SPI_SetStateCS(spi_ltc2315, 0);
     BSP_SPI_Read(spi_ltc2315, rxdata, 2);
