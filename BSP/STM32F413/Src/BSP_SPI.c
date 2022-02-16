@@ -161,7 +161,7 @@ void BSP_SPI_Init(spi_port_t port, bsp_os_t *spi_os, bool baremetal){
 		SPI_InitStruct.SPI_CPOL = SPI_CPOL_High;
 		SPI_InitStruct.SPI_CPHA = SPI_CPHA_2Edge;
 		SPI_InitStruct.SPI_NSS = SPI_NSS_Soft;
-		SPI_InitStruct.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_256;
+		SPI_InitStruct.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_128;
 		SPI_InitStruct.SPI_FirstBit = SPI_FirstBit_MSB;
 		SPI_InitStruct.SPI_CRCPolynomial = 0;	
 		SPI_Init(SPI1, &SPI_InitStruct);
@@ -247,6 +247,29 @@ void BSP_SPI_Init(spi_port_t port, bsp_os_t *spi_os, bool baremetal){
 			NVIC_Init(&NVIC_InitStruct);
 		}
 	}
+}
+
+/**
+ * @brief   Sets the LTC6811's SPI port clock to either the fast speed for
+ *          communicating with the LTC6811 or the slow speed for clocking
+ *          the I2C commnication with the mux
+ * @param   speed  either SPI_SLOW or SPI_FAST
+ * @return  None
+ */
+void BSP_SPI_SetClock(spi_speed_t speed) {
+	SPI_InitTypeDef SPI_InitStruct;
+
+	// Initialize SPI port
+	SPI_InitStruct.SPI_Direction = SPI_Direction_2Lines_FullDuplex;
+	SPI_InitStruct.SPI_Mode = SPI_Mode_Master;
+	SPI_InitStruct.SPI_DataSize = SPI_DataSize_8b;
+	SPI_InitStruct.SPI_CPOL = SPI_CPOL_High;
+	SPI_InitStruct.SPI_CPHA = SPI_CPHA_2Edge;
+	SPI_InitStruct.SPI_NSS = SPI_NSS_Soft;
+	SPI_InitStruct.SPI_BaudRatePrescaler = (speed == SPI_SLOW) ? SPI_BaudRatePrescaler_256 : SPI_BaudRatePrescaler_128;
+	SPI_InitStruct.SPI_FirstBit = SPI_FirstBit_MSB;
+	SPI_InitStruct.SPI_CRCPolynomial = 0;	
+	SPI_Init(SPI3, &SPI_InitStruct);
 }
 
 /**

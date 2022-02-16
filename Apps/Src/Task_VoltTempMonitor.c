@@ -166,7 +166,7 @@ void Task_VoltTempMonitor(void *p_arg) {
         OSMutexPost(&WDog_Mutex, OS_OPT_POST_NONE, &err);
         assertOSError(err);
 
-        //delay of 100ms
+        //delay of 50ms
         OSTimeDly(5, OS_OPT_TIME_DLY, &err);
         assertOSError(err);
     }
