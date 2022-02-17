@@ -17,8 +17,7 @@
         "tasks.h": "c",
         "voltage.h": "c",
         "bsp_spi.h": "c",
-        "charge.h": "c",
-        "amps.h": "c"
+        "charge.h": "c"
     },
     "python.linting.pylintEnabled": true,
     "python.linting.enabled": true,
