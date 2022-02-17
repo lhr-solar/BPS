@@ -38,7 +38,7 @@ static void LTC2315_wakeup_sleep()
 /* Initialize communication LTC2315
  */
 void LTC2315_Init(bsp_os_t spi_os) {
-    BSP_SPI_Init(spi_ltc2315, &spi_os);
+    BSP_SPI_Init(spi_ltc2315, &spi_os, true);
 
     LTC2315_wakeup_sleep();
 }
@@ -58,22 +58,32 @@ void LTC2315_Sleep() {
  */
 uint16_t LTC2315_Read() {
     OS_ERR err;
-    uint8_t rxdata[2];
+    uint8_t rxdata[2] = {0xff, 0xff};
+
+    LTC2315_wakeup_sleep();
 
     uint8_t count = 0;
     do {
-    LTC2315_wakeup_sleep();
+    OSSchedLock(&err);
+    assertOSError(err);
 
     BSP_SPI_SetStateCS(spi_ltc2315, 0);
+    // Note: if this is ever changed to send more than 8bytes, we should make
+    // sure BSP_SPI_Read() does not call the scheduler or the OS will error out
+    // since the scheduler is locked
     BSP_SPI_Read(spi_ltc2315, rxdata, 2);
     BSP_SPI_SetStateCS(spi_ltc2315, 1);
 
-    if (count > MAX_PEC_ERRORS) {
+    OSSchedUnlock(&err);
+    assertOSError(err);
+
+    if ((count > MAX_PEC_ERRORS) && (rxdata[0] == 0xff) && (rxdata[1] == 0xff)) {
       // trip BPS
       Fault_BitMap |= Fault_CRC;
       OSSemPost(&Fault_Sem4, OS_OPT_POST_1, &err);
       assertOSError(err);
     }
+
     ++count;
     } while ((rxdata[0] == 0xff) && (rxdata[1] == 0xff)); // sometimes rxdata is 0xffff. I think this is caused by getting interrupted in the middle of requesting a reading from the ADC
 

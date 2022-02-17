@@ -19,14 +19,27 @@ typedef enum {
     NUM_SPI_BUSSES
 } spi_port_t;
 
+typedef enum {
+    SPI_FAST,
+    SPI_SLOW
+} spi_speed_t;
+
 /**
  * @brief   Initializes the SPI port.
  * @param   port The SPI port to initialize.
  * @param   spi_os pointer to struct that holds the SPI specific pend()/post() functions 
  * @return  None
  */
-void BSP_SPI_Init(spi_port_t port, bsp_os_t *spi_os);
+void BSP_SPI_Init(spi_port_t port, bsp_os_t *spi_os, bool baremetal);
 
+/**
+ * @brief   Sets the LTC6811's SPI port clock to either the fast speed for
+ *          communicating with the LTC6811 or the slow speed for clocking
+ *          the I2C commnication with the mux
+ * @param   speed  either SPI_SLOW or SPI_FAST
+ * @return  None
+ */
+void BSP_SPI_SetClock(spi_speed_t speed);
 
 /**
  * @brief   Transmits data to through SPI.

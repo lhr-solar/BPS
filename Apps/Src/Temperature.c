@@ -8,9 +8,12 @@
 #include "os.h"
 #include "Tasks.h"
 #include "VoltageToTemp.h"
+#include "BSP_PLL.h"
+
+void delay_u(uint16_t micro);
 
 // Holds the temperatures in Celsius (Fixed Point with .001 resolution) for each sensor on each board
-static int32_t ModuleTemperatures[NUM_MINIONS][MAX_TEMP_SENSORS_PER_MINION_BOARD];
+static int32_t temperatures[NUM_MINIONS][MAX_TEMP_SENSORS_PER_MINION_BOARD];
 
 // Holds the maximum measured temperature in the most recent batch of temperature measurements
 static int32_t maxTemperature;
@@ -21,7 +24,6 @@ static uint8_t ChargingState;
 // Interface to communicate with LTC6811 (Register values)
 // Temperature.c uses auxiliary registers to view ADC data and COM register for I2C with LTC1380 MUX
 static cell_asic *Minions;
-
 
 /** Temperature_Init
  * Initializes device drivers including SPI inside LTC6811_init and LTC6811 for Temperature Monitoring
@@ -107,7 +109,7 @@ ErrorStatus Temperature_ChannelConfig(uint8_t tempChannel) {
 	// Send data
     wakeup_sleep(NUM_MINIONS);
     LTC6811_wrcomm(NUM_MINIONS, Minions);
-	LTC6811_rdcomm_safe(NUM_MINIONS, Minions);
+	delay_u(200);
 	LTC6811_stcomm();
 
 	for (int board = 0; board < NUM_MINIONS; board++) {
@@ -116,8 +118,6 @@ ErrorStatus Temperature_ChannelConfig(uint8_t tempChannel) {
 		// Send Address for a particular mux
 		Minions[board].com.tx_data[0] = (AUX_I2C_START << 4) + (muxAddress >> 4); 				
 		Minions[board].com.tx_data[1] = (muxAddress << 4) + AUX_I2C_NACK;
-
-
 
 		// Sends what channel to open. 8 is the enable bit
 		// 8 + temp_channel
@@ -130,9 +130,8 @@ ErrorStatus Temperature_ChannelConfig(uint8_t tempChannel) {
     }
 
 	// Send data
-    wakeup_sleep(NUM_MINIONS);
     LTC6811_wrcomm(NUM_MINIONS, Minions);
-	LTC6811_rdcomm_safe(NUM_MINIONS, Minions);
+	delay_u(200);
 	LTC6811_stcomm();
 	//release mutex
   	OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
@@ -152,7 +151,7 @@ int32_t milliVoltToCelsius(uint32_t milliVolt){
 		return voltToTemp[milliVolt];
 	}
 	else {
-		return -1;
+		return TEMP_ERR_OUT_BOUNDS;
 	}
 }
 
@@ -181,7 +180,7 @@ ErrorStatus Temperature_UpdateSingleChannel(uint8_t channel){
 		
 		// update adc value from GPIO1 stored in a_codes[0]; 
 		// a_codes[0] is fixed point with .001 resolution in volts -> multiply by .001 * 1000 to get mV in double form
-		ModuleTemperatures[board][channel] = milliVoltToCelsius(Minions[board].aux.a_codes[0] / 10);
+		temperatures[board][channel] = milliVoltToCelsius(Minions[board].aux.a_codes[0] / 10);
 	}
 	//release mutex
   	OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
@@ -197,19 +196,26 @@ ErrorStatus Temperature_UpdateSingleChannel(uint8_t channel){
 ErrorStatus Temperature_UpdateAllMeasurements(){
 	// update all measurements
 	for (int sensorCh = 0; sensorCh < MAX_TEMP_SENSORS_PER_MINION_BOARD; sensorCh++) {
+		// A hack to solve a timing issue related to enabling one of the muxes
+		if(sensorCh % 8 == 0) {
+			Temperature_ChannelConfig(sensorCh);
+			Temperature_ChannelConfig(sensorCh);
+		}
+
+		// Update the measurement for this channel
 		Temperature_UpdateSingleChannel(sensorCh);
 	}
 
 	// update max temperature
-	int32_t newMaxTemperature = ModuleTemperatures[0][0];
+	int32_t newMaxTemperature = temperatures[0][0];
 	for (int minion = 0; minion < NUM_MINIONS; ++minion) {
 		for (int sensor = 0; sensor < MAX_TEMP_SENSORS_PER_MINION_BOARD; ++sensor) {
 			// ignore parts of the array that are out of bounds
 			if (minion * MAX_TEMP_SENSORS_PER_MINION_BOARD + sensor >= NUM_TEMPERATURE_SENSORS) {
 				break;
 			}
-			if (ModuleTemperatures[minion][sensor] > newMaxTemperature) {
-				newMaxTemperature = ModuleTemperatures[minion][sensor];
+			if (temperatures[minion][sensor] > newMaxTemperature) {
+				newMaxTemperature = temperatures[minion][sensor];
 			}
 		}
 	}
@@ -228,7 +234,7 @@ SafetyStatus Temperature_CheckStatus(uint8_t isCharging){
 	for (int i = 0; i < NUM_MINIONS; i++) {
 		for (int j = 0; j < MAX_TEMP_SENSORS_PER_MINION_BOARD; j++) {
 			if (i * MAX_TEMP_SENSORS_PER_MINION_BOARD + j >= NUM_TEMPERATURE_SENSORS) break;
-			if (ModuleTemperatures[i][j] > temperatureLimit) {
+			if ((temperatures[i][j] > temperatureLimit) || (temperatures[i][j] == TEMP_ERR_OUT_BOUNDS)) {
 				return DANGER;
 			}
 		}
@@ -260,7 +266,7 @@ uint8_t *Temperature_GetModulesInDanger(void){
 	for (int i = 0; i < NUM_MINIONS-1; i++) {
 		for (int j = 0; j < MAX_TEMP_SENSORS_PER_MINION_BOARD; j++) {
 			if (i * MAX_TEMP_SENSORS_PER_MINION_BOARD + j >= NUM_TEMPERATURE_SENSORS) break;
-			if (ModuleTemperatures[i][j] > temperatureLimit) {
+			if (temperatures[i][j] > temperatureLimit) {
 				ModuleTempStatus[(i * (NUM_TEMP_SENSORS_PER_MOD/2)) + (j % (NUM_TEMP_SENSORS_PER_MOD/2))] = 1;
 			}
 		}
@@ -275,7 +281,7 @@ uint8_t *Temperature_GetModulesInDanger(void){
  * @return temperature of the battery module at specified index
  */
 int32_t Temperature_GetSingleTempSensor(uint8_t board, uint8_t sensorIdx) {
-	return ModuleTemperatures[board][sensorIdx];
+	return temperatures[board][sensorIdx];
 }
 
 /** Temperature_GetModuleTemperature
@@ -290,9 +296,9 @@ int32_t Temperature_GetModuleTemperature(uint8_t moduleIdx){
 	uint8_t board = (moduleIdx * 2) / MAX_TEMP_SENSORS_PER_MINION_BOARD;
 	uint8_t sensor = moduleIdx % (MAX_TEMP_SENSORS_PER_MINION_BOARD / 2);
 
-	total += ModuleTemperatures[board][sensor];
+	total += temperatures[board][sensor];
 	// Get temperature from other sensor on other side
-	total += ModuleTemperatures[board][sensor + MAX_TEMP_SENSORS_PER_MINION_BOARD / 2];
+	total += temperatures[board][sensor + MAX_TEMP_SENSORS_PER_MINION_BOARD / 2];
 	total /= 2;
 	return total;
 }
@@ -311,6 +317,7 @@ int32_t Temperature_GetTotalPackAvgTemperature(void){
 
 /** Temperature_SampleADC
  * Starts ADC conversion on GPIO1 on LTC6811's auxiliary registers on all boards
+ * NOTE: May need to call wakeup_sleep before this function.
  * @param sets the sampling rate
  * @return SUCCESS or ERROR
  */
@@ -320,11 +327,8 @@ ErrorStatus Temperature_SampleADC(uint8_t ADCMode) {
   	OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
   	assertOSError(err);
 	
-	wakeup_sleep(NUM_MINIONS);
 	LTC6811_adax(ADCMode, AUX_CH_GPIO1);							// Start ADC conversion on GPIO1
 	LTC6811_pollAdc();
-
-	wakeup_sleep(NUM_MINIONS);
 	
 	int8_t error = LTC6811_rdaux(AUX_CH_GPIO1, NUM_MINIONS, Minions);   // Update Minions with fresh values
 	//release mutex

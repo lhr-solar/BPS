@@ -49,31 +49,36 @@ static const uint16_t SPI_SELECT_PINS[NUM_SPI_BUSSES] = {
     GPIO_Pin_15
 };
 
+enum spi_operation {
+	SPI_RTOS = 0,
+	SPI_BAREMETAL = 1
+};
+static enum spi_operation SPI_OPERATING_MODES[NUM_SPI_BUSSES] = {0};
+
 static txfifo_t spiTxFifos[NUM_SPI_BUSSES];
 static rxfifo_t spiRxFifos[NUM_SPI_BUSSES];
 
 static bsp_os_t *SPI_os[NUM_SPI_BUSSES];
 
 // Use this inline function to wait until SPI communication is complete
-static inline void SPI_Wait(SPI_TypeDef *SPIx){
+static inline void SPI_Wait(spi_port_t port){
+	SPI_TypeDef * SPIx = SPI_BUSSES[port];
 	while(((SPIx)->SR & (SPI_SR_TXE | SPI_SR_RXNE)) == 0 || ((SPIx)->SR & SPI_SR_BSY));
 }
 
 // Use this inline function to wait until SPI communication is complete
-static inline void SPI_WaitTx(SPI_TypeDef *SPIx){
-#ifdef BAREMETAL
-	SPI_Wait(SPIx);
-#endif
-
-#ifdef RTOS
-	SPI_I2S_ITConfig(SPIx, SPI_I2S_IT_TXE, ENABLE);
-	if(SPIx == SPI1){
-		SPI_os[spi_ltc6811]->pend();
+static inline void SPI_WaitTx(spi_port_t port){
+	switch(SPI_OPERATING_MODES[port]) {
+	case SPI_RTOS:
+		SPI_I2S_ITConfig(SPI_BUSSES[port], SPI_I2S_IT_TXE, ENABLE);
+		SPI_os[port]->pend();
+		break;
+	case SPI_BAREMETAL:
+		SPI_Wait(port);
+		break;
+	default:
+		return;
 	}
-	else if(SPIx == SPI3){
-		SPI_os[spi_ltc2315]->pend();
-	}
-#endif
 }
 
 /** SPI_WriteRead
@@ -83,13 +88,11 @@ static inline void SPI_WaitTx(SPI_TypeDef *SPIx){
  */
 static uint8_t SPI_WriteRead(spi_port_t port, uint8_t txData){
     if(port >= NUM_SPI_BUSSES) return -1;
-
-	SPI_TypeDef *bus = SPI_BUSSES[port];
 	
-	SPI_Wait(bus);
-	bus->DR = txData & 0x00FF;
-	SPI_Wait(bus);
-	return bus->DR & 0x00FF;
+	SPI_Wait(port);
+	SPI_BUSSES[port]->DR = txData & 0x00FF;
+	SPI_Wait(port);
+	return SPI_BUSSES[port]->DR & 0x00FF;
 }
 
 /**
@@ -98,7 +101,7 @@ static uint8_t SPI_WriteRead(spi_port_t port, uint8_t txData){
  * @param   spi_os pointer to struct that holds the SPI specific pend()/post() functions 
  * @return  None
  */
-void BSP_SPI_Init(spi_port_t port, bsp_os_t *spi_os){
+void BSP_SPI_Init(spi_port_t port, bsp_os_t *spi_os, bool baremetal){
 	//      SPI configuration:
     //          speed : 125kbps
     //          CPOL : 1 (polarity of clock during idle is high)
@@ -117,6 +120,8 @@ void BSP_SPI_Init(spi_port_t port, bsp_os_t *spi_os){
 		spiTxFifos[i] = txfifo_new();
 		spiRxFifos[i] = rxfifo_new();
 	}
+
+	SPI_OPERATING_MODES[port] = baremetal ? SPI_BAREMETAL : SPI_RTOS;
 
 	// I don't think there's any way around hardcoding this one
 
@@ -171,15 +176,15 @@ void BSP_SPI_Init(spi_port_t port, bsp_os_t *spi_os){
 		GPIO_Init(GPIOD, &GPIO_InitStruct);
 		SPI_os[spi_ltc6811] = spi_os;
 
-		#ifdef RTOS
-		//Configure SPI1 interrupt priority
-		NVIC_InitTypeDef NVIC_InitStruct;
-		NVIC_InitStruct.NVIC_IRQChannel = SPI1_IRQn;
-		NVIC_InitStruct.NVIC_IRQChannelPreemptionPriority = 0;
-    	NVIC_InitStruct.NVIC_IRQChannelSubPriority = 0;
-    	NVIC_InitStruct.NVIC_IRQChannelCmd = ENABLE;
-		NVIC_Init(&NVIC_InitStruct);
-		#endif
+		if(SPI_OPERATING_MODES[spi_ltc6811] == SPI_RTOS) {
+			//Configure SPI1 interrupt priority
+			NVIC_InitTypeDef NVIC_InitStruct;
+			NVIC_InitStruct.NVIC_IRQChannel = SPI1_IRQn;
+			NVIC_InitStruct.NVIC_IRQChannelPreemptionPriority = 0;
+			NVIC_InitStruct.NVIC_IRQChannelSubPriority = 0;
+			NVIC_InitStruct.NVIC_IRQChannelCmd = ENABLE;
+			NVIC_Init(&NVIC_InitStruct);
+		}
 
 	} else if(port == spi_ltc2315) {
 		//      SPI configuration:
@@ -232,16 +237,39 @@ void BSP_SPI_Init(spi_port_t port, bsp_os_t *spi_os){
 		GPIO_Init(GPIOA, &GPIO_InitStruct);
 		SPI_os[spi_ltc2315] = spi_os;
 
-		#ifdef RTOS
-		//Configure SPI3 interrupt priority
-		NVIC_InitTypeDef NVIC_InitStruct;
-		NVIC_InitStruct.NVIC_IRQChannel = SPI3_IRQn;
-		NVIC_InitStruct.NVIC_IRQChannelPreemptionPriority = 0;
-    	NVIC_InitStruct.NVIC_IRQChannelSubPriority = 1;
-    	NVIC_InitStruct.NVIC_IRQChannelCmd = ENABLE;
-		NVIC_Init(&NVIC_InitStruct);
-		#endif
+		if(SPI_OPERATING_MODES[spi_ltc2315] == SPI_RTOS) {
+			//Configure SPI3 interrupt priority
+			NVIC_InitTypeDef NVIC_InitStruct;
+			NVIC_InitStruct.NVIC_IRQChannel = SPI3_IRQn;
+			NVIC_InitStruct.NVIC_IRQChannelPreemptionPriority = 0;
+			NVIC_InitStruct.NVIC_IRQChannelSubPriority = 1;
+			NVIC_InitStruct.NVIC_IRQChannelCmd = ENABLE;
+			NVIC_Init(&NVIC_InitStruct);
+		}
 	}
+}
+
+/**
+ * @brief   Sets the LTC6811's SPI port clock to either the fast speed for
+ *          communicating with the LTC6811 or the slow speed for clocking
+ *          the I2C commnication with the mux
+ * @param   speed  either SPI_SLOW or SPI_FAST
+ * @return  None
+ */
+void BSP_SPI_SetClock(spi_speed_t speed) {
+	SPI_InitTypeDef SPI_InitStruct;
+
+	// Initialize SPI port
+	SPI_InitStruct.SPI_Direction = SPI_Direction_2Lines_FullDuplex;
+	SPI_InitStruct.SPI_Mode = SPI_Mode_Master;
+	SPI_InitStruct.SPI_DataSize = SPI_DataSize_8b;
+	SPI_InitStruct.SPI_CPOL = SPI_CPOL_High;
+	SPI_InitStruct.SPI_CPHA = SPI_CPHA_2Edge;
+	SPI_InitStruct.SPI_NSS = SPI_NSS_Soft;
+	SPI_InitStruct.SPI_BaudRatePrescaler = (speed == SPI_SLOW) ? SPI_BaudRatePrescaler_256 : SPI_BaudRatePrescaler_128;
+	SPI_InitStruct.SPI_FirstBit = SPI_FirstBit_MSB;
+	SPI_InitStruct.SPI_CRCPolynomial = 0;	
+	SPI_Init(SPI3, &SPI_InitStruct);
 }
 
 /**
@@ -254,7 +282,7 @@ void BSP_SPI_Init(spi_port_t port, bsp_os_t *spi_os){
  */
 void BSP_SPI_Write(spi_port_t port, uint8_t *txBuf, uint32_t txLen) {
 	// If we're below an experimentally-determined value, just use polling
-	if(txLen < 8) { 
+	if(txLen < 8 || SPI_OPERATING_MODES[port] == SPI_BAREMETAL) { 
 		for(int i = 0; i < txLen; i++) {
 			SPI_WriteRead(port, txBuf[i]);
 		}
@@ -269,9 +297,9 @@ void BSP_SPI_Write(spi_port_t port, uint8_t *txBuf, uint32_t txLen) {
 			}
 
 			// Wait for the transmission to complete
-			SPI_WaitTx(SPI_BUSSES[port]);
+			SPI_WaitTx(port);
 		}
-		SPI_Wait(SPI_BUSSES[port]);
+		SPI_Wait(port);
 	}
 }
 
@@ -290,7 +318,7 @@ void BSP_SPI_Read(spi_port_t port, uint8_t *rxBuf, uint32_t rxLen) {
 	// bool first = true;
 
 	// If we have only a little amount of data, just use polling
-	if(rxLen < 8) {
+	if(rxLen < 8 || SPI_OPERATING_MODES[port] == SPI_BAREMETAL) {
 		for(int i = 0; i < rxLen; i++) {
 			rxBuf[i] = SPI_WriteRead(port, 0x00);
 		}
@@ -308,10 +336,10 @@ void BSP_SPI_Read(spi_port_t port, uint8_t *rxBuf, uint32_t rxLen) {
 			}
 
 			// Wait for the transmission to complete
-			SPI_WaitTx(SPI_BUSSES[port]);
+			SPI_WaitTx(port);
 			// Busy wait the last bit, just to ensure all bytes have been received
 
-			SPI_Wait(SPI_BUSSES[port]);
+			SPI_Wait(port);
 
 			// Copy the data out of the fifo
 			while(r < i && rxfifo_get(&spiRxFifos[port], &rxBuf[r])) {

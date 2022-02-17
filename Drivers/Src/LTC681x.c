@@ -1771,10 +1771,12 @@ void LTC681x_stcomm()
 
   cs_set(0);
   spi_write_multi8(cmd,4);
+  BSP_SPI_SetClock(SPI_SLOW);
   for (int i = 0; i<9; i++)
   {
     spi_read8();
   }
+  BSP_SPI_SetClock(SPI_FAST);
   cs_set(1);
 
 }

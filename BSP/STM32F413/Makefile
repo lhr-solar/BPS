@@ -9,7 +9,9 @@ DEBUG = 1
 # building variables
 ######################################
 # optimization
-OPT = -Og
+# change to -Og if you want the compiler to generate assembly that is very close
+# to your source code. Change to -O3 for best performance
+OPT = -O3
 
 #######################################
 # paths
