@@ -171,17 +171,13 @@ Usage
     and the ``SPI3`` bus is for communication with the AS8510 current sensor. When calling the init function, 
     you must specify which port you intend to use (via the ``spi_port_t`` enum). The user can read/write 
     on whichever bus they have chosen. This BSP includes IRQ Handlers for both buses that post the ``MinionsASIC_Mutex``.
-
-    ``SPI_Wait()`` has two different versions - one for the bare-metal BPS code and one for the RTOS code. 
-    The BPS code is automatically compiled with ``#define RTOS``. If the user wants to use the bare-metal
-    version of the code, the code must be compiled with the ``BAREMETAL`` parameter.
+    The ``BSP_SPI_Init()`` function contains a boolean for using interrupt based or busy-wait verion of SPI. 
+    ``BSP_SPISetClock()`` is used to change the clock to a lower speed of peripherals that cannot handle higher speeds. 
 
 Additional Considerations
-    The ``SPI1`` and ``SPI3`` IRQs are only included in the RTOS version of the code.
-
-    If additonal SPI buses are needed, the user must modify the ``spi_port_t`` enum.
-
-    SPI interrupts (preemption priority level 0) have the highest priority amongst all NVIC interrupts. ``SPI1`` has a higher subpriority than ``SPI3``.
+    The ``SPI1`` and ``SPI3`` IRQs are only included in the RTOS version of the code. If additonal SPI buses are needed, 
+    the user must modify the ``spi_port_t`` enum. SPI interrupts (preemption priority level 0) have the highest priority 
+    amongst all NVIC interrupts. ``SPI1`` has a higher subpriority than ``SPI3``.
 
 Timer BSP: Sijin Woo
 =================================
