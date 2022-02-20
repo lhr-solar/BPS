@@ -25,8 +25,8 @@ Purpose
     The Charge App is used to keep track of the state of charge of the battery.
 
 Usage
-    ``Charge_Init()`` must be called before calling any of the other Charge functions. Descriptions of the other 
-    functions can be found in ``Charge.h``.
+    ``Charge_Init()`` must be called before calling any of the other Charge functions. Descriptions of the other functions 
+    can be found in ``Charge.h``.
 
 Additional Considerations
     None.
@@ -173,7 +173,8 @@ A list of all valid CLI commands is included below.
 | Displays all relevant data to the BPS.
 | **Argument(s)**: 
 
-- **none**: prints voltage, current, temperature, contactor, and state of charge data (in the same format as using each command separately)
+- **none**: prints voltage, current, temperature, contactor, and state of charge data (in the same format as using each 
+  command separately)
 
 
 
@@ -209,13 +210,12 @@ Main
 
 The main function is the entry point into the Battery Protection System. 
 
-It first checks whether the BPS has had to reset in the previous run using ``BPS_WDTimer_DidSystemRest()``. If it 
-has, then the program will then enter a    fault state using ``EnterFaultState()``. If the BPS was not previously 
-reset, then main will continue with the rest of the initialization.
+It first checks whether the BPS has had to reset in the previous run using ``BPS_WDTimer_DidSystemRest()``. If it has, then 
+the program will then enter a    fault state using ``EnterFaultState()``. If the BPS was not previously reset, then main will 
+continue with the rest of the initialization.
         
-``OSInit()`` initializes the operating system. ``AsserOSError()`` checks whether there are any errors in the RTOS 
-functions. If there are no errors          ``OSTaskCreate()`` points the program to ``Task_Init()`` which executes
-the rest of the BPS startup.
+``OSInit()`` initializes the operating system. ``AsserOSError()`` checks whether there are any errors in the RTOS functions. 
+If there are no errors ``OSTaskCreate()`` points the program to ``Task_Init()`` which executes the rest of the BPS startup.
 
 Temperature
 ===========
@@ -225,15 +225,18 @@ Purpose
     Each battery module has 2 temperature sensors.
 
 Usage
-    This file uses a global ``int32_t ModuleTemperatures[][]`` 2D array that contains each sensor's temperature. 
+    This file uses a global ``int32_t temperatures[][]`` 2D array that contains each sensor's temperature. 
     ``Temperature_UpdateAllMeasurements()`` should be called to update the values of this array.
     
-    ``Temperature_Init()`` must be called before using any other temperature functions. This function will create 
-    the ``TemperatureBuffer_Mutex``. This function will return an ``ErrorStatus`` indicating its success/failure.
-
+    ``Temperature_Init()`` must be called before using any other temperature functions. This function will create the 
+    ``TemperatureBuffer_Mutex``. This function will return an ``ErrorStatus`` indicating its success/failure.
 
 Additional Considerations
-    None
+    ``TEMP_ERR_OUT_BOUNDS`` was chosen to be it's current value because it is an impossibly high temperature that is returned
+    as an error code. The temperature sensors can never read this value using the LMT87, it will cause an OVOLT fault, and is
+    a good debugging tool. ``delay_u()`` was used due to timing issues with the LTC. ``Temperature_ChannelConfig`` is called
+    twice whenever channel 1 of a mux is initalized due to the start up time of enabling the mux from a powered off state.
+    
 
 Voltage
 ========
