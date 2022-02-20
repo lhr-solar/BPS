@@ -74,7 +74,7 @@ SPI
 
 | These interrupts have premption priority level 0.
 | ``SPI1`` - for sending commands to LTC6811 minions, has subpriority level 0
-| ``SPI3`` - for sending current data to AS8510, has subpriority level 1
+| ``SPI3`` - for sending current data to LTC2315, has subpriority level 1
 
 UART 
 ####

@@ -25,7 +25,8 @@ Purpose
     The Charge App is used to keep track of the state of charge of the battery.
 
 Usage
-    ``Charge_Init()`` must be called before calling any of the other Charge functions. Descriptions of the other functions can be found in ``Charge.h``.
+    ``Charge_Init()`` must be called before calling any of the other Charge functions. Descriptions of the other 
+    functions can be found in ``Charge.h``.
 
 Additional Considerations
     None.
@@ -208,9 +209,13 @@ Main
 
 The main function is the entry point into the Battery Protection System. 
 
-It first checks whether the BPS has had to reset in the previous run using ``BPS_WDTimer_DidSystemRest()``. If it has, then the program will then enter a    fault state using ``EnterFaultState()``. If the BPS was not previously reset, then main will continue with the rest of the initialization.
+It first checks whether the BPS has had to reset in the previous run using ``BPS_WDTimer_DidSystemRest()``. If it 
+has, then the program will then enter a    fault state using ``EnterFaultState()``. If the BPS was not previously 
+reset, then main will continue with the rest of the initialization.
         
-``OSInit()`` initializes the operating system. ``AsserOSError()`` checks whether there are any errors in the RTOS functions. If there are no errors          ``OSTaskCreate()`` points the program to ``Task_Init()`` which executes the rest of the BPS startup.
+``OSInit()`` initializes the operating system. ``AsserOSError()`` checks whether there are any errors in the RTOS 
+functions. If there are no errors          ``OSTaskCreate()`` points the program to ``Task_Init()`` which executes
+the rest of the BPS startup.
 
 Temperature
 ===========
@@ -223,8 +228,8 @@ Usage
     This file uses a global ``int32_t ModuleTemperatures[][]`` 2D array that contains each sensor's temperature. 
     ``Temperature_UpdateAllMeasurements()`` should be called to update the values of this array.
     
-    ``Temperature_Init()`` must be called before using any other temperature functions. This function will create the ``TemperatureBuffer_Mutex``.
-    This function will return an ``ErrorStatus`` indicating its success/failure.
+    ``Temperature_Init()`` must be called before using any other temperature functions. This function will create 
+    the ``TemperatureBuffer_Mutex``. This function will return an ``ErrorStatus`` indicating its success/failure.
 
 
 Additional Considerations
@@ -258,12 +263,74 @@ Mutexes and Semaphores
 MinionsIO Semaphore
 ===================
 
-Whenever the LTC driver is calling the :term:`SPI <SPI>` function, there's going to be some delay until the SPI transfer is complete. 
-During that delay, we should be executing some other task so once the SPI transfer starts, the system should start 
-waiting for this :term: `semaphore <Semaphore>`. Whenever the SPI transfer is complete, we must signal this semaphore so we need to 
-have an :term:`ISR <ISR>` that calls the signal semaphore function whenever a transfer is complete. This ISR is in the BSP SPI module.
+Whenever the LTC driver is calling the :term:`SPI <SPI>` function, there's going to be some delay until the SPI 
+transfer is complete.  During that delay, we should be executing some other task so once the SPI transfer starts, 
+the system should start waiting for this :term:`semaphore <Semaphore>`. Whenever the SPI transfer is complete, we
+must signal this semaphore so we need to have an :term:`ISR <ISR>` that calls the signal semaphore function 
+whenever a transfer is complete. This ISR is in the BSP SPI module.
+
+Safety Check Semaphore
+======================
+
+When the :ref:`Critical State <Critical state Task: Manthan Upadhyaya>` runs, it checks to see if the Amperes, 
+Voltage, Open Wire, and Temperature are safe. This process is done by the Critical State Task using a blocking 
+Pend function on the Safety Check Semaphore. The task uses a blocking pend (wont move past the function until the 
+semaphore is pended ``NUM_FAULT_POINTS`` amount of times).
+
+Fault Semaphore
+===============
+
+When the :ref:`Fault State <Fault State Task: Manthan Upadhyaya>` runs, it uses a blocking pend on this semaphore. 
+When a task notices a fault condition, this semphore will be posted and the fault state task will enter the BPS 
+fault state.
+
+Amperes IO Semaphore
+====================
+
+Whenever the Amperes Driver is calling the :term:`SPI` fucntion, there is going to be some delay until the SPI
+transfer is complete. The Semaphore is pended during that time and other tasks are allowed to execute. Once the
+transfer is complete, an ISR posts the semaphore.
+
+CAN FIFO Semaphore
+==================
+
+Used in `CAN_Queue.c` to flag that there is data in the CAN FIFO. Posted by tasks that place data 
+in the CAN FIFO and pended when data is removed from the FIFO.
+
+CAN Mailbox Semaphore
+=====================
+
+There are 3 hardware mailboxes that can hold CAN messages that will be sent along the CAN line. This semaphore is 
+initialized to a value of 3 (number of empty mailboxes). When the semaphore is posted, the count decreases (one 
+mailbox becomes full). When the semaphore is pended, the count increases (one mailbox becomes empty). This means 
+that the semaphore will keep track of how many CAN mailboxes are free. If we pend this semaphore before sending a 
+CAN message and post it after sending a CAN message, we can make sure the code will block until a mailbox is free 
+if we try to send a CAN message when no mailboxes are free.
+
+CAN FIFO Mutex
+==============
+
+Mutually excludes access to CAN FIFO in `CAN_Queue.c`.
+
+Amperes Data Mutex
+==================
+
+Mutually excluded data to Amperes data in `Amps.c` library.
+
+Watchdog Mutex
+==============
+
+This mutex excludes access to the ``WDog_Bitmap`` variable that makes sure that the 
+:ref:`Voltage/Temperature monitor <Voltage Temperature Monitor Task: Sijin Woo>` and 
+:ref:`Amperes monitor <Amperes Task: Manthan Upadhyaya>` are not stuck.
 
 Voltage Mutex
 =============
 
 Mutually excludes accesses to the Voltage buffer in the Voltage.c library. 
+
+MinionsASIC_Mutex
+=================
+
+This mutex excludes access to the ``Minions`` struct array. This struct holds voltage and temperature data that 
+is taken from the LTC6811.
