@@ -164,7 +164,7 @@ ErrorStatus BSP_CAN_Write(uint32_t id, uint8_t data[8], uint8_t length) {
 
     // send equivalent message over UART
     BSP_UART_Write((char *) &gTxMessage.StdId, sizeof(gTxMessage.StdId), UART_USB);
-    BSP_UART_Write((char *) &gTxMessage.Data, sizeof(gTxMessage.Data), UART_USB);
+    BSP_UART_Write((char *) &gTxMessage.Data, length, UART_USB);
     BSP_UART_Write("\n", 1, UART_USB);
 
     return retVal;
