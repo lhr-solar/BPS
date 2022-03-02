@@ -3,7 +3,10 @@
 #include "BSP_CAN.h"
 #include "stm32f4xx.h"
 #include "os.h"
+
+#ifdef DEBUG
 #include "BSP_UART.h"
+#endif
 
 // The message information that we care to receive
 typedef struct _msg {
@@ -137,8 +140,10 @@ void BSP_CAN_Init(callback_t rxEvent, callback_t txEnd, bool loopback) {
         NVIC_Init(&NVIC_InitStructure);
     }
 
+    #ifdef DEBUG
     // initialize UART, so we can have full-day logging of all CAN messages over UART
     BSP_UART_Init(NULL, NULL, UART_USB);
+    #endif
 }
 
 /**
@@ -163,9 +168,11 @@ ErrorStatus BSP_CAN_Write(uint32_t id, uint8_t data[8], uint8_t length) {
     }
 
     // send equivalent message over UART
+    #ifdef DEBUG
     BSP_UART_Write((char *) &gTxMessage.StdId, sizeof(gTxMessage.StdId), UART_USB);
     BSP_UART_Write((char *) &gTxMessage.Data, length, UART_USB);
     BSP_UART_Write("\n", 1, UART_USB);
+    #endif
 
     return retVal;
 }
