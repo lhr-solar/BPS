@@ -23,7 +23,6 @@ void Task_AmperesMonitor(void *p_arg) {
     CANMSG_t CanMsg;
 
 	Amps_Init();
-    Charge_Init();
 
     while(1) {
         // BLOCKING =====================
@@ -58,6 +57,13 @@ void Task_AmperesMonitor(void *p_arg) {
 		CanMsg.id = CURRENT_DATA;
 		CanMsg.payload = CanPayload;
         CAN_Queue_Post(CanMsg);         // send data to CAN
+
+        // Send state of charge to CAN queue
+        CanData.w = Charge_GetPercent();
+        CanPayload.data = CanData;
+        CanMsg.id = SOC_DATA;
+        CanMsg.payload = CanPayload;
+        CAN_Queue_Post(CanMsg);
 
         //signal watchdog
         OSMutexPend(&WDog_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);

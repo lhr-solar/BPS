@@ -10,6 +10,7 @@
 // addresses for EEPROM data segments
 static const uint16_t EEPROM_CHARGE_ADDR = 0x0;
 static const uint16_t EEPROM_FAULT_ADDR  = (EEPROM_CHARGE_ADDR + sizeof(uint32_t));
+static const uint16_t MAX_FAULTS = 100;
 
 // terminating character for fault array
 static const uint32_t EEPROM_TERMINATOR = 0xFFFFFFFF;
@@ -28,6 +29,11 @@ void EEPROM_Init(void) {
     uint32_t data = 0;
     faultArrayEndAddress = EEPROM_FAULT_ADDR - sizeof(EEPROM_TERMINATOR);
     while (data != EEPROM_TERMINATOR) {
+        if (faultArrayEndAddress > EEPROM_FAULT_ADDR + sizeof(EEPROM_TERMINATOR) * MAX_FAULTS) {
+            EEPROM_Reset();
+            faultArrayEndAddress = EEPROM_FAULT_ADDR;
+            break;
+        }
         faultArrayEndAddress += sizeof(EEPROM_TERMINATOR);
         M24128_Read(faultArrayEndAddress, sizeof(data), (uint8_t *) &data);
     }
@@ -44,6 +50,8 @@ void EEPROM_Reset(void) {
 
     // initialize the fault array
     M24128_Write(EEPROM_FAULT_ADDR, sizeof(EEPROM_TERMINATOR), (uint8_t *) &EEPROM_TERMINATOR);
+
+    faultArrayEndAddress = EEPROM_FAULT_ADDR;
 }
 
 /**

@@ -8,7 +8,6 @@ void Task_LogInfo(void *p_arg) {
     (void)p_arg;
 
     OS_ERR err;
-    EEPROM_Init();
 
     while (1){
         //sends percentage of charge left in the battery pack to EEPROM
