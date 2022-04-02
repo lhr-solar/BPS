@@ -8,7 +8,6 @@
 #define EEPROM_H
 
 #include <stdint.h>
-#include "Tasks.h"
 
 /** EEPROM_Init
  * Initializes I2C to communicate with EEPROM (M24128)
@@ -41,14 +40,15 @@ void EEPROM_SetCharge(uint32_t charge);
  * 
  * @param error The error to log
  */
-void EEPROM_LogError(Fault_Set error);
+void EEPROM_LogError(uint32_t error);
 
 /**
  * @brief Get all of the errors store in the EEPROM
  * 
  * @param errors        a buffer to store all of the errors to
  * @param maxErrors     the maximum number of errors that can fit in the buffer
+ * @return              the number of errors read
  */
-void EEPROM_GetErrors(Fault_Set *errors, uint16_t maxErrors);
+uint16_t EEPROM_GetErrors(uint32_t *errors, uint16_t maxErrors);
 
 #endif

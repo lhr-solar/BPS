@@ -41,44 +41,34 @@ void EnterFaultState() {
     if (BSP_WDTimer_DidSystemReset()) {
         Fault_BitMap = Fault_WDOG;
     }
+
+    // TODO: fix this so it works if there are multiple faults
     switch (Fault_BitMap){
         case Fault_UVOLT:
             BSP_Light_On(UVOLT);
-            EEPROM_LogError(FAULT_LOW_VOLT);
-            for(int i = 0; i < NUM_BATTERY_MODULES; i++) EEPROM_LogData(FAULT_LOW_VOLT, Voltage_GetModuleMillivoltage(i));
             break;
         case Fault_OVOLT:
             BSP_Light_On(OVOLT);
-            EEPROM_LogError(FAULT_HIGH_VOLT);
-            for(int i = 0; i < NUM_BATTERY_MODULES; i++) EEPROM_LogData(FAULT_HIGH_VOLT, Voltage_GetModuleMillivoltage(i));
             break;
         case Fault_OTEMP:
             BSP_Light_On(OTEMP);
-            EEPROM_LogError(FAULT_HIGH_TEMP);
-            uint8_t* tempArray = Temperature_GetModulesInDanger();
-            for(int i = 0; i < NUM_TEMPERATURE_SENSORS; i++) EEPROM_LogData(FAULT_HIGH_TEMP, tempArray[i]);
             break;
         case Fault_OCURR:
             BSP_Light_On(OCURR);
-            EEPROM_LogError(FAULT_HIGH_CURRENT);
-            EEPROM_LogData(FAULT_HIGH_CURRENT, Amps_GetReading());
             break;
         case Fault_OW:
             BSP_Light_On(WIRE);
-            EEPROM_LogError(FAULT_OPEN_WIRE);
-            EEPROM_LogData(FAULT_OPEN_WIRE, Voltage_GetOpenWire());
             break;
         case Fault_HANDLER:
-            EEPROM_LogError(FAULT_HANDLER);
             break;
         case Fault_OS:
-            EEPROM_LogError(FAULT_OS_ERROR);
             break;
         case Fault_WDOG:
             BSP_Light_On(WDOG);
-            EEPROM_LogError(FAULT_WATCHDOG);
             break;
     }
+
+    EEPROM_LogError(Fault_BitMap);
 
     // TODO: create an interrupt-independent CAN interface, so we can use CAN from within a fault state
     // avoid infinite recursive faults, since our CAN Driver relies on the OS to work

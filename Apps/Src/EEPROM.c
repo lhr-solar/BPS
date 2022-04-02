@@ -25,7 +25,7 @@ void EEPROM_Init(void) {
     M24128_Init();
 
     // find the end of the fault array
-    uint16_t data = 0;
+    uint32_t data = 0;
     faultArrayEndAddress = EEPROM_FAULT_ADDR - sizeof(EEPROM_TERMINATOR);
     while (data != EEPROM_TERMINATOR) {
         faultArrayEndAddress += sizeof(EEPROM_TERMINATOR);
@@ -71,10 +71,11 @@ void EEPROM_SetCharge(uint32_t charge) {
  * 
  * @param error The error to log
  */
-void EEPROM_LogError(Fault_Set error) {
-    // assumes sizeof(EEPROM_TERMINATOR) == sizeof(Fault_Set)
+void EEPROM_LogError(uint32_t error) {
+    // assumes sizeof(EEPROM_TERMINATOR) == sizeof(error)
     M24128_Write(faultArrayEndAddress + sizeof(EEPROM_TERMINATOR), sizeof(EEPROM_TERMINATOR), (uint8_t *) &EEPROM_TERMINATOR);
-    M24128_Write(faultArrayEndAddress, sizeof(Fault_Set), (uint8_t *) &error);
+    M24128_Write(faultArrayEndAddress, sizeof(error), (uint8_t *) &error);
+    faultArrayEndAddress += sizeof(error);
 }
 
 /**
@@ -82,11 +83,14 @@ void EEPROM_LogError(Fault_Set error) {
  * 
  * @param errors        a buffer to store all of the errors to
  * @param maxErrors     the maximum number of errors that can fit in the buffer
+ * @return              the number of errors read
  */
-void EEPROM_GetErrors(Fault_Set *errors, uint16_t maxErrors) {
+uint16_t EEPROM_GetErrors(uint32_t *errors, uint16_t maxErrors) {
     uint16_t numErrors = 0;
-    for (uint16_t addr = EEPROM_FAULT_ADDR; (addr < faultArrayEndAddress) && (numErrors < maxErrors);
-            addr += sizeof(Fault_Set), ++numErrors) {
-        M24128_Read(addr, sizeof(Fault_Set), (uint8_t *) (errors + numErrors));
+    uint16_t addr = EEPROM_FAULT_ADDR;
+    for (; (addr < faultArrayEndAddress) && (numErrors < maxErrors); ++numErrors) {
+        M24128_Read(addr, sizeof(*errors), (uint8_t *) (errors + numErrors));
+        addr += sizeof(*errors);
     }
+    return numErrors;
 }
