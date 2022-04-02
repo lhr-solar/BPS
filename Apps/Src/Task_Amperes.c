@@ -9,6 +9,7 @@
 #include "BSP_SPI.h"
 #include "CANbus.h"
 #include "Temperature.h"
+#include "Charge.h"
 
 void Task_AmperesMonitor(void *p_arg) {
     (void)p_arg;
@@ -22,6 +23,7 @@ void Task_AmperesMonitor(void *p_arg) {
     CANMSG_t CanMsg;
 
 	Amps_Init();
+    Charge_Init();
 
     while(1) {
         // BLOCKING =====================
@@ -45,6 +47,9 @@ void Task_AmperesMonitor(void *p_arg) {
 
             amperesHasBeenChecked = true;
         }
+
+        // update state of charge
+        Charge_Calculate(Amps_GetReading());
 
 		//Send measurement to CAN queue
 		int current = Amps_GetReading();
