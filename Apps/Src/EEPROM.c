@@ -15,7 +15,7 @@ static const uint16_t MAX_FAULTS = 100;
 // terminating character for fault array
 static const uint32_t EEPROM_TERMINATOR = 0xFFFFFFFF;
 
-// cached value of end of fault array
+// cached value of end of fault arrzay
 static uint16_t faultArrayEndAddress;
 
 // handle errors from M24128 driver

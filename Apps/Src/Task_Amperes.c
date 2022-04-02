@@ -23,7 +23,6 @@ void Task_AmperesMonitor(void *p_arg) {
     CANMSG_t CanMsg;
 
 	Amps_Init();
-    Charge_Init();
 
     while(1) {
         // BLOCKING =====================
