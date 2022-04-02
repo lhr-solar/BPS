@@ -29,7 +29,7 @@ void EEPROM_Init(void) {
     faultArrayEndAddress = EEPROM_FAULT_ADDR - sizeof(EEPROM_TERMINATOR);
     while (data != EEPROM_TERMINATOR) {
         faultArrayEndAddress += sizeof(EEPROM_TERMINATOR);
-        M24128_Read(faultArrayEndAddress, sizeof(data), &data);
+        M24128_Read(faultArrayEndAddress, sizeof(data), (uint8_t *) &data);
     }
 }
 
@@ -43,7 +43,7 @@ void EEPROM_Reset(void) {
     M24128_Init();
 
     // initialize the fault array
-    M24128_Write(EEPROM_FAULT_ADDR, sizeof(EEPROM_TERMINATOR), &EEPROM_TERMINATOR);
+    M24128_Write(EEPROM_FAULT_ADDR, sizeof(EEPROM_TERMINATOR), (uint8_t *) &EEPROM_TERMINATOR);
 }
 
 /**
@@ -53,7 +53,7 @@ void EEPROM_Reset(void) {
  */
 uint32_t EEPROM_GetCharge(void) {
     uint32_t charge;
-    M24128_Read(EEPROM_CHARGE_ADDR, sizeof(charge), &charge);
+    M24128_Read(EEPROM_CHARGE_ADDR, sizeof(charge), (uint8_t *) &charge);
     return charge;
 }
 
@@ -63,7 +63,7 @@ uint32_t EEPROM_GetCharge(void) {
  * @param charge The value to set the EEPROM's stored state of charge to
  */
 void EEPROM_SetCharge(uint32_t charge) {
-    M24128_Write(EEPROM_CHARGE_ADDR, sizeof(charge), &charge);
+    M24128_Write(EEPROM_CHARGE_ADDR, sizeof(charge), (uint8_t *) &charge);
 }
 
 /**
@@ -73,8 +73,8 @@ void EEPROM_SetCharge(uint32_t charge) {
  */
 void EEPROM_LogError(Fault_Set error) {
     // assumes sizeof(EEPROM_TERMINATOR) == sizeof(Fault_Set)
-    M24128_Write(faultArrayEndAddress + sizeof(EEPROM_TERMINATOR), sizeof(EEPROM_TERMINATOR), &EEPROM_TERMINATOR);
-    M24128_Write(faultArrayEndAddress, sizeof(Fault_Set), &error);
+    M24128_Write(faultArrayEndAddress + sizeof(EEPROM_TERMINATOR), sizeof(EEPROM_TERMINATOR), (uint8_t *) &EEPROM_TERMINATOR);
+    M24128_Write(faultArrayEndAddress, sizeof(Fault_Set), (uint8_t *) &error);
 }
 
 /**
@@ -86,7 +86,7 @@ void EEPROM_LogError(Fault_Set error) {
 void EEPROM_GetErrors(Fault_Set *errors, uint16_t maxErrors) {
     uint16_t numErrors = 0;
     for (uint16_t addr = EEPROM_FAULT_ADDR; (addr < faultArrayEndAddress) && (numErrors < maxErrors);
-            addr += sizeof(Fault_Set), numErrors) {
-        M24128_Read(addr, sizeof(Fault_Set), errors + numErrors);
+            addr += sizeof(Fault_Set), ++numErrors) {
+        M24128_Read(addr, sizeof(Fault_Set), (uint8_t *) (errors + numErrors));
     }
 }
