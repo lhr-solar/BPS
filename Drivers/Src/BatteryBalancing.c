@@ -8,7 +8,6 @@
 
 static void Balancing_ClearDischargeBit(int Cell, uint8_t total_ic, cell_asic *ic);
 static void Balancing_GetICNumber(uint8_t i, uint8_t* ICNumber, uint8_t* ModuleNumber);
-static void Balancing_GetICNumber(uint8_t i, uint8_t* ICNumber, uint8_t* ModuleNumber);
 static void Balancing_SetDischargeBit(uint8_t module, cell_asic ic[]);
 
 /**
@@ -83,6 +82,7 @@ static void Balancing_ClearDischargeBit(int Cell, uint8_t total_ic, cell_asic *i
  * @param   ModuleNumber buffer for module number
  * @return  None
  */
+/*
 static void Balancing_GetICNumber(uint8_t i, uint8_t* ICNumber, uint8_t* ModuleNumber) {
 	uint8_t total = 0;
 	uint8_t NUM_MODULES_PER_MINION[4] = {8,8,8,7};
@@ -94,6 +94,12 @@ static void Balancing_GetICNumber(uint8_t i, uint8_t* ICNumber, uint8_t* ModuleN
 			return;
 		}
 	}
+}
+*/
+
+static void Balancing_GetICNumber(uint8_t i, uint8_t* ICNumber, uint8_t* ModuleNumber) {
+	*ICNumber = i / MAX_VOLT_SENSORS_PER_MINION_BOARD;
+	*ModuleNumber = i % MAX_VOLT_SENSORS_PER_MINION_BOARD;
 }
 
 /**
