@@ -7,6 +7,7 @@
 
 #include <stdint.h>
 #include "BSP_I2C.h"
+#include "config.h"
 
 #define M24128_ADDRESS (0xA0)
 
@@ -22,9 +23,10 @@ void M24128_Init(void) {
  * @param address to write data to
  * @param bytes number of bytes to send
  * @param buffer pointer to buffer that contains data
+ * @return ERROR or SUCCESS
  */
-void M24128_Write(uint16_t address, uint32_t bytes, uint8_t* buffer) {
-    BSP_I2C_Write(M24128_ADDRESS, address, buffer, bytes);
+ErrorStatus M24128_Write(uint16_t address, uint32_t bytes, uint8_t* buffer) {
+    return BSP_I2C_Write(M24128_ADDRESS, address, buffer, bytes);
 }
 
 /** M24128_Read
@@ -32,7 +34,8 @@ void M24128_Write(uint16_t address, uint32_t bytes, uint8_t* buffer) {
  * @param address to read data from
  * @param bytes number of bytes to read
  * @param buffer pointer to buffer to store data in
+ * @return ERROR or SUCCESS
  */
-void M24128_Read(uint16_t address, uint32_t bytes, uint8_t* buffer) {
-    BSP_I2C_Read(M24128_ADDRESS, address, buffer, bytes);
+ErrorStatus M24128_Read(uint16_t address, uint32_t bytes, uint8_t* buffer) {
+    return BSP_I2C_Read(M24128_ADDRESS, address, buffer, bytes);
 }

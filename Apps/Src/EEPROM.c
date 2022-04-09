@@ -18,6 +18,10 @@ static const uint32_t EEPROM_TERMINATOR = 0xFFFFFFFF;
 // cached value of end of fault array
 static uint16_t faultArrayEndAddress;
 
+// handle errors from M24128 driver
+static uint32_t EEPROM_driverErrorCount = 0;
+#define EEPROM_RETRY(func) while ((func) == ERROR) { ++EEPROM_driverErrorCount; }
+
 /** EEPROM_Init
  * Initializes EEPROM application
  */
@@ -35,7 +39,7 @@ void EEPROM_Init(void) {
             break;
         }
         faultArrayEndAddress += sizeof(EEPROM_TERMINATOR);
-        M24128_Read(faultArrayEndAddress, sizeof(data), (uint8_t *) &data);
+        EEPROM_RETRY(M24128_Read(faultArrayEndAddress, sizeof(data), (uint8_t *) &data)); // retry if unsuccessful
     }
 }
 
@@ -49,7 +53,7 @@ void EEPROM_Reset(void) {
     M24128_Init();
 
     // initialize the fault array
-    M24128_Write(EEPROM_FAULT_ADDR, sizeof(EEPROM_TERMINATOR), (uint8_t *) &EEPROM_TERMINATOR);
+    EEPROM_RETRY(M24128_Write(EEPROM_FAULT_ADDR, sizeof(EEPROM_TERMINATOR), (uint8_t *) &EEPROM_TERMINATOR)); // retry if unsuccessful
 
     faultArrayEndAddress = EEPROM_FAULT_ADDR;
 }
@@ -61,7 +65,7 @@ void EEPROM_Reset(void) {
  */
 uint32_t EEPROM_GetCharge(void) {
     uint32_t charge;
-    M24128_Read(EEPROM_CHARGE_ADDR, sizeof(charge), (uint8_t *) &charge);
+    EEPROM_RETRY(M24128_Read(EEPROM_CHARGE_ADDR, sizeof(charge), (uint8_t *) &charge)); // retry if unsuccessful
     return charge;
 }
 
@@ -71,7 +75,11 @@ uint32_t EEPROM_GetCharge(void) {
  * @param charge The value to set the EEPROM's stored state of charge to
  */
 void EEPROM_SetCharge(uint32_t charge) {
-    M24128_Write(EEPROM_CHARGE_ADDR, sizeof(charge), (uint8_t *) &charge);
+    // this gets called a lot during normal operation, and I think it is ok if it fails sometimes, so I won't make it retry
+    ErrorStatus result = M24128_Write(EEPROM_CHARGE_ADDR, sizeof(charge), (uint8_t *) &charge);
+    if (result == ERROR) {
+        EEPROM_driverErrorCount++; // log that we had an error
+    }
 }
 
 /**
@@ -81,8 +89,9 @@ void EEPROM_SetCharge(uint32_t charge) {
  */
 void EEPROM_LogError(uint32_t error) {
     // assumes sizeof(EEPROM_TERMINATOR) == sizeof(error)
-    M24128_Write(faultArrayEndAddress + sizeof(EEPROM_TERMINATOR), sizeof(EEPROM_TERMINATOR), (uint8_t *) &EEPROM_TERMINATOR);
-    M24128_Write(faultArrayEndAddress, sizeof(error), (uint8_t *) &error);
+    // retry writes if unsuccessful
+    EEPROM_RETRY(M24128_Write(faultArrayEndAddress + sizeof(EEPROM_TERMINATOR), sizeof(EEPROM_TERMINATOR), (uint8_t *) &EEPROM_TERMINATOR));
+    EEPROM_RETRY(M24128_Write(faultArrayEndAddress, sizeof(error), (uint8_t *) &error));
     faultArrayEndAddress += sizeof(error);
 }
 
@@ -97,7 +106,7 @@ uint16_t EEPROM_GetErrors(uint32_t *errors, uint16_t maxErrors) {
     uint16_t numErrors = 0;
     uint16_t addr = EEPROM_FAULT_ADDR;
     for (; (addr < faultArrayEndAddress) && (numErrors < maxErrors); ++numErrors) {
-        M24128_Read(addr, sizeof(*errors), (uint8_t *) (errors + numErrors));
+        EEPROM_RETRY(M24128_Read(addr, sizeof(*errors), (uint8_t *) (errors + numErrors))); // retry if unsuccessful
         addr += sizeof(*errors);
     }
     return numErrors;
