@@ -12,6 +12,8 @@
 #include "BSP_WDTimer.h"
 #include "BSP_Contactor.h"
 #include "BSP_UART.h"
+#include "Amps.h"
+#include <stdio.h>
 
 /******************************************************************************
  * Amperes Task Test Plan
@@ -134,6 +136,8 @@ void Task1(void *p_arg){
 void Task2(void *p_arg){
     OS_ERR err;
 
+    int count = 0;
+
     // get contactor to close without temperature, voltage, or open wire readings
     OSSemPost(&SafetyCheck_Sem4,      
                 OS_OPT_POST_1,
@@ -158,6 +162,12 @@ void Task2(void *p_arg){
         //delay of 100ms
         OSTimeDly(10, OS_OPT_TIME_DLY, &err);
         assertOSError(err);
+
+        if (count == 0) {
+            printf("Amps: %ld\n\r", Amps_GetReading());
+        }
+        count = (count + 1) % 10;
+
         BSP_Light_Toggle(RUN);
     }
 }
