@@ -9,6 +9,7 @@
 #include "BSP_SPI.h"
 #include "CANbus.h"
 #include "Temperature.h"
+#include "Charge.h"
 
 void Task_AmperesMonitor(void *p_arg) {
     (void)p_arg;
@@ -46,6 +47,9 @@ void Task_AmperesMonitor(void *p_arg) {
             amperesHasBeenChecked = true;
         }
 
+        // update state of charge
+        Charge_Calculate(Amps_GetReading());
+
 		//Send measurement to CAN queue
 		int current = Amps_GetReading();
 		CanData.w = (uint32_t) current;
@@ -53,6 +57,13 @@ void Task_AmperesMonitor(void *p_arg) {
 		CanMsg.id = CURRENT_DATA;
 		CanMsg.payload = CanPayload;
         CAN_Queue_Post(CanMsg);         // send data to CAN
+
+        // Send state of charge to CAN queue
+        CanData.w = Charge_GetPercent();
+        CanPayload.data = CanData;
+        CanMsg.id = SOC_DATA;
+        CanMsg.payload = CanPayload;
+        CAN_Queue_Post(CanMsg);
 
         //signal watchdog
         OSMutexPend(&WDog_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);

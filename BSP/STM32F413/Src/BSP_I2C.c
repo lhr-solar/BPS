@@ -57,7 +57,7 @@ void BSP_I2C_Init(void) {
  * @return  error status, 0 if fail, 1 if success
  */
 uint8_t BSP_I2C_Write(uint8_t deviceAddr, uint16_t regAddr, uint8_t *txData, uint32_t txLen) {
-    int timeout_count = 0;
+    volatile int timeout_count = 0;
 	while(I2C_GetFlagStatus(I2C3, I2C_FLAG_BUSY)){
 		// Assume running at 80 MHz
 		timeout_count++;
@@ -172,7 +172,7 @@ uint8_t BSP_I2C_Write(uint8_t deviceAddr, uint16_t regAddr, uint8_t *txData, uin
  * @return  error status, 0 if fail, other if success
  */
 uint8_t BSP_I2C_Read(uint8_t deviceAddr, uint16_t regAddr, uint8_t *rxData, uint32_t rxLen) {
-    int timeout_count = 0;
+    volatile int timeout_count = 0;
 	while(I2C_GetFlagStatus(I2C3, I2C_FLAG_BUSY)){
 		// Assume running at 80 MHz
 		timeout_count++;

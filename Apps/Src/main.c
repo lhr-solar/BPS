@@ -12,6 +12,8 @@
 #include "BSP_Contactor.h"
 #include "BSP_PLL.h"
 #include "BSP_UART.h"
+#include "EEPROM.h"
+#include "Charge.h"
 
 void EnterFaultState(void);
 
@@ -31,6 +33,10 @@ int main() {
 		Fault_BitMap = Fault_WDOG; //When function called in if statement, RCC flag cleared so set bitmap here
 		EnterFaultState();
 	}
+
+	// set up EEPROM and state of charge
+	EEPROM_Init();
+	Charge_Init();
 
 	OSInit(&err);
 	assertOSError(err);

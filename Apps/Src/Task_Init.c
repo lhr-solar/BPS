@@ -123,13 +123,14 @@ void Task_Init(void *p_arg) {
 				OS_OPT_TASK_STK_CHK | OS_OPT_TASK_SAVE_FP,	// Options
 				&err);					// return err code
 		assertOSError(err);
+		*/
         //7
         OSTaskCreate(&LogInfo_TCB,				// TCB
 				"TASK_LOG_INFO_PRIO",	// Task Name (String)
 				Task_LogInfo,				// Task function pointer
 				(void *)0,				// Task function args
 				TASK_LOG_INFO_PRIO,			// Priority
-				Init_Stk,				// Stack
+				LogInfo_Stk,				// Stack
 				WATERMARK_STACK_LIMIT,	// Watermark limit for debugging
 				TASK_LOG_INFO_STACK_SIZE,		// Stack size
 				0,						// Queue size (not needed)
@@ -138,7 +139,6 @@ void Task_Init(void *p_arg) {
 				OS_OPT_TASK_STK_CHK | OS_OPT_TASK_SAVE_FP,	// Options
 				&err);					// return err code
 		assertOSError(err);
-	*/
         //8
         OSTaskCreate(&CANBusConsumer_TCB,				// TCB
 				"TASK_CANBUS_CONSUMER_PRIO",	// Task Name (String)

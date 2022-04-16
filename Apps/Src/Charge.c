@@ -19,7 +19,7 @@ void Charge_Init(void){
 	BSP_Timer_Init();
 	
 	// Grab from EEPROM what is the current Charge
-	EEPROM_ReadMultipleBytes(EEPROM_SOC_PTR_LOC, 4, (uint8_t*)&charge);
+	charge = EEPROM_GetCharge();
 
     BSP_Timer_Start();
 }
