@@ -7,7 +7,7 @@ Fault Indicator/Strobe Light
 Description
     The strobelight contains 4, 3 watt LED's and is powered by a 12V line. It has 4 wires for setup
     although we only need to use 3. Outside of power and ground, the other 2 wires are for sync and
-    pattern. 
+    pattern. When tested it used .5A at 12V
 Usage    
     The sync wire is if we are using multiple strobelights that must strobe at the same
     time. The pattern wire must be shorted with power if the pattern is to be changed. Once it is 
@@ -28,3 +28,22 @@ Reason
     According to the ASC regulations(8.5.A), the fuse must be rated for less than 200% of the maximum
     expected current draw(which for this system is around 60A). The rating must also be for more than
     75% of the maximum current capacity of the wire(tbd).
+
+Horn
+====
+Description
+    Make loud noise. 
+Usage
+    Press button to make loud noise.
+Reason    
+    According to ASC regulations (9.4.I), should be between 75 - 102 dBA at 15m away from car. When 
+    measured it was around 84 decibels and used 3.4 amps at 12V.
+
+Contactor
+=========
+Description
+    Switch off
+Usage
+    Place between
+Reason    
+    According to ASC regulations
