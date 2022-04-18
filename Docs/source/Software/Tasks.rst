@@ -26,9 +26,9 @@ Shared Resources
     current sensor), and ``AmperesIO_Sem4``.
 
 Timing Requirements
-    According to Dr. Judy Jeevarajan, current through the Lithium-ion battery pack needs to be monitored at least once every couple minutes
-    to maintain safety and accuracy. For scrutineering and testing purposes, this task is monitored more frequently at once every 100 
-    milliseconds. 
+    According to Dr. Judy Jeevarajan, current through the Lithium-ion battery pack needs to be monitored at least once every 
+    couple minutes to maintain safety and accuracy. For scrutineering and testing purposes, this task is monitored more 
+    frequently at once every 100 milliseconds. 
 
 Yields
     It yields when it signals the critical state task that the current is safe, when it detects a
@@ -60,8 +60,9 @@ Shared Resources
     This task will access the ``MinionsASIC_Mutex``, the ``WDog_Mutex``, and the ``Voltage_Mutex``.
 
 Timing Requirements
-    According to Dr. Judy Jeevarajan, Lithium-ion batteries need to be monitored at least once every couple minutes to maintain safety
-    and accuracy. For scrutineering and testing purposes, this task is monitored more frequently at once every 100 milliseconds. 
+    According to Dr. Judy Jeevarajan, Lithium-ion batteries need to be monitored at least once every couple minutes to 
+    maintain safety and accuracy. For scrutineering and testing purposes, this task is monitored more frequently at once 
+    every 100 milliseconds. 
 
 Yields
     This task yields for the ``MinionsASIC_Mutex``, the ``Voltage_Mutex``, and the ``MinionsIO_Mutex``. 
@@ -86,8 +87,9 @@ Shared Resources
     This task uses the ``CANBus_MsgQ`` queue.
 
 Timing Requirements
-    This task is not safety critical and no safety critical tasks depend on this task, so there is no set timing requirement. This task
-    runs whenever there is a message in the CAN message queue as long as no higher priority tasks are running at the time. 
+    This task is not safety critical and no safety critical tasks depend on this task, so there is no set timing requirement. 
+    This task runs whenever there is a message in the CAN message queue as long as no higher priority tasks are running at 
+    the time. 
 
 Yields
     This task will yield until there is a message in the ``CANBus_MsgQ``. 
@@ -96,7 +98,8 @@ Additional Considerations
     For information about how the message payloads are structured can be found in the documentation for the CAN driver.
     
     All possible CAN messages that will be sent to the rest of the car's system by the BPS
-    are listed on the `CAN Bus IDs spreadsheet <https://docs.google.com/spreadsheets/d/11YWoMVZw8BFr8kyO4DIz0g-aIU_vVa0d-WioSRq85TI/edit#gid=0>`_.
+    are listed on the `CAN Bus IDs spreadsheet 
+    <https://docs.google.com/spreadsheets/d/11YWoMVZw8BFr8kyO4DIz0g-aIU_vVa0d-WioSRq85TI/edit#gid=0>`_.
 
 CLI Task: Sugam Arora
 =====================
@@ -163,7 +166,7 @@ Purpose
     conditions can be found :ref:`here <Design Requirements>`. 
 
 Functionality:
-    1) All other tasks are prevented from running. This is because this is the highest priority task.
+    1) All other tasks are prevented from running. This is because this is the highest priority task and interrupts are disabled.
 
     2) The contactor is turned off.
     
@@ -174,6 +177,11 @@ Functionality:
     5) The fault condition is logged into the EEPROM.
     
     6) A message is sent along the CAN bus to the BPS display board to notify the driver that the BPS is tripped.
+   
+.. note::
+    Since the contactor is turned off, none of the other systems are on to read the CAN message. There is an LED on the 
+    controls minion board that is hardwired to turn on when the BPS enters a fault state. For this purpose and due to 
+    difficulty in implementing CAN with disabled interrupts, step 6 is skipped.
     
     7) The WatchDog timer is continually reset to prevent the BPS from going into fault again.
 
@@ -227,16 +235,18 @@ Yields
 
 Additional Considerations
     When modifying the idle task, it is important to not introduce any functionality that may affect 
-    other tasks. For example, the idle task should not pend any mutexes, since this could block more important tasks from running.
+    other tasks. For example, the idle task should not pend any mutexes, since this could block more important tasks from 
+    running.
 
 Initialization Task: Alex Koo
 ===============================
 
 Purpose
     Create tasks by calling ``OSTaskCreate()`` and provide argument specifying to RTOS how the task will be managed.
-    The order of the semaphore Initialization matters because if the fault semaphore isn't initialized first and a fault is called we do not go into the fault state.
-    Initialization Task also creates :term:`Semaphores <Semaphore>` which are used when a task wants exclusive 
-    access to a resource, needs to synchronize its activities with an ISR or a task, or is waiting until an event occurs.
+    The order of the semaphore Initialization matters because if the fault semaphore isn't initialized first and a fault is 
+    called we do not go into the fault state. Initialization Task also creates :term:`Semaphores <Semaphore>` which are used 
+    when a task wants exclusive access to a resource, needs to synchronize its activities with an ISR or a task, or is 
+    waiting until an event occurs.
 
 Functionality:
     1) The TCB, Task name, Task function argument, Priority, Stack, Watermark limit for debugging, Stack size, Queue size, Time quanta, Extension pointer, Options, Return err code is provided
@@ -346,9 +356,9 @@ Shared Resources
     on the ``SPI1`` port (this port is also used by the Battery Balancing Task).
 
 Timing Requirements
-    According to Dr. Judy Jeevarajan, voltage and tempterature of Lithium-ion batteries need to be monitored at least once every couple
-    minutes to maintain safety and accuracy. For scrutineering and testing purposes, this task is updated more frequently at once every 100
-    milliseconds.
+    According to Dr. Judy Jeevarajan, voltage and tempterature of Lithium-ion batteries need to be monitored at least once 
+    every couple minutes to maintain safety and accuracy. For scrutineering and testing purposes, this task is updated more 
+    frequently at once every 100 milliseconds.
 
 Yields
     Since this task checks all voltage and temperature values, it will wait for the ``Voltage_Mutex`` and the ``TemperatureBuffer_Mutex``
