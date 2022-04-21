@@ -18,6 +18,7 @@ from assuming priority. Ex
     #define ALL_CAPS_WITH_UNDERSCORE
     #define math (4 + x)
     const uint8_t FOUR_KG = 4;
+    #ifdef TASKS_H //No leading underscores
 
 Enums
 =====
@@ -126,7 +127,7 @@ Source files should be formatted in the following method.
 
 The trademark/description should adhere to the following format:
 
-.. code-block:: 
+.. code-block:: c
 
     /* Copyright (c) <YEAR> UT Longhorn Racing Solar */
     /** DRIVER.c
@@ -196,8 +197,8 @@ file and above the declaration in the header file.
 Private Functions
 =================
 
-These are the same as public functions but do not need to have the layer section in their name. 
-Their description should be included in the source file, not the header file.
+Code duplication should be avoided by using private functions instead. Their format is the same as public functions but 
+do not need to have the layer section in their name. Their description should be included in the source file, not the header file.
 
 .. code-block:: c
 
@@ -264,7 +265,3 @@ Common Practice
 **Pointers:** Members to pointers should be accessed through ``p->member`` operator instead of ``*(p).member``.
 **Indentation:** Tabs should be 4 spaces. If a pull request is made and changes are made to files you did not edit, check to see
 if your editor is editing whitespace when opening files (for MAC users). If these issues are not fixed, your PR WILL NOT BE MERGED
-
-Documentation
-=============
-
