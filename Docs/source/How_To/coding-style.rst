@@ -2,6 +2,11 @@
 Coding Style
 *************
 
+.. note:: 
+
+    | CamelCase - FirstWordSecondWord
+    | camelCase - firstWordSecondWord
+
 Macros and Constants
 ====================
 
@@ -17,7 +22,7 @@ from assuming priority. Ex
 Enums
 =====
 
-Enum name should be in CamelCase and all element in enum should be all caps. Ex:
+Enum name should be in CamelCase and all element in enum should be all caps. They should be located in the header file. Ex:
 
 .. code-block:: c
 
@@ -27,6 +32,34 @@ Enum name should be in CamelCase and all element in enum should be all caps. Ex:
         ELEMENT_THREE;
         };
 
+Structs
+=======
+
+All struct names should have a descriptive name written in CamelCase and an appended ``_t``. 
+Members of struct should be written in camelCase. They should be located in the header file. Ex:
+
+.. code-block:: c
+
+    typedef struct {
+        uint8_t element;
+        uint16_t elementTwo;
+    } StructName_t;
+
+Unions
+======
+
+Unions should only be used when absolutely necessary (normally for communication protocols). They should be located in the
+header file, written in CamelCase, and appended with an ``_t``. Members of the union should be in camelCase.
+
+.. code-block:: c
+
+    typedef union {
+	    uint8_t b;
+	    uint16_t h;
+	    uint32_t w;
+	    float f;
+    } CANData_t;
+
 Libraries
 =========
 
@@ -34,8 +67,52 @@ All libraries are separated into source files and header files. The source file 
 holds the function declarations for the library. 
 
 =============
-Source Files
+Library Names
 =============
+
+The name of the library depends on the layer that library is part of. 
+
+Board Support Package (BSP)
+---------------------------
+
+BSP library file names should describe the feature of the microcontroller that is being used. They should all be in 
+snakecase with the first section being ``BSP_``. If the BSP library is for a specific functionality in the system, the name should
+describe the functionality. Ex:
+
+.. code-block:: c
+
+    BSP_ADC.c //Microcontroller Feature
+    BSP_ADC.h
+    BSP_Fans.c //Interface with system
+    BSP_Fans.h
+
+Drivers
+-------
+
+Driver library file names should be the name of the component the library is for with the appropriate suffix. Ex:
+
+.. code-block:: c
+
+    Partname.c
+    Partname.h
+    LTC6811.c
+    LTC6811.h
+
+Application
+-----------
+
+Application level library names should describe the functionality of the application. If the application library is for a task,
+it should be prefaced with the ``Task_`` prefix. the tasks name should be in CamelCase. Ex:
+
+.. code-block:: c 
+
+    EEProm.c //interface with EEPROM
+    Temperature.c
+    Task_TaskName.c
+
+============
+Source Files
+============
 
 Source files should be formatted in the following method.
 
@@ -47,7 +124,40 @@ Source files should be formatted in the following method.
     6. Public Functions
     7. Newline
 
-Included 
+The trademark/description should adhere to the following format:
+
+.. code-block:: 
+
+    /* Copyright (c) <YEAR> UT Longhorn Racing Solar */
+    /** DRIVER.c
+    * DESCRIPTION
+    */
+
+Included files should only be what is necessary for the source code to run. Defines should follow Macro coding style.
+If there is debugging functionality in the source file (that is not essential for the system to run), ``#ifdef`` and ``endif``
+should surround all code necessary for that functionality. This consists of included files, ``printf`` statements, and other code
+inside functions that run at regular runtime. Debugging functions do not have to be surrounded. Static functions must be declare
+before all public functions. It is the prerogative of the programmer as to have the static function definition at the start of the 
+source file or at the end.
+
+============
+Header Files
+============
+
+Header files should be formatted in the following method.
+
+    1. Trademark/Description of file
+    2. Defines
+    3. Includes
+    4. Typedefs
+    5. Function Declarations
+    6. Endifs
+    7. Newline
+
+All header files should be surrounded with ``#ifdef`` and ``#endif``.
+Header files should only have amount of includes necessary for header file to work. For example, if a function returns an 
+``int``, then the header file should ``#include <stdint.h>``. However, if the source file calls ``memcpy`` in a function, it is not
+necessary for the header file to ``#include <stdlib.h>``.
 
 Functions
 =========
@@ -56,7 +166,7 @@ Functions
 Descriptions
 ============
 
-All functions should have a comment paragraph description that follows the specified format.::
+All function declarations and definitions should have a comment paragraph description that follows the specified format.::
 
     /**
      * NOTE: Include anything important someone else will need to know
@@ -91,6 +201,12 @@ Their description should be included in the source file, not the header file.
 
 .. code-block:: c
 
+    /**
+     * NOTE: Include anything important someone else will need to know
+     * @brief Give Description of Function
+     * @param variable Describe input parameters
+     * @return What function returns
+     */
     static void ADC_InitDMA(void);
 
 Variables
@@ -147,4 +263,8 @@ Common Practice
 
 **Pointers:** Members to pointers should be accessed through ``p->member`` operator instead of ``*(p).member``.
 **Indentation:** Tabs should be 4 spaces. If a pull request is made and changes are made to files you did not edit, check to see
-if your editor is editing whitespace when opening files (for MAC users).
+if your editor is editing whitespace when opening files (for MAC users). If these issues are not fixed, your PR WILL NOT BE MERGED
+
+Documentation
+=============
+
