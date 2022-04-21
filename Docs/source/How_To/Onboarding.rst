@@ -19,7 +19,7 @@ First Steps
 
 BPS Starter Project
 *******************
-The description for the BPS starter project can be found `here <https://docs.google.com/document/d/1mnr5hS6oYJ3UnO-METVs7p3KIAmd1dFCfAg1XT5Y6k0/view>`_ (requires access to the google drive).
+The description for the BPS starter project can be found `here <https://docs.google.com/document/d/1mnr5hS6oYJ3UnO-METVs7p3KIAmd1dFCfAg1XT5Y6k0/view>`__ (requires access to the google drive).
 
 Sunlight Starter Project
 ************************
@@ -64,7 +64,7 @@ you coming up with a theory you can test (or at least point raise some questions
 Useful Resources
 ################
     These materials were put together by Alex, a previous BPS member, who found them helpful for learning about the tools used by the BPS team. Clark has made 
-    some additions. Alex's complete notes can be found `here <https://docs.google.com/document/d/194_Bps9CNa6AP8NM2QrIr0dryWyDBb6Pbnc9A6n8sl4/view>`_
+    some additions. Alex's complete notes can be found `here <https://docs.google.com/document/d/194_Bps9CNa6AP8NM2QrIr0dryWyDBb6Pbnc9A6n8sl4/view>`__
 
 Git/Github
 **********
@@ -95,4 +95,4 @@ Ubuntu / VScode
 
 C Programming
 *************
-    Some documentation of the C programming language can be found `here <https://en.cppreference.com/w/c>`_
+    Some documentation of the C programming language can be found `here <https://en.cppreference.com/w/c>`__

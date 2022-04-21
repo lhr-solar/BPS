@@ -35,7 +35,6 @@ release = '0.0'
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-	"recommonmark",
 	"sphinx_rtd_theme", # RTD theme extension
 	"sphinx.ext.autosectionlabel" # extension for hyperlinks
 ]
@@ -61,6 +60,9 @@ html_theme = 'sphinx_rtd_theme' # Enable RTD theme
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
 
+#Ignore warnings for duplicate labels since we use the same label for multiple sections
+#This means that if you are trying to refer to a label, it might not be possible
+suppress_warnings = ['autosectionlabel.*']
 
 #use index.rst
 master_doc = 'index'
