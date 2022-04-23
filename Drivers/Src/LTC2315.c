@@ -5,6 +5,10 @@
 #include "BSP_PLL.h"
 #include <stdio.h>
 
+// offset for current reading
+// experimentally determined at startup through calibration
+static int32_t offset;
+
 // Helper functions copied from LTC681x.c
 
 static void LTC2315_delay_u(uint16_t micro) {
@@ -103,12 +107,6 @@ int32_t LTC2315_GetCurrent() {
      * 
      * Temperature effects are ignored (for now?)
      */
-
-    // assume first reading is at 0 milliamps for calibration
-    // should be a safe assumption, since contactor will be open
-    
-    static bool calibrated = false;
-    static int32_t offset;
    
     int32_t reading = 0;
     for (int i = 0; i < 10; ++i) {
@@ -117,11 +115,22 @@ int32_t LTC2315_GetCurrent() {
 
     reading /= 10;
 
-    if (!calibrated) {
-        calibrated = true;
-        offset = reading;
-    }
     const int32_t PRECISION_MICRO_AMPS = 73242;
     int32_t milliamps = ((reading - offset) * PRECISION_MICRO_AMPS) / 1000;    // during testing, the gain seems to be inverted
     return milliamps;
+}
+
+/**
+ * @brief Calibrate the LTC2315 module. Assumes there is no current flowing
+ *        through the contactor
+ */
+void LTC2315_Calibrate() {
+    int32_t reading = 0;
+    for (int i = 0; i < 10; ++i) {
+        reading += (int32_t)LTC2315_Read();
+    }
+
+    reading /= 10;
+
+    offset = reading;
 }
