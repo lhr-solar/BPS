@@ -11,7 +11,9 @@ Purpose
 Usage
     In order to use these functions, ``LTC2315_Init()`` must be called first. The rest of the  functions are used to read 
     and write to the registers in the chip. In order to read the current you must call ``LTC2315_GetCurrent()`` which returns 
-    the value of the current as an ``int16_t``.
+    the value of the current as an ``int16_t``. ``LTC2315_Calibrate()`` should be run on startup because it 
+    was observed that when the BPS is initially powered, there is a delay before the LTC2315
+	can be calibrated properly. This is not observed on pressing the reset button.
 
 Additional Considerations
     Communication with this chip is done with :term:`SPI <SPI>`. The scheduler is locked whenever communicating with this
@@ -68,25 +70,23 @@ Additional Considerations
     Right now, this driver is optimized for the RTOS version of the BPS. It is not guaranteed that
     it would work in the Bare Metal version of our code.
 
-EEPROM Driver
+M24128 Driver
 =============
 
 Purpose
     The :term:`EEPROM <EEPROM>` Driver is used to read and write the the external EEPROM on the leader 
-    board. We are using the EEPROM to store the state of charge of the battery and the cause of any 
-    faults that cause the BPS to trip. We are using an EEPROM to store this information so it will 
-    survive a BPS reset.
+    board. We are using the EEPROM to store the state of charge of the battery for coulomb counting purposes.
+    by storing the state of charge at reset, we can know the state of charge when it starts up again.
 
 Usage
-    ``EEPROM_Init()`` must be called before any of the other EEPROM functions can be used. 
-    ``EEPROM_Load()`` or ``EEPROM_Reset()`` must be called before reading or writing data to the EEPROM. 
+    ``M24128_Init()`` must be called before any of the other EEPROM functions can be used. 
+    ``M24128_Write()`` or ``M24128_Read()`` are just wrappers for the ``BSP_I2C`` functions. 
 
 Additional Considerations
-    The EEPROM is a non-volatile memory chip, so any previous data on the EEPROM will remain unless 
-    ``EEPROM_Reset()`` is called. The EEPROM is rated for 4 million write cycles, so we should try 
-    use less write cycles than this over the lifetime of the BPS. It takes around 5 milliseconds to 
-    write to the EEPROM, so multiple writes should not be attempted within the same 5 ms time period, 
-    or some of the writes may fail.
+    The EEPROM is a non-volatile memory chip, so any previous data on the EEPROM will remain remain. 
+    The EEPROM is rated for 4 million write cycles, so we should try use less write cycles than this 
+    over the lifetime of the BPS. It takes around 5 milliseconds to write to the EEPROM, so multiple 
+    writes should not be attempted within the same 5 ms time period, or some of the writes may fail.
 
 LTC6811 Driver
 ==============
