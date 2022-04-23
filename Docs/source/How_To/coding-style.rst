@@ -258,6 +258,9 @@ Punctuation
 **Curly Braces:** Opening braces should be on same line as condition or function that contains them. Curly braces should always 
 be used in coditional even if it is one line
 **Parentheses:** Should be used for clarifying oder of precedence.
+**Indentation:** Indentation should be used in all conditionals, iteratives, and functions. Indentation should be 4 spaces.
+**Line Endings:** All End Of Line sequences should be LF(line feed). This prevents files from looking like they are changed when
+nothing was changed at all.
 
 ===============
 Common Practice
