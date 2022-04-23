@@ -4,26 +4,32 @@ Components
 
 Fault Indicator/Strobe Light
 =============================
+
 Description
     The strobelight contains 4, 3 watt LED's and is powered by a 12V line. It has 4 wires for setup
     although we only need to use 3. Outside of power and ground, the other 2 wires are for sync and
-    pattern. When tested it used .5A at 12V
+    pattern. When tested it used .5A at 12V.
+
 Usage    
     The sync wire is if we are using multiple strobelights that must strobe at the same
     time. The pattern wire must be shorted with power if the pattern is to be changed. Once it is 
     set to a pattern, it remembers the pattern with on board flash memory.
+
 Reason
     The strobelight is used to alert other vehicles on the road that the car is dangerous and to 
     avoid it. It is also required under the ASC regulations(9.4.G).
 
 Fuse
 ====
+
 Description
     This fuse is meant to protect the battery in the event of a short circuit in case the BPS cannot
     react fast enough. This `fuse <https://www.allfuses.com/pub/media/documents/Ferraz%20A15QS.pdf>`__
     is rated for 60A and 150VDC and is what is used in the BPS. 
+
 Usage
     It is placed on the high voltage line between the contactor and battery pack.
+
 Reason
     According to the ASC regulations(8.5.A), the fuse must be rated for less than 200% of the maximum
     expected current draw(which for this system is around 60A). The rating must also be for more than
@@ -31,19 +37,29 @@ Reason
 
 Horn
 ====
+
 Description
     Make loud noise. 
+
 Usage
     Press button to make loud noise.
+
 Reason    
     According to ASC regulations (9.4.I), should be between 75 - 102 dBA at 15m away from car. When 
     measured it was around 84 decibels and used 3.4 amps at 12V.
 
-Contactor
-=========
+Contactors
+==========
+
 Description
-    Switch off
+    The `GV241MAB <https://www.gigavac.com/sites/default/files/catalog/spec_sheet/sensata-gigavac-GV24-contactor-datasheet.pdf>`__ 
+    is rated for 800 VDC and 400A. It is used to control connection of high voltage lines in the car. 
+
 Usage
-    Place between
+    It is located between HV+ to Array, HV- to Load, and HV+ to Load. There are 4 wires, PWR, GND, Normally Open, and 
+    Normally Closed. To open the contactor, set a 1 to the normally open pin to close the pin. To read the state of 
+    the contactor, read the pin.
+
 Reason    
-    According to ASC regulations
+    We need a way to prevent power from going to the rest of the car if the BPS trips. The contactors allow us to switch off the 
+    power in a way that is viable for high DC voltage applications.
