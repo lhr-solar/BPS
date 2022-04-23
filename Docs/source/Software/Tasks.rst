@@ -249,11 +249,12 @@ Purpose
     waiting until an event occurs.
 
 Functionality:
-    1) The TCB, Task name, Task function argument, Priority, Stack, Watermark limit for debugging, Stack size, Queue size, Time quanta, Extension pointer, Options, Return err code is provided
+    1) The TCB, Task name, Task function argument, Priority, Stack, Watermark limit for debugging, Stack size, Queue size, Time quanta, 
+    2) Extension pointer, Options, Return err code is provided
     
-    2) Defines the priority level for the tasks
+    3) Defines the priority level for the tasks
     
-    3) Specifies the size of the task's stack in bytes
+    4) Specifies the size of the task's stack in bytes
 
 Priority
     The initialization has the highest priority. 
@@ -367,5 +368,6 @@ Yields
     This task will also yield whenever it sends SPI messages to the LTC6811 minions.
 
 Additional Considerations
-    As of Fall 2021, the open wire functionality of this task has been removed since it takes too much time, and the normal voltage checks usually catch open wires.
+    As of Fall 2021, the open wire functionality of this task has been removed since it takes too much time, and the normal voltage checks 
+    usually catch open wires.
     
