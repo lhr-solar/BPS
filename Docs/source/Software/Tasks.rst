@@ -136,10 +136,9 @@ Purpose
 
 Functionality:
     1) It waits for the VoltTemp and Amperes task to post the SafetyCheck :term:`semaphore <Semaphore>` 4 times. One for voltage, one for temperature, one for current, and one for open wire.
-    
-    2) If all of these checks are safe, the task will send the All Clear message and the Contactor On message across the CAN line. It will also turn the contactor on.
-    
-    3) The task will then destroy itself since it is no longer needed
+    2) It creates the Pet Watchdog Task after the checks are completed (since the checks take longer than the watchdog timer).
+    3) If all of these checks are safe, the task will send the All Clear message and the Contactor On message across the CAN line. It will also turn the contactor on.
+    4) The task will then destroy itself since it is no longer needed
 
 Priority
     It's priority 2, underneath the fault state task. This is because if a fault occurs during the 
@@ -326,7 +325,8 @@ Yields
 
 Additional Considerations
     If we add more tasks (or split up tasks such as voltage and temperature) and want to have the 
-    watchdog timer look over them, we can add more bits to the timer and just check if they are set.
+    watchdog timer look over them, we can add more bits to the timer and just check if they are set. This task
+    is created in the Critical State Task becuase it takes longer than the watchdog time to intialize all the tasks.
 
 Voltage Temperature Monitor Task: Sijin Woo
 ===========================================
