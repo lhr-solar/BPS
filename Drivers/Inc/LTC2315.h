@@ -27,4 +27,10 @@ uint16_t LTC2315_Read();
  */
 int32_t LTC2315_GetCurrent();
 
+/**
+ * @brief Calibrate the LTC2315 module. Assumes there is no current flowing
+ *        through the contactor
+ */
+void LTC2315_Calibrate();
+
 #endif
