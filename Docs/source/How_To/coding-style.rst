@@ -36,12 +36,13 @@ Enum name should be in CamelCase and all element in enum should be all caps. The
 Structs
 =======
 
-All struct names should have a descriptive name written in CamelCase and an appended ``_t``. 
-Members of struct should be written in camelCase. They should be located in the header file. Ex:
+All struct typedef names should have a descriptive name written in CamelCase and an appended ``_t``. The name of the struct should be
+in CamelCase and it's members should be written in camelCase to make it easier to understand gcc error messages. 
+They should be located in the header file. Ex:
 
 .. code-block:: c
 
-    typedef struct {
+    typedef struct StructName {
         uint8_t element;
         uint16_t elementTwo;
     } StructName_t;
