@@ -1,4 +1,4 @@
-/* Copyright (c) 2020 UT Longhorn Racing Solar */
+/* Copyright (c) 2022 UT Longhorn Racing Solar */
 
 #include <string.h>
 #include "Amps.h"
@@ -23,6 +23,8 @@ void Task_AmperesMonitor(void *p_arg) {
     CANMSG_t CanMsg;
 
 	Amps_Init();
+
+    Amps_Calibrate();
 
     while(1) {
         // BLOCKING =====================

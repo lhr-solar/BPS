@@ -1,4 +1,4 @@
-/* Copyright (c) 2020 UT Longhorn Racing Solar */
+/* Copyright (c) 2022 UT Longhorn Racing Solar */
 /** Amps.h
  * File that holds all electrical current related information of BeVolt's battery pack.
  */
@@ -38,5 +38,11 @@ bool Amps_IsCharging(void);
  * @return milliamperes value
  */
 int32_t Amps_GetReading(void);
+
+/**
+ * @brief calibrate the amperes module. Must be called when the contactors are open
+ * 
+ */
+void Amps_Calibrate(void);
 
 #endif

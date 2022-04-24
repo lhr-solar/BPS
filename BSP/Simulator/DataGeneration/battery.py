@@ -1,4 +1,4 @@
-# Copyright (c) 2020 UT Longhorn Racing Solar
+# Copyright (c) 2022 UT Longhorn Racing Solar
 
 """
 Battery class to simulate the real Li-ion battery cells

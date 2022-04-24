@@ -1,4 +1,4 @@
-/* Copyright (c) 2020 UT Longhorn Racing Solar */
+/* Copyright (c) 2022 UT Longhorn Racing Solar */
 
 const char *utsvt_logo = "                                                ,,qp@@@@@pw,\n\r\
                                            ,p0R*\"```   ``\"*R0E@w\n\r\
