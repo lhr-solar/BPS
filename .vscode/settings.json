@@ -22,6 +22,5 @@
     "python.linting.pylintEnabled": true,
     "python.linting.enabled": true,
     "python.pythonPath": "/usr/bin/python3",
-    "restructuredtext.confPath": "${workspaceFolder}/Docs/source",
-    "esbonio.sphinx.confDir": "${workspaceFolder}/Docs/source"
+    "restructuredtext.confPath": "${workspaceFolder}/Docs/source"
 }
