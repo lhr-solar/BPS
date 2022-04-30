@@ -16,7 +16,7 @@ from assuming priority. Ex
 .. code-block:: c
 
     #define ALL_CAPS_WITH_UNDERSCORE
-    #define math (4 + x)
+    #define MATH (4 + x)
     const uint8_t FOUR_KG = 4;
     #ifdef TASKS_H //No leading underscores
 
@@ -245,7 +245,7 @@ being shared. All global variables should have comments describing their purpose
 .. code-block:: c
     :linenos:
 
-    static OS_MUTEX Voltage_Mutex;
+    static OS_MUTEX VoltageMutex;
     static uint16_t VoltageVal[NUM_BATTERY_MODULES]; //Voltage values gathered
 
 Miscellaneous
@@ -257,8 +257,8 @@ Punctuation
 
 **Curly Braces:** Opening braces should be on same line as condition or function that contains them. Curly braces should always 
 be used in coditional even if it is one line
-**Parentheses:** Should be used for clarifying oder of precedence.
-**Indentation:** Indentation should be used in all conditionals, iteratives, and functions. Indentation should be 4 spaces.
+**Parentheses:** Should be used for clarifying order of precedence.
+**Indentation:** Indentation should be used in all conditionals, iteratives, and functions. Indentation should be 4 spaces (NOT TABS).
 **Line Endings:** All End Of Line sequences should be LF(line feed). This prevents files from looking like they are changed when
 nothing was changed at all.
 
@@ -266,6 +266,6 @@ nothing was changed at all.
 Common Practice
 ===============
 
-**Pointers:** Members to pointers should be accessed through ``p->member`` operator instead of ``*(p).member``.
+**Pointers:** Members to pointers should be accessed through ``p->member`` operator instead of ``(p).member``.
 **Indentation:** Tabs should be 4 spaces. If a pull request is made and changes are made to files you did not edit, check to see
 if your editor is editing whitespace when opening files (for MAC users). If these issues are not fixed, your PR WILL NOT BE MERGED
