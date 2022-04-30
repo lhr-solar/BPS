@@ -12,4 +12,8 @@ RTE_Components.h
 __pycache__
 Docs/build/*
 Docs/souce/_build/*
+<<<<<<< HEAD
 .vscode/*
+=======
+.vscode/*
+>>>>>>> b01ece85628f81409751fa6c72987594bfa65704
