@@ -22,18 +22,16 @@ Contactor BSP
 =============
 
 Purpose
-    The contactor BSP interfaces with the :term:`GPIO <GPIO>` pins connected to the contactor. These pins are used to control the 
-    contactor (PB0) and to check the state of the contactor (PB1).
+    The contactor BSP interfaces with the :term:`GPIO <GPIO>` pins connected to the contactor. These pins are used to control the contactor (PB0) and to check 
+    the state of the contactor (PB1).
 
 Usage
-    The peripheral should be initialized by calling ``BSP_Contactor_Init()`` before any of the other functions are called. See 
-    ``BPS/BSP/BSP_Contactor.h`` for details on individual functions. The AUX pin we have connected to the contactor is negative 
-    logic so ``BSP_Contactor_GetState()`` reads negative logic for the state of the contactors.
+    The peripheral should be initialized by calling ``BSP_Contactor_Init()`` before any of the other functions are called. See ``BPS/BSP/BSP_Contactor.h`` 
+    for details on individual functions.
 
 Additional Considerations
-    The contactor is one of the most important safety features in the vehicle, so the contactor should only be turned on (closed) 
-    if the BPS is sure that the battery pack is in a safe state. All 3 of the contactors set pins are in series so calling 
-    ``BSP_Contactor_Off()`` or ``BSP_Contactor_Off()`` will turn all of them on or off.
+    The contactor is one of the most important safety features in the vehicle, so the contactor should only be turned on (closed) if the BPS is sure that the
+    battery pack is in a safe state.
 
 Fans BSP: Manthan Upadhyaya
 ==================================
@@ -220,8 +218,7 @@ Additional Considerations
     This can be done through software by not initializing the USART2 module or through hardware 
     with a switch to turn off power to the BLE module, or just removing it all together. 
 
-    ``UART3`` has a higher subpriority (subpriority level 0) than ``UART2`` (subpriority level 1). ``UART2`` and ``UART3`` 
-    (preemption priority level 1) both have a lower priority than the SPI interrupts (preemption priority level 0).
+    ``UART3`` has a higher subpriority (subpriority level 0) than ``UART2`` (subpriority level 1). ``UART2`` and ``UART3`` (preemption priority level 1) both have a lower priority than the SPI interrupts (preemption priority level 0).
 
 Watchdog Timer BSP: Sijin Woo
 =================================
