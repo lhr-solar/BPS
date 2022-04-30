@@ -44,6 +44,7 @@ Welcome to the BeVolt BPS documentation!
    :caption: How To
 
    How_To/Onboarding
+   How_To/coding-style.rst
 
 .. toctree::
    :hidden:
