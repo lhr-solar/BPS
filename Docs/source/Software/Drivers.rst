@@ -12,8 +12,8 @@ Usage
     In order to use these functions, ``LTC2315_Init()`` must be called first. The rest of the  functions are used to read 
     and write to the registers in the chip. In order to read the current you must call ``LTC2315_GetCurrent()`` which returns 
     the value of the current as an ``int16_t``. ``LTC2315_Calibrate()`` should be run on startup because it 
-    was observed that when the BPS is initially powered, there is a delay before the LTC2315
-	can be calibrated properly. This is not observed on pressing the reset button.
+    was observed that when the BPS is initially powered, there is a delay before the LTC2315 can be calibrated properly. 
+    This is not observed on pressing the reset button.
 
 Additional Considerations
     Communication with this chip is done with :term:`SPI <SPI>`. The scheduler is locked whenever communicating with this
