@@ -23,7 +23,7 @@ from assuming priority. Ex
 Enums
 =====
 
-Enum name should be in CamelCase and all element in enum should be all caps. They should be located in the header file. Ex:
+Enum names should be in CamelCase and all elements in enums should be in all caps. They should be located in the header file. Ex:
 
 .. code-block:: c
 
