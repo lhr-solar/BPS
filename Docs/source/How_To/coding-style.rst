@@ -231,7 +231,7 @@ Unnecessary variables should be avoided. i.e
     //YES BUENO
     if (function()) return;
 
-If functionality of code is affected by this (calling same function multiple time), then
+If the functionality of the code is affected by this (calling the same function multiple times), then
 it is fine to have a variable for the return value.
 
 ================
