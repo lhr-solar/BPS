@@ -72,7 +72,7 @@ holds the function declarations for the library.
 Library Names
 =============
 
-The name of the library depends on the layer that library is part of. 
+The name of the library depends on the layer that the library is part of. 
 
 Board Support Package (BSP)
 ---------------------------
