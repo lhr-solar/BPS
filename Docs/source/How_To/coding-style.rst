@@ -157,7 +157,7 @@ Header files should be formatted in the following method.
     7. Newline
 
 All header files should be surrounded with ``#ifndef`` and ``#endif``.
-Header files should only have amount of includes necessary for header file to work. For example, if a function returns an 
+Header files should only have the number of includes necessary for the header file to work. For example, if a function returns an 
 ``int``, then the header file should ``#include <stdint.h>``. However, if the source file calls ``memcpy`` in a function, it is not
 necessary for the header file to ``#include <stdlib.h>``.
 
