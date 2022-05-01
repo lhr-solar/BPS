@@ -220,7 +220,7 @@ Local Variables
 
 If variables have the same type, declare them on the same line if possible. 
 Meaningful names for variables that aren't used for iterations in loop. Should be written in camelCase.
-Unecessary variables should be avoided. i.e
+Unnecessary variables should be avoided. i.e
 
 .. code-block:: c
     :linenos:
