@@ -104,7 +104,7 @@ Application
 -----------
 
 Application-level library names should describe the functionality of the application. If the application library is for a task,
-it should be prefaced with the ``Task_`` prefix. the tasks name should be in CamelCase. Ex:
+it should be prefixed with the ``Task_`` prefix. the task's name should be in CamelCase. Ex:
 
 .. code-block:: c 
 
