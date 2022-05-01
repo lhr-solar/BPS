@@ -37,7 +37,7 @@ Structs
 =======
 
 All struct typedef names should have a descriptive name written in CamelCase and an appended ``_t``. The name of the struct should be
-in CamelCase and it's members should be written in camelCase to make it easier to understand gcc error messages. 
+in CamelCase and its members should be written in camelCase to make it easier to understand gcc error messages. 
 They should be located in the header file. Ex:
 
 .. code-block:: c
