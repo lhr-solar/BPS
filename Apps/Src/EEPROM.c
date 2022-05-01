@@ -8,7 +8,7 @@
 #include "M24128.h"
 
 // addresses for EEPROM data segments
-static const uint16_t EEPROM_CHARGE_ADDR = 0x0;
+#define EEPROM_CHARGE_ADDR  0x0
 static const uint16_t EEPROM_FAULT_ADDR  = (EEPROM_CHARGE_ADDR + sizeof(uint32_t));
 static const uint16_t MAX_FAULTS = 100;
 
