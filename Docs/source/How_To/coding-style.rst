@@ -10,7 +10,7 @@ Coding Style
 Macros and Constants
 ====================
 
-Should be written in snakecase with all caps. If a macro utilizes arithmetic, it should be covered in parentheses to prevent compiler
+Macros and constants should be written in snakecase with all caps. If a macro utilizes arithmetic, it should be covered in parentheses to prevent the compiler
 from assuming priority. Ex
 
 .. code-block:: c
