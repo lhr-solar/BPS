@@ -183,7 +183,7 @@ Public Functions
 
 The first section should be the layer that which the function resides. The second section should
 be separated by snakecase and have the library the function is a part of. The third section should
-also be separated by snakecase and describe the functions purpose. If there are multiple words in
+also be separated by snakecase and describe the function's purpose. If there are multiple words in
 the third section they should be written in CamelCase. Ex
 
 .. code-block:: c
