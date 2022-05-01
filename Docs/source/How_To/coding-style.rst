@@ -255,7 +255,7 @@ Miscellaneous
 Punctuation
 ============
 
-**Curly Braces:** Opening braces should be on same line as condition or function that contains them. Curly braces should always 
+**Curly Braces:** Opening braces should be on the same line as the condition or function that contains them. Curly braces should always 
 be used in coditional even if it is one line
 **Parentheses:** Should be used for clarifying order of precedence.
 **Indentation:** Indentation should be used in all conditionals, iteratives, and functions. Indentation should be 4 spaces (NOT TABS).
