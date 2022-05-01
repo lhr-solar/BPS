@@ -112,7 +112,7 @@ SafetyStatus Amps_CheckStatus(int32_t maxTemperature) {
  * @return true if charge, false if discharge
  */
 bool Amps_IsCharging(void) {
-	return latestMeasureMilliAmps < 0;
+	return latestMeasureMilliAmps + AMPS_NOISE_LIMIT < 0;
 }
 
 /** Amps_GetReading
