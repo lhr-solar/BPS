@@ -78,7 +78,7 @@ Board Support Package (BSP)
 ---------------------------
 
 BSP library file names should describe the feature of the microcontroller that is being used. They should all be in 
-snakecase with the first section being ``BSP_``. If the BSP library is for a specific functionality in the system, the name should
+snakecase with the first section being ``BSP_``. If the BSP library is for specific functionality in the system, the name should
 describe the functionality. Ex:
 
 .. code-block:: c
