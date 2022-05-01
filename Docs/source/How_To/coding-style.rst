@@ -181,7 +181,7 @@ All function declarations and definitions should have a comment paragraph descri
 Public Functions
 ================
 
-The first section should be the layer that the function resides in. The second section should
+The first section should be the layer that which the function resides. The second section should
 be separated by snakecase and have the library the function is a part of. The third section should
 also be separated by snakecase and describe the functions purpose. If there are multiple words in
 the third section they should be written in CamelCase. Ex
