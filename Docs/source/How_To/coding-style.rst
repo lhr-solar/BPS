@@ -140,7 +140,7 @@ If there is debugging functionality in the source file (that is not essential fo
 should surround all code necessary for that functionality. This consists of included files, ``printf`` statements, and other code
 inside functions that run at regular runtime. Debugging functions do not have to be surrounded. Static functions must be declare
 before all public functions. It is the prerogative of the programmer to have the static function definition at the start of the 
-source file or at the end.
+source file or the end.
 
 ============
 Header Files
