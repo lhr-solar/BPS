@@ -13,6 +13,13 @@
 #include "Tasks.h"
 #include "Amps.h"
 
+// for median filter
+// if you change this, you also need to change the calls to median()
+#define VOLT_MEDIAN_FILTER_DEPTH 3
+
+static uint16_t rawVoltages[NUM_BATTERY_MODULES][VOLT_MEDIAN_FILTER_DEPTH];
+static int32_t voltFilterIdx = VOLT_MEDIAN_FILTER_DEPTH - 1;
+
 static cell_asic *Minions;
 
 static OS_MUTEX Voltage_Mutex;
@@ -23,6 +30,20 @@ static uint32_t openWires[TOTAL_VOLT_WIRES];
  * But we standardized to have 3 decimal places to work with
  * millivolts
  */
+
+/**
+ * @brief find the median of three values
+ * 
+ * @param a first value
+ * @param b second value
+ * @param c third value
+ * @return the median
+ */
+static inline int32_t median(int32_t a, int32_t b, int32_t c) {
+	if ((a <= b && b < c) || (a >= b && b > c)) return b;
+	if ((a < b && a > c) || (b < a && a < c)) return a;
+	return c;
+}
 
 /** Voltage_Init
  * Initializes all device drivers including LTC6811 and GPIO to begin Voltage Monitoring
@@ -62,6 +83,16 @@ void Voltage_Init(cell_asic *boards){
   	OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
   	assertOSError(err);
 	
+	// initialize median filter
+
+	// set up the median filter with alternating voltages of 0 volts and 5 volts
+	for (int32_t filterIdx = 0; filterIdx < VOLT_MEDIAN_FILTER_DEPTH - 1; ++filterIdx) {
+		for (int32_t module = 0; module < NUM_BATTERY_MODULES; ++module) {
+			rawVoltages[module][filterIdx] = (filterIdx & 0x1) ? 50000 : 0;
+		}
+	}
+	// median filter should start pointing to the last set of temperature readings
+	voltFilterIdx = VOLT_MEDIAN_FILTER_DEPTH - 1;
 }
 
 /** Voltage_UpdateMeasurements
@@ -82,10 +113,21 @@ void Voltage_UpdateMeasurements(void){
   	assertOSError(err);
 	LTC6811_rdcv_safe(0, NUM_MINIONS, Minions); // Set to read back all cell voltage registers
 	//copies values from cells.c_codes to private array
+
+	// run median filter
+	for(int i = 0; i < NUM_BATTERY_MODULES; i++){
+		rawVoltages[i][voltFilterIdx] = Minions[i / MAX_VOLT_SENSORS_PER_MINION_BOARD].cells.c_codes[i % MAX_VOLT_SENSORS_PER_MINION_BOARD];
+	}
+	voltFilterIdx = (voltFilterIdx + 1) % VOLT_MEDIAN_FILTER_DEPTH;
+
+	// update public voltage values
 	OSMutexPend(&Voltage_Mutex, 0, OS_OPT_PEND_BLOCKING, &ts, &err);
   	assertOSError(err);
 	for(int i = 0; i < NUM_BATTERY_MODULES; i++){
-		VoltageVal[i] = Minions[i / MAX_VOLT_SENSORS_PER_MINION_BOARD].cells.c_codes[i % MAX_VOLT_SENSORS_PER_MINION_BOARD];
+		// you need to change this if you change VOLT_MEDIAN_FILTER_DEPTH
+		VoltageVal[i] = median(rawVoltages[i][0],
+							   rawVoltages[i][1],
+							   rawVoltages[i][2]);
 	}
 	//release mutex
   	OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);

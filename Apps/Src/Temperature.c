@@ -11,13 +11,13 @@
 #include "BSP_PLL.h"
 
 // if you change this, you also need to change the calls to median()
-#define MEDIAN_FILTER_DEPTH 3
+#define TEMPERATURE_MEDIAN_FILTER_DEPTH 3
 
 void delay_u(uint16_t micro);
 
 // median filter for temperature values
-static int32_t medianFilterIdx = MEDIAN_FILTER_DEPTH - 1;
-static int32_t rawTemperatures[NUM_MINIONS][MAX_TEMP_SENSORS_PER_MINION_BOARD][MEDIAN_FILTER_DEPTH];
+static int32_t medianFilterIdx = TEMPERATURE_MEDIAN_FILTER_DEPTH - 1;
+static int32_t rawTemperatures[NUM_MINIONS][MAX_TEMP_SENSORS_PER_MINION_BOARD][TEMPERATURE_MEDIAN_FILTER_DEPTH];
 
 // Holds the temperatures in Celsius (Fixed Point with .001 resolution) for each sensor on each board
 static int32_t temperatures[NUM_MINIONS][MAX_TEMP_SENSORS_PER_MINION_BOARD];
@@ -41,8 +41,8 @@ static cell_asic *Minions;
  * @return the median
  */
 static inline int32_t median(int32_t a, int32_t b, int32_t c) {
-	if (a <= b && b < c) return b;
-	if (a < b && a > c) return a;
+	if ((a <= b && b < c) || (a >= b && b > c)) return b;
+	if ((a < b && a > c) || (b < a && a < c)) return a;
 	return c;
 }
 
@@ -73,7 +73,7 @@ void Temperature_Init(cell_asic *boards){
   	assertOSError(err);
 
 	// set up the median filter with alternating temperatures of 1000 degrees and 0 degrees
-	for (int32_t filterIdx = 0; filterIdx < MEDIAN_FILTER_DEPTH - 1; ++filterIdx) {
+	for (int32_t filterIdx = 0; filterIdx < TEMPERATURE_MEDIAN_FILTER_DEPTH - 1; ++filterIdx) {
 		for (int32_t minion = 0; minion < NUM_MINIONS; ++minion) {
 			for (int32_t sensor = 0; sensor < MAX_TEMP_SENSORS_PER_MINION_BOARD; ++sensor) {
 				rawTemperatures[minion][sensor][filterIdx] = (filterIdx & 0x1) ? 1000000 : 0;
@@ -81,7 +81,7 @@ void Temperature_Init(cell_asic *boards){
 		}
 	}
 	// median filter should start pointing to the last set of temperature readings
-	medianFilterIdx = MEDIAN_FILTER_DEPTH - 1;
+	medianFilterIdx = TEMPERATURE_MEDIAN_FILTER_DEPTH - 1;
 
 }
 
@@ -212,7 +212,7 @@ ErrorStatus Temperature_UpdateSingleChannel(uint8_t channel){
 	}
 
 	// increment the median filter index
-	medianFilterIdx = (medianFilterIdx + 1) % MEDIAN_FILTER_DEPTH;
+	medianFilterIdx = (medianFilterIdx + 1) % TEMPERATURE_MEDIAN_FILTER_DEPTH;
 
 	// update the filtered values
 	// you need to change this if you change 
