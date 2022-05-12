@@ -108,7 +108,7 @@ it should be prefixed with the ``Task_`` prefix. the task's name should be in Ca
 
 .. code-block:: c 
 
-    EEProm.c //interface with EEPROM
+    EEPROM.c //interface with EEPROM
     Temperature.c
     Task_TaskName.c
 
