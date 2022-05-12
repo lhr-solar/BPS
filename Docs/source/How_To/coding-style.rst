@@ -158,7 +158,7 @@ Header files should be formatted in the following method.
 
 All header files should be surrounded with ``#ifndef`` and ``#endif``.
 Header files should only have the number of includes necessary for the header file to work. For example, if a function returns an 
-``int``, then the header file should ``#include <stdint.h>``. However, if the source file calls ``memcpy`` in a function, it is not
+``int32_t``, then the header file should ``#include <stdint.h>``. However, if the source file calls ``memcpy`` in a function, it is not
 necessary for the header file to ``#include <stdlib.h>``.
 
 Functions
