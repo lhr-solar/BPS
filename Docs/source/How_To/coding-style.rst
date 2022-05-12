@@ -65,8 +65,8 @@ header file, written in CamelCase, and appended with an ``_t``. Members of the u
 Libraries
 =========
 
-All libraries are separated into source files and header files. The source file consists of the source code and the header file
-holds the function declarations for the library. 
+All libraries are separated into source files and header files. The source file consists of the implementation and the header file
+holds the interface. 
 
 =============
 Library Names
