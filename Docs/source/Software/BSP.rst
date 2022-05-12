@@ -32,7 +32,7 @@ Usage
 
 Additional Considerations
     The contactor is one of the most important safety features in the vehicle, so the contactor should only be turned on (closed) 
-    if the BPS is sure that the battery pack is in a safe state. All 3 of the contactors set pins are in series so calling 
+    if the BPS is sure that the battery pack is in a safe state. All 3 of the contactors set pins are in parallel so calling 
     ``BSP_Contactor_Off()`` or ``BSP_Contactor_Off()`` will turn all of them on or off.
 
 Fans BSP: Manthan Upadhyaya
