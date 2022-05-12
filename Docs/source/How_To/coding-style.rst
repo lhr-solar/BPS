@@ -229,7 +229,9 @@ Unnecessary variables should be avoided. i.e
     int x = function();
     if (x) return;
     //YES BUENO
-    if (function()) return;
+    if (function()) {
+        return;
+    }
 
 If the functionality of the code is affected by this (calling the same function multiple times), then
 it is fine to have a variable for the return value.
