@@ -266,6 +266,6 @@ nothing was changed at all.
 Common Practice
 ===============
 
-**Pointers:** Members to pointers should be accessed through ``p->member`` operator instead of ``(p).member``.
+**Pointers:** Members to pointers should be accessed through ``p->member`` operator instead of ``(*p).member``.
 **Indentation:** Tabs should be 4 spaces. If a pull request is made and changes are made to files you did not edit, check to see
 if your editor is editing whitespace when opening files (for MAC users). If these issues are not fixed, your PR WILL NOT BE MERGED
