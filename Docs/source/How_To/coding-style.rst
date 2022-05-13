@@ -23,15 +23,16 @@ from assuming priority. Ex
 Enums
 =====
 
-Enum names should be in CamelCase and all elements in enums should be in all caps. They should be located in the header file. Ex:
+Enum names should be in CamelCase with ``_e`` postfixed and all elements in enums should be in all caps. They should be located in the 
+header file unless they are only used within the library. Ex:
 
 .. code-block:: c
 
-    enum ExampleEnum {
+    typedef enum {
         ELEMENT_ONE;
         ELEMENT_TWO;
         ELEMENT_THREE;
-        };
+        }ExampleEnum_e;
 
 Structs
 =======
@@ -62,6 +63,52 @@ header file, written in CamelCase, and appended with an ``_t``. Members of the u
 	    float f;
     } CANData_t;
 
+Necessary Case: Since we could be sending either 8 bits, or 64 bits, it is necessary to have a union that packs all the diffferent
+data types into one memory address and zero pads the rest of the unused spaces. This is better than having 4 different variables 
+and using the proper variable at the proper time.
+
+.. code-block:: c
+
+    typedef union {
+    	uint8_t b;
+    	uint16_t h;
+    	uint32_t w;
+    	uint64_t d;
+    } CANData_t;
+
+Usage:
+
+.. code-block:: c
+
+    CANData_t Data;
+    uint8_t byte = 7;
+    Data.b = byte;
+
+Unnecessary Case: This union was created so the values of each fault could be accessed either through the bitmap or through the struct
+within the union. In one case, the bitmap could be read by checking each bit in the byte sized variable, or you could check each
+individual Fault value to see if it is set to 1. This is unncecessary and makes the code more difficult to read and use. 
+
+.. code-block:: c
+
+    typedef union{
+        uint8_t bitmap;
+        struct{
+            State Fault_OS : 1;         // for OS faults
+            State Fault_UNREACH : 1;    // for unreachable conditions
+            State Fault_TRITIUM : 1;      // for errors sent from the tritium
+            State Fault_READBPS : 1;    // for unsuccessfully reading from BPS CAN
+            State Fault_DISPLAY : 1;    // for display faults
+        };
+    } fault_bitmap_t;
+
+Usage:
+
+.. code-block:: c
+
+    fault_bitmap_t FaultBitmap;
+    FaultBitmap.bitmap |= 0x02;
+    FaultBitmap.Fault_UNREACH = 1;
+
 Libraries
 =========
 
@@ -85,8 +132,8 @@ describe the functionality. Ex:
 
     BSP_ADC.c //Microcontroller Feature
     BSP_ADC.h
-    BSP_Fans.c //Interface with system
-    BSP_Fans.h
+    BSP_PWM.c //Interface with system
+    BSP_PWM.h
 
 Drivers
 -------
@@ -110,7 +157,18 @@ it should be prefixed with the ``Task_`` prefix. the task's name should be in Ca
 
     EEPROM.c //interface with EEPROM
     Temperature.c
-    Task_TaskName.c
+
+Core
+----
+
+Core level library name should be prefixed by ``Task_`` and then the name of the task. The name of the task should be in CamelCase and
+accurately describe what the task is doing. This is the highest level and care should be taken to make sure that most logic is done in the
+lower levels.
+
+.. code-block:: c 
+
+    Task_BatteryBalance.c //interface with EEPROM
+    Task_VoltTempMonitor.c
 
 ============
 Source Files
@@ -138,9 +196,9 @@ The trademark/description should adhere to the following format:
 Included files should only be what is necessary for the source code to run. Defines should follow Macro coding style.
 If there is debugging functionality in the source file (that is not essential for the system to run), ``#ifdef DEBUG`` and ``endif``
 should surround all code necessary for that functionality. This consists of included files, ``printf`` statements, and other code
-inside functions that run at regular runtime. Debugging functions do not have to be surrounded. Static functions must be declare
+inside functions that run at regular runtime. Debugging functions do not have to be surrounded. Static functions must be declared
 before all public functions. It is the prerogative of the programmer to have the static function definition at the start of the 
-source file or the end.
+source file or the end. More information can be found in the Private Functions Section.
 
 ============
 Header Files
@@ -156,7 +214,15 @@ Header files should be formatted in the following method.
     6. Endifs
     7. Newline
 
-All header files should be surrounded with ``#ifndef`` and ``#endif``.
+All header files should be surrounded with header guards. For example::
+    
+    #ifndef HEADER_H
+    #define HEADER_H
+    
+    // your code here
+    
+    #endif
+
 Header files should only have the number of includes necessary for the header file to work. For example, if a function returns an 
 ``int32_t``, then the header file should ``#include <stdint.h>``. However, if the source file calls ``memcpy`` in a function, it is not
 necessary for the header file to ``#include <stdlib.h>``.
@@ -168,7 +234,8 @@ Functions
 Descriptions
 ============
 
-All function declarations and definitions should have a comment paragraph description that follows the specified format.::
+All function declarations and definitions should have a comment paragraph description that follows the specified format provided by 
+`Doxygen <https://www.doxygen.nl/>`__. ::
 
     /**
      * NOTE: Include anything important someone else will need to know
@@ -181,25 +248,24 @@ All function declarations and definitions should have a comment paragraph descri
 Public Functions
 ================
 
-The first section should be the layer that which the function resides. The second section should
-be separated by snakecase and have the library the function is a part of. The third section should
+The first section should be separated by snakecase and have the library the function is a part of. The second section should
 also be separated by snakecase and describe the function's purpose. If there are multiple words in
-the third section they should be written in CamelCase. Ex
+the second section they should be written in CamelCase. Ex
 
 .. code-block:: c
 
-    Layer_Library_Function();
-    BSP_Contactor_GetState();
+    Library_Function();
+    Contactor_GetState();
 
-Descriptions for public functions should be included above the function definition in the source
-file and above the declaration in the header file.
+Descriptions for public functions should be included above the function definition in the source file and above the declaration 
+in the header file.
 
 =================
 Private Functions
 =================
 
-Code duplication should be avoided by using private functions instead. Their format is the same as public functions but 
-do not need to have the layer section in their name. Their description should be included in the source file, not the header file.
+Code duplication should be avoided by using private functions instead. Their format is the same as public functions but their description 
+should be included in the source file, not the header file. All private functions should be ``static`` and can be implemented in one of two ways.
 
 .. code-block:: c
 
@@ -210,6 +276,33 @@ do not need to have the layer section in their name. Their description should be
      * @return What function returns
      */
     static void ADC_InitDMA(void);
+
+Implementation One: Preferred for longer function blocks
+
+.. code-block:: c 
+
+    //Start of Source File
+    static void Static_FunctionOne(inone, intwo, inthree);
+
+    //Source code with calls to function
+
+    static void Static_FunctionOne(inone, intwo, inthree){
+        //code for static function
+    }
+
+Implementation Two: Preferred for shorter function blocks
+
+.. code-block:: c 
+
+    //Start of Source File
+    static void Static_FunctionOne(inone, intwo, inthree){
+        //code for static function
+    }
+
+    //Source code with calls to function
+
+These implementations should not be mixed within the same source file (i.e you cannot have some static functions defined at the start of the file
+and some at the end).
 
 Variables
 =========
@@ -270,4 +363,4 @@ Common Practice
 
 **Pointers:** Members to pointers should be accessed through ``p->member`` operator instead of ``(*p).member``.
 **Indentation:** Tabs should be 4 spaces. If a pull request is made and changes are made to files you did not edit, check to see
-if your editor is editing whitespace when opening files (for MAC users). If these issues are not fixed, your PR WILL NOT BE MERGED
+if your editor is editing whitespace when opening files. If these issues are not fixed, your PR WILL NOT BE MERGED

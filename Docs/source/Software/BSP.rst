@@ -220,9 +220,6 @@ Additional Considerations
     This can be done through software by not initializing the USART2 module or through hardware 
     with a switch to turn off power to the BLE module, or just removing it all together. 
 
-    ``UART3`` has a higher subpriority (subpriority level 0) than ``UART2`` (subpriority level 1). ``UART2`` and ``UART3`` 
-    (preemption priority level 1) both have a lower priority than the SPI interrupts (preemption priority level 0).
-
 Watchdog Timer BSP: Sijin Woo
 =================================
 
