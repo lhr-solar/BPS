@@ -14,6 +14,6 @@
  * @param   Minions array of the ICs that the modules are connected to
  * @return  None
  */
-void Balancing_Balance(cell_asic Minions[]);
+void BattBalancing_Balance(cell_asic Minions[]);
 
 #endif

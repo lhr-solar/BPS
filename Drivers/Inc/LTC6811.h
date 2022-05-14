@@ -67,7 +67,7 @@ Copyright 2017 Linear Technology Corp. (LTC)
 // Discharge Permitted?
 //	0 : Disabled
 //	1 : Enabled
-#define ADC_DCP									0
+#define ADC_DCP									1
 
 // Cell channels to measure (binary)
 // 	000 : All cells
