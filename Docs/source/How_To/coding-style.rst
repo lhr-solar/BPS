@@ -63,7 +63,7 @@ header file, written in CamelCase, and appended with an ``_t``. Members of the u
 	    float f;
     } CANData_t;
 
-Necessary Case: Since we could be sending either 8 bits, or 64 bits, it is necessary to have a union that packs all the diffferent
+Necessary Case: Since we could be sending either 8 bits, or 64 bits, it is necessary to have a union that packs all the different
 data types into one memory address and zero pads the rest of the unused spaces. This is better than having 4 different variables 
 and using the proper variable at the proper time.
 
@@ -158,10 +158,10 @@ it should be prefixed with the ``Task_`` prefix. the task's name should be in Ca
     EEPROM.c //interface with EEPROM
     Temperature.c
 
-Core
-----
+Tasks
+-----
 
-Core level library name should be prefixed by ``Task_`` and then the name of the task. The name of the task should be in CamelCase and
+Task level library names should be prefixed by ``Task_`` and then the name of the task. The name of the task should be in CamelCase and
 accurately describe what the task is doing. This is the highest level and care should be taken to make sure that most logic is done in the
 lower levels.
 
@@ -198,7 +198,7 @@ If there is debugging functionality in the source file (that is not essential fo
 should surround all code necessary for that functionality. This consists of included files, ``printf`` statements, and other code
 inside functions that run at regular runtime. Debugging functions do not have to be surrounded. Static functions must be declared
 before all public functions. It is the prerogative of the programmer to have the static function definition at the start of the 
-source file or the end. More information can be found in the Private Functions Section.
+source file or the end. More information can be found in the :ref:`Private Functions`.
 
 ============
 Header Files
@@ -341,7 +341,8 @@ being shared. All global variables should have comments describing their purpose
     :linenos:
 
     static OS_MUTEX VoltageMutex;
-    static uint16_t VoltageVal[NUM_BATTERY_MODULES]; //Voltage values gathered
+    static uint16_t Voltages[NUM_BATTERY_MODULES]; //Voltage values gathered
+    static int32_t Temperatures[NUM_MINIONS][MAX_TEMP_SENSORS_PER_MINION_BOARD];
 
 Miscellaneous
 =============
