@@ -170,6 +170,21 @@ lower levels.
     Task_BatteryBalance.c //interface with EEPROM
     Task_VoltTempMonitor.c
 
+Tests
+-----
+
+Files in the test library are used to test libraries of all layers. These should all be source files that are prefixed with ``Test_``. The 
+following name should be the library that it is testing. If there are multiple things to be tested for each library, additional tests can 
+be created for them with the specific test appended in snakecase. For example,
+
+.. code-block:: c
+
+    Test_EEPROM_Read.c //For Driver EEPROM
+    Test_EEPROM_Write.c
+    Test_Temperature.c //For Application Temperature
+    Test_BatteryBalance.c //For Application Battery Balancing
+    Test_Task_BatteryBalance.c //For Task Battery Balancing
+
 ============
 Source Files
 ============
@@ -191,6 +206,16 @@ The trademark/description should adhere to the following format:
     /* Copyright (c) <YEAR> UT Longhorn Racing Solar */
     /** DRIVER.c
     * DESCRIPTION
+    */
+
+Descriptions of Test Files should adhere to the following format:
+
+.. code-block:: c
+
+    /* Copyright (c) <YEAR> UT Longhorn Racing Solar */
+    /** DRIVER.c
+    * Steps to performing tests
+    * What results to expect and how to determine if library functions
     */
 
 Included files should only be what is necessary for the source code to run. Defines should follow Macro coding style.
