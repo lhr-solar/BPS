@@ -15,13 +15,13 @@ void Task_BatteryBalance(void *p_arg) {
     while(1){
         BattBalancing_Balance(Minions);
         //signal watchdog
-        OSMutexPend(&WDog_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
+        /*OSMutexPend(&WDog_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
         assertOSError(err);
 
         WDog_BitMap |= WD_BALANCING;
 
         OSMutexPost(&WDog_Mutex, OS_OPT_POST_NONE, &err);
-        assertOSError(err);
+        assertOSError(err);*/
 
 
         //delay of 100ms

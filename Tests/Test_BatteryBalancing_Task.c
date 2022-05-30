@@ -14,9 +14,11 @@
  * 2. Flash the BPS (see README.md)
  * 3. Connect the BPS UART USB to your laptop and open PuTTY (or comparable)
  * 4. Connect the BPS test board
- * 5. Keep all modules at half voltage except one (of your choice) and keep that at full
+ * 5. If possible, keep all modules at half voltage except one (of your choice) and keep that at full
+ *  a) Otherwise, measure batteries manually and see which ones are off balance. 
+ *     If none are, change balancing tolerance.
  * 6. Reset the BPS by pressing and releasing the reset button
- * 7. Measure the voltage across the appropriate resistor to ensure there is a voltage drop
+ * 7. Check battery balance diodes to see which ones are turning on (indicating that battery is being balanced)
  * 8. Repeat 5-7 for different modules
  * 9. Put all modules to full voltage except one (leaving it at half)
  * 10. Measure the voltage across each of the resistors besides the half voltage module
@@ -87,7 +89,6 @@ void Task1(void* p_arg) {
 int main(void) {
     OS_ERR err;
     BSP_PLL_Init();
-
     OSInit(&err);
     assertOSError(err);
     
@@ -107,5 +108,4 @@ int main(void) {
     assertOSError(err);
 
     OSStart(&err);
-    return 0;
 }

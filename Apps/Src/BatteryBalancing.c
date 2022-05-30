@@ -9,7 +9,17 @@
 #include "os.h"
 #include "Tasks.h"
 
+#define MAX_CONNECTIONS_PER_MINION 12
+
 static uint16_t BattBalancing_GetMinimumVoltage(void);
+static bool dcc[NUM_MINIONS][MAX_CONNECTIONS_PER_MINION];
+
+void BattBalancing_Init(void){
+	for (int i = 0; i < NUM_MINIONS; i++){
+		memset(dcc[i], 0, sizeof(dcc[i]));
+	}
+	
+}
 
 /**
  * @brief   Loops through all 31 modules, sets discharge bits for any module if its voltage is too high, and clears discharge bits for any modules with voltages that are too low
@@ -19,23 +29,23 @@ static uint16_t BattBalancing_GetMinimumVoltage(void);
 void BattBalancing_Balance(cell_asic Minions[]){ 
 	OS_ERR err;
 	uint16_t lowest = BattBalancing_GetMinimumVoltage(); //get lowest voltage
-	bool dcc[MAX_VOLT_SENSORS_PER_MINION_BOARD];
 	uint8_t module = 0;
 	for (uint8_t i = 0; i < NUM_MINIONS; i++){
 		for(uint8_t j = 0; j < MODULES_PER_MINION[i]; j++) {	
 			uint16_t voltage = Voltage_GetModuleMillivoltage(module);
 			if (voltage > lowest + BALANCING_TOLERANCE_START) {	
-				dcc[j] = true;	
+				dcc[i][j] = true;	
 			}
 			else if(voltage < lowest + BALANCING_TOLERANCE_STOP) { //Clear discharge bit of module if it reaches minimum
-				dcc[j] = false;
+				dcc[i][j] = false;
 			}
+			
 			module++;
 		}
 		OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
 		assertOSError(err);
-
-		LTC681x_set_cfgr_dis(i, Minions, dcc); //set discharge bits
+		
+		LTC681x_set_cfgr_dis(i, Minions, dcc[i]); //set discharge bits
 		LTC6811_wrcfg(NUM_MINIONS, Minions); //write to LTC minions
 	
 		OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
