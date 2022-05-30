@@ -147,7 +147,7 @@ INIT (MF_TYPE_NAME *filter, MF_TYPE low, MF_TYPE high) {
 /**
  * @brief update the median filter by giving it a new set of values for all channels
  * 
- * @param filter    a pointer to the median filter to initialize
+ * @param filter    a pointer to the median filter
  * @param channels  a complete set of new values for all channels to add to the median filter
  * 
  */
@@ -162,18 +162,18 @@ PUT (MF_TYPE_NAME *filter, MF_TYPE *channels) {
 /**
  * @brief get a complete set of filtered values for all channels
  * 
- * @param filter    a pointer to the median filter to initialize
+ * @param filter    a pointer to the median filter
  * @param dest      a pointer to a buffer to store all of the filtered values
  */
 static inline void __attribute__((unused))
 GET (MF_TYPE_NAME *filter, MF_TYPE *dest) {
-    memcpy(dest, filter->filtered, sizeof(filter->filtered));
+    memcpy(dest, filter->filtered, sizeof(MF_TYPE) * MF_CHANNELS);
 }
 
 /**
  * @brief get a filtered value for a single channel in the median filter
  * 
- * @param filter    a pointer to the median filter to initialize
+ * @param filter    a pointer to the median filter
  * @param channel   the channel to read
  * @return the filtered value
  */
