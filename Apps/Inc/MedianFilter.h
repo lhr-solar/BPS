@@ -153,10 +153,16 @@ INIT (MF_TYPE_NAME *filter, MF_TYPE low, MF_TYPE high) {
  */
 static inline void __attribute__((unused))
 PUT (MF_TYPE_NAME *filter, MF_TYPE *channels) {
+    // put the new data into the filter
     for (uint32_t channel = 0; channel < MF_CHANNELS; ++channel) {
         filter->raw[channel][filter->index] = channels[channel];
     }
-    ++(filter->index);
+    (filter->index) = (filter->index + 1) % MF_DEPTH;
+
+    // update the list of filtered values
+    for (uint32_t channel = 0; channel < MF_CHANNELS; ++channel) {
+        filter->filtered[channel] = MEDIAN(filter->raw[channel]);
+    }
 }
 
 /**
