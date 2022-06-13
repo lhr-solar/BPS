@@ -18,7 +18,6 @@ void BattBalancing_Init(void){
 	for (int i = 0; i < NUM_MINIONS; i++){
 		memset(dcc[i], 0, sizeof(dcc[i]));
 	}
-	
 }
 
 /**
@@ -42,15 +41,17 @@ void BattBalancing_Balance(cell_asic Minions[]){
 			
 			module++;
 		}
-		OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
-		assertOSError(err);
-		
-		LTC681x_set_cfgr_dis(i, Minions, dcc[i]); //set discharge bits
-		LTC6811_wrcfg(NUM_MINIONS, Minions); //write to LTC minions
-	
-		OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
-		assertOSError(err);
 	}
+	OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
+	assertOSError(err);
+	
+	for (uint8_t i = 0; i < NUM_MINIONS; i++){
+		LTC681x_set_cfgr_dis(i, Minions, dcc[i]); //set discharge bits
+	}
+	LTC6811_wrcfg(NUM_MINIONS, Minions); //write to LTC minions
+	
+	OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
+	assertOSError(err);
 }
 
 /**

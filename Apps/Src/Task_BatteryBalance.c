@@ -11,7 +11,8 @@ void Task_BatteryBalance(void *p_arg) {
     (void)p_arg;
 
     OS_ERR err;
-
+    BattBalancing_Init();
+    
     while(1){
         BattBalancing_Balance(Minions);
         //signal watchdog

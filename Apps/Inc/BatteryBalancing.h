@@ -9,6 +9,8 @@
 #include "LTC6811.h"
 #include "Voltage.h"
 
+void BattBalancing_Init(void);
+
 /**
  * @brief   Loops through all 31 modules, sets discharge bits for any module if its voltage is 
  *          too high, and clears discharge bits for any modules with voltages that are too low
