@@ -39,15 +39,16 @@ typedef enum SafetyStatus_e {SAFE = 0, DANGER = 1, OVERVOLTAGE = 2, UNDERVOLTAGE
 #define MIN_VOLTAGE_CHARGING_LIMIT      2550        // Under voltage limit for charging (milliVolts) 
 #define MIN_VOLTAGE_LIMIT				2700		// Under voltage limit (milliVolts)	(actual min: 2.5V)
 #define MAX_VOLTAGE_LIMIT				4000		// Over voltage limit (milliVolts)		(actual max: 4.2V)
+#define CHARGE_DISABLE_VOLTAGE          3900        // Voltage to stop charging at
 
-#define MAX_DISCHARGE_TEMPERATURE_LIMIT	60000	// Max temperature limit (milliCelcius)	(recommended release: 60.00C)
-#define MAX_CHARGE_TEMPERATURE_LIMIT	45000	// Max temperature limit (milliCelcius)	(recommended release: 45.00C)
+#define MAX_DISCHARGE_TEMPERATURE_LIMIT	60000	    // Max temperature limit (milliCelcius)	(recommended release: 60.00C)
+#define MAX_CHARGE_TEMPERATURE_LIMIT	45000	    // Max temperature limit (milliCelcius)	(recommended release: 45.00C)
 
 #define MAX_CURRENT_LIMIT				75000		// Max current limit (Milliamperes)		(Max continuous discharge is 15A per cell)
 #define MAX_CHARGING_CURRENT 			-20000		// Max current per cell is 1.5 Amps (Standard charge)
 
-#define BALANCING_TOLERANCE_START       50      //mV differential from lowest module that will start battery balancing
-#define BALANCING_TOLERANCE_STOP        20      //mV differential from lowest module that will stop battery balancing
+#define BALANCING_TOLERANCE_START       50          //mV differential from lowest module that will start battery balancing
+#define BALANCING_TOLERANCE_STOP        20          //mV differential from lowest module that will stop battery balancing
 //--------------------------------------------------------------------------------
 // Helpers
 #define STARTUP_WAIT_TIME				100000 // Number of iterations to wait for battery charging instructions on startup
