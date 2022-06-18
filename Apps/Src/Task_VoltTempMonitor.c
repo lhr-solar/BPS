@@ -55,6 +55,7 @@ void Task_VoltTempMonitor(void *p_arg) {
             voltageHasBeenChecked = true;
         }
         //Send measurements to CAN queue
+        bool charge_enable = true;
         CanMsg.id = VOLT_DATA;
         for (int i = 0; i < NUM_BATTERY_MODULES; i++){ //send all battery module voltage data
             CanPayload.idx = i;
@@ -63,6 +64,9 @@ void Task_VoltTempMonitor(void *p_arg) {
             CanPayload.data = CanData;
             CanMsg.payload = CanPayload;
             CAN_Queue_Post(CanMsg);
+            if (voltage > CHARGE_DISABLE_VOLTAGE){
+                charge_enable = false;
+            }
         }
 
         // BLOCKING =====================
@@ -109,7 +113,7 @@ void Task_VoltTempMonitor(void *p_arg) {
 
             temperatureHasBeenChecked = true;
         }
-        bool charge_enable = true;
+
         //Check if car should be allowed to charge or not
         for (uint8_t board = 0; board < NUM_MINIONS; board++) {
             for (int sensor = 0; sensor < MAX_TEMP_SENSORS_PER_MINION_BOARD; sensor++) {
