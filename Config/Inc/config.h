@@ -38,8 +38,8 @@ typedef enum SafetyStatus_e {SAFE = 0, DANGER = 1, OVERVOLTAGE = 2, UNDERVOLTAGE
 // MAX and MIN limits of lithium ion cells
 #define MIN_VOLTAGE_CHARGING_LIMIT      2550        // Under voltage limit for charging (milliVolts) 
 #define MIN_VOLTAGE_LIMIT				2700		// Under voltage limit (milliVolts)	(actual min: 2.5V)
-#define MAX_VOLTAGE_LIMIT				4000		// Over voltage limit (milliVolts)		(actual max: 4.2V)
-#define CHARGE_DISABLE_VOLTAGE          3900        // Voltage to stop charging at
+#define MAX_VOLTAGE_LIMIT				4100		// Over voltage limit (milliVolts)		(actual max: 4.2V)
+#define CHARGE_DISABLE_VOLTAGE          4000        // Voltage to stop charging at
 
 #define MAX_DISCHARGE_TEMPERATURE_LIMIT	60000	    // Max temperature limit (milliCelcius)	(recommended release: 60.00C)
 #define MAX_CHARGE_TEMPERATURE_LIMIT	45000	    // Max temperature limit (milliCelcius)	(recommended release: 45.00C)
