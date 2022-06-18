@@ -41,6 +41,11 @@ typedef enum SafetyStatus_e {SAFE = 0, DANGER = 1, OVERVOLTAGE = 2, UNDERVOLTAGE
 #define MAX_VOLTAGE_LIMIT				4100		// Over voltage limit (milliVolts)		(actual max: 4.2V)
 #define CHARGE_DISABLE_VOLTAGE          4000        // Voltage to stop charging at
 
+// make sure we don't enable charging if we're too close to the voltage limit
+#if MAX_VOLTAGE_LIMIT - 100 < CHARGE_DISABLE_VOLTAGE
+#error "Charging maximum voltage is too close to voltage trip limit!"
+#endif
+
 #define MAX_DISCHARGE_TEMPERATURE_LIMIT	60000	    // Max temperature limit (milliCelcius)	(recommended release: 60.00C)
 #define MAX_CHARGE_TEMPERATURE_LIMIT	45000	    // Max temperature limit (milliCelcius)	(recommended release: 45.00C)
 
