@@ -1,6 +1,9 @@
 # Battery Protection System Code
 This repo contains all code related to LHR Solar's Battery Protection System (BPS)
 
+# BPS Documentation
+https://bps.readthedocs.io/en/latest/
+
 ## Setup
 Development is done in a linux environment to build and flash the BPS program.
 
