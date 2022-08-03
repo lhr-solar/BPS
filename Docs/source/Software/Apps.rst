@@ -12,8 +12,8 @@ Usage
     In order to call any functions in this app ``Amps_Init()`` must be called first. One thing to note
     is that if you want to read the current, you must call ``Amps_UpdateMeasurements()`` first and 
     then call ``Amps_GetReading()``. ``Amps_Calibrate()`` should be run on startup because it 
-    was observed that when the BPS is initially powered, there is a delay before the LTC2315
-	can be calibrated properly. This is not observed on pressing the reset button.
+    was observed that when the BPS is initially powered, there is a delay before the LTC2315 
+    can be calibrated properly. This is not observed on pressing the reset button.
 
 Additional Considerations
     To make it compatible with both Bare-Metal and RTOS, some functions meant for RTOS are left empty
