@@ -49,6 +49,7 @@ void Task1(void* p_arg) {
 	OS_CPU_SysTickInit(SystemCoreClock / (CPU_INT32U) OSCfg_TickRate_Hz);
     OS_ERR err;
 
+    /*
     OSTaskCreate(
         &BatteryBalance_TCB,				// TCB
         "TASK_BATTERY_BALANCE",	// Task Name (String)
@@ -64,6 +65,7 @@ void Task1(void* p_arg) {
         OS_OPT_TASK_STK_CHK | OS_OPT_TASK_SAVE_FP,	// Options
         &err
     );					// return err code}
+    */
 
     OSTaskCreate(
         &UpdateVoltage_TCB,				// TCB

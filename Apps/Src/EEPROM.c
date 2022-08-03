@@ -8,7 +8,7 @@
 #include "M24128.h"
 
 // addresses for EEPROM data segments
-static const uint16_t EEPROM_CHARGE_ADDR = 0x0;
+#define EEPROM_CHARGE_ADDR  0x0
 static const uint16_t EEPROM_FAULT_ADDR  = (EEPROM_CHARGE_ADDR + sizeof(uint32_t));
 static const uint16_t MAX_FAULTS = 100;
 
@@ -18,9 +18,20 @@ static const uint32_t EEPROM_TERMINATOR = 0xFFFFFFFF;
 // cached value of end of fault array
 static uint16_t faultArrayEndAddress;
 
+// variables to keep track of repeated EEPROM communcation failures and to disable it if there are too many failures
+static bool EEPROM_errorLoggingDisabled = false;
+static uint16_t EEPROM_consecutiveFaults = 0;
+static const uint16_t EEPROM_MAX_CONSECUTIVE_FAULTS = 5;
+
 // handle errors from M24128 driver
 static uint32_t EEPROM_driverErrorCount = 0;
-#define EEPROM_RETRY(func) while ((func) == ERROR) { ++EEPROM_driverErrorCount; }
+#define EEPROM_RETRY(func) while ((func) == ERROR) { \
+        ++EEPROM_driverErrorCount; \
+        ++EEPROM_consecutiveFaults; \
+        EEPROM_errorLoggingDisabled = (EEPROM_consecutiveFaults > EEPROM_MAX_CONSECUTIVE_FAULTS); \
+        if (EEPROM_errorLoggingDisabled) break; \
+    } \
+    EEPROM_consecutiveFaults = 0;
 
 /** EEPROM_Init
  * Initializes EEPROM application
@@ -33,6 +44,9 @@ void EEPROM_Init(void) {
     uint32_t data = 0;
     faultArrayEndAddress = EEPROM_FAULT_ADDR - sizeof(EEPROM_TERMINATOR);
     while (data != EEPROM_TERMINATOR) {
+        if (EEPROM_errorLoggingDisabled) {
+            return;
+        }
         if (faultArrayEndAddress > EEPROM_FAULT_ADDR + sizeof(EEPROM_TERMINATOR) * MAX_FAULTS) {
             EEPROM_Reset();
             faultArrayEndAddress = EEPROM_FAULT_ADDR;
@@ -88,6 +102,7 @@ void EEPROM_SetCharge(uint32_t charge) {
  * @param error The error to log
  */
 void EEPROM_LogError(uint32_t error) {
+    if (EEPROM_errorLoggingDisabled) return;
     // assumes sizeof(EEPROM_TERMINATOR) == sizeof(error)
     // retry writes if unsuccessful
     EEPROM_RETRY(M24128_Write(faultArrayEndAddress + sizeof(EEPROM_TERMINATOR), sizeof(EEPROM_TERMINATOR), (uint8_t *) &EEPROM_TERMINATOR));
@@ -103,6 +118,8 @@ void EEPROM_LogError(uint32_t error) {
  * @return              the number of errors read
  */
 uint16_t EEPROM_GetErrors(uint32_t *errors, uint16_t maxErrors) {
+    if (EEPROM_errorLoggingDisabled) return 0;
+
     uint16_t numErrors = 0;
     uint16_t addr = EEPROM_FAULT_ADDR;
     for (; (addr < faultArrayEndAddress) && (numErrors < maxErrors); ++numErrors) {

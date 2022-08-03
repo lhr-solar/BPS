@@ -13,10 +13,18 @@
 #include "Tasks.h"
 #include "Amps.h"
 
+// median filter
+#define MEDIAN_FILTER_TYPE uint16_t
+#define MEDIAN_FILTER_DEPTH 5
+#define MEDIAN_FILTER_CHANNELS NUM_BATTERY_MODULES
+#define MEDIAN_FILTER_NAME VoltageFilter
+#include "MedianFilter.h"
+static VoltageFilter_t VoltageFilter;
+
 static cell_asic *Minions;
 
 static OS_MUTEX Voltage_Mutex;
-static uint16_t VoltageVal[NUM_BATTERY_MODULES]; //Voltage values gathered
+static uint16_t Voltages[NUM_BATTERY_MODULES]; // Voltage values gathered, in units of 0.1 mV
 static uint32_t openWires[TOTAL_VOLT_WIRES];
 
 /** LTC ADC measures with resolution of 4 decimal places, 
@@ -62,6 +70,8 @@ void Voltage_Init(cell_asic *boards){
   	OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
   	assertOSError(err);
 	
+	// Initialize median filter. There should be no modules with less than 0 volts or more than 5 volts
+	VoltageFilter_init(&VoltageFilter, 0, 50000);
 }
 
 /** Voltage_UpdateMeasurements
@@ -82,15 +92,24 @@ void Voltage_UpdateMeasurements(void){
   	assertOSError(err);
 	LTC6811_rdcv_safe(0, NUM_MINIONS, Minions); // Set to read back all cell voltage registers
 	//copies values from cells.c_codes to private array
-	OSMutexPend(&Voltage_Mutex, 0, OS_OPT_PEND_BLOCKING, &ts, &err);
-  	assertOSError(err);
+
+	// package raw voltage values into single array
+	static uint16_t rawVoltages[NUM_BATTERY_MODULES];
 	for(int i = 0; i < NUM_BATTERY_MODULES; i++){
-		VoltageVal[i] = Minions[i / MAX_VOLT_SENSORS_PER_MINION_BOARD].cells.c_codes[i % MAX_VOLT_SENSORS_PER_MINION_BOARD];
+		rawVoltages[i] = Minions[i / MAX_VOLT_SENSORS_PER_MINION_BOARD].cells.c_codes[i % MAX_VOLT_SENSORS_PER_MINION_BOARD];
 	}
-	//release mutex
-  	OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
+	// release minions asic mutex
+	OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
   	assertOSError(err);
 	
+	// run median filter
+	VoltageFilter_put(&VoltageFilter, rawVoltages);
+
+	// update public voltage values
+	OSMutexPend(&Voltage_Mutex, 0, OS_OPT_PEND_BLOCKING, &ts, &err);
+  	assertOSError(err);
+	VoltageFilter_get(&VoltageFilter, Voltages);
+	//release mutex
 	OSMutexPost(&Voltage_Mutex, OS_OPT_POST_NONE, &err);
 	assertOSError(err);
 }
@@ -253,7 +272,7 @@ uint16_t Voltage_GetModuleMillivoltage(uint8_t moduleIdx){
 		OSMutexPend(&Voltage_Mutex, 0, OS_OPT_PEND_BLOCKING, &ts, &err);
 		assertOSError(err);
 	}
-	uint16_t ret = VoltageVal[moduleIdx] / 10;
+	uint16_t ret = Voltages[moduleIdx] / 10;
 	if (!Fault_Flag){
 		OSMutexPost(&Voltage_Mutex, OS_OPT_POST_NONE, &err);
 		assertOSError(err);
