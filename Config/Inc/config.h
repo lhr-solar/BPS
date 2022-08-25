@@ -21,7 +21,7 @@ typedef enum SafetyStatus_e {SAFE = 0, DANGER = 1, OVERVOLTAGE = 2, UNDERVOLTAGE
 //--------------------------------------------------------------------------------
 // Basic Parameters of BPS layout
 
-#define NUM_MINIONS	4					 // Number of minion boards
+#define NUM_MINIONS	3					 // Number of minion boards
 
 
 //--------------------------------------------------------------------------------
@@ -30,8 +30,8 @@ typedef enum SafetyStatus_e {SAFE = 0, DANGER = 1, OVERVOLTAGE = 2, UNDERVOLTAGE
 
 //--------------------------------------------------------------------------------
 // Battery Pack layout
-#define NUM_BATTERY_MODULES				31		// Number of battery modules
-#define NUM_TEMPERATURE_SENSORS			62		// Number of temperature sensors
+#define NUM_BATTERY_MODULES				24		// Number of battery modules
+#define NUM_TEMPERATURE_SENSORS			48		// Number of temperature sensors
 #define NUM_TEMP_SENSORS_PER_MOD		2		// Number of temperature sensors per battery module
 
 //--------------------------------------------------------------------------------
@@ -49,8 +49,8 @@ typedef enum SafetyStatus_e {SAFE = 0, DANGER = 1, OVERVOLTAGE = 2, UNDERVOLTAGE
 #define MAX_DISCHARGE_TEMPERATURE_LIMIT	60000	    // Max temperature limit (milliCelcius)	(recommended release: 60.00C)
 #define MAX_CHARGE_TEMPERATURE_LIMIT	45000	    // Max temperature limit (milliCelcius)	(recommended release: 45.00C)
 
-#define MAX_CURRENT_LIMIT				75000		// Max current limit (Milliamperes)		(Max continuous discharge is 15A per cell)
-#define MAX_CHARGING_CURRENT 			-20000		// Max current per cell is 1.5 Amps (Standard charge)
+#define MAX_CURRENT_LIMIT				40000		// Max current limit (Milliamperes)		(Max continuous discharge is 15A per cell)
+#define MAX_CHARGING_CURRENT 			-40000 		// Max current per cell is 1.5 Amps (Standard charge)
 
 #define BALANCING_TOLERANCE_START       50          //mV differential from lowest module that will start battery balancing
 #define BALANCING_TOLERANCE_STOP        20          //mV differential from lowest module that will stop battery balancing

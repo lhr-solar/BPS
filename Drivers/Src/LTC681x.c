@@ -492,7 +492,7 @@ void LTC681x_rdcv_reg(uint8_t reg, //Determines which cell voltage register is r
                      )
 {
   const uint8_t REG_LEN = 8; //number of bytes in each ICs register + 2 bytes for the PEC
-  uint8_t cmd[4] =  {0};
+  uint8_t cmd[4];
   uint16_t cmd_pec;
 
   if (reg == 1)     //1: RDCVA

@@ -96,7 +96,18 @@ void Voltage_UpdateMeasurements(void){
 	// package raw voltage values into single array
 	static uint16_t rawVoltages[NUM_BATTERY_MODULES];
 	for(int i = 0; i < NUM_BATTERY_MODULES; i++){
-		rawVoltages[i] = Minions[i / MAX_VOLT_SENSORS_PER_MINION_BOARD].cells.c_codes[i % MAX_VOLT_SENSORS_PER_MINION_BOARD];
+		// bypass the first minion
+		#if 0
+		if (i < 8) {
+			rawVoltages[i] = 36000;
+		}
+		#endif
+		// bypass the first tap on the third minion
+		if (i < 8) {
+			rawVoltages[i] = Minions[0].cells.c_codes[i % MAX_VOLT_SENSORS_PER_MINION_BOARD + 1];
+		} else {
+			rawVoltages[i] = Minions[i / MAX_VOLT_SENSORS_PER_MINION_BOARD].cells.c_codes[i % MAX_VOLT_SENSORS_PER_MINION_BOARD];
+		}
 	}
 	// release minions asic mutex
 	OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
@@ -143,11 +154,15 @@ SafetyStatus Voltage_CheckStatus(void){
  * @return pointer to index of modules that are in danger
  */
 void Voltage_GetModulesInDanger(VoltageSafety_t* system){
+#if 0
 	uint32_t wires;
 	uint32_t openWireIdx = 0;
+#endif
 	OS_ERR err;
 	OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
   	assertOSError(err);
+
+#if 0
 	//put all the bits from each minion's system_open_wire variable into one variable
 	for(int k = 0; k < NUM_MINIONS; k++){
 		wires = (Minions[k].system_open_wire & 0x1FF);	//there are at most 8 modules per IC, bit 0 is GND
@@ -159,6 +174,7 @@ void Voltage_GetModulesInDanger(VoltageSafety_t* system){
 			openWireIdx++;
 		}
 	}
+#endif
 	
 	for (int i = 0; i < TOTAL_VOLT_WIRES; i++) {	
 		if(i < NUM_BATTERY_MODULES){

@@ -1,4 +1,4 @@
-/* Copyright (c) 2022 UT Longhorn Racing Solar */
+/* Copyright (c) 2020 UT Longhorn Racing Solar */
 
 /** Temperature.c
  * Temperature class that holds all temperature related information of BeVolt's
@@ -10,14 +10,7 @@
 #include "VoltageToTemp.h"
 #include "BSP_PLL.h"
 
-// if you change this, you also need to change the calls to median()
-#define TEMPERATURE_MEDIAN_FILTER_DEPTH 3
-
 void delay_u(uint16_t micro);
-
-// median filter for temperature values
-static int32_t medianFilterIdx = TEMPERATURE_MEDIAN_FILTER_DEPTH - 1;
-static int32_t rawTemperatures[NUM_MINIONS][MAX_TEMP_SENSORS_PER_MINION_BOARD][TEMPERATURE_MEDIAN_FILTER_DEPTH];
 
 // Holds the temperatures in Celsius (Fixed Point with .001 resolution) for each sensor on each board
 static int32_t temperatures[NUM_MINIONS][MAX_TEMP_SENSORS_PER_MINION_BOARD];
@@ -31,20 +24,6 @@ static uint8_t ChargingState;
 // Interface to communicate with LTC6811 (Register values)
 // Temperature.c uses auxiliary registers to view ADC data and COM register for I2C with LTC1380 MUX
 static cell_asic *Minions;
-
-/**
- * @brief find the median of three values
- * 
- * @param a first value
- * @param b second value
- * @param c third value
- * @return the median
- */
-static inline int32_t median(int32_t a, int32_t b, int32_t c) {
-	if ((a <= b && b < c) || (a >= b && b > c)) return b;
-	if ((a < b && a > c) || (b < a && a < c)) return a;
-	return c;
-}
 
 /** Temperature_Init
  * Initializes device drivers including SPI inside LTC6811_init and LTC6811 for Temperature Monitoring
@@ -71,17 +50,6 @@ void Temperature_Init(cell_asic *boards){
 	//release mutex
   	OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
   	assertOSError(err);
-
-	// set up the median filter with alternating temperatures of 1000 degrees and 0 degrees
-	for (int32_t filterIdx = 0; filterIdx < TEMPERATURE_MEDIAN_FILTER_DEPTH - 1; ++filterIdx) {
-		for (int32_t minion = 0; minion < NUM_MINIONS; ++minion) {
-			for (int32_t sensor = 0; sensor < MAX_TEMP_SENSORS_PER_MINION_BOARD; ++sensor) {
-				rawTemperatures[minion][sensor][filterIdx] = (filterIdx & 0x1) ? 1000000 : 0;
-			}
-		}
-	}
-	// median filter should start pointing to the last set of temperature readings
-	medianFilterIdx = TEMPERATURE_MEDIAN_FILTER_DEPTH - 1;
 
 }
 
@@ -193,6 +161,8 @@ int32_t milliVoltToCelsius(uint32_t milliVolt){
  * @return SUCCESS or ERROR
  */
 ErrorStatus Temperature_UpdateSingleChannel(uint8_t channel){
+	OS_ERR err;
+
 	// Configure correct channel
 	if (ERROR == Temperature_ChannelConfig(channel)) {
 		return ERROR;
@@ -200,31 +170,21 @@ ErrorStatus Temperature_UpdateSingleChannel(uint8_t channel){
 	
 	// Sample ADC channel
 	Temperature_SampleADC(MD_422HZ_1KHZ);
-
-	// update the median filter
+	
+	//take control of mutex
+  	OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
+	assertOSError(err);
 
 	// Convert to Celsius
 	for(int board = 0; board < NUM_MINIONS; board++) {
 		
 		// update adc value from GPIO1 stored in a_codes[0]; 
 		// a_codes[0] is fixed point with .001 resolution in volts -> multiply by .001 * 1000 to get mV in double form
-		rawTemperatures[board][channel][medianFilterIdx] = milliVoltToCelsius(Minions[board].aux.a_codes[0] / 10);
+		temperatures[board][channel] = milliVoltToCelsius(Minions[board].aux.a_codes[0] / 10);
 	}
-
-	// increment the median filter index
-	medianFilterIdx = (medianFilterIdx + 1) % TEMPERATURE_MEDIAN_FILTER_DEPTH;
-
-	// update the filtered values
-	// you need to change this if you change 
-	for (int32_t minion = 0; minion < NUM_MINIONS; ++minion) {
-		for (int32_t sensor = 0; sensor < NUM_TEMP_SENSORS_PER_MOD; ++sensor) {
-			temperatures[minion][sensor] = median(
-													 rawTemperatures[minion][sensor][0],
-													 rawTemperatures[minion][sensor][1],
-													 rawTemperatures[minion][sensor][2]
-												 );
-		}
-	}
+	//release mutex
+  	OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
+  	assertOSError(err);
 
 	return SUCCESS;
 }

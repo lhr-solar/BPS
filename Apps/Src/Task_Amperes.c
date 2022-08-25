@@ -11,6 +11,9 @@
 #include "Temperature.h"
 #include "Charge.h"
 
+#include "stm32f4xx.h"
+void EnterFaultState(void);
+
 void Task_AmperesMonitor(void *p_arg) {
     (void)p_arg;
 
@@ -33,11 +36,17 @@ void Task_AmperesMonitor(void *p_arg) {
         // Check if amperes is NOT safe:
 		SafetyStatus amperesStatus = Amps_CheckStatus(Temperature_GetMaxTemperature());
 		if(amperesStatus != SAFE) {
-		    Fault_BitMap = Fault_OCURR;
+
+            __disable_irq();
+            EnterFaultState();
+
+            Fault_BitMap = Fault_OCURR;
+            #if 0
             OSSemPost(&Fault_Sem4,
                         OS_OPT_POST_1,
                         &err);
 			assertOSError(err);
+            #endif
 			
         } else if((amperesStatus == SAFE) && (!amperesHasBeenChecked)) {
             // Signal to turn on contactor but only signal once

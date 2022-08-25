@@ -36,7 +36,7 @@ void EnterFaultState() {
     BSP_Light_Off(RUN); //turn off run light
     BSP_Light_On(FAULT);
 
-    EEPROM_Init();
+    //EEPROM_Init();
 
     if (BSP_WDTimer_DidSystemReset()) {
         Fault_BitMap = Fault_WDOG;
@@ -68,6 +68,8 @@ void EnterFaultState() {
             break;
     }
 
+#if 0
+
     EEPROM_LogError(Fault_BitMap);
 
     // TODO: create an interrupt-independent CAN interface, so we can use CAN from within a fault state
@@ -96,6 +98,13 @@ void EnterFaultState() {
 #endif
         BSP_WDTimer_Reset(); // WDOG Reset
     }
+
+#endif
+
+    while(1) {
+         BSP_WDTimer_Reset(); // WDOG Reset
+    }
+
 }
 
 void Task_FaultState(void *p_arg) {

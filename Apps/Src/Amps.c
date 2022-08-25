@@ -86,6 +86,7 @@ void Amps_UpdateMeasurements(void) {
  * @return SAFE or DANGER
  */
 SafetyStatus Amps_CheckStatus(int32_t maxTemperature) {
+#if 0
 	OS_ERR err;
 	CPU_TS ticks;
 	SafetyStatus status;
@@ -103,7 +104,13 @@ SafetyStatus Amps_CheckStatus(int32_t maxTemperature) {
 	}
 	OSMutexPost(&AmperesData_Mutex, OS_OPT_POST_NONE, &err);
 	assertOSError(err);
-	return status;
+#endif
+
+	if (latestMeasureMilliAmps >= MAX_CHARGING_CURRENT && latestMeasureMilliAmps <= MAX_CURRENT_LIMIT) {
+		return SAFE;
+	} else {
+		return DANGER;
+	}
 }
 
 /** Amps_IsCharging

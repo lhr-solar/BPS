@@ -97,6 +97,7 @@ uint16_t LTC2315_Read() {
 /* Gets value from LTC2315
  * @return current in milliamps
  */
+#if 0
 int32_t LTC2315_GetCurrent() {
     /**
      * The ADC reads: Gain * (Current * 100uOhm) + Ref
@@ -119,6 +120,33 @@ int32_t LTC2315_GetCurrent() {
     int32_t milliamps = ((reading - offset) * PRECISION_MICRO_AMPS) / 1000;    // during testing, the gain seems to be inverted
     return milliamps;
 }
+#endif
+
+// hack for busted board at comp
+int32_t LTC2315_GetCurrent() {
+    /**
+     * The ADC reads: Gain * (Current * 100uOhm) + Ref
+     * INA186A3 chip has Gain = 100, we are using Ref = 1.5V
+     * With 12 bits and input range [0.0V, 3.0V),
+     * precision is 0.73242mV and 73.242mA
+     * At Current = 0A, ADC should read 1.5V => 0x800
+     * 
+     * Temperature effects are ignored (for now?)
+     */
+   
+    int32_t reading = 0;
+    for (int i = 0; i < 10; ++i) {
+        reading += (int32_t)LTC2315_Read();
+    }
+
+    reading /= 10;
+
+    const int32_t PRECISION_MICRO_AMPS = 150000;
+    // make sure to hook up the shunt so discharging will give us a lower voltage
+    int32_t milliamps = ((offset - reading) * PRECISION_MICRO_AMPS) / 1000;
+    return milliamps;
+}
+
 
 /**
  * @brief Calibrate the LTC2315 module. Assumes there is no current flowing
