@@ -2,8 +2,8 @@
 
 //need to add the proper #include files 
 
-#ifndef Task_RTOSBPS_H
-#define Task_RTOSBPS_H
+#ifndef RTOS_BPS_H
+#define RTOS_BPS_H
 
 //#include
 
@@ -13,42 +13,42 @@
  * @param   
  * @return  
  */
-void RTOS_SemPend(void);
+void RTOS_BPS_SemPend(void);
 
 /**
  * @brief   
  * @param   
  * @return  
  */
-void RTOS_SemPost(void);
+void RTOS_BPS_SemPost(void);
 
 /**
  * @brief   
  * @param   
  * @return  
  */
-void RTOS_MutexPend(void);
+void RTOS_BPS_MutexPend(void);
 
 /**
  * @brief   
  * @param   
  * @return  
  */
-void RTOS_MutexPost(void);
+void RTOS_BPS_MutexPost(void);
 
 /**
  * @brief   
  * @param   
  * @return  
  */
-void RTOS_TaskCreate(void);
+void RTOS_BPS_TaskCreate(void);
 
 /**
  * @brief   
  * @param   
  * @return  
  */
-void RTOS_TimeDelay(void);
+void RTOS_BPS_TimeDelay(void);
 
 
 #endif 
