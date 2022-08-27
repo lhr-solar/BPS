@@ -2,8 +2,8 @@
 
 //need to add the proper #include files 
 
-#ifndef Task_RTOS_BPS_H
-#define Task_RTOS_BPS_H
+#ifndef Task_RTOSBPS_H
+#define Task_RTOSBPS_H
 
 //#include
 
