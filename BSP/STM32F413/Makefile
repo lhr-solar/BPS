@@ -29,6 +29,7 @@ RTOS_DIR = $(TOP_DIR)/RTOS/uCOS-III-STM32F4
 # C sources
 # since current path is in the BSP folder, go to the top level with $(TOP_DIR)/
 C_SOURCES =  \
+$(wildcard $(TOP_DIR)/Tasks/Src/*.c)	\
 $(wildcard $(TOP_DIR)/Drivers/Src/*.c)	\
 $(wildcard $(TOP_DIR)/BSP/STM32F413/Src/*.c)	\
 $(wildcard $(TOP_DIR)/CMSIS/DSP_Lib/Source/*.c)	\
@@ -116,6 +117,7 @@ AS_INCLUDES =
 # C includes
 # since current path is in the BSP folder, go to the top level with $(TOP_DIR)/
 C_INCLUDES =  \
+-I$(TOP_DIR)/Tasks/Inc	\
 -I$(TOP_DIR)/Apps/Inc	\
 -I$(TOP_DIR)/Drivers/Inc	\
 -I$(TOP_DIR)/Config/Inc	\
