@@ -16,9 +16,8 @@ export TEST
 OS = RTOS
 export OS
 
-all:
+stm32f413:
 	$(MAKE) -C BSP -C STM32F413 -j
-	# @echo "${RED}Not enough arguments. Call: ${ORANGE}make help${NC}"
 
 simulator:
 	$(MAKE) -C BSP -C Simulator -j
