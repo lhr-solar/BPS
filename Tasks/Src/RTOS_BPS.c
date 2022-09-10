@@ -13,22 +13,12 @@ void RTOS_BPS_SemPost() {
 void RTOS_BPS_MutexPend(void){
 
 }
-// Connor Leu
-// Post == Give
 BPS_OS_ERR RTOS_BPS_MutexPost(BPS_OS_MUTEX* mutex, BPS_OS_OPT options) {
+    // For future reference, Post is the same as Give
     BPS_OS_ERR err;
     OSMutexPost(mutex, options, &err); // calls MutexPost with all specified params
     assertOSError(err);
-    return err;
-    /**
-     * FreeRTOS only uses ONE parameter for its MutexPost, a SemaphoreHandle_t object (no ptr)
-     * CANNOT be used in an ISR.
-     * xSemaphoreGive() returns pdTRUE if the semaphore is released, pdFALSE if there is some error.
-     * 
-     * Blocking vs Nonblocking appears to come from https://www.freertos.org/xQueueSelectFromSet.html, and
-     * https://www.freertos.org/xQueueCreateSet.html
-     * which is a separate structure used and not just an option passed into the pend/post (take/give) functions
-    */ 
+    return err; // returns OS error, even though we don't *really* use it right now.
 }
 void RTOS_BPS_TaskCreate(void){
 
