@@ -13,12 +13,18 @@ void RTOS_BPS_SemPost(void) {
 void RTOS_BPS_MutexPend(void){
 
 }
+
+/**
+ * @brief   Posts the specified Mutex. (For future reference, Post is the same as Give)
+ * @param   *mutex - pointer to the specified RTOS Mutex object
+ * @param   options - a parameter which determines what kind of Post MutexPost performs
+ * @return  BPS_OS_ERR value
+ */
 BPS_OS_ERR RTOS_BPS_MutexPost(BPS_OS_MUTEX* mutex, BPS_OS_OPT options) {
-    // For future reference, Post is the same as Give
     BPS_OS_ERR err;
-    OSMutexPost(mutex, options, &err); // calls MutexPost with all specified params
+    OSMutexPost(mutex, options, &err);
     assertOSError(err);
-    return err; // returns OS error, even though we don't *really* use it right now.
+    return err;
 }
 void RTOS_BPS_TaskCreate(void){
 
