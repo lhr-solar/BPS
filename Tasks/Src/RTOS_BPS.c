@@ -28,13 +28,13 @@ void RTOS_BPS_MutexPost(BPS_OS_MUTEX* mutex, BPS_OS_OPT options) {
 
 /**
  * Note that the incoming BPS_OS_QUEUE queue !!MUST!! be created already.
- * @brief   Puts a message into the RTOS Queue (i.e., POST something into the Queue). https://docs.silabs.com/micrium/latest/micrium-kernel-api/03-kernel-message-queue-api
+ * @brief   Puts a message into the RTOS Queue following FIFO order (i.e., POST something into the Queue). https://docs.silabs.com/micrium/latest/micrium-kernel-api/03-kernel-message-queue-api
  * @param   *queue - pointer to the Queue to write a message to
  * @param   *msg - void pointer to the message you are going to send
  * @param   size - payload size of *msg (this changes in FreeRTOS)
  * @return  none
  */
-void RTOS_BPS_QueuePut(BPS_OS_QUEUE* queue, void* msg, BPS_OS_MSG_SIZE size) {
+void RTOS_BPS_FifoPut(BPS_OS_QUEUE* queue, void* msg, BPS_OS_MSG_SIZE size) {
     BPS_OS_ERR err;
     OSQPost(queue, msg, size, OS_OPT_POST_FIFO, &err);
     assertOSError(err);
