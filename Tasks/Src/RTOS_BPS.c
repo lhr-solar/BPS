@@ -12,13 +12,15 @@ void RTOS_BPS_SemPost(void) {
 }
 
 /**
- * @brief Creates and returns a mutex. Creates and returns a mutex. Mutex objects are used in Pend and Post, and for Micrium, require no 
- *        initialization besides declaring a variable of BPS_OS_MUTEX type
- * @param none
+ * @brief Creates and returns a mutex.
+ * @param name - char* of the name of the mutex
  * @return an BPS_OS_MUTEX object
  */
-BPS_OS_MUTEX RTOS_BPS_MutexCreate(void) {
+BPS_OS_MUTEX RTOS_BPS_MutexCreate(char* name) {
     BPS_OS_MUTEX mut;
+    BPS_OS_ERR err;
+    OSMutexCreate(&mut, name, &err);
+    assertOSError(err);
     return mut;
 }
 
