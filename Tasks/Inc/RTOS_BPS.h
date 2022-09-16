@@ -36,11 +36,12 @@ void RTOS_BPS_SemPend(void);
 void RTOS_BPS_SemPost(void);
 
 /**
- * @brief Creates and returns a mutex.
+ * @brief Initializes a mutex object.
+ * @param *mut - pointer to a mutex to initialize
  * @param name - char* of the name of the mutex
- * @return an BPS_OS_MUTEX object
+ * @return none
  */
-BPS_OS_MUTEX RTOS_BPS_MutexCreate(char* name);
+void RTOS_BPS_MutexCreate(BPS_OS_MUTEX *mut, char* name);
 
 /**
  * @brief   
