@@ -82,7 +82,7 @@ void RTOS_BPS_TaskCreate(void);
  * @param  
  * @return  
  */
-void RTOS_BPS_TimeDelay(OS_TICK dly, OS_OPT opt);
+void RTOS_BPS_TimeDelay(OS_TICK dly);
 
 
 #endif 
