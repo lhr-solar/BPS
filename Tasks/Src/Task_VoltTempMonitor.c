@@ -9,6 +9,7 @@
 #include "Amps.h"
 #include "CAN_Queue.h"
 
+int32_t avg;
 //declared in Tasks.c
 extern cell_asic Minions[NUM_MINIONS];
 
@@ -159,6 +160,8 @@ void Task_VoltTempMonitor(void *p_arg) {
         // Control Fans depending on temperature
         // Right now this just sets them to maximum speed
         // Once we get a thermal model of the battery box, we can replace this with someting better
+        avg = Temperature_GetTotalPackAvgTemperature();
+        
         BSP_Fans_SetAll(TOPSPEED);
 
         //signal watchdog
