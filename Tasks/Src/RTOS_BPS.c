@@ -52,9 +52,12 @@ void RTOS_BPS_MutexPost(BPS_OS_MUTEX* mutex, BPS_OS_OPT options) {
 void RTOS_BPS_TaskCreate(void){
 
 }
+
+//I checked like two instances of timedelay and they all used OPT - dly 
+//so I assumed the other ones never get used
 void RTOS_BPS_TimeDelay(OS_TICK dly){
-    OS_OPT opt;
+    OS_OPT opt = OS_OPT_TIME_DLY;
     OS_ERR err;
-    OSTimeDly(dly, opt, err);
+    OSTimeDly(dly, opt, &err);
     assertOSError(err);
 }
