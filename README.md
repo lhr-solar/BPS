@@ -47,8 +47,8 @@ The BPS is designed be built and deployed from a Linux terminal, allowing you to
 ## Building
 When calling any of the following commands, make sure you are in the top level of the repo.
 
-Call ```make bsp_type``` to compile the release version of the code. ```bsp_type``` is the system you want to compile for. It can either be
-```stm32f4132``` or ```simulator```. The stm32f413 version is selected by default.
+Call ```make``` to compile the release version of the code. 
+```make bsp_type``` is the system you want to compile for. It can either be ```stm32f4132``` or ```simulator```. The stm32f413 version is selected by default.
 
 Call ```make help``` for more information on how to build the project.
 

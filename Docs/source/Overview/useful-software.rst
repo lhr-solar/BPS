@@ -5,10 +5,8 @@ Useful Software
 To work with the BPS, download the following software: 
 
 * `Kicad PCB Editor <https://kicad-pcb.org/>`_ - View :abbr:`SCH (Circuit Schematic File)` and :term:`PCBs <Printed  Circuit Board>`
-* `Keil MDK <https://www.keil.com/demo/eval/arm.htm>`_ - IDE to program the STM32F413 microcontroller. Only needed for legacy code.
 * `STM32F413 Drivers <https://www.st.com/en/development-tools/stsw-link009.html>`_ - Used to program the BPS
 * `PuTTY <https://www.putty.org/>`_ - Debug the BPS
 * `Ubuntu <https://ubuntu.com/#download>`_ - Windows Subsystem for Linux to compile code and use github
 * `VsCode <https://code.visualstudio.com/>`_ - Text Editor used to edit our code base. Used in conjunction with WSL(Ubuntu) to compile and debug our system.
-* `Virtual Box <https://www.virtualbox.org/wiki/Downloads>`_ - Allows for USB support so you can debug code using gdb. `Setup Instructions <https://brb.nci.nih.gov/seqtools/installUbuntu.html>`_.
-  * `Guest Box Additions Help <https://docs.oracle.com/cd/E36500_01/E36502/html/qs-guest-additions.html>`_ - Sometimes when using the guest OS on virtual box, the screen size is smaller so you need this in order to use the full screen.
+* `VMWare Workstation Pro 16`<https://kb.vmware.com/s/article/2057907> - Virtual Machine used to flash code to MCU. `License Key` <https://gist.github.com/williamgh2019/cc2ad94cc18cb930a0aab42ed8d39e6f>
