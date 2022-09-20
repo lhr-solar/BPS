@@ -4,14 +4,16 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-
+static bool initialized = false;
+static bool state = false;
 /**
- * @brief   Create text file if none exists (Simulator)
+ * @brief   Initializes BSP_strobe 
  * @param   None
  * @return  None
  */
 void BSP_Strobe_Init(void) {
-	// TODO
+	initialized = true;
+    Simulator_log("Initialized Strobelight\n", 24);
 }
 
 /**
@@ -20,7 +22,13 @@ void BSP_Strobe_Init(void) {
  * @return  None
  */
 void BSP_Strobe_On(void) {
-    // TODO
+    if (initialized) {
+        state = true;
+        Simulator_log("Strobelight enabled\n", 20);
+    } else {
+        Simulator_log("Hard Fault: Set strobelight before initialization!\n", 51);
+        exit(-1);
+    }
 }
 
 /**
@@ -29,5 +37,12 @@ void BSP_Strobe_On(void) {
  * @return  None
  */
 void BSP_Strobe_Off(void) {
-    // TODO
+    if (initialized) {
+        state = false;
+        Simulator_log("Strobelight disabled\n",21);
+    }
+    else {
+        Simulator_log("Hard Fault: Set strobelight before initialization!\n", 51);
+        exit(-1);
+    }
 }
