@@ -14,10 +14,17 @@
 #include "BSP_UART.h"
 #include "EEPROM.h"
 #include "Charge.h"
+#ifdef SIMULATION
+#include "Simulator.h"
+#endif
 
 void EnterFaultState(void);
 
 int main() {
+
+#ifdef SIMULATION
+	Simulator_init();
+#endif
 	
 	OS_ERR err;
 
