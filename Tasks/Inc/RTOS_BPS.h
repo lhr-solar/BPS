@@ -7,7 +7,8 @@ RTOS_BPS library includes all the wrapper functions for a functioning RTOS - nee
 #ifndef RTOS_BPS_H
 #define RTOS_BPS_H
 
-//#include
+#include "common.h"
+#include "config.h"
 
 
 /**
