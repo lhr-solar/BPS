@@ -21,7 +21,7 @@ struct simulator_state {
 void Simulator_init(void);
 
 // log something to the simualtor's log file
-void Simulator_log(char *str, int len);
+void Simulator_log(char *str);
 
 #endif
 

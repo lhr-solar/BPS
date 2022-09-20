@@ -1,8 +1,22 @@
 /* Copyright (c) 2022 UT Longhorn Racing Solar */
 
 #include "BSP_Lights.h"
-#include "simulator_conf.h"
+#include "Simulator.h"
 
+static const char* lightsNames[] = {
+	"RUN",
+	"UVOLT",
+	"OVOLT",
+	"OTEMP",
+	"OCURR",
+	"WDOG",
+	"CAN",
+	"EXTRA",
+	"WIRE",
+	"FAULT"
+};
+static bool initialized = false;
+static State state[LIGHTS_MAX];
 
 /**
  * @brief   Initialize all the GPIO pins connected to each LED/Light
@@ -10,7 +24,8 @@
  * @return  None
  */
 void BSP_Lights_Init(void) {
-	// TODO
+	initialized = true;
+    Simulator_log("Lights initialized\n");
 }
 
 /**
@@ -19,7 +34,18 @@ void BSP_Lights_Init(void) {
  * @return  None
  */
 void BSP_Light_Toggle(Light signal) {
-	// TODO
+	if (signal < 0 || signal >= LIGHTS_MAX) {
+		Simulator_log("Error: light out of bounds\n");
+	}
+
+	if (initialized) {
+		state[signal] ^= state[signal];
+		char str[64];
+		sprintf(str, "set light %s to %d\n", lightsNames[signal], states[signal]);
+	} else {
+		Simulator_log("Hard Fault: used lights before initialization\n");
+		exit(-1);
+	}
 }
 
 /**
@@ -28,7 +54,18 @@ void BSP_Light_Toggle(Light signal) {
  * @return  None
  */
 void BSP_Light_On(Light signal) {
-	// TODO
+	if (signal < 0 || signal >= LIGHTS_MAX) {
+		Simulator_log("Error: light out of bounds\n");
+	}
+
+	if (initialized) {
+		state[signal] = 1;
+		char str[64];
+		sprintf(str, "set light %s to %d\n", lightsNames[signal], states[signal]);
+	} else {
+		Simulator_log("Hard Fault: used lights before initialization\n");
+		exit(-1);
+	}
 }
 
 /**
@@ -37,7 +74,18 @@ void BSP_Light_On(Light signal) {
  * @return  None
  */
 void BSP_Light_Off(Light signal) {
-	// TODO
+	if (signal < 0 || signal >= LIGHTS_MAX) {
+		Simulator_log("Error: light out of bounds\n");
+	}
+
+	if (initialized) {
+		state[signal] ^= 0;
+		char str[64];
+		sprintf(str, "set light %s to %d\n", lightsNames[signal], states[signal]);
+	} else {
+		Simulator_log("Hard Fault: used lights before initialization\n");
+		exit(-1);
+	}
 }
 
 /**
@@ -46,5 +94,14 @@ void BSP_Light_Off(Light signal) {
  * @return  State of signal
  */
 State BSP_Light_GetState(Light signal) {
-	// TODO
+	if (signal < 0 || signal >= LIGHTS_MAX) {
+		Simulator_log("Error: light out of bounds\n");
+	}
+
+	if (initialized) {
+		return states[signal];
+	} else {
+		Simulator_log("Hard Fault: used lights before initialization\n");
+		exit(-1);
+	}
 }

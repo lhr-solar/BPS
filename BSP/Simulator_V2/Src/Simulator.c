@@ -47,7 +47,6 @@ void Simulator_init(void) {
 }
 
 // log something to the simualtor's log file
-void Simulator_log(char *str, int len) {
-    write(simulatorLog, str, len);
+void Simulator_log(char *str) {
+    write(simulatorLog, str, strlen(str));
 }
-
