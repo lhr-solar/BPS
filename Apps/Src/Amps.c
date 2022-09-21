@@ -21,8 +21,8 @@ static bsp_os_t spi_os;
 #ifdef RTOS
 void Amperes_Pend(){
 	RTOS_BPS_SemPend(&AmperesIO_Sem,
-			  0,
-			  OS_OPT_PEND_BLOCKING)
+			  		 0,
+			  		 OS_OPT_PEND_BLOCKING);
 }
 
 void Amperes_Post(){
