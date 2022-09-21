@@ -35,12 +35,7 @@ void RTOS_BPS_SemPend(void);
  */
 void RTOS_BPS_SemPost(void);
 
-/**
- * @brief   Function waits for Mutex
- * @param   *mutex - pointer to mutex
- * @param   timeout - timeout period, if 0 will wait forever until resource available
- * @param   options - determines if mutex available or not
-=======
+/*
  * @brief Initializes a mutex object.
  * @param *mut - pointer to a mutex to initialize
  * @param name - char* of the name of the mutex
@@ -49,9 +44,10 @@ void RTOS_BPS_SemPost(void);
 void RTOS_BPS_MutexCreate(BPS_OS_MUTEX *mut, char* name);
 
 /**
- * @brief   
- * @param   
- * @return  
+ * @brief   Function waits for Mutex
+ * @param   *mutex - pointer to mutex
+ * @param   timeout - timeout period, if 0 will wait forever until resource available
+ * @param   options - determines if mutex available or not
  */
 void RTOS_BPS_MutexPend(BPS_OS_MUTEX* mutex, BPS_OS_TICK timeout, BPS_OS_OPT opt);
 

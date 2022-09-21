@@ -23,7 +23,7 @@ void RTOS_BPS_MutexPend(BPS_OS_MUTEX* mutex, BPS_OS_TICK timeout, BPS_OS_OPT opt
     BPS_CPU_TS ticks;
     OSMutexPend(mutex, timeout, opt, &ticks, &err);
     assertOSError(err);
-=======
+}
 
 /**
  * @brief Initializes a mutex object.
@@ -37,9 +37,6 @@ void RTOS_BPS_MutexCreate(BPS_OS_MUTEX *mut, char* name) {
     assertOSError(err);
 }
 
-void RTOS_BPS_MutexPend(void){ 
-
-}
 
 /**
  * @brief   Posts the specified Mutex. (For future reference, Post is the same as Give)
