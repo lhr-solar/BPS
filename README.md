@@ -1,15 +1,18 @@
 # Battery Protection System Code
 This repo contains all code related to LHR Solar's Battery Protection System (BPS)
+The [Documentation](https://bps.readthedocs.io/en/latest/) for the BPS contains other useful software and an in depth explanation of our architecture.
+
+NOTE: As of 2023, the simulator for the BPS repository is deprecated.
 
 ## Setup
-Development is done in a linux environment to build and flash the BPS program.
+Development is done in a Linux environment to build and flash the BPS program.
 
 ### Cloning the Repo
-Cloning repos onto your machine is usually straightforwward, but our RTOS project depend on uCOS-III-Simulator and uCOS-III-STM32F4 repos. Extra steps must be taken to correctly pull submodules. [Submodules](https://git-scm.com/book/en/v2/Git-Tools-Submodules) are repos that are inside a repo.
+Cloning repos onto your machine is usually straightforward, but our RTOS project depend on uCOS-III-Simulator and uCOS-III-STM32F4 repos. Extra steps must be taken to correctly pull submodules. [Submodules](https://git-scm.com/book/en/v2/Git-Tools-Submodules) are repos that are inside a repo.
 
-The most common way to clone repos is to use the HTTPS link, but the most secure way is to clone with SSH. The submodules use SSH, so you must generate and add an SSH key to your GitHub acoount. Follow the instructions in this tutorial. If this is your first time doing this, you can start at the [Generating a new SSH key and adding it to the ssh-agent](https://docs.github.com/en/github/authenticating-to-github/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent) step, but reading everything is beneficial.
+The most common way to clone repos is to use the HTTPS link, but the most secure way is to clone with SSH. The submodules use SSH, so you must generate and add an SSH key to your GitHub account. Follow the instructions in this tutorial. If this is your first time doing this, you can start at the [Generating a new SSH key and adding it to the ssh-agent](https://docs.github.com/en/github/authenticating-to-github/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent) step, but reading everything is beneficial.
 
-Once you're able to use Git with SSH, go to the green "Code" button of the repo, and click "Use SSH" to get the url link. Copy the `git@hithub.com:repo-name` link. Then, enter the following command to the terminal but with the correct url link:
+Once you're able to use Git with SSH, go to the green "Code" button of the repo, and click "Use SSH" to get the URL. Copy the `git@hithub.com:repo-name` link. Then, enter the following command to the terminal but with the correct URL:
 
 ```
 git clone --recurse-submodules git@github.com:repo-name
@@ -22,11 +25,12 @@ git submodule update --remote
 ```
 
 ### Setup for Terminal Development
-The BPS is designed be built and deployed from a linux terminal, allowing you to use your choice of text editor/IDE.
-1. Ensure that you have some type of linux machine such as Ubuntu, Windows Subsystem for Linux, etc. Windows will not work.
+The BPS is designed be built and deployed from a Linux terminal, allowing you to use your choice of text editor/IDE.
+1. Ensure that you have some type of Linux machine such as Ubuntu, Windows Subsystem for Linux, etc. Windows will not work.
+    - While you can compile the code on WSL, you will not be able to flash the code unless it is through a Linux machine (VM, dual boot, etc.)
 2. The BPS code supports multiple microcontrollers and different architectures. Depending on which on you're using, make sure you have the correct toolchain.
     - STM32F413: Follow the instructions in this [repo](https://github.com/SijWoo/ARM-Toolchain-Setup) to setup the toolchains for the current BPS.
-    - Simulator: Install gcc and gdb using the following lines
+    - Simulator: Install GCC and GDB using the following lines
         ```
         sudo apt install gcc gdb
         ```
@@ -43,7 +47,8 @@ The BPS is designed be built and deployed from a linux terminal, allowing you to
 ## Building
 When calling any of the following commands, make sure you are in the top level of the repo.
 
-Call ```make bsp_type``` to compile the release version of the code. ```bsp_type``` is the system you want to compile for.
+Call ```make bsp_type``` to compile the release version of the code. ```bsp_type``` is the system you want to compile for. It can either be
+```stm32f4132``` or ```simulator```. The stm32f413 version is selected by default.
 
 Call ```make help``` for more information on how to build the project.
 
@@ -61,35 +66,41 @@ will build the RTOS version. The RTOS version is selected by default.
 
 For testing, please read the Testing section.
 
-## Flashing
-When calling any of the following commands, make sure you are in the top most level of the directory.
-
-1. Install `st-util`
-2. Connect your computer to the BPS using a nucleo programmer
-3. Call `make flash` to flash the most recently built BPS code. You may need to run this with `sudo`.
-
-## Testing
-The following testing information is speficially for terminal development.
-
-### Rules for making a new test src file
-1. Test names: The formatting of the file names is crucial to have the makefile work properly. "Test_" should be the prefix and the src file name that is to be tested must follow i.e. if you want to test x.c, the test src file must be named Test_x.c or the makefile will not be able to find the file.
-    E.g. A test for Voltage.c should be Test_Voltage.c file, a test for BSP_SPI.c should be named Test_BSP_SPI.c
-2. All test files should be placed into the Tests folder.
-
 ### How to build a test
 To build a new test, you need to use the following command:
 ```make bsp_type TEST=x```
 
-- ```bsp_type``` specifies which system you want to compile the code for: ```stm32f413```, ```simulator```
-- ```x``` specifies which test you want to compile. TEST= is optional and only required if a test is to be compiled. Set TEST equal to the suffix of the Test_ src files i.e. if the test you want to run is in Test_x.c, set TEST=x.
+- ```x``` specifies which test you want to compile. TEST= is optional and only required if a test is to be compiled. Set TEST equal to the suffix of the Test_ Src files i.e. if the test you want to run is in Test_x.c, set TEST=x.
     E.g. Call ```make stm32f413 TEST=Voltage``` if you want to test Voltage.c with the Test_Voltage.c src file
 
+## Flashing
+When calling any of the following commands, make sure you are in the top most level of the directory.
+You must be on a Linux VM or dual boot machine. Consider using [VMWARE](https://kb.vmware.com/s/article/2057907) 
+using this free license [key](https://gist.github.com/williamgh2019/cc2ad94cc18cb930a0aab42ed8d39e6f)
+
+1. Install `st-util`
+2. Connect your computer to the BPS using a Nucleo programmer
+3. Call `make flash` to flash the most recently built BPS code. You may need to run this with `sudo`.
+
+## Testing
+The following testing information is specifically for terminal development.
+
+### Rules for making a new test Src file
+1. Test names: The formatting of the file names is crucial to have the Makefile work properly. "Test_" should be the prefix and the src file name that is to be tested must follow i.e. if you want to test x.c, the test Src file must be named Test_x.c or the Makefile will not be able to find the file.
+    E.g. A test for Voltage.c should be Test_Voltage.c file, a test for BSP_SPI.c should be named Test_BSP_SPI.c
+2. All test files should be placed into the Tests folder.
+
 ### Using GDB
-GDB is a debugger program that can be used to step through a program as it is being run on the board. To use, you need two terminals open, as well as a USB connection to the ST-Link programmer (as if you were going to flash the program to the board). In one terminal, run ```st-util```. This will launch a program that will interface with the board. In the other terminal, start gdb with the command ```gdb-multiarch ./Objects/bps-leader.elf``` (assuming that you are doing this in the root of the project directory.
+NOTE: The below is one way to debug the program. GDB is not that compatible with debugging the code so another method of debugging is also available.
+GDB is a debugger program that can be used to step through a program as it is being run on the board. To use, you need two terminals open, as well as a USB connection to the ST-Link programmer (as if you were going to flash the program to the board). 
+1. In one terminal, run ```st-util```. This will launch a program that will interface with the board. 
+2. In the other terminal, start gdb with the command ```gdb-multiarch ./Objects/bps-leader.elf``` (assuming that you are doing this in the root of the project directory.
+3. This will launch GDB and read in all of the symbols from the program that you are running on the board. In order to actually connect gdb to the board, exectue the command ```target extended-remote localhost:4242```, which will connect to the st-util command from earlier.
 
-This will launch GDB and read in all of the symbols from the program that you are running on the board. In order to actually connect gdb to the board, exectue the command ```target extended-remote localhost:4242```, which will connect to the st-util command from earlier.
-
-Now you can use GDB as normal to debug the board.
+### Using OPENOCD
+OpenOCD is another debugger program that is open source and compatible with the STM32F413. 
+2. Replace step 2 above with ```./openocd-debug.sh```.
+3. Replace step 3 above with ```target extended-remote localhost:3333```
 
 ## Rules
 Make sure to have fun!
