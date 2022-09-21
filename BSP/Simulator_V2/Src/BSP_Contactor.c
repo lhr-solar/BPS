@@ -16,7 +16,7 @@ static bool state = false;
  */
 void BSP_Contactor_Init(void) {
     initialized = true;
-    Simulator_log("Initialized Contactor\n", 22);
+    Simulator_log("Initialized Contactor\n");
 }
 
 /**
@@ -28,9 +28,9 @@ void BSP_Contactor_Init(void) {
 void BSP_Contactor_On(void) {
     if (initialized) {
         state = true;
-        Simulator_log("Contactor enabled\n", 18);
+        Simulator_log("Contactor enabled\n");
     } else {
-        Simulator_log("Hard Fault: Set contactor before initialization!\n", 49);
+        Simulator_log("Hard Fault: Set contactor before initialization!\n");
         exit(-1);   // TODO: maybe actually enter a fault state here
     }
 }
@@ -44,9 +44,9 @@ void BSP_Contactor_On(void) {
 void BSP_Contactor_Off(void) {
     if (initialized) {
         state = false;
-        Simulator_log("Contactor disabled\n", 19);
+        Simulator_log("Contactor disabled\n");
     } else {
-        Simulator_log("Hard Fault: Set contactor before initialization!\n", 49);
+        Simulator_log("Hard Fault: Set contactor before initialization!\n");
         exit(-1);   // TODO: maybe actually enter a fault state here
     }
 }
@@ -57,5 +57,10 @@ void BSP_Contactor_Off(void) {
  * @return  0 if contactor is off/open, 1 if on/closed
  */
 bool BSP_Contactor_GetState(void) {
-    return state;
+    if (initialized) {
+        return state;
+    } else {
+        Simulator_log("Hard Fault: Read contactor before initialization!\n");
+        exit(-1);   // TODO: maybe actually enter a fault state here
+    }
 }

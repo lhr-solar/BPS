@@ -13,7 +13,7 @@ static bool initialized = false;
  */
 void BSP_ADC_Init(void) {
     initialized = true;
-    Simulator_log("ADC initialized\n", 16);
+    Simulator_log("ADC initialized\n");
 }
 
 /**
@@ -23,6 +23,7 @@ void BSP_ADC_Init(void) {
  */
 uint16_t BSP_ADC_High_GetMilliVoltage(void) {
     // TODO
+    return 42;
 }
 
 /**
@@ -32,5 +33,6 @@ uint16_t BSP_ADC_High_GetMilliVoltage(void) {
  */
 uint16_t BSP_ADC_Low_GetMilliVoltage(void) {
     // TODO
+    return 42;
 }
 

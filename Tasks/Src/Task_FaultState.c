@@ -13,7 +13,9 @@
 #include "CANbus.h"
 #include "BSP_UART.h"
 #include "config.h"
+#ifndef SIMULATION
 #include "stm32f4xx.h"
+#endif
 
 /*
  * Note: do not call this directly if it can be helped.
@@ -22,7 +24,9 @@
  */
 void EnterFaultState() {
 
+#ifndef SIMULATION
     __disable_irq();
+#endif
 
     // Turn Contactor Off
     BSP_Contactor_Init();

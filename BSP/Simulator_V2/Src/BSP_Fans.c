@@ -14,7 +14,7 @@ static uint32_t speed[NUM_FANS] = {0,0,0,0};
 void BSP_Fans_Init(void)
 {
     initialized = true;
-    Simulator_log("Initialized Fans\n", 17);
+    Simulator_log("Initialized Fans\n");
 }
 
 /**
@@ -28,12 +28,12 @@ ErrorStatus BSP_Fans_Set(uint8_t fan, uint32_t dutyCycle){
 
     if (initialized) {
         speed[fan - 1] = dutyCycle;
-        char str[30];
+        char str[50];
         sprintf(str, "set fan %d to %d\n", fan, dutyCycle);
-        Simulator_log(str, strlen(str));
+        Simulator_log(str);
         return SUCCESS;
     } else {
-        Simulator_log("Hard Fault: used fan before initialization\n", 43);
+        Simulator_log("Hard Fault: used fan before initialization\n");
         exit(-1);   // TODO: maybe actually enter a fault state here
     }
 }

@@ -16,7 +16,7 @@ static const char* lightsNames[] = {
 	"FAULT"
 };
 static bool initialized = false;
-static State state[LIGHTS_MAX];
+static State states[LIGHTS_MAX];
 
 /**
  * @brief   Initialize all the GPIO pins connected to each LED/Light
@@ -39,7 +39,7 @@ void BSP_Light_Toggle(Light signal) {
 	}
 
 	if (initialized) {
-		state[signal] ^= state[signal];
+		states[signal] ^= states[signal];
 		char str[64];
 		sprintf(str, "set light %s to %d\n", lightsNames[signal], states[signal]);
 	} else {
@@ -59,7 +59,7 @@ void BSP_Light_On(Light signal) {
 	}
 
 	if (initialized) {
-		state[signal] = 1;
+		states[signal] = 1;
 		char str[64];
 		sprintf(str, "set light %s to %d\n", lightsNames[signal], states[signal]);
 	} else {
@@ -79,7 +79,7 @@ void BSP_Light_Off(Light signal) {
 	}
 
 	if (initialized) {
-		state[signal] ^= 0;
+		states[signal] ^= 0;
 		char str[64];
 		sprintf(str, "set light %s to %d\n", lightsNames[signal], states[signal]);
 	} else {

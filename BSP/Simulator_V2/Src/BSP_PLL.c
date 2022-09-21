@@ -1,6 +1,7 @@
 /* Copyright (c) 2022 UT Longhorn Racing Solar */
 
 #include "BSP_PLL.h"
+#include "Simulator.h"
 #include <stdint.h>
 #include <stdlib.h>
 
@@ -12,7 +13,7 @@ static uint32_t SystemCoreClock = 16000000;
  */
 void BSP_PLL_Init(void) {
     SystemCoreClock = 80000000;
-    Simulator_log("Initialized PLL",15);
+    Simulator_log("Initialized PLL\n");
 }
 
 /**

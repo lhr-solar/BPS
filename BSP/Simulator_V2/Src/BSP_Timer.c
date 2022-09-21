@@ -31,6 +31,7 @@ void BSP_Timer_Start(void) {
  */
 uint32_t BSP_Timer_GetTicksElapsed(void) {
     // TODO
+    return 42;
 }
 
 /**
@@ -40,4 +41,15 @@ uint32_t BSP_Timer_GetTicksElapsed(void) {
  */
 uint32_t BSP_Timer_GetRunFreq(void) {
     // TODO
+    return 42;
+}
+
+/**
+ * @brief   Gives a standard unit for time elapsed in microseconds since calling BSP_Timer_GetTicksElapsed()
+ * @param   None
+ * @return  Microseconds 
+ */
+uint32_t BSP_Timer_GetMicrosElapsed(void) {
+    // TODO
+    return 42;
 }

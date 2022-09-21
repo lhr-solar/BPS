@@ -20,6 +20,7 @@ void BSP_WDTimer_Init(void) {
  */
 bool BSP_WDTimer_DidSystemReset(void){
     // TODO
+    return false;
 }
 
 
