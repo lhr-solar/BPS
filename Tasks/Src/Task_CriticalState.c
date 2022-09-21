@@ -6,6 +6,7 @@
 #include "Tasks.h"
 #include "BSP_UART.h"
 #include "Voltage.h"
+#include "RTOS_BPS.h"
 #include "CAN_Queue.h"
 
 
@@ -22,7 +23,9 @@ void Task_CriticalState(void *p_arg) {
     // BLOCKING =====================
     // Wait until voltage, open wire, temperature, and current(Amperes) are all checked and safe
     for (int i = 0; i < NUM_FAULT_POINTS; i++){
-        OSSemPend(&SafetyCheck_Sem4, 0, OS_OPT_PEND_BLOCKING, &ts, &err);
+        RTOS_BPS_SemPend(&SafetyCheck_Sem4,
+                         0,
+                         OS_OPT_PEND_BLOCKING);
     }
 
     // launch watchdog task

@@ -14,6 +14,7 @@
 #include "BSP_UART.h"
 #include "config.h"
 #include "stm32f4xx.h"
+#include "RTOS_BPS.h"
 
 /*
  * Note: do not call this directly if it can be helped.
@@ -100,13 +101,11 @@ void EnterFaultState() {
 
 void Task_FaultState(void *p_arg) {
     (void)p_arg;
-    OS_ERR err;
-    CPU_TS ts;
-
     // BLOCKING =====================
     // Wait until a FAULT is signaled by another task.
-    OSSemPend(&Fault_Sem4, 0, OS_OPT_PEND_BLOCKING, &ts, &err);
-    
+    RTOS_BPS_SemPend(&Fault_Sem4,
+                     0,
+                     OS_OPT_PEND_BLOCKING);
     EnterFaultState();
 }
 

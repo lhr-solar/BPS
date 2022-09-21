@@ -2,6 +2,7 @@
 #include "BSP_CAN.h"
 #include "os.h"
 #include "Tasks.h"
+#include "RTOS_BPS.h"
 
 /* Locking mechanism for the CAN bus.
  * 
@@ -151,16 +152,10 @@ static ErrorStatus CANbus_SendMsg(CANId_t id, CANPayload_t payload) {
  * @return  ERROR if error, SUCCESS otherwise
  */
 ErrorStatus CANbus_BlockAndSend(CANId_t id, CANPayload_t payload) {
-	CPU_TS ts;
-	OS_ERR err;
-
 	// Pend for a mailbox (blocking)
-	OSSemPend(&CANbus_MailSem4,
+	RTOS_BPS_SemPend(&CANbus_MailSem4,
 			  0,
-			  OS_OPT_PEND_BLOCKING,
-			  &ts,
-			  &err);
-	assertOSError(err);
+			  OS_OPT_PEND_BLOCKING);
 	ErrorStatus result = CANbus_SendMsg(id, payload);
 	if (result == ERROR) {
 		CANbus_Release();
@@ -178,17 +173,10 @@ ErrorStatus CANbus_BlockAndSend(CANId_t id, CANPayload_t payload) {
  * @return  ERROR if data wasn't sent, otherwise it was sent.
  */
 ErrorStatus CANbus_Send(CANId_t id, CANPayload_t payload) {
-    CPU_TS ts;
-	OS_ERR err;
-	
-	// Check to see if a mailbox is available
-	OSSemPend(&CANbus_MailSem4,
+	// Check to see if a mailbox is available 
+    RTOS_BPS_SemPend(&CANbus_MailSem4,
 			  0,
-			  OS_OPT_PEND_NON_BLOCKING,
-			  &ts,
-			  &err);
-	assertOSError(err);
-
+			  OS_OPT_PEND_NON_BLOCKING);
 	// Send the message
 	ErrorStatus result = CANbus_SendMsg(id, payload);
 	if (result == ERROR) {
@@ -230,17 +218,10 @@ static ErrorStatus CANbus_GetMsg(CANId_t *id, uint8_t *buffer) {
  * @return  ERROR if there was no message, SUCCESS otherwise.
  */
 ErrorStatus CANbus_Receive(CANId_t *id, uint8_t *buffer) {
-	CPU_TS ts;
-	OS_ERR err;
-	
-	// Check to see if a mailbox is available
-	OSSemPend(&CANbus_ReceiveSem4,
+	//Check to see if a mailbox is available 
+	RTOS_BPS_SemPend(&CANbus_ReceiveSem4,
 			  0,
-			  OS_OPT_PEND_NON_BLOCKING,
-			  &ts,
-			  &err);
-	assertOSError(err);
-
+			  OS_OPT_PEND_NON_BLOCKING);
 	// Send the message
 	return CANbus_GetMsg(id, buffer);
 }
@@ -252,16 +233,9 @@ ErrorStatus CANbus_Receive(CANId_t *id, uint8_t *buffer) {
  * @return  ERROR if there was an error, SUCCESS otherwise.
  */
 ErrorStatus CANbus_WaitToReceive(CANId_t *id, uint8_t *buffer) {
-	CPU_TS ts;
-	OS_ERR err;
-
 	// Pend for a mailbox (blocking)
-	OSSemPend(&CANbus_ReceiveSem4,
-			  0,
-			  OS_OPT_PEND_BLOCKING,
-			  &ts,
-			  &err);
-	assertOSError(err);
-
+	RTOS_BPS_SemPend(&CANbus_ReceiveSem4,
+					 0,
+					 OS_OPT_PEND_BLOCKING);
 	return CANbus_GetMsg(id, buffer);
 }

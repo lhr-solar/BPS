@@ -24,6 +24,7 @@ void pend(void) {
                 OS_OPT_PEND_BLOCKING,
                 &ts,
                 &err);
+    R
 }
 
 void post(void) {

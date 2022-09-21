@@ -9,6 +9,7 @@
 #include "os.h"
 #include "Tasks.h"
 #include "BSP_SPI.h"
+#include "RTOS_BPS.h"
 #include "CANbus.h"
 #include "Charge.h"
 
@@ -19,14 +20,9 @@ static bsp_os_t spi_os;
 
 #ifdef RTOS
 void Amperes_Pend(){
-	CPU_TS ts;
-    OS_ERR err;
-    OSSemPend(&AmperesIO_Sem,
-                        0,
-                        OS_OPT_PEND_BLOCKING,
-                        &ts,
-                        &err);
-    assertOSError(err);
+	RTOS_BPS_SemPend(&AmperesIO_Sem,
+			  0,
+			  OS_OPT_PEND_BLOCKING)
 }
 
 void Amperes_Post(){

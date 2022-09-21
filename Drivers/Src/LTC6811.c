@@ -71,6 +71,7 @@ Copyright 2017 Linear Technology Corp. (LTC)
 #include "LTC6811.h"
 #include "config.h"
 #include "BSP_SPI.h"
+#include "RTOS_BPS.h"
 #include "os.h"
 #include "BSP_OS.h"
 #include "Tasks.h"
@@ -84,14 +85,9 @@ OS_SEM MinionsIO_Sem4;
 // RTOS Setup
 #ifdef RTOS
 void LTC6811_Pend(void) {
-    CPU_TS ts;
-    OS_ERR err;
-    OSSemPend(&MinionsIO_Sem4,
-                        0,
-                        OS_OPT_PEND_BLOCKING,
-                        &ts,
-                        &err);
-    assertOSError(err);
+    RTOS_BPS_SemPend(&MinionsIO_Sem4,
+                     0,
+                     OS_OPT_PEND_BLOCKING);
 }
 
 void LTC6811_Post(void) {
