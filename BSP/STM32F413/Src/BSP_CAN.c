@@ -149,8 +149,11 @@ ErrorStatus BSP_CAN_Write(uint32_t id, uint8_t data[8], uint8_t length) {
     
     gTxMessage.StdId = id;
     gTxMessage.DLC = length;
-	for(int i = 0; i < length; i++){
-        gTxMessage.Data[i] = data[i];
+
+    if(length<=8){
+        for(int i=0; i<length; i++){
+            gTxMessage.Data[i] = data[i];
+        }
     }
 	
     uint8_t mailbox = CAN_Transmit(CAN1, &gTxMessage);
