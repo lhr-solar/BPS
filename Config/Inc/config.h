@@ -49,6 +49,9 @@ typedef enum SafetyStatus_e {SAFE = 0, DANGER = 1, OVERVOLTAGE = 2, UNDERVOLTAGE
 #define MAX_DISCHARGE_TEMPERATURE_LIMIT	60000	    // Max temperature limit (milliCelcius)	(recommended release: 60.00C)
 #define MAX_CHARGE_TEMPERATURE_LIMIT	45000	    // Max temperature limit (milliCelcius)	(recommended release: 45.00C)
 
+#define PID_DESIRED_TEMPERATURE         38000       // Desired temperature   (milliCelcius) 
+#define PID_MAX_TEMPERATURE             55000       // Max temperature where PID is overridden (milliCelsius)
+
 #define MAX_CURRENT_LIMIT				75000		// Max current limit (Milliamperes)		(Max continuous discharge is 15A per cell)
 #define MAX_CHARGING_CURRENT 			-20000		// Max current per cell is 1.5 Amps (Standard charge)
 

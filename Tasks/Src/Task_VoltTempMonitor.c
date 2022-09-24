@@ -8,8 +8,9 @@
 #include "CANbus.h"
 #include "Amps.h"
 #include "CAN_Queue.h"
+#include "PID.h"
 
-int32_t avg;
+
 //declared in Tasks.c
 extern cell_asic Minions[NUM_MINIONS];
 
@@ -97,8 +98,10 @@ void Task_VoltTempMonitor(void *p_arg) {
         // BLOCKING =====================
         // Update Temperature Measurements
         Temperature_UpdateAllMeasurements();
-        // Check if temperature is NOT safe:
+
+        // Check if temperature is NOT safe: for all modules
         SafetyStatus temperatureStatus = Temperature_CheckStatus(Amps_IsCharging());
+        SafetyStatus PIDStatus = Temperature_General_Check(PID_MAX_TEMPERATURE);
         if(temperatureStatus != SAFE) {
             Fault_BitMap = Fault_OTEMP;
             OSSemPost(&Fault_Sem4,
@@ -113,7 +116,18 @@ void Task_VoltTempMonitor(void *p_arg) {
             assertOSError(err);
 
             temperatureHasBeenChecked = true;
+        } 
+        //PID loop - sets fan speed based on avg temperature and desired temperature
+        //overrides PID loop if above PID_MAX_TEMPERATURE or if it's FAULT
+        if (PIDStatus != SAFE || temperatureStatus != SAFE) {    
+            BSP_Fans_SetAll(TOPSPEED);
         }
+        else {
+            BSP_Fans_SetAll(PID_Output(Temperature_GetTotalPackAvgTemperature(), PID_DESIRED_TEMPERATURE));
+        }
+
+
+
 
         //Check if car should be allowed to charge or not
         for (uint8_t board = 0; board < NUM_MINIONS; board++) {
@@ -157,12 +171,7 @@ void Task_VoltTempMonitor(void *p_arg) {
             }
         }
 
-        // Control Fans depending on temperature
-        // Right now this just sets them to maximum speed
-        // Once we get a thermal model of the battery box, we can replace this with someting better
-        avg = Temperature_GetTotalPackAvgTemperature();
-        
-        BSP_Fans_SetAll(TOPSPEED);
+
 
         //signal watchdog
         OSMutexPend(&WDog_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);

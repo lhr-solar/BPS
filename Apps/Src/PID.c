@@ -3,19 +3,38 @@
 #include "PID.h"
 #include "Tasks.h"
 
-#define Proportion 1000     
-#define Integral 1000
-#define Derivative 1000
+//TODO: tune PID with actual pack and fans, and then change values below to appropiate value
+#define PROPORTION -1234
+#define INTEGRAL 4321
+#define DERIVATIVE -9876
 
-static int32_t area = 0;
-int32_t err;
-int32_t rate;
-//returns fan speed based on proportion value
-int32_t PID_output(int32_t avg_temp, int32_t desired_temp) {
-    err = desired_temp - avg_temp;
-    area = area + err;
-    
-    return Proportion*(err);
+static int32_t ErrorSum = 0;
+static int32_t Error;
+static int32_t Rate;
+static int32_t PreviousError = 0;
+
+/**
+ * @brief Gives fan speed based on Average temperature of pack and past error values
+ * @param InputTemp - current temperature
+ * @param DesiredTemp - desired temperature
+ * @return FanSpeed: 0-4000 PWM
+ */
+int32_t PID_output(int32_t InputTemp, int32_t DesiredTemp) {
+    Error = DesiredTemp - InputTemp;
+    ErrorSum = ErrorSum + Error;
+
+    if (PreviousError == 0) {PreviousError = Error;} //init previous val first time
+
+    Rate = Error - PreviousError;
+    PreviousError = Error;     //updates previous err value
+
+    if (((PROPORTION*(Error) + INTEGRAL*(ErrorSum) + DERIVATIVE*(Rate))/25000) > 4000) {
+        return 4000;
+    }
+    if (((PROPORTION*(Error) + INTEGRAL*(ErrorSum) + DERIVATIVE*(Rate))/25000) <= 0) {
+        return 0;
+    }
+    return (PROPORTION*(Error) + INTEGRAL*(ErrorSum) + DERIVATIVE*(Rate))/25000;
 }
 
 

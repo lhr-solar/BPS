@@ -70,6 +70,13 @@ ErrorStatus Temperature_UpdateAllMeasurements(void);
  */
 SafetyStatus Temperature_CheckStatus(uint8_t isCharging);
 
+/** Temperature_General_Check
+ * Checks if all modules below specified temperature
+ * @param target_temperature in millivolts
+ * @return SAFE or DANGER
+ */
+SafetyStatus Temperature_General_Check(int32_t target_temperature);
+
 /** Temperature_SetChargeState
  * Lithium Ion Cells have two separate max temperature limits. There is a limit
  * when the battery is charging and another limit when the battery is discharging.
