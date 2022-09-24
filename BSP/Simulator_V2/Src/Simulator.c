@@ -93,11 +93,6 @@ void Simulator_init(void) {
         printf("error writing file %s\n", JSON_PATH);
         exit(-1);
     }
-
-    // Test CAN message
-    uint8_t msg[8] = "NICECOCK";
-    BSP_CAN_Init(NULL, NULL, false);
-    BSP_CAN_Write(69, msg, 8);
     
     // register the Ctrl-C handler
     sigset_t s;
