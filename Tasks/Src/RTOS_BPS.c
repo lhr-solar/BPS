@@ -15,7 +15,7 @@ void RTOS_BPS_SemPost(void) {
  * @brief   Waits for Mutex, assigns timestamp and any error to err and ticks
  * @param   *mutex - pointer to mutex
  * @param   timeout - timeout period, if 0 will wait forever until resource available
- * @param   options - determines if mutex available or not
+ * @param   options - determines what the mutex will do, ie: block or not block
  * @return  none
  */
 void RTOS_BPS_MutexPend(BPS_OS_MUTEX* mutex, BPS_OS_TICK timeout, BPS_OS_OPT opt) {
