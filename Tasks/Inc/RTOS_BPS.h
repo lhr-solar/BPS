@@ -19,14 +19,18 @@ typedef OS_OPT      BPS_OS_OPT;
 typedef OS_ERR      BPS_OS_ERR;
 typedef OS_SEM      BPS_OS_SEM;
 typedef OS_TCB      BPS_OS_TCB;
+typedef OS_SEM_CTR  BPS_OS_SEM_CTR;
+typedef OS_TICK     BPS_OS_TICK;
 
 
 /**
- * @brief
- * @param
- * @return
+ * @brief Pends a BPS_OS_Semaphore.
+ * @param *sem - pointer to a sempaphore to pend
+ * @param tick - time in clock ticks to timeout for
+ * @param opt - pend option
+ * @return the semaphore count, or 0 if not available
  */
-void RTOS_BPS_SemPend(void);
+BPS_OS_SEM_CTR RTOS_BPS_SemPend(BPS_OS_SEM* sem, BPS_OS_TICK tick, BPS_OS_OPT opt);
 
 /**
  * @brief
