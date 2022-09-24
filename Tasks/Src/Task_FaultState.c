@@ -15,6 +15,8 @@
 #include "config.h"
 #ifndef SIMULATION
 #include "stm32f4xx.h"
+#else
+#include "Simulator.h"
 #endif
 
 /*
@@ -99,6 +101,10 @@ void EnterFaultState() {
         if (BSP_UART_ReadLine(command)) CLI_Handler(command); // CLI
 #endif
         BSP_WDTimer_Reset(); // WDOG Reset
+#ifdef SIMULATION
+        Simulator_log("Completed fault state\n");
+        Simulator_shutdown(0);
+#endif
     }
 }
 

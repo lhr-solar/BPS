@@ -6,12 +6,17 @@
  */
 
 #include "Voltage.h"
+#ifndef SIMULATION
 #include "LTC6811.h"
+#endif
 #include "config.h"
 #include <stdlib.h>
 #include "os.h"
 #include "Tasks.h"
 #include "Amps.h"
+#ifdef SIMULATION
+#include "Simulator.h"
+#endif
 
 // median filter
 #define MEDIAN_FILTER_TYPE uint16_t
@@ -48,6 +53,8 @@ void Voltage_Init(cell_asic *boards){
 				  &err
 				);
 					
+// simulator bypasses ltc driver
+#ifndef SIMULATION
 	wakeup_sleep(NUM_MINIONS);
 	LTC6811_Init(Minions);
 	
@@ -69,11 +76,13 @@ void Voltage_Init(cell_asic *boards){
 	// release mutex
   	OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
   	assertOSError(err);
+#endif
 	
 	// Initialize median filter. There should be no modules with less than 0 volts or more than 5 volts
 	VoltageFilter_init(&VoltageFilter, 0, 50000);
 }
 
+#ifndef SIMULATION
 /** Voltage_UpdateMeasurements
  * Stores and updates the new measurements received
  * @param pointer to new voltage measurements
@@ -113,6 +122,46 @@ void Voltage_UpdateMeasurements(void){
 	OSMutexPost(&Voltage_Mutex, OS_OPT_POST_NONE, &err);
 	assertOSError(err);
 }
+#else
+/** Voltage_UpdateMeasurements
+ * Stores and updates the new measurements received
+ * @param pointer to new voltage measurements
+ */
+void Voltage_UpdateMeasurements(void){
+	CPU_TS ts;
+
+	// Read Voltages from simulator
+	//take control of mutex
+	OS_ERR err;
+#ifndef SIMULATION
+  	OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
+  	assertOSError(err);
+#endif
+
+	// package raw voltage values into single array
+	static uint16_t rawVoltages[NUM_BATTERY_MODULES];
+	for(int i = 0; i < NUM_BATTERY_MODULES; i++){
+		rawVoltages[i] = Simulator_getVoltage(i);
+	}
+
+#ifndef SIMULATION
+	// release minions asic mutex
+	OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
+  	assertOSError(err);
+#endif
+	
+	// run median filter
+	VoltageFilter_put(&VoltageFilter, rawVoltages);
+
+	// update public voltage values
+	OSMutexPend(&Voltage_Mutex, 0, OS_OPT_PEND_BLOCKING, &ts, &err);
+  	assertOSError(err);
+	VoltageFilter_get(&VoltageFilter, Voltages);
+	//release mutex
+	OSMutexPost(&Voltage_Mutex, OS_OPT_POST_NONE, &err);
+	assertOSError(err);
+}
+#endif
 
 /** Voltage_CheckStatus
  * Checks if all battery modules are safe
@@ -143,9 +192,11 @@ SafetyStatus Voltage_CheckStatus(void){
  * @return pointer to index of modules that are in danger
  */
 void Voltage_GetModulesInDanger(VoltageSafety_t* system){
+	OS_ERR err;
+// no simulator support for open wires
+#ifndef SIMULATION
 	uint32_t wires;
 	uint32_t openWireIdx = 0;
-	OS_ERR err;
 	OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
   	assertOSError(err);
 	//put all the bits from each minion's system_open_wire variable into one variable
@@ -159,6 +210,7 @@ void Voltage_GetModulesInDanger(VoltageSafety_t* system){
 			openWireIdx++;
 		}
 	}
+#endif
 	
 	for (int i = 0; i < TOTAL_VOLT_WIRES; i++) {	
 		if(i < NUM_BATTERY_MODULES){
@@ -181,6 +233,8 @@ void Voltage_GetModulesInDanger(VoltageSafety_t* system){
   	assertOSError(err);
 }
 
+// no simulator support for open wire checks (yet)
+#ifndef SIMULATION
 /** Voltage_OpenWireSummary
  * Runs the open wire method with print=true
  */
@@ -246,6 +300,7 @@ uint32_t Voltage_GetOpenWire(void){
 	}
 	return result;
 }
+#endif
 
 /** Voltage_GetModuleVoltage
  * Gets the voltage of a certain battery module in the battery pack
