@@ -1,25 +1,35 @@
 /* Copyright (c) 2022 UT Longhorn Racing Solar */
 
 #include "BSP_CAN.h"
-#include "simulator_conf.h"
+#include "Simulator.h"
 #include <stdint.h>
 #include <stdlib.h>
 #include <sys/file.h>
 #include <unistd.h>
 
+#define to64l(arr) (((uint64_t)(((uint8_t *)(arr))[0]) <<  0)+\
+                    ((uint64_t)(((uint8_t *)(arr))[1]) <<  8)+\
+                    ((uint64_t)(((uint8_t *)(arr))[2]) << 16)+\
+                    ((uint64_t)(((uint8_t *)(arr))[3]) << 24)+\
+                    ((uint64_t)(((uint8_t *)(arr))[4]) << 32)+\
+                    ((uint64_t)(((uint8_t *)(arr))[5]) << 40)+\
+                    ((uint64_t)(((uint8_t *)(arr))[6]) << 48)+\
+                    ((uint64_t)(((uint8_t *)(arr))[7]) << 56))
+
 #if 0
 static const char* file = GET_CSV_PATH(CAN_CSV_FILE);
 #endif
 
+static bool CAN_Initialized = false;
+// User parameters for CAN events
+static void (*gRxEvent)(void);
+static void (*gTxEnd)(void);
 
 /**
  * @brief   Initializes the CAN module that communicates with the rest of the electrical system.
  * @param   None
  * @return  None
  */
-
-
-
 void BSP_CAN_Init(callback_t rxEvent, callback_t txEnd, bool loopback) {
 #if 0   // TODO: replace with interrupt-capable code
     FILE* fp = fopen(file, "w");
@@ -32,6 +42,10 @@ void BSP_CAN_Init(callback_t rxEvent, callback_t txEnd, bool loopback) {
     flock(fno, LOCK_UN);
     fclose(fp);
 #endif
+    gTxEnd = txEnd;
+    gRxEvent = rxEvent;
+    CAN_Initialized = true;
+    Simulator_log("CAN Initialized\n");
 }
 
 
@@ -44,6 +58,11 @@ void BSP_CAN_Init(callback_t rxEvent, callback_t txEnd, bool loopback) {
  * @return  ERROR if module was unable to transmit the data onto the CAN bus. SUCCESS indicates data was transmitted.
  */
 ErrorStatus BSP_CAN_Write(uint32_t id, uint8_t data[8], uint8_t length) {
+    if (length > 8) return ERROR;
+    char canMsgBuf[100] = {0};
+    sprintf(canMsgBuf, "Sending CAN message, with ID [%d], length [%d], message contents [0x%lx]\n", id, length, to64l(data));
+    Simulator_log(canMsgBuf);
+    return SUCCESS;
 #if 0   // TODO: replace with interrupt-capable code
     FILE* fp = fopen(file, "w");
     if(!fp) {
@@ -85,6 +104,9 @@ ErrorStatus BSP_CAN_Write(uint32_t id, uint8_t data[8], uint8_t length) {
  * @return  ERROR if nothing was received so ignore id and data that was received. SUCCESS indicates data was received and stored.
  */
 ErrorStatus BSP_CAN_Read(uint32_t *id, uint8_t *data) {
+    char buffer[50];
+    sprintf(buffer, "Read CAN message of ID 0x%X\n", *id);
+    //gTxEnd();
 #if 0   // TODO: replace with interrupt-capable code
     FILE* fp = fopen(file, "r+");
     if(!fp) {

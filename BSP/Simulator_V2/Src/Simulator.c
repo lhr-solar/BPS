@@ -19,6 +19,8 @@
 #include <stdbool.h>
 #include "cJSON.h" // for json parser
 
+#include "BSP_CAN.h" // CAN testing
+
 // file descriptor of simulator log file
 int simulatorLog;
 
@@ -92,6 +94,11 @@ void Simulator_init(void) {
         exit(-1);
     }
 
+    // Test CAN message
+    uint8_t msg[8] = "NICECOCK";
+    BSP_CAN_Init(NULL, NULL, false);
+    BSP_CAN_Write(69, msg, 8);
+    
     // register the Ctrl-C handler
     sigset_t s;
     sigemptyset(&s);
