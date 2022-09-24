@@ -5,7 +5,11 @@
 #include "CANbus.h"
 #include "os.h"
 #include "Tasks.h"
+#ifndef SIMULATION
 #include "stm32f4xx.h"
+#else
+#include "Simulator.h"
+#endif
 #include "BSP_Lights.h"
 #include "BSP_PLL.h"
 #include "CAN_Queue.h"
@@ -42,7 +46,11 @@ void EnterFaultState(void);
 void Task1(void *p_arg){
     OS_ERR err;
     
+#ifndef SIMULATION
     OS_CPU_SysTickInit(SystemCoreClock / (CPU_INT32U) OSCfg_TickRate_Hz);
+#else
+	Simulator_init();
+#endif
     
     OSSemCreate(&Fault_Sem4,
                 "Fault/Tripped Semaphore",

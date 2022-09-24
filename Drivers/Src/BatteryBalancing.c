@@ -57,6 +57,8 @@ void Balancing_Balance(cell_asic Minions[]){
  * @return  None
  */
 static void Balancing_ClearDischargeBit(int Cell, uint8_t total_ic, cell_asic *ic){
+// No simulator support for battery balancing (yet)
+#ifndef SIMULATION
 	OS_ERR err;
 	OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
   	assertOSError(err);
@@ -73,7 +75,7 @@ static void Balancing_ClearDischargeBit(int Cell, uint8_t total_ic, cell_asic *i
   	}
 	OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
 	assertOSError(err);
-
+#endif
 }
 
 /**
@@ -103,6 +105,8 @@ static void Balancing_GetICNumber(uint8_t i, uint8_t* ICNumber, uint8_t* ModuleN
  * @return  None
  */
 static void Balancing_SetDischargeBit(uint8_t module, cell_asic ic[]) { 
+// No simulator support for battery balancing (yet)
+#ifndef SIMULATION
 	OS_ERR err;
 	uint8_t ICNumber = 0; 
 	uint8_t ModuleNumber = 0;
@@ -118,4 +122,5 @@ static void Balancing_SetDischargeBit(uint8_t module, cell_asic ic[]) {
 	
 	OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
 	assertOSError(err);
+#endif
 }

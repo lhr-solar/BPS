@@ -2,7 +2,9 @@
 
 #include "BSP_WDTimer.h"
 #include <stdint.h>
+#include "Simulator.h"
 
+bool initialized = false;
 
 /**
  * @brief   Initialize the watch dog timer.
@@ -10,7 +12,8 @@
  * @return  None
  */
 void BSP_WDTimer_Init(void) {
-    // TODO
+    initialized = true;
+    Simulator_log("Initialized the watchdog timer\n");
 }
 
 /**
@@ -31,7 +34,13 @@ bool BSP_WDTimer_DidSystemReset(void){
  * @return  None
  */
 void BSP_WDTimer_Start(void) {
-    // TODO
+    if (!initialized) {
+        Simulator_log("Error: used watchdog timer without initialization!\n");
+        exit(-1);
+    }
+
+
+    Simulator_log("Started the watchdog timer\n");
 }
 
 /**
@@ -41,7 +50,12 @@ void BSP_WDTimer_Start(void) {
  * @return  None
  */
 void BSP_WDTimer_Reset(void) {
-    // TODO
+    if (!initialized) {
+        Simulator_log("Error: used watchdog timer without initialization!\n");
+        exit(-1);
+    }
+
+    Simulator_log("Reset the watchdog timer\n");
 }
 
 

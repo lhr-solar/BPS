@@ -42,6 +42,7 @@ void BSP_Light_Toggle(Light signal) {
 		states[signal] ^= states[signal];
 		char str[64];
 		sprintf(str, "set light %s to %d\n", lightsNames[signal], states[signal]);
+		Simulator_log(str);
 	} else {
 		Simulator_log("Hard Fault: used lights before initialization\n");
 		exit(-1);
@@ -62,6 +63,7 @@ void BSP_Light_On(Light signal) {
 		states[signal] = 1;
 		char str[64];
 		sprintf(str, "set light %s to %d\n", lightsNames[signal], states[signal]);
+		Simulator_log(str);
 	} else {
 		Simulator_log("Hard Fault: used lights before initialization\n");
 		exit(-1);
@@ -82,6 +84,7 @@ void BSP_Light_Off(Light signal) {
 		states[signal] ^= 0;
 		char str[64];
 		sprintf(str, "set light %s to %d\n", lightsNames[signal], states[signal]);
+		Simulator_log(str);
 	} else {
 		Simulator_log("Hard Fault: used lights before initialization\n");
 		exit(-1);
