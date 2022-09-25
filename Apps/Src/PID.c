@@ -19,7 +19,7 @@ static int32_t PreviousError = 0;
  * @param DesiredTemp - desired temperature
  * @return FanSpeed: 0-4000 PWM
  */
-int32_t PID_output(int32_t InputTemp, int32_t DesiredTemp) {
+int32_t PID_Output(int32_t InputTemp, int32_t DesiredTemp) {
     Error = DesiredTemp - InputTemp;
     ErrorSum = ErrorSum + Error;
 
