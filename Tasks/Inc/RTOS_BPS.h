@@ -12,9 +12,6 @@ RTOS_BPS library includes all the wrapper functions for a functioning RTOS - nee
 #ifndef RTOS_BPS_H
 #define RTOS_BPS_H
 
-<<<<<<< HEAD
-// Custom typedefs and options for mutex/semaphore functionality
-// ONLY change the first column in the TypeDef depending on the RTOS used
 
 // Currently using Micrium
 typedef OS_MUTEX    BPS_OS_MUTEX;
@@ -25,10 +22,6 @@ typedef OS_SEM      BPS_OS_SEM;
 typedef OS_TCB      BPS_OS_TCB;
 typedef OS_SEM_CTR  BPS_OS_SEM_CTR;
 typedef OS_TICK     BPS_OS_TICK;
-=======
-
-//#include
->>>>>>> 0e12c21 (Wrapper attempt)
 
 
 /**
@@ -82,7 +75,7 @@ void RTOS_BPS_TaskCreate(void);
  * @param  
  * @return  
  */
-void RTOS_BPS_TimeDelay(OS_TICK dly);
+void RTOS_BPS_TimeDelay(OS_TICK dly, OS_OPT opt);
 
 
 #endif 
