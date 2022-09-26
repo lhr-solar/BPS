@@ -7,15 +7,6 @@
 #include <sys/file.h>
 #include <unistd.h>
 
-#define to64l(arr) (((uint64_t)(((uint8_t *)(arr))[0]) <<  0)+\
-                    ((uint64_t)(((uint8_t *)(arr))[1]) <<  8)+\
-                    ((uint64_t)(((uint8_t *)(arr))[2]) << 16)+\
-                    ((uint64_t)(((uint8_t *)(arr))[3]) << 24)+\
-                    ((uint64_t)(((uint8_t *)(arr))[4]) << 32)+\
-                    ((uint64_t)(((uint8_t *)(arr))[5]) << 40)+\
-                    ((uint64_t)(((uint8_t *)(arr))[6]) << 48)+\
-                    ((uint64_t)(((uint8_t *)(arr))[7]) << 56))
-
 #if 0
 static const char* file = GET_CSV_PATH(CAN_CSV_FILE);
 #endif
@@ -59,9 +50,17 @@ void BSP_CAN_Init(callback_t rxEvent, callback_t txEnd, bool loopback) {
  */
 ErrorStatus BSP_CAN_Write(uint32_t id, uint8_t data[8], uint8_t length) {
     if (length > 8) return ERROR;
+    // log message
     char canMsgBuf[100] = {0};
-    sprintf(canMsgBuf, "Sending CAN message, with ID [%d], length [%d], message contents [0x%lx]\n", id, length, to64l(data));
+    sprintf(canMsgBuf, "Sending CAN message, with ID [%d], length [%d], message contents (as bytes): [0x", id, length);
     Simulator_log(canMsgBuf);
+    // log the actual numbers
+    char numBuf[9] = {0};
+    for (uint8_t i = 0; i < length; i++) {
+        sprintf(numBuf, "%X ", data[i]);
+    }
+    numBuf[length] = '\n';
+    Simulator_log(numBuf);
     return SUCCESS;
 #if 0   // TODO: replace with interrupt-capable code
     FILE* fp = fopen(file, "w");
@@ -106,7 +105,7 @@ ErrorStatus BSP_CAN_Write(uint32_t id, uint8_t data[8], uint8_t length) {
 ErrorStatus BSP_CAN_Read(uint32_t *id, uint8_t *data) {
     char buffer[50];
     sprintf(buffer, "Read CAN message of ID 0x%X\n", *id);
-    //gTxEnd();
+    gTxEnd();
 #if 0   // TODO: replace with interrupt-capable code
     FILE* fp = fopen(file, "r+");
     if(!fp) {
