@@ -9,6 +9,9 @@
 #include "Tasks.h"
 #include "VoltageToTemp.h"
 #include "BSP_PLL.h"
+#ifdef SIMULATION
+#include "Simulator.h"
+#endif
 
 // if you change this, you also need to change the calls to median()
 #define TEMPERATURE_MEDIAN_FILTER_DEPTH 3
@@ -28,9 +31,17 @@ static int32_t maxTemperature;
 // 0 if discharging 1 if charging
 static uint8_t ChargingState;
 
+// simulator bypasses ltc driver
+#ifndef SIMULATION
 // Interface to communicate with LTC6811 (Register values)
 // Temperature.c uses auxiliary registers to view ADC data and COM register for I2C with LTC1380 MUX
 static cell_asic *Minions;
+#endif
+
+#ifdef SIMULATION
+// keep track of which temperature channel we are using
+uint8_t currentChannel = 0;
+#endif
 
 /**
  * @brief find the median of three values
@@ -51,6 +62,9 @@ static inline int32_t median(int32_t a, int32_t b, int32_t c) {
  * @param boards LTC6811 data structure that contains the values of each register
  */
 void Temperature_Init(cell_asic *boards){
+// simulator bypasses ltc driver
+#ifndef SIMULATION
+
 	// Record pointer
 	Minions = boards;
 	OS_ERR err;
@@ -71,6 +85,7 @@ void Temperature_Init(cell_asic *boards){
 	//release mutex
   	OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
   	assertOSError(err);
+#endif
 
 	// set up the median filter with alternating temperatures of 1000 degrees and 0 degrees
 	for (int32_t filterIdx = 0; filterIdx < TEMPERATURE_MEDIAN_FILTER_DEPTH - 1; ++filterIdx) {
@@ -94,6 +109,9 @@ void Temperature_Init(cell_asic *boards){
  * @note we clear the otherMux every time a channel is switched even on the same mux; Maybe change depending on speed/optimization
  */
 ErrorStatus Temperature_ChannelConfig(uint8_t tempChannel) {
+#ifdef SIMULATION
+	currentChannel = tempChannel;
+#else
 	uint8_t muxAddress;
 	uint8_t otherMux;
 	
@@ -168,6 +186,7 @@ ErrorStatus Temperature_ChannelConfig(uint8_t tempChannel) {
 	//release mutex
   	OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
   	assertOSError(err);
+#endif
 
 	return SUCCESS;
 }
@@ -208,7 +227,11 @@ ErrorStatus Temperature_UpdateSingleChannel(uint8_t channel){
 		
 		// update adc value from GPIO1 stored in a_codes[0]; 
 		// a_codes[0] is fixed point with .001 resolution in volts -> multiply by .001 * 1000 to get mV in double form
+#ifndef SIMULATION
 		rawTemperatures[board][channel][medianFilterIdx] = milliVoltToCelsius(Minions[board].aux.a_codes[0] / 10);
+#else
+		rawTemperatures[board][channel][medianFilterIdx] = Simulator_getTemperature(board * MAX_TEMP_SENSORS_PER_MINION_BOARD + channel);
+#endif
 	}
 
 	// increment the median filter index
@@ -362,6 +385,7 @@ int32_t Temperature_GetTotalPackAvgTemperature(void){
  * @return SUCCESS or ERROR
  */
 ErrorStatus Temperature_SampleADC(uint8_t ADCMode) {
+#ifndef SIMULATION
 	//take control of mutex
 	OS_ERR err;
   	OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
@@ -375,6 +399,9 @@ ErrorStatus Temperature_SampleADC(uint8_t ADCMode) {
   	OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
   	assertOSError(err);
 	return error != -1 ? SUCCESS : ERROR;
+#else
+	return SUCCESS;
+#endif
 }
 
 /** Temperature_GetMaxTemperature
