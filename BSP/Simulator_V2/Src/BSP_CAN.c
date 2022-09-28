@@ -3,6 +3,7 @@
 #include "BSP_CAN.h"
 #include "Simulator.h"
 #include <stdint.h>
+#include <inttypes.h>
 #include <stdlib.h>
 #include <sys/file.h>
 #include <unistd.h>
@@ -52,15 +53,11 @@ ErrorStatus BSP_CAN_Write(uint32_t id, uint8_t data[8], uint8_t length) {
     if (length > 8) return ERROR;
     // log message
     char canMsgBuf[100] = {0};
-    sprintf(canMsgBuf, "Sending CAN message, with ID [%d], length [%d], message contents (as bytes): [0x", id, length);
+    uint64_t* data64 = (uint64_t*)(data + 1); // skip the " that cJSON includes
+    sprintf(canMsgBuf, "Writing CAN message with ID [%d], DATA [0x%016" PRIx64 "], LEN [%d]\n", id, *data64, length);
     Simulator_log(canMsgBuf);
-    // log the actual numbers
-    char numBuf[9] = {0};
-    for (uint8_t i = 0; i < length; i++) {
-        sprintf(numBuf, "%X ", data[i]);
-    }
-    numBuf[length] = '\n';
-    Simulator_log(numBuf);
+    if (gTxEnd != NULL)
+        gTxEnd();
     return SUCCESS;
 #if 0   // TODO: replace with interrupt-capable code
     FILE* fp = fopen(file, "w");
@@ -103,9 +100,11 @@ ErrorStatus BSP_CAN_Write(uint32_t id, uint8_t data[8], uint8_t length) {
  * @return  ERROR if nothing was received so ignore id and data that was received. SUCCESS indicates data was received and stored.
  */
 ErrorStatus BSP_CAN_Read(uint32_t *id, uint8_t *data) {
-    char buffer[50];
-    sprintf(buffer, "Read CAN message of ID 0x%X\n", *id);
-    gTxEnd();
+    char buffer[75];
+    sprintf(buffer, "Read CAN message ID [%d] DATA [0x%016" PRIx64 "]\n", *id, *(uint64_t*)(data + 1));
+    Simulator_log(buffer);
+    if (gRxEvent != NULL) // so we dont error out and die
+        gRxEvent();
 #if 0   // TODO: replace with interrupt-capable code
     FILE* fp = fopen(file, "r+");
     if(!fp) {
