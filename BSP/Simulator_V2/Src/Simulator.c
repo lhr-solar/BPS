@@ -125,7 +125,24 @@ static void readInputFile(void) {
                 tail->current = field->valueint;
             } else if (strcmp(field->string, "charge") == 0) {
                 tail->charge = field->valueint;
-            }else {
+            } else if (strcmp(field->string, "can") == 0) {
+                // for every CAN msg in the list...
+                for (cJSON* msg = field->child; msg != NULL; msg = msg->next) {
+                    uint32_t id = cJSON_GetObjectItem(msg, "id")->valueint;
+                    char* read_write = cJSON_PrintUnformatted(cJSON_GetObjectItem(msg, "read_write"));
+                    uint8_t* data = (uint8_t*)cJSON_PrintUnformatted(cJSON_GetObjectItem(msg, "data"));
+                    uint8_t len = cJSON_GetObjectItem(msg, "len")->valueint;
+                    if (strcmp(read_write, "\"read\"") == 0)
+                        BSP_CAN_Read(&id, data);
+                    else if (strcmp(read_write, "\"write\"") == 0)
+                        BSP_CAN_Write(id, data, len);
+                    else {
+                        printf("Error: CAN message read/write type invalid! [%s]\n", read_write);
+                        exit(-1);
+                    }
+                }
+            }
+            else {
                 printf("Error: unknown field %s in simulator state!\n", field->string);
                 exit(-1);
             }
@@ -163,10 +180,10 @@ void Simulator_init(void) {
     const struct sigaction act = {.sa_handler = CtrlCHandler, .sa_mask = s, .sa_flags = 0};
     sigaction(SIGINT, &act, NULL);
 
+    Simulator_log("Simulator intialized\n");    
+
     // initialize the fake inputs
     readInputFile();
-
-    Simulator_log("Simulator intialized\n");
 
     // log the starting time
     startTime = time(NULL);
