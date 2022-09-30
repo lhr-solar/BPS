@@ -53,7 +53,7 @@ ErrorStatus BSP_CAN_Write(uint32_t id, uint8_t data[8], uint8_t length) {
     if (length > 8) return ERROR;
     // log message
     char canMsgBuf[100] = {0};
-    uint64_t* data64 = (uint64_t*)(data + 1); // skip the " that cJSON includes
+    uint64_t* data64 = (uint64_t*)(data);
     sprintf(canMsgBuf, "Writing CAN message with ID [%d], DATA [0x%016" PRIx64 "], LEN [%d]\n", id, *data64, length);
     Simulator_log(canMsgBuf);
     if (gTxEnd != NULL)
@@ -101,7 +101,7 @@ ErrorStatus BSP_CAN_Write(uint32_t id, uint8_t data[8], uint8_t length) {
  */
 ErrorStatus BSP_CAN_Read(uint32_t *id, uint8_t *data) {
     char buffer[75];
-    sprintf(buffer, "Read CAN message ID [%d] DATA [0x%016" PRIx64 "]\n", *id, *(uint64_t*)(data + 1));
+    sprintf(buffer, "Read CAN message ID [%d] DATA [0x%016" PRIx64 "]\n", *id, *(uint64_t*)(data));
     Simulator_log(buffer);
     if (gRxEvent != NULL) // so we dont error out and die
         gRxEvent();
