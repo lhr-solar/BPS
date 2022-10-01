@@ -58,8 +58,8 @@ void RTOS_BPS_TaskCreate(void){
  * @param dly Defines how many ticks to delay for.
  * @return none
  */
-void RTOS_BPS_TimeDelay(BPS_OS_TICK dly){
-    BPS_OS_OPT opt = OS_OPT_TIME_DLY;
+void RTOS_BPS_TimeDelay(BPS_OS_TICK dly, BPS_OS_OPT opt){
+    opt = OS_OPT_TIME_DLY;
     BPS_OS_ERR err;
     OSTimeDly(dly, opt, &err);
     assertOSError(err);
