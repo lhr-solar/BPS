@@ -48,8 +48,6 @@ void Task1(void *p_arg){
     
 #ifndef SIMULATION
     OS_CPU_SysTickInit(SystemCoreClock / (CPU_INT32U) OSCfg_TickRate_Hz);
-#else
-	Simulator_init();
 #endif
     
     OSSemCreate(&Fault_Sem4,
@@ -179,7 +177,12 @@ void Task2(void *p_arg){
 }
 
 // Similar to the production code main. Does not mess with contactor 
+#ifndef SIMULATION
 int main(void) {
+#else
+int main(int argc, char **argv) {
+    Simulator_init(argv[1]);
+#endif
 
     //Resetting the contactor
     BSP_Contactor_Init();

@@ -32,14 +32,11 @@ driver adn deal with a higher layer of abstraction (voltage and temperature read
 
 Compiling the Simulator
 =======================
-Right now the simulator can be compiled with ``make simulator_v2``. The simulator requires an additional ``INPUT=`` command line argument to 
-specific the path to the JSON file for the test case to run. I chose to define the test at compile time instead of run time because I wanted 
-to avoid making changes to main() to add command line arguemnts when I started this, but I am open to revisiting this if we decide a run-time 
-option would be better. The ``TEST=`` option is also supported for running custom test cases.
+Right now the simulator can be compiled with ``make simulator_v2``. 
 
 Running the Simulator
 =====================
-The simulator can be run with ``./bps-simulator.out``
+The simulator can be run with ``./bps-simulator.out <path to JSON input file>``
 
 Checking tests
 ==============

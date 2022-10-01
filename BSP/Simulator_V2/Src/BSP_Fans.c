@@ -1,10 +1,8 @@
 #include "BSP_Fans.h"
 #include "Simulator.h"
 
-#define NUM_FANS 4
-
 static bool initialized = false;
-static uint32_t speed[NUM_FANS] = {0,0,0,0};
+static uint32_t speed[NUM_FANS];
 
 /**
  * @brief   Initialize all the GPIO pins connected to each fan
@@ -14,6 +12,7 @@ static uint32_t speed[NUM_FANS] = {0,0,0,0};
 void BSP_Fans_Init(void)
 {
     initialized = true;
+    memset(speed, 0, sizeof(speed));
     Simulator_log("Initialized Fans\n");
 }
 

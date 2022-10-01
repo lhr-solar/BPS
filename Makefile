@@ -16,9 +16,6 @@ export TEST
 OS = RTOS
 export OS
 
-INPUT = none
-export INPUT
-
 stm32f413:
 	$(MAKE) -C BSP -C STM32F413 -j
 

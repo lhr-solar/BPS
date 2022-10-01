@@ -30,19 +30,31 @@ static simulator_state *states = NULL;
 // note that this only has a granularity of 1 second, so it's not super precise
 static time_t startTime;
 
-// It knows what the input file is because the Makefile should make a #define for the file path called SIMULATOR_JSON_PATH
-#ifndef SIMULATOR_JSON_PATH
-#define JSON_PATH "Error: make sure you define the simulator JSON path in the Makefile!"
-#else
-// #define QUOTE_MARK "
-#define STR(X) # X
-#define STRINGIFY(X) STR(X)
-#define JSON_PATH STRINGIFY(SIMULATOR_JSON_PATH) 
-#endif
-
 // log something to the simualtor's log file
 void Simulator_log(char *str) {
     write(simulatorLog, str, strlen(str));
+}
+
+#define SIMULATOR_MESSAGE(prefix, message) { \
+    char *buffer = (char *) malloc(sizeof(prefix) + strlen(str) + 2); \
+    sprintf(buffer, "%s%s\n", prefix, message); \
+    Simulator_log(buffer); \
+    free(buffer); \
+}
+
+// log an error to the simulator's log file
+void Simulator_error(char *str) {
+    SIMULATOR_MESSAGE("Error:   ", str)
+}
+
+// log an info message to the simulator's log file
+void Simualtor_info(char *str) {
+    SIMULATOR_MESSAGE("Info:    ", str)
+}
+
+// log a warning to the simulator's log file
+void Simulator_warning(char *str) {
+    SIMULATOR_MESSAGE("Warning: ", str)
 }
 
 // shut down the simulator
@@ -53,24 +65,24 @@ void Simulator_shutdown(int status) {
 }
 
 // read the input json file and parse it
-static void readInputFile(void) {
+static void readInputFile(char *jsonPath) {
     // get the length of the input file
     struct stat inFileStats;
-    if (stat(JSON_PATH, &inFileStats) < 0) {
-        printf("error getting stats for file %s\n", JSON_PATH);
+    if (stat(jsonPath, &inFileStats) < 0) {
+        printf("error getting stats for file %s\n", jsonPath);
         exit(-1);
     }
     off_t length = inFileStats.st_size;
 
     // read in the input file
     char *inFile = (char *) malloc(length);
-    int fd = open(JSON_PATH, O_RDONLY);
+    int fd = open(jsonPath, O_RDONLY);
     if (fd < 0) {
-        printf("error opening file %s\n", JSON_PATH);
+        printf("error opening file %s\n", jsonPath);
         exit(-1);
     }
     if (read(fd, inFile, length) < 0) {
-        printf("error reading file %s", JSON_PATH);
+        printf("error reading file %s", jsonPath);
         exit(-1);
     }
 
@@ -138,7 +150,7 @@ void CtrlCHandler(int n) {
 }
 
 // intialize the simulator
-void Simulator_init(void) {
+void Simulator_init(char *jsonPath) {
     // generate unique name for log file
     startTime = time(NULL);
     char filename[30];
@@ -147,11 +159,11 @@ void Simulator_init(void) {
     // create the log file
     simulatorLog = open(filename, O_CREAT | O_WRONLY, 0664);
     if (simulatorLog < 0) {
-        printf("error opening file %s\n", JSON_PATH);
+        printf("error opening file %s\n", jsonPath);
         exit(-1);
     }
     if (write(simulatorLog, "simulator started...\n", 21) < 0) {
-        printf("error writing file %s\n", JSON_PATH);
+        printf("error writing file %s\n", jsonPath);
         exit(-1);
     }
 
@@ -162,7 +174,7 @@ void Simulator_init(void) {
     sigaction(SIGINT, &act, NULL);
 
     // initialize the fake inputs
-    readInputFile();
+    readInputFile(jsonPath);
 
     Simulator_log("Simulator intialized\n");
 

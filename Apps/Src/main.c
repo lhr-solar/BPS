@@ -20,10 +20,16 @@
 
 void EnterFaultState(void);
 
+// the simulator take command line args, the embedded version does not
+#ifdef SIMULATION
+int main(int argc, char **argv) {
+#else
 int main() {
+#endif
 
 #ifdef SIMULATION
-	Simulator_init();
+	// the first command line argument is the path to the JSON file
+	Simulator_init(argv[1]);
 #endif
 	
 	OS_ERR err;
