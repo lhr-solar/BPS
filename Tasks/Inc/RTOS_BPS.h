@@ -65,17 +65,17 @@ void RTOS_BPS_MutexPost(BPS_OS_MUTEX* mutex, BPS_OS_OPT options);
 
 /**
  * @brief   
- * @param   
+ * @param  
  * @return  
  */
 void RTOS_BPS_TaskCreate(void);
 
 /**
- * @brief   
- * @param  
- * @return  
+ * @brief Creates a Time Delay.
+ * @param Defines how many ticks to delay for.
+ * @return none  
  */
-void RTOS_BPS_TimeDelay(OS_TICK dly, OS_OPT opt);
+void RTOS_BPS_TimeDelay(BPS_OS_TICK dly, BPS_OS_OPT opt);
 
 
 #endif 
