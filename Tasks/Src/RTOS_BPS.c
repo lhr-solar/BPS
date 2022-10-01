@@ -18,8 +18,17 @@ BPS_OS_SEM_CTR RTOS_BPS_SemPend(BPS_OS_SEM* sem, BPS_OS_TICK tick, BPS_OS_OPT op
     return count;
 }
 
-void RTOS_BPS_SemPost(void) {
-
+/**
+ * @brief Posts a semaphore
+ * @param sem4 this is a semaphore pointer to post to
+ * @param opt determines the type of POST performed
+ * @return The current value of the semaphore counter or 0 upon error 
+ */
+BPS_OS_SEM_CTR RTOS_BPS_SemPost(BPS_OS_SEM *sem4, BPS_OS_OPT opt) {
+    BPS_OS_ERR err;
+    BPS_OS_SEM_CTR counter = OSSemPost(sem4, opt, err);
+    assertOSError(err);
+    return counter;
 }
 
 /**
