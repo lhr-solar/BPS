@@ -11,6 +11,9 @@
  * 
  *        Additionally, please see BSP/Simulator_V2/Data JSON files for examples of how
  *        to write sample JSON test files for the simulator.
+ * 
+ *        The JSON files are *significantly* more comprehensive tests. This test file just ensures
+ *        that the function calls work, and information gets logged to the simulator.
  */
 
 int main(void) {

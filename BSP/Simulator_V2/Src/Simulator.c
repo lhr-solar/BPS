@@ -111,7 +111,9 @@ static void readInputFile(void) {
             tail->next = temp;
             tail = tail->next;
         }
-
+        char buffer[50];
+        sprintf(buffer, "\nExecuting state #%d...\n", stateCount);
+        Simulator_log(buffer);
         // Try and get every field we should have in each state.
         // If null, it doesn't exist.
         cJSON* time = cJSON_GetObjectItem(state, "time");
