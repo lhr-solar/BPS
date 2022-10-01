@@ -20,6 +20,12 @@ typedef OS_ERR      BPS_OS_ERR;
 typedef OS_SEM      BPS_OS_SEM;
 typedef OS_TCB      BPS_OS_TCB;
 
+//Custom typedefs for BPS_TaskCreate function currently using micirium
+typedef OS_TASK_PTR  BPS_OS_TASK_PTR;  //pointer to the task
+typedef char         BPS_OS_TASK_NAME; //name of the task
+typedef OS_PRIO      BPS_OS_TASK_PRIO; //priority for the task
+typedef CPU_STK_SIZE BPS_OS_TASK_STK_SIZE;  //size of the stack in WORDS not bytes
+
 
 /**
  * @brief

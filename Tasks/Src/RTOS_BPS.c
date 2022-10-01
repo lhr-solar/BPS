@@ -54,18 +54,30 @@ void RTOS_BPS_MutexPost(BPS_OS_MUTEX* mutex, BPS_OS_OPT options) {
  * @return  nothing to see here
  */
 void RTOS_BPS_TaskCreate(
-    OS_TCB        *p_tcb,
-    CPU_CHAR      *p_name,
-    OS_TASK_PTR    p_task,
-    void          *p_arg,
-    OS_PRIO        prio,
-    CPU_STK       *p_stk_base,
-    CPU_STK_SIZE   stk_size,
-    OS_ERR        *p_err)
+    OS_TCB              *p_tcb,
+    BPS_OS_TASK_NAME    *p_name,
+    BPS_OS_TASK_PTR      p_task,
+    void                *p_arg,
+    BPS_OS_TASK_PRIO     prio,
+    CPU_STK             *p_stk_base,
+    BPS_OS_TASK_STK_SIZE stk_size,
+    OS_ERR              *p_err)
     {
     OSTaskCreate(p_tcb, p_name, p_task, p_arg, prio, p_stk_base, WATERMARK_STACK_LIMIT, stk_size, 0, 10,(void *)0, OS_OPT_TASK_STK_CHK | OS_OPT_TASK_SAVE_FP, p_err);
-    assertOSError(*p_err);
     }
+
+/*
+void RTOS_BPS_TaskCreate(
+    BPS_OS_TASK_PTR taskptr, 
+    BPS_OS_TASK_NAME *taskname, 
+    void *args, 
+    BPS_OS_TASK_PRIO priority, 
+    BPS_OS_TASK_STK_SIZE stack_size
+    )
+{
+    see if I can implement this one later
+}
+*/
 
 void RTOS_BPS_TimeDelay(void){
 
