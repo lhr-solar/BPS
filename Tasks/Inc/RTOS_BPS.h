@@ -33,11 +33,12 @@ typedef OS_TICK     BPS_OS_TICK;
 BPS_OS_SEM_CTR RTOS_BPS_SemPend(BPS_OS_SEM* sem, BPS_OS_TICK tick, BPS_OS_OPT opt);
 
 /**
- * @brief
- * @param
- * @return  
+ * @brief Posts a semaphore
+ * @param sem4 this is a semaphore pointer to post to
+ * @param opt determines the type of POST performed
+ * @return The current value of the semaphore counter or 0 upon error 
  */
-void RTOS_BPS_SemPost(void);
+BPS_OS_SEM_CTR RTOS_BPS_SemPost(BPS_OS_SEM *sem4, BPS_OS_OPT opt);
 
 /**
  * @brief Initializes a mutex object.
