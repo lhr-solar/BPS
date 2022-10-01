@@ -47,7 +47,7 @@ void RTOS_BPS_MutexCreate(BPS_OS_MUTEX *mut, char* name);
  * @brief   Function waits for Mutex
  * @param   *mutex - pointer to mutex
  * @param   timeout - timeout period, if 0 will wait forever until resource available
- * @param   options - determines if mutex available or not
+ * @param   options - determines what the mutex will do, ie: block or not block
  */
 void RTOS_BPS_MutexPend(BPS_OS_MUTEX* mutex, BPS_OS_TICK timeout, BPS_OS_OPT opt);
 
