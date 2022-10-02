@@ -10,6 +10,9 @@ DARKGRAY=\033[1;30m
 YELLOW=\033[0;33m
 NC=\033[0m # No Color
 
+DEFINES = none
+export DEFINES
+
 TEST = none
 export TEST
 

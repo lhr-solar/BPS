@@ -26,6 +26,7 @@ RTOS_DIR = $(TOP_DIR)/RTOS/uCOS-III-STM32F4
 ######################################
 # source
 ######################################
+
 # C sources
 # since current path is in the BSP folder, go to the top level with $(TOP_DIR)/
 C_SOURCES =  \
@@ -33,7 +34,6 @@ $(wildcard $(TOP_DIR)/Tasks/Src/*.c)	\
 $(wildcard $(TOP_DIR)/Drivers/Src/*.c)	\
 $(wildcard $(TOP_DIR)/BSP/STM32F413/Src/*.c)	\
 $(wildcard $(TOP_DIR)/CMSIS/DSP_Lib/Source/*.c)	\
-$(wildcard $(TOP_DIR)/Config/Src/*.c)	\
 $(wildcard $(TOP_DIR)/BSP/STM32F413/STM32F4xx_StdPeriph_Driver/Src/*.c)	\
 $(wildcard $(RTOS_DIR)/uCOS-III/Source/*.c)	\
 $(wildcard $(RTOS_DIR)/uCOS-III/Ports/ARM-Cortex-M4/Generic/GNU/*.c)	\
@@ -45,7 +45,8 @@ $(wildcard $(RTOS_DIR)/uC-Serial/Driver/ST/*.c)	\
 $(wildcard $(RTOS_DIR)/uC-Serial/Line/*.c)	\
 $(wildcard $(RTOS_DIR)/uC-Serial/OS/*.c)	\
 $(wildcard $(RTOS_DIR)/uC-Serial/OS/uCOS-III/*.c)	\
-$(wildcard $(RTOS_DIR)/uC-Serial/Source/*.c)	
+$(wildcard $(RTOS_DIR)/uC-Serial/Source/*.c)	\
+$(wildcard $(TOP_DIR)/Config/Src/*.c) 
 
 
 
@@ -145,6 +146,11 @@ CFLAGS = $(MCU) $(C_DEFS) $(C_INCLUDES) $(OPT) -Wall -Werror -fdata-sections -ff
 
 ifeq ($(DEBUG), 1)
 CFLAGS += -g3 -gdwarf-2
+endif
+
+# custom user defines here
+ifneq ($(DEFINES), none)
+CFLAGS += $(DEFINES)
 endif
 
 
