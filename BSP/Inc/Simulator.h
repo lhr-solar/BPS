@@ -20,10 +20,19 @@ typedef struct simulator_state {
 } simulator_state;
 
 // intialize the simulator
-void Simulator_init(void);
+void Simulator_init(char *jsonPath);
 
 // log something to the simualtor's log file
 void Simulator_log(char *str);
+
+// log an error to the simulator's log file
+void Simulator_error(char *str);
+
+// log an info message to the simulator's log file
+void Simualtor_info(char *str);
+
+// log a warning to the simulator's log file
+void Simulator_warning(char *str);
 
 // shut down the simulator
 void Simulator_shutdown(int status);

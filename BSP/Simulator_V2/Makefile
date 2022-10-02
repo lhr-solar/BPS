@@ -68,11 +68,7 @@ FLAGS = -Wall -Werror -g -std=c11 $(INC_DIR) -DSIMULATION -D_GNU_SOURCE
 ######################################
 # Defines
 ######################################
-ifneq ($(INPUT), none)
-DEF = -D_XOPEN_SOURCE=700 -DSIMULATION -D$(OS) -DSIMULATOR_JSON_PATH=$(INPUT)
-else
-DEF = "Error: you should pass in an input file with INPUT="<path to file>"
-endif
+DEF = -D_XOPEN_SOURCE=700 -DSIMULATION -D$(OS)
 
 
 ######################################
