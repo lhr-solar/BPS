@@ -99,7 +99,7 @@ GDB is a debugger program that can be used to step through a program as it is be
 
 ### Using OPENOCD
 OpenOCD is another debugger program that is open source and compatible with the STM32F413. 
-2. Replace step 2 above with ```./openocd-debug.sh```.
+2. Replace step 1 above with ```./openocd-debug.sh```.
 3. Replace step 3 above with ```target extended-remote localhost:3333```
 
 ### Using the Simulator
@@ -107,7 +107,7 @@ The simulator reads input from a JSON file to simulate dummy values and dumps ou
 
 the simulator can be compiled with `make simulator_v2`. The simulator requires an additional `INPUT=` command line argument to specific the path to the JSON file for the test case to run.
 
-The simulator can be run with `./bps-simulator.out`.
+The simulator can be run with `./bps-simulator.out <path to JSON test>`.
 
 ## Rules
 Make sure to have fun!
