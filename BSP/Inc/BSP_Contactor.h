@@ -5,6 +5,13 @@
 
 #include "common.h"
 
+// implement me later
+typedef enum {
+    ARRAY_CONTACTOR,
+    LOAD_CONTACTOR,
+    HVLOW_CONTACTOR
+} Contactor;
+
 /**
  * @brief   A Contactor is a high power switch similar to what a relay is. The Contactor
  *          essentially "turns on and off" the whole car.
