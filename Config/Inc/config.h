@@ -14,15 +14,6 @@ typedef enum State_e {OFF = 0, ON} State;
 typedef enum ErrorStatus_e {ERROR = 0, SUCCESS = !ERROR} ErrorStatus;
 typedef enum SafetyStatus_e {SAFE = 0, DANGER = 1, OVERVOLTAGE = 2, UNDERVOLTAGE = 3} SafetyStatus;
 
-// NUCLEO or custom
-#ifdef CUSTOM_COMMAND_SIZE
-#define COMMAND_SIZE CUSTOM_COMMAND_SIZE
-#else
-#define COMMAND_SIZE			128
-#endif
-
-#define NUCLEO		0		// Change 1 if using nucleo, 0 if not
-
 //--------------------------------------------------------------------------------
 // Basic Parameters of BPS layout
 
@@ -41,27 +32,19 @@ typedef enum SafetyStatus_e {SAFE = 0, DANGER = 1, OVERVOLTAGE = 2, UNDERVOLTAGE
 
 //--------------------------------------------------------------------------------
 // MAX and MIN limits of lithium ion cells
-#ifdef CUSTOM_MIN_VOLT_CHARGE
-#define MIN_VOLTAGE_CHARGING_LIMIT CUSTOM_MIN_VOLT_CHARGE
-#else
+#ifndef MIN_VOLTAGE_CHARGING_LIMIT
 #define MIN_VOLTAGE_CHARGING_LIMIT      2550        // Under voltage limit for charging (milliVolts) 
 #endif
 
-#ifdef CUSTOM_MIN_VOLT
-#define MIN_VOLTAGE_LIMIT CUSTOM_MIN_VOLT
-#else
+#ifndef MIN_VOLTAGE_LIMIT
 #define MIN_VOLTAGE_LIMIT				2700		// Under voltage limit (milliVolts)	(actual min: 2.5V)
 #endif
 
-#ifdef CUSTOM_MAX_VOLT
-#define MAX_VOLTAGE_LIMIT CUSTOM_MAX_VOLT
-#else
+#ifndef MAX_VOLTAGE_LIMIT
 #define MAX_VOLTAGE_LIMIT				4100		// Over voltage limit (milliVolts)		(actual max: 4.2V)
 #endif
 
-#ifdef CUSTOM_CHARGE_DIS_VOLT
-#define CHARGE_DISABLE_VOLTAGE CUSTOM_CHARGE_DIS_VOLT
-#else
+#ifndef CHARGE_DISABLE_VOLTAGE
 #define CHARGE_DISABLE_VOLTAGE          4000        // Voltage to stop charging at
 #endif
 
@@ -70,39 +53,27 @@ typedef enum SafetyStatus_e {SAFE = 0, DANGER = 1, OVERVOLTAGE = 2, UNDERVOLTAGE
 #error "Charging maximum voltage is too close to voltage trip limit!"
 #endif
 
-#ifdef CUSTOM_MAX_DISCHARGE_TEMP
-#define MAX_DISCHARGE_TEMPERATURE_LIMIT CUSTOM_MAX_DISCHARGE_TEMP
-#else
+#ifndef MAX_DISCHARGE_TEMPERATURE_LIMIT
 #define MAX_DISCHARGE_TEMPERATURE_LIMIT	60000	    // Max temperature limit (milliCelcius)	(recommended release: 60.00C)
 #endif
 
-#ifdef CUSTOM_MAX_CHARGE_TEMP
-#define MAX_CHARGE_TEMPERATURE_LIMIT CUSTOM_MAX_CHARGE_TEMP
-#else
+#ifndef MAX_CHARGE_TEMPERATURE_LIMIT
 #define MAX_CHARGE_TEMPERATURE_LIMIT	45000	    // Max temperature limit (milliCelcius)	(recommended release: 45.00C)
 #endif
 
-#ifdef CUSTOM_MAX_CURRENT
-#define MAX_CURRENT_LIMIT CUSTOM_MAX_CURRENT
-#else
+#ifndef MAX_CURRENT_LIMIT
 #define MAX_CURRENT_LIMIT				75000		// Max current limit (Milliamperes)		(Max continuous discharge is 15A per cell)
 #endif
 
-#ifdef CUSTOM_MAX_CHARGE_CURRENT
-#define MAX_CHARGING_CURRENT CUSTOM_MAX_CHARGE_CURRENT
-#else
+#ifndef MAX_CHARGING_CURRENT
 #define MAX_CHARGING_CURRENT 			-20000		// Max current per cell is 1.5 Amps (Standard charge)
 #endif
 
-#ifdef CUSTOM_BALANCE_TOLERANCE_START
-#define BALANCING_TOLERANCE_START CUSTOM_BALANCE_TOLERANCE_START
-#else
+#ifndef BALANCING_TOLERANCE_START
 #define BALANCING_TOLERANCE_START       50          //mV differential from lowest module that will start battery balancing
 #endif
 
-#ifdef CUSTOM_BALANCE_TOLERANCE_STOP
-#define BALANCING_TOLERANCE_STOP
-#else
+#ifndef BALANCING_TOLERANCE_STOP
 #define BALANCING_TOLERANCE_STOP        20          //mV differential from lowest module that will stop battery balancing
 #endif
 //--------------------------------------------------------------------------------

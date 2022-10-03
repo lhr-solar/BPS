@@ -11,48 +11,49 @@
  * config.h will also have similar formatting.
  */
 
-#ifdef CUSTOM_COMMAND_SIZE
-#pragma message ("Custom command size set!")
+// For displaying the value
+// Two defines needed to print the actual value and not the name of the define.
+#define XSTR(x) STR(x)
+#define STR(x) #x
+
+#ifdef MIN_VOLTAGE_CHARGING_LIMIT
+#pragma message ("Custom minimum voltage charge limit set to " XSTR(MIN_VOLTAGE_CHARGING_LIMIT))
 #endif
 
-#ifdef CUSTOM_MIN_VOLT_CHARGE
-#pragma message ("Custom minimum voltage charge limit set!")
+#ifdef MIN_VOLTAGE_LIMIT
+#pragma message ("Custom minimum voltage set to " XSTR(MIN_VOLTAGE_LIMIT))
 #endif
 
-#ifdef CUSTOM_MIN_VOLT
-#pragma message ("Custom minimum voltage set!")
+#ifdef MAX_VOLTAGE_LIMIT
+#pragma message ("Custom maximum voltage set to " XSTR(MAX_VOLTAGE_LIMIT))
 #endif
 
-#ifdef CUSTOM_MAX_VOLT
-#pragma message ("Custom maximum voltage set!")
+#ifdef CHARGE_DISABLE_VOLTAGE
+#pragma message ("Custom charge disable voltage set to " XSTR(CHARGE_DISABLE_VOLTAGE))
 #endif
 
-#ifdef CUSTOM_CHARGE_DIS_VOLT
-#pragma message ("Custom charge disable voltage set!")
+#ifdef MAX_DISCHARGE_TEMPERATURE_LIMIT
+#pragma message ("Custom maximum discharge temperature set to " XSTR(MAX_DISCHARGE_TEMPERATURE_LIMIT))
 #endif
 
-#ifdef CUSTOM_MAX_DISCHARGE_TEMP
-#pragma message ("Custom maximum discharge temperature set!")
+#ifdef MAX_CHARGE_TEMPERATURE_LIMIT
+#pragma message ("Custom maximum charge temperature set to " XSTR(MAX_CHARGE_TEMPERATURE_LIMIT))
 #endif
 
-#ifdef CUSTOM_MAX_CHARGE_TEMP
-#pragma message ("Custom maximum charge temperature set!")
+#ifdef MAX_CURRENT_LIMIT
+#pragma message ("Custom maximum current set to " XSTR(MAX_CURRENT_LIMIT))
 #endif
 
-#ifdef CUSTOM_MAX_CURRENT
-#pragma message ("Custom maximum current set!")
+#ifdef MAX_CHARGING_CURRENT
+#pragma message ("Custom charge current set to " XSTR(MAX_CHARGING_CURRENT))
 #endif
 
-#ifdef CUSTOM_MAX_CHARGE_CURRENT
-#pragma message ("Custom charge current set!")
+#ifdef BALANCING_TOLERANCE_START
+#pragma message ("Custom balance tolerance start set to " XSTR(BALANCING_TOLERANCE_START))
 #endif
 
-#ifdef CUSTOM_BALANCE_TOLERANCE_START
-#pragma message ("Custom balance tolerance start set!")
-#endif
-
-#ifdef CUSTOM_BALANCE_TOLERANCE_STOP
-#pragma message ("Custom balance tolerance stop set!")
+#ifdef BALANCING_TOLERANCE_STOP
+#pragma message ("Custom balance tolerance stop set to " XSTR(BALANCING_TOLERANCE_STOP))
 #endif
 
 // I don't think the other #defines in config.h should be editable

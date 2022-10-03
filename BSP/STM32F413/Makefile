@@ -29,6 +29,8 @@ RTOS_DIR = $(TOP_DIR)/RTOS/uCOS-III-STM32F4
 
 # C sources
 # since current path is in the BSP folder, go to the top level with $(TOP_DIR)/
+# Note: Config/Src/*.c needs to be last in this list, so that we see compile line prints at the END of compilation.
+
 C_SOURCES =  \
 $(wildcard $(TOP_DIR)/Tasks/Src/*.c)	\
 $(wildcard $(TOP_DIR)/Drivers/Src/*.c)	\
@@ -48,7 +50,7 @@ $(wildcard $(RTOS_DIR)/uC-Serial/OS/uCOS-III/*.c)	\
 $(wildcard $(RTOS_DIR)/uC-Serial/Source/*.c)	\
 $(wildcard $(TOP_DIR)/Config/Src/*.c) 
 
-
+MESSAGES = $(wildcard $(TOP_DIR)/Config/Src/*.c)
 
 ifneq ($(TEST), none)
 TEST_FILE := Test_$(TEST).c
@@ -182,6 +184,7 @@ vpath %.c $(sort $(dir $(C_SOURCES)))
 # list of ASM program objects
 OBJECTS += $(addprefix $(BUILD_DIR)/,$(notdir $(ASM_SOURCES:.s=.o)))
 vpath %.s $(sort $(dir $(ASM_SOURCES)))
+OBJECTS += $(addprefix $(BUILD_DIR)/,$(notdir $(MESSAGES:.c=.o))) # messages
 
 $(BUILD_DIR)/%.o: %.c Makefile | $(BUILD_DIR) 
 	$(CC) -c $(CFLAGS) -Wa,-a,-ad,-alms=$(BUILD_DIR)/$(notdir $(<:.c=.lst)) $< -o $@
