@@ -77,7 +77,7 @@ void Task_AmperesMonitor(void *p_arg) {
         assertOSError(err);
         
         //delay of 10ms
-        OSTimeDly(1, OS_OPT_TIME_DLY, &err);
+        RTOS_BPS_TimeDelay(1);
         assertOSError(err);
     }
 }

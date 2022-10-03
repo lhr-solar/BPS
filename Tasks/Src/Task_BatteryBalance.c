@@ -25,7 +25,7 @@ void Task_BatteryBalance(void *p_arg) {
 
 
         //delay of 100ms
-        OSTimeDly(10, OS_OPT_TIME_DLY, &err);
+        RTOS_BPS_TimeDelay(10);
         assertOSError(err);
     }
 }

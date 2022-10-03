@@ -75,7 +75,6 @@ void RTOS_BPS_TaskCreate(void);
  * @param Defines how many ticks to delay for.
  * @return none  
  */
-void RTOS_BPS_TimeDelay(BPS_OS_TICK dly, BPS_OS_OPT opt);
-
+void RTOS_BPS_TimeDelay(BPS_OS_TICK dly);
 
 #endif 

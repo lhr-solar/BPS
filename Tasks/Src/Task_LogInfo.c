@@ -15,7 +15,7 @@ void Task_LogInfo(void *p_arg) {
 
         //1 tick every 10 millisconds, so 300 ticks for a delay of 3000ms --> 3s
         //OS_OPT_TIME_DLY specifies relative delay, so the delay is started from the "current time + dly".
-        OSTimeDly(300, OS_OPT_TIME_DLY, &err);
+        RTOS_BPS_TimeDelay(300);
         assertOSError(err);
     }
 }
