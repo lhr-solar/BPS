@@ -61,6 +61,6 @@ void RTOS_BPS_TaskCreate(void){
 void RTOS_BPS_TimeDelay(BPS_OS_TICK dly){
     BPS_OS_OPT opt = OS_OPT_TIME_DLY;
     BPS_OS_ERR err;
-    RTOS_BPS_TimeDelay(dly);
-    assertOSError(&err);
+    OSTimeDly(dly, opt, &err);
+    assertOSError(err);
 }
