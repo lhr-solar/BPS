@@ -10,7 +10,7 @@ typedef enum {
     ARRAY_CONTACTOR,
     LOAD_CONTACTOR,
     HVLOW_CONTACTOR
-} Contactor;
+} Contactor_e;
 
 #define CONTACTORS_ALL (ARRAY_CONTACTOR | LOAD_CONTACTOR | HVLOW_CONTACTOR)
 
@@ -44,7 +44,7 @@ void BSP_Contactor_Init(void);
  * @note    May be good in the future to make this return something if the contactor could not successfully close.
 
  */
-void BSP_Contactor_On(Contactor c);
+void BSP_Contactor_On(Contactor_e c);
 
 /**
  * @brief   Opens the Contactor switch i.e. turns off the whole electrical system.
@@ -52,13 +52,13 @@ void BSP_Contactor_On(Contactor c);
  * @param   None
  * @return  None
  */
-void BSP_Contactor_Off(Contactor c);
+void BSP_Contactor_Off(Contactor_e c);
 
 /**
  * @brief   Gets the state of the Contactor switch from one of its AUX pins.
  * @param   None
  * @return  0 if contactor is off/open, 1 if on/closed
  */
-bool BSP_Contactor_GetState(Contactor c);
+bool BSP_Contactor_GetState(Contactor_e c);
 
 #endif
