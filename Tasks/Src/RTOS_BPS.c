@@ -60,10 +60,12 @@ void RTOS_BPS_TaskCreate(
     void                *p_arg,
     BPS_OS_TASK_PRIO     prio,
     CPU_STK             *p_stk_base,
-    BPS_OS_TASK_STK_SIZE stk_size,
-    OS_ERR              *p_err)
+    BPS_OS_TASK_STK_SIZE stk_size
+    )
     {
-    OSTaskCreate(p_tcb, p_name, p_task, p_arg, prio, p_stk_base, WATERMARK_STACK_LIMIT, stk_size, 0, 10,(void *)0, OS_OPT_TASK_STK_CHK | OS_OPT_TASK_SAVE_FP, p_err);
+        BPS_OS_ERR err;
+        OSTaskCreate(p_tcb, p_name, p_task, p_arg, prio, p_stk_base, WATERMARK_STACK_LIMIT, stk_size, 0, 10,(void *)0, OS_OPT_TASK_STK_CHK | OS_OPT_TASK_SAVE_FP, &err);
+        assertOSError(err);
     }
 
 /*
