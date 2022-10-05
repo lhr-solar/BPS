@@ -26,7 +26,7 @@ void EnterFaultState() {
 
     // Turn Contactor Off
     BSP_Contactor_Init();
-    BSP_Contactor_Off();
+    BSP_Contactor_Off(CONTACTORS_ALL);
     //Set Fans to full speed
     BSP_Fans_Init();
     BSP_Fans_SetAll(TOPSPEED);
