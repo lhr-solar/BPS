@@ -4,6 +4,8 @@
 #define BSP_CONTACTOR_H
 
 #include "common.h"
+#include "stm32f4xx_gpio.h"
+#include "stm32f4xx_rcc.h"
 
 // implement me later
 typedef enum {
@@ -23,6 +25,21 @@ typedef enum {
 // Contactor 3
 #define C3_PORT		GPIOC
 #define C3_PERIPH 	RCC_AHB1Periph_GPIOC
+
+/**
+ * @brief Initializes GPIO ports per Contactor requirements
+ * 
+ * @param gpioPort Specific port to initialize on
+ * @param gpioStruct Specific struct to initialize
+ * @param pinOutput pin number for output
+ * @param pinInput pin number for input
+ * @param mode pin mode
+ * @param speed 
+ * @param otype 
+ * @param pupd 
+ */
+inline void Setup(GPIO_TypeDef* port, GPIO_InitTypeDef* gpioStruct, uint32_t pinOutput, uint32_t pinInput, GPIOMode_TypeDef mode, GPIOSpeed_TypeDef speed, 
+               GPIOOType_TypeDef otype, GPIOPuPd_TypeDef pupd);
 
 /**
  * @brief   A Contactor is a high power switch similar to what a relay is. The Contactor

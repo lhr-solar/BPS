@@ -2,8 +2,6 @@
 
 #include "BSP_Contactor.h"
 #include "stm32f4xx.h"
-#include "stm32f4xx_gpio.h"
-#include "stm32f4xx_rcc.h"
 
 /**
  * Used pins:
@@ -116,12 +114,15 @@ void BSP_Contactor_On(Contactor_e contactor) {
  */
 void BSP_Contactor_Off(Contactor_e contactor) {
     // set output pins LOW
-	if (contactor & ARRAY_CONTACTOR)
+	if (contactor & ARRAY_CONTACTOR) {
 		GPIO_WriteBit(C1_PORT, GPIO_Pin_0, Bit_RESET);
-	if (contactor & LOAD_CONTACTOR)
+	}
+	if (contactor & LOAD_CONTACTOR) {
 		GPIO_WriteBit(C2_PORT, GPIO_Pin_4, Bit_RESET);
-	if (contactor & HVLOW_CONTACTOR)
+	}
+	if (contactor & HVLOW_CONTACTOR) {
 		GPIO_WriteBit(C3_PORT, GPIO_Pin_0, Bit_RESET);
+	}
 }
 
 /**
@@ -134,7 +135,7 @@ bool BSP_Contactor_GetState(Contactor_e contactor) {
 		return ((C1_PORT->IDR & GPIO_Pin_1) >> 1) ? 0 : 1;
 	}
 	else if (contactor & LOAD_CONTACTOR) {
-		return ((C2_PORT->IDR & GPIO_Pin_5) >> 1) ? 0 : 1;
+		return ((C2_PORT->IDR & GPIO_Pin_5) >> 5) ? 0 : 1;
 	}
 	else {
 		return ((C3_PORT->IDR & GPIO_Pin_1) >> 1) ? 0 : 1;
