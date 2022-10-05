@@ -19,7 +19,7 @@ void Task_CheckContactor(void *p_arg) {
         assertOSError(err);
 
         // fault if the contactor is open
-        if (BSP_Contactor_GetState() != true) {
+        if (BSP_Contactor_GetState(ARRAY_CONTACTOR) != true) {
             Fault_BitMap |= Fault_ESTOP;
             OSSemPost(&Fault_Sem4,
                         OS_OPT_POST_1,

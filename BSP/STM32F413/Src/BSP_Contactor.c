@@ -5,16 +5,6 @@
 #include "stm32f4xx_gpio.h"
 #include "stm32f4xx_rcc.h"
 
-// Contactor 1
-#define C1_PORT		GPIOB
-#define C1_PERIPH 	RCC_AHB1Periph_GPIOB
-// Contactor 2
-#define C2_PORT		GPIOA
-#define C2_PERIPH 	RCC_AHB1Periph_GPIOA
-// Contactor 3
-#define C3_PORT		GPIOC
-#define C3_PERIPH 	RCC_AHB1Periph_GPIOC
-
 /**
  * Used pins:
  * A:
@@ -108,11 +98,14 @@ void BSP_Contactor_Init(void) {
  * @param   None
  * @return  None
  */
-void BSP_Contactor_On(void) {
+void BSP_Contactor_On(Contactor c) {
 	// set output pins HIGH
-	GPIO_WriteBit(C1_PORT, GPIO_Pin_0, Bit_SET);
-	GPIO_WriteBit(C2_PORT, GPIO_Pin_4, Bit_SET);
-	GPIO_WriteBit(C3_PORT, GPIO_Pin_0, Bit_SET);
+	if (c & ARRAY_CONTACTOR)
+		GPIO_WriteBit(C1_PORT, GPIO_Pin_0, Bit_SET);
+	if (c & LOAD_CONTACTOR)
+		GPIO_WriteBit(C2_PORT, GPIO_Pin_4, Bit_SET);
+	if (c & HVLOW_CONTACTOR)
+		GPIO_WriteBit(C3_PORT, GPIO_Pin_0, Bit_SET);
 }
 
 /**
@@ -121,11 +114,14 @@ void BSP_Contactor_On(void) {
  * @param   None
  * @return  None
  */
-void BSP_Contactor_Off(void) {
+void BSP_Contactor_Off(Contactor c) {
     // set output pins LOW
-	GPIO_WriteBit(C1_PORT, GPIO_Pin_0, Bit_RESET);
-	GPIO_WriteBit(C2_PORT, GPIO_Pin_4, Bit_RESET);
-	GPIO_WriteBit(C3_PORT, GPIO_Pin_0, Bit_RESET);
+	if (c & ARRAY_CONTACTOR)
+		GPIO_WriteBit(C1_PORT, GPIO_Pin_0, Bit_RESET);
+	if (c & LOAD_CONTACTOR)
+		GPIO_WriteBit(C2_PORT, GPIO_Pin_4, Bit_RESET);
+	if (c & HVLOW_CONTACTOR)
+		GPIO_WriteBit(C3_PORT, GPIO_Pin_0, Bit_RESET);
 }
 
 /**
@@ -133,11 +129,14 @@ void BSP_Contactor_Off(void) {
  * @param   None
  * @return  0 if contactor is off/open, 1 if on/closed
  */
-bool BSP_Contactor_GetState(void) {
-    // The AUX pin we have connected to is negative logic
-    if((GPIOB->IDR & GPIO_Pin_1) >> 1) {
-		return 0;
-	} else {
-		return 1;
+bool BSP_Contactor_GetState(Contactor c) {
+	if (c & ARRAY_CONTACTOR) {
+		return ((C1_PORT->IDR & GPIO_Pin_1) >> 1) ? 0 : 1;
+	}
+	if (c & LOAD_CONTACTOR) {
+		return ((C2_PORT->IDR & GPIO_Pin_5) >> 1) ? 0 : 1;
+	}
+	if (c & HVLOW_CONTACTOR) {
+		return ((C3_PORT->IDR & GPIO_Pin_1) >> 1) ? 0 : 1;
 	}
 }

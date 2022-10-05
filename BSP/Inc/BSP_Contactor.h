@@ -12,6 +12,18 @@ typedef enum {
     HVLOW_CONTACTOR
 } Contactor;
 
+#define CONTACTORS_ALL (ARRAY_CONTACTOR | LOAD_CONTACTOR | HVLOW_CONTACTOR)
+
+// Contactor 1
+#define C1_PORT		GPIOB
+#define C1_PERIPH 	RCC_AHB1Periph_GPIOB
+// Contactor 2
+#define C2_PORT		GPIOA
+#define C2_PERIPH 	RCC_AHB1Periph_GPIOA
+// Contactor 3
+#define C3_PORT		GPIOC
+#define C3_PERIPH 	RCC_AHB1Periph_GPIOC
+
 /**
  * @brief   A Contactor is a high power switch similar to what a relay is. The Contactor
  *          essentially "turns on and off" the whole car.
@@ -32,7 +44,7 @@ void BSP_Contactor_Init(void);
  * @note    May be good in the future to make this return something if the contactor could not successfully close.
 
  */
-void BSP_Contactor_On(void);
+void BSP_Contactor_On(Contactor c);
 
 /**
  * @brief   Opens the Contactor switch i.e. turns off the whole electrical system.
@@ -40,13 +52,13 @@ void BSP_Contactor_On(void);
  * @param   None
  * @return  None
  */
-void BSP_Contactor_Off(void);
+void BSP_Contactor_Off(Contactor c);
 
 /**
  * @brief   Gets the state of the Contactor switch from one of its AUX pins.
  * @param   None
  * @return  0 if contactor is off/open, 1 if on/closed
  */
-bool BSP_Contactor_GetState(void);
+bool BSP_Contactor_GetState(Contactor c);
 
 #endif
