@@ -98,13 +98,13 @@ void BSP_Contactor_Init(void) {
  * @param   None
  * @return  None
  */
-void BSP_Contactor_On(Contactor c) {
+void BSP_Contactor_On(Contactor contactor) {
 	// set output pins HIGH
-	if (c & ARRAY_CONTACTOR)
+	if (contactor & ARRAY_CONTACTOR)
 		GPIO_WriteBit(C1_PORT, GPIO_Pin_0, Bit_SET);
-	if (c & LOAD_CONTACTOR)
+	if (contactor & LOAD_CONTACTOR)
 		GPIO_WriteBit(C2_PORT, GPIO_Pin_4, Bit_SET);
-	if (c & HVLOW_CONTACTOR)
+	if (contactor & HVLOW_CONTACTOR)
 		GPIO_WriteBit(C3_PORT, GPIO_Pin_0, Bit_SET);
 }
 
@@ -114,13 +114,13 @@ void BSP_Contactor_On(Contactor c) {
  * @param   None
  * @return  None
  */
-void BSP_Contactor_Off(Contactor c) {
+void BSP_Contactor_Off(Contactor contactor) {
     // set output pins LOW
-	if (c & ARRAY_CONTACTOR)
+	if (contactor & ARRAY_CONTACTOR)
 		GPIO_WriteBit(C1_PORT, GPIO_Pin_0, Bit_RESET);
-	if (c & LOAD_CONTACTOR)
+	if (contactor & LOAD_CONTACTOR)
 		GPIO_WriteBit(C2_PORT, GPIO_Pin_4, Bit_RESET);
-	if (c & HVLOW_CONTACTOR)
+	if (contactor & HVLOW_CONTACTOR)
 		GPIO_WriteBit(C3_PORT, GPIO_Pin_0, Bit_RESET);
 }
 
@@ -129,14 +129,14 @@ void BSP_Contactor_Off(Contactor c) {
  * @param   None
  * @return  0 if contactor is off/open, 1 if on/closed
  */
-bool BSP_Contactor_GetState(Contactor c) {
-	if (c & ARRAY_CONTACTOR) {
+bool BSP_Contactor_GetState(Contactor contactor) {
+	if (contactor & ARRAY_CONTACTOR) {
 		return ((C1_PORT->IDR & GPIO_Pin_1) >> 1) ? 0 : 1;
 	}
-	if (c & LOAD_CONTACTOR) {
+	else if (contactor & LOAD_CONTACTOR) {
 		return ((C2_PORT->IDR & GPIO_Pin_5) >> 1) ? 0 : 1;
 	}
-	if (c & HVLOW_CONTACTOR) {
+	else {
 		return ((C3_PORT->IDR & GPIO_Pin_1) >> 1) ? 0 : 1;
 	}
 }
