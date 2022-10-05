@@ -138,11 +138,11 @@ void Amps_Calibrate(void) {
 	Amps_UpdateMeasurements();
 
 	// keep calibrating until we read 0 Amps
-	OSTimeDly(1, OS_OPT_TIME_DLY, &err);
+	RTOS_BPS_TimeDelay(1);
 	Amps_UpdateMeasurements();
 	while (Amps_GetReading() != 0) {
 		LTC2315_Calibrate();
-		OSTimeDly(1, OS_OPT_TIME_DLY, &err);
+		RTOS_BPS_TimeDelay(1);
 		Amps_UpdateMeasurements();
 	}
 

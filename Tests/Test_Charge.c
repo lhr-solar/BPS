@@ -24,7 +24,7 @@ void Task1(void *p_arg){
         printf("Charge after 5Amps for 100 milliseconds : %ld\n\r", charge_reading);
         Charge_Calculate(5000);
         charge_reading = Charge_GetPercent();
-        OSTimeDly(10, OS_OPT_TIME_DLY, &err);
+        RTOS_BPS_TimeDelay(10);
         assertOSError(err);
     }
 

@@ -74,7 +74,7 @@ void Task2(void *p_arg){
     while(1){
         BSP_Light_Toggle(UVOLT);
         // for (volatile int i = 0; i < 1000000; i++);
-        OSTimeDly(15, OS_OPT_TIME_DLY, &err);
+        RTOS_BPS_TimeDelay(15);
     }
 }
 
