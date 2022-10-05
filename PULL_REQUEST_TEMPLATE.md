@@ -12,6 +12,7 @@ There are exceptions with all guidelines. As long as your decisions are justifie
     - NOTE: If test file already exists, use that one 
 - [ ] 2 Members of the team have already reviewed my PR 
     - NOTE: Approver will not look at PR if 2 other members haven't reviewed first 
+- [ ] Did you Have Fun?
 
 ## Things to Consider 
 - [ ] Even if the above are checked, is this the best way of writing my code? 

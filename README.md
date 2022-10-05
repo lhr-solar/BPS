@@ -121,5 +121,4 @@ You can either approve, comment, or request changes at the end of your pull requ
 Approvers:
 1. Manthan Upadhyaya
 2. Clark Poon
-3. Chase Block
-4. Rishi Ponnekanti
+3. Tianda Huang
