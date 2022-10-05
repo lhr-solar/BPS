@@ -98,7 +98,7 @@ void BSP_Contactor_Init(void) {
  * @param   None
  * @return  None
  */
-void BSP_Contactor_On(Contactor contactor) {
+void BSP_Contactor_On(Contactor_e contactor) {
 	// set output pins HIGH
 	if (contactor & ARRAY_CONTACTOR)
 		GPIO_WriteBit(C1_PORT, GPIO_Pin_0, Bit_SET);
@@ -114,7 +114,7 @@ void BSP_Contactor_On(Contactor contactor) {
  * @param   None
  * @return  None
  */
-void BSP_Contactor_Off(Contactor contactor) {
+void BSP_Contactor_Off(Contactor_e contactor) {
     // set output pins LOW
 	if (contactor & ARRAY_CONTACTOR)
 		GPIO_WriteBit(C1_PORT, GPIO_Pin_0, Bit_RESET);
@@ -129,7 +129,7 @@ void BSP_Contactor_Off(Contactor contactor) {
  * @param   None
  * @return  0 if contactor is off/open, 1 if on/closed
  */
-bool BSP_Contactor_GetState(Contactor contactor) {
+bool BSP_Contactor_GetState(Contactor_e contactor) {
 	if (contactor & ARRAY_CONTACTOR) {
 		return ((C1_PORT->IDR & GPIO_Pin_1) >> 1) ? 0 : 1;
 	}
