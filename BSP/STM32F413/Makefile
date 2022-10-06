@@ -4,6 +4,7 @@
 TARGET = bps-leader
 
 DEBUG = 1
+READABLE = false
 
 ######################################
 # building variables
@@ -186,15 +187,32 @@ OBJECTS += $(addprefix $(BUILD_DIR)/,$(notdir $(ASM_SOURCES:.s=.o)))
 vpath %.s $(sort $(dir $(ASM_SOURCES)))
 OBJECTS += $(addprefix $(BUILD_DIR)/,$(notdir $(MESSAGES:.c=.o))) # messages
 
-$(BUILD_DIR)/%.o: %.c Makefile | $(BUILD_DIR) 
+# The ifneq... @... endif modifies the make console output to not print every file name,
+# assuming make is run with READABLE= some nonzero number
+
+$(BUILD_DIR)/%.o: %.c Makefile | $(BUILD_DIR) c_compile_msg
+ifeq ($(READABLE), true)
+	@$(CC) -c $(CFLAGS) -Wa,-a,-ad,-alms=$(BUILD_DIR)/$(notdir $(<:.c=.lst)) $< -o $@
+else
 	$(CC) -c $(CFLAGS) -Wa,-a,-ad,-alms=$(BUILD_DIR)/$(notdir $(<:.c=.lst)) $< -o $@
+endif
 
-$(BUILD_DIR)/%.o: %.s Makefile | $(BUILD_DIR)
+$(BUILD_DIR)/%.o: %.s Makefile | $(BUILD_DIR) asm_compile_msg
+ifeq ($(READABLE), true)
+	@echo Building ASM object files...
+	@$(AS) -c $(CFLAGS) $< -o $@
+else
 	$(AS) -c $(CFLAGS) $< -o $@
+endif
 
-$(BUILD_DIR)/$(TARGET).elf: $(OBJECTS) Makefile
+$(BUILD_DIR)/$(TARGET).elf: $(OBJECTS) Makefile build_msg
+ifeq ($(READABLE), true)
+	@$(CC) $(OBJECTS) $(LDFLAGS) -o $@
+	@$(SZ) $@
+else
 	$(CC) $(OBJECTS) $(LDFLAGS) -o $@
 	$(SZ) $@
+endif
 
 $(BUILD_DIR)/%.hex: $(BUILD_DIR)/%.elf | $(BUILD_DIR)
 	$(HEX) $< $@
@@ -203,7 +221,21 @@ $(BUILD_DIR)/%.bin: $(BUILD_DIR)/%.elf | $(BUILD_DIR)
 	$(BIN) $< $@	
 	
 $(BUILD_DIR):
-	mkdir $@		
+	mkdir $@
+
+.INTERMEDIATE: c_compile_msg
+.INTERMEDIATE: asm_compile_msg
+.INTERMEDIATE: build_msg
+
+c_compile_msg:
+	@echo Compiling C files...
+
+asm_compile_msg:
+	@echo Compiling ASM files...
+
+build_msg:
+	@echo Generating BPS executable...
+
 
 #######################################
 # clean up

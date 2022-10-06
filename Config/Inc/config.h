@@ -26,9 +26,17 @@ typedef enum SafetyStatus_e {SAFE = 0, DANGER = 1, OVERVOLTAGE = 2, UNDERVOLTAGE
 
 //--------------------------------------------------------------------------------
 // Battery Pack layout
+#ifndef NUM_BATTERY_MODULES
 #define NUM_BATTERY_MODULES				31		// Number of battery modules
+#endif
+
+#ifndef NUM_TEMPERATURE_SENSORS
 #define NUM_TEMPERATURE_SENSORS			62		// Number of temperature sensors
+#endif
+
+#ifndef NUM_TEMP_SENSORS_PER_MOD
 #define NUM_TEMP_SENSORS_PER_MOD		2		// Number of temperature sensors per battery module
+#endif
 
 //--------------------------------------------------------------------------------
 // MAX and MIN limits of lithium ion cells

@@ -16,6 +16,18 @@
 #define XSTR(x) STR(x)
 #define STR(x) #x
 
+#ifdef NUM_BATTERY_MODULES
+#pragma message ("Custom number of battery modules set to " XSTR(NUM_BATTERY_MODULES))
+#endif
+
+#ifdef NUM_TEMPERATURE_SENSORS
+#pragma message ("Custom number of temperature sensors set to " XSTR(NUM_TEMPERATURE_SENSORS))
+#endif
+
+#ifdef NUM_TEMP_SENSORS_PER_MOD
+#pragma message ("Custom number of temp sensors per battery module set to " XSTR(NUM_TEMP_SENSORS_PER_MOD))
+#endif
+
 #ifdef MIN_VOLTAGE_CHARGING_LIMIT
 #pragma message ("Custom minimum voltage charge limit set to " XSTR(MIN_VOLTAGE_CHARGING_LIMIT))
 #endif
