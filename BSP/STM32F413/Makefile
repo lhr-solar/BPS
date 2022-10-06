@@ -199,7 +199,6 @@ endif
 
 $(BUILD_DIR)/%.o: %.s Makefile | $(BUILD_DIR) asm_compile_msg
 ifeq ($(READABLE), true)
-	@echo Building ASM object files...
 	@$(AS) -c $(CFLAGS) $< -o $@
 else
 	$(AS) -c $(CFLAGS) $< -o $@
