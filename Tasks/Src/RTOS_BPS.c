@@ -3,10 +3,7 @@ RTOS_BPS library includes all the wrapper functions for a functioning RTOS - nee
 */
 
 #include "RTOS_BPS.h"
-
-#include "Tasks.h"
 void RTOS_BPS_SemPend(void){ 
-
 
 } 
 void RTOS_BPS_SemPost(void) {
