@@ -3,7 +3,6 @@ RTOS_BPS library includes all the wrapper functions for a functioning RTOS - nee
 */
 
 #include "RTOS_BPS.h"
-#include <stdlib.h>
 
 /**
  * @brief Pends a BPS_OS_Semaphore.
