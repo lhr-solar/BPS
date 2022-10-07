@@ -8,6 +8,7 @@ There are exceptions with all guidelines. As long as your decisions are justifie
 - [ ] Code Build checks pass 
 - [ ] No merge conflicts 
 - [ ] Software feature has test associated with it. 
+- [ ] Software feature has documentation for it updated.
 - [ ] Test provides useful information and uses relevant data to accurately represent BPS 
     - NOTE: If test file already exists, use that one 
 - [ ] 2 Members of the team have already reviewed my PR 
