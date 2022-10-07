@@ -3,6 +3,8 @@ RTOS_BPS library includes all the wrapper functions for a functioning RTOS - nee
 */
 
 #include "RTOS_BPS.h"
+#include <stdlib.h>
+
 void RTOS_BPS_SemPend(void){ 
 
 } 
@@ -61,7 +63,9 @@ void RTOS_BPS_TaskCreate(
     )
     {
         BPS_OS_ERR err;
-        OSTaskCreate(p_tcb, p_name, p_task, p_arg, prio, p_stk_base, WATERMARK_STACK_LIMIT, stk_size, 0, 10,(void *)0, OS_OPT_TASK_STK_CHK | OS_OPT_TASK_SAVE_FP, &err);
+        OS_TCB *tcbptr = calloc(1, sizeof(OS_TCB));
+        CPU_STK *stkptr = calloc(stk_size, sizeof(unsigned int)); // using size of unstacked int because cpu stack is type defined as an array of unsigned int
+        OSTaskCreate(tcbptr, p_name, p_task, p_arg, prio, stkptr, WATERMARK_STACK_LIMIT, stk_size, 0, 10,(void *)0, OS_OPT_TASK_STK_CHK | OS_OPT_TASK_SAVE_FP, &err);
         assertOSError(err);
     }
 
