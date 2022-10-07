@@ -19,6 +19,8 @@ typedef OS_OPT      BPS_OS_OPT;
 typedef OS_ERR      BPS_OS_ERR;
 typedef OS_SEM      BPS_OS_SEM;
 typedef OS_TCB      BPS_OS_TCB;
+typedef OS_SEM_CTR  BPS_OS_SEM_CTR;
+typedef OS_TICK     BPS_OS_TICK;
 
 //Custom typedefs for BPS_TaskCreate function currently using micirium
 typedef OS_TASK_PTR  BPS_OS_TASK_PTR;  //pointer to the task
@@ -28,18 +30,21 @@ typedef CPU_STK_SIZE BPS_OS_TASK_STK_SIZE;  //size of the stack in WORDS not byt
 
 
 /**
- * @brief
- * @param
- * @return
+ * @brief Pends a BPS_OS_Semaphore.
+ * @param *sem - pointer to a sempaphore to pend
+ * @param tick - time in clock ticks to timeout for
+ * @param opt - pend option
+ * @return the semaphore count, or 0 if not available
  */
-void RTOS_BPS_SemPend(void);
+BPS_OS_SEM_CTR RTOS_BPS_SemPend(BPS_OS_SEM* sem, BPS_OS_TICK tick, BPS_OS_OPT opt);
 
 /**
- * @brief
- * @param
- * @return  
+ * @brief Posts a semaphore
+ * @param sem4 this is a semaphore pointer to post to
+ * @param opt determines the type of POST performed
+ * @return The current value of the semaphore counter or 0 upon error 
  */
-void RTOS_BPS_SemPost(void);
+BPS_OS_SEM_CTR RTOS_BPS_SemPost(BPS_OS_SEM *sem4, BPS_OS_OPT opt);
 
 /**
  * @brief Initializes a mutex object.

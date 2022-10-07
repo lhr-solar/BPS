@@ -5,11 +5,31 @@ RTOS_BPS library includes all the wrapper functions for a functioning RTOS - nee
 #include "RTOS_BPS.h"
 #include <stdlib.h>
 
-void RTOS_BPS_SemPend(void){ 
+/**
+ * @brief Pends a BPS_OS_Semaphore.
+ * @param *sem - pointer to a sempaphore to pend
+ * @param tick - time in clock ticks to timeout for
+ * @param opt - pend option
+ * @return the semaphore count, or 0 if not available
+ */
+BPS_OS_SEM_CTR RTOS_BPS_SemPend(BPS_OS_SEM* sem, BPS_OS_TICK tick, BPS_OS_OPT opt) {
+    BPS_OS_ERR err;
+    BPS_OS_SEM_CTR count = OSSemPend(sem, tick, opt, 0, &err); // we don't need timestamp
+    assertOSError(err);
+    return count;
+}
 
-} 
-void RTOS_BPS_SemPost(void) {
-
+/**
+ * @brief Posts a semaphore
+ * @param sem4 this is a semaphore pointer to post to
+ * @param opt determines the type of POST performed
+ * @return The current value of the semaphore counter or 0 upon error 
+ */
+BPS_OS_SEM_CTR RTOS_BPS_SemPost(BPS_OS_SEM *sem4, BPS_OS_OPT opt) {
+    BPS_OS_ERR err;
+    BPS_OS_SEM_CTR counter = OSSemPost(sem4, opt, &err);
+    assertOSError(err);
+    return counter;
 }
 
 /**
