@@ -58,7 +58,7 @@ void Task1(void *p_arg){
 
         BSP_Light_Toggle(EXTRA);
         
-        RTOS_BPS_TimeDelay(100);
+        RTOS_BPS_DelayTick(100);
     }
 
     exit(0);

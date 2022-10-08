@@ -2,12 +2,11 @@
 RTOS_BPS library includes all the wrapper functions for a functioning RTOS - needed for cleaner code and portability
 */
 
-//need to add the proper #include files 
-#include "os.h" // for RTOS stuff
-#include "Tasks.h" // for OS errors
+//need to add the proper #include files
 
 #include "os.h" // for RTOS stuff
 #include "Tasks.h" // for OS errors
+#include <stdint.h>
 
 #ifndef RTOS_BPS_H
 #define RTOS_BPS_H
@@ -71,10 +70,24 @@ void RTOS_BPS_MutexPost(BPS_OS_MUTEX* mutex, BPS_OS_OPT options);
 void RTOS_BPS_TaskCreate(void);
 
 /**
- * @brief Creates a Time Delay.
+ * @brief Creates a Second-based Time Delay.
+ * @param dly Defines how many seconds to delay for.
+ * @return none 
+ */
+void RTOS_BPS_DelaySecs(int16_t dly);
+
+/**
+ * @brief Creates a Millisecond-based Time Delay.
+ * @param dly Defines how many milliseconds to delay for.
+ * @return none 
+ */
+void RTOS_BPS_DelayMs(int16_t dly);
+
+/**
+ * @brief Creates a Tick-based Time Delay.
  * @param dly Defines how many ticks to delay for.
  * @return none 
  */
-void RTOS_BPS_TimeDelay(BPS_OS_TICK dly);
+void RTOS_BPS_DelayTick(BPS_OS_TICK dly);
 
 #endif 

@@ -33,7 +33,7 @@ void Task_PetWDog(void *p_arg) {
         OSMutexPost(&WDog_Mutex, OS_OPT_POST_NONE, &err);
         assertOSError(err);
 
-        RTOS_BPS_TimeDelay(10);
+        RTOS_BPS_DelayTick(10);
         assertOSError(err);
     }
 }

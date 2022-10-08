@@ -40,7 +40,7 @@ void Task_UpdateVoltage(void* p_arg) {
 
     while (1) {
         Voltage_UpdateMeasurements();
-        RTOS_BPS_TimeDelay(5);
+        RTOS_BPS_DelayTick(5);
         assertOSError(err);
     }
 }

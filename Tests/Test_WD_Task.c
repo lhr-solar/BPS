@@ -23,7 +23,7 @@ void Task2(void *p_arg){
    
     while(1) {
         BSP_Light_Toggle(EXTRA);
-        RTOS_BPS_TimeDelay(25);
+        RTOS_BPS_DelayTick(25);
         // Comment out the following lines to test watchdog timeout
         OSMutexPend(&WDog_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
         WDog_BitMap = 7;

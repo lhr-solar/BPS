@@ -94,7 +94,7 @@ void Task_Spam(void *p_arg){
         }
 
         // delay for 50ms (half the time volttemp delays for because other threads will also take CPU during the race)
-        RTOS_BPS_TimeDelay(5);
+        RTOS_BPS_DelayTick(5);
         assertOSError(err);
     }
 }

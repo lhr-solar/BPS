@@ -27,7 +27,7 @@ void Task1(void *p_arg) {
     BSP_UART_Init(NULL, NULL, UART_USB);
     printf("Checkpoint A\n");
 
-    RTOS_BPS_TimeDelay(1);
+    RTOS_BPS_DelayTick(1);
     while(err != OS_ERR_NONE);
 
     // Create Task 2
@@ -55,7 +55,7 @@ void Task1(void *p_arg) {
                       &err);
         }
 
-        RTOS_BPS_TimeDelay(1);
+        RTOS_BPS_DelayTick(1);
         printf("1\r\n");
     }
 }
@@ -70,7 +70,7 @@ void Task2(void *p_arg) {
                     OS_OPT_POST_ALL,
                     &err);
 
-        RTOS_BPS_TimeDelay(1);
+        RTOS_BPS_DelayTick(1);
 
         printf("2\r\n");
     }

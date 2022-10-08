@@ -82,7 +82,7 @@ void test(void) {
         BSP_SPI_Read(spi_ltc6811, rxbuf, 8);
         rxbuf[0] = 0;
         */
-        RTOS_BPS_TimeDelay(400);
+        RTOS_BPS_DelayTick(400);
     }
 }
 

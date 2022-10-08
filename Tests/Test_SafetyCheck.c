@@ -11,7 +11,7 @@ static void Voltage_UpdateMeasurements(void) {
     printf("V0\r\n");
 
     OS_ERR err;
-    RTOS_BPS_TimeDelay(1);
+    RTOS_BPS_DelayTick(1);
 
     printf("V1\r\n");
 }
@@ -32,7 +32,7 @@ static SafetyStatus Voltage_OpenWire(void) {
     printf("O0\r\n");
     
     OS_ERR err;
-    RTOS_BPS_TimeDelay(1);
+    RTOS_BPS_DelayTick(1);
 
     printf("O1\r\n");
 
@@ -50,7 +50,7 @@ static void Temperature_UpdateAllMeasurements(void) {
     printf("T0\r\n");
 
     OS_ERR err;
-    RTOS_BPS_TimeDelay(1);
+    RTOS_BPS_DelayTick(1);
 
     printf("T1\r\n");
 }
@@ -72,7 +72,7 @@ static void Current_UpdateMeasurements(void) {
     printf("A0\r\n");
     
     OS_ERR err;
-    RTOS_BPS_TimeDelay(1);
+    RTOS_BPS_DelayTick(1);
 
     printf("A1\r\n");
 }

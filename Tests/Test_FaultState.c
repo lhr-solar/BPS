@@ -17,7 +17,7 @@ CPU_STK Task2_Stk[256];
 void Task2(void *p_arg){
     OS_ERR err;
 
-    RTOS_BPS_TimeDelay(250);
+    RTOS_BPS_DelayTick(250);
 
     Fault_BitMap = Fault_OW;   // set this to whatever you want
     OSSemPost(&Fault_Sem4,
@@ -29,7 +29,7 @@ void Task2(void *p_arg){
    
     while(1) {
         BSP_Light_Toggle(EXTRA);
-        RTOS_BPS_TimeDelay(25);
+        RTOS_BPS_DelayTick(25);
     }
 
     exit(0);

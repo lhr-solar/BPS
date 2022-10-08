@@ -171,7 +171,7 @@ void Task_VoltTempMonitor(void *p_arg) {
         assertOSError(err);
 
         //delay of 50ms
-        RTOS_BPS_TimeDelay(5);
+        RTOS_BPS_DelayTick(5);
         assertOSError(err);
     }
 }

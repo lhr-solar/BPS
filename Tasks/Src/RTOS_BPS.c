@@ -3,6 +3,7 @@ RTOS_BPS library includes all the wrapper functions for a functioning RTOS - nee
 */
 
 #include "RTOS_BPS.h"
+#include <stdint.h>
 
 /**
  * @brief Pends a BPS_OS_Semaphore.
@@ -54,11 +55,35 @@ void RTOS_BPS_TaskCreate(void){
 }
 
 /**
- * @brief: Creates a Time Delay.
+ * @brief: Creates a Second-Based Time Delay.
+ * @param dly Defines how many seconds to delay for.
+ * @return none
+ */
+void RTOS_BPS_DelaySecs(int16_t dly){
+    BPS_OS_OPT opt = OS_OPT_TIME_HMSM_NON_STRICT;
+    BPS_OS_ERR err;
+    OSTimeDlyHMSM(0, 0, dly, 0, opt, &err);
+    assertOSError(err);
+}
+
+/**
+ * @brief: Creates a Millisecond-Based Time Delay.
+ * @param dly Defines how many milliseconds to delay for.
+ * @return none
+ */
+void RTOS_BPS_DelayMs(int16_t dly){
+    BPS_OS_OPT opt = OS_OPT_TIME_HMSM_NON_STRICT;
+    BPS_OS_ERR err;
+    OSTimeDlyHMSM(0, 0, 0, dly, opt, &err);
+    assertOSError(err);
+}
+
+/**
+ * @brief: Creates a Tick-Based Time Delay.
  * @param dly Defines how many ticks to delay for.
  * @return none
  */
-void RTOS_BPS_TimeDelay(BPS_OS_TICK dly){
+void RTOS_BPS_TickDelay(BPS_OS_TICK dly){
     BPS_OS_OPT opt = OS_OPT_TIME_DLY;
     BPS_OS_ERR err;
     OSTimeDly(dly, opt, &err);

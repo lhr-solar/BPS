@@ -28,7 +28,7 @@ CPU_STK Task2_Stk[256];
 void Task2(void *p_arg){    //This task is meant to allow contactor to close
     OS_ERR err;
 
-    RTOS_BPS_TimeDelay(250);
+    RTOS_BPS_DelayTick(250);
 
 
     OSSemPost(&SafetyCheck_Sem4,
@@ -55,7 +55,7 @@ void Task2(void *p_arg){    //This task is meant to allow contactor to close
    
     while(1) {
         BSP_Light_Toggle(RUN);
-        RTOS_BPS_TimeDelay(25);
+        RTOS_BPS_DelayTick(25);
     }
 
     exit(0);
