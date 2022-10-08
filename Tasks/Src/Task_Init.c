@@ -27,10 +27,7 @@ void Task_Init(void *p_arg) {
                 &err);
     assertOSError(err);
 
-    OSMutexCreate(&WDog_Mutex,
-                "Watchdog Mutex",
-                &err);
-    assertOSError(err);
+    RTOS_BPS_MutexCreate(&WDog_Mutex, "Watchdog Mutex");
 
         //1
     	OSTaskCreate(&FaultState_TCB,				// TCB
