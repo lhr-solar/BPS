@@ -82,7 +82,7 @@ int main(void) {
     BSP_PLL_Init();
     BSP_Lights_Init();
     BSP_Contactor_Init();
-    BSP_Contactor_On();
+    BSP_Contactor_On(ALL_CONTACTORS);
 
     __disable_irq();
 

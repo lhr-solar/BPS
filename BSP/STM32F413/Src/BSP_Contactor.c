@@ -53,41 +53,23 @@ void BSP_Contactor_Init(void) {
 	// Initialize Port B for Contactor 1
 	// PB0 - output
 	// PB1 - input
-	GPIO_C1Init.GPIO_Pin = GPIO_Pin_0;
-	GPIO_C1Init.GPIO_Mode = GPIO_Mode_OUT;
-	GPIO_C1Init.GPIO_Speed = GPIO_Speed_50MHz;
-	GPIO_C1Init.GPIO_OType = GPIO_OType_PP;
-	GPIO_C1Init.GPIO_PuPd = GPIO_PuPd_UP;
-	GPIO_Init(C1_PORT, &GPIO_C1Init);
-	GPIO_C1Init.GPIO_Pin = GPIO_Pin_1;
-	GPIO_C1Init.GPIO_Mode = GPIO_Mode_IN;
-	GPIO_Init(C1_PORT, &GPIO_C1Init);
+	Setup(C1_PORT, &GPIO_C1Init, 
+			GPIO_Pin_0, GPIO_Pin_1, GPIO_Speed_50MHz,
+			GPIO_OType_PP, GPIO_PuPd_UP);
 
 	// Initialize Port A for Contactor 2
 	// PA4 - output
 	// PA5 - input
-	GPIO_C2Init.GPIO_Pin = GPIO_Pin_4;
-	GPIO_C2Init.GPIO_Mode = GPIO_Mode_OUT;
-	GPIO_C2Init.GPIO_Speed = GPIO_Speed_50MHz;
-	GPIO_C2Init.GPIO_OType = GPIO_OType_PP;
-	GPIO_C2Init.GPIO_PuPd = GPIO_PuPd_UP;
-	GPIO_Init(C2_PORT, &GPIO_C2Init);
-	GPIO_C2Init.GPIO_Pin = GPIO_Pin_5;
-	GPIO_C2Init.GPIO_Mode = GPIO_Mode_IN;
-	GPIO_Init(C2_PORT, &GPIO_C2Init);
+	Setup(C2_PORT, &GPIO_C2Init, 
+			GPIO_Pin_4, GPIO_Pin_5, GPIO_Speed_50MHz,
+			GPIO_OType_PP, GPIO_PuPd_UP);
 
 	// Initialize Port C for Contactor 3
 	// PC0 - output
 	// PC1 - input
-	GPIO_C3Init.GPIO_Pin = GPIO_Pin_0;
-	GPIO_C3Init.GPIO_Mode = GPIO_Mode_OUT;
-	GPIO_C3Init.GPIO_Speed = GPIO_Speed_50MHz;
-	GPIO_C3Init.GPIO_OType = GPIO_OType_PP;
-	GPIO_C3Init.GPIO_PuPd = GPIO_PuPd_UP;
-	GPIO_Init(C3_PORT, &GPIO_C3Init);
-	GPIO_C3Init.GPIO_Pin = GPIO_Pin_1;
-	GPIO_C3Init.GPIO_Mode = GPIO_Mode_IN;
-	GPIO_Init(C3_PORT, &GPIO_C3Init);
+	Setup(C3_PORT, &GPIO_C3Init, 
+			GPIO_Pin_0, GPIO_Pin_1, GPIO_Speed_50MHz,
+			GPIO_OType_PP, GPIO_PuPd_UP);
 }
 
 /**
@@ -96,13 +78,13 @@ void BSP_Contactor_Init(void) {
  * @param   None
  * @return  None
  */
-void BSP_Contactor_On(Contactor_e contactor) {
+void BSP_Contactor_On(CONT_CHOICE contactorChoice) {
 	// set output pins HIGH
-	if (contactor & ARRAY_CONTACTOR)
+	if (contactorChoice & ARRAY_CONTACTOR)
 		GPIO_WriteBit(C1_PORT, GPIO_Pin_0, Bit_SET);
-	if (contactor & LOAD_CONTACTOR)
+	if (contactorChoice & LOAD_CONTACTOR)
 		GPIO_WriteBit(C2_PORT, GPIO_Pin_4, Bit_SET);
-	if (contactor & HVLOW_CONTACTOR)
+	if (contactorChoice & HVLOW_CONTACTOR)
 		GPIO_WriteBit(C3_PORT, GPIO_Pin_0, Bit_SET);
 }
 
@@ -112,15 +94,15 @@ void BSP_Contactor_On(Contactor_e contactor) {
  * @param   None
  * @return  None
  */
-void BSP_Contactor_Off(Contactor_e contactor) {
+void BSP_Contactor_Off(CONT_CHOICE contactorChoice) {
     // set output pins LOW
-	if (contactor & ARRAY_CONTACTOR) {
+	if (contactorChoice & ARRAY_CONTACTOR) {
 		GPIO_WriteBit(C1_PORT, GPIO_Pin_0, Bit_RESET);
 	}
-	if (contactor & LOAD_CONTACTOR) {
+	if (contactorChoice & LOAD_CONTACTOR) {
 		GPIO_WriteBit(C2_PORT, GPIO_Pin_4, Bit_RESET);
 	}
-	if (contactor & HVLOW_CONTACTOR) {
+	if (contactorChoice & HVLOW_CONTACTOR) {
 		GPIO_WriteBit(C3_PORT, GPIO_Pin_0, Bit_RESET);
 	}
 }
@@ -130,11 +112,11 @@ void BSP_Contactor_Off(Contactor_e contactor) {
  * @param   None
  * @return  0 if contactor is off/open, 1 if on/closed
  */
-bool BSP_Contactor_GetState(Contactor_e contactor) {
-	if (contactor & ARRAY_CONTACTOR) {
+bool BSP_Contactor_GetState(CONT_CHOICE contactorChoice) {
+	if (contactorChoice & ARRAY_CONTACTOR) {
 		return ((C1_PORT->IDR & GPIO_Pin_1) >> 1) ? 0 : 1;
 	}
-	else if (contactor & LOAD_CONTACTOR) {
+	else if (contactorChoice & LOAD_CONTACTOR) {
 		return ((C2_PORT->IDR & GPIO_Pin_5) >> 5) ? 0 : 1;
 	}
 	else {

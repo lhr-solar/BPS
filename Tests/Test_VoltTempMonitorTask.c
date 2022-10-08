@@ -175,7 +175,7 @@ int main(void) {
 
     //Resetting the contactor
     BSP_Contactor_Init();
-    BSP_Contactor_Off();
+    BSP_Contactor_Off(ALL_CONTACTORS);
 
     if (BSP_WDTimer_DidSystemReset()) {
         Fault_BitMap = Fault_WDOG;

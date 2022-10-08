@@ -7,14 +7,11 @@
 #include "stm32f4xx_gpio.h"
 #include "stm32f4xx_rcc.h"
 
-// implement me later
-typedef enum {
-    ARRAY_CONTACTOR,
-    LOAD_CONTACTOR,
-    HVLOW_CONTACTOR
-} Contactor_e;
-
-#define CONTACTORS_ALL (ARRAY_CONTACTOR | LOAD_CONTACTOR | HVLOW_CONTACTOR)
+typedef uint8_t CONT_CHOICE;
+const CONT_CHOICE ARRAY_CONTACTOR = 1;
+const CONT_CHOICE LOAD_CONTACTOR = 2;
+const CONT_CHOICE HVLOW_CONTACTOR = 4;
+const CONT_CHOICE ALL_CONTACTORS = 7;
 
 // Contactor 1
 #define C1_PORT		GPIOB
@@ -38,8 +35,21 @@ typedef enum {
  * @param otype 
  * @param pupd 
  */
-inline void Setup(GPIO_TypeDef* port, GPIO_InitTypeDef* gpioStruct, uint32_t pinOutput, uint32_t pinInput, GPIOMode_TypeDef mode, GPIOSpeed_TypeDef speed, 
-               GPIOOType_TypeDef otype, GPIOPuPd_TypeDef pupd);
+inline void Setup(GPIO_TypeDef* port, GPIO_InitTypeDef* gpioStruct, uint32_t pinOutput, uint32_t pinInput, GPIOSpeed_TypeDef speed, 
+               GPIOOType_TypeDef otype, GPIOPuPd_TypeDef pupd)
+{
+    // first output pin, then input pin.
+    // other configs stay the same across init calls
+    gpioStruct->GPIO_Pin = pinOutput;
+    gpioStruct->GPIO_Mode = GPIO_Mode_OUT;
+    gpioStruct->GPIO_Speed = speed;
+    gpioStruct->GPIO_PuPd = pupd;
+    gpioStruct->GPIO_OType = otype;
+    GPIO_Init(port, gpioStruct);
+    gpioStruct->GPIO_Pin = pinInput;
+    gpioStruct->GPIO_Mode = GPIO_Mode_IN;
+    GPIO_Init(port, gpioStruct);
+}
 
 /**
  * @brief   A Contactor is a high power switch similar to what a relay is. The Contactor
@@ -61,7 +71,7 @@ void BSP_Contactor_Init(void);
  * @note    May be good in the future to make this return something if the contactor could not successfully close.
 
  */
-void BSP_Contactor_On(Contactor_e c);
+void BSP_Contactor_On(CONT_CHOICE contactorChoice);
 
 /**
  * @brief   Opens the Contactor switch i.e. turns off the whole electrical system.
@@ -69,13 +79,13 @@ void BSP_Contactor_On(Contactor_e c);
  * @param   None
  * @return  None
  */
-void BSP_Contactor_Off(Contactor_e c);
+void BSP_Contactor_Off(CONT_CHOICE contactorChoice);
 
 /**
  * @brief   Gets the state of the Contactor switch from one of its AUX pins.
  * @param   None
  * @return  0 if contactor is off/open, 1 if on/closed
  */
-bool BSP_Contactor_GetState(Contactor_e c);
+bool BSP_Contactor_GetState(CONT_CHOICE contactorChoice);
 
 #endif
