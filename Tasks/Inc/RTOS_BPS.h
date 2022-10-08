@@ -5,7 +5,7 @@ RTOS_BPS library includes all the wrapper functions for a functioning RTOS - nee
 //need to add the proper #include files 
 #include "os.h" // for RTOS stuff
 #include "Tasks.h" // for OS errors
-#include <stdlib.h> 
+#include <stdint.h> 
 
 #ifndef RTOS_BPS_H
 #define RTOS_BPS_H
@@ -24,10 +24,8 @@ typedef OS_SEM_CTR  BPS_OS_SEM_CTR;
 typedef OS_TICK     BPS_OS_TICK;
 
 //Custom typedefs for BPS_TaskCreate function currently using micirium
-typedef OS_TASK_PTR  BPS_OS_TASK_PTR;  //pointer to the task
-typedef char         BPS_OS_TASK_NAME; //name of the task
-typedef OS_PRIO      BPS_OS_TASK_PRIO; //priority for the task
-typedef CPU_STK_SIZE BPS_OS_TASK_STK_SIZE;  //size of the stack in WORDS not bytes
+typedef OS_TCB       BPS_OS_TCB;
+typedef CPU_STK      BPS_CPU_STK;
 
 
 /**
@@ -83,13 +81,13 @@ void RTOS_BPS_MutexPost(BPS_OS_MUTEX* mutex, BPS_OS_OPT options);
  * @return  nothing to see here
  */
 void RTOS_BPS_TaskCreate(
-    OS_TCB              *p_tcb,
-    BPS_OS_TASK_NAME    *p_name,
-    BPS_OS_TASK_PTR      p_task,
-    void                *p_arg,
-    BPS_OS_TASK_PRIO     prio,
-    CPU_STK             *p_stk_base,
-    BPS_OS_TASK_STK_SIZE stk_size
+    BPS_OS_TCB      *p_tcb,
+    char         *p_name,
+    void         *p_task,
+    void         *p_arg,
+    uint8_t       prio,
+    BPS_CPU_STK  *p_stk_base,
+    uint64_t      stk_size
 );
 
 /**
