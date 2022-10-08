@@ -83,7 +83,7 @@ void RTOS_BPS_DelayMs(int16_t dly){
  * @param dly Defines how many ticks to delay for.
  * @return none
  */
-void RTOS_BPS_TickDelay(BPS_OS_TICK dly){
+void RTOS_BPS_DelayTick(BPS_OS_TICK dly){
     BPS_OS_OPT opt = OS_OPT_TIME_DLY;
     BPS_OS_ERR err;
     OSTimeDly(dly, opt, &err);
