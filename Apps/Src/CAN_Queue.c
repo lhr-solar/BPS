@@ -20,7 +20,6 @@ static OS_MUTEX canFifo_Mutex;
 
 void CAN_Queue_Init(void) {
     OS_ERR err;
-    CPU_TS ticks;
     OSMutexCreate(&canFifo_Mutex, "CAN queue mutex", &err);
     assertOSError(err);
     OSSemCreate(&canFifo_Sem4,
@@ -36,7 +35,6 @@ void CAN_Queue_Init(void) {
 
 ErrorStatus CAN_Queue_Post(CANMSG_t message) {
     OS_ERR err;
-    CPU_TS ticks;
     RTOS_BPS_MutexPend(&canFifo_Mutex, 0, OS_OPT_POST_NONE);
     bool success = CAN_fifo_put(&canFifo, message);
     OSMutexPost(&canFifo_Mutex, OS_OPT_POST_NONE, &err);

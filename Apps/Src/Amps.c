@@ -72,7 +72,6 @@ void Amps_Init(void) {
  */
 void Amps_UpdateMeasurements(void) {
 	OS_ERR err;
-	CPU_TS ticks;
 	RTOS_BPS_MutexPend(&AmperesData_Mutex, 0, OS_OPT_PEND_BLOCKING);
 	latestMeasureMilliAmps = LTC2315_GetCurrent();
 	OSMutexPost(&AmperesData_Mutex, OS_OPT_POST_NONE, &err);
@@ -86,7 +85,6 @@ void Amps_UpdateMeasurements(void) {
  */
 SafetyStatus Amps_CheckStatus(int32_t maxTemperature) {
 	OS_ERR err;
-	CPU_TS ticks;
 	SafetyStatus status;
 
 	// determine if we should allow charging or not

@@ -77,7 +77,6 @@ void Voltage_Init(cell_asic *boards){
  * @param pointer to new voltage measurements
  */
 void Voltage_UpdateMeasurements(void){
-	CPU_TS ts;
 	// Start Cell ADC Measurements
 	wakeup_sleep(NUM_MINIONS);
 	LTC6811_adcv(ADC_CONVERSION_MODE,ADC_DCP,CELL_CH_TO_CONVERT);
@@ -246,7 +245,6 @@ uint32_t Voltage_GetOpenWire(void){
  * @return voltage of module at specified index
  */
 uint16_t Voltage_GetModuleMillivoltage(uint8_t moduleIdx){
-	CPU_TS ts;
 	OS_ERR err;
 	// These if statements prevents a hardfault.
     if(moduleIdx >= NUM_BATTERY_MODULES) {
