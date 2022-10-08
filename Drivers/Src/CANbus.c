@@ -53,15 +53,9 @@ static void CANbus_CountIncoming(void) {
 void CANbus_Init(bool loopback) {
 	OS_ERR err;
 
-	OSMutexCreate(&CANbus_TxMutex,
-				  "CAN TX Lock",
-				  &err);
-	assertOSError(err);
+	RTOS_BPS_MutexCreate(&CANbus_TxMutex, "CAN TX Lock");
 
-	OSMutexCreate(&CANbus_RxMutex,
-				  "CAN RX Lock",
-				  &err);
-	assertOSError(err);
+	RTOS_BPS_MutexCreate(&CANbus_RxMutex, "CAN RX Lock");
 
 	OSSemCreate(&CANbus_MailSem4,
                 "CAN Mailbox Semaphore",

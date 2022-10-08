@@ -20,8 +20,7 @@ static OS_MUTEX canFifo_Mutex;
 
 void CAN_Queue_Init(void) {
     OS_ERR err;
-    OSMutexCreate(&canFifo_Mutex, "CAN queue mutex", &err);
-    assertOSError(err);
+    RTOS_BPS_MutexCreate(&canFifo_Mutex, "CAN queue mutex");
     OSSemCreate(&canFifo_Sem4,
                 "CAN queue semaphore",
                 0,

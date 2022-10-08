@@ -38,10 +38,7 @@ void Task1(void *p_arg){
 
     OS_CPU_SysTickInit(SystemCoreClock / (CPU_INT32U) OSCfg_TickRate_Hz);
 
-    OSMutexCreate(&WDog_Mutex,
-                "Watchdog Mutex",
-                &err);
-    assertOSError(err);
+    RTOS_BPS_MutexCreate(&WDog_Mutex, "Watchdog Mutex");
     
     OSTaskCreate(&Task2_TCB,
                 "Task 2",

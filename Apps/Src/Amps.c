@@ -63,8 +63,7 @@ void Amps_Init(void) {
 	spi_os.pend = Amperes_Pend;
 	spi_os.post = Amperes_Post;
 	LTC2315_Init(spi_os);
-	OSMutexCreate(&AmperesData_Mutex, "Amperes Mutex", &err);
-	assertOSError(err);
+	RTOS_BPS_MutexCreate(&AmperesData_Mutex, "Amperes Mutex");
 }
 
 /** Amps_UpdateMeasurements
