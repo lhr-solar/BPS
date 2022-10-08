@@ -4,7 +4,7 @@
 TARGET = bps-leader
 
 DEBUG = 1
-READABLE = false
+READABLE = true
 
 ######################################
 # building variables
