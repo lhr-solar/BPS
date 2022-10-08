@@ -25,6 +25,7 @@ Welcome to the BeVolt BPS documentation!
    :caption: Software
 
    Software/Tasks
+   Software/RTOS
    Software/BSP
    Software/Drivers
    Software/Apps
