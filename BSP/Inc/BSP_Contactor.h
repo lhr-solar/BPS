@@ -8,10 +8,10 @@
 #include "stm32f4xx_rcc.h"
 
 typedef uint8_t CONT_CHOICE;
-const CONT_CHOICE ARRAY_CONTACTOR = 1;
-const CONT_CHOICE LOAD_CONTACTOR = 2;
-const CONT_CHOICE HVLOW_CONTACTOR = 4;
-const CONT_CHOICE ALL_CONTACTORS = 7;
+static const CONT_CHOICE ARRAY_CONTACTOR = 1;
+static const CONT_CHOICE LOAD_CONTACTOR = 2;
+static const CONT_CHOICE HVLOW_CONTACTOR = 4;
+static const CONT_CHOICE ALL_CONTACTORS = 7;
 
 // Contactor 1
 #define C1_PORT		GPIOB
