@@ -14,6 +14,18 @@ READABLE = true
 # to your source code. Change to -O3 for best performance
 OPT = -O3
 
+# COLORS
+RED=\033[0;31m
+GREEN=\033[0;32m
+ORANGE=\033[0;33m
+BLUE=\033[0;34m
+PURPLE=\033[0;35m
+CYAN=\033[0;36m
+LIGHTGRAY=\033[0;37m
+DARKGRAY=\033[1;30m
+YELLOW=\033[0;33m
+NC=\033[0m # No Color
+
 #######################################
 # paths
 #######################################
@@ -145,7 +157,7 @@ C_INCLUDES =  \
 # compile gcc flags
 ASFLAGS = $(MCU) $(AS_DEFS) $(AS_INCLUDES) $(OPT) -Wall -fdata-sections -ffunction-sections
 
-CFLAGS = $(MCU) $(C_DEFS) $(C_INCLUDES) $(OPT) -Wall -Werror -fdata-sections -ffunction-sections
+CFLAGS = $(MCU) $(C_DEFS) $(C_INCLUDES) $(OPT) -Wall -Werror -fdata-sections -ffunction-sections -ftrack-macro-expansion=0 -fno-diagnostics-show-caret
 
 ifeq ($(DEBUG), 1)
 CFLAGS += -g3 -gdwarf-2
@@ -227,13 +239,13 @@ $(BUILD_DIR):
 .INTERMEDIATE: build_msg
 
 c_compile_msg:
-	@echo Compiling C files...
+	@echo "${GREEN}Compiling C files...${NC}"
 
 asm_compile_msg:
-	@echo Compiling ASM files...
+	@echo "${GREEN}Compiling ASM files...${NC}"
 
 build_msg:
-	@echo Generating BPS executable...
+	@echo "${CYAN}Generating BPS executable...${NC}"
 
 
 #######################################
