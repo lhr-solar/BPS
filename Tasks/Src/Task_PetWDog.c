@@ -16,8 +16,7 @@ void Task_PetWDog(void *p_arg) {
 
     while (1){
         //take WDog Mutex
-        OSMutexPend(&WDog_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
-        assertOSError(err);
+        RTOS_BPS_MutexPend(&WDog_Mutex, 0, OS_OPT_PEND_BLOCKING);
 
         // If WDog_BitMap is all set:
         // Reset watchdog timer

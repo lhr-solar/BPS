@@ -162,8 +162,7 @@ void Task_VoltTempMonitor(void *p_arg) {
         BSP_Fans_SetAll(TOPSPEED);
 
         //signal watchdog
-        OSMutexPend(&WDog_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
-        assertOSError(err);
+        RTOS_BPS_MutexPend(&WDog_Mutex, 0, OS_OPT_PEND_BLOCKING);
 
         WDog_BitMap |= WD_VOLT_TEMP; //Set watchdog bits for task
 

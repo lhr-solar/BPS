@@ -58,8 +58,7 @@ void Balancing_Balance(cell_asic Minions[]){
  */
 static void Balancing_ClearDischargeBit(int Cell, uint8_t total_ic, cell_asic *ic){
 	OS_ERR err;
-	OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
-  	assertOSError(err);
+	RTOS_BPS_MutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING);
 	for(int i=0; i<total_ic; i++){
 		if((Cell<9)&& (Cell!=0)){
 			ic[i].config.tx_data[4] = ic[i].config.tx_data[4] & ~(1<<(Cell-1));
@@ -108,8 +107,7 @@ static void Balancing_SetDischargeBit(uint8_t module, cell_asic ic[]) {
 	uint8_t ModuleNumber = 0;
 	Balancing_GetICNumber(module, &ICNumber, &ModuleNumber);//Get IC and ModuleInIC number
 	
-	OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
-	assertOSError(err);
+	RTOS_BPS_MutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING);
 	
 	LTC6811_rdcfg_safe(NUM_MINIONS, ic);
 	LTC6811_set_discharge(ModuleNumber, NUM_MINIONS, &ic[ICNumber]); //Set discharge bit
