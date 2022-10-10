@@ -43,10 +43,7 @@ void Voltage_Init(cell_asic *boards){
 	Minions = boards;
 	//initialize mutex
 	OS_ERR err;
-	OSMutexCreate(&Voltage_Mutex,
-				  "Voltage Buffer Mutex",
-				  &err
-				);
+	RTOS_BPS_MutexCreate(&Voltage_Mutex, "Voltage Buffer Mutex");
 					
 	wakeup_sleep(NUM_MINIONS);
 	LTC6811_Init(Minions);

@@ -119,10 +119,7 @@ void LTC6811_Init(cell_asic *battMod){
   static bool mutexExists = false;
   OS_ERR err;
   if (mutexExists == false){
-    OSMutexCreate(&MinionsASIC_Mutex,
-                "Minions ASIC Mutex",
-                &err);
-    assertOSError(err);
+    RTOS_BPS_MutexCreate(&MinionsASIC_Mutex, "Minions ASIC Mutex");
     OSSemCreate(&MinionsIO_Sem4,
                 "Minions Sem4",
                 0,
