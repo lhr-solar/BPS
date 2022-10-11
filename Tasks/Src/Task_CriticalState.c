@@ -39,7 +39,7 @@ void Task_CriticalState(void *p_arg) {
     BSP_Contactor_On();
 
     // launch check contactor task
-    OSTaskCreate(&CheckContactor_TCB,                       // TCB
+    RTOS_BPS_TaskCreate(&CheckContactor_TCB,                       // TCB
 				"Task_CheckContactor",                      // Task Name (String)
 				Task_CheckContactor,                        // Task function pointer
 				(void *)0,                                  // Task function args
