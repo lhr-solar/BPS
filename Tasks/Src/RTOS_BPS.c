@@ -63,9 +63,9 @@ void RTOS_BPS_MutexPost(BPS_OS_MUTEX* mutex, BPS_OS_OPT options) {
  * @brief   Creates a task that will be handled by the OS
  * @param   *p_tcb - pointer to the tcb
  * @param   *p_name - pointer to task name
- * @param   p_task - pointer to the task
+ * @param   *p_task - pointer to the task
  * @param   *p_args - pointer to task function arguments
- * @param   *prio - task priority
+ * @param   prio - task priority
  * @param   *p_stk_base - the stack
  * @param   stk_size - size of the stack
  * @param   *p_err - return error code
