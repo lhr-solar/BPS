@@ -20,13 +20,13 @@ typedef OS_OPT      BPS_OS_OPT;
 typedef OS_ERR      BPS_OS_ERR;
 typedef OS_SEM      BPS_OS_SEM;
 typedef OS_TCB      BPS_OS_TCB;
+typedef CPU_TS      BPS_CPU_TS;
 typedef OS_SEM_CTR  BPS_OS_SEM_CTR;
 typedef OS_TICK     BPS_OS_TICK;
 
 //Custom typedefs for BPS_TaskCreate function currently using micirium
 typedef OS_TCB       BPS_OS_TCB;
 typedef CPU_STK      BPS_CPU_STK;
-
 
 /**
  * @brief Pends a BPS_OS_Semaphore.
@@ -45,7 +45,7 @@ BPS_OS_SEM_CTR RTOS_BPS_SemPend(BPS_OS_SEM* sem, BPS_OS_TICK tick, BPS_OS_OPT op
  */
 BPS_OS_SEM_CTR RTOS_BPS_SemPost(BPS_OS_SEM *sem4, BPS_OS_OPT opt);
 
-/**
+/*
  * @brief Initializes a mutex object.
  * @param *mut - pointer to a mutex to initialize
  * @param name - char* of the name of the mutex
@@ -54,11 +54,12 @@ BPS_OS_SEM_CTR RTOS_BPS_SemPost(BPS_OS_SEM *sem4, BPS_OS_OPT opt);
 void RTOS_BPS_MutexCreate(BPS_OS_MUTEX *mut, char* name);
 
 /**
- * @brief   
- * @param   
- * @return  
+ * @brief   Function waits for Mutex
+ * @param   *mutex - pointer to mutex
+ * @param   timeout - timeout period, if 0 will wait forever until resource available
+ * @param   options - determines what the mutex will do, ie: block or not block
  */
-void RTOS_BPS_MutexPend(void);
+void RTOS_BPS_MutexPend(BPS_OS_MUTEX* mutex, BPS_OS_TICK timeout, BPS_OS_OPT opt);
 
 /**
  * @brief   Posts the specified Mutex
