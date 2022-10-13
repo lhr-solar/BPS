@@ -97,19 +97,6 @@ void RTOS_BPS_TaskCreate(
         assertOSError(err);
     }
 
-/*
-void RTOS_BPS_TaskCreate(
-    BPS_OS_TASK_PTR taskptr, 
-    BPS_OS_TASK_NAME *taskname, 
-    void *args, 
-    BPS_OS_TASK_PRIO priority, 
-    BPS_OS_TASK_STK_SIZE stack_size
-    )
-{
-    see if I can implement this one later
-}
-*/
-
 void RTOS_BPS_TimeDelay(void){
 
 }
