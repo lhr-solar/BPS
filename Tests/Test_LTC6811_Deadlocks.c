@@ -176,35 +176,23 @@ int main() {
                 0,
                 &err);
 
-    OSTaskCreate(&LTC6811_Deadlocks_TCB,				// TCB
+    RTOS_BPS_TaskCreate(&LTC6811_Deadlocks_TCB,				// TCB
 				"LTC6811 Deadlocks Test",	// Task Name (String)
 				LTC6811_Deadlocks,				// Task function pointer
 				(void *)0,				// Task function args
 				1,			// Priority
-				LTC6811_Deadlocks_Stk,				// Stack
-				256,	// Watermark limit for debugging
-				512,		// Stack size
-				0,						// Queue size (not needed)
-				10,						// Time quanta (time slice) 10 ticks
-				(void *)0,				// Extension pointer (not needed)
-				OS_OPT_TASK_STK_CHK | OS_OPT_TASK_SAVE_FP,	// Options
-				&err);					// return err code
+				LTC6811_Deadlocks_Stk,	// Watermark limit for debugging
+				512);					// return err code
 
 	// ASSERT err
 
-    OSTaskCreate(&LTC6811_Deadlocks2_TCB,				// TCB
+    RTOS_BPS_TaskCreate(&LTC6811_Deadlocks2_TCB,				// TCB
 				"LTC6811 Deadlocks Test",	// Task Name (String)
 				LTC6811_Deadlocks2,				// Task function pointer
 				(void *)0,				// Task function args
 				2,			// Priority
-				LTC6811_Deadlocks2_Stk,				// Stack
-				256,	// Watermark limit for debugging
-				512,		// Stack size
-				0,						// Queue size (not needed)
-				10,						// Time quanta (time slice) 10 ticks
-				(void *)0,				// Extension pointer (not needed)
-				OS_OPT_TASK_STK_CHK | OS_OPT_TASK_SAVE_FP,	// Options
-				&err);					// return err code
+				LTC6811_Deadlocks2_Stk,	// Watermark limit for debugging
+				512);					// return err code
 
     // ASSERT err
 

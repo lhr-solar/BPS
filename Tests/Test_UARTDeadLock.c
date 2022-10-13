@@ -120,33 +120,21 @@ int main() {
                 "Safety Check Semaphore",
                 0,
                 &err);
-    OSTaskCreate(&UART_Deadlocks_TCB,				// TCB
+    RTOS_BPS_TaskCreate(&UART_Deadlocks_TCB,				// TCB
 				"UART Deadlocks Test",	// Task Name (String)
 				UART_Deadlocks,				// Task function pointer
 				(void *)0,				// Task function args
 				1,			// Priority
-				UART_Deadlocks_Stk,				// Stack
-				256,	// Watermark limit for debugging
-				512,		// Stack size
-				0,						// Queue size (not needed)
-				10,						// Time quanta (time slice) 10 ticks
-				(void *)0,				// Extension pointer (not needed)
-				OS_OPT_TASK_STK_CHK | OS_OPT_TASK_SAVE_FP,	// Options
-				&err);					// return err code
+				UART_Deadlocks_Stk,	// Watermark limit for debugging
+				512);					// return err code
 	// ASSERT err
-    OSTaskCreate(&UART_Deadlocks2_TCB,				// TCB
+    RTOS_BPS_TaskCreate(&UART_Deadlocks2_TCB,				// TCB
 				"UART Deadlocks Test",	// Task Name (String)
 				UART_Deadlocks2,				// Task function pointer
 				(void *)0,				// Task function args
 				2,			// Priority
-				UART_Deadlocks2_Stk,				// Stack
-				256,	// Watermark limit for debugging
-				512,		// Stack size
-				0,						// Queue size (not needed)
-				10,						// Time quanta (time slice) 10 ticks
-				(void *)0,				// Extension pointer (not needed)
-				OS_OPT_TASK_STK_CHK | OS_OPT_TASK_SAVE_FP,	// Options
-				&err);					// return err code
+				UART_Deadlocks2_Stk,	// Watermark limit for debugging
+				512);					// return err code
     // ASSERT err
 	OSStart(&err);
 }
