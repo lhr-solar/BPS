@@ -65,14 +65,16 @@ void Task1(void *p_arg){
             Task_FaultState,				// Task function pointer
             (void *)0,				// Task function args
             TASK_FAULT_STATE_PRIO,			// Priority
-            FaultState_Stk);					// return err code
+            FaultState_Stk,	// Watermark limit for debugging
+            TASK_FAULT_STATE_STACK_SIZE);					// return err code
     //2
     RTOS_BPS_TaskCreate(&CriticalState_TCB,				// TCB
             "TASK_CRITICAL_STATE_PRIO",	// Task Name (String)
             Task_CriticalState,				// Task function pointer
             (void *)0,				// Task function args
             TASK_CRITICAL_STATE_PRIO,			// Priority
-            CriticalState_Stk);					// return err code
+            CriticalState_Stk,	// Watermark limit for debugging
+            TASK_CRITICAL_STATE_STACK_SIZE);					// return err code
 
     //3
     RTOS_BPS_TaskCreate(&PetWDog_TCB,				// TCB
@@ -80,14 +82,16 @@ void Task1(void *p_arg){
 			Task_PetWDog,				// Task function pointer
 			(void *)0,				// Task function args
 			TASK_PETWDOG_PRIO,			// Priority
-			PetWDog_Stk);					// return err code
+			PetWDog_Stk,	// Watermark limit for debugging
+			TASK_PETWDOG_STACK_SIZE);					// return err code
     // Spawn Task_VoltTempMonitor with PRIO 4
     RTOS_BPS_TaskCreate(&VoltTempMonitor_TCB,				// TCB
 			"TASK_VOLT_TEMP_MONITOR_PRIO",	// Task Name (String)
 			Task_VoltTempMonitor,				// Task function pointer
 			(void *)0,				// Task function args
 			TASK_VOLT_TEMP_MONITOR_PRIO,			// Priority
-			VoltTempMonitor_Stk);					// return err code
+			VoltTempMonitor_Stk,	// Watermark limit for debugging
+			TASK_VOLT_TEMP_MONITOR_STACK_SIZE);					// return err code
 
     // Spawn CANBUS Consumer, PRIO 7
     RTOS_BPS_TaskCreate(&CANBusConsumer_TCB,				// TCB
@@ -95,7 +99,8 @@ void Task1(void *p_arg){
             Task_CANBusConsumer,				// Task function pointer
             (void *)true,				// Use loopback mode
             TASK_CANBUS_CONSUMER_PRIO,			// Priority
-            CANBusConsumer_Stk);					// return err code
+            CANBusConsumer_Stk,	// Watermark limit for debugging
+            TASK_CANBUS_CONSUMER_STACK_SIZE);					// return err code
     assertOSError(err);
 
     // Initialize CAN queue
@@ -155,8 +160,19 @@ int main(void) {
                 Task1,
                 (void *)0,
                 1,
-                Task1_Stk);
+                Task1_Stk,
+                256);
     assertOSError(err);
 
     //Give same priority as amperes task thread
-    
+    RTOS_BPS_TaskCreate(&Task2_TCB,
+                "Task 2",
+                Task2,
+                (void *)0,
+                5,
+                Task2_Stk,
+                256);
+    assertOSError(err);
+
+    OSStart(&err);
+}
