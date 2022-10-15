@@ -1,4 +1,4 @@
-
+/* Copyright (c) 2018-2022 UT Longhorn Racing Solar */
 #include "LTC6811.h"
 #include "Voltage.h"
 #include "BatteryBalancing.h"

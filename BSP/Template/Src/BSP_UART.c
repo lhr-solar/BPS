@@ -1,3 +1,4 @@
+/* Copyright (c) 2018-2022 UT Longhorn Racing Solar */
 #include "BSP_UART.h"
 
 #define TX_SIZE     128

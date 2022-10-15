@@ -1,4 +1,4 @@
-/* Copyright (c) 2020 UT Longhorn Racing Solar */
+/* Copyright (c) 2018-2022 UT Longhorn Racing Solar */
 
 #ifndef __SIMULATOR_CONF_H
 #define __SIMULATOR_CONF_H

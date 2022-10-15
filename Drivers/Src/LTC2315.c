@@ -1,3 +1,4 @@
+/* Copyright (c) 2018-2022 UT Longhorn Racing Solar */
 #include "LTC2315.h"
 #include "BSP_SPI.h"
 #include "os.h"

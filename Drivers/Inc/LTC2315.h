@@ -1,3 +1,4 @@
+/* Copyright (c) 2018-2022 UT Longhorn Racing Solar */
 #ifndef LTC2315_H
 #define LTC2315_H
 

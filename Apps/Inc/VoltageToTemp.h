@@ -1,4 +1,4 @@
-/* Copyright (c) 2021 UT Longhorn Racing Solar */
+/* Copyright (c) 2018-2022 UT Longhorn Racing Solar */
 
 #ifndef __VOLTAGETOTEMP_H__
 #define __VOLTAGETOTEMP_H__
