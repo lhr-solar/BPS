@@ -15,7 +15,7 @@ void Task_CheckContactor(void *p_arg) {
 
     while(1) {
         //delay of 250ms
-        RTOS_BPS_DelayTick(25);
+        RTOS_BPS_DelayMs(250);
         assertOSError(err);
 
         // fault if the contactor is open

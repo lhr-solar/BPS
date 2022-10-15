@@ -59,10 +59,9 @@ void RTOS_BPS_TaskCreate(void){
  * @param dly Defines how many seconds to delay for.
  * @return none
  */
-void RTOS_BPS_DelaySecs(int16_t dly){
-    BPS_OS_OPT opt = OS_OPT_TIME_HMSM_NON_STRICT;
+void RTOS_BPS_DelaySecs(uint16_t dly){
     BPS_OS_ERR err;
-    OSTimeDlyHMSM(0, 0, dly, 0, opt, &err);
+    OSTimeDlyHMSM(0, 0, dly, 0, OS_OPT_TIME_HMSM_NON_STRICT, &err);
     assertOSError(err);
 }
 
@@ -71,10 +70,9 @@ void RTOS_BPS_DelaySecs(int16_t dly){
  * @param dly Defines how many milliseconds to delay for.
  * @return none
  */
-void RTOS_BPS_DelayMs(int16_t dly){
-    BPS_OS_OPT opt = OS_OPT_TIME_HMSM_NON_STRICT;
+void RTOS_BPS_DelayMs(uint16_t dly){
     BPS_OS_ERR err;
-    OSTimeDlyHMSM(0, 0, 0, dly, opt, &err);
+    OSTimeDlyHMSM(0, 0, 0, dly, OS_OPT_TIME_HMSM_NON_STRICT, &err);
     assertOSError(err);
 }
 
@@ -84,8 +82,7 @@ void RTOS_BPS_DelayMs(int16_t dly){
  * @return none
  */
 void RTOS_BPS_DelayTick(BPS_OS_TICK dly){
-    BPS_OS_OPT opt = OS_OPT_TIME_DLY;
     BPS_OS_ERR err;
-    OSTimeDly(dly, opt, &err);
+    OSTimeDly(dly, OS_OPT_TIME_DLY, &err);
     assertOSError(err);
 }

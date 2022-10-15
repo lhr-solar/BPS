@@ -74,14 +74,14 @@ void RTOS_BPS_TaskCreate(void);
  * @param dly Defines how many seconds to delay for.
  * @return none 
  */
-void RTOS_BPS_DelaySecs(int16_t dly);
+void RTOS_BPS_DelaySecs(uint16_t dly);
 
 /**
  * @brief Creates a Millisecond-based Time Delay.
  * @param dly Defines how many milliseconds to delay for.
  * @return none 
  */
-void RTOS_BPS_DelayMs(int16_t dly);
+void RTOS_BPS_DelayMs(uint16_t dly);
 
 /**
  * @brief Creates a Tick-based Time Delay.
