@@ -19,5 +19,7 @@ int main(void) {
     BSP_CAN_Write(0, (uint8_t*)"ABCDEFGH", 8);
     BSP_CAN_Write(1, (uint8_t*)"LHRSOLAR", 8);
     BSP_CAN_Write(2, (uint8_t*)"DEADBEEF", 8);
+    uint8_t hex[] = {0xAA, 0xBB, 0xCC, 0xDD};
+    BSP_CAN_Write(3, hex, 4);
     return 0;
 }
