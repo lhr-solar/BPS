@@ -1,14 +1,14 @@
-**********************
-BPS RTOS Wrapper Layer
-**********************
+**************
+BPS RTOS Layer
+**************
 
 RTOS
 ====
 Currently, the BPS wrapper code is based around the `Micrium uC/OS-III RTOS <https://docs.silabs.com/micrium/latest/micrium-general-concepts/>`_
 RTOS. We plan to migrate over to `FreeRTOS <https://www.freertos.org/>`_.
 
-Wrapper Structure
-=================
+BPS RTOS Structure
+==================
 
 Semaphore Pend - ``RTOS_BPS_SemPend(BPS_OS_SEM* sem, BPS_OS_TICK tick, BPS_OS_OPT opt)``
     ``RTOS_BPS_SemPend()`` pends a semaphore, and requires three parameters:
