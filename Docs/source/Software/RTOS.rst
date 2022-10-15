@@ -5,8 +5,7 @@ BPS RTOS Wrapper Layer
 RTOS
 ====
 Currently, the BPS wrapper code is based around the `Micrium uC/OS-III RTOS <https://docs.silabs.com/micrium/latest/micrium-general-concepts/>`_
-RTOS. We plan to migrate over to `FreeRTOS <https://www.freertos.org/>`_. Micrium is powerful, but very verbose, and requires a lot of 
-specifications for these common functions.
+RTOS. We plan to migrate over to `FreeRTOS <https://www.freertos.org/>`_.
 
 Wrapper Structure
 =================
