@@ -78,65 +78,41 @@ void Task1(void *p_arg){
                 &err);
     assertOSError(err);
 
-    	OSTaskCreate(&FaultState_TCB,				// TCB
+    	RTOS_BPS_TaskCreate(&FaultState_TCB,				// TCB
 				"TASK_FAULT_STATE_PRIO",	// Task Name (String)
 				Task_FaultState,				// Task function pointer
 				(void *)0,				// Task function args
 				TASK_FAULT_STATE_PRIO,			// Priority
-				FaultState_Stk,				// Stack
-				WATERMARK_STACK_LIMIT,	// Watermark limit for debugging
-				TASK_FAULT_STATE_STACK_SIZE,		// Stack size
-				0,						// Queue size (not needed)
-				10,						// Time quanta (time slice) 10 ticks
-				(void *)0,				// Extension pointer (not needed)
-				OS_OPT_TASK_STK_CHK | OS_OPT_TASK_SAVE_FP,	// Options
-				&err);					// return err code
+				FaultState_Stk,	// Watermark limit for debugging
+				TASK_FAULT_STATE_STACK_SIZE);					// return err code
 		assertOSError(err);
 
-    OSTaskCreate(&CriticalState_TCB,				// TCB
+    RTOS_BPS_TaskCreate(&CriticalState_TCB,				// TCB
 				"TASK_CRITICAL_STATE_PRIO",	// Task Name (String)
 				Task_CriticalState,				// Task function pointer
 				(void *)0,				// Task function args
 				TASK_CRITICAL_STATE_PRIO,			// Priority
-				CriticalState_Stk,				// Stack
-				WATERMARK_STACK_LIMIT,	// Watermark limit for debugging
-				TASK_CRITICAL_STATE_STACK_SIZE,		// Stack size
-				0,						// Queue size (not needed)
-				10,						// Time quanta (time slice) 10 ticks
-				(void *)0,				// Extension pointer (not needed)
-				OS_OPT_TASK_STK_CHK | OS_OPT_TASK_SAVE_FP,	// Options
-				&err);					// return err code
+				CriticalState_Stk,	// Watermark limit for debugging
+				TASK_CRITICAL_STATE_STACK_SIZE);					// return err code
 		assertOSError(err);
 
     
-    OSTaskCreate(&Task2_TCB,
+    RTOS_BPS_TaskCreate(&Task2_TCB,
                 "Task 2",
                 Task2,
                 (void *)0,
                 4,
                 Task2_Stk,
-                16,
-                256,
-                0,
-                0,
-                (void *)0,
-                OS_OPT_TASK_SAVE_FP | OS_OPT_TASK_STK_CHK,
-                &err);
+                256);
 		assertOSError(err);
 
-        OSTaskCreate(&CANBusConsumer_TCB,				// TCB
+        RTOS_BPS_TaskCreate(&CANBusConsumer_TCB,				// TCB
 				"TASK_CANBUS_CONSUMER_PRIO",	// Task Name (String)
 				Task_CANBusConsumer,				// Task function pointer
 				(void *)false,				// don't use loopback mode
 				TASK_CANBUS_CONSUMER_PRIO,			// Priority
-				CANBusConsumer_Stk,				// Stack
-				WATERMARK_STACK_LIMIT,	// Watermark limit for debugging
-				TASK_CANBUS_CONSUMER_STACK_SIZE,		// Stack size
-				0,						// Queue size (not needed)
-				10,						// Time quanta (time slice) 10 ticks
-				(void *)0,				// Extension pointer (not needed)
-				OS_OPT_TASK_STK_CHK | OS_OPT_TASK_SAVE_FP,	// Options
-				&err);					// return err code
+				CANBusConsumer_Stk,	// Watermark limit for debugging
+				TASK_CANBUS_CONSUMER_STACK_SIZE);					// return err code
 		assertOSError(err);
 
     CAN_Queue_Init();
@@ -155,19 +131,13 @@ int main(void) {
     OSInit(&err);
     while(err != OS_ERR_NONE);
 
-    OSTaskCreate(&Task1_TCB,
+    RTOS_BPS_TaskCreate(&Task1_TCB,
                 "Task 1",
                 Task1,
                 (void *)0,
                 1,
                 Task1_Stk,
-                16,
-                256,
-                0,
-                0,
-                (void *)0,
-                OS_OPT_TASK_SAVE_FP | OS_OPT_TASK_STK_CHK,
-                &err);
+                256);
     while(err != OS_ERR_NONE);
 
     __enable_irq();

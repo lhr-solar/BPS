@@ -69,9 +69,34 @@ void RTOS_BPS_MutexPost(BPS_OS_MUTEX* mutex, BPS_OS_OPT options) {
     OSMutexPost(mutex, options, &err);
     assertOSError(err);
 }
-void RTOS_BPS_TaskCreate(void){
 
-}
+/**
+ * @brief   Creates a task that will be handled by the OS
+ * @param   *p_tcb - pointer to the tcb
+ * @param   *p_name - pointer to task name
+ * @param   *p_task - pointer to the task
+ * @param   *p_args - pointer to task function arguments
+ * @param   prio - task priority
+ * @param   *p_stk_base - the stack
+ * @param   stk_size - size of the stack
+ * @param   *p_err - return error code
+ * @return  nothing to see here
+ */
+void RTOS_BPS_TaskCreate(
+    BPS_OS_TCB      *p_tcb,
+    char            *p_name,
+    void            *p_task,
+    void            *p_arg,
+    uint8_t          prio,
+    BPS_CPU_STK     *p_stk_base,
+    uint64_t         stk_size
+    )
+    {
+        BPS_OS_ERR err;
+        OSTaskCreate(p_tcb, p_name, p_task, p_arg, prio, p_stk_base, stk_size, stk_size, 0, 10,(void *)0, OS_OPT_TASK_STK_CHK | OS_OPT_TASK_SAVE_FP, &err);
+        assertOSError(err);
+    }
+
 void RTOS_BPS_TimeDelay(void){
 
 }

@@ -287,83 +287,53 @@ int main() {
 
     BSP_UART_Init();
 
-    OSTaskCreate(&Init_TCB,				// TCB
+    RTOS_BPS_TaskCreate(&Init_TCB,				// TCB
 				"Initialize System",	// Task Name (String)
 				Task_Init,				// Task function pointer
 				(void *)0,				// Task function args
 				TASK_INIT_PRIO,			// Priority
-				Init_Stk,				// Stack
-				WATERMARK_STACK_LIMIT,	// Watermark limit for debugging
-				DEFAULT_STACK_SIZE,		// Stack size
-				0,						// Queue size (not needed)
-				10,						// Time quanta (time slice) 10 ticks
-				(void *)0,				// Extension pointer (not needed)
-				OS_OPT_TASK_STK_CHK | OS_OPT_TASK_SAVE_FP,	// Options
-				&err);					// return err code
+				Init_Stk,	// Watermark limit for debugging
+				DEFAULT_STACK_SIZE);					// return err code
 
 	// ASSERT err
 
-    OSTaskCreate(&FaultState_TCB,				// TCB
+    RTOS_BPS_TaskCreate(&FaultState_TCB,				// TCB
 				"Fault State",	// Task Name (String)
 				FaultState,				// Task function pointer
 				(void *)0,				// Task function args
 				TASK_FAULT_STATE_PRIO,			// Priority
-				AmperesMonitor_Stk,				// Stack
-				WATERMARK_STACK_LIMIT,	// Watermark limit for debugging
-				TASK_FAULT_STATE_STACK_SIZE,		// Stack size
-				0,						// Queue size (not needed)
-				10,						// Time quanta (time slice) 10 ticks
-				(void *)0,				// Extension pointer (not needed)
-				OS_OPT_TASK_STK_CHK | OS_OPT_TASK_SAVE_FP,	// Options
-				&err);					// return err code
+				AmperesMonitor_Stk,	// Watermark limit for debugging
+				TASK_FAULT_STATE_STACK_SIZE);					// return err code
 
 	// ASSERT err
 
-    OSTaskCreate(&CriticalState_TCB,				// TCB
+    RTOS_BPS_TaskCreate(&CriticalState_TCB,				// TCB
 				"Critical State",	// Task Name (String)
 				CriticalState,				// Task function pointer
 				(void *)0,				// Task function args
 				TASK_CRITICAL_STATE_PRIO,			// Priority
-				CriticalState_Stk,				// Stack
-				WATERMARK_STACK_LIMIT,	// Watermark limit for debugging
-				TASK_CRITICAL_STATE_STACK_SIZE,		// Stack size
-				0,						// Queue size (not needed)
-				10,						// Time quanta (time slice) 10 ticks
-				(void *)0,				// Extension pointer (not needed)
-				OS_OPT_TASK_STK_CHK | OS_OPT_TASK_SAVE_FP,	// Options
-				&err);					// return err code
+				CriticalState_Stk,	// Watermark limit for debugging
+				TASK_CRITICAL_STATE_STACK_SIZE);					// return err code
 
 	// ASSERT err
 
-    OSTaskCreate(&VoltTempMonitor_TCB,				// TCB
+    RTOS_BPS_TaskCreate(&VoltTempMonitor_TCB,				// TCB
 				"Voltage/Temperature Monitor",	// Task Name (String)
 				VoltTempMonitor,				// Task function pointer
 				(void *)0,				// Task function args
 				TASK_VOLT_TEMP_MONITOR_PRIO,			// Priority
-				VoltTempMonitor_Stk,				// Stack
-				WATERMARK_STACK_LIMIT,	// Watermark limit for debugging
-				TASK_VOLT_TEMP_MONITOR_STACK_SIZE,		// Stack size
-				0,						// Queue size (not needed)
-				10,						// Time quanta (time slice) 10 ticks
-				(void *)0,				// Extension pointer (not needed)
-				OS_OPT_TASK_STK_CHK | OS_OPT_TASK_SAVE_FP,	// Options
-				&err);					// return err code
+				VoltTempMonitor_Stk,	// Watermark limit for debugging
+				TASK_VOLT_TEMP_MONITOR_STACK_SIZE);					// return err code
 
 	// ASSERT err
 
-    OSTaskCreate(&AmperesMonitor_TCB,				// TCB
+    RTOS_BPS_TaskCreate(&AmperesMonitor_TCB,				// TCB
 				"Amperes Monitor",	// Task Name (String)
 				AmperesMonitor,				// Task function pointer
 				(void *)0,				// Task function args
 				TASK_AMPERES_MONITOR_PRIO,			// Priority
-				AmperesMonitor_Stk,				// Stack
-				WATERMARK_STACK_LIMIT,	// Watermark limit for debugging
-				TASK_AMPERES_MONITOR_STACK_SIZE,		// Stack size
-				0,						// Queue size (not needed)
-				10,						// Time quanta (time slice) 10 ticks
-				(void *)0,				// Extension pointer (not needed)
-				OS_OPT_TASK_STK_CHK | OS_OPT_TASK_SAVE_FP,	// Options
-				&err);					// return err code
+				AmperesMonitor_Stk,	// Watermark limit for debugging
+				TASK_AMPERES_MONITOR_STACK_SIZE);					// return err code
 
 	// ASSERT err
 

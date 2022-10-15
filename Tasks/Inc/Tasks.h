@@ -4,7 +4,6 @@
 
 #include "os.h"
 #include "RTOS_BPS.h"
-#include <stdint.h>
 
 #define TASK_INIT_PRIO                      0
 #define TASK_FAULT_STATE_PRIO               1

@@ -5,6 +5,7 @@ RTOS_BPS library includes all the wrapper functions for a functioning RTOS - nee
 //need to add the proper #include files 
 #include "os.h" // for RTOS stuff
 #include "Tasks.h" // for OS errors
+#include <stdint.h> 
 
 #ifndef RTOS_BPS_H
 #define RTOS_BPS_H
@@ -22,6 +23,10 @@ typedef OS_TCB      BPS_OS_TCB;
 typedef CPU_TS      BPS_CPU_TS;
 typedef OS_SEM_CTR  BPS_OS_SEM_CTR;
 typedef OS_TICK     BPS_OS_TICK;
+
+//Custom typedefs for BPS_TaskCreate function currently using micirium
+typedef OS_TCB       BPS_OS_TCB;
+typedef CPU_STK      BPS_CPU_STK;
 
 /**
  * @brief Pends a BPS_OS_Semaphore.
@@ -65,11 +70,26 @@ void RTOS_BPS_MutexPend(BPS_OS_MUTEX* mutex, BPS_OS_TICK timeout, BPS_OS_OPT opt
 void RTOS_BPS_MutexPost(BPS_OS_MUTEX* mutex, BPS_OS_OPT options);
 
 /**
- * @brief   
- * @param   
- * @return  
+ * @brief   Creates a task that will be handled by the OS
+ * @param   *p_tcb - pointer to the tcb
+ * @param   *p_name - pointer to task name
+ * @param   p_task - pointer to the task
+ * @param   *p_args - pointer to task function arguments
+ * @param   *prio - task priority
+ * @param   *p_stk_base - the stack
+ * @param   stk_size - size of the stack
+ * @param   *p_err - return error code
+ * @return  nothing to see here
  */
-void RTOS_BPS_TaskCreate(void);
+void RTOS_BPS_TaskCreate(
+    BPS_OS_TCB      *p_tcb,
+    char         *p_name,
+    void         *p_task,
+    void         *p_arg,
+    uint8_t       prio,
+    BPS_CPU_STK  *p_stk_base,
+    uint64_t      stk_size
+);
 
 /**
  * @brief   

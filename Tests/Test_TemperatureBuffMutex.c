@@ -106,49 +106,31 @@ int main() {
     OSInit(&err);
     // assert
 
-	OSTaskCreate(&Temp1_TCB,				// TCB
+	RTOS_BPS_TaskCreate(&Temp1_TCB,				// TCB
 				"Temperature Buffer Mutex1",	// Task Name (String)
 				Task_TestTempMutex1,				// Task function pointer
 				(void *)0,				// Task function args
 				2,			            // Priority
-				Temp1_Stk,				// Stack
-				WATERMARK_STACK_LIMIT,	// Watermark limit for debugging
-				DEFAULT_STACK_SIZE,		// Stack size
-				0,						// Queue size (not needed)
-				10,						// Time quanta (time slice) 10 ticks
-				(void *)0,				// Extension pointer (not needed)
-				OS_OPT_TASK_STK_CHK | OS_OPT_TASK_SAVE_FP,	// Options
-				&err);					// return err code
+				Temp1_Stk,	// Watermark limit for debugging
+				DEFAULT_STACK_SIZE);					// return err code
 	// assert
 
-    OSTaskCreate(&Temp2_TCB,				// TCB
+    RTOS_BPS_TaskCreate(&Temp2_TCB,				// TCB
 				"Temperature Buffer Mutex2",	// Task Name (String)
 				Task_TestTempMutex2,				// Task function pointer
 				(void *)0,				// Task function args
 				3,			            // Priority
-				Temp2_Stk,				// Stack
-				WATERMARK_STACK_LIMIT,	// Watermark limit for debugging
-				DEFAULT_STACK_SIZE,		// Stack size
-				0,						// Queue size (not needed)
-				10,						// Time quanta (time slice) 10 ticks
-				(void *)0,				// Extension pointer (not needed)
-				OS_OPT_TASK_STK_CHK | OS_OPT_TASK_SAVE_FP,	// Options
-				&err);					// return err code
+				Temp2_Stk,	// Watermark limit for debugging
+				DEFAULT_STACK_SIZE);					// return err code
 	// assert
 
-    OSTaskCreate(&Dummy_TCB,				// TCB
+    RTOS_BPS_TaskCreate(&Dummy_TCB,				// TCB
 				"Dummy",	// Task Name (String)
 				Task_Dummy,				// Task function pointer
 				(void *)0,				// Task function args
 				4,			            // Priority
-				Dummy_Stk,				// Stack
-				WATERMARK_STACK_LIMIT,	// Watermark limit for debugging
-				DEFAULT_STACK_SIZE,		// Stack size
-				0,						// Queue size (not needed)
-				10,						// Time quanta (time slice) 10 ticks
-				(void *)0,				// Extension pointer (not needed)
-				OS_OPT_TASK_STK_CHK | OS_OPT_TASK_SAVE_FP,	// Options
-				&err);					// return err code
+				Dummy_Stk,	// Watermark limit for debugging
+				DEFAULT_STACK_SIZE);					// return err code
 	// assert
 
 	OSStart(&err);
