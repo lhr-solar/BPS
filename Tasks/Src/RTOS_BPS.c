@@ -39,7 +39,7 @@ BPS_OS_SEM_CTR RTOS_BPS_SemPost(BPS_OS_SEM *sem4, BPS_OS_OPT opt) {
  */
 void RTOS_BPS_MutexPend(BPS_OS_MUTEX* mutex, BPS_OS_OPT opt) {
     BPS_OS_ERR err;
-    OSMutexPend(mutex, 0, opt, NULL, &err);
+    OSMutexPend(mutex, 0, opt, (void*) 0, &err); 
     assertOSError(err);
 }
 
