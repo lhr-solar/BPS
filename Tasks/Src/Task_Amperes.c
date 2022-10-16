@@ -68,7 +68,7 @@ void Task_AmperesMonitor(void *p_arg) {
         CAN_Queue_Post(CanMsg);
 
         //signal watchdog
-        RTOS_BPS_MutexPend(&WDog_Mutex, 0, OS_OPT_PEND_BLOCKING);
+        RTOS_BPS_MutexPend(&WDog_Mutex, OS_OPT_PEND_BLOCKING);
 
         WDog_BitMap |= WD_AMPERES;
 

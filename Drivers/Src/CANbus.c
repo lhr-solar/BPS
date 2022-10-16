@@ -119,7 +119,6 @@ static ErrorStatus CANbus_SendMsg(CANId_t id, CANPayload_t payload) {
 	// choosing the mailbox to put the message into,
 	// leaving a possible race condition if not protected.
 	RTOS_BPS_MutexPend(&CANbus_TxMutex,
-				0,
 				OS_OPT_PEND_BLOCKING
 				);
 
@@ -193,7 +192,6 @@ static ErrorStatus CANbus_GetMsg(CANId_t *id, uint8_t *buffer) {
 	
 	// The mutex is require to access the CAN receive queue.
 	RTOS_BPS_MutexPend(&CANbus_RxMutex,
-				0,
 				OS_OPT_PEND_BLOCKING
 				);
 

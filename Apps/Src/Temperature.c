@@ -60,7 +60,7 @@ void Temperature_Init(cell_asic *boards){
 	LTC6811_Init(Minions);
 
 	//take control of mutex
-  	RTOS_BPS_MutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING);
+  	RTOS_BPS_MutexPend(&MinionsASIC_Mutex, OS_OPT_PEND_BLOCKING);
 	// Write Configuration Register
 	LTC6811_wrcfg(NUM_MINIONS, Minions);
 
@@ -117,7 +117,7 @@ ErrorStatus Temperature_ChannelConfig(uint8_t tempChannel) {
 
 	//take control of mutex
 	OS_ERR err;
-  	RTOS_BPS_MutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING);
+  	RTOS_BPS_MutexPend(&MinionsASIC_Mutex, OS_OPT_PEND_BLOCKING);
 	
 	for (int board = 0; board < NUM_MINIONS; board++) {
 		/* Clear other mux */
@@ -362,7 +362,7 @@ int32_t Temperature_GetTotalPackAvgTemperature(void){
 ErrorStatus Temperature_SampleADC(uint8_t ADCMode) {
 	//take control of mutex
 	OS_ERR err;
-  	RTOS_BPS_MutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING);
+  	RTOS_BPS_MutexPend(&MinionsASIC_Mutex, OS_OPT_PEND_BLOCKING);
 	
 	LTC6811_adax(ADCMode, AUX_CH_GPIO1);							// Start ADC conversion on GPIO1
 	LTC6811_pollAdc();

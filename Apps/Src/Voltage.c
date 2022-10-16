@@ -49,7 +49,7 @@ void Voltage_Init(cell_asic *boards){
 	LTC6811_Init(Minions);
 	
 	//take control of mutex
-  	RTOS_BPS_MutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING);
+  	RTOS_BPS_MutexPend(&MinionsASIC_Mutex, OS_OPT_PEND_BLOCKING);
 	// Write Configuration Register
 	LTC6811_wrcfg(NUM_MINIONS, Minions);
 	//release mutex
@@ -58,7 +58,7 @@ void Voltage_Init(cell_asic *boards){
 
 	// Read Configuration Register
 	// take control of mutex
-  	RTOS_BPS_MutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING);
+  	RTOS_BPS_MutexPend(&MinionsASIC_Mutex, OS_OPT_PEND_BLOCKING);
 	wakeup_sleep(NUM_MINIONS);
 	LTC6811_rdcfg_safe(NUM_MINIONS, Minions);
 	// release mutex
@@ -82,7 +82,7 @@ void Voltage_UpdateMeasurements(void){
 	// Read Cell Voltage Registers
 	//take control of mutex
 	OS_ERR err;
-  	RTOS_BPS_MutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING);
+  	RTOS_BPS_MutexPend(&MinionsASIC_Mutex, OS_OPT_PEND_BLOCKING);
 	LTC6811_rdcv_safe(0, NUM_MINIONS, Minions); // Set to read back all cell voltage registers
 	//copies values from cells.c_codes to private array
 
@@ -99,7 +99,7 @@ void Voltage_UpdateMeasurements(void){
 	VoltageFilter_put(&VoltageFilter, rawVoltages);
 
 	// update public voltage values
-	RTOS_BPS_MutexPend(&Voltage_Mutex, 0, OS_OPT_PEND_BLOCKING);
+	RTOS_BPS_MutexPend(&Voltage_Mutex, OS_OPT_PEND_BLOCKING);
 	VoltageFilter_get(&VoltageFilter, Voltages);
 	//release mutex
 	OSMutexPost(&Voltage_Mutex, OS_OPT_POST_NONE, &err);
@@ -138,7 +138,7 @@ void Voltage_GetModulesInDanger(VoltageSafety_t* system){
 	uint32_t wires;
 	uint32_t openWireIdx = 0;
 	OS_ERR err;
-	RTOS_BPS_MutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING);
+	RTOS_BPS_MutexPend(&MinionsASIC_Mutex, OS_OPT_PEND_BLOCKING);
 	//put all the bits from each minion's system_open_wire variable into one variable
 	for(int k = 0; k < NUM_MINIONS; k++){
 		wires = (Minions[k].system_open_wire & 0x1FF);	//there are at most 8 modules per IC, bit 0 is GND
@@ -179,7 +179,7 @@ void Voltage_OpenWireSummary(void){
 	wakeup_idle(NUM_MINIONS);
 	//take control of mutex
 	OS_ERR err;
-  	RTOS_BPS_MutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING);
+  	RTOS_BPS_MutexPend(&MinionsASIC_Mutex, OS_OPT_PEND_BLOCKING);
 	LTC6811_run_openwire_multi(NUM_MINIONS, Minions, true);
 	//release mutex
   	OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
@@ -195,7 +195,7 @@ SafetyStatus Voltage_OpenWire(void){
 	wakeup_idle(NUM_MINIONS);
 
 	OS_ERR err;
-  	RTOS_BPS_MutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING);
+  	RTOS_BPS_MutexPend(&MinionsASIC_Mutex, OS_OPT_PEND_BLOCKING);
 	
 	LTC6811_run_openwire_multi(NUM_MINIONS, Minions, false);
 
@@ -224,7 +224,7 @@ uint32_t Voltage_GetOpenWire(void){
 	//take control of mutex
 	OS_ERR err;
 	if(!Fault_Flag){
-  		RTOS_BPS_MutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING);
+  		RTOS_BPS_MutexPend(&MinionsASIC_Mutex, OS_OPT_PEND_BLOCKING);
 	}
 	uint32_t result = LTC6811_run_openwire_multi(NUM_MINIONS, Minions, false);
 	//release 
@@ -256,7 +256,7 @@ uint16_t Voltage_GetModuleMillivoltage(uint8_t moduleIdx){
         return 0xFFFF;  // return -1 which indicates error voltage
     }
 	if (!Fault_Flag){
-		RTOS_BPS_MutexPend(&Voltage_Mutex, 0, OS_OPT_PEND_BLOCKING);
+		RTOS_BPS_MutexPend(&Voltage_Mutex, OS_OPT_PEND_BLOCKING);
 	}
 	uint16_t ret = Voltages[moduleIdx] / 10;
 	if (!Fault_Flag){

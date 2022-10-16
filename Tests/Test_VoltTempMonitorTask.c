@@ -154,7 +154,7 @@ void Task2(void *p_arg){
 	assertOSError(err);
 
     while(1){
-        RTOS_BPS_MutexPend(&WDog_Mutex, 0, OS_OPT_PEND_BLOCKING);
+        RTOS_BPS_MutexPend(&WDog_Mutex, OS_OPT_PEND_BLOCKING);
         WDog_BitMap |= WD_AMPERES;
         WDog_BitMap |= WD_BALANCING;
         OSMutexPost(&WDog_Mutex, OS_OPT_POST_NONE, &err);

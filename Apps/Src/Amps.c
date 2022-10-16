@@ -71,7 +71,7 @@ void Amps_Init(void) {
  */
 void Amps_UpdateMeasurements(void) {
 	OS_ERR err;
-	RTOS_BPS_MutexPend(&AmperesData_Mutex, 0, OS_OPT_PEND_BLOCKING);
+	RTOS_BPS_MutexPend(&AmperesData_Mutex, OS_OPT_PEND_BLOCKING);
 	latestMeasureMilliAmps = LTC2315_GetCurrent();
 	OSMutexPost(&AmperesData_Mutex, OS_OPT_POST_NONE, &err);
 	assertOSError(err);
@@ -90,7 +90,7 @@ SafetyStatus Amps_CheckStatus(int32_t maxTemperature) {
 	bool dischargingOnly = maxTemperature > MAX_CHARGE_TEMPERATURE_LIMIT;
 	int32_t chargingCurrentLimit = dischargingOnly ? 0 : MAX_CHARGING_CURRENT;
 
-	RTOS_BPS_MutexPend(&AmperesData_Mutex, 0, OS_OPT_PEND_BLOCKING);
+	RTOS_BPS_MutexPend(&AmperesData_Mutex, OS_OPT_PEND_BLOCKING);
 	if((latestMeasureMilliAmps >= chargingCurrentLimit)&&(latestMeasureMilliAmps < MAX_CURRENT_LIMIT)){
 		status = SAFE;
 	} else{
