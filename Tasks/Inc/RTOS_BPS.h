@@ -6,7 +6,6 @@ RTOS_BPS library includes all the wrapper functions for a functioning RTOS - nee
 
 #include "os.h" // for RTOS stuff
 #include "Tasks.h" // for OS errors
-#include <stdint.h>
 
 #ifndef RTOS_BPS_H
 #define RTOS_BPS_H

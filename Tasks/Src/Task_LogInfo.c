@@ -11,8 +11,6 @@ void Task_LogInfo(void *p_arg) {
         //sends percentage of charge left in the battery pack to EEPROM
         EEPROM_SetCharge(Charge_GetPercent());
 
-        //1 tick every 10 millisconds, so 300 ticks for a delay of 3000ms --> 3s
-        //OS_OPT_TIME_DLY specifies relative delay, so the delay is started from the "current time + dly".
-        RTOS_BPS_DelayTick(300);
+        RTOS_BPS_DelayMs(3000);
     }
 }
