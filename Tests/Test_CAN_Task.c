@@ -108,34 +108,22 @@ void Task1(void *p_arg){
     // Spawn a thread to spam CAN messages
     // Has a higher priority than CANBUS Consumer because CAN messages will be sent 
     // by higher priority threads during the race
-    OSTaskCreate(&TaskSpam_TCB,				// TCB
+    RTOS_BPS_TaskCreate(&TaskSpam_TCB,				// TCB
             "TASK_SPAM",	// Task Name (String)
             Task_Spam,				// Task function pointer
             (void *)0,				// Task function args
             6,			            // Priority
-            TaskSpam_Stk,				// Stack
-            WATERMARK_STACK_LIMIT,	// Watermark limit for debugging
-            DEFAULT_STACK_SIZE,		// Stack size
-            0,						// Queue size (not needed)
-            10,						// Time quanta (time slice) 10 ticks
-            (void *)0,				// Extension pointer (not needed)
-            OS_OPT_TASK_STK_CHK | OS_OPT_TASK_SAVE_FP,	// Options
-            &err);					// return err code}
+            TaskSpam_Stk,	// Watermark limit for debugging
+            DEFAULT_STACK_SIZE);					// return err code}
 
     // Spawn CANBUS Consumer, PRIO 7
-    OSTaskCreate(&CANBusConsumer_TCB,				// TCB
+    RTOS_BPS_TaskCreate(&CANBusConsumer_TCB,				// TCB
             "TASK_CANBUS_CONSUMER_PRIO",	// Task Name (String)
             Task_CANBusConsumer,				// Task function pointer
             (void *)true,				// Use loopback mode
             TASK_CANBUS_CONSUMER_PRIO,			// Priority
-            CANBusConsumer_Stk,				// Stack
-            WATERMARK_STACK_LIMIT,	// Watermark limit for debugging
-            TASK_CANBUS_CONSUMER_STACK_SIZE,		// Stack size
-            0,						// Queue size (not needed)
-            10,						// Time quanta (time slice) 10 ticks
-            (void *)0,				// Extension pointer (not needed)
-            OS_OPT_TASK_STK_CHK | OS_OPT_TASK_SAVE_FP,	// Options
-            &err);					// return err code
+            CANBusConsumer_Stk,	// Watermark limit for debugging
+            TASK_CANBUS_CONSUMER_STACK_SIZE);					// return err code
         
         // Initialize CAN queue
         CAN_Queue_Init();
@@ -152,19 +140,13 @@ int main(void) {
     OSInit(&err);
     assertOSError(err);
 
-    OSTaskCreate(&Task1_TCB,
+    RTOS_BPS_TaskCreate(&Task1_TCB,
                 "Task 1",
                 Task1,
                 (void *)0,
                 1,
                 Task1_Stk,
-                16,
-                256,
-                0,
-                0,
-                (void *)0,
-                OS_OPT_TASK_SAVE_FP | OS_OPT_TASK_STK_CHK,
-                &err);
+                256);
     assertOSError(err);
 
     OSStart(&err);

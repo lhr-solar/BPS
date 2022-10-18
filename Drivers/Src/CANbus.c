@@ -53,15 +53,9 @@ static void CANbus_CountIncoming(void) {
 void CANbus_Init(bool loopback) {
 	OS_ERR err;
 
-	OSMutexCreate(&CANbus_TxMutex,
-				  "CAN TX Lock",
-				  &err);
-	assertOSError(err);
+	RTOS_BPS_MutexCreate(&CANbus_TxMutex, "CAN TX Lock");
 
-	OSMutexCreate(&CANbus_RxMutex,
-				  "CAN RX Lock",
-				  &err);
-	assertOSError(err);
+	RTOS_BPS_MutexCreate(&CANbus_RxMutex, "CAN RX Lock");
 
 	OSSemCreate(&CANbus_MailSem4,
                 "CAN Mailbox Semaphore",
@@ -85,7 +79,6 @@ static ErrorStatus CANbus_SendMsg(CANId_t id, CANPayload_t payload) {
 	uint8_t data_length = 0;
 	
 	OS_ERR err;
-	CPU_TS ts;
 
 	// TODO: is it really best to keep the list of
 	//		 valid messages to be sending in the driver?
@@ -125,12 +118,7 @@ static ErrorStatus CANbus_SendMsg(CANId_t id, CANPayload_t payload) {
 	// This is because the software is responsible for
 	// choosing the mailbox to put the message into,
 	// leaving a possible race condition if not protected.
-	OSMutexPend(&CANbus_TxMutex,
-				0,
-				OS_OPT_PEND_BLOCKING,
-				&ts,
-				&err);
-	assertOSError(err);
+	RTOS_BPS_MutexPend(&CANbus_TxMutex, OS_OPT_PEND_BLOCKING);
 
 	// Write the data to the bus
 	ErrorStatus retVal = BSP_CAN_Write(id, txdata, data_length);
@@ -198,16 +186,10 @@ ErrorStatus CANbus_Send(CANId_t id, CANPayload_t payload) {
 }
 
 static ErrorStatus CANbus_GetMsg(CANId_t *id, uint8_t *buffer) {
-	CPU_TS ts;
 	OS_ERR err;
 	
 	// The mutex is require to access the CAN receive queue.
-	OSMutexPend(&CANbus_RxMutex,
-				0,
-				OS_OPT_PEND_BLOCKING,
-				&ts,
-				&err);
-	assertOSError(err);
+	RTOS_BPS_MutexPend(&CANbus_RxMutex, OS_OPT_PEND_BLOCKING);
 
 	// Write the data to the bus
 	uint32_t id_int;

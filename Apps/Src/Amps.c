@@ -63,8 +63,7 @@ void Amps_Init(void) {
 	spi_os.pend = Amperes_Pend;
 	spi_os.post = Amperes_Post;
 	LTC2315_Init(spi_os);
-	OSMutexCreate(&AmperesData_Mutex, "Amperes Mutex", &err);
-	assertOSError(err);
+	RTOS_BPS_MutexCreate(&AmperesData_Mutex, "Amperes Mutex");
 }
 
 /** Amps_UpdateMeasurements
@@ -72,9 +71,7 @@ void Amps_Init(void) {
  */
 void Amps_UpdateMeasurements(void) {
 	OS_ERR err;
-	CPU_TS ticks;
-	OSMutexPend(&AmperesData_Mutex, 0, OS_OPT_PEND_BLOCKING, &ticks, &err);
-	assertOSError(err);
+	RTOS_BPS_MutexPend(&AmperesData_Mutex, OS_OPT_PEND_BLOCKING);
 	latestMeasureMilliAmps = LTC2315_GetCurrent();
 	OSMutexPost(&AmperesData_Mutex, OS_OPT_POST_NONE, &err);
 	assertOSError(err);
@@ -87,15 +84,13 @@ void Amps_UpdateMeasurements(void) {
  */
 SafetyStatus Amps_CheckStatus(int32_t maxTemperature) {
 	OS_ERR err;
-	CPU_TS ticks;
 	SafetyStatus status;
 
 	// determine if we should allow charging or not
 	bool dischargingOnly = maxTemperature > MAX_CHARGE_TEMPERATURE_LIMIT;
 	int32_t chargingCurrentLimit = dischargingOnly ? 0 : MAX_CHARGING_CURRENT;
 
-	OSMutexPend(&AmperesData_Mutex, 0, OS_OPT_PEND_BLOCKING, &ticks, &err);
-	assertOSError(err);
+	RTOS_BPS_MutexPend(&AmperesData_Mutex, OS_OPT_PEND_BLOCKING);
 	if((latestMeasureMilliAmps >= chargingCurrentLimit)&&(latestMeasureMilliAmps < MAX_CURRENT_LIMIT)){
 		status = SAFE;
 	} else{
