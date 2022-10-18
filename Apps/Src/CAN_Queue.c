@@ -20,15 +20,13 @@ static OS_MUTEX canFifo_Mutex;
 
 void CAN_Queue_Init(void) {
     OS_ERR err;
-    CPU_TS ticks;
     RTOS_BPS_MutexCreate(&canFifo_Mutex, "CAN queue mutex");
     OSSemCreate(&canFifo_Sem4,
                 "CAN queue semaphore",
                 0,
                 &err);
     assertOSError(err);
-    OSMutexPend(&canFifo_Mutex, 0, OS_OPT_POST_NONE, &ticks, &err);
-    assertOSError(err);
+    RTOS_BPS_MutexPend(&canFifo_Mutex, OS_OPT_PEND_BLOCKING);
     CAN_fifo_renew(&canFifo);
     OSMutexPost(&canFifo_Mutex, OS_OPT_POST_NONE, &err);
     assertOSError(err);
@@ -36,9 +34,7 @@ void CAN_Queue_Init(void) {
 
 ErrorStatus CAN_Queue_Post(CANMSG_t message) {
     OS_ERR err;
-    CPU_TS ticks;
-    OSMutexPend(&canFifo_Mutex, 0, OS_OPT_POST_NONE, &ticks, &err);
-    assertOSError(err);
+    RTOS_BPS_MutexPend(&canFifo_Mutex, OS_OPT_PEND_BLOCKING);
     bool success = CAN_fifo_put(&canFifo, message);
     OSMutexPost(&canFifo_Mutex, OS_OPT_POST_NONE, &err);
     assertOSError(err);
@@ -57,8 +53,7 @@ ErrorStatus CAN_Queue_Pend(CANMSG_t *message) {
     
     OSSemPend(&canFifo_Sem4, 0, OS_OPT_PEND_BLOCKING, &ticks, &err);
     assertOSError(err);
-    OSMutexPend(&canFifo_Mutex, 0, OS_OPT_POST_NONE, &ticks, &err);
-    assertOSError(err);
+    RTOS_BPS_MutexPend(&canFifo_Mutex, OS_OPT_PEND_BLOCKING);
     bool result = CAN_fifo_get(&canFifo, message);
     OSMutexPost(&canFifo_Mutex, OS_OPT_POST_NONE, &err);
     assertOSError(err);
