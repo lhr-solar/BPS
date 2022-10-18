@@ -118,9 +118,7 @@ static ErrorStatus CANbus_SendMsg(CANId_t id, CANPayload_t payload) {
 	// This is because the software is responsible for
 	// choosing the mailbox to put the message into,
 	// leaving a possible race condition if not protected.
-	RTOS_BPS_MutexPend(&CANbus_TxMutex,
-				OS_OPT_PEND_BLOCKING
-				);
+	RTOS_BPS_MutexPend(&CANbus_TxMutex, OS_OPT_PEND_BLOCKING);
 
 	// Write the data to the bus
 	ErrorStatus retVal = BSP_CAN_Write(id, txdata, data_length);
@@ -191,9 +189,7 @@ static ErrorStatus CANbus_GetMsg(CANId_t *id, uint8_t *buffer) {
 	OS_ERR err;
 	
 	// The mutex is require to access the CAN receive queue.
-	RTOS_BPS_MutexPend(&CANbus_RxMutex,
-				OS_OPT_PEND_BLOCKING
-				);
+	RTOS_BPS_MutexPend(&CANbus_RxMutex, OS_OPT_PEND_BLOCKING);
 
 	// Write the data to the bus
 	uint32_t id_int;
