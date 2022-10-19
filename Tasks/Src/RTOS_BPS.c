@@ -10,18 +10,7 @@ void RTOS_BPS_SemPend(void) {
 void RTOS_BPS_SemPost(void) {
 
 }
-/**
- * @brief   Waits for Mutex, assigns timestamp and any error to err and ticks
- * @param   *mutex - pointer to mutex
- * @param   timeout - timeout period, if 0 will wait forever until resource available
- * @param   options - determines if mutex available or not
- * @return  none
- */
-void RTOS_BPS_MutexPend(BPS_OS_MUTEX* mutex, BPS_OS_TICK timeout, BPS_OS_OPT opt) {
-    BPS_OS_ERR err;
-    BPS_CPU_TS ticks;
-    OSMutexPend(mutex, timeout, opt, &ticks, &err);
-    assertOSError(err);
+void RTOS_BPS_MutexPend(void){
 
 }
 

@@ -19,8 +19,8 @@ typedef OS_OPT      BPS_OS_OPT;
 typedef OS_ERR      BPS_OS_ERR;
 typedef OS_SEM      BPS_OS_SEM;
 typedef OS_TCB      BPS_OS_TCB;
-typedef OS_TICK     BPS_OS_TICK;
-typedef CPU_TS      BPS_CPU_TS;
+
+
 /**
  * @brief
  * @param
@@ -36,13 +36,11 @@ void RTOS_BPS_SemPend(void);
 void RTOS_BPS_SemPost(void);
 
 /**
- * @brief   Function waits for Mutex
- * @param   *mutex - pointer to mutex
- * @param   timeout - timeout period, if 0 will wait forever until resource available
- * @param   options - determines if mutex available or not
+ * @brief   
+ * @param   
  * @return  
  */
-void RTOS_BPS_MutexPend(BPS_OS_MUTEX* mutex, BPS_OS_TICK timeout, BPS_OS_OPT opt);
+void RTOS_BPS_MutexPend(void);
 
 /**
  * @brief   Posts the specified Mutex
