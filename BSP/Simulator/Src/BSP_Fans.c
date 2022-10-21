@@ -1,12 +1,13 @@
-#include "BSP_Fans.h"
-#include "simulator_conf.h"
-#include <unistd.h>
-#include <sys/file.h>
-#include "config.h"
-#define MAX_SPEED    8
+/* Copyright (c) 2022 UT Longhorn Racing Solar */
+/**
+ * BSP_Fans.c - Simulates Fan PWM Pins
+*/
 
-static const char* file = GET_CSV_PATH(FANS_CSV_FILE);
-static int Fans[NUM_FANS];
+#include "BSP_Fans.h"
+#include "Simulator.h"
+
+static bool initialized = false;
+static uint32_t speed[NUM_FANS];
 
 /**
  * @brief   Initialize all the GPIO pins connected to each fan
@@ -15,13 +16,9 @@ static int Fans[NUM_FANS];
  */
 void BSP_Fans_Init(void)
 {
-    // Creates file if none exists
-    FILE* fp = fopen(file, "w+");
-    int fno = fileno(fp);
-    flock(fno, LOCK_EX);
-    fprintf(fp, "0,0,0,0"); 
-    flock(fno, LOCK_UN);
-    fclose(fp);
+    initialized = true;
+    memset(speed, 0, sizeof(speed));
+    Simulator_log(LOG, "Initialized Fans\n");
 }
 
 /**
@@ -31,21 +28,18 @@ void BSP_Fans_Init(void)
  * @return  None
  */
 ErrorStatus BSP_Fans_Set(uint8_t fan, uint32_t dutyCycle){
-    //if input is outside of bounds
-    if (fan < 1 || fan > NUM_FANS) return ERROR;
-    if (dutyCycle < 0 || dutyCycle > MAX_SPEED) return ERROR;
-    FILE* fp = fopen(file, "r"); //Open file for reading
-    int fno = fileno(fp);  //Lock
-    flock(fno, LOCK_EX);  
-    fscanf(fp, "%d,%d,%d,%d", &(Fans[0]), &(Fans[1]), &(Fans[2]), &(Fans[3])); //read file
-    flock(fno, LOCK_UN); //Unlock
-    fclose(fp); //Close file
-    fp = fopen(file, "w"); //Open file for writing
-    Fans[fan - 1] = dutyCycle; //write to array
-    fprintf(fp, "%d,%d,%d,%d", Fans[0], Fans[1], Fans[2], Fans[3]); //write to file
-    flock(fno, LOCK_UN); //Unlock
-    fclose(fp); //Close file
-    return SUCCESS;
+    if (fan > 4 || fan < 1) return ERROR;
+
+    if (initialized) {
+        speed[fan - 1] = dutyCycle;
+        char str[50];
+        sprintf(str, "set fan %d to %d\n", fan, dutyCycle);
+        Simulator_log(LOG, str);
+        return SUCCESS;
+    } else {
+        Simulator_log(LOG_ERROR, "Used fan before initialization\n");
+        exit(-1);   // TODO: maybe actually enter a fault state here
+    }
 }
 
 /**
@@ -54,11 +48,22 @@ ErrorStatus BSP_Fans_Set(uint8_t fan, uint32_t dutyCycle){
  * @return  Current PWM duty cycle
  */
 int BSP_Fans_GetSpeed(uint8_t fan){
-    FILE* fp = fopen(file, "r"); //Open file for reading
-    int fno = fileno(fp); //Lock
-    flock(fno, LOCK_EX);
-    fscanf(fp, "%d,%d,%d,%d", &(Fans[0]), &(Fans[1]), &(Fans[2]), &(Fans[3])); //read file
-    flock(fno, LOCK_UN); //Unlock
-    fclose(fp); //Close file
-    return Fans[fan - 1];                   
+    return speed[fan - 1];                   
+}
+
+
+/**
+ * @brief   Sets fan duty cycle for all fans
+ * @param   dutyCycle: int for duty cycle amount in range 0-8
+ * @return  ErrorStatus
+ */
+ErrorStatus BSP_Fans_SetAll(uint32_t speed) {
+    ErrorStatus result = SUCCESS;
+    for (uint8_t i = 1; i <= 4; i++){
+        ErrorStatus e = BSP_Fans_Set(i, TOPSPEED);
+        if (e != SUCCESS) {
+            result = e;
+        }
+    }
+    return result;
 }

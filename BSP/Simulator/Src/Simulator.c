@@ -32,20 +32,31 @@ static simulator_state *states = NULL;
 // note that this only has a granularity of 1 second, so it's not super precise
 static time_t startTime;
 
+// units in mV
+static uint16_t DUMMY_VOLTAGES[NUM_BATTERY_MODULES] = { 3000 };
+// units in mC, but config.h uses 45,000 as 45.00C, so we'll bump these up to 30k for 30C
+static uint16_t DUMMY_TEMPS[NUM_TEMPERATURE_SENSORS] = { 30000 };
+
+// LUT which corresponds Logging Level type to string to print out in LogFile
+const char* LoggingLUT[LOG_MAXLEVEL] = {"", "INFO: ", "WARNING: ", "ERROR: "};
+
 /**
  * @brief   Log something to simulator log file
  * @param   lvl - Choose level at which to log at. Levels defined in LoggingType enum.
  * @param   str - string to print
  * @return  None
  */
-void Simulator_log(LoggingType lvl, char *str) {
-    char* msg = strcat(strcat(LoggingLUT[lvl], str))
+void Simulator_log(LoggingType_t lvl, char *str) {
+    char prefix[32];
+    strcpy(prefix, LoggingLUT[lvl]); //This is because strcat cannot concat const
+    char* msg = strcat(prefix, str);
     write(simulatorLog, msg, strlen(msg));
     if (0) {
         char *buffer = (char *) malloc(strlen(msg) + 2);
-        sprintf(buffer, "%s%s\n", msg);
+        sprintf(buffer, "%s\n", msg);
         free(buffer);
     }
+}
 
 // It knows what the input file is because the Makefile should make a #define for the file path called SIMULATOR_JSON_PATH
 #ifndef SIMULATOR_JSON_PATH
@@ -57,18 +68,13 @@ void Simulator_log(LoggingType lvl, char *str) {
 #define JSON_PATH STRINGIFY(SIMULATOR_JSON_PATH) 
 #endif
 
-// units in mV
-static uint16_t DUMMY_VOLTAGES[NUM_BATTERY_MODULES] = { 3000 };
-// units in mC, but config.h uses 45,000 as 45.00C, so we'll bump these up to 30k for 30C
-static uint16_t DUMMY_TEMPS[NUM_TEMPERATURE_SENSORS] = { 30000 };
-
 /**
  * @brief   Shut down the simulator
  * @param   status - Look at man page for C exit() function 
  * @return  None
  */
 void Simulator_shutdown(int status) {
-    Simulator_log("Shutting down the simulator...\n");
+    Simulator_log(LOG, "Shutting down the simulator...\n");
     close(simulatorLog);
     exit(status);
 }
@@ -117,7 +123,7 @@ static void readInputFile(char *jsonPath) {
         }
         char buffer[50];
         sprintf(buffer, "\nExecuting state #%d...\n", stateCount);
-        Simulator_log(buffer);
+        Simulator_log(LOG, buffer);
         // Try and get every field we should have in each state.
         // If null, it doesn't exist.
         cJSON* time = cJSON_GetObjectItem(state, "time");
@@ -180,7 +186,7 @@ static void readInputFile(char *jsonPath) {
         if (!canList) {
             char buffer[67];
             sprintf(buffer, "No CAN messages to simulate in this state. (State Count = %d)\n", stateCount);
-            Simulator_log(buffer);
+            Simulator_log(LOG, buffer);
         } else { // otherwise, there are some potential CAN messages. 
             // for every CAN message...
             for (cJSON* msg = canList->child; msg != NULL; msg = msg->next) {
@@ -208,7 +214,7 @@ static void readInputFile(char *jsonPath) {
  * @return  None
  */
 void CtrlCHandler(int n) {
-    Simulator_log("simulator received SIGINT!\n");
+    Simulator_log(LOG_WARN, "simulator received SIGINT!\n");
     Simulator_shutdown(-1);
 }
 
@@ -240,7 +246,7 @@ void Simulator_init(char *jsonPath) {
     const struct sigaction act = {.sa_handler = CtrlCHandler, .sa_mask = s, .sa_flags = 0};
     sigaction(SIGINT, &act, NULL);
 
-    Simulator_log("Simulator intialized\n");    
+    Simulator_log(LOG, "Simulator intialized\n");    
 
     // initialize the fake inputs
     readInputFile(jsonPath);
@@ -264,7 +270,7 @@ static void Simulator_Transition(void) {
         free(prev);
 
         if (states == NULL) {
-            Simulator_log("Finished last state!\n");
+            Simulator_log(LOG, "Finished last state!\n");
             Simulator_shutdown(0);
         }
     }
