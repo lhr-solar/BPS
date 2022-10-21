@@ -1,5 +1,10 @@
 /* Copyright (c) 2022 UT Longhorn Racing Solar */
 
+/**
+ * BSP_WDTimer.c - Simulates Watchdog timer of BPS. NOTE: Should not be used to definitively test
+ * timing capabilities of BPS.
+*/
+
 #include "BSP_WDTimer.h"
 #include <stdint.h>
 #include "Simulator.h"
@@ -57,6 +62,3 @@ void BSP_WDTimer_Reset(void) {
 
     Simulator_log(LOG, "Reset the watchdog timer\n");
 }
-
-
-

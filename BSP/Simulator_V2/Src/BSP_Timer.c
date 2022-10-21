@@ -4,8 +4,6 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-
-
 /**
  * @brief   Initialize the timer for time measurements.
  * @param   None

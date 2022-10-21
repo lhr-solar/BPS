@@ -1,4 +1,7 @@
 /* Copyright (c) 2022 UT Longhorn Racing Solar */
+/**
+ * BSP_Lights.c - Simulates LED's on BPS leader board.
+*/
 
 #include "BSP_Lights.h"
 #include "Simulator.h"

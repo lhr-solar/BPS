@@ -1,9 +1,11 @@
 /* Copyright (c) 2022 UT Longhorn Racing Solar */
+/**
+ * BSP_SPI.c - Simulates SPI communication on BPS board
+*/
 
 #include "BSP_SPI.h"
 #include "config.h"
 #include "common.h"
-
 
 void SPI3_Init(bsp_os_t *spi3_os){
 	// TODO

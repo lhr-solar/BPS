@@ -1,3 +1,8 @@
+/* Copyright (c) 2022 UT Longhorn Racing Solar */
+/**
+ * BSP_Fans.c - Simulates Fan PWM Pins
+*/
+
 #include "BSP_Fans.h"
 #include "Simulator.h"
 

@@ -1,4 +1,7 @@
 /* Copyright (c) 2022 UT Longhorn Racing Solar */
+/**
+ * BSP_PLL.c - Simulates PLL on BPS board.
+*/
 
 #include "BSP_PLL.h"
 #include "Simulator.h"

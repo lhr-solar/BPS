@@ -1,5 +1,10 @@
 /* Copyright (c) 2022 UT Longhorn Racing Solar */
 
+/**
+ * BSP_I2C.c - Simulates I2C communication with EEPROM. Written with assumption that we will only 
+ * read and write SOC to EEPROM.
+*/
+
 #include "BSP_I2C.h"
 #include "EEPROM.h"
 #include "config.h"

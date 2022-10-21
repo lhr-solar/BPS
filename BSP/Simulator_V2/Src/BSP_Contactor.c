@@ -1,4 +1,7 @@
 /* Copyright (c) 2022 UT Longhorn Racing Solar */
+/**
+ * BSP_Contactor.c - Simulates Contactor GPIO pins.
+*/
 
 #include "BSP_Contactor.h"
 #include "Simulator.h"

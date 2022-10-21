@@ -1,4 +1,7 @@
 /* Copyright (c) 2022 UT Longhorn Racing Solar */
+/**
+ * BSP_ADC.c - Simulates ADC of BPS 
+ */
 
 #include "BSP_ADC.h"
 #include "Simulator.h"
@@ -35,4 +38,3 @@ uint16_t BSP_ADC_Low_GetMilliVoltage(void) {
     // TODO
     return 42;
 }
-
