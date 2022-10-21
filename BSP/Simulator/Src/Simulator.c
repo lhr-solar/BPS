@@ -38,7 +38,7 @@ static uint16_t DUMMY_VOLTAGES[NUM_BATTERY_MODULES] = { 3000 };
 static uint16_t DUMMY_TEMPS[NUM_TEMPERATURE_SENSORS] = { 30000 };
 
 // LUT which corresponds Logging Level type to string to print out in LogFile
-const char* LoggingLUT[LOG_MAXLEVEL] = {"", "INFO: ", "WARNING: ", "ERROR: "};
+static const char* LoggingLUT[LOG_MAXLEVEL] = {"", "INFO: ", "WARNING: ", "ERROR: "};
 
 /**
  * @brief   Log something to simulator log file
@@ -46,7 +46,7 @@ const char* LoggingLUT[LOG_MAXLEVEL] = {"", "INFO: ", "WARNING: ", "ERROR: "};
  * @param   str - string to print
  * @return  None
  */
-void Simulator_log(LoggingType_t lvl, char *str) {
+void Simulator_Log(LoggingType_t lvl, char *str) {
     char prefix[32];
     strcpy(prefix, LoggingLUT[lvl]); //This is because strcat cannot concat const
     char* msg = strcat(prefix, str);
@@ -73,8 +73,8 @@ void Simulator_log(LoggingType_t lvl, char *str) {
  * @param   status - Look at man page for C exit() function 
  * @return  None
  */
-void Simulator_shutdown(int status) {
-    Simulator_log(LOG, "Shutting down the simulator...\n");
+void Simulator_Shutdown(int status) {
+    Simulator_Log(LOG, "Shutting down the simulator...\n");
     close(simulatorLog);
     exit(status);
 }
@@ -123,7 +123,7 @@ static void readInputFile(char *jsonPath) {
         }
         char buffer[50];
         sprintf(buffer, "\nExecuting state #%d...\n", stateCount);
-        Simulator_log(LOG, buffer);
+        Simulator_Log(LOG, buffer);
         // Try and get every field we should have in each state.
         // If null, it doesn't exist.
         cJSON* time = cJSON_GetObjectItem(state, "time");
@@ -186,7 +186,7 @@ static void readInputFile(char *jsonPath) {
         if (!canList) {
             char buffer[67];
             sprintf(buffer, "No CAN messages to simulate in this state. (State Count = %d)\n", stateCount);
-            Simulator_log(LOG, buffer);
+            Simulator_Log(LOG, buffer);
         } else { // otherwise, there are some potential CAN messages. 
             // for every CAN message...
             for (cJSON* msg = canList->child; msg != NULL; msg = msg->next) {
@@ -214,8 +214,8 @@ static void readInputFile(char *jsonPath) {
  * @return  None
  */
 void CtrlCHandler(int n) {
-    Simulator_log(LOG_WARN, "simulator received SIGINT!\n");
-    Simulator_shutdown(-1);
+    Simulator_Log(LOG_WARN, "simulator received SIGINT!\n");
+    Simulator_Shutdown(-1);
 }
 
 /**
@@ -223,7 +223,7 @@ void CtrlCHandler(int n) {
  * @param   jsonPath - path to json file
  * @return  None
  */
-void Simulator_init(char *jsonPath) {
+void Simulator_Init(char *jsonPath) {
     // generate unique name for log file
     startTime = time(NULL);
     char filename[30];
@@ -246,7 +246,7 @@ void Simulator_init(char *jsonPath) {
     const struct sigaction act = {.sa_handler = CtrlCHandler, .sa_mask = s, .sa_flags = 0};
     sigaction(SIGINT, &act, NULL);
 
-    Simulator_log(LOG, "Simulator intialized\n");    
+    Simulator_Log(LOG, "Simulator intialized\n");    
 
     // initialize the fake inputs
     readInputFile(jsonPath);
@@ -270,8 +270,8 @@ static void Simulator_Transition(void) {
         free(prev);
 
         if (states == NULL) {
-            Simulator_log(LOG, "Finished last state!\n");
-            Simulator_shutdown(0);
+            Simulator_Log(LOG, "Finished last state!\n");
+            Simulator_Shutdown(0);
         }
     }
 }

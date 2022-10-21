@@ -19,7 +19,7 @@ static bool initialized = false;
  */
 void BSP_I2C_Init(void) {
     initialized = true;
-    Simulator_log(LOG_INFO, "EEPROM Initialized\n");
+    Simulator_Log(LOG_INFO, "EEPROM Initialized\n");
 }
 
 /**
@@ -31,14 +31,14 @@ void BSP_I2C_Init(void) {
  */
 uint8_t  BSP_I2C_Write(uint8_t devAddr, uint16_t regAddr, uint8_t *txData, uint32_t txLen) {
     if (!initialized) {
-        Simulator_log(LOG_ERROR, "Used I2C without initialization!\n");
+        Simulator_Log(LOG_ERROR, "Used I2C without initialization!\n");
         exit(-1);
     }
 
     char buffer[100];
     for (uint32_t i = 0; i < txLen; ++i) {
         sprintf(buffer, "Wrote 0x%x to I2C device 0x%x at address 0x%x\n", txData[i], devAddr, regAddr);
-        Simulator_log(LOG, buffer);
+        Simulator_Log(LOG, buffer);
     }
 
     return SUCCESS;
@@ -53,12 +53,12 @@ uint8_t  BSP_I2C_Write(uint8_t devAddr, uint16_t regAddr, uint8_t *txData, uint3
  */
 uint8_t BSP_I2C_Read(uint8_t devAddr, uint16_t regAddr, uint8_t *rxData, uint32_t rxLen) {
     if (!initialized) {
-        Simulator_log(LOG_ERROR, "Used I2C without initialization!\n");
+        Simulator_Log(LOG_ERROR, "Used I2C without initialization!\n");
         exit(-1);
     }
 
     if (rxLen != sizeof(uint32_t)) {
-        Simulator_log(LOG_ERROR, "Simulator only supports reading state of charge!\n");
+        Simulator_Log(LOG_ERROR, "Simulator only supports reading state of charge!\n");
         exit(-1);
     }
     

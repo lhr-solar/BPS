@@ -27,13 +27,13 @@ typedef struct simulator_state {
 typedef enum {LOG, LOG_INFO, LOG_WARN, LOG_ERROR, LOG_MAXLEVEL} LoggingType_t;
 
 // intialize the simulator
-void Simulator_init(char *jsonPath);
+void Simulator_Init(char *jsonPath);
 
 // log something to the simualtor's log file
-void Simulator_log(LoggingType_t lvl, char *str);
+void Simulator_Log(LoggingType_t lvl, char *str);
 
 // shut down the simulator
-void Simulator_shutdown(int status);
+void Simulator_Shutdown(int status);
 
 // get the adcHigh
 uint16_t Simulator_getAdcHigh(void);

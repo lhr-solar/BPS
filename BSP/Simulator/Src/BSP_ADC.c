@@ -16,7 +16,7 @@ static bool initialized = false;
  */
 void BSP_ADC_Init(void) {
     initialized = true;
-    Simulator_log(LOG, "ADC initialized\n");
+    Simulator_Log(LOG, "ADC initialized\n");
 }
 
 /**

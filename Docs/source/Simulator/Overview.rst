@@ -32,7 +32,7 @@ driver adn deal with a higher layer of abstraction (voltage and temperature read
 
 Compiling the Simulator
 =======================
-Right now the simulator can be compiled with ``make simulator_v2``. 
+Right now the simulator can be compiled with ``make simulator``. 
 
 Running the Simulator
 =====================

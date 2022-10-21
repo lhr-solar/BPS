@@ -181,7 +181,7 @@ void Task2(void *p_arg){
 int main(void) {
 #else
 int main(int argc, char **argv) {
-    Simulator_init(argv[1]);
+    Simulator_Init(argv[1]);
 #endif
 
     //Resetting the contactor

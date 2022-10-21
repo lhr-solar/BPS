@@ -29,7 +29,7 @@ int main() {
 
 #ifdef SIMULATION
 	// the first command line argument is the path to the JSON file
-	Simulator_init(argv[1]);
+	Simulator_Init(argv[1]);
 #endif
 	
 	OS_ERR err;
