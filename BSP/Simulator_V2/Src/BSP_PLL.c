@@ -13,7 +13,7 @@ static uint32_t SystemCoreClock = 16000000;
  */
 void BSP_PLL_Init(void) {
     SystemCoreClock = 80000000;
-    Simulator_log("Initialized PLL\n");
+    Simulator_log(LOG, "Initialized PLL\n");
 }
 
 /**

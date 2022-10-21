@@ -19,6 +19,14 @@ typedef struct simulator_state {
     struct simulator_state *next;
 } simulator_state;
 
+typedef enum {LOG, INFO, WARN, ERROR, MAXLEVEL} LoggingType;
+
+static const struct LoggingLvl LoggingLUT[MAXLEVEL] = {
+    [LOG] = "",
+    [INFO] = "INFO: ",
+    [WARN] = "WARNING: ",
+    [ERROR] = "ERROR: "
+}
 // intialize the simulator
 void Simulator_init(char *jsonPath);
 

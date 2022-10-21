@@ -13,7 +13,7 @@ bool initialized = false;
  */
 void BSP_WDTimer_Init(void) {
     initialized = true;
-    Simulator_log("Initialized the watchdog timer\n");
+    Simulator_log(LOG, "Initialized the watchdog timer\n");
 }
 
 /**
@@ -35,12 +35,12 @@ bool BSP_WDTimer_DidSystemReset(void){
  */
 void BSP_WDTimer_Start(void) {
     if (!initialized) {
-        Simulator_log("Error: used watchdog timer without initialization!\n");
+        Simulator_log(ERROR, "Used watchdog timer without initialization!\n");
         exit(-1);
     }
 
 
-    Simulator_log("Started the watchdog timer\n");
+    Simulator_log(LOG, "Started the watchdog timer\n");
 }
 
 /**
@@ -51,11 +51,11 @@ void BSP_WDTimer_Start(void) {
  */
 void BSP_WDTimer_Reset(void) {
     if (!initialized) {
-        Simulator_log("Error: used watchdog timer without initialization!\n");
+        Simulator_log(ERROR, "Used watchdog timer without initialization!\n");
         exit(-1);
     }
 
-    Simulator_log("Reset the watchdog timer\n");
+    Simulator_log(LOG, "Reset the watchdog timer\n");
 }
 
 

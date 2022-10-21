@@ -30,41 +30,38 @@ static simulator_state *states = NULL;
 // note that this only has a granularity of 1 second, so it's not super precise
 static time_t startTime;
 
-// log something to the simualtor's log file
-void Simulator_log(char *str) {
-    write(simulatorLog, str, strlen(str));
+/**
+ * @brief   Log something to simulator log file
+ * @param   lvl - Choose level at which to log at. Levels defined in LoggingType enum.
+ * @param   str - string to print
+ * @return  None
+ */
+void Simulator_log(LoggingType lvl, char *str) {
+    char* msg = strcat(strcat(LoggingLUT[lvl], str))
+    write(simulatorLog, msg, strlen(msg));
+    if (0) {
+        char *buffer = (char *) malloc(strlen(msg) + 2);
+        sprintf(buffer, "%s%s\n", msg);
+        free(buffer);
+    }
 }
 
-#define SIMULATOR_MESSAGE(prefix, message) { \
-    char *buffer = (char *) malloc(sizeof(prefix) + strlen(str) + 2); \
-    sprintf(buffer, "%s%s\n", prefix, message); \
-    Simulator_log(buffer); \
-    free(buffer); \
-}
-
-// log an error to the simulator's log file
-void Simulator_error(char *str) {
-    SIMULATOR_MESSAGE("Error:   ", str)
-}
-
-// log an info message to the simulator's log file
-void Simualtor_info(char *str) {
-    SIMULATOR_MESSAGE("Info:    ", str)
-}
-
-// log a warning to the simulator's log file
-void Simulator_warning(char *str) {
-    SIMULATOR_MESSAGE("Warning: ", str)
-}
-
-// shut down the simulator
+/**
+ * @brief   Shut down the simulator
+ * @param   status - Look at man page for C exit() function 
+ * @return  None
+ */
 void Simulator_shutdown(int status) {
     Simulator_log("Shutting down the simulator...\n");
     close(simulatorLog);
     exit(status);
 }
 
-// read the input json file and parse it
+/**
+ * @brief   Read the input json file and parse it
+ * @param   jsonPath - Path to json file
+ * @return  None
+ */
 static void readInputFile(char *jsonPath) {
     // get the length of the input file
     struct stat inFileStats;
@@ -143,13 +140,21 @@ static void readInputFile(char *jsonPath) {
     }
 }
 
-// handler for Ctrl-C to safely shut down the simulator
+/**
+ * @brief   Handler for Ctrl-C to safely shut down the simulator
+ * @param   n - unused
+ * @return  None
+ */
 void CtrlCHandler(int n) {
     Simulator_log("simulator received SIGINT!\n");
     Simulator_shutdown(-1);
 }
 
-// intialize the simulator
+/**
+ * @brief   Initialize Simulator
+ * @param   jsonPath - path to json file
+ * @return  None
+ */
 void Simulator_init(char *jsonPath) {
     // generate unique name for log file
     startTime = time(NULL);
@@ -182,7 +187,11 @@ void Simulator_init(char *jsonPath) {
     startTime = time(NULL);
 }
 
-// check for state transition and transition if necessary
+/**
+ * @brief   Check for state transition and transition if necessary
+ * @param   None
+ * @return  None
+ */
 static void Simulator_Transition(void) {
     // advance to the current state
     time_t currentTime = time(NULL);
@@ -199,8 +208,8 @@ static void Simulator_Transition(void) {
     }
 }
 
-// Functions for accessing simulator state
-// add more of these if you add more fields
+
+// Functions for accessing simulator state. Each field should have a function associated with it
 
 // get the adcHigh
 uint16_t Simulator_getAdcHigh(void) {

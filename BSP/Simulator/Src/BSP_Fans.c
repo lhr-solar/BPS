@@ -2,8 +2,8 @@
 #include "simulator_conf.h"
 #include <unistd.h>
 #include <sys/file.h>
+#include "config.h"
 #define MAX_SPEED    8
-#define NUM_FANS     4
 
 static const char* file = GET_CSV_PATH(FANS_CSV_FILE);
 static int Fans[NUM_FANS];
