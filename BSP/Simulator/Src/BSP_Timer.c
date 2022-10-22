@@ -1,16 +1,23 @@
 /* Copyright (c) 2022 UT Longhorn Racing Solar */
 
 #include "BSP_Timer.h"
+#include <time.h>
+#include "Simulator.h"
 #include <stdint.h>
 #include <stdlib.h>
 
+#define MICROS_IN_SEC 1000000
+
+static bool initialized = false;
+static clock_t t;
 /**
  * @brief   Initialize the timer for time measurements.
  * @param   None
  * @return  None
  */
 void BSP_Timer_Init(void) {
-    /// TODO
+    initialized = true;
+    Simulator_log("Initialized Timer\n");
 }
 
 /**
@@ -19,7 +26,13 @@ void BSP_Timer_Init(void) {
  * @return  None
  */
 void BSP_Timer_Start(void) {
-    // TODO
+    if (initialized) {
+        t = clock();
+        Simulator_log("Timer started\n");
+    }
+    else {
+        Simulator_log("Hard Fault: Initialize Timer before start\n");
+    }
 }
 
 /**
@@ -28,18 +41,17 @@ void BSP_Timer_Start(void) {
  * @return  Number of ticks
  */
 uint32_t BSP_Timer_GetTicksElapsed(void) {
-    // TODO
-    return 42;
+    return clock() - t;
+    
 }
 
 /**
- * @brief   Gets the running frequency of the timer (time per tick)
+ * @brief   Gets the ticks/s from CLOCKS_PER_SEC
  * @param   None
- * @return  frequency in Hz
+ * @return  ticks/s
  */
 uint32_t BSP_Timer_GetRunFreq(void) {
-    // TODO
-    return 42;
+    return CLOCKS_PER_SEC;  //returns ticks/s instead because this function is only used internally
 }
 
 /**
@@ -48,6 +60,5 @@ uint32_t BSP_Timer_GetRunFreq(void) {
  * @return  Microseconds 
  */
 uint32_t BSP_Timer_GetMicrosElapsed(void) {
-    // TODO
-    return 42;
+    return (uint32_t) (BSP_Timer_GetTicksElasped() * MICROS_IN_SEC) / CLOCKS_PER_SEC;
 }
