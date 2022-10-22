@@ -4,6 +4,7 @@
 TARGET = bps-leader
 
 DEBUG = 1
+READABLE = true
 
 ######################################
 # building variables
@@ -12,6 +13,18 @@ DEBUG = 1
 # change to -Og if you want the compiler to generate assembly that is very close
 # to your source code. Change to -O3 for best performance
 OPT = -O3
+
+# COLORS
+RED=\033[0;31m
+GREEN=\033[0;32m
+ORANGE=\033[0;33m
+BLUE=\033[0;34m
+PURPLE=\033[0;35m
+CYAN=\033[0;36m
+LIGHTGRAY=\033[0;37m
+DARKGRAY=\033[1;30m
+YELLOW=\033[0;33m
+NC=\033[0m # No Color
 
 #######################################
 # paths
@@ -26,14 +39,16 @@ RTOS_DIR = $(TOP_DIR)/RTOS/uCOS-III-STM32F4
 ######################################
 # source
 ######################################
+
 # C sources
 # since current path is in the BSP folder, go to the top level with $(TOP_DIR)/
+# Note: Config/Src/*.c needs to be last in this list, so that we see compile line prints at the END of compilation.
+
 C_SOURCES =  \
 $(wildcard $(TOP_DIR)/Tasks/Src/*.c)	\
 $(wildcard $(TOP_DIR)/Drivers/Src/*.c)	\
 $(wildcard $(TOP_DIR)/BSP/STM32F413/Src/*.c)	\
 $(wildcard $(TOP_DIR)/CMSIS/DSP_Lib/Source/*.c)	\
-$(wildcard $(TOP_DIR)/Config/Src/*.c)	\
 $(wildcard $(TOP_DIR)/BSP/STM32F413/STM32F4xx_StdPeriph_Driver/Src/*.c)	\
 $(wildcard $(RTOS_DIR)/uCOS-III/Source/*.c)	\
 $(wildcard $(RTOS_DIR)/uCOS-III/Ports/ARM-Cortex-M4/Generic/GNU/*.c)	\
@@ -45,9 +60,10 @@ $(wildcard $(RTOS_DIR)/uC-Serial/Driver/ST/*.c)	\
 $(wildcard $(RTOS_DIR)/uC-Serial/Line/*.c)	\
 $(wildcard $(RTOS_DIR)/uC-Serial/OS/*.c)	\
 $(wildcard $(RTOS_DIR)/uC-Serial/OS/uCOS-III/*.c)	\
-$(wildcard $(RTOS_DIR)/uC-Serial/Source/*.c)	
+$(wildcard $(RTOS_DIR)/uC-Serial/Source/*.c)	\
+$(wildcard $(TOP_DIR)/Config/Src/*.c) 
 
-
+MESSAGES = $(wildcard $(TOP_DIR)/Config/Src/*.c)
 
 ifneq ($(TEST), none)
 TEST_FILE := Test_$(TEST).c
@@ -147,6 +163,11 @@ ifeq ($(DEBUG), 1)
 CFLAGS += -g3 -gdwarf-2
 endif
 
+# custom user defines here
+ifneq ($(DEFINES), none)
+CFLAGS += $(DEFINES)
+endif
+
 
 # Generate dependency information
 CFLAGS += -MMD -MP -MF"$(@:%.o=%.d)"
@@ -176,16 +197,33 @@ vpath %.c $(sort $(dir $(C_SOURCES)))
 # list of ASM program objects
 OBJECTS += $(addprefix $(BUILD_DIR)/,$(notdir $(ASM_SOURCES:.s=.o)))
 vpath %.s $(sort $(dir $(ASM_SOURCES)))
+OBJECTS += $(addprefix $(BUILD_DIR)/,$(notdir $(MESSAGES:.c=.o))) # messages
 
-$(BUILD_DIR)/%.o: %.c Makefile | $(BUILD_DIR) 
+# The ifneq... @... endif modifies the make console output to not print every file name,
+# assuming make is run with READABLE= some nonzero number
+
+$(BUILD_DIR)/%.o: %.c Makefile | $(BUILD_DIR) c_compile_msg
+ifeq ($(READABLE), true)
+	@$(CC) -c $(CFLAGS) -Wa,-a,-ad,-alms=$(BUILD_DIR)/$(notdir $(<:.c=.lst)) $< -o $@
+else
 	$(CC) -c $(CFLAGS) -Wa,-a,-ad,-alms=$(BUILD_DIR)/$(notdir $(<:.c=.lst)) $< -o $@
+endif
 
-$(BUILD_DIR)/%.o: %.s Makefile | $(BUILD_DIR)
+$(BUILD_DIR)/%.o: %.s Makefile | $(BUILD_DIR) asm_compile_msg
+ifeq ($(READABLE), true)
+	@$(AS) -c $(CFLAGS) $< -o $@
+else
 	$(AS) -c $(CFLAGS) $< -o $@
+endif
 
-$(BUILD_DIR)/$(TARGET).elf: $(OBJECTS) Makefile
+$(BUILD_DIR)/$(TARGET).elf: $(OBJECTS) Makefile build_msg
+ifeq ($(READABLE), true)
+	@$(CC) $(OBJECTS) $(LDFLAGS) -o $@
+	@$(SZ) $@
+else
 	$(CC) $(OBJECTS) $(LDFLAGS) -o $@
 	$(SZ) $@
+endif
 
 $(BUILD_DIR)/%.hex: $(BUILD_DIR)/%.elf | $(BUILD_DIR)
 	$(HEX) $< $@
@@ -194,7 +232,21 @@ $(BUILD_DIR)/%.bin: $(BUILD_DIR)/%.elf | $(BUILD_DIR)
 	$(BIN) $< $@	
 	
 $(BUILD_DIR):
-	mkdir $@		
+	mkdir $@
+
+.INTERMEDIATE: c_compile_msg
+.INTERMEDIATE: asm_compile_msg
+.INTERMEDIATE: build_msg
+
+c_compile_msg:
+	@echo "${GREEN}Compiling C files...${NC}"
+
+asm_compile_msg:
+	@echo "${GREEN}Compiling ASM files...${NC}"
+
+build_msg:
+	@echo "${CYAN}Generating BPS executable...${NC}"
+
 
 #######################################
 # clean up
