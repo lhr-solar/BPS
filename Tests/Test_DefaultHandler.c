@@ -1,4 +1,4 @@
-/* Copyright (c) 2021 UT Longhorn Racing Solar */
+/* Copyright (c) 2018-2022 UT Longhorn Racing Solar */
 
 #include "stm32f4xx_tim.h"
 #include "stm32f4xx.h"
