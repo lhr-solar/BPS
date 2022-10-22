@@ -104,6 +104,6 @@ void RTOS_BPS_TimeDelay(void);
  * @param name - name of the semaphore
  * @param count - initial count for the semaphore
  */
-void RTOS_BPS_SemCreate(BPS_OS_SEM* sem, char* name, uint32_t count)
+void RTOS_BPS_SemCreate(BPS_OS_SEM* sem, char* name, uint32_t count);
 
 #endif 
