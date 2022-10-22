@@ -7,6 +7,8 @@
 #define PROPORTION -1234
 #define INTEGRAL 4321
 #define DERIVATIVE -9876
+#define MAX_FAN_SPEED 4000
+#define DIVISOR 25000
 
 static int32_t ErrorSum = 0;
 static int32_t Error;
@@ -28,13 +30,13 @@ int32_t PID_Output(int32_t InputTemp, int32_t DesiredTemp) {
     Rate = Error - PreviousError;
     PreviousError = Error;     //updates previous err value
 
-    if (((PROPORTION*(Error) + INTEGRAL*(ErrorSum) + DERIVATIVE*(Rate))/25000) > 4000) {
-        return 4000;
+    if (((PROPORTION*(Error) + INTEGRAL*(ErrorSum) + DERIVATIVE*(Rate))/DIVISOR) > MAX_FAN_SPEED) {
+        return MAX_FAN_SPEED;
     }
-    if (((PROPORTION*(Error) + INTEGRAL*(ErrorSum) + DERIVATIVE*(Rate))/25000) <= 0) {
+    if (((PROPORTION*(Error) + INTEGRAL*(ErrorSum) + DERIVATIVE*(Rate))/DIVISOR) <= 0) {
         return 0;
     }
-    return (PROPORTION*(Error) + INTEGRAL*(ErrorSum) + DERIVATIVE*(Rate))/25000;
+    return (PROPORTION*(Error) + INTEGRAL*(ErrorSum) + DERIVATIVE*(Rate))/DIVISOR;
 }
 
 
