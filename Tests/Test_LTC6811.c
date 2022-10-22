@@ -36,7 +36,7 @@ void Task1(void *p_arg){
     printf("pec: %d\n", pec);
 
     OS_ERR err;
-    OSTimeDly(15, OS_OPT_TIME_DLY, &err);
+    RTOS_BPS_DelayTick(15);
 
     LTC6811_adcv(ADC_CONVERSION_MODE,ADC_DCP,CELL_CH_TO_CONVERT);
 
