@@ -112,7 +112,7 @@ void RTOS_BPS_DelayMs(uint16_t dly);
  */
 void RTOS_BPS_SemCreate(BPS_OS_SEM* sem, char* name, uint32_t count);
 
-
+/**
  * @brief Creates a Tick-based Time Delay.
  * @param dly Defines how many ticks to delay for.
  * @return none 
