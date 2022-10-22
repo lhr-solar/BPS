@@ -27,7 +27,7 @@ CPU_STK Task2_Stk[256];
 void Task2(void *p_arg){    //This task is meant to cause contactor to remain open
     OS_ERR err;
 
-    OSTimeDly(250, OS_OPT_TIME_DLY, &err);
+    RTOS_BPS_DelayTick(250);
 
 
     OSSemPost(&SafetyCheck_Sem4,
@@ -45,7 +45,7 @@ void Task2(void *p_arg){    //This task is meant to cause contactor to remain op
    
     while(1) {
         BSP_Light_Toggle(EXTRA);
-        OSTimeDly(25, OS_OPT_TIME_DLY, &err);   // heartbeat
+        RTOS_BPS_DelayTick(25);   // heartbeat
     }
 
     exit(0);

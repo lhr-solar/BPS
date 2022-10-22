@@ -130,7 +130,7 @@ void Task2(void *p_arg){
         OSMutexPost(&WDog_Mutex, OS_OPT_POST_NONE, &err);
         assertOSError(err);
         //delay of 100ms
-        OSTimeDly(10, OS_OPT_TIME_DLY, &err);
+        RTOS_BPS_DelayTick(10);
         assertOSError(err);
         //BSP_Light_Toggle(RUN);
     }

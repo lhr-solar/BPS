@@ -32,43 +32,6 @@ BPS_OS_SEM_CTR RTOS_BPS_SemPost(BPS_OS_SEM *sem4, BPS_OS_OPT opt) {
 }
 
 /**
- * @brief   Waits for Mutex, assigns timestamp and any error to err and ticks
- * @param   *mutex - pointer to mutex
- * @param   options - determines what the mutex will do, ie: block or not block
- * @return  none
- */
-void RTOS_BPS_MutexPend(BPS_OS_MUTEX* mutex, BPS_OS_OPT opt) {
-    BPS_OS_ERR err;
-    OSMutexPend(mutex, 0, opt, (void*) 0, &err); 
-    assertOSError(err);
-}
-
-/**
- * @brief Initializes a mutex object.
- * @param *mut - pointer to a mutex to initialize
- * @param name - char* of the name of the mutex
- * @return none
- */
-void RTOS_BPS_MutexCreate(BPS_OS_MUTEX *mut, char* name) {
-    BPS_OS_ERR err;
-    OSMutexCreate(mut, name, &err);
-    assertOSError(err);
-}
-
-
-/**
- * @brief   Posts the specified Mutex. (For future reference, Post is the same as Give)
- * @param   *mutex - pointer to the specified RTOS Mutex object
- * @param   options - a parameter which determines what kind of Post MutexPost performs
- * @return  none
- */
-void RTOS_BPS_MutexPost(BPS_OS_MUTEX* mutex, BPS_OS_OPT options) {
-    BPS_OS_ERR err;
-    OSMutexPost(mutex, options, &err);
-    assertOSError(err);
-}
-
-/**
  * @brief   Creates a task that will be handled by the OS
  * @param   *p_tcb - pointer to the tcb
  * @param   *p_name - pointer to task name
@@ -95,8 +58,73 @@ void RTOS_BPS_TaskCreate(
         assertOSError(err);
     }
 
-void RTOS_BPS_TimeDelay(void){
+/**
+ * @brief   Waits for Mutex, assigns timestamp and any error to err and ticks
+ * @param   *mutex - pointer to mutex
+ * @param   options - determines what the mutex will do, ie: block or not block
+ * @return  none
+ */
+void RTOS_BPS_MutexPend(BPS_OS_MUTEX* mutex, BPS_OS_OPT opt) {
+    BPS_OS_ERR err;
+    OSMutexPend(mutex, 0, opt, (void*) 0, &err); 
+    assertOSError(err);
+}
 
+/**
+ * @brief Initializes a mutex object.
+ * @param *mut - pointer to a mutex to initialize
+ * @param name - char* of the name of the mutex
+ * @return none
+ */
+void RTOS_BPS_MutexCreate(BPS_OS_MUTEX *mut, char* name) {
+    BPS_OS_ERR err;
+    OSMutexCreate(mut, name, &err);
+    assertOSError(err);
+}
+
+/**
+ * @brief   Posts the specified Mutex. (For future reference, Post is the same as Give)
+ * @param   *mutex - pointer to the specified RTOS Mutex object
+ * @param   options - a parameter which determines what kind of Post MutexPost performs
+ * @return  none
+ */
+void RTOS_BPS_MutexPost(BPS_OS_MUTEX* mutex, BPS_OS_OPT options) {
+    BPS_OS_ERR err;
+    OSMutexPost(mutex, options, &err);
+    assertOSError(err);
+}
+
+/**
+ * @brief: Creates a Second-Based Time Delay.
+ * @param dly Defines how many seconds to delay for.
+ * @return none
+ */
+void RTOS_BPS_DelaySecs(uint16_t dly){
+    BPS_OS_ERR err;
+    OSTimeDlyHMSM(0, 0, dly, 0, OS_OPT_TIME_HMSM_NON_STRICT, &err);
+    assertOSError(err);
+}
+
+/**
+ * @brief: Creates a Millisecond-Based Time Delay.
+ * @param dly Defines how many milliseconds to delay for.
+ * @return none
+ */
+void RTOS_BPS_DelayMs(uint16_t dly){
+    BPS_OS_ERR err;
+    OSTimeDlyHMSM(0, 0, 0, dly, OS_OPT_TIME_HMSM_NON_STRICT, &err);
+    assertOSError(err);
+}
+
+/**
+ * @brief: Creates a Tick-Based Time Delay.
+ * @param dly Defines how many ticks to delay for.
+ * @return none
+ */
+void RTOS_BPS_DelayTick(BPS_OS_TICK dly){
+    BPS_OS_ERR err;
+    OSTimeDly(dly, OS_OPT_TIME_DLY, &err);
+    assertOSError(err);
 }
 
 /**
