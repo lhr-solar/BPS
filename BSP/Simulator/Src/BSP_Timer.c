@@ -46,12 +46,13 @@ uint32_t BSP_Timer_GetTicksElapsed(void) {
 }
 
 /**
- * @brief   Gets the ticks/s from CLOCKS_PER_SEC
+ * @note    Function not implemented so returns 0
+ * @brief   Returns 0
  * @param   None
- * @return  ticks/s
+ * @return  0
  */
 uint32_t BSP_Timer_GetRunFreq(void) {
-    return CLOCKS_PER_SEC;  //returns ticks/s instead because this function is only used internally
+    return 0;
 }
 
 /**
