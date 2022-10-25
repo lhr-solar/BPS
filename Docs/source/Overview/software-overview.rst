@@ -49,7 +49,8 @@ Running these threads creates "pseudo-concurrency".
 The RTOS ensures that safety critical tasks will not be blocked by non-safety
 critical tasks.
 
-We use the `Micrium uC/OS-III RTOS <https://docs.silabs.com/micrium/latest/micrium-general-concepts/>`__. 
+We use custom RTOS wrappers to allow easy porting. Currently, we are wrapping for
+`Micrium uC/OS-III RTOS <https://docs.silabs.com/micrium/latest/micrium-general-concepts/>`__. 
 
 Applications (Apps)
 ===================
