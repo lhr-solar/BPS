@@ -11,6 +11,7 @@
 #include "BSP_SPI.h"
 #include "CANbus.h"
 #include "Charge.h"
+#include "RTOS_BPS.h"
 
 static OS_MUTEX AmperesData_Mutex;
 
@@ -54,12 +55,9 @@ static int32_t latestMeasureMilliAmps;
  * Initializes hardware to begin current monitoring.
  */
 void Amps_Init(void) {
-	OS_ERR err;
-	OSSemCreate(&AmperesIO_Sem,
+	RTOS_BPS_SemCreate(&AmperesIO_Sem,
 				"AmperesIO Semaphore",
-                0,
-                &err);
-	assertOSError(err);
+                0);
 	spi_os.pend = Amperes_Pend;
 	spi_os.post = Amperes_Post;
 	LTC2315_Init(spi_os);

@@ -78,10 +78,9 @@ int main(void) {
     OSInit(&err);
     while(err != OS_ERR_NONE);
 
-    OSSemCreate(&SafetyCheck_Sem4,
+    RTOS_BPS_SemCreate(&SafetyCheck_Sem4,
                 "Safety Check Semaphore",
-                0,
-                &err);
+                0);
 
     RTOS_BPS_TaskCreate(&Task1_TCB,
                 "Task 1",

@@ -66,17 +66,13 @@ void Task1(void *p_arg){
 
     OS_CPU_SysTickInit(SystemCoreClock / (CPU_INT32U) OSCfg_TickRate_Hz);
 
-    OSSemCreate(&Fault_Sem4,
+    RTOS_BPS_SemCreate(&Fault_Sem4,
                 "Fault/Tripped Semaphore",
-                0,
-                &err);
-    assertOSError(err);
+                0);
 
-    OSSemCreate(&SafetyCheck_Sem4,
+    RTOS_BPS_SemCreate(&SafetyCheck_Sem4,
                 "Safety Check Semaphore",
-                0,
-                &err);
-    assertOSError(err);
+                0);
 
     	RTOS_BPS_TaskCreate(&FaultState_TCB,				// TCB
 				"TASK_FAULT_STATE_PRIO",	// Task Name (String)

@@ -117,14 +117,11 @@ void LTC6811_Post(void) {
 void LTC6811_Init(cell_asic *battMod){
   //only create the mutex the first time this function is called (called by Voltage_Init() and Temperature_Init())
   static bool mutexExists = false;
-  OS_ERR err;
   if (mutexExists == false){
     RTOS_BPS_MutexCreate(&MinionsASIC_Mutex, "Minions ASIC Mutex");
-    OSSemCreate(&MinionsIO_Sem4,
+    RTOS_BPS_SemCreate(&MinionsIO_Sem4,
                 "Minions Sem4",
-                0,
-                &err);
-    assertOSError(err);
+                0);
     mutexExists = true;
   }
 

@@ -1,6 +1,7 @@
 #include "CANbus.h"
 #include "BSP_CAN.h"
 #include "os.h"
+#include "RTOS_BPS.h"
 #include "Tasks.h"
 
 /* Locking mechanism for the CAN bus.
@@ -51,23 +52,18 @@ static void CANbus_CountIncoming(void) {
  * @return  None
  */
 void CANbus_Init(bool loopback) {
-	OS_ERR err;
 
 	RTOS_BPS_MutexCreate(&CANbus_TxMutex, "CAN TX Lock");
 
 	RTOS_BPS_MutexCreate(&CANbus_RxMutex, "CAN RX Lock");
 
-	OSSemCreate(&CANbus_MailSem4,
+	RTOS_BPS_SemCreate(&CANbus_MailSem4,
                 "CAN Mailbox Semaphore",
-                3,	// Number of mailboxes
-                &err);
-	assertOSError(err);
+                3); // # of mailboxes
 
-	OSSemCreate(&CANbus_ReceiveSem4,
+	RTOS_BPS_SemCreate(&CANbus_ReceiveSem4,
                 "CAN Queue Counter Semaphore",
-                0,
-                &err);
-	assertOSError(err);
+                0);
 
 	// Initialize and pass interrupt hooks
     BSP_CAN_Init(CANbus_CountIncoming, CANbus_Release, loopback);

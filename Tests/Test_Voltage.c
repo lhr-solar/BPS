@@ -197,11 +197,9 @@ void Task1(void *p_arg){
 
 
     OS_ERR err;
-    OSSemCreate(&Fault_Sem4,
+    RTOS_BPS_SemCreate(&Fault_Sem4,
                 "Fault/Tripped Semaphore",
-                0,
-                &err);
-    assertOSError(err);
+                0);
 
     test();
 }
