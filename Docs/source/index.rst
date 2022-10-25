@@ -24,11 +24,11 @@ Welcome to the BeVolt BPS documentation!
    :maxdepth: 2
    :caption: Software
 
-   Software/Apps
-   Software/Tasks
-   Software/RTOS
    Software/BSP
    Software/Drivers
+   Software/RTOS
+   Software/Apps
+   Software/Tasks
 
 .. toctree::
    :hidden:
