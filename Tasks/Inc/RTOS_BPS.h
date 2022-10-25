@@ -104,6 +104,15 @@ void RTOS_BPS_DelaySecs(uint16_t dly);
 void RTOS_BPS_DelayMs(uint16_t dly);
 
 /**
+ * @brief Creates a semaphore with the initially specified count
+ * 
+ * @param sem - pointer to a semaphore object to create and initialize
+ * @param name - name of the semaphore
+ * @param count - initial count for the semaphore
+ */
+void RTOS_BPS_SemCreate(BPS_OS_SEM* sem, char* name, uint32_t count);
+
+/**
  * @brief Creates a Tick-based Time Delay.
  * @param dly Defines how many ticks to delay for.
  * @return none 

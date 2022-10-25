@@ -42,10 +42,9 @@ void Task_TestTempMutex1(void *p_args) {
                 &err);
     // assert
 
-    OSSemCreate(&tmr_Sem4,
+    RTOS_BPS_SemCreate(&tmr_Sem4,
                 "Temperature Timer Semaphore",
-                1,
-                &err);
+                1);
     // assert
 
     Temperature_Init(minions);

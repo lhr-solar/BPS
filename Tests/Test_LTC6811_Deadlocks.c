@@ -171,10 +171,9 @@ int main() {
     OS_ERR err;
     OSInit(&err);
 
-    OSSemCreate(&SafetyCheck_Sem4,
+    RTOS_BPS_SemCreate(&SafetyCheck_Sem4,
                 "Safety Check Semaphore",
-                0,
-                &err);
+                0);
 
     RTOS_BPS_TaskCreate(&LTC6811_Deadlocks_TCB,				// TCB
 				"LTC6811 Deadlocks Test",	// Task Name (String)

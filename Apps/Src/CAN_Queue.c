@@ -6,6 +6,7 @@
 #include "CAN_Queue.h"
 #include "os.h"
 #include "CANbus.h"
+#include "RTOS_BPS.h"
 #include "Tasks.h"
 
 // fifo
@@ -21,11 +22,9 @@ static OS_MUTEX canFifo_Mutex;
 void CAN_Queue_Init(void) {
     OS_ERR err;
     RTOS_BPS_MutexCreate(&canFifo_Mutex, "CAN queue mutex");
-    OSSemCreate(&canFifo_Sem4,
+    RTOS_BPS_SemCreate(&canFifo_Sem4,
                 "CAN queue semaphore",
-                0,
-                &err);
-    assertOSError(err);
+                0);
     RTOS_BPS_MutexPend(&canFifo_Mutex, OS_OPT_PEND_BLOCKING);
     CAN_fifo_renew(&canFifo);
     OSMutexPost(&canFifo_Mutex, OS_OPT_POST_NONE, &err);

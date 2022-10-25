@@ -9,6 +9,7 @@
 #include "BSP_PLL.h"
 #include "BSP_Lights.h"
 #include "stm32f4xx.h"
+#include "RTOS_BPS.h"
 
 OS_TCB Task1_TCB, Task2_TCB;
 CPU_STK Task1_Stk[256];
@@ -44,10 +45,9 @@ void Task1(void *p_arg){
 
     bsp_os_t spi_os;
     OS_ERR err;
-    OSSemCreate(&semaphore,
+    RTOS_BPS_SemCreate(&semaphore,
                 "SPI Semaphore",
-                0,
-                &err);
+                0);
     spi_os.pend = pend;
     spi_os.post = post;
 

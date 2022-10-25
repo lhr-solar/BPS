@@ -56,11 +56,9 @@ void Task1(void *p_arg){
 
     OS_CPU_SysTickInit(SystemCoreClock / (CPU_INT32U) OSCfg_TickRate_Hz);
 
-    OSSemCreate(&SafetyCheck_Sem4,
+    RTOS_BPS_SemCreate(&SafetyCheck_Sem4,
                 "Safety Check Semaphore",
-                0,
-                &err);
-    assertOSError(err);
+                0);
 
     RTOS_BPS_TaskCreate(&CriticalState_TCB,				// TCB
 				"TASK_CRITICAL_STATE_PRIO",	// Task Name (String)

@@ -13,6 +13,7 @@
 #include "BSP_Contactor.h"
 #include "BSP_UART.h"
 #include "Amps.h"
+#include "RTOS_BPS.h"
 #include <stdio.h>
 
 /******************************************************************************
@@ -47,17 +48,13 @@ void Task1(void *p_arg){
 
     OS_ERR err;
     
-    OSSemCreate(&Fault_Sem4,
+    RTOS_BPS_SemCreate(&Fault_Sem4,
                 "Fault/Tripped Semaphore",
-                0,
-                &err);
-    assertOSError(err);
+                0);
 
-    OSSemCreate(&SafetyCheck_Sem4,
+    RTOS_BPS_SemCreate(&SafetyCheck_Sem4,
                 "Safety Check Semaphore",
-                0,
-                &err);
-    assertOSError(err);
+                0);
 
     RTOS_BPS_MutexCreate(&WDog_Mutex, "Watchdog Mutex");
 

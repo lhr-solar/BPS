@@ -126,3 +126,16 @@ void RTOS_BPS_DelayTick(BPS_OS_TICK dly){
     OSTimeDly(dly, OS_OPT_TIME_DLY, &err);
     assertOSError(err);
 }
+
+/**
+ * @brief Creates a semaphore with the initially specified count
+ * 
+ * @param sem - pointer to a semaphore object to create and initialize
+ * @param name - name of the semaphore
+ * @param count - initial count for the semaphore
+ */
+void RTOS_BPS_SemCreate(BPS_OS_SEM* sem, char* name, uint32_t count) {
+    BPS_OS_ERR err;
+    OSSemCreate(sem, name, count, &err);
+    assertOSError(err);
+}
