@@ -40,6 +40,35 @@
  * @param   None
  * @return  None
  */
+
+/**
+ * @brief Initializes GPIO ports per Contactor requirements
+ * 
+ * @param gpioPort Specific port to initialize on
+ * @param gpioStruct Specific struct to initialize
+ * @param pinOutput pin number for output
+ * @param pinInput pin number for input
+ * @param mode pin mode
+ * @param speed speed
+ * @param otype 
+ * @param pupd 
+ */
+static void Setup(GPIO_TypeDef* port, GPIO_InitTypeDef* gpioStruct, uint32_t pinOutput, uint32_t pinInput, GPIOSpeed_TypeDef speed, 
+               GPIOOType_TypeDef otype, GPIOPuPd_TypeDef pupd)
+{
+    // first output pin, then input pin.
+    // other configs stay the same across init calls
+    gpioStruct->GPIO_Pin = pinOutput;
+    gpioStruct->GPIO_Mode = GPIO_Mode_OUT;
+    gpioStruct->GPIO_Speed = speed;
+    gpioStruct->GPIO_PuPd = pupd;
+    gpioStruct->GPIO_OType = otype;
+    GPIO_Init(port, gpioStruct);
+    gpioStruct->GPIO_Pin = pinInput;
+    gpioStruct->GPIO_Mode = GPIO_Mode_IN;
+    GPIO_Init(port, gpioStruct);
+}
+
 void BSP_Contactor_Init(void) {
     GPIO_InitTypeDef GPIO_C1Init;
 	GPIO_InitTypeDef GPIO_C2Init;
