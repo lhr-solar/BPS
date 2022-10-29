@@ -32,7 +32,7 @@ header file unless they are only used within the library. Ex:
         ELEMENT_ONE;
         ELEMENT_TWO;
         ELEMENT_THREE;
-        }ExampleEnum_e;
+        } ExampleEnum_e;
 
 Structs
 =======
@@ -377,16 +377,46 @@ Punctuation
 ============
 
 **Curly Braces:** Opening braces should be on the same line as the condition or function that contains them. Curly braces should always 
-be used in conditionals even if it is one line
+be used in conditionals even if it is one line.
+
 **Parentheses:** Should be used for clarifying the order of precedence.
+
 **Indentation:** Indentation should be used in all conditionals, iteratives, and functions. Indentation should be 4 spaces (NOT TABS).
+
 **Line Endings:** All End Of Line sequences should be LF(line feed). This prevents files from looking like they are changed when
 nothing was changed at all.
+
+**End of File:** All source files (.c and .h files) should have newlines at the end of the file.
+
+**Whitespace:** All whitespace should remain consistent in function blocks. Unacceptable:
+
+.. code-block:: c
+    :linenos:
+
+    void functionName(int var) {
+        int x=3;
+        for(i= 0; i < 5; i++) {
+            x +=1;
+        }
+    }
+
+Acceptable:
+
+.. code-block:: c
+    :linenos:
+
+    void functionName(int var){ //no space between curly brace and parentheses
+        int x = 3; //spaces between everything except semicolon
+        for(i = 0; i < 5; i++){ //spaces between comment line and last character of code
+            x += 1;
+        }
+    }
 
 ===============
 Common Practice
 ===============
 
 **Pointers:** Members to pointers should be accessed through ``p->member`` operator instead of ``(*p).member``.
+
 **Indentation:** Tabs should be 4 spaces. If a pull request is made and changes are made to files you did not edit, check to see
 if your editor is editing whitespace when opening files. If these issues are not fixed, your PR WILL NOT BE MERGED
