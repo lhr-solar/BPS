@@ -24,34 +24,6 @@ static const CONT_CHOICE ALL_CONTACTORS = 7;
 #define C3_PERIPH 	RCC_AHB1Periph_GPIOC
 
 /**
- * @brief Initializes GPIO ports per Contactor requirements
- * 
- * @param gpioPort Specific port to initialize on
- * @param gpioStruct Specific struct to initialize
- * @param pinOutput pin number for output
- * @param pinInput pin number for input
- * @param mode pin mode
- * @param speed 
- * @param otype 
- * @param pupd 
- */
-inline void Setup(GPIO_TypeDef* port, GPIO_InitTypeDef* gpioStruct, uint32_t pinOutput, uint32_t pinInput, GPIOSpeed_TypeDef speed, 
-               GPIOOType_TypeDef otype, GPIOPuPd_TypeDef pupd)
-{
-    // first output pin, then input pin.
-    // other configs stay the same across init calls
-    gpioStruct->GPIO_Pin = pinOutput;
-    gpioStruct->GPIO_Mode = GPIO_Mode_OUT;
-    gpioStruct->GPIO_Speed = speed;
-    gpioStruct->GPIO_PuPd = pupd;
-    gpioStruct->GPIO_OType = otype;
-    GPIO_Init(port, gpioStruct);
-    gpioStruct->GPIO_Pin = pinInput;
-    gpioStruct->GPIO_Mode = GPIO_Mode_IN;
-    GPIO_Init(port, gpioStruct);
-}
-
-/**
  * @brief   A Contactor is a high power switch similar to what a relay is. The Contactor
  *          essentially "turns on and off" the whole car.
  */
