@@ -1,6 +1,6 @@
 #include "Simulator.h"
 
-int main(void) {
-    Simulator_init();
+int main(int argc, char **argv) {
+    Simulator_Init(argv[1]);
     return 0;
 }

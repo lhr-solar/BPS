@@ -11,15 +11,16 @@
  * 
  *        Additionally, please see BSP/Simulator_V2/Data JSON files for examples of how
  *        to write sample JSON test files for the simulator.
+ * 
+ *        The JSON files are *significantly* more comprehensive tests. This test file just ensures
+ *        that the function calls work, and information gets logged to the simulator.
  */
 
-int main(void) {
-    Simulator_init();
+int main(int argc, char **argv) {
+    Simulator_Init(argv[1]);
     BSP_CAN_Init(NULL, NULL, false);
     BSP_CAN_Write(0, (uint8_t*)"ABCDEFGH", 8);
     BSP_CAN_Write(1, (uint8_t*)"LHRSOLAR", 8);
     BSP_CAN_Write(2, (uint8_t*)"DEADBEEF", 8);
-    uint8_t hex[] = {0xAA, 0xBB, 0xCC, 0xDD};
-    BSP_CAN_Write(3, hex, 4);
     return 0;
 }

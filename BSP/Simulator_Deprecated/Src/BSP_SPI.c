@@ -30,7 +30,7 @@ void SPI3_Init(bsp_os_t *spi3_os){
  * @param   port The SPI port to initialize.
  * @return  None
  */
-void BSP_SPI_Init(spi_port_t port, bsp_os_t *spi_os, bool baremetal) {
+void BSP_SPI_Init(spi_port_t port, bsp_os_t *spi_os) {
     // Check if simulator is running i.e. were the csv files created?
     if(access(read_file, F_OK) != 0) {
         // File doesn't exit if true
@@ -191,13 +191,3 @@ void BSP_SPI_SetStateCS(spi_port_t port, uint8_t state) {
     chipSelectState = state;
 }
 
-/**
- * @brief   Sets the LTC6811's SPI port clock to either the fast speed for
- *          communicating with the LTC6811 or the slow speed for clocking
- *          the I2C commnication with the mux
- * @param   speed  either SPI_SLOW or SPI_FAST
- * @return  None
- */
-void BSP_SPI_SetClock(spi_speed_t speed) {
-    // TODO
-}

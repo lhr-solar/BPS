@@ -83,4 +83,7 @@ typedef enum SafetyStatus_e {SAFE = 0, DANGER = 1, OVERVOLTAGE = 2, UNDERVOLTAGE
 // used to determine if we are charging
 #define AMPS_NOISE_LIMIT 250 // milliamps
 
+// number of independently controlled fans
+#define NUM_FANS 4
+
 #endif

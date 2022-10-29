@@ -1,30 +1,22 @@
 /* Copyright (c) 2022 UT Longhorn Racing Solar */
+/**
+ * BSP_PLL.c - Simulates PLL on BPS board.
+*/
 
 #include "BSP_PLL.h"
+#include "Simulator.h"
 #include <stdint.h>
 #include <stdlib.h>
-#include <sys/file.h>
-#include "simulator_conf.h"
 
-static char* file = GET_CSV_PATH(PLL_CSV_FILE);
-
+static uint32_t SystemCoreClock = 16000000;
 /**
  * @brief   Initialize the PLL so the system core frequency runs at your preferred frequency.
  * @param   None
  * @return  None
  */
 void BSP_PLL_Init(void) {
-    FILE* fp = fopen(file, "w");
-    if(!fp) {
-        perror(PLL_CSV_FILE);
-        exit(EXIT_FAILURE);
-    }
-    int fno = fileno(fp);
-    flock(fno, LOCK_EX);
-    
-    fprintf(fp, "%d", 80000000); 
-    flock(fno, LOCK_UN);
-	fclose(fp);
+    SystemCoreClock = 80000000;
+    Simulator_Log(LOG, "Initialized PLL\n");
 }
 
 /**
@@ -33,18 +25,5 @@ void BSP_PLL_Init(void) {
  * @return  System core clock frequency in Hz
  */
 uint32_t BSP_PLL_GetSystemClock(void) {
-    uint32_t currentFreq;
-    char str[20];
-    FILE* fp = fopen(file, "r");
-    if(!fp) {
-        perror(PLL_CSV_FILE);
-        exit(EXIT_FAILURE);
-    }
-    int fno = fileno(fp);
-    flock(fno, LOCK_EX);
-    fgets(str, 20, fp);
-    flock(fno, LOCK_UN);
-    fclose(fp);
-    currentFreq = atoi(str);
-    return currentFreq;   
+    return SystemCoreClock;
 }

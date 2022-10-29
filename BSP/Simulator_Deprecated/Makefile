@@ -23,7 +23,6 @@ SRC += $(subst $(TARGET_PATH)/Drivers/Src/LTC681x.c,,$(SRC2))
 ifneq ($(TEST), none)
 TEST_FILE := Test_$(TEST).c
 SRC += \
-$(wildcard $(TARGET_PATH)/Tasks/Src/*.c)	\
 $(filter-out $(TARGET_PATH)/Apps/Src/main.c, $(wildcard $(TARGET_PATH)/Apps/Src/*.c)) \
 $(wildcard $(TARGET_PATH)/Tests/$(TEST_FILE))		# Apps (not main)
 else
@@ -50,7 +49,6 @@ vpath %.c $(sort $(dir $(SRC)))		# In case files aren't found
 # Flags
 ######################################
 INC_DIR = \
--I$(TARGET_PATH)/Tasks/Inc	\
 -I$(TARGET_PATH)/Apps/Inc \
 -I$(TARGET_PATH)/Drivers/Inc \
 -I$(TARGET_PATH)/BSP/Inc \
@@ -68,11 +66,7 @@ FLAGS = -Wall -Werror -g -std=c11 $(INC_DIR) -DSIMULATION -D_GNU_SOURCE
 ######################################
 # Defines
 ######################################
-ifneq ($(INPUT), none)
-DEF = -D_XOPEN_SOURCE=700 -DSIMULATION -D$(OS) -DSIMULATOR_JSON_PATH=$(INPUT)
-else
-DEF = "Error: you should pass in an input file with INPUT="<path to file>"
-endif
+DEF = -D_XOPEN_SOURCE=700 -DSIMULATION -D$(OS)
 
 
 ######################################
