@@ -16,17 +16,14 @@ export TEST
 OS = RTOS
 export OS
 
-INPUT = none
-export INPUT
-
 stm32f413:
 	$(MAKE) -C BSP -C STM32F413 -j
 
 simulator:
 	$(MAKE) -C BSP -C Simulator -j
 
-simulator_V2:
-	$(MAKE) -C BSP -C Simulator_V2 -j
+simulator_legacy:
+	$(MAKE) -C BSP -C Simulator_Deprecated -j
 
 flash:
 	$(MAKE) -C BSP -C STM32F413 flash

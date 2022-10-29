@@ -14,16 +14,22 @@ CC = gcc
 ######################################
 SRC = $(wildcard Src/*.c)	# BSP code
 
-SRC += \
+SRC1 = \
 $(wildcard $(TARGET_PATH)/Drivers/Src/*.c)	# Driver code
+# don't compile LTC drivers
+SRC2 = $(subst $(TARGET_PATH)/Drivers/Src/LTC6811.c,,$(SRC1))
+SRC += $(subst $(TARGET_PATH)/Drivers/Src/LTC681x.c,,$(SRC2))
 
 ifneq ($(TEST), none)
 TEST_FILE := Test_$(TEST).c
 SRC += \
+$(wildcard $(TARGET_PATH)/Tasks/Src/*.c)	\
 $(filter-out $(TARGET_PATH)/Apps/Src/main.c, $(wildcard $(TARGET_PATH)/Apps/Src/*.c)) \
 $(wildcard $(TARGET_PATH)/Tests/$(TEST_FILE))		# Apps (not main)
 else
-SRC += $(wildcard $(TARGET_PATH)/Apps/Src/*.c)		# Apps (with  main)
+SRC += \
+$(wildcard $(TARGET_PATH)/Tasks/Src/*.c)	\
+$(wildcard $(TARGET_PATH)/Apps/Src/*.c)		# Apps (with  main)
 endif
 
 SRC += \
@@ -44,6 +50,7 @@ vpath %.c $(sort $(dir $(SRC)))		# In case files aren't found
 # Flags
 ######################################
 INC_DIR = \
+-I$(TARGET_PATH)/Tasks/Inc	\
 -I$(TARGET_PATH)/Apps/Inc \
 -I$(TARGET_PATH)/Drivers/Inc \
 -I$(TARGET_PATH)/BSP/Inc \

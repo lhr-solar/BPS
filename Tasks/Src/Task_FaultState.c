@@ -102,8 +102,8 @@ void EnterFaultState() {
 #endif
         BSP_WDTimer_Reset(); // WDOG Reset
 #ifdef SIMULATION
-        Simulator_log("Completed fault state\n");
-        Simulator_shutdown(0);
+        Simulator_Log(LOG_INFO, "Completed fault state\n");
+        Simulator_Shutdown(0);
 #endif
     }
 }

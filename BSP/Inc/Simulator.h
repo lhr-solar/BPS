@@ -1,5 +1,10 @@
-// TODO: uncomment this before pushing
-//#ifdef SIMULATION
+/* Copyright (c) 2022 UT Longhorn Racing Solar */
+
+/** 
+ * Simulator.h - Simulator Functionality
+*/
+
+#ifdef SIMULATION
 
 #ifndef SIMULTOR_H
 #define SIMULATOR_H
@@ -19,14 +24,16 @@ typedef struct simulator_state {
     struct simulator_state *next;
 } simulator_state;
 
+typedef enum {LOG, LOG_INFO, LOG_WARN, LOG_ERROR, LOG_MAXLEVEL} LoggingType_t;
+
 // intialize the simulator
-void Simulator_init(void);
+void Simulator_Init(char *jsonPath);
 
 // log something to the simualtor's log file
-void Simulator_log(char *str);
+void Simulator_Log(LoggingType_t lvl, char *str);
 
 // shut down the simulator
-void Simulator_shutdown(int status);
+void Simulator_Shutdown(int status);
 
 // get the adcHigh
 uint16_t Simulator_getAdcHigh(void);
@@ -48,4 +55,4 @@ uint32_t Simulator_getCharge(void);
 
 #endif
 
-//#endif
+#endif

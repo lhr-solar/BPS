@@ -4,8 +4,6 @@
 #include <stdint.h>
 #include <pthread.h>
 //Written by Sijin and Revised by Manthan Upadhyaya: 10/2020
-
-#if 0
 #define RX_SIZE     64
 
 static char rxBuffer3[RX_SIZE];
@@ -30,15 +28,12 @@ static pthread_mutex_t rx_mutex2 = PTHREAD_MUTEX_INITIALIZER;
 void *ScanThread3(void *arg);
 void *ScanThread2(void *arg);
 
-#endif
-
 /**
  * @brief   Initializes the UART peripheral
  */
 void BSP_UART_Init(__attribute__((unused)) callback_t rxCallback,   // I can't be bother to figure out how to use these  
                    __attribute__((unused)) callback_t txCallback,   // callbacks in simulation, so they're just going to
                    __attribute__((unused)) UART_Port usart) {       // be unused for now.
-#if 0
     int err = 0;
     pthread_attr_t attr;
     pthread_t id;
@@ -74,7 +69,6 @@ void BSP_UART_Init(__attribute__((unused)) callback_t rxCallback,   // I can't b
         perror("pthread_create");
         exit(EXIT_FAILURE);
     }
-#endif
 }
 
 /**
@@ -86,7 +80,6 @@ void BSP_UART_Init(__attribute__((unused)) callback_t rxCallback,   // I can't b
  * @return  number of bytes that was read
  */
 uint32_t BSP_UART_ReadLine(char *str, UART_Port usart) {
-#if 0
     uint8_t data = 0;
     uint32_t recvd = 0;
     if(lineReceived3 && (usart == UART_USB)) {
@@ -115,7 +108,6 @@ uint32_t BSP_UART_ReadLine(char *str, UART_Port usart) {
         pthread_mutex_unlock(&rx_mutex2);
         return recvd;
     }
-#endif
     return 0;
 }
 
@@ -130,7 +122,7 @@ uint32_t BSP_UART_Write(char *str, uint32_t len, UART_Port usart) {
     return printf("%.*s", len, str);
 }
 
-#if 0
+
 void *ScanThread3(void *arg) {
     do {
         int data = fgetc(stdin);
@@ -231,4 +223,3 @@ static bool RxFifo_IsEmpty(UART_Port usart) {
     // In event of an error, assume it is not empty
     return false;
 }
-#endif
