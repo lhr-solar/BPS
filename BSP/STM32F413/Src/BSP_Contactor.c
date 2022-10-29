@@ -111,7 +111,7 @@ void BSP_Contactor_On(CONT_CHOICE contactorChoice) {
 	// set output pins HIGH
 	if (contactorChoice & ARRAY_CONTACTOR)
 		GPIO_WriteBit(C1_PORT, GPIO_Pin_0, Bit_SET);
-	if (contactorChoice & LOAD_CONTACTOR)
+	if (contactorChoice & HVHIGH_CONTACTOR)
 		GPIO_WriteBit(C2_PORT, GPIO_Pin_4, Bit_SET);
 	if (contactorChoice & HVLOW_CONTACTOR)
 		GPIO_WriteBit(C3_PORT, GPIO_Pin_0, Bit_SET);
@@ -128,7 +128,7 @@ void BSP_Contactor_Off(CONT_CHOICE contactorChoice) {
 	if (contactorChoice & ARRAY_CONTACTOR) {
 		GPIO_WriteBit(C1_PORT, GPIO_Pin_0, Bit_RESET);
 	}
-	if (contactorChoice & LOAD_CONTACTOR) {
+	if (contactorChoice & HVHIGH_CONTACTOR) {
 		GPIO_WriteBit(C2_PORT, GPIO_Pin_4, Bit_RESET);
 	}
 	if (contactorChoice & HVLOW_CONTACTOR) {
@@ -145,7 +145,7 @@ bool BSP_Contactor_GetState(CONT_CHOICE contactorChoice) {
 	if (contactorChoice & ARRAY_CONTACTOR) {
 		return ((C1_PORT->IDR & GPIO_Pin_1) >> 1) ? 0 : 1;
 	}
-	else if (contactorChoice & LOAD_CONTACTOR) {
+	else if (contactorChoice & HVHIGH_CONTACTOR) {
 		return ((C2_PORT->IDR & GPIO_Pin_5) >> 5) ? 0 : 1;
 	}
 	else {
