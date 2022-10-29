@@ -47,7 +47,7 @@ static const char* LoggingLUT[LOG_MAXLEVEL] = {"", "INFO: ", "WARNING: ", "ERROR
  * @return  None
  */
 void Simulator_Log(LoggingType_t lvl, char *str) {
-    char prefix[32];
+    char prefix[128];
     strcpy(prefix, LoggingLUT[lvl]); //This is because strcat cannot concat const
     char* msg = strcat(prefix, str);
     write(simulatorLog, msg, strlen(msg));

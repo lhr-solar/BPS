@@ -17,7 +17,7 @@ static clock_t t;
  */
 void BSP_Timer_Init(void) {
     initialized = true;
-    Simulator_log("Initialized Timer\n");
+    Simulator_Log(LOG_INFO,"Initialized Timer\n");
 }
 
 /**
@@ -28,10 +28,10 @@ void BSP_Timer_Init(void) {
 void BSP_Timer_Start(void) {
     if (initialized) {
         t = clock();
-        Simulator_log("Timer started\n");
+        Simulator_Log(LOG_INFO,"Timer started\n");
     }
     else {
-        Simulator_log("Hard Fault: Initialize Timer before start\n");
+        Simulator_Log(LOG_INFO,"Hard Fault: Initialize Timer before start\n");
     }
 }
 
@@ -41,8 +41,11 @@ void BSP_Timer_Start(void) {
  * @return  Number of ticks
  */
 uint32_t BSP_Timer_GetTicksElapsed(void) {
-    return clock() - t;
-    
+    uint32_t TicksElasped = clock() - t;
+    char TimeMessage[100] = {0};
+    sprintf(TimeMessage, "Ticks Elasped: %d ticks\n", TicksElasped);
+    Simulator_Log(LOG_INFO, TimeMessage);
+    return TicksElasped;
 }
 
 /**
@@ -61,5 +64,9 @@ uint32_t BSP_Timer_GetRunFreq(void) {
  * @return  Microseconds 
  */
 uint32_t BSP_Timer_GetMicrosElapsed(void) {
-    return (uint32_t) (BSP_Timer_GetTicksElasped() * MICROS_IN_SEC) / CLOCKS_PER_SEC;
+    uint32_t MicrosElasped = ((uint64_t) BSP_Timer_GetTicksElapsed() * MICROS_IN_SEC) / CLOCKS_PER_SEC;
+    char MicrosMessage[100] = {0};
+    sprintf(MicrosMessage, "Microseconds elasped: %d us\n", MicrosElasped);
+    Simulator_Log(LOG_INFO, MicrosMessage);
+    return (uint32_t) MicrosElasped;
 }
