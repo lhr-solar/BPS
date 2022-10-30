@@ -4,44 +4,6 @@
 #include "stm32f4xx.h"
 
 /**
- * Used pins:
- * A:
- * 		PA2, PA3 - ADC and UART
- * 		PA8 - I2C SCL
- * 		PA4 thru PA7 - Lights
- * 		PA15 - SPI CS
- * B:
- * 		PB3 thru PB5 - SPI
- * 		PB8, PB9 - CAN
- * 		PB10 - UART
- * 		PB12 - Lights
- * 		PB14, PB15 - Fans
- * C:
- * 		PC5 - also UART
- * 		PC6, PC7 - Fans
- * 		PC9 - I2C SDA
- * 		PC0 thru PC4 - Lights
- * 		PC10 thru PC12 - more SPI
- * D:	
- * 		PD2 - SPI CS
- * 		
- * 
- * 		Available Pins for contactors:
- * 		PB0-1 used for C1
- * 		PC0-1 can use for C3
- * 		PA4-5 can use for C2
- */
-
-/**
- * @brief   Initializes the GPIO pins that interfaces with the Contactors.
- *          Two GPIO pins are initialized. One as an output and one as an input.
- *          The output pin controls the state and the input pin views what state the contactor is through the
- *          Aux pins.
- * @param   None
- * @return  None
- */
-
-/**
  * @brief Initializes GPIO ports per Contactor requirements
  * 
  * @param gpioPort Specific port to initialize on
@@ -69,6 +31,11 @@ static void Setup(GPIO_TypeDef* port, GPIO_InitTypeDef* gpioStruct, uint32_t pin
     GPIO_Init(port, gpioStruct);
 }
 
+/**
+ * @brief Initializes all Contactor pins used by the BPS
+ * @param none
+ * @return none
+ */
 void BSP_Contactor_Init(void) {
     GPIO_InitTypeDef GPIO_C1Init;
 	GPIO_InitTypeDef GPIO_C2Init;
@@ -102,50 +69,63 @@ void BSP_Contactor_Init(void) {
 }
 
 /**
- * @brief   Closes all Contactor switches i.e. turns on the whole electrical system.
+ * @brief   Closes the specified Contactor switch(es) i.e. turns on the whole electrical system.
  * @note    May be good in the future to make this return something if the contactor could not successfully close.
- * @param   None
+ * @param   Contactor to turn on
  * @return  None
  */
 void BSP_Contactor_On(CONT_CHOICE contactorChoice) {
 	// set output pins HIGH
-	if (contactorChoice & ARRAY_CONTACTOR)
+	if (contactorChoice == ARRAY_CONTACTOR) {
 		GPIO_WriteBit(C1_PORT, GPIO_Pin_0, Bit_SET);
-	if (contactorChoice & HVHIGH_CONTACTOR)
+	}
+	if (contactorChoice == HVHIGH_CONTACTOR) {
 		GPIO_WriteBit(C2_PORT, GPIO_Pin_4, Bit_SET);
-	if (contactorChoice & HVLOW_CONTACTOR)
+	}
+	if (contactorChoice == HVLOW_CONTACTOR) {
 		GPIO_WriteBit(C3_PORT, GPIO_Pin_0, Bit_SET);
+	}
+	if (contactorChoice == ALL_CONTACTORS) {
+		GPIO_WriteBit(C1_PORT, GPIO_Pin_0, Bit_SET);
+		GPIO_WriteBit(C2_PORT, GPIO_Pin_4, Bit_SET);
+		GPIO_WriteBit(C3_PORT, GPIO_Pin_0, Bit_SET);
+	}
 }
 
 /**
- * @brief   Opens the Contactor switch i.e. turns off the whole electrical system.
- * @note    May be good in the future to make this return something if the contactor could not successfully open.
- * @param   None
+ * @brief   Opens the specified Contactor switch(es) i.e. turns off the whole electrical system.
+ * @param   Contactor to turn off
  * @return  None
  */
 void BSP_Contactor_Off(CONT_CHOICE contactorChoice) {
     // set output pins LOW
-	if (contactorChoice & ARRAY_CONTACTOR) {
+	if (contactorChoice == ARRAY_CONTACTOR) {
 		GPIO_WriteBit(C1_PORT, GPIO_Pin_0, Bit_RESET);
 	}
-	if (contactorChoice & HVHIGH_CONTACTOR) {
+	if (contactorChoice == HVHIGH_CONTACTOR) {
 		GPIO_WriteBit(C2_PORT, GPIO_Pin_4, Bit_RESET);
 	}
-	if (contactorChoice & HVLOW_CONTACTOR) {
+	if (contactorChoice == HVLOW_CONTACTOR) {
+		GPIO_WriteBit(C3_PORT, GPIO_Pin_0, Bit_RESET);
+	}
+	if (contactorChoice == ALL_CONTACTORS) {
+		GPIO_WriteBit(C1_PORT, GPIO_Pin_0, Bit_RESET);
+		GPIO_WriteBit(C2_PORT, GPIO_Pin_4, Bit_RESET);
 		GPIO_WriteBit(C3_PORT, GPIO_Pin_0, Bit_RESET);
 	}
 }
 
 /**
  * @brief   Gets the state of the Contactor switch from one of its AUX pins.
- * @param   None
+ * @note	You cannot get the state of ALL_CONTACTORS. As such, if that param is passed, it will return the state of the array contactor.
+ * @param   Contactor to get state of
  * @return  0 if contactor is off/open, 1 if on/closed
  */
 bool BSP_Contactor_GetState(CONT_CHOICE contactorChoice) {
-	if (contactorChoice & ARRAY_CONTACTOR) {
+	if (contactorChoice == ARRAY_CONTACTOR || contactorChoice == ALL_CONTACTORS) {
 		return ((C1_PORT->IDR & GPIO_Pin_1) >> 1) ? 0 : 1;
 	}
-	else if (contactorChoice & HVHIGH_CONTACTOR) {
+	else if (contactorChoice == HVHIGH_CONTACTOR) {
 		return ((C2_PORT->IDR & GPIO_Pin_5) >> 5) ? 0 : 1;
 	}
 	else {
