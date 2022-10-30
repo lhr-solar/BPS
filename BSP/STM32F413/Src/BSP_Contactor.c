@@ -102,7 +102,7 @@ void BSP_Contactor_Init(void) {
 }
 
 /**
- * @brief   Closes all Contactor switch i.e. turns on the whole electrical system.
+ * @brief   Closes all Contactor switches i.e. turns on the whole electrical system.
  * @note    May be good in the future to make this return something if the contactor could not successfully close.
  * @param   None
  * @return  None
