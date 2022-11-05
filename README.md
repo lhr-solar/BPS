@@ -105,9 +105,15 @@ OpenOCD is another debugger program that is open source and compatible with the 
 ### Using the Simulator
 The simulator reads input from a JSON file to simulate dummy values and dumps output to a log file to simulate controlling the BPS's peripherals. The goal is to create repeatable tests that can be checked automatically by using the same test file, and by parsing the log file.
 
-the simulator can be compiled with `make simulator_v2`. The simulator requires an additional `INPUT=` command line argument to specific the path to the JSON file for the test case to run.
+The simulator can be compiled with `make simulator`. The simulator also has an optional command line argument `TEST=` to specify the name of the test file to run. 
+
+Note: when typing name it, don't type the `Test_` part or the `.c` part.
+
+Example: `make simulator TEST=SimulatorInit`.
 
 The simulator can be run with `./bps-simulator.out <path to JSON test>`.
+
+You can check the log file by doing `cat bps-sim-<logged time>.log`.
 
 ## Rules
 Make sure to have fun!
