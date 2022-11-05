@@ -15,9 +15,7 @@
  * @param otype 
  * @param pupd 
  */
-static void Setup(GPIO_TypeDef* port, GPIO_InitTypeDef* gpioStruct, uint32_t pinOutput, uint32_t pinInput, GPIOSpeed_TypeDef speed, 
-               GPIOOType_TypeDef otype, GPIOPuPd_TypeDef pupd)
-{
+static void Setup(GPIO_TypeDef* port, GPIO_InitTypeDef* gpioStruct, uint32_t pinOutput, uint32_t pinInput) {
     // first output pin, then input pin.
     // other configs stay the same across init calls
     gpioStruct->GPIO_Pin = pinOutput;
@@ -49,17 +47,17 @@ void BSP_Contactor_Init(void) {
 	// Initialize Port B for Contactor 1
 	// PB0 - output
 	// PB1 - input
-	Setup(GPIOB, &GPIO_C1Init, GPIO_Pin_0, GPIO_Pin_1);
+	Setup(C1_PORT, &GPIO_C1Init, GPIO_Pin_0, GPIO_Pin_1);
 
 	// Initialize Port A for Contactor 2
 	// PA4 - output
 	// PA5 - input
-	Setup(GPIOA, &GPIO_C2Init, GPIO_Pin_4, GPIO_Pin_5);
+	Setup(C2_PORT, &GPIO_C2Init, GPIO_Pin_4, GPIO_Pin_5);
 
 	// Initialize Port C for Contactor 3
 	// PC0 - output
 	// PC1 - input
-	Setup(GPIOC, &GPIO_C3Init, GPIO_Pin_0, GPIO_Pin_1);
+	Setup(C3_PORT, &GPIO_C3Init, GPIO_Pin_0, GPIO_Pin_1);
 }
 
 /**
