@@ -10,16 +10,6 @@
 typedef uint8_t CONT_CHOICE;
 typedef enum {ARRAY_CONTACTOR = 1, HVHIGH_CONTACTOR = 2, HVLOW_CONTACTOR = 4, ALL_CONTACTORS = 7} Contactors_t;
 
-// Contactor 1
-#define C1_PORT		GPIOB
-#define C1_PERIPH 	RCC_AHB1Periph_GPIOB
-// Contactor 2
-#define C2_PORT		GPIOA
-#define C2_PERIPH 	RCC_AHB1Periph_GPIOA
-// Contactor 3
-#define C3_PORT		GPIOC
-#define C3_PERIPH 	RCC_AHB1Periph_GPIOC
-
 /**
  * @brief   A Contactor is a high power switch similar to what a relay is. The Contactor
  *          essentially "turns on and off" the whole car.

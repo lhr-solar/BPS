@@ -22,9 +22,9 @@ static void Setup(GPIO_TypeDef* port, GPIO_InitTypeDef* gpioStruct, uint32_t pin
     // other configs stay the same across init calls
     gpioStruct->GPIO_Pin = pinOutput;
     gpioStruct->GPIO_Mode = GPIO_Mode_OUT;
-    gpioStruct->GPIO_Speed = speed;
-    gpioStruct->GPIO_PuPd = pupd;
-    gpioStruct->GPIO_OType = otype;
+    gpioStruct->GPIO_Speed = GPIO_Speed_50MHz;
+    gpioStruct->GPIO_PuPd = GPIO_PuPd_UP;
+    gpioStruct->GPIO_OType = GPIO_OType_PP;
     GPIO_Init(port, gpioStruct);
     gpioStruct->GPIO_Pin = pinInput;
     gpioStruct->GPIO_Mode = GPIO_Mode_IN;
@@ -42,30 +42,24 @@ void BSP_Contactor_Init(void) {
 	GPIO_InitTypeDef GPIO_C3Init;
 	
 	// Initialize clock
-	RCC_AHB1PeriphClockCmd(C1_PERIPH, ENABLE);
-	RCC_AHB1PeriphClockCmd(C2_PERIPH, ENABLE);
-	RCC_AHB1PeriphClockCmd(C3_PERIPH, ENABLE);
+	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE); //HV Contactor
+	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
+	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC, ENABLE);
 	
 	// Initialize Port B for Contactor 1
 	// PB0 - output
 	// PB1 - input
-	Setup(C1_PORT, &GPIO_C1Init, 
-			GPIO_Pin_0, GPIO_Pin_1, GPIO_Speed_50MHz,
-			GPIO_OType_PP, GPIO_PuPd_UP);
+	Setup(GPIOB, &GPIO_C1Init, GPIO_Pin_0, GPIO_Pin_1);
 
 	// Initialize Port A for Contactor 2
 	// PA4 - output
 	// PA5 - input
-	Setup(C2_PORT, &GPIO_C2Init, 
-			GPIO_Pin_4, GPIO_Pin_5, GPIO_Speed_50MHz,
-			GPIO_OType_PP, GPIO_PuPd_UP);
+	Setup(GPIOA, &GPIO_C2Init, GPIO_Pin_4, GPIO_Pin_5);
 
 	// Initialize Port C for Contactor 3
 	// PC0 - output
 	// PC1 - input
-	Setup(C3_PORT, &GPIO_C3Init, 
-			GPIO_Pin_0, GPIO_Pin_1, GPIO_Speed_50MHz,
-			GPIO_OType_PP, GPIO_PuPd_UP);
+	Setup(GPIOC, &GPIO_C3Init, GPIO_Pin_0, GPIO_Pin_1);
 }
 
 /**
