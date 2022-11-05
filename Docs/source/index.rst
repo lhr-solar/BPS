@@ -41,6 +41,13 @@ Welcome to the BeVolt BPS documentation!
 .. toctree::
    :hidden:
    :maxdepth: 2
+   :caption: Simulator
+
+   Simulator/Overview.rst
+
+.. toctree::
+   :hidden:
+   :maxdepth: 2
    :caption: How To
 
    How_To/Onboarding
