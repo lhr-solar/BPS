@@ -1,4 +1,4 @@
-/* Copyright (c) 2022 UT Longhorn Racing Solar */
+/* Copyright (c) 2018-2022 UT Longhorn Racing Solar */
 
 /** Voltage.c
  * Voltage wrapper that holds all voltage related information of BeVolt's

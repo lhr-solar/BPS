@@ -1,4 +1,4 @@
-/* Copyright (c) 2022 UT Longhorn Racing Solar */
+/* Copyright (c) 2018-2022 UT Longhorn Racing Solar */
 
 /** EEPROM.c
  * Interface for the EEPROM. Used for keeping track of state of charge and errors across resets.

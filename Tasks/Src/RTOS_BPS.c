@@ -1,5 +1,5 @@
-/* Copyright (c) 2022 UT Longhorn Racing Solar 
-RTOS_BPS library includes all the wrapper functions for a functioning RTOS - needed for cleaner code and portability
+/* Copyright (c) 2018-2022 UT Longhorn Racing Solar */
+/*RTOS_BPS library includes all the wrapper functions for a functioning RTOS - needed for cleaner code and portability
 */
 
 #include "RTOS_BPS.h"

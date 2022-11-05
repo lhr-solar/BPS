@@ -1,5 +1,5 @@
 ************
-Application
+Applications
 ************
 
 Amps
