@@ -22,7 +22,7 @@ void BSP_CAN_Init(callback_t rxEvent, callback_t txEnd, bool loopback);
  * @param   length : num of bytes of data to be transmitted. This must be <= 8 bytes or else the rest of the message is dropped.
  * @return  ERROR if module was unable to transmit the data onto the CAN bus. SUCCESS indicates data was transmitted.
  */
-ErrorStatus BSP_CAN_Write(uint32_t id, uint8_t data[8], uint8_t length);
+ErrorStatus BSP_CAN_Write(uint32_t id, uint8_t data[], uint8_t length);
 
 /**
  * @brief   Gets the data that was received from the CAN bus.
