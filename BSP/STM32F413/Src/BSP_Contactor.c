@@ -79,13 +79,13 @@ void BSP_Contactor_On(CONT_CHOICE contactorChoice) {
 	if (contactorChoice == ARRAY_CONTACTOR) {
 		GPIO_WriteBit(C1_PORT, GPIO_Pin_0, Bit_SET);
 	}
-	if (contactorChoice == HVHIGH_CONTACTOR) {
+	else if (contactorChoice == HVHIGH_CONTACTOR) {
 		GPIO_WriteBit(C2_PORT, GPIO_Pin_4, Bit_SET);
 	}
-	if (contactorChoice == HVLOW_CONTACTOR) {
+	else if (contactorChoice == HVLOW_CONTACTOR) {
 		GPIO_WriteBit(C3_PORT, GPIO_Pin_0, Bit_SET);
 	}
-	if (contactorChoice == ALL_CONTACTORS) {
+	else if (contactorChoice == ALL_CONTACTORS) {
 		GPIO_WriteBit(C1_PORT, GPIO_Pin_0, Bit_SET);
 		GPIO_WriteBit(C2_PORT, GPIO_Pin_4, Bit_SET);
 		GPIO_WriteBit(C3_PORT, GPIO_Pin_0, Bit_SET);
@@ -102,13 +102,13 @@ void BSP_Contactor_Off(CONT_CHOICE contactorChoice) {
 	if (contactorChoice == ARRAY_CONTACTOR) {
 		GPIO_WriteBit(C1_PORT, GPIO_Pin_0, Bit_RESET);
 	}
-	if (contactorChoice == HVHIGH_CONTACTOR) {
+	else if (contactorChoice == HVHIGH_CONTACTOR) {
 		GPIO_WriteBit(C2_PORT, GPIO_Pin_4, Bit_RESET);
 	}
-	if (contactorChoice == HVLOW_CONTACTOR) {
+	else if (contactorChoice == HVLOW_CONTACTOR) {
 		GPIO_WriteBit(C3_PORT, GPIO_Pin_0, Bit_RESET);
 	}
-	if (contactorChoice == ALL_CONTACTORS) {
+	else if (contactorChoice == ALL_CONTACTORS) {
 		GPIO_WriteBit(C1_PORT, GPIO_Pin_0, Bit_RESET);
 		GPIO_WriteBit(C2_PORT, GPIO_Pin_4, Bit_RESET);
 		GPIO_WriteBit(C3_PORT, GPIO_Pin_0, Bit_RESET);
@@ -128,7 +128,7 @@ bool BSP_Contactor_GetState(CONT_CHOICE contactorChoice) {
 	else if (contactorChoice == HVHIGH_CONTACTOR) {
 		return ((C2_PORT->IDR & GPIO_Pin_5) >> 5) ? 0 : 1;
 	}
-	else {
+	else if (contactorChoice == HVLOW_CONTACTOR) {
 		return ((C3_PORT->IDR & GPIO_Pin_1) >> 1) ? 0 : 1;
 	}
 }
