@@ -420,3 +420,30 @@ Common Practice
 
 **Indentation:** Tabs should be 4 spaces. If a pull request is made and changes are made to files you did not edit, check to see
 if your editor is editing whitespace when opening files. If these issues are not fixed, your PR WILL NOT BE MERGED
+
+**Return Path:** It is common practice for most functions to have one return path, making it easier to read the code and understand what 
+complicated functions do. For example:
+
+.. code-block:: c
+    :linenos:
+
+    //GOOD PRACTICE
+    bool return_value;
+    if (...) {
+       return_value = ...
+    }
+    else if (...) {
+        return_value = ...
+    }
+    return return_value
+    // BAD PRACTICE
+    bool return_value;
+    if (...) {
+       return return_value
+    }
+    else if (...) {
+        return_value
+    }
+
+While this is the preferred style, it should not be done at the expense of making the code too complex. Sometimes it is not possible to
+have just one return path.
