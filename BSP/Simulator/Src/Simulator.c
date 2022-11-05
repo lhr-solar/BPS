@@ -47,7 +47,7 @@ static const char* LoggingLUT[LOG_MAXLEVEL] = {"", "INFO: ", "WARNING: ", "ERROR
  * @return  None
  */
 void Simulator_Log(LoggingType_t lvl, char *str) {
-    char prefix[32];
+    char prefix[128];
     strcpy(prefix, LoggingLUT[lvl]); //This is because strcat cannot concat const
     char* msg = strcat(prefix, str);
     write(simulatorLog, msg, strlen(msg));
@@ -178,6 +178,11 @@ static void readInputFile(char *jsonPath) {
         if (!current) { // current in mA
             printf("Current simulator state does not have a specified current value. Using 30...\n");
             tail->current = 30;
+        } else {
+            tail->current = cJSON_GetNumberValue(current);
+            char CurrentBuffer[32] = {0};
+            sprintf(CurrentBuffer,"Logged current of %d mA\n", Simulator_getCurrent());
+            Simulator_Log(LOG_INFO,CurrentBuffer);
         }
         if (!charge) {
             printf("Current simulator state does not have a specified charge value. Using 25,000,000...\n");
