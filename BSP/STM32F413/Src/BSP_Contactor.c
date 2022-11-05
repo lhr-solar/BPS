@@ -122,19 +122,21 @@ void BSP_Contactor_Off(CONT_CHOICE contactorChoice) {
  * @return  0 if contactor is off/open, 1 if on/closed
  */
 bool BSP_Contactor_GetState(CONT_CHOICE contactorChoice) {
+	bool contactorReturnValue = false;
 	if (contactorChoice == ARRAY_CONTACTOR) {
-		return ((C1_PORT->IDR & GPIO_Pin_1) >> 1) ? 0 : 1;
+		contactorReturnValue = ((C1_PORT->IDR & GPIO_Pin_1) >> 1) ? 0 : 1;
 	}
 	else if (contactorChoice == HVHIGH_CONTACTOR) {
-		return ((C2_PORT->IDR & GPIO_Pin_5) >> 5) ? 0 : 1;
+		contactorReturnValue = ((C2_PORT->IDR & GPIO_Pin_5) >> 5) ? 0 : 1;
 	}
 	else if (contactorChoice == HVLOW_CONTACTOR) {
-		return ((C3_PORT->IDR & GPIO_Pin_1) >> 1) ? 0 : 1;
+		contactorReturnValue = ((C3_PORT->IDR & GPIO_Pin_1) >> 1) ? 0 : 1;
 	}
 	else if (contactorChoice == ALL_CONTACTORS) {
 		// return if ANY of the contactors are off.
-		return (((C1_PORT->IDR & GPIO_Pin_1) >> 1) ? 0 : 1)
+		contactorReturnValue = (((C1_PORT->IDR & GPIO_Pin_1) >> 1) ? 0 : 1)
 			&& (((C2_PORT->IDR & GPIO_Pin_5) >> 5) ? 0 : 1)
 			&& (((C3_PORT->IDR & GPIO_Pin_1) >> 1) ? 0 : 1);
 	}
+	return contactorReturnValue;
 }
