@@ -2,6 +2,8 @@
 
 #include "BSP_Timer.h"
 #include "stm32f4xx.h"
+#include "stm32f4xx_tim.h"
+#include "stm32f4xx_rcc.h"
 
 static const int PRESCALER = 1999;
 static const int MICROSEC_CON = 1000000;

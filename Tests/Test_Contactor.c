@@ -10,20 +10,20 @@
 int main() {
     BSP_Contactor_Init();   // Initialize the contactor
 
-    BSP_Contactor_On();     // Enable the contactor
+    BSP_Contactor_On(ALL_CONTACTORS);     // Enable the contactor
 
     while(1) {
         // Delay for some time before doing anything else
         for(volatile int i = 0; i < 1000000; i++);
     
         // Read the contactor state
-        bool contactorEnabled = BSP_Contactor_GetState();
+        bool contactorEnabled = BSP_Contactor_GetState(ARRAY_CONTACTOR);
         
         // Toggle the contactor state
         if(contactorEnabled) {
-            BSP_Contactor_Off();
+            BSP_Contactor_Off(ALL_CONTACTORS);
         } else {
-            BSP_Contactor_On();
+            BSP_Contactor_On(ALL_CONTACTORS);
         }
     }
 }

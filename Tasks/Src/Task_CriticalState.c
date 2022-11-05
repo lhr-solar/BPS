@@ -42,7 +42,7 @@ void Task_CriticalState(void *p_arg) {
 	assertOSError(err);
 
     // Turn Contactor On
-    BSP_Contactor_On();
+    BSP_Contactor_On(ALL_CONTACTORS);
 
     // launch check contactor task
     OSTaskCreate(&CheckContactor_TCB,                       // TCB
