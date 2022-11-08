@@ -66,7 +66,8 @@
 
 #define CLI_SHUTDOWN_HASH       0xE7D4586
 #define CLI_PARTYTIME_HASH      0x391FEB33
-#define CLI_PING_HASH           0x307C4E
+//#define CLI_PING_HASH           0x307C4E
+#define CLI_PING_HASH           16
 
 // Useful values
 #define NUM_TEMP_SENSORS_LAST_MINION    14
@@ -163,22 +164,22 @@ void CLI_CAN(int* hashTokens);
  */
 void CLI_Display(void);
 
-/** CLI_Watchdog
- * Shows whether watchdog was tripped
- * @param hashTokens is the array of hashed tokens
- */
-void CLI_Watchdog(int* hashTokens);
-
-/** CLI_EEPROM
- * Interacts with EEPROM by reading and writing to the EEPROM
- * @param hashTokens is the array of hashed tokens
- */
-void CLI_EEPROM(int* hashTokens);
-
-/** CLI_ADC
- * Prints the high precision and
- * low precision readings
- */
+///** CLI_Watchdog
+// * Shows whether watchdog was tripped
+// * @param hashTokens is the array of hashed tokens
+// */
+//void CLI_Watchdog(int* hashTokens);
+//
+///** CLI_EEPROM
+// * Interacts with EEPROM by reading and writing to the EEPROM
+// * @param hashTokens is the array of hashed tokens
+// */
+//void CLI_EEPROM(int* hashTokens);
+//
+///** CLI_ADC
+// * Prints the high precision and
+// * low precision readings
+// */
 void CLI_ADC(void);
 
 /** CLI_Critical
@@ -190,6 +191,8 @@ void CLI_Critical(void);
  * Displays all information about BPS modules: voltage, current, temperature, charge, contactor
  */
 void CLI_All(void);
+
+void CLI_Ping(void);
 
 /** CLI_Handler
  * Routes the command given to the proper measurement method to check the desired values
