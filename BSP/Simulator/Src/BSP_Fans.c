@@ -33,12 +33,12 @@ ErrorStatus BSP_Fans_Set(uint8_t fan, uint32_t dutyCycle){
     if (initialized) {
         speed[fan - 1] = dutyCycle;
         char str[50];
-        sprintf(str, "set fan %d to %d\n", fan, dutyCycle);
+        sprintf(str, "Set Fan #%d to %d\n", fan, dutyCycle);
         Simulator_Log(LOG, str);
         return SUCCESS;
     } else {
         Simulator_Log(LOG_ERROR, "Used fan before initialization\n");
-        exit(-1);   // TODO: maybe actually enter a fault state here
+        exit(-1); // Fault state for fans??
     }
 }
 

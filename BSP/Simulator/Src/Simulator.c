@@ -24,6 +24,9 @@
 // file descriptor of simulator log file
 int simulatorLog;
 
+// Counter for current state we are on
+uint8_t stateCount = 0;
+
 // linked list of simulator states
 static simulator_state *states = NULL;
 
@@ -109,7 +112,6 @@ static void readInputFile(char *jsonPath) {
 
     // parse the json structure into an array of states
     simulator_state *tail = states;
-    uint8_t stateCount = 0;
     // For every state in the JSON (highest level {...})
     for (cJSON *state = json->child; state != NULL; state = state->next) {
         if (states == NULL) {

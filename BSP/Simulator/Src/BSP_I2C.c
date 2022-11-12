@@ -32,7 +32,7 @@ void BSP_I2C_Init(void) {
 uint8_t  BSP_I2C_Write(uint8_t devAddr, uint16_t regAddr, uint8_t *txData, uint32_t txLen) {
     if (!initialized) {
         Simulator_Log(LOG_ERROR, "Used I2C without initialization!\n");
-        exit(-1);
+        exit(-1); // fault state for i2c?
     }
 
     char buffer[100];

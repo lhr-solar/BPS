@@ -4,8 +4,10 @@
 #define BSP_CONTACTOR_H
 
 #include "common.h"
+#ifndef SIMULATION
 #include "stm32f4xx_gpio.h"
 #include "stm32f4xx_rcc.h"
+#endif
 
 typedef uint8_t CONT_CHOICE;
 static const CONT_CHOICE ARRAY_CONTACTOR = 1;

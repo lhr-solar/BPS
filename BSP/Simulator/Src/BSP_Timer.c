@@ -41,10 +41,12 @@ void BSP_Timer_Start(void) {
  * @return  Number of ticks
  */
 uint32_t BSP_Timer_GetTicksElapsed(void) {
-    uint32_t TicksElasped = clock() - t;
+    uint32_t currentTime = clock();
+    uint32_t TicksElasped = currentTime - t;
     char TimeMessage[100] = {0};
     sprintf(TimeMessage, "Ticks Elasped: %d ticks\n", TicksElasped);
     Simulator_Log(LOG_INFO, TimeMessage);
+    t = currentTime; // reassign so we track time between calls, not since program start
     return TicksElasped;
 }
 

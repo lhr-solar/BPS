@@ -9,6 +9,12 @@
 
 #include "config.h"
 
+// Used for simulator logging and fault states
+// See Fault State files
+#include "Tasks.h"
+extern uint32_t Fault_BitMap;
+extern void EnterFaultState();
+
 // struct for managing what the simulator should read if it does I/O
 typedef struct simulator_state {
     uint32_t time;          // how long to stay in this state
