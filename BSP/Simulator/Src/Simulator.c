@@ -19,7 +19,6 @@
 #include <stdbool.h>
 #include "cJSON.h" // for json parser
 #include <stdlib.h> // for calloc/free
-
 #include "BSP_CAN.h" // CAN testing
 
 // file descriptor of simulator log file
@@ -47,7 +46,7 @@ static const char* LoggingLUT[LOG_MAXLEVEL] = {"", "INFO: ", "WARNING: ", "ERROR
  * @return  None
  */
 void Simulator_Log(LoggingType_t lvl, char *str) {
-    char prefix[32];
+    char prefix[128];
     strcpy(prefix, LoggingLUT[lvl]); //This is because strcat cannot concat const
     char* msg = strcat(prefix, str);
     write(simulatorLog, msg, strlen(msg));
@@ -227,7 +226,12 @@ void Simulator_Init(char *jsonPath) {
     // generate unique name for log file
     startTime = time(NULL);
     char filename[30];
-    sprintf(filename, "bps-sim-%ld.log", startTime);
+    // make the file name the test file
+    char* tempName = jsonPath + strlen(jsonPath);
+    while (*tempName != '/') tempName--;
+    tempName++; // remove the '/'
+    // makes the output nice
+    sprintf(filename, "bps-sim-%s.log", tempName);
 
     // create the log file
     simulatorLog = open(filename, O_CREAT | O_WRONLY, 0664);
