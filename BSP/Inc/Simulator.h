@@ -4,8 +4,6 @@
  * Simulator.h - Simulator Functionality
 */
 
-#ifdef SIMULATION
-
 #ifndef SIMULTOR_H
 #define SIMULATOR_H
 
@@ -52,7 +50,5 @@ int32_t Simulator_getCurrent(void);
 
 // get the charge (stored in the EEPROM)
 uint32_t Simulator_getCharge(void);
-
-#endif
 
 #endif
