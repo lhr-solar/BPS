@@ -51,6 +51,7 @@ void EnterFaultState() {
     // TODO: fix this so it works if there are multiple faults
     switch (Fault_BitMap){
         case Fault_UVOLT:
+            printf("faulted on uvolt\n");
             BSP_Light_On(UVOLT);
             break;
         case Fault_OVOLT:
