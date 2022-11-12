@@ -123,7 +123,6 @@ void EnterFaultState() {
             sprintf(err, "$$$ Entered fault in state [%d] - ELECTRICAL STOP\n", stateCount - 1);
             Simulator_Log(LOG_ERROR, err);
         #endif
-            BSP_Light_On(LIGHTS_MAX);
             BSP_Contactor_Off(ALL_CONTACTORS);
         #ifdef SIMULATION
             exit(-1);

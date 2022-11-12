@@ -23,6 +23,7 @@
 
 // file descriptor of simulator log file
 int simulatorLog;
+FILE* simFile;
 
 // Counter for current state we are on
 uint8_t stateCount = 0;
@@ -106,7 +107,7 @@ static void readInputFile(char *jsonPath) {
         printf("error reading file %s", jsonPath);
         exit(-1);
     }
-
+    simFile = fdopen(simulatorLog, "w");
     // parses the input file as a json
     cJSON *json = cJSON_ParseWithLength(inFile, length);
 
