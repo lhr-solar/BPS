@@ -28,3 +28,21 @@ Reason
     According to the ASC regulations(8.5.A), the fuse must be rated for less than 200% of the maximum
     expected current draw(which for this system is around 60A). The rating must also be for more than
     75% of the maximum current capacity of the wire(tbd).
+
+`Contactors <https://www.waytekwire.com/datasheet/77101.pdf>`__
+===============================================================
+Description
+    Turn car on and off. 
+Usage
+    Control power delivered to load (HV+), power delivered to battery (ARR+), GNDPWR(HV-) connections by
+    powering contactors. They are normally open and have a turn on current around 4A (when tested). They
+    have a sense pin that returns whether the contactors are on or off. If the kill switch is pressed, 
+    the Contactors power is removed and the sense line is pulled low. The sense line must be read to 
+    turn on the strobe light of the car.
+
+`Fans <https://noctua.at/en/nf-f12-industrialppc-2000-pwm/specification>`__
+===========================================================================
+Description
+    Cool down battery pack.
+Usage
+    Use PWM to change speed of fans and save power.
