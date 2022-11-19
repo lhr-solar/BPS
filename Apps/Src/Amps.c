@@ -74,12 +74,12 @@ void Amps_Init(void) {
  */
 void Amps_UpdateMeasurements(void) {
 
-	char CurrentBuffer[70] = {0};
 	OS_ERR err;
 	CPU_TS ticks;
 	OSMutexPend(&AmperesData_Mutex, 0, OS_OPT_PEND_BLOCKING, &ticks, &err);
 	assertOSError(err);
 	#ifdef SIMULATION
+	char CurrentBuffer[70] = {0};
 	sprintf(CurrentBuffer,"Logged current of %d mA\n", Simulator_getCurrent());
 	Simulator_Log(LOG_INFO,CurrentBuffer);
 	latestMeasureMilliAmps = Simulator_getCurrent();
