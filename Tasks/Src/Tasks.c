@@ -70,7 +70,7 @@ void EnterFaultState(void);
  * Used to assert if there has been an error in one of the OS functions
  * Kills the car if there is an OS error
  **/
-void assertOSError(BPS_OS_ERR err){
+void assertOSError(OS_ERR err){
     if(err != OS_ERR_NONE) {
         Fault_BitMap |= Fault_OS;
         Fault_Flag = 1;
