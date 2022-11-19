@@ -180,9 +180,9 @@ static void readInputFile(char *jsonPath) {
             tail->current = 30;
         } else {
             tail->current = cJSON_GetNumberValue(current);
-            char CurrentBuffer[32] = {0};
-            sprintf(CurrentBuffer,"Logged current of %d mA\n", Simulator_getCurrent());
-            Simulator_Log(LOG_INFO,CurrentBuffer);
+            // char CurrentBuffer[32] = {0};
+            // sprintf(CurrentBuffer,"Logged current of %d  mA\n", (int) tail->current);
+            // Simulator_Log(LOG_INFO,CurrentBuffer);
         }
         if (!charge) {
             printf("Current simulator state does not have a specified charge value. Using 25,000,000...\n");
@@ -268,7 +268,7 @@ void Simulator_Init(char *jsonPath) {
 static void Simulator_Transition(void) {
     // advance to the current state
     time_t currentTime = time(NULL);
-    while (startTime + states->time < currentTime) {
+    while (startTime + states->time < currentTime) { 
         simulator_state *prev = states;
         states = states->next;
         startTime += prev->time;
