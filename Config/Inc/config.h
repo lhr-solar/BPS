@@ -74,7 +74,7 @@ typedef enum SafetyStatus_e {SAFE = 0, DANGER = 1, OVERVOLTAGE = 2, UNDERVOLTAGE
 #endif
 
 #ifndef PID_MAX_TEMPERATURE
-#define PID_MAX_TEMPERATURE             55000       // Max temperature where PID is overridden (milliCelsius)
+#define PID_MAX_TEMPERATURE             45000       // Max temperature where PID is overridden (milliCelsius)
 #endif
 
 #ifndef MAX_CURRENT_LIMIT
