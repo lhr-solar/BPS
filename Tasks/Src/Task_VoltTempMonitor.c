@@ -8,7 +8,6 @@
 #include "CANbus.h"
 #include "Amps.h"
 #include "CAN_Queue.h"
-#include "PID.h"
 
 
 //declared in Tasks.c

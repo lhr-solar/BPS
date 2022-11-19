@@ -1,6 +1,6 @@
 /* Copyright (c) 2022 UT Longhorn Racing Solar */
 
-#include "PID.h"
+#include "Temperature.h"
 #include "Tasks.h"
 
 //TODO: tune PID with actual pack and fans, and then change values below to appropiate value
@@ -38,6 +38,3 @@ int32_t PID_Output(int32_t InputTemp, int32_t DesiredTemp) {
     }
     return (PROPORTION*(Error) + INTEGRAL*(ErrorSum) + DERIVATIVE*(Rate))/DIVISOR;
 }
-
-
-
