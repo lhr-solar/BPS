@@ -20,6 +20,10 @@
  * @brief Test for getting current
  * Call Amps_UpdateMeasurements() anytime to get current reading based on JSON file
 */
+OS_TMR tmr;
+OS_SEM tmr_Sem;
+static int tmr_count = 50;
+
 OS_TCB Task1_TCB;
 CPU_STK Task1_Stk[256];
 
@@ -138,10 +142,28 @@ void Task1(void *p_arg){
 	//delete task
 	OSTaskDel(NULL, &p_err); // Delete task
 }
-
+void trigger(void *p_tmr, void *p_arg) {
+    //tmr_count--;
+    OS_ERR err;
+    if (tmr_count <= 1) {
+        OSTmrDel(&tmr,&err);
+    }
+    Amps_UpdateMeasurements();
+}
 //Task to prevent watchdog from tripping
 void Task2(void *p_arg){
     OS_ERR err;
+
+    OSTmrCreate(&tmr,
+                "Current Timer",
+                10,
+                10000,
+                OS_OPT_TMR_ONE_SHOT,
+                trigger,
+                NULL,
+                &err);
+    //OSTmrStart(&tmr,&err);
+    
 
     OSSemPost(&SafetyCheck_Sem4,      //Set semaphore once since Amperes Task doesn't run
                 OS_OPT_POST_1,
@@ -160,14 +182,17 @@ void Task2(void *p_arg){
     while(1){
         OSMutexPend(&WDog_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
         assertOSError(err);
+        if (tmr_count == 0) {
+            Amps_UpdateMeasurements();
+            tmr_count = 10000;
+        }
+        else tmr_count--;
         WDog_BitMap |= WD_AMPERES;
         WDog_BitMap |= WD_BALANCING;
         OSMutexPost(&WDog_Mutex, OS_OPT_POST_NONE, &err);
         assertOSError(err);
         //delay of 100ms
-        //OSTimeDly(1, OS_OPT_TIME_DLY,&err);
-        assertOSError(err);
-        Amps_UpdateMeasurements();
+        //Amps_UpdateMeasurements();
         //BSP_Light_Toggle(RUN);
     }
 }
