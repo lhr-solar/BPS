@@ -1,7 +1,7 @@
 /* Copyright (c) 2018-2022 UT Longhorn Racing Solar */
 #include "common.h"
 #include "config.h"
-#include "os.h"
+#include "RTOS_BPS.h"
 #include "Tasks.h"
 #include "Temperature.h"
 
@@ -20,18 +20,13 @@ OS_SEM tmr_Sem4;
 cell_asic minions[NUM_MINIONS];
 
 void trigger(OS_TMR *p_tmr, void *p_arg) {
-    OS_ERR err;
-    OSSemPost(&tmr_Sem4,
-            OS_OPT_POST_1,
-            &err);
-    // assert
+    RTOS_BPS_SemPost(&tmr_Sem4, OS_OPT_POST_1); 
 }
 
 void Task_TestTempMutex1(void *p_args) {
     (void)p_args;
 
     OS_ERR err;
-    CPU_TS ts;
 
     OSTmrCreate(&tmr,
                 "Temperature Timer",
@@ -41,12 +36,9 @@ void Task_TestTempMutex1(void *p_args) {
                 trigger,
                 NULL,
                 &err);
-    // assert
+    assertOSError(err);
 
-    RTOS_BPS_SemCreate(&tmr_Sem4,
-                "Temperature Timer Semaphore",
-                1);
-    // assert
+    RTOS_BPS_SemCreate(&tmr_Sem4, "Temperature Timer Semaphore", 1);
 
     Temperature_Init(minions);
 
@@ -58,27 +50,21 @@ void Task_TestTempMutex1(void *p_args) {
         //         &err);
         // assert
 
-        OSSemPend(&tmr_Sem4,
-                10,
-                OS_OPT_PEND_BLOCKING,
-                &ts,
-                &err);
+        RTOS_BPS_SemPend(&tmr_Sem4, OS_OPT_PEND_BLOCKING);
         // assert
 
-        SafetyStatus temperature_status = Temperature_CheckStatus(1);
+        Temperature_CheckStatus(1);
     }
 }
 
 void Task_TestTempMutex2(void *p_args) {
     (void)p_args;
 
-    OS_ERR err;
-
     while(1) {
         printf("2\r\n");
-        SafetyStatus temperature_status = Temperature_CheckStatus(1);
+        Temperature_CheckStatus(1);
         for(int i = 0; i < 16; i++) {
-            printf("%d\r\n", Temperature_GetModuleTemperature(i));
+            printf("%ld\r\n", Temperature_GetModuleTemperature(i));
         }
         // for(int i = 0; i < 1000000; i++);
     }
@@ -87,14 +73,9 @@ void Task_TestTempMutex2(void *p_args) {
 void Task_Dummy(void *p_args) {
     (void)p_args;
 
-    OS_ERR err;
-
     while(1) {
         printf("3\r\n");
-        OSSemPost(&tmr_Sem4,
-                OS_OPT_PEND_BLOCKING,
-                &err);
-        // assert
+        RTOS_BPS_SemPost(&tmr_Sem4, OS_OPT_PEND_BLOCKING);
         for(int i = 0; i < 1000000; i++);
     }
 }
@@ -112,8 +93,7 @@ int main() {
 				(void *)0,				// Task function args
 				2,			            // Priority
 				Temp1_Stk,	// Watermark limit for debugging
-				DEFAULT_STACK_SIZE);					// return err code
-	// assert
+				DEFAULT_STACK_SIZE); 
 
     RTOS_BPS_TaskCreate(&Temp2_TCB,				// TCB
 				"Temperature Buffer Mutex2",	// Task Name (String)
@@ -121,8 +101,7 @@ int main() {
 				(void *)0,				// Task function args
 				3,			            // Priority
 				Temp2_Stk,	// Watermark limit for debugging
-				DEFAULT_STACK_SIZE);					// return err code
-	// assert
+				DEFAULT_STACK_SIZE); 
 
     RTOS_BPS_TaskCreate(&Dummy_TCB,				// TCB
 				"Dummy",	// Task Name (String)
@@ -130,8 +109,7 @@ int main() {
 				(void *)0,				// Task function args
 				4,			            // Priority
 				Dummy_Stk,	// Watermark limit for debugging
-				DEFAULT_STACK_SIZE);					// return err code
-	// assert
+				DEFAULT_STACK_SIZE); 
 
 	OSStart(&err);
 

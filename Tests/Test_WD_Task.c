@@ -3,6 +3,7 @@
 #include "common.h"
 #include "config.h"
 #include "os.h"
+#include "RTOS_BPS.h"
 #include "Tasks.h"
 #include "stm32f4xx.h"
 #include "BSP_Lights.h"
@@ -27,7 +28,7 @@ void Task2(void *p_arg){
         // Comment out the following lines to test watchdog timeout
         RTOS_BPS_MutexPend(&WDog_Mutex, OS_OPT_PEND_BLOCKING);
         WDog_BitMap = 7;
-        OSMutexPost(&WDog_Mutex, OS_OPT_POST_NONE, &err);
+        RTOS_BPS_MutexPost(&WDog_Mutex, OS_OPT_POST_NONE, &err);
     }
 
     exit(0);

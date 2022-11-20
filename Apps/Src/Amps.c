@@ -6,7 +6,6 @@
 
 #include "Amps.h"
 #include "LTC2315.h"
-#include "os.h"
 #include "Tasks.h"
 #include "BSP_SPI.h"
 #include "CANbus.h"
@@ -20,22 +19,11 @@ static bsp_os_t spi_os;
 
 #ifdef RTOS
 void Amperes_Pend(){
-	CPU_TS ts;
-    OS_ERR err;
-    OSSemPend(&AmperesIO_Sem,
-                        0,
-                        OS_OPT_PEND_BLOCKING,
-                        &ts,
-                        &err);
-    assertOSError(err);
+    RTOS_BPS_SemPend(&AmperesIO_Sem, OS_OPT_PEND_BLOCKING);
 }
 
 void Amperes_Post(){
-	OS_ERR err;
-    OSSemPost(&AmperesIO_Sem,
-                        OS_OPT_POST_1,
-                        &err);
-    assertOSError(err);
+    RTOS_BPS_SemPost(&AmperesIO_Sem, OS_OPT_POST_1);
 }
 #endif
 
@@ -55,9 +43,7 @@ static int32_t latestMeasureMilliAmps;
  * Initializes hardware to begin current monitoring.
  */
 void Amps_Init(void) {
-	RTOS_BPS_SemCreate(&AmperesIO_Sem,
-				"AmperesIO Semaphore",
-                0);
+	RTOS_BPS_SemCreate(&AmperesIO_Sem, "AmperesIO Semaphore", 0);
 	spi_os.pend = Amperes_Pend;
 	spi_os.post = Amperes_Post;
 	LTC2315_Init(spi_os);
@@ -68,11 +54,9 @@ void Amps_Init(void) {
  * Stores and updates the new measurements received
  */
 void Amps_UpdateMeasurements(void) {
-	OS_ERR err;
 	RTOS_BPS_MutexPend(&AmperesData_Mutex, OS_OPT_PEND_BLOCKING);
 	latestMeasureMilliAmps = LTC2315_GetCurrent();
-	OSMutexPost(&AmperesData_Mutex, OS_OPT_POST_NONE, &err);
-	assertOSError(err);
+	RTOS_BPS_MutexPost(&AmperesData_Mutex, OS_OPT_POST_NONE);
 }
 
 /** Amps_CheckStatus
@@ -81,7 +65,6 @@ void Amps_UpdateMeasurements(void) {
  * @return SAFE or DANGER
  */
 SafetyStatus Amps_CheckStatus(int32_t maxTemperature) {
-	OS_ERR err;
 	SafetyStatus status;
 
 	// determine if we should allow charging or not
@@ -94,8 +77,7 @@ SafetyStatus Amps_CheckStatus(int32_t maxTemperature) {
 	} else{
 		status = DANGER;
 	}
-	OSMutexPost(&AmperesData_Mutex, OS_OPT_POST_NONE, &err);
-	assertOSError(err);
+	RTOS_BPS_MutexPost(&AmperesData_Mutex, OS_OPT_POST_NONE);
 	return status;
 }
 

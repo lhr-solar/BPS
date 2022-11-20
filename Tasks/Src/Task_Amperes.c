@@ -3,7 +3,7 @@
 #include <string.h>
 #include "Amps.h"
 #include "LTC2315.h"
-#include "os.h"
+#include "RTOS_BPS.h"
 #include "Tasks.h"
 #include "CAN_Queue.h"
 #include "BSP_SPI.h"
@@ -14,8 +14,6 @@
 void Task_AmperesMonitor(void *p_arg) {
     (void)p_arg;
 
-    OS_ERR err;
-
 	bool amperesHasBeenChecked = false;
 
 	CANData_t CanData;
@@ -23,7 +21,6 @@ void Task_AmperesMonitor(void *p_arg) {
     CANMSG_t CanMsg;
 
 	Amps_Init();
-
     Amps_Calibrate();
 
     while(1) {
@@ -34,18 +31,11 @@ void Task_AmperesMonitor(void *p_arg) {
 		SafetyStatus amperesStatus = Amps_CheckStatus(Temperature_GetMaxTemperature());
 		if(amperesStatus != SAFE) {
 		    Fault_BitMap = Fault_OCURR;
-            OSSemPost(&Fault_Sem4,
-                        OS_OPT_POST_1,
-                        &err);
-			assertOSError(err);
+            RTOS_BPS_SemPost(&Fault_Sem4, OS_OPT_POST_1);
 			
         } else if((amperesStatus == SAFE) && (!amperesHasBeenChecked)) {
             // Signal to turn on contactor but only signal once
-            OSSemPost(&SafetyCheck_Sem4,
-                        OS_OPT_POST_1,
-                        &err);
-			assertOSError(err);
-
+            RTOS_BPS_SemPost(&SafetyCheck_Sem4, OS_OPT_POST_1);
             amperesHasBeenChecked = true;
         }
 
@@ -72,11 +62,9 @@ void Task_AmperesMonitor(void *p_arg) {
 
         WDog_BitMap |= WD_AMPERES;
 
-        OSMutexPost(&WDog_Mutex, OS_OPT_POST_NONE, &err);
-        assertOSError(err);
+        RTOS_BPS_MutexPost(&WDog_Mutex, OS_OPT_POST_NONE);
         
         //delay of 10ms
         RTOS_BPS_DelayMs(10);
-        assertOSError(err);
     }
 }

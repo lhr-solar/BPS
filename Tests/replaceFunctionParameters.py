@@ -22,7 +22,7 @@ for i in range(len(filename)-1,0,-1):
 path = filename[0:lastslash+1]
 print(path)
 
-
+'''
 #if the newFunction name is not given, then set it to the old function name
 if(newFunctionName == ""):
     newFunctionName = oldFunctionName
@@ -67,13 +67,12 @@ for files in os.listdir(path):
     with open(files, 'w') as f:
         f.write(outputfile)
         f.close()
-
-
 '''
+
+
 #run through the compiling 
 for files in os.listdir(path):
     filename = str(files)[5:-2]
     command = "make stm32f413 TEST="+filename
     command = command.split(" ")
     subprocess.run(command)
-'''

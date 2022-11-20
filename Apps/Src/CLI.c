@@ -279,7 +279,7 @@
 // void CLI_LTC6811(void) {
 // 	OS_ERR err;
 //     CPU_TS ts;
-// 	OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, &ts, &err);
+// 	RTOS_Mutex_Pend(&MinionsASIC_Mutex, OS_OPT_PEND_BLOCKING);
 // 	assertOSError(err);
 // 	for(uint8_t current_ic = 0; current_ic < NUM_MINIONS; current_ic++) {
 // 		printf("Minion board %d: ", current_ic);
@@ -330,8 +330,7 @@
 // 		printf("\n\rPEC: %d\n\r", Minions[current_ic].sctrlb.rx_pec_match);
 // 	}
 // 	//release mutex
-//   	OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
-//   	assertOSError(err);
+//   	RTOS_BPS_MutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE);
 // }
 
 // /** CLI_Contactor

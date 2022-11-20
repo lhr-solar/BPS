@@ -11,9 +11,8 @@
 
 void Task_CriticalState(void *p_arg) {
     (void)p_arg;
-
     OS_ERR err;
-    CPU_TS ts;
+    
     CANMSG_t CANMSG;
     CANPayload_t CanPayload; 
     CanPayload.idx    = 0;
@@ -22,7 +21,7 @@ void Task_CriticalState(void *p_arg) {
     // BLOCKING =====================
     // Wait until voltage, open wire, temperature, and current(Amperes) are all checked and safe
     for (int i = 0; i < NUM_FAULT_POINTS; i++){
-        OSSemPend(&SafetyCheck_Sem4, 0, OS_OPT_PEND_BLOCKING, &ts, &err);
+        RTOS_BPS_SemPend(&SafetyCheck_Sem4,OS_OPT_PEND_BLOCKING);
     }
 
     // launch watchdog task
@@ -56,5 +55,4 @@ void Task_CriticalState(void *p_arg) {
     CANMSG.id = CONTACTOR_STATE;
     CAN_Queue_Post(CANMSG);
     OSTaskDel(NULL, &err); // Delete task
-    
 }

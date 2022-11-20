@@ -96,7 +96,6 @@ void Task1(void *p_arg){
         
     // Initialize CAN queue
     CAN_Queue_Init();
-    assertOSError(err);
 
 	//delete task
 	OSTaskDel(NULL, &err); // Delete task
@@ -104,33 +103,20 @@ void Task1(void *p_arg){
 
 //Task to prevent watchdog from tripping
 void Task2(void *p_arg){
-    OS_ERR err;
-
     int count = 0;
 
     // get contactor to close without temperature, voltage, or open wire readings
-    OSSemPost(&SafetyCheck_Sem4,      
-                OS_OPT_POST_1,
-                &err);
-	assertOSError(err);
-    OSSemPost(&SafetyCheck_Sem4,      
-                OS_OPT_POST_1,
-                &err);
-	assertOSError(err);
-    OSSemPost(&SafetyCheck_Sem4,
-                OS_OPT_POST_1,
-                &err);
-    assertOSError(err);
+    RTOS_BPS_SemPost(&SafetyCheck_Sem4, OS_OPT_POST_1);
+    RTOS_BPS_SemPost(&SafetyCheck_Sem4, OS_OPT_POST_1);
+    RTOS_BPS_SemPost(&SafetyCheck_Sem4, OS_OPT_POST_1);
 
     while(1){
         RTOS_BPS_MutexPend(&WDog_Mutex, OS_OPT_PEND_BLOCKING);
         WDog_BitMap |= WD_VOLT_TEMP;
         WDog_BitMap |= WD_BALANCING;
-        OSMutexPost(&WDog_Mutex, OS_OPT_POST_NONE, &err);
-        assertOSError(err);
+        RTOS_BPS_MutexPost(&WDog_Mutex, OS_OPT_POST_NONE);
         //delay of 100ms
         RTOS_BPS_DelayTick(10);
-        assertOSError(err);
 
         if (count == 0) {
             printf("Amps: %ld\n\r", Amps_GetReading());
@@ -167,7 +153,6 @@ int main(void) {
                 1,
                 Task1_Stk,
                 256);
-    assertOSError(err);
 
     //Give same priority as volt temp task thread
     RTOS_BPS_TaskCreate(&Task2_TCB,
@@ -177,7 +162,6 @@ int main(void) {
                 4,
                 Task2_Stk,
                 256);
-    assertOSError(err);
 
     OSStart(&err);
 }

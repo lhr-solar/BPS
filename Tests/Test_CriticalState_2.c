@@ -25,21 +25,10 @@ CPU_STK Task2_Stk[256];
 
 
 void Task2(void *p_arg){    //This task is meant to cause contactor to remain open
-    OS_ERR err;
-
     RTOS_BPS_DelayTick(250);
 
-
-    OSSemPost(&SafetyCheck_Sem4,
-                OS_OPT_POST_1,
-                &err);
-    assertOSError(err);
-    
-    OSSemPost(&SafetyCheck_Sem4,
-                OS_OPT_POST_1,
-                &err);
-    assertOSError(err);
-
+    RTOS_BPS_SemPost(&SafetyCheck_Sem4, OS_OPT_POST_1);
+    RTOS_BPS_SemPost(&SafetyCheck_Sem4, OS_OPT_POST_1);
 
     BSP_Lights_Init();
    
@@ -56,9 +45,7 @@ void Task1(void *p_arg){
 
     OS_CPU_SysTickInit(SystemCoreClock / (CPU_INT32U) OSCfg_TickRate_Hz);
 
-    RTOS_BPS_SemCreate(&SafetyCheck_Sem4,
-                "Safety Check Semaphore",
-                0);
+    RTOS_BPS_SemCreate(&SafetyCheck_Sem4, "Safety Check Semaphore", 0);
 
     RTOS_BPS_TaskCreate(&CriticalState_TCB,				// TCB
 				"TASK_CRITICAL_STATE_PRIO",	// Task Name (String)
@@ -77,6 +64,7 @@ void Task1(void *p_arg){
                 256);
 
     OSTaskDel(NULL, &err);
+    assertOSError(err);
 }
 
 int main(void) {
@@ -88,7 +76,7 @@ int main(void) {
     __disable_irq();
 
     OSInit(&err);
-    while(err != OS_ERR_NONE);
+    assertOSError(err);
 
     RTOS_BPS_TaskCreate(&Task1_TCB,
                 "Task 1",
@@ -97,9 +85,10 @@ int main(void) {
                 1,
                 Task1_Stk,
                 256);
-    while(err != OS_ERR_NONE);
+    assertOSError(err);
 
     __enable_irq();
 
     OSStart(&err);
+    assertOSError(err);
 }

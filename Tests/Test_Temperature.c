@@ -48,8 +48,6 @@ CPU_STK Task1_Stk[DEFAULT_STACK_SIZE];
 cell_asic minions[NUM_MINIONS];
 
 void test(void) {
-    OS_ERR err;
-
     BSP_UART_Init(NULL, NULL, UART_USB);    // Initialize printf
 
     Temperature_Init(minions);
@@ -108,7 +106,6 @@ int main(void) {
                 1,
                 Task1_Stk,
                 256);
-    assertOSError(err);
 
     OSStart(&err);
 }

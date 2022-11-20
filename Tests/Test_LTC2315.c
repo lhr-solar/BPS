@@ -4,6 +4,7 @@
 #include "common.h"
 #include "config.h"
 #include "os.h"
+#include "RTOS_BPS.h"
 #include "Tasks.h"
 #include "stm32f4xx.h"
 #include "BSP_Lights.h"
@@ -39,7 +40,6 @@ OS_TCB Task1_TCB;
 CPU_STK Task1_Stk[256];
 
 void Task1(void *p_arg){
-    OS_ERR err;
     OS_CPU_SysTickInit(SystemCoreClock / (CPU_INT32U) OSCfg_TickRate_Hz);
     
     BSP_Lights_Init();
@@ -71,7 +71,7 @@ int main(void){
     __disable_irq();
 
     OSInit(&err);
-    while(err != OS_ERR_NONE);
+    assertOSError(err);
 
     RTOS_BPS_TaskCreate(&Task1_TCB,
                 "Task 1",
@@ -80,7 +80,6 @@ int main(void){
                 1,
                 Task1_Stk,
                 256);
-    while(err != OS_ERR_NONE);
 
     __enable_irq();
 

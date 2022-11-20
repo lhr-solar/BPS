@@ -6,7 +6,7 @@
 #include "LTC681x.h"
 #include "config.h"
 #include "BSP_SPI.h"
-#include "os.h"
+#include "RTOS_BPS.h"
 
 OS_SEM SafetyCheck_Sem4;
 
@@ -19,15 +19,19 @@ CPU_STK LTC6811_Deadlocks2_Stk[512];
 int counter1 = 0;
 int counter2 = 0;
 
+
 void LTC6811_Deadlocks(void *p_arg){
     (void)p_arg;
 
-    OS_ERR err;
-    CPU_TS ts;
-
     cell_asic boards[NUM_MINIONS];
     printf("initializing...\n");
-    BSP_SPI_Init();
+    bsp_os_t spi_os;
+    OS_SEM semaphore;
+    RTOS_BPS_SemCreate(&semaphore, "SPI Semaphore", 0);
+    spi_os.pend = pend;
+    spi_os.post = post;
+
+    BSP_SPI_Init(spi_ltc6811, &spi_os, 0);
     printf("SPI initialized\n");
     Voltage_Init(boards);
     printf("Voltage initialized\n");
@@ -39,11 +43,7 @@ void LTC6811_Deadlocks(void *p_arg){
     int arg = 0;
     while (1){
         //for(int i = 0; i < 4; i++) {
-        OSSemPend(&SafetyCheck_Sem4,
-                    0,
-                    OS_OPT_PEND_BLOCKING,
-                    &ts,
-                    &err);
+        RTOS_BPS_SemPend(&SafetyCheck_Sem4, OS_OPT_PEND_BLOCKING);
         //}
 
         printf("running %dth loop, thread 1\n", counter);
@@ -51,8 +51,6 @@ void LTC6811_Deadlocks(void *p_arg){
         Voltage_UpdateMeasurements();
         printf("running Voltage_CheckStatus...\n");
         Voltage_CheckStatus();
-        printf("running Voltage_GetModulesInDanger...\n");
-        Voltage_GetModulesInDanger();
         printf("running Voltage_OpenWireSummary...\n");
         Voltage_OpenWireSummary();
         printf("running Volatge_OpenWire...\n");
@@ -98,12 +96,15 @@ void LTC6811_Deadlocks(void *p_arg){
 void LTC6811_Deadlocks2(void *p_arg){
     (void)p_arg;
 
-    OS_ERR err;
-    CPU_TS ts;
-
     cell_asic boards[NUM_MINIONS];
     printf("initializing...\n");
-    BSP_SPI_Init();
+    bsp_os_t spi_os;
+    OS_SEM semaphore;
+    RTOS_BPS_SemCreate(&semaphore, "SPI Semaphore", 0);
+    spi_os.pend = pend;
+    spi_os.post = post;
+
+    BSP_SPI_Init(spi_ltc6811, &spi_os, 0);
     printf("SPI initialized\n");
     Voltage_Init(boards);
     printf("Voltage initialized\n");
@@ -114,17 +115,13 @@ void LTC6811_Deadlocks2(void *p_arg){
     int counter = 0;
     int arg = 0;
     while (1){
-        OSSemPost(&SafetyCheck_Sem4,
-                    OS_OPT_POST_ALL,
-                    &err);
+        RTOS_BPS_SemPost(&SafetyCheck_Sem4, OS_OPT_POST_1);
 
         printf("running %dth loop, thread 2\n", counter);
         printf("running Voltage_UpdateMeasurements...\n");
         Voltage_UpdateMeasurements();
         printf("running Voltage_CheckStatus...\n");
         Voltage_CheckStatus();
-        printf("running Voltage_GetModulesInDanger...\n");
-        Voltage_GetModulesInDanger();
         printf("running Voltage_OpenWireSummary...\n");
         Voltage_OpenWireSummary();
         printf("running Volatge_OpenWire...\n");
@@ -172,9 +169,7 @@ int main() {
     OS_ERR err;
     OSInit(&err);
 
-    RTOS_BPS_SemCreate(&SafetyCheck_Sem4,
-                "Safety Check Semaphore",
-                0);
+    RTOS_BPS_SemCreate(&SafetyCheck_Sem4, "Safety Check Semaphore", 0);
 
     RTOS_BPS_TaskCreate(&LTC6811_Deadlocks_TCB,				// TCB
 				"LTC6811 Deadlocks Test",	// Task Name (String)
@@ -182,9 +177,7 @@ int main() {
 				(void *)0,				// Task function args
 				1,			// Priority
 				LTC6811_Deadlocks_Stk,	// Watermark limit for debugging
-				512);					// return err code
-
-	// ASSERT err
+				512);
 
     RTOS_BPS_TaskCreate(&LTC6811_Deadlocks2_TCB,				// TCB
 				"LTC6811 Deadlocks Test",	// Task Name (String)
@@ -192,9 +185,7 @@ int main() {
 				(void *)0,				// Task function args
 				2,			// Priority
 				LTC6811_Deadlocks2_Stk,	// Watermark limit for debugging
-				512);					// return err code
-
-    // ASSERT err
+				512);
 
 	OSStart(&err);
 }

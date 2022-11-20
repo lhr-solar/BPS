@@ -18,7 +18,6 @@ void Task1(void *p_arg){
     BSP_UART_Init(NULL, NULL, UART_USB);
     Charge_Init();
     Charge_SetAccum(50000);
-    OS_ERR err;
     OS_CPU_SysTickInit(SystemCoreClock / (CPU_INT32U) OSCfg_TickRate_Hz);
    
     while(1) {
@@ -26,23 +25,19 @@ void Task1(void *p_arg){
         Charge_Calculate(5000);
         charge_reading = Charge_GetPercent();
         RTOS_BPS_DelayTick(10);
-        assertOSError(err);
     }
 
     exit(0);
 }
 
 int main(void){
-    
-    
-
     OS_ERR err;
     BSP_PLL_Init();
 
     __disable_irq();
 
     OSInit(&err);
-    while(err != OS_ERR_NONE);
+    assertOSError(err);
 
     RTOS_BPS_TaskCreate(&Task1_TCB,
                 "Task 1",
@@ -51,12 +46,9 @@ int main(void){
                 1,
                 Task1_Stk,
                 256);
-    while(err != OS_ERR_NONE);
 
     __enable_irq();
 
     OSStart(&err);
-
-
-    
+    assertOSError(err);
 }

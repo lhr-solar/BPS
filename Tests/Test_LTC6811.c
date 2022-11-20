@@ -9,7 +9,7 @@
 #include "BSP_SPI.h"
 #include "BSP_UART.h"
 #include "LTC6811.h"
-#include "BSP_OS.h"
+#include "RTOS_BPS.h"
 #include "BSP_PLL.h"
 #include "BSP_Lights.h"
 #include "stm32f4xx.h"
@@ -35,7 +35,6 @@ void Task1(void *p_arg){
     int8_t pec = LTC6811_rdcfg(NUM_MINIONS, minions);
     printf("pec: %d\n", pec);
 
-    OS_ERR err;
     RTOS_BPS_DelayTick(15);
 
     LTC6811_adcv(ADC_CONVERSION_MODE,ADC_DCP,CELL_CH_TO_CONVERT);
@@ -57,7 +56,6 @@ void Task1(void *p_arg){
 }
 
 int main() {
-
     OS_ERR err;
     BSP_PLL_Init();
     BSP_Lights_Init();
@@ -65,7 +63,7 @@ int main() {
     __disable_irq();
 
     OSInit(&err);
-    while(err != OS_ERR_NONE);
+    assertOSError(err);
 
     RTOS_BPS_TaskCreate(&Task1_TCB,
                 "Task 1",
@@ -74,7 +72,6 @@ int main() {
                 1,
                 Task1_Stk,
                 256);
-    while(err != OS_ERR_NONE);
 
     __enable_irq();
 

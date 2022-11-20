@@ -15,15 +15,10 @@ OS_TCB Task2_TCB;
 CPU_STK Task2_Stk[256];
 
 void Task2(void *p_arg){
-    OS_ERR err;
-
     RTOS_BPS_DelayTick(250);
 
     Fault_BitMap = Fault_OW;   // set this to whatever you want
-    OSSemPost(&Fault_Sem4,
-                OS_OPT_POST_1,
-                &err);
-    assertOSError(err);
+    RTOS_BPS_SemPost(&Fault_Sem4, OS_OPT_POST_1);
     
     BSP_Lights_Init();
    
@@ -40,9 +35,7 @@ void Task1(void *p_arg){
 
     OS_CPU_SysTickInit(SystemCoreClock / (CPU_INT32U) OSCfg_TickRate_Hz);
 
-    RTOS_BPS_SemCreate(&Fault_Sem4,
-                "Fault/Tripped Semaphore",
-                0);
+    RTOS_BPS_SemCreate(&Fault_Sem4, "Fault/Tripped Semaphore", 0);
 
     RTOS_BPS_TaskCreate(&FaultState_TCB,				// TCB
 				"TASK_FAULT_STATE_PRIO",	// Task Name (String)
@@ -73,7 +66,7 @@ int main(void) {
     __disable_irq();
 
     OSInit(&err);
-    while(err != OS_ERR_NONE);
+    assertOSError(err);
 
     RTOS_BPS_TaskCreate(&Task1_TCB,
                 "Task 1",
@@ -82,7 +75,6 @@ int main(void) {
                 1,
                 Task1_Stk,
                 256);
-    while(err != OS_ERR_NONE);
 
     __enable_irq();
 

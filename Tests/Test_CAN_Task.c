@@ -46,7 +46,6 @@ CPU_STK TaskSpam_Stk[DEFAULT_STACK_SIZE];
 // heavily influenced by Task_VoltTempMonitor's CAN code
 // because that code will send the vast majority of CAN messages
 void Task_Spam(void *p_arg){
-    OS_ERR err;
     CANData_t CanData;
     CANPayload_t CanPayload;
     CANMSG_t CanMsg;
@@ -95,7 +94,6 @@ void Task_Spam(void *p_arg){
 
         // delay for 50ms (half the time volttemp delays for because other threads will also take CPU during the race)
         RTOS_BPS_DelayTick(5);
-        assertOSError(err);
     }
 }
 
@@ -127,7 +125,6 @@ void Task1(void *p_arg){
         
         // Initialize CAN queue
         CAN_Queue_Init();
-        assertOSError(err);
 	//delete task
 	OSTaskDel(NULL, &err); // Delete task
 }

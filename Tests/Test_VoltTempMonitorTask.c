@@ -11,6 +11,7 @@
 #include "CAN_Queue.h"
 #include "BSP_WDTimer.h"
 #include "BSP_Contactor.h"
+#include "RTOS_BPS.h"
 
 /******************************************************************************
  * VoltTempMonitor Task Test Plan
@@ -40,17 +41,12 @@ void EnterFaultState(void);
 
 // Initialization task for this test
 void Task1(void *p_arg){
-    OS_ERR err;
     
     OS_CPU_SysTickInit(SystemCoreClock / (CPU_INT32U) OSCfg_TickRate_Hz);
     
-    RTOS_BPS_SemCreate(&Fault_Sem4,
-                "Fault/Tripped Semaphore",
-                0);
+    RTOS_BPS_SemCreate(&Fault_Sem4, "Fault/Tripped Semaphore", 0);
 
-    RTOS_BPS_SemCreate(&SafetyCheck_Sem4,
-                "Safety Check Semaphore",
-                0);
+    RTOS_BPS_SemCreate(&SafetyCheck_Sem4, "Safety Check Semaphore", 0);
 
     RTOS_BPS_MutexCreate(&WDog_Mutex, "Watchdog Mutex");
 
@@ -97,7 +93,6 @@ void Task1(void *p_arg){
             TASK_CANBUS_CONSUMER_PRIO,			// Priority
             CANBusConsumer_Stk,	// Watermark limit for debugging
             TASK_CANBUS_CONSUMER_STACK_SIZE);					// return err code
-    assertOSError(err);
 
     // Initialize CAN queue
     CAN_Queue_Init();
@@ -108,33 +103,25 @@ void Task1(void *p_arg){
 
 //Task to prevent watchdog from tripping
 void Task2(void *p_arg){
-    OS_ERR err;
 
-    OSSemPost(&SafetyCheck_Sem4,      //Set semaphore once since Amperes Task doesn't run
-                OS_OPT_POST_1,
-                &err);
-	assertOSError(err);
-    OSSemPost(&SafetyCheck_Sem4,      //Set semaphore once since Battery Balancing Task doesn't run
-                OS_OPT_POST_1,
-                &err);
-	assertOSError(err);
+    RTOS_BPS_SemPend(&SafetyCheck_Sem4, OS_OPT_POST_1);
+    RTOS_BPS_SemPend(&SafetyCheck_Sem4, OS_OPT_POST_1);
 
     while(1){
         RTOS_BPS_MutexPend(&WDog_Mutex, OS_OPT_PEND_BLOCKING);
         WDog_BitMap |= WD_AMPERES;
         WDog_BitMap |= WD_BALANCING;
-        OSMutexPost(&WDog_Mutex, OS_OPT_POST_NONE, &err);
-        assertOSError(err);
+        RTOS_BPS_MutexPost(&WDog_Mutex, OS_OPT_POST_NONE);
         //delay of 100ms
         RTOS_BPS_DelayTick(10);
-        assertOSError(err);
         //BSP_Light_Toggle(RUN);
     }
 }
 
 // Similar to the production code main. Does not mess with contactor 
 int main(void) {
-
+    OS_ERR err;
+    
     //Resetting the contactor
     BSP_Contactor_Init();
     BSP_Contactor_Off();
@@ -144,7 +131,6 @@ int main(void) {
         EnterFaultState();
     }
 
-    OS_ERR err;
     BSP_PLL_Init();
     BSP_Lights_Init();
     OSInit(&err);
@@ -157,7 +143,6 @@ int main(void) {
                 1,
                 Task1_Stk,
                 256);
-    assertOSError(err);
 
     //Give same priority as amperes task thread
     RTOS_BPS_TaskCreate(&Task2_TCB,
@@ -167,7 +152,6 @@ int main(void) {
                 5,
                 Task2_Stk,
                 256);
-    assertOSError(err);
 
     OSStart(&err);
 }

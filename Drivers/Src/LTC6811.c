@@ -84,22 +84,11 @@ OS_SEM MinionsIO_Sem4;
 // RTOS Setup
 #ifdef RTOS
 void LTC6811_Pend(void) {
-    CPU_TS ts;
-    OS_ERR err;
-    OSSemPend(&MinionsIO_Sem4,
-                        0,
-                        OS_OPT_PEND_BLOCKING,
-                        &ts,
-                        &err);
-    assertOSError(err);
+    RTOS_BPS_SemPend(&MinionsIO_Sem4, OS_OPT_PEND_BLOCKING);
 }
 
 void LTC6811_Post(void) {
-    OS_ERR err;
-    OSSemPost(&MinionsIO_Sem4,
-                        OS_OPT_POST_1,
-                        &err);
-    assertOSError(err);
+    RTOS_BPS_SemPost(&MinionsIO_Sem4, OS_OPT_POST_1);
 }
 #endif
 
@@ -141,14 +130,12 @@ void LTC6811_rdcv_safe(uint8_t reg, // Controls which cell voltage register is r
                      cell_asic ic[] // Array of the parsed cell codes
                     )
 {
-  OS_ERR err;
   uint8_t count = 0;
   while(LTC681x_rdcv(reg,total_ic,ic) == -1){
     if(count == MAX_PEC_ERRORS){
       //trip BPS
       Fault_BitMap |= Fault_CRC;
-      OSSemPost(&Fault_Sem4, OS_OPT_POST_1, &err);
-      assertOSError(err);
+      RTOS_BPS_SemPost(&Fault_Sem4, OS_OPT_POST_1);
     }
     count++;
   }
@@ -165,14 +152,12 @@ void LTC6811_rdaux_safe(uint8_t reg, //Determines which GPIO voltage register is
                      cell_asic ic[]//A two dimensional array of the gpio voltage codes.
                     )
 {
-  OS_ERR err;
   uint8_t count = 0;
   while(LTC681x_rdaux(reg,total_ic,ic) == -1){
     if(count == MAX_PEC_ERRORS){
       //trip BPS
       Fault_BitMap |= Fault_CRC;
-      OSSemPost(&Fault_Sem4, OS_OPT_POST_1, &err);
-      assertOSError(err);
+      RTOS_BPS_SemPost(&Fault_Sem4, OS_OPT_POST_1);
     }
     count++;
   }
@@ -190,14 +175,12 @@ void LTC6811_rdstat_safe(uint8_t reg, //Determines which Stat  register is read 
                       cell_asic ic[]
                      )
 {
-  OS_ERR err;
   uint8_t count = 0;
   while(LTC681x_rdstat(reg,total_ic,ic) == -1){
     if(count == MAX_PEC_ERRORS){
       //trip BPS
       Fault_BitMap |= Fault_CRC;
-      OSSemPost(&Fault_Sem4, OS_OPT_POST_1, &err);
-      assertOSError(err);
+      RTOS_BPS_SemPost(&Fault_Sem4, OS_OPT_POST_1);
     }
     count++;
   }
@@ -211,14 +194,12 @@ void LTC6811_rdcfg_safe(uint8_t total_ic, //Number of ICs in the system
                      cell_asic ic[] //A two dimensional array that the function stores the read configuration data.
                     )
 {
-  OS_ERR err;
   uint8_t count = 0;
   while(LTC681x_rdcfg(total_ic, ic) == -1){
     if(count == MAX_PEC_ERRORS){
       //trip BPS
       Fault_BitMap |= Fault_CRC;
-      OSSemPost(&Fault_Sem4, OS_OPT_POST_1, &err);
-      assertOSError(err);
+      RTOS_BPS_SemPost(&Fault_Sem4, OS_OPT_POST_1);
     }
     count++;
   }
@@ -233,14 +214,12 @@ void LTC6811_rdpwm_safe(uint8_t total_ic, //Number of ICs in the system
                      cell_asic ic[] //A two dimensional array that the function stores the read configuration data.
                     )
 {
-  OS_ERR err;
   uint8_t count = 0;
   while(LTC681x_rdpwm(total_ic, pwmReg, ic) == -1){
     if(count == MAX_PEC_ERRORS){
       //trip BPS
       Fault_BitMap |= Fault_CRC;
-      OSSemPost(&Fault_Sem4, OS_OPT_POST_1, &err);
-      assertOSError(err);
+      RTOS_BPS_SemPost(&Fault_Sem4, OS_OPT_POST_1);
     }
     count++;
   }
@@ -254,14 +233,12 @@ void LTC6811_rdcomm_safe(uint8_t total_ic, //Number of ICs in the system
                       cell_asic ic[] //A two dimensional array that the function stores the read configuration data.
                      )
 {
-  OS_ERR err;
   uint8_t count = 0;
   while(LTC681x_rdcomm(total_ic, ic) == -1){
     if(count == MAX_PEC_ERRORS){
       //trip BPS
       Fault_BitMap |= Fault_CRC;
-      OSSemPost(&Fault_Sem4, OS_OPT_POST_1, &err);
-      assertOSError(err);
+      RTOS_BPS_SemPost(&Fault_Sem4, OS_OPT_POST_1);
     }
     count++;
   }

@@ -11,7 +11,7 @@ void foo(void){
 
 int main() {
     BSP_UART_Init(foo, foo, UART_USB);
-
+    char str[128];
     while(1) {
         int num = BSP_UART_ReadLine(str, UART_USB);
         if(num > 0) {

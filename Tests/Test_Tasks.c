@@ -1,7 +1,7 @@
 /* Copyright (c) 2018-2022 UT Longhorn Racing Solar */
 #include "common.h"
 #include "config.h"
-#include "os.h"
+#include "RTOS_BPS.h"
 #include "Tasks.h"
 #include "BSP_UART.h"
 #include "stm32f4xx.h"
@@ -19,9 +19,6 @@ void Task2(void *p_arg);
 
 void Task1(void *p_arg) {
     (void)p_arg;
-
-    OS_ERR err;
-    CPU_TS ts;
     
     OS_CPU_SysTickInit(SystemCoreClock / (CPU_INT32U) OSCfg_TickRate_Hz);
 
@@ -29,7 +26,6 @@ void Task1(void *p_arg) {
     printf("Checkpoint A\n");
 
     RTOS_BPS_DelayTick(1);
-    while(err != OS_ERR_NONE);
 
     // Create Task 2
     RTOS_BPS_TaskCreate(&Task2_TCB,
@@ -39,15 +35,10 @@ void Task1(void *p_arg) {
                 2,
                 Task2_Stk,
                 256);
-    while(err != OS_ERR_NONE);
 
     while(1) {
         for(int i = 0; i < 4; i++) {
-            OSSemPend(&SafetyCheck_Sem4,
-                      0,
-                      OS_OPT_PEND_BLOCKING,
-                      &ts,
-                      &err);
+            RTOS_BPS_SemPend(&SafetyCheck_Sem4, OS_OPT_PEND_BLOCKING);
         }
 
         RTOS_BPS_DelayTick(1);
@@ -57,16 +48,10 @@ void Task1(void *p_arg) {
 
 void Task2(void *p_arg) {
     (void)p_arg;
-    
-    OS_ERR err;
 
     while(1) {
-        OSSemPost(&SafetyCheck_Sem4,
-                    OS_OPT_POST_ALL,
-                    &err);
-
+        RTOS_BPS_SemPost(&SafetyCheck_Sem4, OS_OPT_POST_1);
         RTOS_BPS_DelayTick(1);
-
         printf("2\r\n");
     }
 }
@@ -77,11 +62,9 @@ int main(void) {
     __disable_irq();
 
     OSInit(&err);
-    while(err != OS_ERR_NONE);
+    assertOSError(err);
 
-    RTOS_BPS_SemCreate(&SafetyCheck_Sem4,
-                "Safety Check Semaphore",
-                0);
+    RTOS_BPS_SemCreate(&SafetyCheck_Sem4, "Safety Check Semaphore", 0);
 
     RTOS_BPS_TaskCreate(&Task1_TCB,
                 "Task 1",
@@ -90,7 +73,6 @@ int main(void) {
                 1,
                 Task1_Stk,
                 256);
-    while(err != OS_ERR_NONE);
 
     __enable_irq();
 

@@ -34,14 +34,12 @@ extern cell_asic Minions[NUM_MINIONS];
 
 void Task_UpdateVoltage(void* p_arg) {
     (void) p_arg;
-    OS_ERR err;
 
     Voltage_Init(Minions);
 
     while (1) {
         Voltage_UpdateMeasurements();
         RTOS_BPS_DelayTick(5);
-        assertOSError(err);
     }
 }
 
@@ -86,7 +84,6 @@ int main(void) {
                 1,
                 Task1_Stk,
                 256);
-    assertOSError(err);
 
     OSStart(&err);
     return 0;

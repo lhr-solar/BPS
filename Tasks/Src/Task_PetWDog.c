@@ -7,8 +7,6 @@
 void Task_PetWDog(void *p_arg) {
     (void)p_arg;
 
-    OS_ERR err;
-
     BSP_WDTimer_Init();
     BSP_WDTimer_Start();
     BSP_Lights_Init();
@@ -27,12 +25,9 @@ void Task_PetWDog(void *p_arg) {
             BSP_Light_Toggle(RUN);
             WDog_BitMap = 0;
         }
-   
         //release WDog Mutex
-        OSMutexPost(&WDog_Mutex, OS_OPT_POST_NONE, &err);
-        assertOSError(err);
-
+        RTOS_BPS_MutexPost(&WDog_Mutex, OS_OPT_POST_NONE);
+        
         RTOS_BPS_DelayTick(10);
-        assertOSError(err);
     }
 }

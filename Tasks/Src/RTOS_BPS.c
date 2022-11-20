@@ -5,15 +5,45 @@
 #include "RTOS_BPS.h"
 
 /**
+ * @brief   Creates a task that will be handled by the OS
+ * @param   *p_tcb - pointer to the tcb
+ * @param   *p_name - pointer to task name
+ * @param   *p_task - pointer to the task
+ * @param   *p_args - pointer to task function arguments
+ * @param   prio - task priority
+ * @param   *p_stk_base - the stack
+ * @param   stk_size - size of the stack
+ * @param   *p_err - return error code
+ * @return  nothing to see here
+ */
+void RTOS_BPS_TaskCreate(BPS_OS_TCB *p_tcb, char *p_name, void *p_task, void *p_arg, uint8_t prio, BPS_CPU_STK *p_stk_base, uint64_t stk_size) {
+    BPS_OS_ERR err;
+    OSTaskCreate(p_tcb, p_name, p_task, p_arg, prio, p_stk_base, stk_size, stk_size, 0, 10,(void *)0, OS_OPT_TASK_STK_CHK | OS_OPT_TASK_SAVE_FP, &err);
+    assertOSError(err);
+}
+
+/**
+ * @brief Creates a semaphore with the initially specified count
+ * 
+ * @param sem - pointer to a semaphore object to create and initialize
+ * @param name - name of the semaphore
+ * @param count - initial count for the semaphore
+ */
+void RTOS_BPS_SemCreate(BPS_OS_SEM* sem, char* name, uint32_t count) {
+    BPS_OS_ERR err;
+    OSSemCreate(sem, name, count, &err);
+    assertOSError(err);
+}
+
+/**
  * @brief Pends a BPS_OS_Semaphore.
- * @param *sem - pointer to a sempaphore to pend
- * @param tick - time in clock ticks to timeout for
+ * @param sem - pointer to a sempaphore to pend
  * @param opt - pend option
  * @return the semaphore count, or 0 if not available
  */
-BPS_OS_SEM_CTR RTOS_BPS_SemPend(BPS_OS_SEM* sem, BPS_OS_TICK tick, BPS_OS_OPT opt) {
+BPS_OS_SEM_CTR RTOS_BPS_SemPend(BPS_OS_SEM* sem, BPS_OS_OPT opt) {
     BPS_OS_ERR err;
-    BPS_OS_SEM_CTR count = OSSemPend(sem, tick, opt, 0, &err); // we don't need timestamp
+    BPS_OS_SEM_CTR count = OSSemPend(sem, 0, opt, 0, &err); // we don't need timestamp
     assertOSError(err);
     return count;
 }
@@ -32,31 +62,16 @@ BPS_OS_SEM_CTR RTOS_BPS_SemPost(BPS_OS_SEM *sem4, BPS_OS_OPT opt) {
 }
 
 /**
- * @brief   Creates a task that will be handled by the OS
- * @param   *p_tcb - pointer to the tcb
- * @param   *p_name - pointer to task name
- * @param   *p_task - pointer to the task
- * @param   *p_args - pointer to task function arguments
- * @param   prio - task priority
- * @param   *p_stk_base - the stack
- * @param   stk_size - size of the stack
- * @param   *p_err - return error code
- * @return  nothing to see here
+ * @brief Initializes a mutex object.
+ * @param *mut - pointer to a mutex to initialize
+ * @param name - char* of the name of the mutex
+ * @return none
  */
-void RTOS_BPS_TaskCreate(
-    BPS_OS_TCB      *p_tcb,
-    char            *p_name,
-    void            *p_task,
-    void            *p_arg,
-    uint8_t          prio,
-    BPS_CPU_STK     *p_stk_base,
-    uint64_t         stk_size
-    )
-    {
-        BPS_OS_ERR err;
-        OSTaskCreate(p_tcb, p_name, p_task, p_arg, prio, p_stk_base, stk_size, stk_size, 0, 10,(void *)0, OS_OPT_TASK_STK_CHK | OS_OPT_TASK_SAVE_FP, &err);
-        assertOSError(err);
-    }
+void RTOS_BPS_MutexCreate(BPS_OS_MUTEX *mut, char* name) {
+    BPS_OS_ERR err;
+    OSMutexCreate(mut, name, &err);
+    assertOSError(err);
+}
 
 /**
  * @brief   Waits for Mutex, assigns timestamp and any error to err and ticks
@@ -67,18 +82,6 @@ void RTOS_BPS_TaskCreate(
 void RTOS_BPS_MutexPend(BPS_OS_MUTEX* mutex, BPS_OS_OPT opt) {
     BPS_OS_ERR err;
     OSMutexPend(mutex, 0, opt, (void*) 0, &err); 
-    assertOSError(err);
-}
-
-/**
- * @brief Initializes a mutex object.
- * @param *mut - pointer to a mutex to initialize
- * @param name - char* of the name of the mutex
- * @return none
- */
-void RTOS_BPS_MutexCreate(BPS_OS_MUTEX *mut, char* name) {
-    BPS_OS_ERR err;
-    OSMutexCreate(mut, name, &err);
     assertOSError(err);
 }
 
@@ -127,15 +130,3 @@ void RTOS_BPS_DelayTick(BPS_OS_TICK dly){
     assertOSError(err);
 }
 
-/**
- * @brief Creates a semaphore with the initially specified count
- * 
- * @param sem - pointer to a semaphore object to create and initialize
- * @param name - name of the semaphore
- * @param count - initial count for the semaphore
- */
-void RTOS_BPS_SemCreate(BPS_OS_SEM* sem, char* name, uint32_t count) {
-    BPS_OS_ERR err;
-    OSSemCreate(sem, name, count, &err);
-    assertOSError(err);
-}

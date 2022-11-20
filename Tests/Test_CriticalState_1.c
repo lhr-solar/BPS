@@ -26,30 +26,13 @@ CPU_STK Task2_Stk[256];
 ****************************************************************************/
 
 void Task2(void *p_arg){    //This task is meant to allow contactor to close
-    OS_ERR err;
 
     RTOS_BPS_DelayTick(250);
 
-
-    OSSemPost(&SafetyCheck_Sem4,
-                OS_OPT_POST_1,
-                &err);
-    assertOSError(err);
-    
-    OSSemPost(&SafetyCheck_Sem4,
-                OS_OPT_POST_1,
-                &err);
-    assertOSError(err);
-
-    OSSemPost(&SafetyCheck_Sem4,
-                OS_OPT_POST_1,
-                &err);
-    assertOSError(err);
-
-    OSSemPost(&SafetyCheck_Sem4,
-                OS_OPT_POST_1,
-                &err);
-    assertOSError(err);
+    RTOS_BPS_SemPost(&SafetyCheck_Sem4, OS_OPT_POST_1);
+    RTOS_BPS_SemPost(&SafetyCheck_Sem4, OS_OPT_POST_1);
+    RTOS_BPS_SemPost(&SafetyCheck_Sem4, OS_OPT_POST_1);
+    RTOS_BPS_SemPost(&SafetyCheck_Sem4, OS_OPT_POST_1);
 
     BSP_Lights_Init();
    
@@ -66,50 +49,42 @@ void Task1(void *p_arg){
 
     OS_CPU_SysTickInit(SystemCoreClock / (CPU_INT32U) OSCfg_TickRate_Hz);
 
-    RTOS_BPS_SemCreate(&Fault_Sem4,
-                "Fault/Tripped Semaphore",
-                0);
+    RTOS_BPS_SemCreate(&Fault_Sem4, "Fault/Tripped Semaphore", 0);
 
-    RTOS_BPS_SemCreate(&SafetyCheck_Sem4,
-                "Safety Check Semaphore",
-                0);
+    RTOS_BPS_SemCreate(&SafetyCheck_Sem4, "Safety Check Semaphore", 0);
 
-    	RTOS_BPS_TaskCreate(&FaultState_TCB,				// TCB
-				"TASK_FAULT_STATE_PRIO",	// Task Name (String)
-				Task_FaultState,				// Task function pointer
-				(void *)0,				// Task function args
-				TASK_FAULT_STATE_PRIO,			// Priority
-				FaultState_Stk,	// Watermark limit for debugging
-				TASK_FAULT_STATE_STACK_SIZE);					// return err code
-		assertOSError(err);
+    RTOS_BPS_TaskCreate(&FaultState_TCB,				// TCB
+		"TASK_FAULT_STATE_PRIO",	// Task Name (String)
+		Task_FaultState,				// Task function pointer
+		(void *)0,				// Task function args
+		TASK_FAULT_STATE_PRIO,			// Priority
+		FaultState_Stk,	// Watermark limit for debugging
+		TASK_FAULT_STATE_STACK_SIZE); 
 
     RTOS_BPS_TaskCreate(&CriticalState_TCB,				// TCB
-				"TASK_CRITICAL_STATE_PRIO",	// Task Name (String)
-				Task_CriticalState,				// Task function pointer
-				(void *)0,				// Task function args
-				TASK_CRITICAL_STATE_PRIO,			// Priority
-				CriticalState_Stk,	// Watermark limit for debugging
-				TASK_CRITICAL_STATE_STACK_SIZE);					// return err code
-		assertOSError(err);
+		"TASK_CRITICAL_STATE_PRIO",	// Task Name (String)
+		Task_CriticalState,				// Task function pointer
+		(void *)0,				// Task function args
+		TASK_CRITICAL_STATE_PRIO,			// Priority
+		CriticalState_Stk,	// Watermark limit for debugging
+		TASK_CRITICAL_STATE_STACK_SIZE);
 
     
     RTOS_BPS_TaskCreate(&Task2_TCB,
-                "Task 2",
-                Task2,
-                (void *)0,
-                4,
-                Task2_Stk,
-                256);
-		assertOSError(err);
+        "Task 2",
+        Task2,
+        (void *)0,
+        4,
+        Task2_Stk,
+        256);
 
-        RTOS_BPS_TaskCreate(&CANBusConsumer_TCB,				// TCB
-				"TASK_CANBUS_CONSUMER_PRIO",	// Task Name (String)
-				Task_CANBusConsumer,				// Task function pointer
-				(void *)false,				// don't use loopback mode
-				TASK_CANBUS_CONSUMER_PRIO,			// Priority
-				CANBusConsumer_Stk,	// Watermark limit for debugging
-				TASK_CANBUS_CONSUMER_STACK_SIZE);					// return err code
-		assertOSError(err);
+    RTOS_BPS_TaskCreate(&CANBusConsumer_TCB,				// TCB
+		"TASK_CANBUS_CONSUMER_PRIO",	// Task Name (String)
+		Task_CANBusConsumer,				// Task function pointer
+		(void *)false,				// don't use loopback mode
+		TASK_CANBUS_CONSUMER_PRIO,			// Priority
+		CANBusConsumer_Stk,	// Watermark limit for debugging
+		TASK_CANBUS_CONSUMER_STACK_SIZE);
 
     CAN_Queue_Init();
 
@@ -125,7 +100,7 @@ int main(void) {
     __disable_irq();
 
     OSInit(&err);
-    while(err != OS_ERR_NONE);
+    assertOSError(err);
 
     RTOS_BPS_TaskCreate(&Task1_TCB,
                 "Task 1",
@@ -134,9 +109,9 @@ int main(void) {
                 1,
                 Task1_Stk,
                 256);
-    while(err != OS_ERR_NONE);
 
     __enable_irq();
 
     OSStart(&err);
+    assertOSError(err);
 }

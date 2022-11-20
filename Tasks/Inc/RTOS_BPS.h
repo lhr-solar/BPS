@@ -34,7 +34,7 @@ typedef CPU_STK      BPS_CPU_STK;
  * @param opt - pend option
  * @return the semaphore count, or 0 if not available
  */
-BPS_OS_SEM_CTR RTOS_BPS_SemPend(BPS_OS_SEM* sem, BPS_OS_TICK tick, BPS_OS_OPT opt);
+BPS_OS_SEM_CTR RTOS_BPS_SemPend(BPS_OS_SEM* sem, BPS_OS_OPT opt);
 
 /**
  * @brief Posts a semaphore

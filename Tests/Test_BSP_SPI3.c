@@ -5,7 +5,6 @@
 #include "BSP_SPI.h"
 #include "BSP_UART.h"
 #include "LTC6811.h"
-#include "BSP_OS.h"
 #include "BSP_PLL.h"
 #include "BSP_Lights.h"
 #include "stm32f4xx.h"
@@ -18,21 +17,12 @@ OS_SEM semaphore;
 bool initFlag = false;
 
 void pend(void) {
-    OS_ERR err;
-    CPU_TS ts;
-    OSSemPend(&semaphore,
-                0,
-                OS_OPT_PEND_BLOCKING,
-                &ts,
-                &err);
+    RTOS_BPS_SemPend(&semaphore, OS_OPT_PEND_BLOCKING);
 }
 
 void post(void) {
-    OS_ERR err;
     //BSP_Light_On(FAULT);
-    OSSemPost(&semaphore,
-            OS_OPT_PEND_BLOCKING,
-            &err);
+    RTOS_BPS_SemPost(&semaphore, OS_OPT_PEND_BLOCKING);
     //BSP_Light_Toggle(OVOLT);
     //for (volatile int i = 0; i < 1000000; i++);
 }
@@ -44,14 +34,11 @@ void Task1(void *p_arg){
     OS_CPU_SysTickInit(SystemCoreClock / (CPU_INT32U) OSCfg_TickRate_Hz);
 
     bsp_os_t spi_os;
-    OS_ERR err;
-    RTOS_BPS_SemCreate(&semaphore,
-                "SPI Semaphore",
-                0);
+    RTOS_BPS_SemCreate(&semaphore, "SPI Semaphore", 0);
     spi_os.pend = pend;
     spi_os.post = post;
 
-    BSP_SPI_Init(spi_ltc2315, &spi_os);
+    BSP_SPI_Init(spi_ltc2315, &spi_os, 0);
     
 
     uint8_t data[32/*4+NUM_MINIONS*8*/] = {0xAB, 0xCD, 0xEF, 0x6E, 0x00, 0x00};  
@@ -94,7 +81,6 @@ int main(void) {
                 1,
                 Task1_Stk,
                 256);
-    while(err != OS_ERR_NONE);
 
     RTOS_BPS_TaskCreate(&Task2_TCB,
                 "Task 2",
@@ -103,7 +89,6 @@ int main(void) {
                 2,
                 Task2_Stk,
                 256);
-    while(err != OS_ERR_NONE);
 
     __enable_irq();
 
