@@ -1,3 +1,6 @@
+#ifndef BSP_PWM_H
+#define BSP_PWM_H
+
 #include "stm32f4xx.h"
 #include "stm32f4xx_tim.h"
 #include "stm32f4xx_gpio.h"
@@ -27,3 +30,5 @@ ErrorStatus BSP_PWM_Set(uint8_t pin, uint32_t speed);
  * @return  Current PWM duty cycle of pin
  */
 int BSP_PWM_Get(uint8_t pin);
+
+#endif
