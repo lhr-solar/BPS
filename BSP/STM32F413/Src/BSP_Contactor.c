@@ -1,33 +1,6 @@
 /* Copyright (c) 2018-2022 UT Longhorn Racing Solar */
 
 #include "BSP_Contactor.h"
-#include "stm32f4xx.h"
-
-/**
- * @brief Initializes GPIO ports per Contactor requirements
- * 
- * @param gpioPort Specific port to initialize on
- * @param gpioStruct Specific struct to initialize
- * @param pinOutput pin number for output
- * @param pinInput pin number for input
- * @param mode pin mode
- * @param speed speed
- * @param otype 
- * @param pupd 
- */
-static void Setup(GPIO_TypeDef* port, GPIO_InitTypeDef* gpioStruct, uint32_t pinOutput, uint32_t pinInput) {
-    // first output pin, then input pin.
-    // other configs stay the same across init calls
-    gpioStruct->GPIO_Pin = pinOutput;
-    gpioStruct->GPIO_Mode = GPIO_Mode_OUT;
-    gpioStruct->GPIO_Speed = GPIO_Speed_50MHz;
-    gpioStruct->GPIO_PuPd = GPIO_PuPd_UP;
-    gpioStruct->GPIO_OType = GPIO_OType_PP;
-    GPIO_Init(port, gpioStruct);
-    gpioStruct->GPIO_Pin = pinInput;
-    gpioStruct->GPIO_Mode = GPIO_Mode_IN;
-    GPIO_Init(port, gpioStruct);
-}
 
 /**
  * @brief Initializes all Contactor pins used by the BPS
@@ -35,29 +8,14 @@ static void Setup(GPIO_TypeDef* port, GPIO_InitTypeDef* gpioStruct, uint32_t pin
  * @return none
  */
 void BSP_Contactor_Init(void) {
+	//since pwm was setup in BSP_PWM_INIT, all we need to do is setup an input pin
     GPIO_InitTypeDef GPIO_C1Init;
-	GPIO_InitTypeDef GPIO_C2Init;
-	GPIO_InitTypeDef GPIO_C3Init;
-	
-	// Initialize clock
-	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE); //HV Contactor
-	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
-	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC, ENABLE);
-	
-	// Initialize Port B for Contactor 1
-	// PB0 - output
-	// PB1 - input
-	Setup(C1_PORT, &GPIO_C1Init, GPIO_Pin_0, GPIO_Pin_1);
-
-	// Initialize Port A for Contactor 2
-	// PA4 - output
-	// PA5 - input
-	Setup(C2_PORT, &GPIO_C2Init, GPIO_Pin_4, GPIO_Pin_5);
-
-	// Initialize Port C for Contactor 3
-	// PC0 - output
-	// PC1 - input
-	Setup(C3_PORT, &GPIO_C3Init, GPIO_Pin_0, GPIO_Pin_1);
+	GPIO_C1Init.GPIO_Pin = GPIO_Pin_1; //output pin is 0
+    GPIO_C1Init.GPIO_Mode = GPIO_Mode_IN;
+    GPIO_C1Init.GPIO_Speed = GPIO_Speed_2MHz;
+    GPIO_C1Init.GPIO_PuPd = GPIO_PuPd_DOWN;
+    GPIO_C1Init.GPIO_OType = GPIO_OType_PP;
+    GPIO_Init(C1_PORT, &GPIO_C1Init);
 }
 
 /**
@@ -67,20 +25,24 @@ void BSP_Contactor_Init(void) {
  * @return  None
  */
 void BSP_Contactor_On(Contactors_t contactorChoice) {
-	// set output pins HIGH
-	if (contactorChoice == ARRAY_CONTACTOR) {
-		GPIO_WriteBit(C1_PORT, GPIO_Pin_0, Bit_SET);
-	}
-	else if (contactorChoice == HVHIGH_CONTACTOR) {
-		GPIO_WriteBit(C2_PORT, GPIO_Pin_4, Bit_SET);
-	}
-	else if (contactorChoice == HVLOW_CONTACTOR) {
-		GPIO_WriteBit(C3_PORT, GPIO_Pin_0, Bit_SET);
-	}
-	else if (contactorChoice == ALL_CONTACTORS) {
-		GPIO_WriteBit(C1_PORT, GPIO_Pin_0, Bit_SET);
-		GPIO_WriteBit(C2_PORT, GPIO_Pin_4, Bit_SET);
-		GPIO_WriteBit(C3_PORT, GPIO_Pin_0, Bit_SET);
+	// set output pins to start outputing with a duty cycle set by PWM_ON_TIME in the header file
+	switch (contactorChoice)
+	{
+	case ARRAY_CONTACTOR:
+		BSP_PWM_Set(ARRAY_CONTACTOR_OUT, PWM_ON_TIME);
+		break;
+	case HVHIGH_CONTACTOR:
+		BSP_PWM_Set(HVHIGH_CONTACTOR_OUT, PWM_ON_TIME);
+		break;
+	case HVLOW_CONTACTOR:
+		BSP_PWM_Set(HVLOW_CONTACTOR_OUT, PWM_ON_TIME);
+		break;
+	case ALL_CONTACTORS: //c1 and cfan are the only two possible contactors, so we operate on both
+		BSP_PWM_Set(CFAN, PWM_ON_TIME);
+		BSP_PWM_Set(C1, PWM_ON_TIME);
+		break;
+	default:
+		break;
 	}
 }
 
@@ -90,21 +52,25 @@ void BSP_Contactor_On(Contactors_t contactorChoice) {
  * @return  None
  */
 void BSP_Contactor_Off(Contactors_t contactorChoice) {
-    // set output pins LOW
-	if (contactorChoice == ARRAY_CONTACTOR) {
-		GPIO_WriteBit(C1_PORT, GPIO_Pin_0, Bit_RESET);
-	}
-	else if (contactorChoice == HVHIGH_CONTACTOR) {
-		GPIO_WriteBit(C2_PORT, GPIO_Pin_4, Bit_RESET);
-	}
-	else if (contactorChoice == HVLOW_CONTACTOR) {
-		GPIO_WriteBit(C3_PORT, GPIO_Pin_0, Bit_RESET);
-	}
-	else if (contactorChoice == ALL_CONTACTORS) {
-		GPIO_WriteBit(C1_PORT, GPIO_Pin_0, Bit_RESET);
-		GPIO_WriteBit(C2_PORT, GPIO_Pin_4, Bit_RESET);
-		GPIO_WriteBit(C3_PORT, GPIO_Pin_0, Bit_RESET);
-	}
+    // set output pin to a duty cycle of 0
+	switch (contactorChoice)
+		{
+		case ARRAY_CONTACTOR:
+			BSP_PWM_Set(ARRAY_CONTACTOR_OUT, 0);
+			break;
+		case HVHIGH_CONTACTOR:
+			BSP_PWM_Set(HVHIGH_CONTACTOR_OUT, 0);
+			break;
+		case HVLOW_CONTACTOR:
+			BSP_PWM_Set(HVLOW_CONTACTOR_OUT, 0);
+			break;
+		case ALL_CONTACTORS:
+			BSP_PWM_Set(CFAN, 0);
+			BSP_PWM_Set(C1, 0);
+			break;
+		default:
+			break;
+		}
 }
 
 /**
@@ -114,6 +80,9 @@ void BSP_Contactor_Off(Contactors_t contactorChoice) {
  * @return  0 if contactor is off/open, 1 if on/closed
  */
 bool BSP_Contactor_GetState(Contactors_t contactorChoice) {
+	bool contactorReturnValue = ((C1_PORT->IDR & GPIO_Pin_1) >> 1) ? 0 : 1; //read the one and only input pin
+
+	/* this is old implementation, but we only have one input pin now
 	bool contactorReturnValue = false;
 	if (contactorChoice == ARRAY_CONTACTOR) {
 		contactorReturnValue = ((C1_PORT->IDR & GPIO_Pin_1) >> 1) ? 0 : 1;
@@ -130,5 +99,7 @@ bool BSP_Contactor_GetState(Contactors_t contactorChoice) {
 			&& (((C2_PORT->IDR & GPIO_Pin_5) >> 5) ? 0 : 1)
 			&& (((C3_PORT->IDR & GPIO_Pin_1) >> 1) ? 0 : 1);
 	}
+
+	*/
 	return contactorReturnValue;
 }

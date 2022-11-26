@@ -3,19 +3,26 @@
 #ifndef BSP_CONTACTOR_H
 #define BSP_CONTACTOR_H
 
+#include "BSP_PWM.h" //PWM_Period is defined in here
 #include "common.h"
-#include "stm32f4xx_gpio.h"
-#include "stm32f4xx_rcc.h"
+
+//Parameters for PWM
+#define PWM_ON_TIME 2000
+
+// Contactor 1
+#define C1 5 // contactor 1 on pwm output 5
+#define C1_PORT		GPIOB
+// Contactor 2 - this is for the contactor connected to the fan board
+#define CFAN 4 // right now we are using fan pin 4 as the contactor output
+
+//These are defining how the contactors are wired, the array contactor is assumed to be wired to the fan board
+#define ARRAY_CONTACTOR_OUT CFAN
+#define HVHIGH_CONTACTOR_OUT C1
+#define HVLOW_CONTACTOR_OUT C1
 
 typedef uint8_t CONT_CHOICE;
 typedef enum {ARRAY_CONTACTOR = 1, HVHIGH_CONTACTOR = 2, HVLOW_CONTACTOR = 4, ALL_CONTACTORS = 7} Contactors_t;
 
-// Contactor 1
-#define C1_PORT		GPIOB
-// Contactor 2
-#define C2_PORT		GPIOA
-// Contactor 3
-#define C3_PORT		GPIOC
 
 /**
  * @brief   A Contactor is a high power switch similar to what a relay is. The Contactor
