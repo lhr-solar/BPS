@@ -122,7 +122,7 @@ void Task_VoltTempMonitor(void *p_arg) {
             BSP_Fans_SetAll(TOPSPEED);
         }
         else {
-            BSP_Fans_SetAll(PID_Output(Temperature_GetTotalPackAvgTemperature(), PID_DESIRED_TEMPERATURE));
+            BSP_Fans_SetAll(Temperature_PID_Output(Temperature_GetTotalPackAvgTemperature(), PID_DESIRED_TEMPERATURE));
         }
 
 

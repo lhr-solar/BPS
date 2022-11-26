@@ -137,5 +137,5 @@ int32_t Temperature_GetMaxTemperature(void);
  * @param DesiredTemp - desired temperature
  * @return FanSpeed: 0-4000 PWM
  */
-int32_t PID_Output(int32_t InputTemp, int32_t DesiredTemp);
+int32_t Temperature_PID_Output(int32_t InputTemp, int32_t DesiredTemp);
 #endif
