@@ -37,7 +37,7 @@ ErrorStatus BSP_Fans_Set(uint8_t fan, uint32_t dutyCycle){
         Simulator_Log(LOG, str);
         return SUCCESS;
     } else {
-        Simulator_Log(LOG_ERROR, "Used fan before initialization\n");
+        Simulator_Log(LOG_ERROR, "Used fan before initialization!\n");
         exit(-1); // Fault state for fans??
     }
 }
