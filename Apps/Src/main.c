@@ -9,7 +9,7 @@
 #include "os.h"
 #include "Tasks.h"
 #include "BSP_WDTimer.h"
-#include "BSP_Contactor.h"
+#include "Contactor.h"
 #include "BSP_PLL.h"
 #include "BSP_UART.h"
 #include "EEPROM.h"

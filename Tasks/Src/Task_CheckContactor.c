@@ -1,6 +1,6 @@
 /* Copyright (c) 2018-2022 UT Longhorn Racing Solar */
 #include "os.h"
-#include "BSP_Contactor.h"
+#include "Contactor.h"
 #include "Tasks.h"
 
 /* 

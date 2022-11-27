@@ -1,6 +1,6 @@
 /* Copyright (c) 2018-2022 UT Longhorn Racing Solar */
 
-#include "BSP_Contactor.h"
+#include "Contactor.h"
 
 /**
  * @brief Initializes all Contactor pins used by the BPS
@@ -8,9 +8,12 @@
  * @return none
  */
 void BSP_Contactor_Init(void) {
-	//since pwm was setup in BSP_PWM_INIT, all we need to do is setup an input pin
+	//Contactor Init is called before fan init, so initialize pwm here first. This will setup the contactor outputs
+	BSP_PWM_Init();
+
+	//setup the input pin
     GPIO_InitTypeDef GPIO_C1Init;
-	GPIO_C1Init.GPIO_Pin = GPIO_Pin_1; //output pin is 0
+	GPIO_C1Init.GPIO_Pin = GPIO_Pin_1; //input pin is gpio B1
     GPIO_C1Init.GPIO_Mode = GPIO_Mode_IN;
     GPIO_C1Init.GPIO_Speed = GPIO_Speed_2MHz;
     GPIO_C1Init.GPIO_PuPd = GPIO_PuPd_DOWN;
@@ -82,7 +85,7 @@ void BSP_Contactor_Off(Contactors_t contactorChoice) {
 bool BSP_Contactor_GetState(Contactors_t contactorChoice) {
 	bool contactorReturnValue = ((C1_PORT->IDR & GPIO_Pin_1) >> 1) ? 0 : 1; //read the one and only input pin
 
-	/* this is old implementation, but we only have one input pin now
+	/* this is future support for multiple contactors, but we only have one pin right now
 	bool contactorReturnValue = false;
 	if (contactorChoice == ARRAY_CONTACTOR) {
 		contactorReturnValue = ((C1_PORT->IDR & GPIO_Pin_1) >> 1) ? 0 : 1;

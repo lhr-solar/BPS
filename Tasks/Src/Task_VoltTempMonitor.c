@@ -4,7 +4,7 @@
 #include "os.h"
 #include "Voltage.h"
 #include "Temperature.h"
-#include "BSP_Fans.h"
+#include "Fans.h"
 #include "CANbus.h"
 #include "Amps.h"
 #include "CAN_Queue.h"

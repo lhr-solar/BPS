@@ -1,10 +1,10 @@
 /* Copyright (c) 2018-2022 UT Longhorn Racing Solar */
 #include "os.h"
 #include "Tasks.h"
-#include "BSP_Contactor.h"
+#include "Contactor.h"
 #include "BSP_Lights.h"
 #include "Voltage.h"
-#include "BSP_Fans.h"
+#include "Fans.h"
 #include "Temperature.h"
 #include "Amps.h"
 #include "EEPROM.h"

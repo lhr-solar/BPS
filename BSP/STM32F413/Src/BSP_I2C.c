@@ -2,9 +2,6 @@
 
 #include "BSP_I2C.h"
 #include "stm32f4xx.h"
-#include "stm32f4xx_gpio.h"
-#include "stm32f4xx_rcc.h"
-#include "stm32f4xx_i2c.h"
 
 #define TIMEOUT_THRESHOLD   1200000 // 15 ms delay threshold (3x the write time)
 

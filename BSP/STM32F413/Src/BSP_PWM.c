@@ -6,8 +6,11 @@ GPIO_InitTypeDef GPIO_INIT_STRUCT; //struct used to initialize pins
 TIM_OCInitTypeDef TIMER_OC_STRUCT; //struct used to configure output compare for timers
 TIM_TimeBaseInitTypeDef TIMER_INIT_STRUCT; //struct used to initialize PWM timers
 
+/**
+ * @brief   Sets up contactor and fan pin timers for outputting PWM signals
+ */
 void BSP_PWM_Init(void){
-    //we will initialize all pins pertaining to fans and contactors for PWM here
+    //initialize all pins pertaining to fans and contactors for PWM here
 
     //Enable TIM 3,8,12
     RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3, ENABLE);
@@ -81,10 +84,19 @@ void BSP_PWM_Init(void){
     TIM_Cmd(TIM12, ENABLE);
 }
 
+/**
+ * @brief   Sets the PWM duty cycle of a specific pin
+ * @note    
+ * @param   pin Which pin to set the speed. Pins 1-4 are defined to be on the fan board, and pin 5 is the contactor output
+ * @param   speed The value to write to the output compare register. The timer counts up from 0 to 4000, so speed must be between 0-4000
+ * @return  ErrorStatus will return 1 if successful, 0 if there were problems
+ */
 ErrorStatus BSP_PWM_Set(uint8_t pin, uint32_t speed){
     //Range of pulse is 0-4000
     //First check to make sure that change is within range of values
     //Load new value into Compare and Capture Register
+    if (speed>4000) speed = 4000;
+
     switch (pin)
     {
     case 1:
@@ -113,6 +125,11 @@ ErrorStatus BSP_PWM_Set(uint8_t pin, uint32_t speed){
     }
 }
 
+/**
+ * @brief   Gets the PWM duty cycle of a pin. 
+ * @param   pin The pin to get the duty cycle from
+ * @return  The value inside the output compare register. You will need to math to convert this to an actual duty cycle. Returns -1 if input pin is invalid
+ */
 int BSP_PWM_Get(uint8_t pin){
     switch (pin)
     {
