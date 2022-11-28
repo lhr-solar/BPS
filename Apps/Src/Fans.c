@@ -21,6 +21,7 @@ void BSP_Fans_Init(void){
 
 ErrorStatus BSP_Fans_Set(uint8_t fan, uint32_t speed){
     //don't mess with the contactor
+    BSP_PWM_Init();
     if (fan == CFAN) return ERROR; 
     //Range of pulse is 0-4000
     //First check to make sure that change is within range of values
