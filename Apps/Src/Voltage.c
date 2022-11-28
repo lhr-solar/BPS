@@ -42,33 +42,25 @@ void Voltage_Init(cell_asic *boards){
 	// Record pointer
 	Minions = boards;
 	//initialize mutex
-	OS_ERR err;
-	OSMutexCreate(&Voltage_Mutex,
-				  "Voltage Buffer Mutex",
-				  &err
-				);
+	RTOS_BPS_MutexCreate(&Voltage_Mutex, "Voltage Buffer Mutex");
 					
 	wakeup_sleep(NUM_MINIONS);
 	LTC6811_Init(Minions);
 	
 	//take control of mutex
-  	OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
-  	assertOSError(err);
+  	RTOS_BPS_MutexPend(&MinionsASIC_Mutex, OS_OPT_PEND_BLOCKING);
 	// Write Configuration Register
 	LTC6811_wrcfg(NUM_MINIONS, Minions);
 	//release mutex
-  	OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
-  	assertOSError(err);
+  	RTOS_BPS_MutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE);
 
 	// Read Configuration Register
 	// take control of mutex
-  	OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
-  	assertOSError(err);
+  	RTOS_BPS_MutexPend(&MinionsASIC_Mutex, OS_OPT_PEND_BLOCKING);
 	wakeup_sleep(NUM_MINIONS);
 	LTC6811_rdcfg_safe(NUM_MINIONS, Minions);
 	// release mutex
-  	OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
-  	assertOSError(err);
+  	RTOS_BPS_MutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE);
 	
 	// Initialize median filter. There should be no modules with less than 0 volts or more than 5 volts
 	VoltageFilter_init(&VoltageFilter, 0, 50000);
@@ -79,7 +71,6 @@ void Voltage_Init(cell_asic *boards){
  * @param pointer to new voltage measurements
  */
 void Voltage_UpdateMeasurements(void){
-	CPU_TS ts;
 	// Start Cell ADC Measurements
 	wakeup_sleep(NUM_MINIONS);
 	LTC6811_adcv(ADC_CONVERSION_MODE,ADC_DCP,CELL_CH_TO_CONVERT);
@@ -87,9 +78,7 @@ void Voltage_UpdateMeasurements(void){
 	
 	// Read Cell Voltage Registers
 	//take control of mutex
-	OS_ERR err;
-  	OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
-  	assertOSError(err);
+  	RTOS_BPS_MutexPend(&MinionsASIC_Mutex, OS_OPT_PEND_BLOCKING);
 	LTC6811_rdcv_safe(0, NUM_MINIONS, Minions); // Set to read back all cell voltage registers
 	//copies values from cells.c_codes to private array
 
@@ -99,19 +88,15 @@ void Voltage_UpdateMeasurements(void){
 		rawVoltages[i] = Minions[i / MAX_VOLT_SENSORS_PER_MINION_BOARD].cells.c_codes[i % MAX_VOLT_SENSORS_PER_MINION_BOARD];
 	}
 	// release minions asic mutex
-	OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
-  	assertOSError(err);
+	RTOS_BPS_MutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE);
 	
 	// run median filter
 	VoltageFilter_put(&VoltageFilter, rawVoltages);
 
 	// update public voltage values
-	OSMutexPend(&Voltage_Mutex, 0, OS_OPT_PEND_BLOCKING, &ts, &err);
-  	assertOSError(err);
+	RTOS_BPS_MutexPend(&Voltage_Mutex, OS_OPT_PEND_BLOCKING);
 	VoltageFilter_get(&VoltageFilter, Voltages);
-	//release mutex
-	OSMutexPost(&Voltage_Mutex, OS_OPT_POST_NONE, &err);
-	assertOSError(err);
+	RTOS_BPS_MutexPost(&Voltage_Mutex, OS_OPT_POST_NONE);
 }
 
 /** Voltage_CheckStatus
@@ -145,9 +130,7 @@ SafetyStatus Voltage_CheckStatus(void){
 void Voltage_GetModulesInDanger(VoltageSafety_t* system){
 	uint32_t wires;
 	uint32_t openWireIdx = 0;
-	OS_ERR err;
-	OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
-  	assertOSError(err);
+	RTOS_BPS_MutexPend(&MinionsASIC_Mutex, OS_OPT_PEND_BLOCKING);
 	//put all the bits from each minion's system_open_wire variable into one variable
 	for(int k = 0; k < NUM_MINIONS; k++){
 		wires = (Minions[k].system_open_wire & 0x1FF);	//there are at most 8 modules per IC, bit 0 is GND
@@ -177,8 +160,7 @@ void Voltage_GetModulesInDanger(VoltageSafety_t* system){
 			system->wire_checks[i] = SAFE;
 		}
 	}
-	OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
-  	assertOSError(err);
+	RTOS_BPS_MutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE);
 }
 
 /** Voltage_OpenWireSummary
@@ -186,14 +168,9 @@ void Voltage_GetModulesInDanger(VoltageSafety_t* system){
  */
 void Voltage_OpenWireSummary(void){
 	wakeup_idle(NUM_MINIONS);
-	//take control of mutex
-	OS_ERR err;
-  	OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
-  	assertOSError(err);
+  	RTOS_BPS_MutexPend(&MinionsASIC_Mutex, OS_OPT_PEND_BLOCKING);
 	LTC6811_run_openwire_multi(NUM_MINIONS, Minions, true);
-	//release mutex
-  	OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
-  	assertOSError(err);
+  	RTOS_BPS_MutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE);
 }
 
 /** Voltage_OpenWire
@@ -203,10 +180,8 @@ void Voltage_OpenWireSummary(void){
 SafetyStatus Voltage_OpenWire(void){
 	SafetyStatus status = SAFE;
 	wakeup_idle(NUM_MINIONS);
-
-	OS_ERR err;
-  	OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
-	assertOSError(err);
+	
+  	RTOS_BPS_MutexPend(&MinionsASIC_Mutex, OS_OPT_PEND_BLOCKING);
 	
 	LTC6811_run_openwire_multi(NUM_MINIONS, Minions, false);
 
@@ -219,9 +194,7 @@ SafetyStatus Voltage_OpenWire(void){
 			break;
 		}
 	}
-
-	OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
-  	assertOSError(err);
+	RTOS_BPS_MutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE);
 
 	return status;
 }
@@ -232,17 +205,14 @@ SafetyStatus Voltage_OpenWire(void){
  */
 uint32_t Voltage_GetOpenWire(void){
 	wakeup_idle(NUM_MINIONS);
-	//take control of mutex
-	OS_ERR err;
-	if(!Fault_Flag){
-  		OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
-  		assertOSError(err);
+	if (!Fault_Flag) {
+		RTOS_BPS_MutexPend(&MinionsASIC_Mutex, OS_OPT_PEND_BLOCKING);
 	}
+	
 	uint32_t result = LTC6811_run_openwire_multi(NUM_MINIONS, Minions, false);
-	//release 
-	if (!Fault_Flag){
-  		OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
-  		assertOSError(err);
+	
+	if (!Fault_Flag) {
+		RTOS_BPS_MutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE);
 	}
 	return result;
 }
@@ -254,8 +224,6 @@ uint32_t Voltage_GetOpenWire(void){
  * @return voltage of module at specified index
  */
 uint16_t Voltage_GetModuleMillivoltage(uint8_t moduleIdx){
-	CPU_TS ts;
-	OS_ERR err;
 	// These if statements prevents a hardfault.
     if(moduleIdx >= NUM_BATTERY_MODULES) {
         return 0xFFFF;  // return -1 which indicates error voltage
@@ -268,14 +236,15 @@ uint16_t Voltage_GetModuleMillivoltage(uint8_t moduleIdx){
     if((moduleIdx / MAX_VOLT_SENSORS_PER_MINION_BOARD) >= NUM_MINIONS) {
         return 0xFFFF;  // return -1 which indicates error voltage
     }
-	if (!Fault_Flag){
-		OSMutexPend(&Voltage_Mutex, 0, OS_OPT_PEND_BLOCKING, &ts, &err);
-		assertOSError(err);
+
+	if (!Fault_Flag) {
+		RTOS_BPS_MutexPend(&Voltage_Mutex, OS_OPT_PEND_BLOCKING);
 	}
+	
 	uint16_t ret = Voltages[moduleIdx] / 10;
-	if (!Fault_Flag){
-		OSMutexPost(&Voltage_Mutex, OS_OPT_POST_NONE, &err);
-		assertOSError(err);
+	
+	if (!Fault_Flag) {
+		RTOS_BPS_MutexPost(&Voltage_Mutex, OS_OPT_POST_NONE);
 	}
 	return ret;
 }

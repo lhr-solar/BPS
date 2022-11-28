@@ -13,9 +13,7 @@
 extern cell_asic Minions[NUM_MINIONS];
 
 void Task_VoltTempMonitor(void *p_arg) {
-    (void)p_arg;
-
-    OS_ERR err;
+    (void)p_arg; 
 
     BSP_Fans_Init();
     Voltage_Init(Minions);
@@ -40,18 +38,10 @@ void Task_VoltTempMonitor(void *p_arg) {
         if(voltageStatus != SAFE) {
             if (voltageStatus == UNDERVOLTAGE) Fault_BitMap = Fault_UVOLT;
             if (voltageStatus == OVERVOLTAGE) Fault_BitMap = Fault_OVOLT;
-            OSSemPost(&Fault_Sem4,
-                        OS_OPT_POST_1,
-                        &err);
-            assertOSError(err);
-        
+            RTOS_BPS_SemPost(&Fault_Sem4, OS_OPT_POST_1); 
         } else if((voltageStatus == SAFE) && (!voltageHasBeenChecked)) {
             // Signal to turn on contactor but only signal once
-            OSSemPost(&SafetyCheck_Sem4,
-                        OS_OPT_POST_1,
-                        &err);
-            assertOSError(err);
-
+            RTOS_BPS_SemPost(&SafetyCheck_Sem4, OS_OPT_POST_1);
             voltageHasBeenChecked = true;
         }
         //Send measurements to CAN queue
@@ -78,18 +68,10 @@ void Task_VoltTempMonitor(void *p_arg) {
         
         if(wireStatus != SAFE) {
             Fault_BitMap = Fault_OW;
-            OSSemPost(&Fault_Sem4,
-                        OS_OPT_POST_1,
-                        &err);
-            assertOSError(err);
-
+            RTOS_BPS_SemPost(&Fault_Sem4, OS_OPT_POST_1);
         } else if((wireStatus == SAFE) && (!openWireHasBeenChecked)) {
             // Signal to turn on contactor but only signal once
-            OSSemPost(&SafetyCheck_Sem4,
-                        OS_OPT_POST_1,
-                        &err);
-            assertOSError(err);
-
+            RTOS_BPS_SemPost(&SafetyCheck_Sem4, OS_OPT_POST_1); 
             openWireHasBeenChecked = true;
         }
 
@@ -100,17 +82,10 @@ void Task_VoltTempMonitor(void *p_arg) {
         SafetyStatus temperatureStatus = Temperature_CheckStatus(Amps_IsCharging());
         if(temperatureStatus != SAFE) {
             Fault_BitMap = Fault_OTEMP;
-            OSSemPost(&Fault_Sem4,
-                        OS_OPT_POST_1,
-                        &err);
-            assertOSError(err);
+            RTOS_BPS_SemPost(&Fault_Sem4, OS_OPT_POST_1);
         } else if((temperatureStatus == SAFE) && (!temperatureHasBeenChecked)) {
             // Signal to turn on contactor but only signal once
-            OSSemPost(&SafetyCheck_Sem4,
-                        OS_OPT_POST_1,
-                        &err);
-            assertOSError(err);
-
+            RTOS_BPS_SemPost(&SafetyCheck_Sem4, OS_OPT_POST_1);
             temperatureHasBeenChecked = true;
         }
 
@@ -162,16 +137,13 @@ void Task_VoltTempMonitor(void *p_arg) {
         BSP_Fans_SetAll(TOPSPEED);
 
         //signal watchdog
-        OSMutexPend(&WDog_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
-        assertOSError(err);
+        RTOS_BPS_MutexPend(&WDog_Mutex, OS_OPT_PEND_BLOCKING);
 
         WDog_BitMap |= WD_VOLT_TEMP; //Set watchdog bits for task
 
-        OSMutexPost(&WDog_Mutex, OS_OPT_POST_NONE, &err);
-        assertOSError(err);
-
+        RTOS_BPS_MutexPost(&WDog_Mutex, OS_OPT_POST_NONE); 
+        
         //delay of 50ms
-        OSTimeDly(5, OS_OPT_TIME_DLY, &err);
-        assertOSError(err);
+        RTOS_BPS_DelayMs(50);
     }
 }

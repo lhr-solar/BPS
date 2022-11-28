@@ -11,6 +11,7 @@
 #include "CAN_Queue.h"
 #include "BSP_WDTimer.h"
 #include "BSP_Contactor.h"
+#include "RTOS_BPS.h"
 
 /******************************************************************************
  * VoltTempMonitor Task Test Plan
@@ -40,101 +41,58 @@ void EnterFaultState(void);
 
 // Initialization task for this test
 void Task1(void *p_arg){
-    OS_ERR err;
     
     OS_CPU_SysTickInit(SystemCoreClock / (CPU_INT32U) OSCfg_TickRate_Hz);
     
-    OSSemCreate(&Fault_Sem4,
-                "Fault/Tripped Semaphore",
-                0,
-                &err);
-    assertOSError(err);
+    RTOS_BPS_SemCreate(&Fault_Sem4, "Fault/Tripped Semaphore", 0);
 
-    OSSemCreate(&SafetyCheck_Sem4,
-                "Safety Check Semaphore",
-                0,
-                &err);
-    assertOSError(err);
+    RTOS_BPS_SemCreate(&SafetyCheck_Sem4, "Safety Check Semaphore", 0);
 
-    OSMutexCreate(&WDog_Mutex,
-                "Watchdog Mutex",
-                &err);
-    assertOSError(err);
+    RTOS_BPS_MutexCreate(&WDog_Mutex, "Watchdog Mutex");
 
     // Spawn tasks needed for Amperes readings to affect contactor
     //1
-    OSTaskCreate(&FaultState_TCB,				// TCB
+    RTOS_BPS_TaskCreate(&FaultState_TCB,				// TCB
             "TASK_FAULT_STATE_PRIO",	// Task Name (String)
             Task_FaultState,				// Task function pointer
             (void *)0,				// Task function args
             TASK_FAULT_STATE_PRIO,			// Priority
-            FaultState_Stk,				// Stack
-            WATERMARK_STACK_LIMIT,	// Watermark limit for debugging
-            TASK_FAULT_STATE_STACK_SIZE,		// Stack size
-            0,						// Queue size (not needed)
-            10,						// Time quanta (time slice) 10 ticks
-            (void *)0,				// Extension pointer (not needed)
-            OS_OPT_TASK_STK_CHK | OS_OPT_TASK_SAVE_FP,	// Options
-            &err);					// return err code
+            FaultState_Stk,	// Watermark limit for debugging
+            TASK_FAULT_STATE_STACK_SIZE);					// return err code
     //2
-    OSTaskCreate(&CriticalState_TCB,				// TCB
+    RTOS_BPS_TaskCreate(&CriticalState_TCB,				// TCB
             "TASK_CRITICAL_STATE_PRIO",	// Task Name (String)
             Task_CriticalState,				// Task function pointer
             (void *)0,				// Task function args
             TASK_CRITICAL_STATE_PRIO,			// Priority
-            CriticalState_Stk,				// Stack
-            WATERMARK_STACK_LIMIT,	// Watermark limit for debugging
-            TASK_CRITICAL_STATE_STACK_SIZE,		// Stack size
-            0,						// Queue size (not needed)
-            10,						// Time quanta (time slice) 10 ticks
-            (void *)0,				// Extension pointer (not needed)
-            OS_OPT_TASK_STK_CHK | OS_OPT_TASK_SAVE_FP,	// Options
-            &err);					// return err code
+            CriticalState_Stk,	// Watermark limit for debugging
+            TASK_CRITICAL_STATE_STACK_SIZE);					// return err code
 
     //3
-    OSTaskCreate(&PetWDog_TCB,				// TCB
+    RTOS_BPS_TaskCreate(&PetWDog_TCB,				// TCB
 			"TASK_PETWDOG_PRIO",	// Task Name (String)
 			Task_PetWDog,				// Task function pointer
 			(void *)0,				// Task function args
 			TASK_PETWDOG_PRIO,			// Priority
-			PetWDog_Stk,				// Stack
-			WATERMARK_STACK_LIMIT,	// Watermark limit for debugging
-			TASK_PETWDOG_STACK_SIZE,		// Stack size
-			0,						// Queue size (not needed)
-			10,						// Time quanta (time slice) 10 ticks
-			(void *)0,				// Extension pointer (not needed)
-			OS_OPT_TASK_STK_CHK | OS_OPT_TASK_SAVE_FP,	// Options
-			&err);					// return err code
+			PetWDog_Stk,	// Watermark limit for debugging
+			TASK_PETWDOG_STACK_SIZE);					// return err code
     // Spawn Task_VoltTempMonitor with PRIO 4
-    OSTaskCreate(&VoltTempMonitor_TCB,				// TCB
+    RTOS_BPS_TaskCreate(&VoltTempMonitor_TCB,				// TCB
 			"TASK_VOLT_TEMP_MONITOR_PRIO",	// Task Name (String)
 			Task_VoltTempMonitor,				// Task function pointer
 			(void *)0,				// Task function args
 			TASK_VOLT_TEMP_MONITOR_PRIO,			// Priority
-			VoltTempMonitor_Stk,				// Stack
-			WATERMARK_STACK_LIMIT,	// Watermark limit for debugging
-			TASK_VOLT_TEMP_MONITOR_STACK_SIZE,		// Stack size
-			0,						// Queue size (not needed)
-			10,						// Time quanta (time slice) 10 ticks
-			(void *)0,				// Extension pointer (not needed)
-			OS_OPT_TASK_STK_CHK | OS_OPT_TASK_SAVE_FP,	// Options
-			&err);					// return err code
+			VoltTempMonitor_Stk,	// Watermark limit for debugging
+			TASK_VOLT_TEMP_MONITOR_STACK_SIZE);					// return err code
 
     // Spawn CANBUS Consumer, PRIO 7
-    OSTaskCreate(&CANBusConsumer_TCB,				// TCB
+    RTOS_BPS_TaskCreate(&CANBusConsumer_TCB,				// TCB
             "TASK_CANBUS_CONSUMER_PRIO",	// Task Name (String)
             Task_CANBusConsumer,				// Task function pointer
             (void *)true,				// Use loopback mode
             TASK_CANBUS_CONSUMER_PRIO,			// Priority
-            CANBusConsumer_Stk,				// Stack
-            WATERMARK_STACK_LIMIT,	// Watermark limit for debugging
-            TASK_CANBUS_CONSUMER_STACK_SIZE,		// Stack size
-            0,						// Queue size (not needed)
-            10,						// Time quanta (time slice) 10 ticks
-            (void *)0,				// Extension pointer (not needed)
-            OS_OPT_TASK_STK_CHK | OS_OPT_TASK_SAVE_FP,	// Options
-            &err);					// return err code
-    assertOSError(err);
+            CANBusConsumer_Stk,	// Watermark limit for debugging
+            TASK_CANBUS_CONSUMER_STACK_SIZE);					// return err code
 
     // Initialize CAN queue
     CAN_Queue_Init();
@@ -145,34 +103,25 @@ void Task1(void *p_arg){
 
 //Task to prevent watchdog from tripping
 void Task2(void *p_arg){
-    OS_ERR err;
 
-    OSSemPost(&SafetyCheck_Sem4,      //Set semaphore once since Amperes Task doesn't run
-                OS_OPT_POST_1,
-                &err);
-	assertOSError(err);
-    OSSemPost(&SafetyCheck_Sem4,      //Set semaphore once since Battery Balancing Task doesn't run
-                OS_OPT_POST_1,
-                &err);
-	assertOSError(err);
+    RTOS_BPS_SemPend(&SafetyCheck_Sem4, OS_OPT_POST_1);
+    RTOS_BPS_SemPend(&SafetyCheck_Sem4, OS_OPT_POST_1);
 
     while(1){
-        OSMutexPend(&WDog_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
-        assertOSError(err);
+        RTOS_BPS_MutexPend(&WDog_Mutex, OS_OPT_PEND_BLOCKING);
         WDog_BitMap |= WD_AMPERES;
         WDog_BitMap |= WD_BALANCING;
-        OSMutexPost(&WDog_Mutex, OS_OPT_POST_NONE, &err);
-        assertOSError(err);
+        RTOS_BPS_MutexPost(&WDog_Mutex, OS_OPT_POST_NONE);
         //delay of 100ms
-        OSTimeDly(10, OS_OPT_TIME_DLY, &err);
-        assertOSError(err);
+        RTOS_BPS_DelayTick(10);
         //BSP_Light_Toggle(RUN);
     }
 }
 
 // Similar to the production code main. Does not mess with contactor 
 int main(void) {
-
+    OS_ERR err;
+    
     //Resetting the contactor
     BSP_Contactor_Init();
     BSP_Contactor_Off(ALL_CONTACTORS);
@@ -182,42 +131,27 @@ int main(void) {
         EnterFaultState();
     }
 
-    OS_ERR err;
     BSP_PLL_Init();
     BSP_Lights_Init();
     OSInit(&err);
     assertOSError(err);
 
-    OSTaskCreate(&Task1_TCB,
+    RTOS_BPS_TaskCreate(&Task1_TCB,
                 "Task 1",
                 Task1,
                 (void *)0,
                 1,
                 Task1_Stk,
-                16,
-                256,
-                0,
-                0,
-                (void *)0,
-                OS_OPT_TASK_SAVE_FP | OS_OPT_TASK_STK_CHK,
-                &err);
-    assertOSError(err);
+                256);
 
     //Give same priority as amperes task thread
-    OSTaskCreate(&Task2_TCB,
+    RTOS_BPS_TaskCreate(&Task2_TCB,
                 "Task 2",
                 Task2,
                 (void *)0,
                 5,
                 Task2_Stk,
-                16,
-                256,
-                0,
-                0,
-                (void *)0,
-                OS_OPT_TASK_SAVE_FP | OS_OPT_TASK_STK_CHK,
-                &err);
-    assertOSError(err);
+                256);
 
     OSStart(&err);
 }
