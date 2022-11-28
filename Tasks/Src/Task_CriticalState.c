@@ -35,7 +35,7 @@ void Task_CriticalState(void *p_arg) {
                 );                      // return err code
 
     // Turn Contactor On
-    BSP_Contactor_On(ALL_CONTACTORS);
+    Contactor_On(ALL_CONTACTORS);
 
     // launch check contactor task
     RTOS_BPS_TaskCreate(&CheckContactor_TCB,                       // TCB

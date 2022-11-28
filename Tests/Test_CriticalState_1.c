@@ -5,7 +5,7 @@
 #include "os.h"
 #include "Tasks.h"
 #include "stm32f4xx.h"
-#include "BSP_Contactor.h"
+#include "Contactor.h"
 #include "BSP_Lights.h"
 #include "BSP_PLL.h"
 #include "CAN_Queue.h"
@@ -95,7 +95,7 @@ int main(void) {
     OS_ERR err;
     BSP_PLL_Init();
     BSP_Lights_Init();
-    BSP_Contactor_Init();
+    Contactor_Init();
 
     __disable_irq();
 

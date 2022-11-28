@@ -25,11 +25,11 @@ void EnterFaultState() {
     __disable_irq();
 
     // Turn Contactor Off
-    BSP_Contactor_Init();
-    BSP_Contactor_Off(ALL_CONTACTORS);
+    Contactor_Init();
+    Contactor_Off(ALL_CONTACTORS);
     //Set Fans to full speed
-    BSP_Fans_Init();
-    BSP_Fans_SetAll(TOPSPEED);
+    Fans_Init();
+    Fans_SetAll(TOPSPEED);
     // Turn Strobe Light On
     // Turn LEDs On and logs Error into EEPROM
     BSP_Lights_Init();

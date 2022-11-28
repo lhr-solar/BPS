@@ -9,7 +9,7 @@
 // #include "Voltage.h"
 // #include "Amps.h"
 // #include "Temperature.h"
-// #include "BSP_Contactor.h"
+// #include "Contactor.h"
 // #include "BSP_WDTimer.h"
 // #include "BSP_Lights.h"
 // #include "config.h"
@@ -339,7 +339,7 @@
 //  * @param hashTokens is the array of hashed tokens
 //  */
 // void CLI_Contactor(int* hashTokens) {
-// 	State contactor = BSP_Contactor_GetState();
+// 	State contactor = Contactor_GetState();
 // 	if(hashTokens[1] == 0) {
 // 		if(contactor == ON) {
 // 			printf("Contactor is Enabled\n\r");
@@ -637,7 +637,7 @@
 // 	while(1) {
 // 		if(BSP_UART_ReadLine(response, 3) > 0) {
 // 			if(CLI_StringHash(response) == CLI_SHUTDOWN_HASH) {
-// 				BSP_Contactor_Off();
+// 				Contactor_Off();
 // 				printf("Contactor is off\n\r");
 // 				break;
 // 			} else {

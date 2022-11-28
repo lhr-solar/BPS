@@ -8,8 +8,8 @@ Uses Pins PC6,7 and PB14,15
 #include "Fans.h"
 #include "Contactor.h"
 
-void BSP_Fans_Init(void){
-    BSP_Fans_SetAll(4); //start with all fans half speed
+void Fans_Init(void){
+    Fans_SetAll(4); //start with all fans half speed
 }
 
 /**
@@ -19,7 +19,7 @@ void BSP_Fans_Init(void){
  * @return ErrorStatus will return 1 if successful, 0 if error occurred
  */
 
-ErrorStatus BSP_Fans_Set(uint8_t fan, uint32_t speed){
+ErrorStatus Fans_Set(uint8_t fan, uint32_t speed){
     //don't mess with the contactor
     BSP_PWM_Init();
     if (fan == CFAN) return ERROR; 
@@ -34,7 +34,7 @@ ErrorStatus BSP_Fans_Set(uint8_t fan, uint32_t speed){
  * @param   fan Gets the duty cycle for this fan
  * @return  int representation of the fan speed from 0-8, -1 if an error occurred
  */
-int BSP_Fans_GetSpeed(uint8_t fan){
+int Fans_GetSpeed(uint8_t fan){
     if (fan == CFAN) return -1;
     int fanspeed = BSP_PWM_Get(fan);
     return fanspeed == -1 ? -1 : fanspeed / DIVIDER;
@@ -45,11 +45,11 @@ int BSP_Fans_GetSpeed(uint8_t fan){
  * @param   dutyCycle: int for duty cycle amount in range 0-8
  * @return  ErrorStatus
  */
-ErrorStatus BSP_Fans_SetAll(uint32_t speed) {
+ErrorStatus Fans_SetAll(uint32_t speed) {
     ErrorStatus result = SUCCESS;
     for (uint8_t i = 1; i <= 4; i++){
         if (i == CFAN) continue;
-        ErrorStatus e = BSP_Fans_Set(i, speed);
+        ErrorStatus e = Fans_Set(i, speed);
         if (e != SUCCESS) result = e;
     }
     return result;

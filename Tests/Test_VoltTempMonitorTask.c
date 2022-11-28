@@ -10,7 +10,7 @@
 #include "BSP_PLL.h"
 #include "CAN_Queue.h"
 #include "BSP_WDTimer.h"
-#include "BSP_Contactor.h"
+#include "Contactor.h"
 #include "RTOS_BPS.h"
 
 /******************************************************************************
@@ -123,8 +123,8 @@ int main(void) {
     OS_ERR err;
     
     //Resetting the contactor
-    BSP_Contactor_Init();
-    BSP_Contactor_Off(ALL_CONTACTORS);
+    Contactor_Init();
+    Contactor_Off(ALL_CONTACTORS);
 
     if (BSP_WDTimer_DidSystemReset()) {
         Fault_BitMap = Fault_WDOG;

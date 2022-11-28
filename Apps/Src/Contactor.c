@@ -7,7 +7,7 @@
  * @param none
  * @return none
  */
-void BSP_Contactor_Init(void) {
+void Contactor_Init(void) {
 	//Contactor Init is called before fan init, so initialize pwm here first. This will setup the contactor outputs
 	BSP_PWM_Init();
 
@@ -27,7 +27,7 @@ void BSP_Contactor_Init(void) {
  * @param   Contactor to turn on
  * @return  None
  */
-void BSP_Contactor_On(Contactors_t contactorChoice) {
+void Contactor_On(Contactors_t contactorChoice) {
 	// set output pins to start outputing with a duty cycle set by PWM_ON_TIME in the header file
 	switch (contactorChoice)
 	{
@@ -54,7 +54,7 @@ void BSP_Contactor_On(Contactors_t contactorChoice) {
  * @param   Contactor to turn off
  * @return  None
  */
-void BSP_Contactor_Off(Contactors_t contactorChoice) {
+void Contactor_Off(Contactors_t contactorChoice) {
     // set output pin to a duty cycle of 0
 	switch (contactorChoice)
 		{
@@ -82,7 +82,7 @@ void BSP_Contactor_Off(Contactors_t contactorChoice) {
  * @param   Contactor to get state of
  * @return  0 if contactor is off/open, 1 if on/closed
  */
-bool BSP_Contactor_GetState(Contactors_t contactorChoice) {
+bool Contactor_GetState(Contactors_t contactorChoice) {
 	bool contactorReturnValue = ((C1_PORT->IDR & GPIO_Pin_1) >> 1) ? 0 : 1; //read the one and only input pin
 
 	/* this is future support for multiple contactors, but we only have one pin right now

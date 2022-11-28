@@ -1,7 +1,7 @@
 /* Copyright (c) 2018-2022 UT Longhorn Racing Solar */
 
-#ifndef BSP_CONTACTOR_H
-#define BSP_CONTACTOR_H
+#ifndef CONTACTOR_H
+#define CONTACTOR_H
 
 #include "BSP_PWM.h" //PWM_Period is defined in here
 #include "common.h"
@@ -37,14 +37,14 @@ typedef enum {ARRAY_CONTACTOR = 1, HVHIGH_CONTACTOR = 2, HVLOW_CONTACTOR = 4, AL
  * @param   None
  * @return  None
  */
-void BSP_Contactor_Init(void);
+void Contactor_Init(void);
 
 /**
  * @brief   Closes the Contactor switch i.e. turns on the whole electrical system.
  * @note    May be good in the future to make this return something if the contactor could not successfully close.
 
  */
-void BSP_Contactor_On(Contactors_t contactorChoice);
+void Contactor_On(Contactors_t contactorChoice);
 
 /**
  * @brief   Opens the Contactor switch i.e. turns off the whole electrical system.
@@ -52,13 +52,13 @@ void BSP_Contactor_On(Contactors_t contactorChoice);
  * @param   None
  * @return  None
  */
-void BSP_Contactor_Off(Contactors_t contactorChoice);
+void Contactor_Off(Contactors_t contactorChoice);
 
 /**
  * @brief   Gets the state of the Contactor switch from one of its AUX pins.
  * @param   None
  * @return  0 if contactor is off/open, 1 if on/closed
  */
-bool BSP_Contactor_GetState(Contactors_t contactorChoice);
+bool Contactor_GetState(Contactors_t contactorChoice);
 
 #endif
