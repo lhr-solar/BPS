@@ -9,7 +9,7 @@
 #include "os.h"
 #include "Tasks.h"
 #include "BSP_WDTimer.h"
-#include "BSP_Contactor.h"
+#include "Contactor.h"
 #include "BSP_PLL.h"
 #include "BSP_UART.h"
 #include "EEPROM.h"
@@ -25,8 +25,8 @@ int main() {
 	BSP_UART_Init(NULL, NULL, UART_USB);	
 
 	//Resetting the contactor
-	BSP_Contactor_Init();
-	BSP_Contactor_Off();
+	Contactor_Init();
+	Contactor_Off(ALL_CONTACTORS);
 
 	// If the WDTimer counts down to 0, then the BPS resets. If BPS has reset, enter a fault state.
 	if (BSP_WDTimer_DidSystemReset()) {

@@ -1,6 +1,6 @@
 /* Copyright (c) 2018-2022 UT Longhorn Racing Solar */
 
-#include "BSP_Contactor.h"
+#include "Contactor.h"
 #include "simulator_conf.h"
 #include <stdio.h>
 #include <sys/file.h>
@@ -15,7 +15,7 @@ static const char* file = GET_CSV_PATH(CONTACTOR_CSV_FILE);
  * @param   None
  * @return  None
  */
-void BSP_Contactor_Init(void) {
+void Contactor_Init(void) {
     /* Hardware: Initialize two pins that will be connected to the Contactor. One must be configued as an input
           and the other must be configued as an output.
     Software: Create file that contains one unsigned integer, 0 means off, 1 means on
@@ -34,7 +34,7 @@ void BSP_Contactor_Init(void) {
  * @param   None
  * @return  None
  */
-void BSP_Contactor_On(void) {
+void Contactor_On(void) {
     // Hardware: Set the state to high for the output pin.
     //      Use Positive Logic.
     // Software: Set integer to 1
@@ -52,7 +52,7 @@ void BSP_Contactor_On(void) {
  * @param   None
  * @return  None
  */
-void BSP_Contactor_Off(void) {
+void Contactor_Off(void) {
     // Hardware: Set the state to low for the output pin.
     // Software: Set integer to 0
     FILE* fp = fopen(file, "w"); //Open file to write
@@ -68,7 +68,7 @@ void BSP_Contactor_Off(void) {
  * @param   None
  * @return  0 if contactor is off/open, 1 if on/closed
  */
-bool BSP_Contactor_GetState(void) {
+bool Contactor_GetState(void) {
     // Hardware: Return if the Contactor is on or off.
     //      Check for negative logic. The gpio input pin can read low but the contactor could be on. Just make sure
     //      you check that your return value is the same value of what the contactor is irl.

@@ -7,7 +7,7 @@
 #include "stm32f4xx.h"
 #include "BSP_Lights.h"
 #include "BSP_PLL.h"
-#include "BSP_Contactor.h"
+#include "Contactor.h"
 
 OS_TCB Task1_TCB;
 CPU_STK Task1_Stk[256];
@@ -60,8 +60,8 @@ int main(void) {
     OS_ERR err;
     BSP_PLL_Init();
     BSP_Lights_Init();
-    BSP_Contactor_Init();
-    BSP_Contactor_On();
+    Contactor_Init();
+    Contactor_On(ALL_CONTACTORS);
 
     __disable_irq();
 

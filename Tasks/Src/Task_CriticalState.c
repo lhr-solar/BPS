@@ -1,7 +1,7 @@
 /* Copyright (c) 2018-2022 UT Longhorn Racing Solar */
 #include "os.h"
 #include "config.h"
-#include "BSP_Contactor.h"
+#include "Contactor.h"
 #include "CANbus.h"
 #include "Tasks.h"
 #include "BSP_UART.h"
@@ -35,7 +35,7 @@ void Task_CriticalState(void *p_arg) {
                 );                      // return err code
 
     // Turn Contactor On
-    BSP_Contactor_On();
+    Contactor_On(ALL_CONTACTORS);
 
     // launch check contactor task
     RTOS_BPS_TaskCreate(&CheckContactor_TCB,                       // TCB

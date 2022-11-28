@@ -4,7 +4,7 @@
 #include "os.h"
 #include "Voltage.h"
 #include "Temperature.h"
-#include "BSP_Fans.h"
+#include "Fans.h"
 #include "CANbus.h"
 #include "Amps.h"
 #include "CAN_Queue.h"
@@ -15,7 +15,7 @@ extern cell_asic Minions[NUM_MINIONS];
 void Task_VoltTempMonitor(void *p_arg) {
     (void)p_arg; 
 
-    BSP_Fans_Init();
+    Fans_Init();
     Voltage_Init(Minions);
     Temperature_Init(Minions);
 
@@ -134,7 +134,7 @@ void Task_VoltTempMonitor(void *p_arg) {
         // Control Fans depending on temperature
         // Right now this just sets them to maximum speed
         // Once we get a thermal model of the battery box, we can replace this with someting better
-        BSP_Fans_SetAll(TOPSPEED);
+        Fans_SetAll(TOPSPEED);
 
         //signal watchdog
         RTOS_BPS_MutexPend(&WDog_Mutex, OS_OPT_PEND_BLOCKING);

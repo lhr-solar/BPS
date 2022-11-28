@@ -41,8 +41,9 @@ The BPS is designed be built and deployed from a Linux terminal, allowing you to
     - cortex-debug
 5. OPTIONAL: If you are testing on the simulator, you must add the following line in `/etc/security/limits.conf` then restart your machine:
     ```
-    <username> - rtprio unlimited
+    <username>             -      rtprio          unlimited
     ```
+    The tabbing MUST MATCH the other dashes at the bottom of the file, otherwise this will not work!
 
 ## Building
 When calling any of the following commands, make sure you are in the top level of the repo.

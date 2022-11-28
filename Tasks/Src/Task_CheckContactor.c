@@ -1,6 +1,6 @@
 /* Copyright (c) 2018-2022 UT Longhorn Racing Solar */
 #include "RTOS_BPS.h"
-#include "BSP_Contactor.h"
+#include "Contactor.h"
 #include "Tasks.h"
 
 /* 
@@ -17,7 +17,7 @@ void Task_CheckContactor(void *p_arg) {
         RTOS_BPS_DelayMs(250);
 
         // fault if the contactor is open
-        if (BSP_Contactor_GetState() != true) {
+        if (Contactor_GetState(HVHIGH_CONTACTOR) != true) {
             Fault_BitMap |= Fault_ESTOP;
             RTOS_BPS_SemPost(&Fault_Sem4, OS_OPT_POST_1);
         }

@@ -1,5 +1,5 @@
 /* Copyright (c) 2018-2022 UT Longhorn Racing Solar */
-#include "BSP_Fans.h"
+#include "Fans.h"
 #include "simulator_conf.h"
 #include <unistd.h>
 #include <sys/file.h>
@@ -14,7 +14,7 @@ static int Fans[NUM_FANS];
  * @param   None
  * @return  None
  */
-void BSP_Fans_Init(void)
+void Fans_Init(void)
 {
     // Creates file if none exists
     FILE* fp = fopen(file, "w+");
@@ -31,7 +31,7 @@ void BSP_Fans_Init(void)
  *          fan: fan number whose speed should be changed (1-4)
  * @return  None
  */
-ErrorStatus BSP_Fans_Set(uint8_t fan, uint32_t dutyCycle){
+ErrorStatus Fans_Set(uint8_t fan, uint32_t dutyCycle){
     //if input is outside of bounds
     if (fan < 1 || fan > NUM_FANS) return ERROR;
     if (dutyCycle < 0 || dutyCycle > MAX_SPEED) return ERROR;
@@ -54,7 +54,7 @@ ErrorStatus BSP_Fans_Set(uint8_t fan, uint32_t dutyCycle){
  * @param   fan number
  * @return  Current PWM duty cycle
  */
-int BSP_Fans_GetSpeed(uint8_t fan){
+int Fans_GetSpeed(uint8_t fan){
     FILE* fp = fopen(file, "r"); //Open file for reading
     int fno = fileno(fp); //Lock
     flock(fno, LOCK_EX);
