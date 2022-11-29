@@ -276,6 +276,8 @@ ErrorStatus Temperature_UpdateAllMeasurements(){
 	return SUCCESS;
 }
 
+//TODO: merge Temperature_CheckStatus and Temperature_General_Check into one function or do
+//function overloading
 /** Temperature_CheckStatus
  * Checks if all modules are safe
  * @param 1 if pack is charging, 0 if discharging

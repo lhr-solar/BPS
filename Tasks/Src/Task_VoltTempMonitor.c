@@ -52,7 +52,6 @@ void Task_VoltTempMonitor(void *p_arg) {
                         OS_OPT_POST_1,
                         &err);
             assertOSError(err);
-
             voltageHasBeenChecked = true;
         }
         //Send measurements to CAN queue
@@ -118,12 +117,10 @@ void Task_VoltTempMonitor(void *p_arg) {
         } 
         //PID loop - sets fan speed based on avg temperature and desired temperature
         //overrides PID loop if above PID_MAX_TEMPERATURE or if it's FAULT
-        if (PIDStatus != SAFE || temperatureStatus != SAFE) {    
+        if (PIDStatus != SAFE) {
             BSP_Fans_SetAll(TOPSPEED);
         }
-        else {
-            BSP_Fans_SetAll(Temperature_PID_Output(Temperature_GetTotalPackAvgTemperature(), PID_DESIRED_TEMPERATURE));
-        }
+        else BSP_Fans_SetAll(Temperature_PID_Output(Temperature_GetTotalPackAvgTemperature(), PID_DESIRED_TEMPERATURE));
 
 
 
