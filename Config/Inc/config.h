@@ -73,10 +73,6 @@ typedef enum SafetyStatus_e {SAFE = 0, DANGER = 1, OVERVOLTAGE = 2, UNDERVOLTAGE
 #define PID_DESIRED_TEMPERATURE         38000       // Desired temperature   (milliCelcius) 
 #endif
 
-#ifndef PID_MAX_TEMPERATURE
-#define PID_MAX_TEMPERATURE             45000       // Max temperature where PID is overridden (milliCelsius)
-#endif
-
 #ifndef MAX_CURRENT_LIMIT
 #define MAX_CURRENT_LIMIT				75000		// Max current limit (Milliamperes)		(Max continuous discharge is 15A per cell)
 #endif

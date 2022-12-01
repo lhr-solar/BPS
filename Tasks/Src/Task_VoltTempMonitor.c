@@ -99,7 +99,6 @@ void Task_VoltTempMonitor(void *p_arg) {
 
         // Check if temperature is NOT safe: for all modules
         SafetyStatus temperatureStatus = Temperature_CheckStatus(Amps_IsCharging());
-        SafetyStatus PIDStatus = Temperature_General_Check(PID_MAX_TEMPERATURE);
         if(temperatureStatus != SAFE) {
             Fault_BitMap = Fault_OTEMP;
             OSSemPost(&Fault_Sem4,
@@ -117,11 +116,9 @@ void Task_VoltTempMonitor(void *p_arg) {
         } 
         //PID loop - sets fan speed based on avg temperature and desired temperature
         //overrides PID loop if above PID_MAX_TEMPERATURE or if it's FAULT
-        if (PIDStatus != SAFE) {
-            BSP_Fans_SetAll(TOPSPEED);
+        if (temperatureStatus == SAFE) {
+            BSP_Fans_SetAll(Temperature_PID_Output(Temperature_GetTotalPackAvgTemperature(), PID_DESIRED_TEMPERATURE));
         }
-        else BSP_Fans_SetAll(Temperature_PID_Output(Temperature_GetTotalPackAvgTemperature(), PID_DESIRED_TEMPERATURE));
-
 
 
 

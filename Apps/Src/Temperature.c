@@ -276,8 +276,6 @@ ErrorStatus Temperature_UpdateAllMeasurements(){
 	return SUCCESS;
 }
 
-//TODO: merge Temperature_CheckStatus and Temperature_General_Check into one function or do
-//function overloading
 /** Temperature_CheckStatus
  * Checks if all modules are safe
  * @param 1 if pack is charging, 0 if discharging
@@ -285,26 +283,6 @@ ErrorStatus Temperature_UpdateAllMeasurements(){
  */
 SafetyStatus Temperature_CheckStatus(uint8_t isCharging){
 	int32_t temperatureLimit = isCharging == 1 ? MAX_CHARGE_TEMPERATURE_LIMIT : MAX_DISCHARGE_TEMPERATURE_LIMIT;
-
-	for (int i = 0; i < NUM_MINIONS; i++) {
-		for (int j = 0; j < MAX_TEMP_SENSORS_PER_MINION_BOARD; j++) {
-			if (i * MAX_TEMP_SENSORS_PER_MINION_BOARD + j >= NUM_TEMPERATURE_SENSORS) break;
-			if ((temperatures[i][j] > temperatureLimit) || (temperatures[i][j] == TEMP_ERR_OUT_BOUNDS)) {
-				return DANGER;
-			}
-		}
-	}
-
-	return SAFE;
-}
-
-/** Temperature_General_Check
- * Checks if all modules below specified temperature
- * @param target_temperature in millivolts
- * @return SAFE or DANGER
- */
-SafetyStatus Temperature_General_Check(int32_t target){
-	int32_t temperatureLimit = target;
 
 	for (int i = 0; i < NUM_MINIONS; i++) {
 		for (int j = 0; j < MAX_TEMP_SENSORS_PER_MINION_BOARD; j++) {
