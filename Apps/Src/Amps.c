@@ -11,9 +11,9 @@
 #include "BSP_SPI.h"
 #include "CANbus.h"
 #include "Charge.h"
-//#ifdef SIMULATION
+#ifdef SIMULATION
 #include "Simulator.h"
-//#endif
+#endif
 static OS_MUTEX AmperesData_Mutex;
 
 static OS_SEM AmperesIO_Sem;
@@ -79,9 +79,6 @@ void Amps_UpdateMeasurements(void) {
 	OSMutexPend(&AmperesData_Mutex, 0, OS_OPT_PEND_BLOCKING, &ticks, &err);
 	assertOSError(err);
 	#ifdef SIMULATION
-	char CurrentBuffer[70] = {0};
-	sprintf(CurrentBuffer,"Logged current of %d mA\n", Simulator_getCurrent());
-	Simulator_Log(LOG_INFO,CurrentBuffer);
 	latestMeasureMilliAmps = Simulator_getCurrent();
 	#else 
 	latestMeasureMilliAmps = LTC2315_GetCurrent();

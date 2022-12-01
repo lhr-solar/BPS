@@ -5,7 +5,11 @@
 #include "CANbus.h"
 #include "os.h"
 #include "Tasks.h"
+#ifndef SIMULATION
 #include "stm32f4xx.h"
+#else
+#include "Simulator.h"
+#endif
 #include "BSP_Lights.h"
 #include "BSP_PLL.h"
 #include "CAN_Queue.h"
@@ -43,8 +47,9 @@ CPU_STK Task2_Stk[DEFAULT_STACK_SIZE];
 
 // Initialization task for this test
 void Task1(void *p_arg){
+#ifndef SIMULATION
 	OS_CPU_SysTickInit(SystemCoreClock / (CPU_INT32U) OSCfg_TickRate_Hz);
-
+#endif
     OS_ERR err;
     
     OSSemCreate(&Fault_Sem4,
@@ -123,7 +128,19 @@ void Task1(void *p_arg){
             (void *)0,				// Extension pointer (not needed)
             OS_OPT_TASK_STK_CHK | OS_OPT_TASK_SAVE_FP,	// Options
             &err);					// return err code
-        
+    OSTaskCreate(&PetWDog_TCB,				// TCB
+			"TASK_PETWDOG_PRIO",	// Task Name (String)
+			Task_PetWDog,				// Task function pointer
+			(void *)0,				// Task function args
+			TASK_PETWDOG_PRIO,			// Priority
+			PetWDog_Stk,				// Stack
+			WATERMARK_STACK_LIMIT,	// Watermark limit for debugging
+			TASK_PETWDOG_STACK_SIZE,		// Stack size
+			0,						// Queue size (not needed)
+			10,						// Time quanta (time slice) 10 ticks
+			(void *)0,				// Extension pointer (not needed)
+			OS_OPT_TASK_STK_CHK | OS_OPT_TASK_SAVE_FP,	// Options
+			&err);	
     // Initialize CAN queue
     CAN_Queue_Init();
     assertOSError(err);
@@ -162,9 +179,10 @@ void Task2(void *p_arg){
         //delay of 100ms
         OSTimeDly(10, OS_OPT_TIME_DLY, &err);
         assertOSError(err);
-
+        Amps_UpdateMeasurements();
         if (count == 0) {
-            printf("Amps: %ld\n\r", Amps_GetReading());
+            // printf("Amps: %d\n\r", Amps_GetReading());
+            Amps_UpdateMeasurements();
         }
         count = (count + 1) % 10;
 
@@ -173,7 +191,12 @@ void Task2(void *p_arg){
 }
 
 // Similar to the production code main. Does not check watchdog or mess with contactor 
+#ifndef SIMULATION
 int main(void) {
+#else
+int main (int argc, char**argv) {
+    Simulator_Init(argv[1]);
+#endif
     OS_ERR err;
 
 
@@ -185,6 +208,7 @@ int main(void) {
 
     // If the WDTimer counts down to 0, then the BPS resets. If BPS has reset, enter a fault state.
     if (BSP_WDTimer_DidSystemReset()) {
+        Fault_BitMap = Fault_WDOG;
 	    EnterFaultState();
     }
 
