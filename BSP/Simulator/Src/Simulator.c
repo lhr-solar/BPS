@@ -41,7 +41,14 @@ static uint16_t DUMMY_VOLTAGES[NUM_BATTERY_MODULES] = { 3000 };
 static uint16_t DUMMY_TEMPS[NUM_TEMPERATURE_SENSORS] = { 30000 };
 
 // LUT which corresponds Logging Level type to string to print out in LogFile
-static const char* LoggingLUT[LOG_MAXLEVEL] = {"", "INFO: ", "WARNING: ", "ERROR: "};
+static const char* LoggingLUT[LOG_NUM_LEVELS] = {
+    [LOG_INFO] = "[INFO] ",
+    [LOG_WARN] = "[WARNING] ",
+    [LOG_ERROR] = "[ERROR] ",
+    [LOG_OUTPUT] = "[OUTPUT] ",
+    [LOG] = "",
+    [LOG_MISC] = "[MISC] ",
+};
 
 /**
  * @brief   Log something to simulator log file
@@ -54,11 +61,6 @@ void Simulator_Log(LoggingType_t lvl, char *str) {
     strcpy(prefix, LoggingLUT[lvl]); //This is because strcat cannot concat const
     char* msg = strcat(prefix, str);
     write(simulatorLog, msg, strlen(msg));
-    if (0) {
-        char *buffer = (char *) malloc(strlen(msg) + 2);
-        sprintf(buffer, "%s\n", msg);
-        free(buffer);
-    }
 }
 
 // It knows what the input file is because the Makefile should make a #define for the file path called SIMULATOR_JSON_PATH
@@ -77,7 +79,7 @@ void Simulator_Log(LoggingType_t lvl, char *str) {
  * @return  None
  */
 void Simulator_Shutdown(int status) {
-    Simulator_Log(LOG, "Shutting down the simulator...\n");
+    Simulator_Log(LOG, "\nShutting down the simulator...\n");
     close(simulatorLog);
     exit(status);
 }
@@ -188,7 +190,7 @@ static void readInputFile(char *jsonPath) {
         if (!canList) {
             char buffer[67];
             sprintf(buffer, "No CAN messages to simulate in this state. (State Count = %d)\n", stateCount);
-            Simulator_Log(LOG, buffer);
+            Simulator_Log(LOG_MISC, buffer);
         } else { // otherwise, there are some potential CAN messages. 
             // for every CAN message...
             for (cJSON* msg = canList->child; msg != NULL; msg = msg->next) {
@@ -253,7 +255,7 @@ void Simulator_Init(char *jsonPath) {
     const struct sigaction act = {.sa_handler = CtrlCHandler, .sa_mask = s, .sa_flags = 0};
     sigaction(SIGINT, &act, NULL);
 
-    Simulator_Log(LOG, "Simulator intialized\n");    
+    Simulator_Log(LOG, "\nSimulator intialized\n");    
 
     // initialize the fake inputs
     readInputFile(jsonPath);
@@ -277,7 +279,7 @@ static void Simulator_Transition(void) {
         free(prev);
 
         if (states == NULL) {
-            Simulator_Log(LOG, "Finished last state!\n");
+            Simulator_Log(LOG, "\nFinished last state!\n");
             Simulator_Shutdown(0);
         }
     }

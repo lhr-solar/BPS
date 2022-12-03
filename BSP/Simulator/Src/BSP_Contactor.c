@@ -29,7 +29,7 @@ static ContactorStates_t ContStates;
  */
 void BSP_Contactor_Init(void) {
     initialized = true;
-    Simulator_Log(LOG_INFO, "Initialized Contactors\n");
+    Simulator_Log_Location(LOG_INFO, "Initialized Contactors\n");
 }
 
 /**
@@ -41,20 +41,20 @@ void BSP_Contactor_Init(void) {
 void BSP_Contactor_On(CONT_CHOICE contactor) {
     if (initialized) {
         if (contactor == HVHIGH_CONTACTOR) {
-            Simulator_Log(LOG_INFO, "Contactor 'HVHIGH' enabled\n");
+            Simulator_Log_Location(LOG_OUTPUT, "Contactor 'HVHIGH' {enabled}\n");
             ContStates.HVHIGH = true;
         } else if (contactor == ARRAY_CONTACTOR) {
-            Simulator_Log(LOG_INFO, "Contactor 'ARRAY' enabled\n");
+            Simulator_Log(LOG_OUTPUT, "Contactor 'ARRAY' {enabled}\n");
             ContStates.HVLOW = true;
         } else if (contactor == HVLOW_CONTACTOR) {
-            Simulator_Log(LOG_INFO, "Contactor 'HVLOW' enabled\n");
+            Simulator_Log(LOG_OUTPUT, "Contactor 'HVLOW' {enabled}\n");
             ContStates.HVLOW = true;
         } else if (contactor == ALL_CONTACTORS) {
-            Simulator_Log(LOG_INFO, "All Contactors enabled\n");
+            Simulator_Log(LOG_OUTPUT, "Contactor 'ALL' {enabled}\n");
             ContStates.ARRAY = ContStates.HVLOW = ContStates.HVHIGH = true;
         }
     } else {
-        Simulator_Log(LOG_ERROR, "Hard Fault: Set contactors before initialization!\n");
+        Simulator_Log_Location(LOG_ERROR, "Hard Fault: Set contactors before initialization!\n");
         Fault_BitMap = Fault_ESTOP;
         EnterFaultState();
     }
@@ -70,20 +70,20 @@ void BSP_Contactor_Off(CONT_CHOICE contactor) {
     if (initialized) {
         state = false;
         if (contactor == HVHIGH_CONTACTOR) {
-            Simulator_Log(LOG_INFO, "Contactor 'HVHIGH' disabled\n");
+            Simulator_Log(LOG_OUTPUT, "Contactor 'HVHIGH' {disabled}\n");
             ContStates.HVHIGH = false;
         } else if (contactor == ARRAY_CONTACTOR) {
-            Simulator_Log(LOG_INFO, "Contactor 'ARRAY' disabled\n");
+            Simulator_Log(LOG_OUTPUT, "Contactor 'ARRAY' {disabled}\n");
             ContStates.ARRAY = false;
         } else if (contactor == HVLOW_CONTACTOR) {
-            Simulator_Log(LOG_INFO, "Contactor 'HVLOW' disabled\n");
+            Simulator_Log(LOG_OUTPUT, "Contactor 'HVLOW' {disabled}\n");
             ContStates.HVLOW = false;
         } else if (contactor == ALL_CONTACTORS) {
-            Simulator_Log(LOG_INFO, "All Contactors disabled\n");
+            Simulator_Log(LOG_OUTPUT, "Contactor 'ALL' {disabled}\n");
             ContStates.ARRAY = ContStates.HVLOW = ContStates.HVHIGH = false;
         }
     } else {
-        Simulator_Log(LOG_ERROR, "Set contactor before initialization!\n");
+        Simulator_Log_Location(LOG_ERROR, "Set contactor before initialization!\n");
         Fault_BitMap = Fault_ESTOP;
         EnterFaultState();
     }
@@ -105,7 +105,7 @@ bool BSP_Contactor_GetState(CONT_CHOICE contactor) {
             return ContStates.HVLOW;
         }
     } else {
-        Simulator_Log(LOG_ERROR, "Read contactor before initialization!\n");
+        Simulator_Log_Location(LOG_ERROR, "Read contactor before initialization!\n");
         Fault_BitMap = Fault_ESTOP;
         EnterFaultState();
         return false; // never reached, but...

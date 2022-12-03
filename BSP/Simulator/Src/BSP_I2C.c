@@ -31,14 +31,14 @@ void BSP_I2C_Init(void) {
  */
 uint8_t  BSP_I2C_Write(uint8_t devAddr, uint16_t regAddr, uint8_t *txData, uint32_t txLen) {
     if (!initialized) {
-        Simulator_Log(LOG_ERROR, "Used I2C without initialization!\n");
+        Simulator_Log_Location(LOG_ERROR, "Used I2C without initialization!\n");
         exit(-1); // fault state for i2c?
     }
 
     char buffer[100];
     for (uint32_t i = 0; i < txLen; ++i) {
-        sprintf(buffer, "Wrote 0x%x to I2C device 0x%x at address 0x%x\n", txData[i], devAddr, regAddr);
-        Simulator_Log(LOG_INFO, buffer);
+        sprintf(buffer, "Wrote I2C Device {0x%x} at address {0x%x} with data {0x%x}\n", txData[i], devAddr, regAddr);
+        Simulator_Log(LOG_OUTPUT, buffer);
     }
 
     return SUCCESS;
@@ -53,7 +53,7 @@ uint8_t  BSP_I2C_Write(uint8_t devAddr, uint16_t regAddr, uint8_t *txData, uint3
  */
 uint8_t BSP_I2C_Read(uint8_t devAddr, uint16_t regAddr, uint8_t *rxData, uint32_t rxLen) {
     if (!initialized) {
-        Simulator_Log(LOG_ERROR, "Used I2C without initialization!\n");
+        Simulator_Log_Location(LOG_ERROR, "Used I2C without initialization!\n");
         exit(-1);
     }
 

@@ -31,7 +31,7 @@ void BSP_Timer_Start(void) {
         Simulator_Log(LOG_INFO,"Timer started\n");
     }
     else {
-        Simulator_Log(LOG_INFO,"Hard Fault: Initialize Timer before start\n");
+        Simulator_Log_Location(LOG_INFO,"Hard Fault: Initialize Timer before start\n");
     }
 }
 

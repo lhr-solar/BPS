@@ -33,11 +33,11 @@ ErrorStatus BSP_Fans_Set(uint8_t fan, uint32_t dutyCycle){
     if (initialized) {
         speed[fan - 1] = dutyCycle;
         char str[50];
-        sprintf(str, "Set Fan #%d to %d\n", fan, dutyCycle);
-        Simulator_Log(LOG_INFO, str);
+        sprintf(str, "Set Fan #{%d} to {%d}\n", fan, dutyCycle);
+        Simulator_Log(LOG_OUTPUT, str);
         return SUCCESS;
     } else {
-        Simulator_Log(LOG_ERROR, "Used fan before initialization!\n");
+        Simulator_Log_Location(LOG_ERROR, "Used fan before initialization!\n");
         exit(-1); // Fault state for fans??
     }
 }
@@ -66,9 +66,11 @@ ErrorStatus BSP_Fans_SetAll(uint32_t speed) {
         }
     }
     if (result != SUCCESS) {
-        Simulator_Log(LOG_WARN, "Fans_SetAll() attempt was not a SUCCESS\n");
+        Simulator_Log_Location(LOG_WARN, "Fans_SetAll() attempt was not a SUCCESS\n");
     } else {
-        Simulator_Log(LOG_INFO, "Set all fans to top speed\n");
+        char buffer[50];
+        sprintf(buffer, "Set Fan {ALL} to max: {%d}\n", TOPSPEED);
+        Simulator_Log(LOG_OUTPUT, buffer);
     }
     return result;
 }

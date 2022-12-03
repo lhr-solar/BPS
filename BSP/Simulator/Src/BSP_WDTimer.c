@@ -40,9 +40,8 @@ bool BSP_WDTimer_DidSystemReset(void){
  */
 void BSP_WDTimer_Start(void) {
     if (!initialized) {
-        Simulator_Log(LOG_ERROR, "Used watchdog timer without initialization!\n");
+        Simulator_Log_Location(LOG_ERROR, "Used watchdog timer without initialization!\n");
         Fault_BitMap = Fault_WDOG;
-        //initialized = true; // this avoids an infinite loop
         EnterFaultState();
     }
     Simulator_Log(LOG_INFO, "Started the watchdog timer\n");
@@ -56,7 +55,7 @@ void BSP_WDTimer_Start(void) {
  */
 void BSP_WDTimer_Reset(void) {
     if (!initialized) {
-        Simulator_Log(LOG_ERROR, "Used watchdog timer without initialization!\n");
+        Simulator_Log_Location(LOG_ERROR, "Used watchdog timer without initialization!\n");
         Fault_BitMap = Fault_WDOG;
         EnterFaultState();
     }
