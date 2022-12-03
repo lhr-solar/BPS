@@ -230,6 +230,7 @@ void Simulator_Init(char *jsonPath) {
     char* tempName = jsonPath + strlen(jsonPath);
     while (*tempName != '/') tempName--;
     tempName++; // remove the '/'
+    // makes the output nice
     sprintf(filename, "bps-sim-%s.log", tempName);
 
     // create the log file
