@@ -31,9 +31,10 @@ static void (*gTxEnd)(void);
  * @param   rxEvent     : the function to execute when recieving a message. NULL for no action.
  * @param   txEnd       : the function to execute after transmitting a message. NULL for no action.
  * @param   loopback    : if we should use loopback mode (for testing)
+ * @param   faultState  : fault state determines whether to implement Rx and Tx interrupts 
  * @return  None
  */
-void BSP_CAN_Init(callback_t rxEvent, callback_t txEnd, bool loopback) {
+void BSP_CAN_Init(callback_t rxEvent, callback_t txEnd, bool loopback, bool faultState) {
     GPIO_InitTypeDef GPIO_InitStructure;
     CAN_InitTypeDef CAN_InitStructure;
     NVIC_InitTypeDef NVIC_InitStructure;
@@ -114,29 +115,31 @@ void BSP_CAN_Init(callback_t rxEvent, callback_t txEnd, bool loopback) {
     gRxMessage.DLC = 0;
     gRxMessage.FMI = 0;
 
-    /* Enable FIFO 0 message pending Interrupt */
-    CAN_ITConfig(CAN1, CAN_IT_FMP0, ENABLE);
+    /* Enable interrupts if in normal state */
+    if(!faultState){
+        /* Enable FIFO 0 message pending Interrupt */
+        CAN_ITConfig(CAN1, CAN_IT_FMP0, ENABLE);
 
-    // Enable Rx interrupts
-    NVIC_InitStructure.NVIC_IRQChannel = CAN1_RX0_IRQn;
-    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x1;
-    NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x1;
-    NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-    NVIC_Init(&NVIC_InitStructure);	
-
-    if(NULL != txEnd) {
-        // set up CAN Tx interrupts
-        CAN_ITConfig(CAN1, CAN_IT_TME, ENABLE);
-
-        // Enable Tx Interrupts
-        NVIC_InitStructure.NVIC_IRQChannel = CAN1_TX_IRQn;
-        NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x1; // TODO: assess both of these priority settings
-        NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x0;
+        // Enable Rx interrupts
+        NVIC_InitStructure.NVIC_IRQChannel = CAN1_RX0_IRQn;
+        NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x1;
+        NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x1;
         NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-        NVIC_Init(&NVIC_InitStructure);
+        NVIC_Init(&NVIC_InitStructure);	
+
+        if(NULL != txEnd) {
+            // set up CAN Tx interrupts
+            CAN_ITConfig(CAN1, CAN_IT_TME, ENABLE);
+
+            // Enable Tx Interrupts
+            NVIC_InitStructure.NVIC_IRQChannel = CAN1_TX_IRQn;
+            NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x1; // TODO: assess both of these priority settings
+            NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x0;
+            NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+            NVIC_Init(&NVIC_InitStructure);
+        }
     }
 }
-
 /**
  * @brief   Transmits the data onto the CAN bus with the specified id
  * @param   id : Message of ID. Also indicates the priority of message. The lower the value, the higher the priority.

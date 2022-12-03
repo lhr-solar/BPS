@@ -11,7 +11,7 @@ void Task_CANBusConsumer(void *p_arg) {
 
     CANMSG_t message;
 
-    CANbus_Init((bool) p_arg);
+    CANbus_Init((bool) p_arg, false);
     
     while(1) {
         // BLOCKING =====================
