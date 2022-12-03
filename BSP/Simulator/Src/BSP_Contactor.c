@@ -38,7 +38,7 @@ void BSP_Contactor_Init(void) {
  * @param   None
  * @return  None
  */
-void BSP_Contactor_On(CONT_CHOICE contactor) {
+void BSP_Contactor_On(Contactors_t contactor) {
     if (initialized) {
         if (contactor == HVHIGH_CONTACTOR) {
             Simulator_Log_Location(LOG_OUTPUT, "Contactor 'HVHIGH' {enabled}\n");
@@ -66,7 +66,7 @@ void BSP_Contactor_On(CONT_CHOICE contactor) {
  * @param   None
  * @return  None
  */
-void BSP_Contactor_Off(CONT_CHOICE contactor) {
+void BSP_Contactor_Off(Contactors_t contactor) {
     if (initialized) {
         state = false;
         if (contactor == HVHIGH_CONTACTOR) {
@@ -94,7 +94,7 @@ void BSP_Contactor_Off(CONT_CHOICE contactor) {
  * @param   None
  * @return  0 if contactor is off/open, 1 if on/closed
  */
-bool BSP_Contactor_GetState(CONT_CHOICE contactor) {
+bool BSP_Contactor_GetState(Contactors_t contactor) {
     if (initialized) {
         if (contactor == HVHIGH_CONTACTOR) {
             return ContStates.HVHIGH;
