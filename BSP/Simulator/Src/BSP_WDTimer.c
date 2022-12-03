@@ -18,7 +18,7 @@ bool initialized = false;
  */
 void BSP_WDTimer_Init(void) {
     initialized = true;
-    Simulator_Log(LOG, "Initialized the watchdog timer\n");
+    Simulator_Log(LOG_INFO, "Initialized the watchdog timer\n");
 }
 
 /**
@@ -44,7 +44,7 @@ void BSP_WDTimer_Start(void) {
         Fault_BitMap = Fault_WDOG;
         EnterFaultState();
     }
-    Simulator_Log(LOG, "Started the watchdog timer\n");
+    Simulator_Log(LOG_INFO, "Started the watchdog timer\n");
 }
 
 /**
@@ -60,5 +60,5 @@ void BSP_WDTimer_Reset(void) {
         EnterFaultState();
     }
 
-    Simulator_Log(LOG, "Reset the watchdog timer\n");
+    Simulator_Log(LOG_INFO, "Reset the watchdog timer\n");
 }

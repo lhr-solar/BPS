@@ -28,7 +28,7 @@ static State states[LIGHTS_MAX];
  */
 void BSP_Lights_Init(void) {
 	initialized = true;
-    Simulator_Log(LOG, "Lights initialized\n");
+    Simulator_Log(LOG_INFO, "Lights initialized\n");
 }
 
 /**
@@ -45,7 +45,7 @@ void BSP_Light_Toggle(Light signal) {
 		states[signal] ^= states[signal];
 		char str[64];
 		sprintf(str, "Set Light '%s' to %d\n", lightsNames[signal], states[signal]);
-		Simulator_Log(LOG, str);
+		Simulator_Log(LOG_INFO, str);
 	} else {
 		Simulator_Log(LOG_ERROR, "Used lights before initialization\n");
 		exit(-1); // Fault state for lights??
@@ -66,7 +66,7 @@ void BSP_Light_On(Light signal) {
 		states[signal] = 1;
 		char str[64];
 		sprintf(str, "Set Light '%s' to %d\n", lightsNames[signal], states[signal]);
-		Simulator_Log(LOG, str);
+		Simulator_Log(LOG_INFO, str);
 	} else {
 		Simulator_Log(LOG_ERROR, "Used lights before initialization\n");
 		exit(-1);
@@ -87,7 +87,7 @@ void BSP_Light_Off(Light signal) {
 		states[signal] ^= 0;
 		char str[64];
 		sprintf(str, "Set Light '%s' to %d\n", lightsNames[signal], states[signal]);
-		Simulator_Log(LOG, str);
+		Simulator_Log(LOG_INFO, str);
 	} else {
 		Simulator_Log(LOG_ERROR, "Used lights before initialization\n");
 		exit(-1);
