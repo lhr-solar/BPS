@@ -44,4 +44,5 @@ help:
 
 clean:
 	rm -fR Objects
+	rm -f *.log
 	rm -f *.out
