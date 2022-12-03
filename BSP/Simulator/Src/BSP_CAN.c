@@ -25,7 +25,7 @@ void BSP_CAN_Init(callback_t rxEvent, callback_t txEnd, bool loopback) {
     gTxEnd = txEnd;
     gRxEvent = rxEvent;
     CAN_Initialized = true;
-    Simulator_Log_Location(LOG_INFO, "CAN Initialized\n");
+    Simulator_Log(LOG_INFO, "CAN Initialized\n");
 }
 
 /**

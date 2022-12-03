@@ -2,7 +2,6 @@
 
 #include "BSP_PLL.h"
 #include "stm32f4xx.h"
-#include "stm32f4xx_rcc.h"
 
 // PLL_VCO = (HSE_VALUE or HSI_VALUE / PLL_M) * PLL_N 
 #define PLL_M 8

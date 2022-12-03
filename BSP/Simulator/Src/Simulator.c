@@ -36,9 +36,9 @@ static simulator_state *states = NULL;
 static time_t startTime;
 
 // units in mV
-static uint16_t DUMMY_VOLTAGES[NUM_BATTERY_MODULES] = { 3000 };
+static uint16_t DUMMY_VOLTAGES[NUM_BATTERY_MODULES] = {[0 ... NUM_BATTERY_MODULES - 1] = 3000};
 // units in mC, but config.h uses 45,000 as 45.00C, so we'll bump these up to 30k for 30C
-static uint16_t DUMMY_TEMPS[NUM_TEMPERATURE_SENSORS] = { 30000 };
+static uint16_t DUMMY_TEMPS[NUM_TEMPERATURE_SENSORS] = {[0 ... NUM_TEMPERATURE_SENSORS - 1] = 30000};
 
 // LUT which corresponds Logging Level type to string to print out in LogFile
 static const char* LoggingLUT[LOG_NUM_LEVELS] = {
