@@ -11,9 +11,10 @@
  * @param   rxEvent     : the function to execute when recieving a message. NULL for no action.
  * @param   txEnd       : the function to execute after transmitting a message. NULL for no action.
  * @param   loopback    : if we should use loopback mode (for testing)
+ * @param   faultState  : fault state determines whether to implement Rx and Tx interrupts
  * @return  None
  */
-void BSP_CAN_Init(callback_t rxEvent, callback_t txEnd, bool loopback);
+void BSP_CAN_Init(callback_t rxEvent, callback_t txEnd, bool loopback, bool faultState);
 
 /**
  * @brief   Transmits the data onto the CAN bus with the specified id
