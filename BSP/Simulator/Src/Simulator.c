@@ -61,6 +61,7 @@ void Simulator_Log(LoggingType_t lvl, char *str) {
     strcpy(prefix, LoggingLUT[lvl]); //This is because strcat cannot concat const
     char* msg = strcat(prefix, str);
     write(simulatorLog, msg, strlen(msg));
+    printf("%s %s", prefix, str);
 }
 
 // It knows what the input file is because the Makefile should make a #define for the file path called SIMULATOR_JSON_PATH
