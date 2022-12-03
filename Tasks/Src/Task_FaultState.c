@@ -61,7 +61,7 @@ void EnterFaultState() {
         #endif
             BSP_Light_On(UVOLT);
         #ifdef SIMULATION
-            exit(-1);
+            //exit(-1);
         #endif
             break;
         case Fault_OVOLT:
@@ -71,7 +71,7 @@ void EnterFaultState() {
         #endif
             BSP_Light_On(OVOLT);
         #ifdef SIMULATION
-            exit(-1);
+            //exit(-1);
         #endif
             break;
         case Fault_OTEMP:
@@ -81,7 +81,7 @@ void EnterFaultState() {
         #endif
             BSP_Light_On(OTEMP);
         #ifdef SIMULATION
-            exit(-1);
+            //exit(-1);
         #endif
             break;
         case Fault_OCURR:
@@ -91,7 +91,7 @@ void EnterFaultState() {
         #endif
             BSP_Light_On(OCURR);
         #ifdef SIMULATION
-            exit(-1);
+            //exit(-1);
         #endif
             break;
         case Fault_OW:
@@ -101,7 +101,7 @@ void EnterFaultState() {
         #endif
             BSP_Light_On(WIRE);
         #ifdef SIMULATION
-            exit(-1);
+            //exit(-1);
         #endif    
             break;
         case Fault_HANDLER:
@@ -112,10 +112,11 @@ void EnterFaultState() {
         #ifdef SIMULATION
             sprintf(err, "$$$ Entered fault in state [%d] - WATCHDOG\n", stateCount - 1);
             Simulator_Log(LOG_ERROR, err);
+            //BSP_WDTimer_Init();
         #endif
             BSP_Light_On(WDOG);
         #ifdef SIMULATION
-            exit(-1);
+            //exit(-1);
         #endif
             break;
         case Fault_ESTOP:
@@ -125,7 +126,7 @@ void EnterFaultState() {
         #endif
             BSP_Contactor_Off(ALL_CONTACTORS);
         #ifdef SIMULATION
-            exit(-1);
+            //exit(-1);
         #endif
             break;
     }

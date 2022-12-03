@@ -63,10 +63,12 @@ ErrorStatus BSP_Fans_SetAll(uint32_t speed) {
         ErrorStatus e = BSP_Fans_Set(i, TOPSPEED);
         if (e != SUCCESS) {
             result = e;
-            Simulator_Log(LOG_WARN, "Fans_SetAll() attempt was not a SUCCESS\n");
-        } else {
-            Simulator_Log(LOG_INFO, "Set all fans to top speed\n");
         }
+    }
+    if (result != SUCCESS) {
+        Simulator_Log(LOG_WARN, "Fans_SetAll() attempt was not a SUCCESS\n");
+    } else {
+        Simulator_Log(LOG_INFO, "Set all fans to top speed\n");
     }
     return result;
 }

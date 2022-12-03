@@ -9,7 +9,7 @@
 #include <stdint.h>
 #include "Simulator.h"
 
-bool initialized = false;
+volatile bool initialized = false;
 
 /**
  * @brief   Initialize the watch dog timer.
@@ -42,6 +42,7 @@ void BSP_WDTimer_Start(void) {
     if (!initialized) {
         Simulator_Log(LOG_ERROR, "Used watchdog timer without initialization!\n");
         Fault_BitMap = Fault_WDOG;
+        //initialized = true; // this avoids an infinite loop
         EnterFaultState();
     }
     Simulator_Log(LOG_INFO, "Started the watchdog timer\n");
