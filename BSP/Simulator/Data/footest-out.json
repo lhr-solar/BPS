@@ -1,0 +1,18 @@
+{
+    "forbidden_states": {
+        "Contactor": "enabled"
+    },
+    "end_state": {
+        "Contactor": "disabled",
+        "Light": [
+            ["FAULT", "1"],
+            ["UVOLT", "1"]
+        ],
+        "Fan": [
+            ["1", "8"],
+            ["2", "8"],
+            ["3", "8"],
+            ["4", "8"]
+        ]
+    }
+}
