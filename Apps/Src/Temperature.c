@@ -230,7 +230,9 @@ ErrorStatus Temperature_UpdateSingleChannel(uint8_t channel){
 #ifndef SIMULATION
 		rawTemperatures[board][channel][medianFilterIdx] = milliVoltToCelsius(Minions[board].aux.a_codes[0] / 10);
 #else
-		rawTemperatures[board][channel][medianFilterIdx] = Simulator_getTemperature(board * MAX_TEMP_SENSORS_PER_MINION_BOARD + channel);
+		if (board * MAX_TEMP_SENSORS_PER_MINION_BOARD + channel < 61) {
+			rawTemperatures[board][channel][medianFilterIdx] = Simulator_getTemperature(board * MAX_TEMP_SENSORS_PER_MINION_BOARD + channel);
+		}
 #endif
 	}
 
