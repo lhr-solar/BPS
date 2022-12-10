@@ -23,6 +23,10 @@
 
 // file descriptor of simulator log file
 int simulatorLog;
+FILE* simFile;
+
+// Counter for current state we are on
+uint8_t stateCount = 0;
 
 // linked list of simulator states
 static simulator_state *states = NULL;
@@ -32,12 +36,19 @@ static simulator_state *states = NULL;
 static time_t startTime;
 
 // units in mV
-static uint16_t DUMMY_VOLTAGES[NUM_BATTERY_MODULES] = { 3000 };
+static uint16_t DUMMY_VOLTAGES[NUM_BATTERY_MODULES] = {[0 ... NUM_BATTERY_MODULES - 1] = 3000};
 // units in mC, but config.h uses 45,000 as 45.00C, so we'll bump these up to 30k for 30C
-static uint16_t DUMMY_TEMPS[NUM_TEMPERATURE_SENSORS] = { 30000 };
+static uint16_t DUMMY_TEMPS[NUM_TEMPERATURE_SENSORS] = {[0 ... NUM_TEMPERATURE_SENSORS - 1] = 30000};
 
 // LUT which corresponds Logging Level type to string to print out in LogFile
-static const char* LoggingLUT[LOG_MAXLEVEL] = {"", "INFO: ", "WARNING: ", "ERROR: "};
+static const char* LoggingLUT[LOG_NUM_LEVELS] = {
+    [LOG_INFO] = "[INFO] ",
+    [LOG_WARN] = "[WARNING] ",
+    [LOG_ERROR] = "[ERROR] ",
+    [LOG_OUTPUT] = "[OUTPUT] ",
+    [LOG] = "",
+    [LOG_MISC] = "[MISC] ",
+};
 
 /**
  * @brief   Log something to simulator log file
@@ -50,11 +61,7 @@ void Simulator_Log(LoggingType_t lvl, char *str) {
     strcpy(prefix, LoggingLUT[lvl]); //This is because strcat cannot concat const
     char* msg = strcat(prefix, str);
     write(simulatorLog, msg, strlen(msg));
-    if (0) {
-        char *buffer = (char *) malloc(strlen(msg) + 2);
-        sprintf(buffer, "%s\n", msg);
-        free(buffer);
-    }
+    printf("%s %s", prefix, str);
 }
 
 // It knows what the input file is because the Makefile should make a #define for the file path called SIMULATOR_JSON_PATH
@@ -73,7 +80,7 @@ void Simulator_Log(LoggingType_t lvl, char *str) {
  * @return  None
  */
 void Simulator_Shutdown(int status) {
-    Simulator_Log(LOG, "Shutting down the simulator...\n");
+    Simulator_Log(LOG, "\nShutting down the simulator...\n");
     close(simulatorLog);
     exit(status);
 }
@@ -103,13 +110,12 @@ static void readInputFile(char *jsonPath) {
         printf("error reading file %s", jsonPath);
         exit(-1);
     }
-
+    simFile = fdopen(simulatorLog, "w");
     // parses the input file as a json
     cJSON *json = cJSON_ParseWithLength(inFile, length);
 
     // parse the json structure into an array of states
     simulator_state *tail = states;
-    uint8_t stateCount = 0;
     // For every state in the JSON (highest level {...})
     for (cJSON *state = json->child; state != NULL; state = state->next) {
         if (states == NULL) {
@@ -185,7 +191,7 @@ static void readInputFile(char *jsonPath) {
         if (!canList) {
             char buffer[67];
             sprintf(buffer, "No CAN messages to simulate in this state. (State Count = %d)\n", stateCount);
-            Simulator_Log(LOG, buffer);
+            Simulator_Log(LOG_MISC, buffer);
         } else { // otherwise, there are some potential CAN messages. 
             // for every CAN message...
             for (cJSON* msg = canList->child; msg != NULL; msg = msg->next) {
@@ -250,7 +256,7 @@ void Simulator_Init(char *jsonPath) {
     const struct sigaction act = {.sa_handler = CtrlCHandler, .sa_mask = s, .sa_flags = 0};
     sigaction(SIGINT, &act, NULL);
 
-    Simulator_Log(LOG, "Simulator intialized\n");    
+    Simulator_Log(LOG, "\nSimulator intialized\n");    
 
     // initialize the fake inputs
     readInputFile(jsonPath);
@@ -274,7 +280,7 @@ static void Simulator_Transition(void) {
         free(prev);
 
         if (states == NULL) {
-            Simulator_Log(LOG, "Finished last state!\n");
+            Simulator_Log(LOG, "\nFinished last state!\n");
             Simulator_Shutdown(0);
         }
     }

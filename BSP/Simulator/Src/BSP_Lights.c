@@ -28,7 +28,7 @@ static State states[LIGHTS_MAX];
  */
 void BSP_Lights_Init(void) {
 	initialized = true;
-    Simulator_Log(LOG, "Lights initialized\n");
+    Simulator_Log(LOG_INFO, "Lights initialized\n");
 }
 
 /**
@@ -38,17 +38,17 @@ void BSP_Lights_Init(void) {
  */
 void BSP_Light_Toggle(Light signal) {
 	if (signal < 0 || signal >= LIGHTS_MAX) {
-		Simulator_Log(LOG_ERROR, "Light out of bounds\n");
+		Simulator_Log_Location(LOG_ERROR, "Light out of bounds\n");
 	}
 
 	if (initialized) {
 		states[signal] ^= states[signal];
 		char str[64];
-		sprintf(str, "set light %s to %d\n", lightsNames[signal], states[signal]);
-		Simulator_Log(LOG, str);
+		sprintf(str, "Set Light {%s} to {%d}\n", lightsNames[signal], states[signal]);
+		Simulator_Log(LOG_OUTPUT, str);
 	} else {
-		Simulator_Log(LOG_ERROR, "Used lights before initialization\n");
-		exit(-1);
+		Simulator_Log_Location(LOG_ERROR, "Used lights before initialization\n");
+		exit(-1); // Fault state for lights??
 	}
 }
 
@@ -59,16 +59,16 @@ void BSP_Light_Toggle(Light signal) {
  */
 void BSP_Light_On(Light signal) {
 	if (signal < 0 || signal >= LIGHTS_MAX) {
-		Simulator_Log(LOG_ERROR, "Light out of bounds\n");
+		Simulator_Log_Location(LOG_ERROR, "Light out of bounds\n");
 	}
 
 	if (initialized) {
 		states[signal] = 1;
 		char str[64];
-		sprintf(str, "set light %s to %d\n", lightsNames[signal], states[signal]);
-		Simulator_Log(LOG, str);
+		sprintf(str, "Set Light {%s} to {%d}\n", lightsNames[signal], states[signal]);
+		Simulator_Log(LOG_OUTPUT, str);
 	} else {
-		Simulator_Log(LOG_ERROR, "Used lights before initialization\n");
+		Simulator_Log_Location(LOG_ERROR, "Used lights before initialization\n");
 		exit(-1);
 	}
 }
@@ -80,16 +80,16 @@ void BSP_Light_On(Light signal) {
  */
 void BSP_Light_Off(Light signal) {
 	if (signal < 0 || signal >= LIGHTS_MAX) {
-		Simulator_Log(LOG_ERROR, "Light out of bounds\n");
+		Simulator_Log_Location(LOG_ERROR, "Light out of bounds\n");
 	}
 
 	if (initialized) {
 		states[signal] ^= 0;
 		char str[64];
-		sprintf(str, "set light %s to %d\n", lightsNames[signal], states[signal]);
-		Simulator_Log(LOG, str);
+		sprintf(str, "Set Light {%s} to {%d}\n", lightsNames[signal], states[signal]);
+		Simulator_Log(LOG_OUTPUT, str);
 	} else {
-		Simulator_Log(LOG_ERROR, "Used lights before initialization\n");
+		Simulator_Log_Location(LOG_ERROR, "Used lights before initialization\n");
 		exit(-1);
 	}
 }
@@ -107,7 +107,7 @@ State BSP_Light_GetState(Light signal) {
 	if (initialized) {
 		return states[signal];
 	} else {
-		Simulator_Log(LOG_ERROR, "Used lights before initialization\n");
+		Simulator_Log_Location(LOG_ERROR, "Used lights before initialization\n");
 		exit(-1);
 	}
 }

@@ -17,6 +17,7 @@
 #include "stm32f4xx.h"
 #else
 #include "Simulator.h"
+extern uint8_t stateCount;
 #endif
 
 /*
@@ -32,7 +33,7 @@ void EnterFaultState() {
 
     // Turn Contactor Off
     BSP_Contactor_Init();
-    BSP_Contactor_Off();
+    BSP_Contactor_Off(ALL_CONTACTORS);
     //Set Fans to full speed
     BSP_Fans_Init();
     BSP_Fans_SetAll(TOPSPEED);
@@ -49,28 +50,76 @@ void EnterFaultState() {
     }
 
     // TODO: fix this so it works if there are multiple faults
+    #ifdef SIMULATION
+    char err[100] = {0};
+    #endif
     switch (Fault_BitMap){
         case Fault_UVOLT:
+        #ifdef SIMULATION
+            sprintf(err, "$$$ Entered fault in state {%d} - UNDERVOLT\n", stateCount - 1);
+            Simulator_Log_Location(LOG_INFO, err);
+        #endif
             BSP_Light_On(UVOLT);
+        #ifdef SIMULATION
+        #endif
             break;
         case Fault_OVOLT:
+        #ifdef SIMULATION
+            sprintf(err, "$$$ Entered fault in state {%d} - OVERVOLT\n", stateCount - 1);
+            Simulator_Log_Location(LOG_INFO, err);
+        #endif
             BSP_Light_On(OVOLT);
+        #ifdef SIMULATION
+        #endif
             break;
         case Fault_OTEMP:
+        #ifdef SIMULATION
+            sprintf(err, "$$$ Entered fault in state {%d} - OVERTEMP\n", stateCount - 1);
+            Simulator_Log_Location(LOG_INFO, err);
+        #endif
             BSP_Light_On(OTEMP);
+        #ifdef SIMULATION
+        #endif
             break;
         case Fault_OCURR:
+        #ifdef SIMULATION
+            sprintf(err, "$$$ Entered fault in state {%d} - OVERCURRENT\n", stateCount - 1);
+            Simulator_Log_Location(LOG_INFO, err);
+        #endif
             BSP_Light_On(OCURR);
+        #ifdef SIMULATION
+        #endif
             break;
         case Fault_OW:
+        #ifdef SIMULATION
+            sprintf(err, "$$$ Entered fault in state {%d} - WIRE\n", stateCount - 1);
+            Simulator_Log_Location(LOG_INFO, err);
+        #endif
             BSP_Light_On(WIRE);
+        #ifdef SIMULATION
+        #endif    
             break;
         case Fault_HANDLER:
             break;
         case Fault_OS:
             break;
         case Fault_WDOG:
+        #ifdef SIMULATION
+            sprintf(err, "$$$ Entered fault in state {%d} - WATCHDOG\n", stateCount - 1);
+            Simulator_Log_Location(LOG_INFO, err);
+        #endif
             BSP_Light_On(WDOG);
+        #ifdef SIMULATION
+        #endif
+            break;
+        case Fault_ESTOP:
+        #ifdef SIMULATION
+            sprintf(err, "$$$ Entered fault in state {%d} - ELECTRICAL STOP\n", stateCount - 1);
+            Simulator_Log_Location(LOG_INFO, err);
+        #endif
+            BSP_Contactor_Off(ALL_CONTACTORS);
+        #ifdef SIMULATION
+        #endif
             break;
     }
 

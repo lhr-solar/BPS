@@ -40,8 +40,8 @@ ErrorStatus BSP_CAN_Write(uint32_t id, uint8_t data[], uint8_t length) {
     // log message
     char canMsgBuf[100] = {0};
     uint64_t* data64 = (uint64_t*)(data);
-    sprintf(canMsgBuf, "Writing CAN message with ID [%d], DATA [0x%016" PRIx64 "], LEN [%d]\n", id, *data64, length);
-    Simulator_Log(LOG_INFO, canMsgBuf);
+    sprintf(canMsgBuf, "Writing CAN message with ID {%d}, DATA {0x%016" PRIx64 "}, LEN {%d}\n", id, *data64, length);
+    Simulator_Log(LOG_OUTPUT, canMsgBuf);
     if (gTxEnd != NULL)
         gTxEnd();
     return SUCCESS;
@@ -57,8 +57,8 @@ ErrorStatus BSP_CAN_Write(uint32_t id, uint8_t data[], uint8_t length) {
  */
 ErrorStatus BSP_CAN_Read(uint32_t *id, uint8_t *data) {
     char buffer[75];
-    sprintf(buffer, "Read CAN message ID [%d] DATA [0x%016" PRIx64 "]\n", *id, *(uint64_t*)(data));
-    Simulator_Log(LOG_INFO, buffer);
+    sprintf(buffer, "Read CAN message ID {%d} DATA {0x%016" PRIx64 "}\n", *id, *(uint64_t*)(data));
+    Simulator_Log(LOG_OUTPUT, buffer);
     if (gRxEvent != NULL) { // so we dont error out and die
         gRxEvent();
     }

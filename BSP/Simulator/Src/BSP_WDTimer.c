@@ -9,7 +9,7 @@
 #include <stdint.h>
 #include "Simulator.h"
 
-bool initialized = false;
+volatile bool initialized = false;
 
 /**
  * @brief   Initialize the watch dog timer.
@@ -18,7 +18,7 @@ bool initialized = false;
  */
 void BSP_WDTimer_Init(void) {
     initialized = true;
-    Simulator_Log(LOG, "Initialized the watchdog timer\n");
+    Simulator_Log(LOG_INFO, "Initialized the watchdog timer\n");
 }
 
 /**
@@ -40,12 +40,11 @@ bool BSP_WDTimer_DidSystemReset(void){
  */
 void BSP_WDTimer_Start(void) {
     if (!initialized) {
-        Simulator_Log(LOG_ERROR, "Used watchdog timer without initialization!\n");
-        exit(-1);
+        Simulator_Log_Location(LOG_ERROR, "Used watchdog timer without initialization!\n");
+        Fault_BitMap = Fault_WDOG;
+        EnterFaultState();
     }
-
-
-    Simulator_Log(LOG, "Started the watchdog timer\n");
+    Simulator_Log(LOG_INFO, "Started the watchdog timer\n");
 }
 
 /**
@@ -56,9 +55,10 @@ void BSP_WDTimer_Start(void) {
  */
 void BSP_WDTimer_Reset(void) {
     if (!initialized) {
-        Simulator_Log(LOG_ERROR, "Used watchdog timer without initialization!\n");
-        exit(-1);
+        Simulator_Log_Location(LOG_ERROR, "Used watchdog timer without initialization!\n");
+        Fault_BitMap = Fault_WDOG;
+        EnterFaultState();
     }
 
-    Simulator_Log(LOG, "Reset the watchdog timer\n");
+    Simulator_Log(LOG_INFO, "Reset the watchdog timer\n");
 }
