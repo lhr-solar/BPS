@@ -96,3 +96,13 @@ int BSP_PWM_Get(uint8_t pin){
     }
 }
 
+/**
+ * @brief   Gets the state of the Contactor switch from one of its AUX pins.
+ * @note	THIS IS ALSO CODE THAT HAS NO HOME. You cannot get the state of ALL_CONTACTORS. As such, if that param is passed, it will return the state of the array contactor.
+ * @param   Contactor to get state of
+ * @return  0 if contactor is off/open, 1 if on/closed
+ */
+bool Contactor_Get(uint8_t contactorChoice) {
+    return pinSpeeds[contactorChoice] != 0;
+}
+

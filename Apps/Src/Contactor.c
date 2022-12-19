@@ -11,14 +11,7 @@ void Contactor_Init(void) {
 	//Contactor Init is called before fan init, so initialize pwm here first. This will setup the contactor outputs
 	BSP_PWM_Init();
 
-	//setup the input pin
-    GPIO_InitTypeDef GPIO_C1Init;
-	GPIO_C1Init.GPIO_Pin = GPIO_Pin_1; //input pin is gpio B1
-    GPIO_C1Init.GPIO_Mode = GPIO_Mode_IN;
-    GPIO_C1Init.GPIO_Speed = GPIO_Speed_2MHz;
-    GPIO_C1Init.GPIO_PuPd = GPIO_PuPd_DOWN;
-    GPIO_C1Init.GPIO_OType = GPIO_OType_PP;
-    GPIO_Init(C1_PORT, &GPIO_C1Init);
+
 }
 
 /**
@@ -83,25 +76,5 @@ void Contactor_Off(Contactors_t contactorChoice) {
  * @return  0 if contactor is off/open, 1 if on/closed
  */
 bool Contactor_GetState(Contactors_t contactorChoice) {
-	bool contactorReturnValue = ((C1_PORT->IDR & GPIO_Pin_1) >> 1) ? 0 : 1; //read the one and only input pin
-
-	/* this is future support for multiple contactors, but we only have one pin right now
-	bool contactorReturnValue = false;
-	if (contactorChoice == ARRAY_CONTACTOR) {
-		contactorReturnValue = ((C1_PORT->IDR & GPIO_Pin_1) >> 1) ? 0 : 1;
-	}
-	else if (contactorChoice == HVHIGH_CONTACTOR) {
-		contactorReturnValue = ((C2_PORT->IDR & GPIO_Pin_5) >> 5) ? 0 : 1;
-	}
-	else if (contactorChoice == HVLOW_CONTACTOR) {
-		contactorReturnValue = ((C3_PORT->IDR & GPIO_Pin_1) >> 1) ? 0 : 1;
-	}
-	else if (contactorChoice == ALL_CONTACTORS) {
-		// return if ANY of the contactors are off.
-		contactorReturnValue = (((C1_PORT->IDR & GPIO_Pin_1) >> 1) ? 0 : 1)
-			&& (((C2_PORT->IDR & GPIO_Pin_5) >> 5) ? 0 : 1)
-			&& (((C3_PORT->IDR & GPIO_Pin_1) >> 1) ? 0 : 1);
-	}
-	*/
-	return contactorReturnValue;
+	return Contactor_Get((uint8_t) contactorChoice);
 }

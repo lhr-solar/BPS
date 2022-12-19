@@ -5,6 +5,8 @@
 #include "stm32f4xx_tim.h"
 #include "stm32f4xx_gpio.h"
 #include "stm32f4xx_rcc.h"
+#include "common.h"
+
 
 #define PWM_PERIOD 4000
 
@@ -31,4 +33,12 @@ ErrorStatus BSP_PWM_Set(uint8_t pin, uint32_t speed);
  */
 int BSP_PWM_Get(uint8_t pin);
 
+#define C1_PORT GPIOB //TO MAKE THE CONTACTOR CODE WORK, REMOVE ONCE IT HAS A NEW HOME. This is the port for the input pin
+/**
+ * @brief   Gets the state of the Contactor switch from one of its AUX pins.
+ * @note	THIS IS ALSO CODE THAT HAS NO HOME. You cannot get the state of ALL_CONTACTORS. As such, if that param is passed, it will return the state of the array contactor.
+ * @param   Contactor to get state of
+ * @return  0 if contactor is off/open, 1 if on/closed
+ */
+bool Contactor_Get(uint8_t contactorChoice);
 #endif

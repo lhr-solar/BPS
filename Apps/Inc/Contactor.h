@@ -5,14 +5,12 @@
 #define CONTACTOR_H
 
 #include "BSP_PWM.h" //PWM_Period is defined in here
-#include "common.h"
 
 //Parameters for PWM
 #define PWM_ON_TIME 2000
 
 // Contactor 1
 #define C1 5 // contactor 1 on pwm output 5
-#define C1_PORT		GPIOB
 // Contactor 2 - this is for the contactor connected to the fan board
 #define CFAN 4 // right now we are using fan pin 4 as the contactor output
 
