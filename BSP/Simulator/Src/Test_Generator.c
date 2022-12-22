@@ -54,6 +54,7 @@ void generateTest(char selection){
             break;
     }
 
+    //now we throw an error into the data so that simulator will trip
     switch (selection){
         case '0':
             state[0].current = MAX_CURRENT_LIMIT + 1;
