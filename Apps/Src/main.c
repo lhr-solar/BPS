@@ -22,28 +22,31 @@ void EnterFaultState(void);
 
 // the simulator take command line args, the embedded version does not
 #ifdef SIMULATION
-int main(int argc, char **argv) {
+int main(int argc, char **argv)
+{
 #else
-int main() {
+int main()
+{
 #endif
 
 #ifdef SIMULATION
 	// the first command line argument is the path to the JSON file
 	Simulator_Init(argv[1]);
 #endif
-	
+
 	OS_ERR err;
 
 	BSP_PLL_Init();
-	BSP_UART_Init(NULL, NULL, UART_USB);	
+	BSP_UART_Init(NULL, NULL, UART_USB);
 
-	//Resetting the contactor
+	// Resetting the contactor
 	BSP_Contactor_Init();
 	BSP_Contactor_Off(ALL_CONTACTORS);
 
 	// If the WDTimer counts down to 0, then the BPS resets. If BPS has reset, enter a fault state.
-	if (BSP_WDTimer_DidSystemReset()) {
-		Fault_BitMap = Fault_WDOG; //When function called in if statement, RCC flag cleared so set bitmap here
+	if (BSP_WDTimer_DidSystemReset())
+	{
+		Fault_BitMap = Fault_WDOG; // When function called in if statement, RCC flag cleared so set bitmap here
 		EnterFaultState();
 	}
 
@@ -54,19 +57,19 @@ int main() {
 	OSInit(&err);
 	assertOSError(err);
 
-	OSTaskCreate(&Init_TCB,				// TCB
-				"Initialize System",	// Task Name (String)
-				Task_Init,				// Task function pointer
-				(void *)0,				// Task function args
-				TASK_INIT_PRIO,			// Priority
-				Init_Stk,				// Stack
-				WATERMARK_STACK_LIMIT,	// Watermark limit for debugging
-				DEFAULT_STACK_SIZE,		// Stack size
-				0,						// Queue size (not needed)
-				10,						// Time quanta (time slice) 10 ticks
-				(void *)0,				// Extension pointer (not needed)
-				OS_OPT_TASK_STK_CHK | OS_OPT_TASK_SAVE_FP,	// Options
-				&err);					// return err code
+	OSTaskCreate(&Init_TCB,									// TCB
+				 "Initialize System",						// Task Name (String)
+				 Task_Init,									// Task function pointer
+				 (void *)0,									// Task function args
+				 TASK_INIT_PRIO,							// Priority
+				 Init_Stk,									// Stack
+				 WATERMARK_STACK_LIMIT,						// Watermark limit for debugging
+				 DEFAULT_STACK_SIZE,						// Stack size
+				 0,											// Queue size (not needed)
+				 10,										// Time quanta (time slice) 10 ticks
+				 (void *)0,									// Extension pointer (not needed)
+				 OS_OPT_TASK_STK_CHK | OS_OPT_TASK_SAVE_FP, // Options
+				 &err);										// return err code
 	assertOSError(err);
 
 	OSStart(&err);
