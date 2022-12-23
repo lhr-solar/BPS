@@ -161,7 +161,7 @@ Additional Considerations
     entire BPS takes, it is worth noting. It should also be initialized before anything else that is 
     dependent on the clock speed (e.g UART).
 
-PLL BSP: Champers Fu
+PWM BSP: Champers Fu
 ==================================
 
 Purpose
@@ -173,7 +173,7 @@ Usage
 
     The init function is called during initialization of the contactors ``Contactor_Init()``.
     Calling the init function sets up the timers for fans and contactors.
-    The PWM library abstracts the GPIO pins of the microcontroller to simply pins 1 through 5. Pins 1-4 are for the fans, and pin 5 is for the contactor. 
+    The PWM library abstracts the GPIO pins of the microcontroller used for fans/contactors to pins 0 through 4. Pins 0-3 are for the fans, and pin 4 is for the contactor. The actual hardware pins that are used are listed in the comments of BSP_PWM.c
     To set the duty cycle of a pin, call ``BSP_PWM_Set(uint8_t pin, uint32_t speed)``, where the speed is a number between 0 and 4000, with 4000 being the max speed. 
     To read the duty cycle of a pin, call ``BSP_PWM_Get(uint8_t pin)``
     
