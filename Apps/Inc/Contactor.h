@@ -10,9 +10,9 @@
 #define PWM_ON_TIME 2000
 
 // Contactor 1
-#define C1 5 // contactor 1 on pwm output 5
+#define C1 4 // contactor 1 on pwm output 4
 // Contactor 2 - this is for the contactor connected to the fan board
-#define CFAN 4 // right now we are using fan pin 4 as the contactor output
+#define CFAN 3 // right now we are using fan pin 3 as the contactor output
 
 //These are defining how the contactors are wired, the array contactor is assumed to be wired to the fan board
 #define ARRAY_CONTACTOR_OUT CFAN

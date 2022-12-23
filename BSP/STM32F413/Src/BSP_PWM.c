@@ -9,6 +9,8 @@ TIM_TimeBaseInitTypeDef TIMER_INIT_STRUCT; //struct used to initialize PWM timer
 
 /**
  * @brief   Sets up contactor and fan pin timers for outputting PWM signals
+ * @note    GPIO_B0 = contactor
+ * @note    GPIO_C6, GPIO_C7, GPIO_B14, GPIO_B15 are for fans
  */
 void BSP_PWM_Init(void){
     //initialize all pins pertaining to fans and contactors for PWM here
@@ -101,7 +103,7 @@ void BSP_PWM_Init(void){
 /**
  * @brief   Sets the PWM duty cycle of a specific pin
  * @note
- * @param   pin Which pin to set the speed. Pins 1-4 are defined to be on the fan board, and pin 5 is the contactor output
+ * @param   pin Which pin to set the speed. Pins 0-3 are defined to be on the fan board, and pin 4 is the contactor output
  * @param   speed The value to write to the output compare register. The timer counts up from 0 to 4000, so speed must be between 0-4000
  * @return  ErrorStatus will return 1 if successful, 0 if there were problems
  */
@@ -113,23 +115,23 @@ ErrorStatus BSP_PWM_Set(uint8_t pin, uint32_t speed){
 
     switch (pin)
     {
-    case 1:
+    case 0:
         TIM_SetCompare1(TIM8, speed);
         return SUCCESS;
         break;
-    case 2:
+    case 1:
         TIM_SetCompare2(TIM8, speed);
         return SUCCESS;
         break;
-    case 3:
+    case 2:
         TIM_SetCompare1(TIM12, speed);
         return SUCCESS;
         break;
-    case 4:
+    case 3:
         TIM_SetCompare2(TIM12, speed);
         return SUCCESS;
         break;
-    case 5:
+    case 4:
         TIM_SetCompare3(TIM3, speed);
         return SUCCESS;
         break;
@@ -147,19 +149,19 @@ ErrorStatus BSP_PWM_Set(uint8_t pin, uint32_t speed){
 int BSP_PWM_Get(uint8_t pin){
     switch (pin)
     {
-    case 1:
+    case 0:
         return TIM_GetCapture1(TIM8);
         break;
-    case 2:
+    case 1:
         return TIM_GetCapture2(TIM8);
         break;
-    case 3:
+    case 2:
         return TIM_GetCapture1(TIM12);
         break;
-    case 4:
+    case 3:
         return TIM_GetCapture2(TIM12);
         break;
-    case 5:
+    case 4:
         return TIM_GetCapture3(TIM3);
         break;
     default:
