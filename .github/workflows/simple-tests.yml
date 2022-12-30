@@ -16,11 +16,11 @@ jobs:
         sudo apt -y update
     - name: Initialize submodules
       run: git submodule update --init --recursive
-   - name: build
-     run: make simulator
+    - name: build
+      run: make simulator
     # simple test for verifying testing infrastructure
-   - name: footest 
-     run: ./bps-simulator.out BSP/Simulator/Data/footest.json
-     run: python3 Validation/verify_test.py footest > footest.result
-     run: diff footest.result Validation/Test_Results/footest.result
+    - name: footest 
+      run: ./bps-simulator.out BSP/Simulator/Data/footest.json
+      run: python3 Validation/verify_test.py footest > footest.result
+      run: diff footest.result Validation/Test_Results/footest.result
     # add more tests here
