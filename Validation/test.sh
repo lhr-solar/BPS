@@ -5,6 +5,6 @@
 ulimit -r unlimited
 
 ./bps-simulator.out BSP/Simulator/Data/$1.json
-python3 Validation/verify_test.py $1 > $1.result
+python3 Validation/verify_test.py $1
 
 exit $?
