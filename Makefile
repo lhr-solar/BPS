@@ -29,17 +29,17 @@ flash:
 	$(MAKE) -C BSP -C STM32F413 flash
 
 help:
-	@echo "Format: ${ORANGE}make ${BLUE}<BSP type>${NC}${ORANGE}TEST=${PURPLE}<Test type>${NC}"
-	@echo "BSP types (required):"
-	@echo "	${BLUE}simulator${NC}"
-	@echo "	${BLUE}stm32f413${NC}"
-	@echo ""
-	@echo "Test types (optional):"
-	@echo "	Set TEST only if you want to build a test."
-	@echo "	Otherwise, don't include TEST in the command."
-	@echo "	To build a test, replace ${PURPLE}<Test type>${NC} with the name of the file"
-	@echo "	excluding the file type (.c) e.g. say you want to test Voltage.c, call"
-	@echo "		${ORANGE}make ${BLUE}stm32f413 ${ORANGE}TEST=${PURPLE}Voltage${NC}"
+	@echo -e "Format: ${ORANGE}make ${BLUE}<BSP type>${NC}${ORANGE}TEST=${PURPLE}<Test type>${NC}"
+	@echo -e "BSP types (required):"
+	@echo -e "	${BLUE}simulator${NC}"
+	@echo -e "	${BLUE}stm32f413${NC}"
+	@echo -e ""
+	@echo -e "Test types (optional):"
+	@echo -e "	Set TEST only if you want to build a test."
+	@echo -e "	Otherwise, don't include TEST in the command."
+	@echo -e "	To build a test, replace ${PURPLE}<Test type>${NC} with the name of the file"
+	@echo -e "	excluding the file type (.c) e.g. say you want to test Voltage.c, call"
+	@echo -e "		${ORANGE}make ${BLUE}stm32f413 ${ORANGE}TEST=${PURPLE}Voltage${NC}"
 
 
 clean:
