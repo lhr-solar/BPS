@@ -161,6 +161,25 @@ Additional Considerations
     entire BPS takes, it is worth noting. It should also be initialized before anything else that is 
     dependent on the clock speed (e.g UART).
 
+PWM BSP: Champers Fu
+==================================
+
+Purpose
+    The :term:`PWM <Pulse Width Modulation>` library is used to generate PWM signals to drive the fans and contactors. 
+    Right now, it is set to a period of 4000 clock cycles. 
+
+Usage
+    The timers will count up to number defined in the PWM header file as ``PWM_PERIOD``. It is set to 4000 right now. 
+
+    The init function is called during initialization of the contactors ``Contactor_Init()``.
+    Calling the init function sets up the timers for fans and contactors.
+    The PWM library abstracts the GPIO pins of the microcontroller used for fans/contactors to pins 0 through 4. Pins 0-3 are for the fans, and pin 4 is for the contactor. The actual hardware pins that are used are listed in the comments of BSP_PWM.c
+    To set the duty cycle of a pin, call ``BSP_PWM_Set(uint8_t pin, uint32_t speed)``, where the speed is a number between 0 and 4000, with 4000 being the max speed. 
+    To read the duty cycle of a pin, call ``BSP_PWM_Get(uint8_t pin)``
+    
+Additional Considerations
+Changing the PWM_PERIOD will alter the frequency, but it may also alter the duty cycle of certain things if you're not careful. Be sure to adjust preset values match the new period if period is ever changed. 
+
 SPI BSP: Clark Poon, Sijin Woo, and Sugam Arora
 ===============================================
 
