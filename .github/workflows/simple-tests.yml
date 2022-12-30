@@ -11,9 +11,6 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: Install tools
-      run: |
-        sudo apt -y update
     - name: Initialize submodules
       run: git submodule update --init --recursive
     - name: build
