@@ -5,7 +5,7 @@ on:
   push:
 
 jobs:
-  build:
+  test:
 
     runs-on: ubuntu-latest
 
@@ -22,7 +22,7 @@ jobs:
     # run tests in sudo for rtprio to work
     - name: footest 
       run: |
-        sudo ./bps-simulator.out BSP/Simulator/Data/footest.json
+        sudo ./Validation/test.sh BSP/Simulator/Data/footest.json
         python3 Validation/verify_test.py footest > footest.result
         diff footest.result Validation/Test_Results/footest.result
     # add more tests here
