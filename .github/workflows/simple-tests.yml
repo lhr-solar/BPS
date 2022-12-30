@@ -18,12 +18,11 @@ jobs:
       run: git submodule update --init --recursive
     - name: build
       run: make simulator
-    - name: rtprio
-      run: sudo ulimit -r unlimited
     # simple test for verifying testing infrastructure
+    # run tests in sudo for rtprio to work
     - name: footest 
       run: |
-        ./bps-simulator.out BSP/Simulator/Data/footest.json
+        sudo ./bps-simulator.out BSP/Simulator/Data/footest.json
         python3 Validation/verify_test.py footest > footest.result
         diff footest.result Validation/Test_Results/footest.result
     # add more tests here
