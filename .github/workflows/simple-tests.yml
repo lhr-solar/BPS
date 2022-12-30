@@ -22,7 +22,5 @@ jobs:
     # run tests in sudo for rtprio to work
     - name: footest 
       run: |
-        sudo ./Validation/test.sh BSP/Simulator/Data/footest.json
-        python3 Validation/verify_test.py footest > footest.result
-        diff footest.result Validation/Test_Results/footest.result
+        sudo ./Validation/test.sh footest
     # add more tests here
