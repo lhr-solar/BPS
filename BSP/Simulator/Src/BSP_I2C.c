@@ -19,7 +19,7 @@ static bool initialized = false;
  */
 void BSP_I2C_Init(void) {
     initialized = true;
-    Simulator_Log(LOG_INFO, "EEPROM Initialized\n");
+    Simulator_Log(LOG_INFO, "I2C Initialized\n");
 }
 
 /**
