@@ -33,11 +33,19 @@ ErrorStatus BSP_PWM_Set(uint8_t pin, uint32_t speed){
     char *output;
     if (speed>4000) speed = 4000;
 
-    asprintf(&output, "Setting output pin %d to speed %d", pin, speed);
+    if(pin == 4){
+        if(speed == 0){
+            output = "Setting contactor to off";
+        }else{
+            output = "Setting contactor to on";
+        }
+    }else{
+        asprintf(&output, "Setting output pin %d to speed %d\n", pin, speed);
+    }
     Simulator_Log(LOG_INFO, output);
     if (pin > 4) {
         char *errormessage;
-        asprintf(&errormessage, "Failed to set output PWM, pin %d is invalid", pin);
+        asprintf(&errormessage, "Failed to set output PWM, pin %d is invalid\n", pin);
         Simulator_Log(LOG_ERROR, errormessage);
         return ERROR; //invalid fan value
     }
@@ -52,7 +60,7 @@ ErrorStatus BSP_PWM_Set(uint8_t pin, uint32_t speed){
  */
 int BSP_PWM_Get(uint8_t pin){
     if(pin > 4){
-        Simulator_Log(LOG_WARN, "Attempted to read from nonexistent PWM pin");
+        Simulator_Log(LOG_WARN, "Attempted to read from nonexistent PWM pin\n");
         return -1;
     }
 
