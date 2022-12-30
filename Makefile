@@ -51,4 +51,4 @@ clean:
 	rm -fR Objects
 	rm -f *.log
 	rm -f *.out
-	rm BSP/Simulator/Data/*-*.json
+	rm -f BSP/Simulator/Data/*-*.json
