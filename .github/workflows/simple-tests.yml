@@ -20,7 +20,8 @@ jobs:
       run: make simulator
     # simple test for verifying testing infrastructure
     - name: footest 
-      run: ./bps-simulator.out BSP/Simulator/Data/footest.json
-      run: python3 Validation/verify_test.py footest > footest.result
-      run: diff footest.result Validation/Test_Results/footest.result
+      run: |
+        ./bps-simulator.out BSP/Simulator/Data/footest.json
+        python3 Validation/verify_test.py footest > footest.result
+        diff footest.result Validation/Test_Results/footest.result
     # add more tests here
