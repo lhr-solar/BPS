@@ -16,18 +16,23 @@ export TEST
 OS = RTOS
 export OS
 
+.PHONY: stm32f413
 stm32f413:
 	$(MAKE) -C BSP -C STM32F413 -j
 
+.PHONY: simulator
 simulator:
 	$(MAKE) -C BSP -C Simulator -j
 
+.PHONY: simulator_legacy
 simulator_legacy:
 	$(MAKE) -C BSP -C Simulator_Deprecated -j
 
+.PHONY: flash
 flash:
 	$(MAKE) -C BSP -C STM32F413 flash
 
+.PHONY: help
 help:
 	@echo -e "Format: ${ORANGE}make ${BLUE}<BSP type>${NC}${ORANGE}TEST=${PURPLE}<Test type>${NC}"
 	@echo -e "BSP types (required):"
@@ -41,8 +46,9 @@ help:
 	@echo -e "	excluding the file type (.c) e.g. say you want to test Voltage.c, call"
 	@echo -e "		${ORANGE}make ${BLUE}stm32f413 ${ORANGE}TEST=${PURPLE}Voltage${NC}"
 
-
+.PHONY: clean
 clean:
 	rm -fR Objects
 	rm -f *.log
 	rm -f *.out
+	rm BSP/Simulator/Data/*-*.json
