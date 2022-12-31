@@ -15,6 +15,17 @@
 #include "cJSON.h" // for json parser
 #include <stdlib.h> // for calloc/free
 
+/**
+ * @brief   Generates random numbers between a range
+ * @param   lower The lower bound, inclusive
+ * @param   upper The upper bound, exclusive
+ * @return  Random number between lower and upper
+ */
+int randomRange(int lower, int upper){
+    return (rand() % (upper - lower + 1)) + lower;
+}
+#define randomRange(lower, upper) ((rand() % (upper - lower + 1)) + lower)
+
 static struct State states[jsonLength];
 
 /**
@@ -65,7 +76,7 @@ int main(int argc, char **argv){
         free(j);
 
     }else{
-        
+
         //if there are no CLI parameters, ask the user for which test to run
         printf("\n0-Critical Overcurrent\n1-Critical Overtemp while charging\n2-Critical Overtemp while discharging\n3-Critical Overvolt\n4-Critical Undervolt\n5-Overcurrent\n6-Overtemp while charging\n7-Overtemp while discharging\n8-Overvolt\n9-Undervolt\nA-Generate All Error Tests\nB-No Error Test\nC-All Edge Cases Error Test\nSelect a Test to run by typing the corresponding character:");
         char* userinput;
@@ -75,10 +86,10 @@ int main(int argc, char **argv){
         inputsize = 0;
         for(int i=0; i<inputlen; i++){
             if(isalnum(*(userinput + i))){
-                    if(*(userinput + i) == 'A' || *(userinput + i) == 'a'){
-                        printf("Running all tests\n");
-                        generateData('a');
-                        runTest('a');
+                if(*(userinput + i) == 'A' || *(userinput + i) == 'a'){
+                    printf("Running all tests\n");
+                    generateData('a');
+                    runTest('a');
                     return 0;
                 }
                 *(inputargs + inputsize) = *(userinput + i);
@@ -231,16 +242,6 @@ void initializeVariables(bool charging){
 
         states[i].charge = 50000000;
     }
-}
-
-/**
- * @brief   Generates random numbers between a range
- * @param   lower The lower bound, inclusive
- * @param   upper The upper bound, exclusive
- * @return  Random number between lower and upper
- */
-int randomRange(int lower, int upper){
-    return (rand() % (upper - lower + 1)) + lower;
 }
 
 /**

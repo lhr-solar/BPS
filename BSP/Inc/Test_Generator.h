@@ -51,14 +51,6 @@ void generateData(char selection);
 void initializeVariables(bool charging);
 
 /**
- * @brief   Generates random numbers between a range
- * @param   lower The lower bound, inclusive
- * @param   upper The upper bound, exclusive
- * @return  Random number between lower and upper
- */
-int randomRange(int lower, int upper);
-
-/**
  * @brief   Writes out a json file using all the variables set earlier
  * @param   filename The name of the json to write out to, filepath and .json extension will be added automatically
  * @return  Whether the creation of json was successful
