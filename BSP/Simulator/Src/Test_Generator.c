@@ -18,7 +18,7 @@
 static struct State states[jsonLength];
 
 /**
- * @brief The output of this file automates the generation of test files and running them using the simulator
+ * @brief The output of this file automates the generation of test files and runs them using the simulator
  * @param argv CLI inputs that specify which test(s) to run. 
  * @note Example: ./Test_Generator 123 will generate and run tests 1, 2, 3
  * @note If no command line arguments are supplied, you will have to type them after the program starts running
@@ -27,18 +27,20 @@ static struct State states[jsonLength];
 int main(int argc, char **argv){
     //seed the RNG
     srand(time(NULL));
+    int inputsize;
+    char* inputargs;
 
-    //argc more than 1 means the user has passed arguments that will be processed
     if(argc > 1){
-        //allocate space for all the arguments that the user typed
+    //argc more than 1 means the user has passed arguments that will be processed
+            //allocate space for all the arguments that the user typed
         char* strptr = *(argv + argc - 1); //starting address of the last argument
         //search for null terminator of the last argument
         while(*strptr != '\0'){
             strptr++;
         }
 
-        int inputsize =(int) (strptr - *(argv + 1) - (argc - 2)); //don't wanna count null terminators so we subtract out number of command line arguments
-        char* inputargs = (char *)malloc(inputsize);
+        inputsize =(int) (strptr - *(argv + 1) - (argc - 2)); //don't wanna count null terminators so we subtract out number of command line arguments
+        inputargs = (char *)malloc(inputsize);
         //printf("Allocataing %d locations", inputsize);
         
 
@@ -62,18 +64,33 @@ int main(int argc, char **argv){
         }
         free(j);
 
-        //Iterate through the collected command line args and run all the specified tests
-        for(int i=0; i<inputsize; i++){
-            generateData(*(inputargs + i));
-            runTest(*(inputargs + i));
-        }
     }else{
+        
         //if there are no CLI parameters, ask the user for which test to run
-        printf("Select a Test to run by typing the corresponding character \n0-Critical Overcurrent\n1-Critical Overtemp while charging\n2-Critical Overtemp while discharging\n3-Critical Overvolt\n4-Critical Undervolt\n5-Overcurrent\n6-Overtemp while charging\n7-Overtemp while discharging\n8-Overvolt\n9-Undervolt\nA-Generate All Error Tests\nB-No Error Test\nC-All Edge Cases Error Test\n");
+        printf("\n0-Critical Overcurrent\n1-Critical Overtemp while charging\n2-Critical Overtemp while discharging\n3-Critical Overvolt\n4-Critical Undervolt\n5-Overcurrent\n6-Overtemp while charging\n7-Overtemp while discharging\n8-Overvolt\n9-Undervolt\nA-Generate All Error Tests\nB-No Error Test\nC-All Edge Cases Error Test\nSelect a Test to run by typing the corresponding character:");
+        char* userinput;
+        scanf("%m[^\n]", &userinput); //dynamically allocate memory for user input
+        int inputlen = strlen(userinput);
+        inputargs = (char *) malloc(sizeof(char) * inputlen); //allocate space for the array
+        inputsize = 0;
+        for(int i=0; i<inputlen; i++){
+            if(isalnum(*(userinput + i))){
+                    if(*(userinput + i) == 'A' || *(userinput + i) == 'a'){
+                        printf("Running all tests\n");
+                        generateData('a');
+                        runTest('a');
+                    return 0;
+                }
+                *(inputargs + inputsize) = *(userinput + i);
+                inputsize++;
+            }
+        }
+    }
 
-        char userinput = getchar();
-        generateData(userinput);
-        runTest(userinput);
+    //Iterate through the collected command line args and run all the specified tests
+    for(int i=0; i<inputsize; i++){
+        generateData(*(inputargs + i));
+        runTest(*(inputargs + i));
     }
     return 0;
 }
