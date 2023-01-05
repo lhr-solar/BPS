@@ -20,7 +20,8 @@
 #include "cJSON.h" // for json parser
 #include <stdlib.h> // for calloc/free
 #include "BSP_CAN.h" // CAN testing
-
+#include "os.h"
+#include "cpu.h"
 // file descriptor of simulator log file
 int simulatorLog;
 
@@ -50,6 +51,7 @@ void Simulator_Log(LoggingType_t lvl, char *str) {
     strcpy(prefix, LoggingLUT[lvl]); //This is because strcat cannot concat const
     char* msg = strcat(prefix, str);
     write(simulatorLog, msg, strlen(msg));
+    printf("%s\n",msg);
     if (0) {
         char *buffer = (char *) malloc(strlen(msg) + 2);
         sprintf(buffer, "%s\n", msg);
@@ -73,6 +75,13 @@ void Simulator_Log(LoggingType_t lvl, char *str) {
  * @return  None
  */
 void Simulator_Shutdown(int status) {
+    // OS_ERR err;
+    // OSTaskDel(&OSTickTaskTCB,&err);
+    // OSTaskDel(&OSTmrTaskTCB,&err);
+    //pthread_cancel(CPU_TmrInterruptTask);
+    char time_msg[30];
+    sprintf(time_msg, "Time logged: %ld\n", startTime);
+    Simulator_Log(LOG,time_msg);
     Simulator_Log(LOG, "Shutting down the simulator...\n");
     close(simulatorLog);
     exit(status);
@@ -262,6 +271,9 @@ void Simulator_Init(char *jsonPath) {
 
     // log the starting time
     startTime = time(NULL);
+    char time_msg[30];
+    sprintf(time_msg, "Time logged: %ld\n", startTime);
+    Simulator_Log(LOG,time_msg);
 }
 
 /**
@@ -283,6 +295,17 @@ static void Simulator_Transition(void) {
             Simulator_Shutdown(0);
         }
     }
+    // time_t currentTime = time(NULL);
+    // if (currentTime > startTime + states->time) {
+    //     simulator_state *prev = states;
+    //     states = states->next;
+    //     startTime = currentTime;
+    //     free(prev);
+    //     if (states == NULL) {
+    //         Simulator_Log(LOG, "Finished Last state!\n");
+    //         Simulator_Shutdown(0);
+    //     }
+    // }
 }
 
 

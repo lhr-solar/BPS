@@ -9,7 +9,7 @@
 #include <stdint.h>
 #include "Simulator.h"
 
-bool initialized = false;
+static bool initialized = false;
 
 /**
  * @brief   Initialize the watch dog timer.

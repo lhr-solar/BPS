@@ -29,7 +29,7 @@ void EnterFaultState() {
 #ifndef SIMULATION
     __disable_irq();
 #endif
-
+    printf("fault is %d\n",Fault_BitMap);
     // Turn Contactor Off
     BSP_Contactor_Init();
     BSP_Contactor_Off();

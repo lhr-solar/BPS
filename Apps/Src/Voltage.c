@@ -44,7 +44,7 @@ static uint32_t openWires[TOTAL_VOLT_WIRES];
  * @return SUCCESS or ERROR
  */
 void Voltage_Init(cell_asic *boards){
-	// Record pointer
+	// Record pointerf
 	Minions = boards;
 	//initialize mutex
 	OS_ERR err;
@@ -79,7 +79,7 @@ void Voltage_Init(cell_asic *boards){
 #endif
 	
 	// Initialize median filter. There should be no modules with less than 0 volts or more than 5 volts
-	VoltageFilter_init(&VoltageFilter, 0, 5000);
+	VoltageFilter_init(&VoltageFilter, 0, 50000);
 }
 
 #ifndef SIMULATION

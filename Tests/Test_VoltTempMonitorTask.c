@@ -15,7 +15,7 @@
 #include "CAN_Queue.h"
 #include "BSP_WDTimer.h"
 #include "BSP_Contactor.h"
-
+#include <time.h>
 /******************************************************************************
  * VoltTempMonitor Task Test Plan
  * 
@@ -48,6 +48,8 @@ void Task1(void *p_arg){
     
 #ifndef SIMULATION
     OS_CPU_SysTickInit(SystemCoreClock / (CPU_INT32U) OSCfg_TickRate_Hz);
+#else
+
 #endif
     
     OSSemCreate(&Fault_Sem4,
@@ -98,19 +100,19 @@ void Task1(void *p_arg){
             &err);					// return err code
 
     //3
-    OSTaskCreate(&PetWDog_TCB,				// TCB
-			"TASK_PETWDOG_PRIO",	// Task Name (String)
-			Task_PetWDog,				// Task function pointer
-			(void *)0,				// Task function args
-			TASK_PETWDOG_PRIO,			// Priority
-			PetWDog_Stk,				// Stack
-			WATERMARK_STACK_LIMIT,	// Watermark limit for debugging
-			TASK_PETWDOG_STACK_SIZE,		// Stack size
-			0,						// Queue size (not needed)
-			10,						// Time quanta (time slice) 10 ticks
-			(void *)0,				// Extension pointer (not needed)
-			OS_OPT_TASK_STK_CHK | OS_OPT_TASK_SAVE_FP,	// Options
-			&err);					// return err code
+    // OSTaskCreate(&PetWDog_TCB,				// TCB
+	// 		"TASK_PETWDOG_PRIO",	// Task Name (String)
+	// 		Task_PetWDog,				// Task function pointer
+	// 		(void *)0,				// Task function args
+	// 		TASK_PETWDOG_PRIO,			// Priority
+	// 		PetWDog_Stk,				// Stack
+	// 		WATERMARK_STACK_LIMIT,	// Watermark limit for debugging
+	// 		TASK_PETWDOG_STACK_SIZE,		// Stack size
+	// 		0,						// Queue size (not needed)
+	// 		10,						// Time quanta (time slice) 10 ticks
+	// 		(void *)0,				// Extension pointer (not needed)
+	// 		OS_OPT_TASK_STK_CHK | OS_OPT_TASK_SAVE_FP,	// Options
+	// 		&err);					// return err code
     // Spawn Task_VoltTempMonitor with PRIO 4
     OSTaskCreate(&VoltTempMonitor_TCB,				// TCB
 			"TASK_VOLT_TEMP_MONITOR_PRIO",	// Task Name (String)
@@ -163,6 +165,7 @@ void Task2(void *p_arg){
 	assertOSError(err);
 
     while(1){
+        //printf("time: %ld\n", time(NULL));
         OSMutexPend(&WDog_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
         assertOSError(err);
         WDog_BitMap |= WD_AMPERES;
@@ -181,7 +184,9 @@ void Task2(void *p_arg){
 int main(void) {
 #else
 int main(int argc, char **argv) {
+    CPU_Init();
     Simulator_Init(argv[1]);
+    OS_CPU_SysTickInit();   
 #endif
 
     //Resetting the contactor
@@ -229,6 +234,6 @@ int main(int argc, char **argv) {
                 OS_OPT_TASK_SAVE_FP | OS_OPT_TASK_STK_CHK,
                 &err);
     assertOSError(err);
-
+    //OS_CPU_SysTickInit();
     OSStart(&err);
 }

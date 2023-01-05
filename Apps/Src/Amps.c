@@ -138,21 +138,18 @@ int32_t Amps_GetReading(void) {
 void Amps_Calibrate(void) {
 	// we have observed that when the BPS is initially powered, there is a delay before the LTC2315
 	// can be calibrated properly. This is not observed on pressing the reset button
+	// OS_ERR err;
 
-	OS_ERR err;
-
-	// initial calibration
-	LTC2315_Calibrate();
-	Amps_UpdateMeasurements();
-
-	// keep calibrating until we read 0 Amps
-	OSTimeDly(1, OS_OPT_TIME_DLY, &err);
-	Amps_UpdateMeasurements();
-	while (Amps_GetReading() != 0) {
-		LTC2315_Calibrate();
-		OSTimeDly(1, OS_OPT_TIME_DLY, &err);
-		Amps_UpdateMeasurements();
-	}
-
+	// // initial calibration
+	// LTC2315_Calibrate();
+	// // keep calibrating until we read 0 Amps
+	// OSTimeDly(1, OS_OPT_TIME_DLY, &err);
+	// //Amps_UpdateMeasurements();
+	// while (Amps_GetReading() != 0) {
+	// 	LTC2315_Calibrate();
+	// 	OSTimeDly(1, OS_OPT_TIME_DLY, &err);
+	// 	//Amps_UpdateMeasurements();
+	// }
+	// OSTimeDly(1,OS_OPT_TIME_DLY,&err);
 	
 }

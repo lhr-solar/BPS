@@ -31,8 +31,17 @@ void Charge_Init(void){
  */
 void Charge_Calculate(int32_t milliamps){ 
 	/* Update Charge, units of 0.000001% . 100,000,000 is charge at 100% */
-	
-	int64_t micro_sec = (int64_t)BSP_Timer_GetMicrosElapsed();
+	#ifndef SIMULATION
+		int64_t micro_sec = (int64_t)BSP_Timer_GetMicrosElapsed();
+	#else   //to stop printing repeats of the same log message
+        static int Simulator_milliamps = 0;
+		int64_t micro_sec;
+        if (milliamps != Simulator_milliamps) {
+            micro_sec = (int64_t)BSP_Timer_GetMicrosElapsed();
+            Simulator_milliamps = milliamps;
+        }
+    #endif
+
 	int64_t millis = (int64_t)milliamps;
 	                                                                   // Psuedo code that represents what this math does. In the coded math, order of operations is very important to avoid overflow 
 	charge -= (int32_t) (micro_sec * millis                            // microseconds / 1,000,000 / 3600 = hours_elapsed

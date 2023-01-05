@@ -50,8 +50,9 @@ void Task1(void *p_arg){
 #ifndef SIMULATION
 	OS_CPU_SysTickInit(SystemCoreClock / (CPU_INT32U) OSCfg_TickRate_Hz);
 #endif
+    OS_CPU_SysTickInit();
     OS_ERR err;
-    
+
     OSSemCreate(&Fault_Sem4,
                 "Fault/Tripped Semaphore",
                 0,
@@ -179,10 +180,10 @@ void Task2(void *p_arg){
         //delay of 100ms
         OSTimeDly(10, OS_OPT_TIME_DLY, &err);
         assertOSError(err);
-        Amps_UpdateMeasurements();
+        //Amps_UpdateMeasurements();
         if (count == 0) {
             // printf("Amps: %d\n\r", Amps_GetReading());
-            Amps_UpdateMeasurements();
+            //Amps_UpdateMeasurements();
         }
         count = (count + 1) % 10;
 

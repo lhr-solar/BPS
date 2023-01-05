@@ -61,12 +61,12 @@ void LTC2315_Sleep() {
  * @return Raw 12-bit value read from the ADC
  */
 uint16_t LTC2315_Read() {
-    OS_ERR err;
+
     uint8_t rxdata[2] = {0xff, 0xff};
-
     LTC2315_wakeup_sleep();
-
+    OS_ERR err;
     uint8_t count = 0;
+     //TODO once BSP_SPI sim works properly get rid of guards :
     do {
     OSSchedLock(&err);
     assertOSError(err);
@@ -90,7 +90,6 @@ uint16_t LTC2315_Read() {
 
     ++count;
     } while ((rxdata[0] == 0xff) && (rxdata[1] == 0xff)); // sometimes rxdata is 0xffff. I think this is caused by getting interrupted in the middle of requesting a reading from the ADC
-
     return (((uint16_t) rxdata[0] << 5) | ((uint16_t) rxdata[1] >> 3)) & 0x0fff;  // pack reading into 12 bits
 }
 

@@ -16,7 +16,6 @@ void Task_VoltTempMonitor(void *p_arg) {
     (void)p_arg;
 
     OS_ERR err;
-
     BSP_Fans_Init();
     Voltage_Init(Minions);
     Temperature_Init(Minions);
@@ -34,7 +33,6 @@ void Task_VoltTempMonitor(void *p_arg) {
         // BLOCKING =====================
         // Update Voltage Measurements
         Voltage_UpdateMeasurements();
-        
         // Check if voltage is NOT safe:
         SafetyStatus voltageStatus = Voltage_CheckStatus();
         if(voltageStatus != SAFE) {
@@ -159,8 +157,8 @@ void Task_VoltTempMonitor(void *p_arg) {
         // Control Fans depending on temperature
         // Right now this just sets them to maximum speed
         // Once we get a thermal model of the battery box, we can replace this with someting better
+        
         BSP_Fans_SetAll(TOPSPEED);
-
         //signal watchdog
         OSMutexPend(&WDog_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
         assertOSError(err);
@@ -171,7 +169,7 @@ void Task_VoltTempMonitor(void *p_arg) {
         assertOSError(err);
 
         //delay of 50ms
-        OSTimeDly(5, OS_OPT_TIME_DLY, &err);
+        //OSTimeDly(100, OS_OPT_TIME_DLY, &err);
         assertOSError(err);
     }
 }
