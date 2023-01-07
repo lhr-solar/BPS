@@ -1,0 +1,23 @@
+# workflow for running quick, simple tests in the simulator. Runs on every push
+name: Simple Tests
+
+on:
+  push:
+
+jobs:
+  test:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Initialize submodules
+      run: git submodule update --init --recursive
+    - name: build
+      run: make simulator
+    # simple test for verifying testing infrastructure
+    # run tests in sudo for rtprio to work
+    - name: footest 
+      run: |
+        sudo ./Validation/test.sh footest
+    # add more tests here

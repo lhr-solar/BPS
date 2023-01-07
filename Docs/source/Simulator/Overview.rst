@@ -38,12 +38,24 @@ Running the Simulator
 =====================
 The simulator can be run with ``./bps-simulator.out <path to JSON input file>``
 
-Checking tests
+Checking Tests
 ==============
-This is not implemented yet, but I would like to create a script/program for parsing the simulator output files to determine the ending state 
-of the simulator's outputs. We can then compare the final state with the expected state (define by the creator of the test case) to determine 
-if the test passed or failed. This would allow us to script the testing process and integrate it with GitHub actions to run regression tests on 
-all of our pull requests.
+The python script ``Validation/verify_test.py`` can be used to verify if the test passes or fails. It takes the name
+of the test as an argument. For example, if you want to run a test called ``footest`` specified in
+``BSP/Simulator/Data/footest.json`` and ``BSP/Simulator/Data/footest-out.json``, you should run
+``python3 Validation/verify_test.py``. This script assumes the ``<testname>.json`` and ``<testname>-out.json`` will
+be in the ``BSP/Simulator/Data/`` directory and that ``./bps-simulator.out`` generated a log called
+``bps-sim-<testname>.json.log`` in the current directory (usually the root of the BPS repo).
 
-Some things (like current, CAN, and automated test checking) are not supported yet, so maybe we want to wait a little bit before merging with 
-master? I also haven't written any serious test cases yet.
+Creating Tests
+==============
+To add a test to regressions, create a files called ``<testname>.json`` and ``<testname>-out.json`` in 
+``BSP/Simulator/Data/`` to specify the test states and requirements. Then modify the appropriate GitHub
+workflow (in ``.github/workflows/``) to add your test. The shell script ``Validation/test.sh`` is used to
+run the simulator on GitHub's servers with the proper conditions adn must be run with sudo. For example, 
+this is how the footest test is added to the simple-tests workflow in ``.github/workflows/simple-tests.yml``::
+
+    - name: footest 
+      run: |
+        sudo ./Validation/test.sh footest
+

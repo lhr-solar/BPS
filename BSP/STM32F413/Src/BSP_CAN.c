@@ -152,6 +152,11 @@ ErrorStatus BSP_CAN_Write(uint32_t id, uint8_t data[], uint8_t length) {
     }
     gTxMessage.StdId = id;
     gTxMessage.DLC = length;
+
+    if (length > 8) {
+        length = 8;
+    }
+
 	for(int i = 0; i < length; i++){
         gTxMessage.Data[i] = data[i];
     }

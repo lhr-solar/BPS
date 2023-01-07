@@ -76,6 +76,7 @@ def verify_init_before_use(bps_state: Dict[str, List[List[str]]]) -> bool:
         if len(bps_state[peripheral]) > 0 and bps_state[peripheral][0] != ["init"]:
             print("ERROR: " + peripheral + " used before initialization")
             return False
+    return True
 
 
 def verify_output(out_json: str, bps_state: Dict[str, List[List[str]]]) -> bool:
@@ -96,8 +97,10 @@ def main():
     out_json = parse_output(out_filepath)
     if verify_output(out_json, bps_state):
         print("Test passed")
+        exit(0)
     else:
         print("Test failed")
+        exit(-1)
 
 
 if __name__ == '__main__':
