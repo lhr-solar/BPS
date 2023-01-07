@@ -1,10 +1,10 @@
 /* Copyright (c) 2022 UT Longhorn Racing Solar */
 #include "os.h"
 #include "Tasks.h"
-#include "BSP_Contactor.h"
+#include "Contactor.h"
 #include "BSP_Lights.h"
 #include "Voltage.h"
-#include "BSP_Fans.h"
+#include "Fans.h"
 #include "Temperature.h"
 #include "Amps.h"
 #include "EEPROM.h"
@@ -32,11 +32,11 @@ void EnterFaultState() {
 #endif
 
     // Turn Contactor Off
-    BSP_Contactor_Init();
-    BSP_Contactor_Off(ALL_CONTACTORS);
+    Contactor_Init();
+    Contactor_Off(ALL_CONTACTORS);
     //Set Fans to full speed
-    BSP_Fans_Init();
-    BSP_Fans_SetAll(TOPSPEED);
+    Fans_Init();
+    Fans_SetAll(TOPSPEED);
     // Turn Strobe Light On
     // Turn LEDs On and logs Error into EEPROM
     BSP_Lights_Init();
@@ -117,7 +117,7 @@ void EnterFaultState() {
             sprintf(err, "$$$ Entered fault in state {%d} - ELECTRICAL STOP\n", stateCount - 1);
             Simulator_Log_Location(LOG_INFO, err);
         #endif
-            BSP_Contactor_Off(ALL_CONTACTORS);
+            Contactor_Off(ALL_CONTACTORS);
         #ifdef SIMULATION
         #endif
             break;
