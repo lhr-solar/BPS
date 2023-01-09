@@ -232,7 +232,7 @@ void CtrlCHandler(int n) {
 void Simulator_Init(char *jsonPath) {
     // generate unique name for log file
     startTime = time(NULL);
-    char filename[30];
+    char filename[50];
     // make the file name the test file
     char* tempName = jsonPath + strlen(jsonPath);
     while (*tempName != '/') tempName--;
