@@ -19,5 +19,14 @@ jobs:
     # run tests in sudo for rtprio to work
     - name: footest 
       run: |
-        sudo ./Validation/test.sh footest
+        sudo ./Validation/test.sh critical_overcurrent
+        sudo ./Validation/test.sh critical_overtemp_charging
+        sudo ./Validation/test.sh critical_overtemp_discharging
+        sudo ./Validation/test.sh critical_overvolt
+        sudo ./Validation/test.sh critical_undervolt
+        sudo ./Validation/test.sh overcurrent
+        sudo ./Validation/test.sh overtemp_charging
+        sudo ./Validation/test.sh overtemp_discharging
+        sudo ./Validation/test.sh overvolt
+        sudo ./Validation/test.sh undervolt
     # add more tests here
