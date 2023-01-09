@@ -30,21 +30,16 @@ ErrorStatus BSP_PWM_Set(uint8_t pin, uint32_t speed){
     //First check to make sure that change is within range of values
     //Load new value into Compare and Capture Register
     char *output;
-    if (speed>4000) speed = 4000;
 
-    if (pin == 3){
-        if(speed == 0){
-            output = "Contactor {CFAN} {disabled}\n";
-        }else{
-            output = "Contactor {CFAN} {enabled}\n";
-        }
+    if (speed > 4000){ 
+        speed = 4000;
     }
-    else if (pin == 4){
-        if(speed == 0){
-            output = "Contactor {C1} {disabled}\n";
-        }else{
-            output = "Contactor {C1} {enabled}\n";
-        }
+    
+    char *cont = (pin == 3) ? "CFAN" : "C1";
+    char *status = (speed == 0) ? "disabled" : "enabled";
+
+    if (pin >= 3){
+        asprintf(&output, "Contactor %s %s\n", cont, status);
     }
     else{
         asprintf(&output, "Fan {%d} set to speed {%d}\n", pin, speed);
