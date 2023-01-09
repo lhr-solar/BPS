@@ -17,7 +17,7 @@ jobs:
       run: make simulator
     # simple test for verifying testing infrastructure
     # run tests in sudo for rtprio to work
-    - name: footest 
+    - name: Unit Test 
       run: |
         sudo ./Validation/test.sh critical_overcurrent
         sudo ./Validation/test.sh critical_overtemp_charging
