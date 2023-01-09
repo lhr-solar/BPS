@@ -9,7 +9,10 @@ Uses Pins PC6,7 and PB14,15
 #include "Contactor.h"
 
 void Fans_Init(void){
-    Fans_SetAll(4); //start with all fans half speed
+    #ifdef SIMULATION
+		Simulator_Log(LOG_INFO, "Fans Initialized\n");
+	#endif
+    BSP_PWM_Init();
 }
 
 /**
@@ -21,7 +24,6 @@ void Fans_Init(void){
 
 ErrorStatus Fans_Set(uint8_t fan, uint32_t speed){
     //don't mess with the contactor
-    BSP_PWM_Init();
     if (fan == CFAN) return ERROR;
     //Range of pulse is 0-4000
     //First check to make sure that change is within range of values
@@ -47,7 +49,7 @@ int Fans_GetSpeed(uint8_t fan){
  */
 ErrorStatus Fans_SetAll(uint32_t speed) {
     ErrorStatus result = SUCCESS;
-    for (uint8_t i = 1; i <= 4; i++){
+    for (uint8_t i = 0; i < 4; i++){
         if (i == CFAN) continue;
         ErrorStatus e = Fans_Set(i, speed);
         if (e != SUCCESS) result = e;

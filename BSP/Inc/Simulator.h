@@ -4,7 +4,7 @@
  * Simulator.h - Simulator Functionality
 */
 
-#ifndef SIMULTOR_H
+#ifndef SIMULATOR_H
 #define SIMULATOR_H
 
 #include "config.h"

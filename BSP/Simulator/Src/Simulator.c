@@ -41,11 +41,12 @@ static uint16_t DUMMY_VOLTAGES[NUM_BATTERY_MODULES] = {[0 ... NUM_BATTERY_MODULE
 static uint16_t DUMMY_TEMPS[NUM_TEMPERATURE_SENSORS] = {[0 ... NUM_TEMPERATURE_SENSORS - 1] = 30000};
 
 // LUT which corresponds Logging Level type to string to print out in LogFile
+//When Logging data that should be parsed, data should be enclosed in {}
 static const char* LoggingLUT[LOG_NUM_LEVELS] = {
     [LOG_INFO] = "[INFO] ",
     [LOG_WARN] = "[WARNING] ",
     [LOG_ERROR] = "[ERROR] ",
-    [LOG_OUTPUT] = "[OUTPUT] ",
+    [LOG_OUTPUT] = "[OUTPUT] ", //This logging level is output to JSON file to run unit tests. Use this when output should be parsed
     [LOG] = "",
     [LOG_MISC] = "[MISC] ",
 };
@@ -61,7 +62,7 @@ void Simulator_Log(LoggingType_t lvl, char *str) {
     strcpy(prefix, LoggingLUT[lvl]); //This is because strcat cannot concat const
     char* msg = strcat(prefix, str);
     write(simulatorLog, msg, strlen(msg));
-    printf("%s %s", prefix, str);
+    printf("%s", msg);
 }
 
 // It knows what the input file is because the Makefile should make a #define for the file path called SIMULATOR_JSON_PATH

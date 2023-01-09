@@ -12,11 +12,10 @@ static uint32_t pinSpeeds[] = {0, 0, 0, 0, 0};
 /**
  * @brief   Sets up contactor and fan pin timers for outputting PWM signals
  */
-
 void BSP_PWM_Init(void){
     //initialize all pins pertaining to fans and contactors for PWM here
     initialized = true;
-    Simulator_Log(LOG_INFO,"Initialized PWM interface\n");
+    Simulator_Log(LOG_INFO,"PWM initialized\n");
 }
 
 /**
@@ -33,16 +32,24 @@ ErrorStatus BSP_PWM_Set(uint8_t pin, uint32_t speed){
     char *output;
     if (speed>4000) speed = 4000;
 
-    if(pin == 4){
+    if (pin == 3){
         if(speed == 0){
-            output = "Setting contactor to off";
+            output = "Contactor {CFAN} {disabled}\n";
         }else{
-            output = "Setting contactor to on";
+            output = "Contactor {CFAN} {enabled}\n";
         }
-    }else{
-        asprintf(&output, "Setting output pin %d to speed %d\n", pin, speed);
     }
-    Simulator_Log(LOG_INFO, output);
+    else if (pin == 4){
+        if(speed == 0){
+            output = "Contactor {C1} {disabled}\n";
+        }else{
+            output = "Contactor {C1} {enabled}\n";
+        }
+    }
+    else{
+        asprintf(&output, "Fan {%d} set to speed {%d}\n", pin, speed);
+    }
+    Simulator_Log(LOG_OUTPUT, output);
     if (pin > 4) {
         char *errormessage;
         asprintf(&errormessage, "Failed to set output PWM, pin %d is invalid\n", pin);

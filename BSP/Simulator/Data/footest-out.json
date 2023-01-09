@@ -1,18 +1,19 @@
 {
     "forbidden_states": {
-        "Contactor": "enabled"
+        "ContactorC1": "enabled",
+        "ContactorCFAN": "enabled"
     },
     "end_state": {
-        "Contactor": "disabled",
+        "ContactorC1": "disabled",
+        "ContactorCFAN": "disabled",
         "Light": [
             ["FAULT", "1"],
             ["UVOLT", "1"]
         ],
         "Fan": [
-            ["1", "8"],
-            ["2", "8"],
-            ["3", "8"],
-            ["4", "8"]
+            ["0", "4000"],
+            ["1", "4000"],
+            ["2", "4000"]
         ]
     }
 }

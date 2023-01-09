@@ -14,7 +14,8 @@ TEST_FILEPATH: str = "./BSP/Simulator/Data/"
 LOG_PREFIX: str = "bps-sim-"
 PERIPHERALS_MULTIPLE: List[str] = [
     "Light",
-    "Fan"
+    "Fan",
+    "Contactor"
 ]
 
 def parse_args() -> argparse.Namespace:
@@ -101,7 +102,7 @@ def main():
     else:
         print("Test failed")
         exit(-1)
-
+    
 
 if __name__ == '__main__':
     main()

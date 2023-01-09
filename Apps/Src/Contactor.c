@@ -9,9 +9,10 @@
  */
 void Contactor_Init(void) {
 	//Contactor Init is called before fan init, so initialize pwm here first. This will setup the contactor outputs
+	#ifdef SIMULATION
+		Simulator_Log(LOG_INFO, "Contactor Initialized\n");
+	#endif
 	BSP_PWM_Init();
-
-
 }
 
 /**
