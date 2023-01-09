@@ -127,8 +127,8 @@ static void readInputFile(char *jsonPath) {
             tail->next = temp;
             tail = tail->next;
         }
-        char buffer[50];
-        sprintf(buffer, "\nExecuting state #%d...\n", stateCount);
+        char* buffer;
+        asprintf(&buffer, "\nExecuting state #%d...\n", stateCount);
         Simulator_Log(LOG, buffer);
         // Try and get every field we should have in each state.
         // If null, it doesn't exist.
@@ -190,8 +190,8 @@ static void readInputFile(char *jsonPath) {
             tail->charge = 25000000;
         }
         if (!canList) {
-            char buffer[67];
-            sprintf(buffer, "No CAN messages to simulate in this state. (State Count = %d)\n", stateCount);
+            char* buffer;
+            asprintf(&buffer, "No CAN messages to simulate in this state. (State Count = %d)\n", stateCount);
             Simulator_Log(LOG_MISC, buffer);
         } else { // otherwise, there are some potential CAN messages. 
             // for every CAN message...
@@ -232,13 +232,13 @@ void CtrlCHandler(int n) {
 void Simulator_Init(char *jsonPath) {
     // generate unique name for log file
     startTime = time(NULL);
-    char filename[50];
+    char* filename;
     // make the file name the test file
     char* tempName = jsonPath + strlen(jsonPath);
     while (*tempName != '/') tempName--;
     tempName++; // remove the '/'
     // makes the output nice
-    sprintf(filename, "bps-sim-%s.log", tempName);
+    asprintf(&filename, "bps-sim-%s.log", tempName);
 
     // create the log file
     simulatorLog = open(filename, O_CREAT | O_WRONLY, 0664);
