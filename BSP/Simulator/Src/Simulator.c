@@ -80,6 +80,9 @@ void Simulator_Log(LoggingType_t lvl, char *str) {
  * @return  None
  */
 void Simulator_Shutdown(int status) {
+    char time_msg[30];
+    sprintf(time_msg, "Time logged: %ld\n", startTime);
+    Simulator_Log(LOG,time_msg);
     Simulator_Log(LOG, "\nShutting down the simulator...\n");
     close(simulatorLog);
     exit(status);
@@ -263,6 +266,9 @@ void Simulator_Init(char *jsonPath) {
 
     // log the starting time
     startTime = time(NULL);
+    char time_msg[30];
+    sprintf(time_msg, "Time logged: %ld\n", startTime);
+    Simulator_Log(LOG,time_msg);
 }
 
 /**

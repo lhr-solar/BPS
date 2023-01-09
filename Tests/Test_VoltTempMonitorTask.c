@@ -182,6 +182,7 @@ int main(void) {
 #else
 int main(int argc, char **argv) {
     Simulator_Init(argv[1]);
+    OS_CPU_SysTickInit();
 #endif
 
     //Resetting the contactor
