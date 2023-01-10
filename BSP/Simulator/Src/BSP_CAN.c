@@ -36,6 +36,10 @@ void BSP_CAN_Init(callback_t rxEvent, callback_t txEnd, bool loopback) {
  * @return  ERROR if module was unable to transmit the data onto the CAN bus. SUCCESS indicates data was transmitted.
  */
 ErrorStatus BSP_CAN_Write(uint32_t id, uint8_t data[], uint8_t length) {
+    if(!CAN_Initialized) {
+        Simulator_Log_Location(LOG_ERROR, "Used CAN without initialization!\n");
+        exit(-1);
+    }
     if (length > 8) return ERROR;
     // log message
     char canMsgBuf[100] = {0};
@@ -56,6 +60,10 @@ ErrorStatus BSP_CAN_Write(uint32_t id, uint8_t data[], uint8_t length) {
  * @return  ERROR if nothing was received so ignore id and data that was received. SUCCESS indicates data was received and stored.
  */
 ErrorStatus BSP_CAN_Read(uint32_t *id, uint8_t *data) {
+    if(!CAN_Initialized) {
+        Simulator_Log_Location(LOG_ERROR, "Used CAN without initialization!\n");
+        exit(-1);
+    }
     char buffer[75];
     sprintf(buffer, "Read CAN message ID {%d} DATA {0x%016" PRIx64 "}\n", *id, *(uint64_t*)(data));
     Simulator_Log(LOG_OUTPUT, buffer);

@@ -11,6 +11,9 @@
 #include "BSP_SPI.h"
 #include "CANbus.h"
 #include "Charge.h"
+#ifdef SIMULATION
+#include "Simulator.h"
+#endif
 
 static OS_MUTEX AmperesData_Mutex;
 
@@ -75,7 +78,12 @@ void Amps_UpdateMeasurements(void) {
 	CPU_TS ticks;
 	OSMutexPend(&AmperesData_Mutex, 0, OS_OPT_PEND_BLOCKING, &ticks, &err);
 	assertOSError(err);
-	latestMeasureMilliAmps = LTC2315_GetCurrent();
+	#ifdef SIMULATION
+		latestMeasureMilliAmps = Simulator_getCurrent();
+		printf("Milliamp measurement is %d\n\n", latestMeasureMilliAmps);
+	#else 
+		latestMeasureMilliAmps = LTC2315_GetCurrent();
+	#endif
 	OSMutexPost(&AmperesData_Mutex, OS_OPT_POST_NONE, &err);
 	assertOSError(err);
 }

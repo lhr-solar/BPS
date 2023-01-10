@@ -6,10 +6,10 @@
 #include "BSP_SPI.h"
 #include "config.h"
 #include "common.h"
+#include <inttypes.h>
+#include "Simulator.h"
 
-void SPI3_Init(bsp_os_t *spi3_os){
-	// TODO
-}
+static bool initialized = false;
 
 /**
  * @brief   Initializes the SPI port.
@@ -17,7 +17,9 @@ void SPI3_Init(bsp_os_t *spi3_os){
  * @return  None
  */
 void BSP_SPI_Init(spi_port_t port, bsp_os_t *spi_os, bool baremetal) {
-    // TODO
+    initialized = true;
+    Simulator_Log(LOG_INFO,"SPI initialized\n");
+    Simulator_Log(LOG_INFO,"SPI3 initialized\n");
 }
 
 /**
@@ -29,7 +31,22 @@ void BSP_SPI_Init(spi_port_t port, bsp_os_t *spi_os, bool baremetal) {
  * @return  None
  */
 void BSP_SPI_Write(spi_port_t port, uint8_t *txBuf, uint32_t txLen) {
-    // TODO
+    char* spi = port ? "SPI3 LTC2315" : "SPI LTC6811";
+    char* msg;
+    if(!initialized) {
+        asprintf(&msg, "Used %s without initialization!\n", spi);
+        Simulator_Log_Location(LOG_ERROR, msg);
+        Fault_BitMap |= Fault_CRC;
+        EnterFaultState();
+    }
+    char* data;
+    memcpy(&data, txBuf, txLen);
+    asprintf(&msg, "Wrote to %s with data {", spi);
+    for (uint32_t i = 0; i < txLen; i++){
+        strcat(msg, (char*)&txBuf[i]);
+    }
+    strcat(msg, "}\n");
+    Simulator_Log(LOG_INFO, msg);
 }
 
 /**
@@ -43,7 +60,16 @@ void BSP_SPI_Write(spi_port_t port, uint8_t *txBuf, uint32_t txLen) {
  * @return  None
  */
 void BSP_SPI_Read(spi_port_t port, uint8_t *rxBuf, uint32_t rxLen) {
-    // TODO
+    char* spi = port ? "SPI3 LTC2315" : "SPI LTC6811";
+    char* msg;
+    if(!initialized) {
+        asprintf(&msg, "Used %s without initialization!\n", spi);
+        Simulator_Log_Location(LOG_ERROR, msg);
+        Fault_BitMap |= Fault_CRC;
+        EnterFaultState();
+    }
+    asprintf(&msg, "%s {read}\n", spi);
+    Simulator_Log(LOG_INFO, msg);
 }
 
 /**
@@ -55,7 +81,14 @@ void BSP_SPI_Read(spi_port_t port, uint8_t *rxBuf, uint32_t rxLen) {
  * @return  None
  */
 void BSP_SPI_SetStateCS(spi_port_t port, uint8_t state) {
-    // TODO
+    char* spi = port ? "SPI3 LTC2315" : "SPI LTC6811";
+    char* msg;
+    if(!initialized) {
+        asprintf(&msg, "Used %s without initialization!\n", spi);
+        Simulator_Log_Location(LOG_ERROR, msg);
+        Fault_BitMap |= Fault_CRC;
+        EnterFaultState();
+    }
 }
 
 /**
@@ -66,5 +99,11 @@ void BSP_SPI_SetStateCS(spi_port_t port, uint8_t state) {
  * @return  None
  */
 void BSP_SPI_SetClock(spi_speed_t speed) {
-    // TODO
+    char* msg;
+    if(!initialized) {
+        asprintf(&msg, "Used SPI LTC6811 without initialization!\n");
+        Simulator_Log_Location(LOG_ERROR, msg);
+        Fault_BitMap |= Fault_CRC;
+        EnterFaultState();
+    }
 }

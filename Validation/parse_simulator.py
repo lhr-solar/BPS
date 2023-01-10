@@ -19,6 +19,7 @@ PERIPHERALS: List[str] = [
     "Light",
     "PLL",
     "SPI",
+    "SPI3",
     "Timer",
     "UART",
     "WDTimer",
