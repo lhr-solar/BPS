@@ -29,6 +29,10 @@ static State states[LIGHTS_MAX];
 void BSP_Lights_Init(void) {
 	initialized = true;
     Simulator_Log(LOG_INFO, "Lights initialized\n");
+	//Need to initially turn off all lights for simulator to detect wrong end state
+	for (uint8_t i = 0; i < LIGHTS_MAX; i++){
+		BSP_Light_Off(i);
+	}
 }
 
 /**

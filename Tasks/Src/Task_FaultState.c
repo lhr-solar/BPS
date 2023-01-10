@@ -101,6 +101,10 @@ void EnterFaultState() {
             BSP_Light_On(WDOG);
             break;
         case Fault_CRC: //Cannot get Fault_CRC in Simulation
+            #ifdef SIMULATION
+                sprintf(err, "$$$ Entered fault in state {%d} - CRC\n", stateCount - 1);
+                Simulator_Log_Location(LOG_INFO, err);
+            #endif
             BSP_Light_On(EXTRA);
             break;
         case Fault_ESTOP:

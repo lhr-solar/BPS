@@ -1,11 +1,15 @@
 {
     "forbidden_states": {
-        "ContactorC1": "enabled",
-        "ContactorCFAN": "enabled"
+        "Contactor": [
+            ["ContactorC1", "enabled"],
+            ["ContactorCFAN", "enabled"]
+        ]
     },
     "end_state": {
-        "ContactorC1": "disabled",
-        "ContactorCFAN": "disabled",
+        "Contactor": [
+            ["ContactorC1", "disabled"],
+            ["ContactorCFAN", "disabled"]
+        ],
         "Light": [
             ["FAULT", "1"],
             ["OTEMP", "1"]

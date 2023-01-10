@@ -35,8 +35,8 @@ ErrorStatus BSP_PWM_Set(uint8_t pin, uint32_t speed){
         speed = 4000;
     }
     
-    char *cont = (pin == 3) ? "CFAN" : "C1";
-    char *status = (speed == 0) ? "disabled" : "enabled";
+    char *cont = (pin == 3) ? "{CFAN}" : "{C1}";
+    char *status = (speed == 0) ? "{disabled}" : "{enabled}";
 
     if (pin >= 3){
         asprintf(&output, "Contactor %s %s\n", cont, status);
