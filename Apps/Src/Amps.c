@@ -80,7 +80,9 @@ void Amps_UpdateMeasurements(void) {
 	assertOSError(err);
 	#ifdef SIMULATION
 		latestMeasureMilliAmps = Simulator_getCurrent();
-		printf("Milliamp measurement is %d\n\n", latestMeasureMilliAmps);
+		char* msg;
+		asprintf(&msg, "Milliamp measurement is %d\n", latestMeasureMilliAmps);
+    	Simulator_Log(LOG_INFO, msg);
 	#else 
 		latestMeasureMilliAmps = LTC2315_GetCurrent();
 	#endif
@@ -142,14 +144,18 @@ void Amps_Calibrate(void) {
 	OS_ERR err;
 
 	// initial calibration
-	LTC2315_Calibrate();
+	#ifndef SIMULATION
+		LTC2315_Calibrate();
+	#endif
 	Amps_UpdateMeasurements();
 
 	// keep calibrating until we read 0 Amps
 	OSTimeDly(1, OS_OPT_TIME_DLY, &err);
 	Amps_UpdateMeasurements();
 	while (Amps_GetReading() != 0) {
-		LTC2315_Calibrate();
+		#ifndef SIMULATION
+			LTC2315_Calibrate();
+		#endif
 		OSTimeDly(1, OS_OPT_TIME_DLY, &err);
 		Amps_UpdateMeasurements();
 	}

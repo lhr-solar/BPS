@@ -47,8 +47,8 @@ void BSP_Light_Toggle(Light signal) {
 
 	if (initialized) {
 		states[signal] ^= states[signal];
-		char str[64];
-		sprintf(str, "Set Light {%s} to {%d}\n", lightsNames[signal], states[signal]);
+		char* str;
+		asprintf(&str, "Set Light {%s} to {%d}\n", lightsNames[signal], states[signal]);
 		Simulator_Log(LOG_OUTPUT, str);
 	} else {
 		Simulator_Log_Location(LOG_ERROR, "Used lights before initialization\n");
@@ -68,8 +68,8 @@ void BSP_Light_On(Light signal) {
 
 	if (initialized) {
 		states[signal] = 1;
-		char str[64];
-		sprintf(str, "Set Light {%s} to {%d}\n", lightsNames[signal], states[signal]);
+		char* str;
+		asprintf(&str, "Set Light {%s} to {%d}\n", lightsNames[signal], states[signal]);
 		Simulator_Log(LOG_OUTPUT, str);
 	} else {
 		Simulator_Log_Location(LOG_ERROR, "Used lights before initialization\n");
@@ -89,8 +89,8 @@ void BSP_Light_Off(Light signal) {
 
 	if (initialized) {
 		states[signal] ^= 0;
-		char str[64];
-		sprintf(str, "Set Light {%s} to {%d}\n", lightsNames[signal], states[signal]);
+		char* str;
+		asprintf(&str, "Set Light {%s} to {%d}\n", lightsNames[signal], states[signal]);
 		Simulator_Log(LOG_OUTPUT, str);
 	} else {
 		Simulator_Log_Location(LOG_ERROR, "Used lights before initialization\n");

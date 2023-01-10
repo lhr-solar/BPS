@@ -64,8 +64,8 @@ ErrorStatus BSP_CAN_Read(uint32_t *id, uint8_t *data) {
         Simulator_Log_Location(LOG_ERROR, "Used CAN without initialization!\n");
         exit(-1);
     }
-    char buffer[75];
-    sprintf(buffer, "Read CAN message ID {%d} DATA {0x%016" PRIx64 "}\n", *id, *(uint64_t*)(data));
+    char* buffer;
+    asprintf(&buffer, "Read CAN message ID {%d} DATA {0x%016" PRIx64 "}\n", *id, *(uint64_t*)(data));
     Simulator_Log(LOG_OUTPUT, buffer);
     if (gRxEvent != NULL) { // so we dont error out and die
         gRxEvent();
