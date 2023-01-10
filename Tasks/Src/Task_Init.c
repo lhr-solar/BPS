@@ -12,6 +12,8 @@ void Task_Init(void *p_arg) {
 
 #ifndef SIMULATION
 	OS_CPU_SysTickInit(SystemCoreClock / (CPU_INT32U) OSCfg_TickRate_Hz);
+#else
+	OS_CPU_SysTickInit();
 #endif
 
     OS_ERR err;

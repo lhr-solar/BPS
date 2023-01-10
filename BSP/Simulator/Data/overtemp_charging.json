@@ -1,6 +1,6 @@
 [
     {
-        "time": 10,
+        "time": 1,
         "adcHigh": 0,
         "adcLow": 0,
         "voltages": [
@@ -14,7 +14,7 @@
         "charge": 50000000
     },
     {
-        "time": 12,
+        "time": 1,
         "adcHigh": 0,
         "adcLow": 0,
         "voltages": [
@@ -28,7 +28,7 @@
         "charge": 50000000
     },
     {
-        "time": 14,
+        "time": 1,
         "adcHigh": 0,
         "adcLow": 0,
         "voltages": [
@@ -42,7 +42,7 @@
         "charge": 50000000
     },
     {
-        "time": 16,
+        "time": 1,
         "adcHigh": 0,
         "adcLow": 0,
         "voltages": [

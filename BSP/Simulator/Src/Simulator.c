@@ -127,9 +127,6 @@ static void readInputFile(char *jsonPath) {
             tail->next = temp;
             tail = tail->next;
         }
-        char* buffer;
-        asprintf(&buffer, "\nExecuting state #%d...\n", stateCount);
-        Simulator_Log(LOG, buffer);
         // Try and get every field we should have in each state.
         // If null, it doesn't exist.
         cJSON* time = cJSON_GetObjectItem(state, "time");
@@ -274,6 +271,7 @@ void Simulator_Init(char *jsonPath) {
 static void Simulator_Transition(void) {
     // advance to the current state
     time_t currentTime = time(NULL);
+    //wait until time for state is completed before moving to next state
     while (startTime + states->time < currentTime) {
         simulator_state *prev = states;
         states = states->next;
@@ -286,7 +284,6 @@ static void Simulator_Transition(void) {
         }
     }
 }
-
 
 // Functions for accessing simulator state. Each field should have a function associated with it
 

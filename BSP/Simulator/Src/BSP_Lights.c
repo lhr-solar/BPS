@@ -46,7 +46,7 @@ void BSP_Light_Toggle(Light signal) {
 	}
 
 	if (initialized) {
-		states[signal] ^= states[signal];
+		states[signal] ^= 1;
 		char* str;
 		asprintf(&str, "Set Light {%s} to {%d}\n", lightsNames[signal], states[signal]);
 		Simulator_Log(LOG_OUTPUT, str);
