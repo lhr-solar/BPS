@@ -4,8 +4,11 @@
 #define BSP_CONTACTOR_H
 
 #include "common.h"
+
+#ifndef SIMULATION
 #include "../STM32F413/STM32F4xx_StdPeriph_Driver/Inc/stm32f4xx_gpio.h"
 #include "stm32f4xx_rcc.h"
+#endif
 
 typedef uint8_t CONT_CHOICE;
 typedef enum {ARRAY_CONTACTOR = 1, HVHIGH_CONTACTOR = 2, HVLOW_CONTACTOR = 4, ALL_CONTACTORS = 7} Contactors_t;

@@ -61,6 +61,7 @@ INC_DIR = \
 -I$(TARGET_PATH)/RTOS/uCOS-III-Simulator/uC-LIB \
 -I$(TARGET_PATH)/RTOS/uCOS-III-Simulator/uCOS-III/Source \
 -I$(TARGET_PATH)/RTOS/uCOS-III-Simulator/uCOS-III/Ports/POSIX/GNU \
+
 LIB = -lm -lpthread		# Standard libraries used
 
 FLAGS = -Wall -Werror -g -std=c11 $(INC_DIR) -DSIMULATION -D_GNU_SOURCE

@@ -5,7 +5,11 @@
 #include "CANbus.h"
 #include "os.h"
 #include "Tasks.h"
+#ifndef SIMULATION
 #include "stm32f4xx.h"
+#else
+#include "Simulator.h"
+#endif
 #include "BSP_Lights.h"
 #include "BSP_PLL.h"
 #include "CAN_Queue.h"
@@ -43,8 +47,9 @@ CPU_STK Task2_Stk[DEFAULT_STACK_SIZE];
 
 // Initialization task for this test
 void Task1(void *p_arg){
+#ifndef SIMULATION
 	OS_CPU_SysTickInit(SystemCoreClock / (CPU_INT32U) OSCfg_TickRate_Hz);
-
+#endif
     OS_ERR err;
     
     OSSemCreate(&Fault_Sem4,
@@ -164,24 +169,29 @@ void Task2(void *p_arg){
         assertOSError(err);
 
         if (count == 0) {
-            printf("Amps: %ld\n\r", Amps_GetReading());
+            printf("Amps: %d\n\r", Amps_GetReading());
         }
-        count = (count + 1) % 10;
+        count = (count + 1) % 100;
 
         BSP_Light_Toggle(RUN);
     }
 }
 
 // Similar to the production code main. Does not check watchdog or mess with contactor 
+#ifndef SIMULATION
 int main(void) {
+#else
+int main(int argc, char **argv) {
+    Simulator_Init(argv[1]);
+    OS_CPU_SysTickInit();
+#endif
+    CPU_Init();
     OS_ERR err;
-
-
     BSP_PLL_Init();
     BSP_UART_Init(NULL, NULL, UART_USB);
     //Resetting the contactor
     BSP_Contactor_Init();
-    BSP_Contactor_Off();
+    BSP_Contactor_Off(ALL_CONTACTORS);
 
     // If the WDTimer counts down to 0, then the BPS resets. If BPS has reset, enter a fault state.
     if (BSP_WDTimer_DidSystemReset()) {
