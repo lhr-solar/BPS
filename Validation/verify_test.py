@@ -53,12 +53,10 @@ def verify_forbidden_states(forbidden_states: Dict[str, object], bps_state) -> b
 def verify_end_state(end_state: Dict[str, object], bps_state) -> bool:
     # Check if the end state matches the expected end state
     verified = True
-    print(bps_state)
     for peripheral in PERIPHERALS:
         if peripheral in PERIPHERALS_MULTIPLE and peripheral in end_state:
             for end_sub_state in end_state[peripheral]:
-                print(end_state[peripheral])
-                for state in bps_state[peripheral]:
+                for state in reversed(bps_state[peripheral]):
                     if end_sub_state[0] == state[0]:
                         if end_sub_state == state:
                             break
