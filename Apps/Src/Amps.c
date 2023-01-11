@@ -152,15 +152,11 @@ void Amps_Calibrate(void) {
 	// keep calibrating until we read 0 Amps
 	OSTimeDly(1, OS_OPT_TIME_DLY, &err);
 	Amps_UpdateMeasurements();
+	#ifndef SIMULATION
 	while (Amps_GetReading() != 0) {
-		#ifndef SIMULATION
-			LTC2315_Calibrate();
-		#endif
+		LTC2315_Calibrate();
 		OSTimeDly(1, OS_OPT_TIME_DLY, &err);
 		Amps_UpdateMeasurements();
 	}
-
-	// This function never finishes - something to do with UpdateMeasurements.
-	// GDB Debugging this is a pain because of the threads I don't really know what's
-	// Going on with it - Connor
+	#endif
 }

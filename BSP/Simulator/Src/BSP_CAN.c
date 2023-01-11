@@ -42,12 +42,13 @@ ErrorStatus BSP_CAN_Write(uint32_t id, uint8_t data[], uint8_t length) {
     }
     if (length > 8) return ERROR;
     // log message
-    // char canMsgBuf[100] = {0};
-    // uint64_t* data64 = (uint64_t*)(data);
-    // sprintf(canMsgBuf, "Writing CAN message with ID {%d}, DATA {0x%016" PRIx64 "}, LEN {%d}\n", id, *data64, length);
-    // Simulator_Log(LOG_OUTPUT, canMsgBuf);
-    if (gTxEnd != NULL)
+    char* canMsgBuf;
+    uint64_t* data64 = (uint64_t*)(data);
+    asprintf(&canMsgBuf, "Writing CAN message with ID {%d}, DATA {0x%016" PRIx64 "}, LEN {%d}\n", id, *data64, length);
+    Simulator_Log(LOG_OUTPUT, canMsgBuf);
+    if (gTxEnd != NULL) {
         gTxEnd();
+    }
     return SUCCESS;
 }
 

@@ -191,9 +191,7 @@ static void readInputFile(char *jsonPath) {
             tail->charge = charge->valueint;
         }
         if (!canList) {
-            char* buffer;
-            asprintf(&buffer, "No CAN messages to simulate in this state. (State Count = %d)\n", stateCount);
-            Simulator_Log(LOG_MISC, buffer);
+            printf("No CAN messages to simulate in this state. (State Count = %d)\n", stateCount);
         } else { // otherwise, there are some potential CAN messages. 
             // for every CAN message...
             for (cJSON* msg = canList->child; msg != NULL; msg = msg->next) {
