@@ -9,7 +9,6 @@ import json
 from typing import Dict, List
 from parse_simulator import parse, LOG_FILEPATH, PERIPHERALS
 
-
 TEST_FILEPATH: str = "./BSP/Simulator/Data/"
 LOG_PREFIX: str = "bps-sim-"
 PERIPHERALS_MULTIPLE: List[str] = [
@@ -23,13 +22,11 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("test_name", help="Name of the test to verify")
     return parser.parse_args()
 
-
 def parse_output(out_file: str) -> str:
     # Read JSON from out_file
     with open(out_file, "r") as f:
         out_json = json.load(f)
     return out_json
-
 
 def verify_forbidden_states(forbidden_states: Dict[str, object], bps_state) -> bool:
     # Check if any forbidden states were reached
@@ -48,7 +45,6 @@ def verify_forbidden_states(forbidden_states: Dict[str, object], bps_state) -> b
                         print("ERROR: " + peripheral + " reached forbidden state " + forbidden_states[peripheral])
                         return False
     return True
-
 
 def verify_end_state(end_state: Dict[str, object], bps_state) -> bool:
     # Check if the end state matches the expected end state
@@ -70,7 +66,6 @@ def verify_end_state(end_state: Dict[str, object], bps_state) -> bool:
                     verified = False
     return verified
 
-
 def verify_init_before_use(bps_state: Dict[str, List[List[str]]]) -> bool:
     # Check that all peripherals were initialized before use
     for peripheral in PERIPHERALS:
@@ -79,7 +74,6 @@ def verify_init_before_use(bps_state: Dict[str, List[List[str]]]) -> bool:
             return False
     return True
 
-
 def verify_output(out_json: str, bps_state: Dict[str, List[List[str]]]) -> bool:
     # Check that the output matches the expected behavior
     verified: bool = True
@@ -87,7 +81,6 @@ def verify_output(out_json: str, bps_state: Dict[str, List[List[str]]]) -> bool:
     verified = verify_init_before_use(bps_state) and verified
     verified = verify_end_state(out_json["end_state"], bps_state) and verified
     return verified
-
 
 def main():
     args = parse_args()
@@ -103,6 +96,5 @@ def main():
         print("Test failed")
         exit(-1)
     
-
 if __name__ == '__main__':
     main()
