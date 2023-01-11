@@ -29,7 +29,12 @@ void EnterFaultState() {
 
 #ifndef SIMULATION
     __disable_irq();
+#else
+    OS_ERR oserr;
+    OSSchedLock(&oserr);
+    assertOSError(oserr);
 #endif
+
 
     // Turn Contactor Off
     Contactor_Init();

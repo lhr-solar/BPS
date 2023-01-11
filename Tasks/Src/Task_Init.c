@@ -175,7 +175,6 @@ void Task_Init(void *p_arg) {
 		assertOSError(err);
         
 		CAN_Queue_Init();
-        assertOSError(err);
 	//delete task
 	OSTaskDel(NULL, &err); // Delete task
 }
