@@ -35,7 +35,6 @@ void EnterFaultState() {
     assertOSError(oserr);
 #endif
 
-
     // Turn Contactor Off
     Contactor_Init();
     Contactor_Off(ALL_CONTACTORS);

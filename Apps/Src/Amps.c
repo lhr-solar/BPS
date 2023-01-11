@@ -160,5 +160,7 @@ void Amps_Calibrate(void) {
 		Amps_UpdateMeasurements();
 	}
 
-	
+	// This function never finishes - something to do with UpdateMeasurements.
+	// GDB Debugging this is a pain because of the threads I don't really know what's
+	// Going on with it - Connor
 }

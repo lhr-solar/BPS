@@ -24,8 +24,9 @@ void Task_AmperesMonitor(void *p_arg) {
 
 	Amps_Init();
 
+#ifndef SIMULATION
     Amps_Calibrate();
-
+#endif
     while(1) {
         // BLOCKING =====================
         // Update Amperes Measurements
