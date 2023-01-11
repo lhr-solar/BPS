@@ -4,7 +4,7 @@
 
 ulimit -r unlimited
 
-gdb --args ./bps-simulator.out BSP/Simulator/Data/$1.json
+./bps-simulator.out BSP/Simulator/Data/$1.json
 python3 Validation/verify_test.py $1
 
 exit $?
