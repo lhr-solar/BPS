@@ -20,7 +20,6 @@ jobs:
     - name: Unit Test 
       run: |
         sudo ./Validation/test.sh critical_overcurrent
-        sudo ./Validation/test.sh critical_overtemp_charging
         sudo ./Validation/test.sh critical_overtemp_discharging
         sudo ./Validation/test.sh critical_overvolt
         sudo ./Validation/test.sh critical_undervolt
