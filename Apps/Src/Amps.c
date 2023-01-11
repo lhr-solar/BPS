@@ -83,6 +83,7 @@ void Amps_UpdateMeasurements(void) {
 		char* msg;
 		asprintf(&msg, "Milliamp measurement is %d\n", latestMeasureMilliAmps);
     	Simulator_Log(LOG_INFO, msg);
+		free(&msg);
 	#else 
 		latestMeasureMilliAmps = LTC2315_GetCurrent();
 	#endif
