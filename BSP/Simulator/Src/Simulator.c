@@ -241,7 +241,7 @@ void Simulator_Init(char *jsonPath) {
 
     // create the log file
     simulatorLog = open(filename, O_CREAT | O_WRONLY, 0664);
-    free(&filename);
+    free(filename);
     if (simulatorLog < 0) {
         printf("error opening file %s\n", jsonPath);
         exit(-1);

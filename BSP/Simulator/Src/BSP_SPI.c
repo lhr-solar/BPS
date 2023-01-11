@@ -1,6 +1,7 @@
 /* Copyright (c) 2022 UT Longhorn Racing Solar */
 /**
  * BSP_SPI.c - Simulates SPI communication on BPS board
+ * NOTE: This does not fully simulate all SPI communication.
 */
 
 #include "BSP_SPI.h"
@@ -36,7 +37,7 @@ void BSP_SPI_Write(spi_port_t port, uint8_t *txBuf, uint32_t txLen) {
     if(!initialized) {
         asprintf(&msg, "Used %s without initialization!\n", spi);
         Simulator_Log_Location(LOG_ERROR, msg);
-        free(&msg);
+        free(msg);
         Fault_BitMap |= Fault_CRC;
         EnterFaultState();
     }
@@ -48,7 +49,7 @@ void BSP_SPI_Write(spi_port_t port, uint8_t *txBuf, uint32_t txLen) {
     }
     strcat(msg, "}\n");
     Simulator_Log(LOG_INFO, msg);
-    free(&msg);
+    free(msg);
 }
 
 /**
@@ -67,13 +68,13 @@ void BSP_SPI_Read(spi_port_t port, uint8_t *rxBuf, uint32_t rxLen) {
     if(!initialized) {
         asprintf(&msg, "Used %s without initialization!\n", spi);
         Simulator_Log_Location(LOG_ERROR, msg);
-        free(&msg);
+        free(msg);
         Fault_BitMap |= Fault_CRC;
         EnterFaultState();
     }
     asprintf(&msg, "%s {read}\n", spi);
     Simulator_Log(LOG_INFO, msg);
-    free(&msg);
+    free(msg);
 }
 
 /**
@@ -90,7 +91,7 @@ void BSP_SPI_SetStateCS(spi_port_t port, uint8_t state) {
     if(!initialized) {
         asprintf(&msg, "Used %s without initialization!\n", spi);
         Simulator_Log_Location(LOG_ERROR, msg);
-        free(&msg);
+        free(msg);
         Fault_BitMap |= Fault_CRC;
         EnterFaultState();
     }
@@ -108,7 +109,7 @@ void BSP_SPI_SetClock(spi_speed_t speed) {
     if(!initialized) {
         asprintf(&msg, "Used SPI LTC6811 without initialization!\n");
         Simulator_Log_Location(LOG_ERROR, msg);
-        free(&msg);
+        free(msg);
         Fault_BitMap |= Fault_CRC;
         EnterFaultState();
     }

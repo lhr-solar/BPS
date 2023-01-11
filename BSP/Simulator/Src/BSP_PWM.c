@@ -51,12 +51,12 @@ ErrorStatus BSP_PWM_Set(uint8_t pin, uint32_t speed){
         asprintf(&output, "Fan {%d} set to speed {%d}\n", pin, speed);
     }
     Simulator_Log(LOG_OUTPUT, output);
-    free(&output);
+    free(output);
     if (pin > 4) {
         char *errormessage;
         asprintf(&errormessage, "Failed to set output PWM, pin %d is invalid\n", pin);
         Simulator_Log(LOG_ERROR, errormessage);
-        free(&errormessage);
+        free(errormessage);
         return ERROR; //invalid fan value
     }
     pinSpeeds[pin] = speed;

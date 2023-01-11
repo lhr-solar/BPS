@@ -39,7 +39,7 @@ uint8_t  BSP_I2C_Write(uint8_t devAddr, uint16_t regAddr, uint8_t *txData, uint3
     for (uint32_t i = 0; i < txLen; ++i) {
         asprintf(&buffer, "Wrote I2C Device {0x%x} at address {0x%x} with data {0x%x}\n", txData[i], devAddr, regAddr);
         Simulator_Log(LOG_OUTPUT, buffer);
-        free(&buffer);
+        free(buffer);
     }
 
     return SUCCESS;
