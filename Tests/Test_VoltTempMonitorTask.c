@@ -49,7 +49,7 @@ void Task1(void *p_arg){
 #ifndef SIMULATION
     OS_CPU_SysTickInit(SystemCoreClock / (CPU_INT32U) OSCfg_TickRate_Hz);
 #endif
-    
+        OS_CPU_SysTickInit();
     OSSemCreate(&Fault_Sem4,
                 "Fault/Tripped Semaphore",
                 0,
@@ -182,7 +182,7 @@ int main(void) {
 #else
 int main(int argc, char **argv) {
     Simulator_Init(argv[1]);
-    OS_CPU_SysTickInit();
+
 #endif
 
     //Resetting the contactor
