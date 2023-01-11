@@ -136,7 +136,7 @@ static void readInputFile(char *jsonPath) {
         cJSON* voltageArray = cJSON_GetObjectItem(state, "voltages");
         // temperatureArray should have 31*2 elements.
         cJSON* temperatureArray = cJSON_GetObjectItem(state, "temperatures");
-        cJSON* current = cJSON_GetObjectItem(state, "current");
+        cJSON* currentObj = cJSON_GetObjectItem(state, "current");
         cJSON* charge = cJSON_GetObjectItem(state, "charge");
         cJSON* canList = cJSON_GetObjectItem(state, "can");
     
@@ -178,13 +178,17 @@ static void readInputFile(char *jsonPath) {
                 tail->temperatures[idx] = cJSON_GetArrayItem(temperatureArray, idx)->valueint;
             }
         }
-        if (!current) { // current in mA
+        if (!currentObj) { // current in mA
             printf("Current simulator state does not have a specified current value. Using 30...\n");
             tail->current = 30;
+        } else {
+            tail->current = currentObj->valueint;
         }
         if (!charge) {
             printf("Current simulator state does not have a specified charge value. Using 25,000,000...\n");
             tail->charge = 25000000;
+        } else {
+            tail->charge = charge->valueint;
         }
         if (!canList) {
             char* buffer;
