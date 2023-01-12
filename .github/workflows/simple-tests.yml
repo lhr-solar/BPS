@@ -11,9 +11,15 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+    - name: Install tools
+      run: |
+        sudo apt -y update
+        sudo apt -y install gcc-arm-none-eabi
     - name: Initialize submodules
       run: git submodule update --init --recursive
-    - name: build
+    - name: clean
+      run: make clean
+    - name: make simulator
       run: make simulator
     # simple test for verifying testing infrastructure
     # run tests in sudo for rtprio to work
