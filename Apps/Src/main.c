@@ -14,6 +14,7 @@
 #include "BSP_UART.h"
 #include "EEPROM.h"
 #include "Charge.h"
+#include "BSP_Lights.h"
 #ifdef SIMULATION
 #include "Simulator.h"
 #endif
@@ -40,6 +41,8 @@ int main() {
 	//Resetting the contactor
 	Contactor_Init();
 	Contactor_Off(ALL_CONTACTORS);
+
+    BSP_Lights_Init();
 
 	// If the WDTimer counts down to 0, then the BPS resets. If BPS has reset, enter a fault state.
 	if (BSP_WDTimer_DidSystemReset()) {

@@ -19,6 +19,7 @@ PERIPHERALS: List[str] = [
     "Light",
     "PLL",
     "SPI",
+    "SPI3",
     "Timer",
     "UART",
     "WDTimer",
@@ -36,7 +37,7 @@ def parse_args() -> argparse.Namespace:
 def parse_line(line: str):
     if "[OUTPUT]" in line:
         for peripheral in PERIPHERALS:
-            if peripheral in line:
+            if (peripheral in line) and ('{' + peripheral + '}' not in line): # the surrounding by {} is an edge case for CAN with Lights
                 values = [val[1:-1] for val in re.findall("{[^{}]*}", line)]
                 bps_state[peripheral].append(values)
     elif "initialized" in line.lower():

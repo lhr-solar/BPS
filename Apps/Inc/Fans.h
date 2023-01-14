@@ -9,6 +9,7 @@ Controls speed of fans which cool down the battery pack. Uses Pins PC6, 7 and PB
 #include "BSP_PWM.h" //PWM_Period is defined here
 #include "common.h"
 #include "config.h"
+#include "Simulator.h"
 
 #define DIVIDER 500 //Speed increments
 #define TOPSPEED PWM_PERIOD/DIVIDER //top speed achievable

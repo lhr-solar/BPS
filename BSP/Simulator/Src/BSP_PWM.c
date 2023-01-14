@@ -12,11 +12,10 @@ static uint32_t pinSpeeds[] = {0, 0, 0, 0, 0};
 /**
  * @brief   Sets up contactor and fan pin timers for outputting PWM signals
  */
-
 void BSP_PWM_Init(void){
     //initialize all pins pertaining to fans and contactors for PWM here
     initialized = true;
-    Simulator_Log(LOG_INFO,"Initialized PWM interface\n");
+    Simulator_Log(LOG_INFO,"PWM initialized\n");
 }
 
 /**
@@ -30,23 +29,34 @@ ErrorStatus BSP_PWM_Set(uint8_t pin, uint32_t speed){
     //Range of pulse is 0-4000
     //First check to make sure that change is within range of values
     //Load new value into Compare and Capture Register
-    char *output;
-    if (speed>4000) speed = 4000;
 
-    if(pin == 4){
-        if(speed == 0){
-            output = "Setting contactor to off";
-        }else{
-            output = "Setting contactor to on";
-        }
-    }else{
-        asprintf(&output, "Setting output pin %d to speed %d\n", pin, speed);
+    if(!initialized) {
+        Simulator_Log_Location(LOG_ERROR, "Used PWM without initialization!\n");
+        exit(-1);
     }
-    Simulator_Log(LOG_INFO, output);
+
+    char *output;
+
+    if (speed > 4000){ 
+        speed = 4000;
+    }
+    
+    char *cont = (pin == 3) ? "{CFAN}" : "{C1}";
+    char *status = (speed == 0) ? "{disabled}" : "{enabled}";
+
+    if (pin >= 3){
+        asprintf(&output, "Contactor %s %s\n", cont, status);
+    }
+    else{
+        asprintf(&output, "Fan {%d} set to speed {%d}\n", pin, speed);
+    }
+    Simulator_Log(LOG_OUTPUT, output);
+    free(output);
     if (pin > 4) {
         char *errormessage;
         asprintf(&errormessage, "Failed to set output PWM, pin %d is invalid\n", pin);
         Simulator_Log(LOG_ERROR, errormessage);
+        free(errormessage);
         return ERROR; //invalid fan value
     }
     pinSpeeds[pin] = speed;
@@ -59,6 +69,11 @@ ErrorStatus BSP_PWM_Set(uint8_t pin, uint32_t speed){
  * @return  The value inside the output compare register. You will need to math to convert this to an actual duty cycle. Returns -1 if input pin is invalid
  */
 int BSP_PWM_Get(uint8_t pin){
+    if(!initialized) {
+        Simulator_Log_Location(LOG_ERROR, "Used PWM without initialization!\n");
+        exit(-1);
+    }
+
     if(pin > 4){
         Simulator_Log(LOG_WARN, "Attempted to read from nonexistent PWM pin\n");
         return -1;
@@ -74,6 +89,11 @@ int BSP_PWM_Get(uint8_t pin){
  * @return  0 if contactor is off/open, 1 if on/closed
  */
 bool Contactor_Get(uint8_t contactorChoice) {
+    if(!initialized) {
+        Simulator_Log_Location(LOG_ERROR, "Used PWM without initialization!\n");
+        exit(-1);
+    }
+    
     return pinSpeeds[4] != 0;
 }
 

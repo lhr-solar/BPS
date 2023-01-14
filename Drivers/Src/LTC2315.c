@@ -43,7 +43,6 @@ static void LTC2315_wakeup_sleep()
  */
 void LTC2315_Init(bsp_os_t spi_os) {
     BSP_SPI_Init(spi_ltc2315, &spi_os, true);
-
     LTC2315_wakeup_sleep();
 }
 

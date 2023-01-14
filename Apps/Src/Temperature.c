@@ -242,7 +242,7 @@ ErrorStatus Temperature_UpdateSingleChannel(uint8_t channel){
 	// update the filtered values
 	// you need to change this if you change 
 	for (int32_t minion = 0; minion < NUM_MINIONS; ++minion) {
-		for (int32_t sensor = 0; sensor < NUM_TEMP_SENSORS_PER_MOD; ++sensor) {
+		for (int32_t sensor = 0; sensor < MAX_TEMP_SENSORS_PER_MINION_BOARD; ++sensor) {
 			temperatures[minion][sensor] = median(
 													 rawTemperatures[minion][sensor][0],
 													 rawTemperatures[minion][sensor][1],
