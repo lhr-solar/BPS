@@ -13,6 +13,7 @@ int main() {
 
     while(1) {
         // Delay for some time before doing anything else
+<<<<<<< Updated upstream
         for(volatile int i = 0; i < 1000000; i++);
     
         // Read the contactor state
@@ -24,5 +25,14 @@ int main() {
         } else {
             BSP_Contactor_On(ALL_CONTACTORS);
         }
+=======
+        Contactor_On(HVHIGH_CONTACTOR_OUT);
+        Contactor_Off(HVHIGH_CONTACTOR_OUT);
+        for(volatile int i = 0; i < 10000000; i++);
+        Contactor_Off(HVHIGH_CONTACTOR_OUT);
+        Contactor_On(ARRAY_CONTACTOR_OUT);
+        for(volatile int i = 0; i < 10000000; i++);
+
+>>>>>>> Stashed changes
     }
 }

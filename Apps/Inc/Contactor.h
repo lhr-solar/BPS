@@ -7,7 +7,7 @@
 #include "BSP_PWM.h" //PWM_Period is defined in here
 
 //Parameters for PWM
-#define PWM_ON_TIME 2000
+#define PWM_ON_TIME 3000
 
 // Contactor 1
 #define C1 4 // contactor 1 on pwm output 4
