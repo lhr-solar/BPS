@@ -1,4 +1,4 @@
-/* Copyright (c) 2022 UT Longhorn Racing Solar */
+/* Copyright (c) 2018-2022 UT Longhorn Racing Solar */
 
 /**
  * BSP_I2C.c - Simulates I2C communication with EEPROM. Written with assumption that we will only 

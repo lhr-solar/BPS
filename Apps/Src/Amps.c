@@ -1,4 +1,4 @@
-/* Copyright (c) 2022 UT Longhorn Racing Solar */
+/* Copyright (c) 2018-2022 UT Longhorn Racing Solar */
 /** Amps.c
  * Wrapper that holds all electrical current related information of BeVolt's
  * battery pack.
