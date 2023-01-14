@@ -10,9 +10,7 @@ void Task_PetWDog(void *p_arg) {
     OS_ERR err;
 
     BSP_WDTimer_Init();
-    BSP_WDTimer_Start();
-    BSP_Lights_Init();
-    
+    BSP_WDTimer_Start();    
 
     while (1){
         //take WDog Mutex

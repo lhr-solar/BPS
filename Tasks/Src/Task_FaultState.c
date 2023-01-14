@@ -1,10 +1,10 @@
 /* Copyright (c) 2022 UT Longhorn Racing Solar */
 #include "os.h"
 #include "Tasks.h"
-#include "BSP_Contactor.h"
+#include "Contactor.h"
 #include "BSP_Lights.h"
 #include "Voltage.h"
-#include "BSP_Fans.h"
+#include "Fans.h"
 #include "Temperature.h"
 #include "Amps.h"
 #include "EEPROM.h"
@@ -29,14 +29,18 @@ void EnterFaultState() {
 
 #ifndef SIMULATION
     __disable_irq();
+#else
+    OS_ERR oserr;
+    OSSchedLock(&oserr);
+    assertOSError(oserr);
 #endif
 
     // Turn Contactor Off
-    BSP_Contactor_Init();
-    BSP_Contactor_Off(ALL_CONTACTORS);
+    Contactor_Init();
+    Contactor_Off(ALL_CONTACTORS);
     //Set Fans to full speed
-    BSP_Fans_Init();
-    BSP_Fans_SetAll(TOPSPEED);
+    Fans_Init();
+    Fans_SetAll(TOPSPEED);
     // Turn Strobe Light On
     // Turn LEDs On and logs Error into EEPROM
     BSP_Lights_Init();
@@ -60,8 +64,6 @@ void EnterFaultState() {
             Simulator_Log_Location(LOG_INFO, err);
         #endif
             BSP_Light_On(UVOLT);
-        #ifdef SIMULATION
-        #endif
             break;
         case Fault_OVOLT:
         #ifdef SIMULATION
@@ -69,8 +71,6 @@ void EnterFaultState() {
             Simulator_Log_Location(LOG_INFO, err);
         #endif
             BSP_Light_On(OVOLT);
-        #ifdef SIMULATION
-        #endif
             break;
         case Fault_OTEMP:
         #ifdef SIMULATION
@@ -78,8 +78,6 @@ void EnterFaultState() {
             Simulator_Log_Location(LOG_INFO, err);
         #endif
             BSP_Light_On(OTEMP);
-        #ifdef SIMULATION
-        #endif
             break;
         case Fault_OCURR:
         #ifdef SIMULATION
@@ -87,17 +85,13 @@ void EnterFaultState() {
             Simulator_Log_Location(LOG_INFO, err);
         #endif
             BSP_Light_On(OCURR);
-        #ifdef SIMULATION
-        #endif
             break;
         case Fault_OW:
         #ifdef SIMULATION
             sprintf(err, "$$$ Entered fault in state {%d} - WIRE\n", stateCount - 1);
             Simulator_Log_Location(LOG_INFO, err);
         #endif
-            BSP_Light_On(WIRE);
-        #ifdef SIMULATION
-        #endif    
+            BSP_Light_On(WIRE);  
             break;
         case Fault_HANDLER:
             break;
@@ -109,17 +103,20 @@ void EnterFaultState() {
             Simulator_Log_Location(LOG_INFO, err);
         #endif
             BSP_Light_On(WDOG);
+            break;
+        case Fault_CRC: //Cannot get Fault_CRC in Simulation
         #ifdef SIMULATION
+            sprintf(err, "$$$ Entered fault in state {%d} - CRC\n", stateCount - 1);
+            Simulator_Log_Location(LOG_INFO, err);
         #endif
+            BSP_Light_On(EXTRA);
             break;
         case Fault_ESTOP:
         #ifdef SIMULATION
             sprintf(err, "$$$ Entered fault in state {%d} - ELECTRICAL STOP\n", stateCount - 1);
             Simulator_Log_Location(LOG_INFO, err);
         #endif
-            BSP_Contactor_Off(ALL_CONTACTORS);
-        #ifdef SIMULATION
-        #endif
+            BSP_Light_On(WIRE); //This is normally for Open Wire, but is used for ESTOP since we do not check Open Wire as of 1/9/2023
             break;
     }
 
@@ -145,6 +142,8 @@ void EnterFaultState() {
 #ifdef DEBUGMODE
     char command[COMMAND_SIZE];
 #endif
+    BSP_WDTimer_Init(); //This is in case we did not pass critical state and watchdog timer was not initialized
+    BSP_WDTimer_Start(); 
     while(1) {
 #ifdef DEBUGMODE
         if (BSP_UART_ReadLine(command)) CLI_Handler(command); // CLI

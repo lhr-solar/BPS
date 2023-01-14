@@ -19,7 +19,7 @@ static bool initialized = false;
  */
 void BSP_I2C_Init(void) {
     initialized = true;
-    Simulator_Log(LOG_INFO, "EEPROM Initialized\n");
+    Simulator_Log(LOG_INFO, "I2C Initialized\n");
 }
 
 /**
@@ -35,10 +35,11 @@ uint8_t  BSP_I2C_Write(uint8_t devAddr, uint16_t regAddr, uint8_t *txData, uint3
         exit(-1); // fault state for i2c?
     }
 
-    char buffer[100];
+    char* buffer;
     for (uint32_t i = 0; i < txLen; ++i) {
-        sprintf(buffer, "Wrote I2C Device {0x%x} at address {0x%x} with data {0x%x}\n", txData[i], devAddr, regAddr);
+        asprintf(&buffer, "Wrote I2C Device {0x%x} at address {0x%x} with data {0x%x}\n", txData[i], devAddr, regAddr);
         Simulator_Log(LOG_OUTPUT, buffer);
+        free(buffer);
     }
 
     return SUCCESS;

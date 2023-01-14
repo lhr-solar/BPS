@@ -230,7 +230,9 @@ ErrorStatus Temperature_UpdateSingleChannel(uint8_t channel){
 #ifndef SIMULATION
 		rawTemperatures[board][channel][medianFilterIdx] = milliVoltToCelsius(Minions[board].aux.a_codes[0] / 10);
 #else
-		rawTemperatures[board][channel][medianFilterIdx] = Simulator_getTemperature(board * MAX_TEMP_SENSORS_PER_MINION_BOARD + channel);
+		if (board * MAX_TEMP_SENSORS_PER_MINION_BOARD + channel < NUM_TEMPERATURE_SENSORS) {
+			rawTemperatures[board][channel][medianFilterIdx] = Simulator_getTemperature(board * MAX_TEMP_SENSORS_PER_MINION_BOARD + channel);
+		}
 #endif
 	}
 
@@ -240,7 +242,7 @@ ErrorStatus Temperature_UpdateSingleChannel(uint8_t channel){
 	// update the filtered values
 	// you need to change this if you change 
 	for (int32_t minion = 0; minion < NUM_MINIONS; ++minion) {
-		for (int32_t sensor = 0; sensor < NUM_TEMP_SENSORS_PER_MOD; ++sensor) {
+		for (int32_t sensor = 0; sensor < MAX_TEMP_SENSORS_PER_MINION_BOARD; ++sensor) {
 			temperatures[minion][sensor] = median(
 													 rawTemperatures[minion][sensor][0],
 													 rawTemperatures[minion][sensor][1],
