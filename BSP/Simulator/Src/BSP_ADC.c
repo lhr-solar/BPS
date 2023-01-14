@@ -25,7 +25,10 @@ void BSP_ADC_Init(void) {
  * @return  millivoltage value ADC measurement
  */
 uint16_t BSP_ADC_High_GetMilliVoltage(void) {
-    // TODO
+    if(!initialized) {
+        Simulator_Log_Location(LOG_ERROR, "Used ADC without initialization!\n");
+        exit(-1);
+    }
     return 42;
 }
 
@@ -35,6 +38,9 @@ uint16_t BSP_ADC_High_GetMilliVoltage(void) {
  * @return  millivoltage value ADC measurement
  */
 uint16_t BSP_ADC_Low_GetMilliVoltage(void) {
-    // TODO
+    if(!initialized) {
+        Simulator_Log_Location(LOG_ERROR, "Used ADC without initialization!\n");
+        exit(-1);
+    }
     return 42;
 }

@@ -41,6 +41,11 @@ void BSP_Timer_Start(void) {
  * @return  Number of ticks
  */
 uint32_t BSP_Timer_GetTicksElapsed(void) {
+    if(!initialized) {
+        Simulator_Log_Location(LOG_ERROR, "Used PWM without initialization!\n");
+        exit(-1);
+    }
+
     uint32_t currentTime = clock();
     uint32_t TicksElasped = currentTime - t;
     char TimeMessage[100] = {0};
@@ -57,6 +62,10 @@ uint32_t BSP_Timer_GetTicksElapsed(void) {
  * @return  0
  */
 uint32_t BSP_Timer_GetRunFreq(void) {
+    if(!initialized) {
+        Simulator_Log_Location(LOG_ERROR, "Used PWM without initialization!\n");
+        exit(-1);
+    }
     return 0;
 }
 
@@ -66,6 +75,10 @@ uint32_t BSP_Timer_GetRunFreq(void) {
  * @return  Microseconds 
  */
 uint32_t BSP_Timer_GetMicrosElapsed(void) {
+    if(!initialized) {
+        Simulator_Log_Location(LOG_ERROR, "Used PWM without initialization!\n");
+        exit(-1);
+    }
     uint32_t MicrosElasped = ((uint64_t) BSP_Timer_GetTicksElapsed() * MICROS_IN_SEC) / CLOCKS_PER_SEC;
     char MicrosMessage[100] = {0};
     sprintf(MicrosMessage, "Microseconds elasped: %d us\n", MicrosElasped);

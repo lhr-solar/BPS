@@ -50,11 +50,19 @@ vpath %.c $(sort $(dir $(SRC)))		# In case files aren't found
 # Flags
 ######################################
 
-INC_DIR = $(shell find $(TARGET_PATH) -name '*.h')
-INC_DIR := $(shell dirname $(INC_DIR))
-INC_DIR := $(addprefix -I,$(INC_DIR))
+INC_DIR = \
+-I$(TARGET_PATH)/Tasks/Inc  \
+-I$(TARGET_PATH)/Apps/Inc \
+-I$(TARGET_PATH)/Drivers/Inc \
+-I$(TARGET_PATH)/BSP/Inc \
+-I$(TARGET_PATH)/Config/Inc \
+-I$(TARGET_PATH)/RTOS/uCOS-III-Simulator/uC-CPU \
+-I$(TARGET_PATH)/RTOS/uCOS-III-Simulator/uC-CPU/Posix/GNU \
+-I$(TARGET_PATH)/RTOS/uCOS-III-Simulator/uC-LIB \
+-I$(TARGET_PATH)/RTOS/uCOS-III-Simulator/uCOS-III/Source \
+-I$(TARGET_PATH)/RTOS/uCOS-III-Simulator/uCOS-III/Ports/POSIX/GNU \
 
-LIB = -lm -lpthread		# Standard libraries used
+LIB = -lm -lpthread     # Standard libraries used
 
 FLAGS = -Wall -Werror -g -std=c11 $(INC_DIR) -DSIMULATION -D_GNU_SOURCE
 
