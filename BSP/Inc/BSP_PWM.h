@@ -1,10 +1,13 @@
 #ifndef BSP_PWM_H
 #define BSP_PWM_H
 
+#ifndef SIMULATION
 #include "stm32f4xx.h"
 #include "stm32f4xx_tim.h"
 #include "stm32f4xx_gpio.h"
 #include "stm32f4xx_rcc.h"
+#endif
+#include "config.h"
 #include "common.h"
 
 
