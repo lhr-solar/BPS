@@ -161,12 +161,12 @@ void generateData(char selection){
             break;
         case '3':
             victim = randomRange(0, NUM_BATTERY_MODULES);
-            states[0].voltages[victim] = MAX_VOLTAGE_LIMIT + 1;
+            states[0].voltages[victim] = (MAX_VOLTAGE_LIMIT + 1)*10;
             writeOut("3-Critical-OverVoltage");
             break;
         case '4':
             victim = randomRange(0, NUM_BATTERY_MODULES);
-            states[0].voltages[victim] = MIN_VOLTAGE_CHARGING_LIMIT - 1;
+            states[0].voltages[victim] = (MIN_VOLTAGE_CHARGING_LIMIT - 1)*10;
             writeOut("4-Critical-UnderVoltage");
             break;
         case '5':
@@ -189,13 +189,13 @@ void generateData(char selection){
         case '8':
             index = randomRange(1,jsonLength - 1);
             victim = randomRange(0, NUM_BATTERY_MODULES);
-            states[index].voltages[victim] = MAX_VOLTAGE_LIMIT + 1;
+            states[index].voltages[victim] = (MAX_VOLTAGE_LIMIT + 1)*10;
             writeOut("8-OverVoltage");
             break;
         case '9':
             index = randomRange(1,jsonLength);
             victim = randomRange(0, NUM_BATTERY_MODULES);
-            states[index].voltages[victim] = MIN_VOLTAGE_CHARGING_LIMIT - 1;
+            states[index].voltages[victim] = (MIN_VOLTAGE_CHARGING_LIMIT - 1)*10;
             writeOut("9-UnderVoltage");
             break;
         case 'A':
@@ -231,7 +231,7 @@ void initializeVariables(bool charging){
         states[i].adcLow = 0;
 
         for(int j=0; j<NUM_BATTERY_MODULES; j++) {
-            states[i].voltages[j] = randomRange(MIN_VOLTAGE_LIMIT, MAX_VOLTAGE_LIMIT);
+            states[i].voltages[j] = randomRange(MIN_VOLTAGE_LIMIT * 10, MAX_VOLTAGE_LIMIT * 10);
         }
 
         for(int j=0; j<NUM_TEMPERATURE_SENSORS; j++){
