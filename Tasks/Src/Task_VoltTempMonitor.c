@@ -117,7 +117,7 @@ void Task_VoltTempMonitor(void *p_arg) {
         //PID loop - sets fan speed based on avg temperature and desired temperature
         //overrides PID loop if above PID_MAX_TEMPERATURE or if it's FAULT
         if (temperatureStatus == SAFE) {
-            BSP_Fans_SetAll(Temperature_PID_Output(Temperature_GetTotalPackAvgTemperature(), PID_DESIRED_TEMPERATURE));
+            Fans_SetAll(Temperature_PID_Output(Temperature_GetTotalPackAvgTemperature(), PID_DESIRED_TEMPERATURE));
         }
 
 
