@@ -1,9 +1,12 @@
-/* Copyright (c) 2022 UT Longhorn Racing Solar */
+/* Copyright (c) 2018-2022 UT Longhorn Racing Solar */
 
 #include "BSP_SPI.h"
 #include "stm32f4xx.h"
 #include "os.h"
 #include "BSP_OS.h"
+#include "stm32f4xx_gpio.h"
+#include "stm32f4xx_rcc.h"
+#include "stm32f4xx_spi.h"
 
 // These are the sizes of the fifos.
 // You can write/read more than this at once,

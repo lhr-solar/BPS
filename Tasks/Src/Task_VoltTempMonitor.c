@@ -1,4 +1,4 @@
-/* Copyright (c) 2022 UT Longhorn Racing Solar */
+/* Copyright (c) 2018-2022 UT Longhorn Racing Solar */
 #include <string.h>
 #include "Tasks.h"
 #include "os.h"
@@ -8,6 +8,7 @@
 #include "CANbus.h"
 #include "Amps.h"
 #include "CAN_Queue.h"
+
 
 //declared in Tasks.c
 extern cell_asic Minions[NUM_MINIONS];
@@ -51,7 +52,6 @@ void Task_VoltTempMonitor(void *p_arg) {
                         OS_OPT_POST_1,
                         &err);
             assertOSError(err);
-
             voltageHasBeenChecked = true;
         }
         //Send measurements to CAN queue
@@ -96,7 +96,8 @@ void Task_VoltTempMonitor(void *p_arg) {
         // BLOCKING =====================
         // Update Temperature Measurements
         Temperature_UpdateAllMeasurements();
-        // Check if temperature is NOT safe:
+
+        // Check if temperature is NOT safe: for all modules
         SafetyStatus temperatureStatus = Temperature_CheckStatus(Amps_IsCharging());
         if(temperatureStatus != SAFE) {
             Fault_BitMap = Fault_OTEMP;
@@ -112,7 +113,14 @@ void Task_VoltTempMonitor(void *p_arg) {
             assertOSError(err);
 
             temperatureHasBeenChecked = true;
+        } 
+        //PID loop - sets fan speed based on avg temperature and desired temperature
+        //overrides PID loop if above PID_MAX_TEMPERATURE or if it's FAULT
+        if (temperatureStatus == SAFE) {
+            Fans_SetAll(Temperature_PID_Output(Temperature_GetTotalPackAvgTemperature(), PID_DESIRED_TEMPERATURE));
         }
+
+
 
         //Check if car should be allowed to charge or not
         for (uint8_t board = 0; board < NUM_MINIONS; board++) {

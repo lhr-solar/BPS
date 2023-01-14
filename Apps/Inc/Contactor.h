@@ -1,4 +1,3 @@
- 
 /* Copyright (c) 2018-2022 UT Longhorn Racing Solar */
 
 #ifndef CONTACTOR_H
@@ -22,7 +21,6 @@
 
 typedef uint8_t CONT_CHOICE;
 typedef enum {ARRAY_CONTACTOR = 1, HVHIGH_CONTACTOR = 2, HVLOW_CONTACTOR = 4, ALL_CONTACTORS = 7} Contactors_t;
-
 
 /**
  * @brief   A Contactor is a high power switch similar to what a relay is. The Contactor

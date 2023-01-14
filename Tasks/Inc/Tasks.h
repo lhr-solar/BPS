@@ -1,4 +1,4 @@
-/* Copyright (c) 2022 UT Longhorn Racing Solar */
+/* Copyright (c) 2018-2022 UT Longhorn Racing Solar */
 #ifndef TASKS_H
 #define TASKS_H
 

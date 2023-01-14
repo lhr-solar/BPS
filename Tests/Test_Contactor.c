@@ -1,3 +1,4 @@
+/* Copyright (c) 2018-2022 UT Longhorn Racing Solar */
 #include "BSP_Contactor.h"
 
 /* This is a basic test to verify that our contactor

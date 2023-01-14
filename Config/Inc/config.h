@@ -1,4 +1,4 @@
-/* Copyright (c) 2020 UT Longhorn Racing Solar */
+/* Copyright (c) 2018-2022 UT Longhorn Racing Solar */
 
 /** config.h
  * Config file to hold any aliases/constants referenced by multiple files
@@ -14,10 +14,6 @@ typedef enum State_e {OFF = 0, ON} State;
 typedef enum ErrorStatus_e {ERROR = 0, SUCCESS = !ERROR} ErrorStatus;
 typedef enum SafetyStatus_e {SAFE = 0, DANGER = 1, OVERVOLTAGE = 2, UNDERVOLTAGE = 3} SafetyStatus;
 
-// NUCLEO or custom
-#define COMMAND_SIZE			128
-#define NUCLEO		0		// Change 1 if using nucleo, 0 if not
-
 //--------------------------------------------------------------------------------
 // Basic Parameters of BPS layout
 
@@ -30,30 +26,68 @@ typedef enum SafetyStatus_e {SAFE = 0, DANGER = 1, OVERVOLTAGE = 2, UNDERVOLTAGE
 
 //--------------------------------------------------------------------------------
 // Battery Pack layout
+#ifndef NUM_BATTERY_MODULES
 #define NUM_BATTERY_MODULES				31		// Number of battery modules
+#endif
+
+#ifndef NUM_TEMPERATURE_SENSORS
 #define NUM_TEMPERATURE_SENSORS			62		// Number of temperature sensors
+#endif
+
+#ifndef NUM_TEMP_SENSORS_PER_MOD
 #define NUM_TEMP_SENSORS_PER_MOD		2		// Number of temperature sensors per battery module
+#endif
 
 //--------------------------------------------------------------------------------
 // MAX and MIN limits of lithium ion cells
+#ifndef MIN_VOLTAGE_CHARGING_LIMIT
 #define MIN_VOLTAGE_CHARGING_LIMIT      2550        // Under voltage limit for charging (milliVolts) 
+#endif
+
+#ifndef MIN_VOLTAGE_LIMIT
 #define MIN_VOLTAGE_LIMIT				2700		// Under voltage limit (milliVolts)	(actual min: 2.5V)
+#endif
+
+#ifndef MAX_VOLTAGE_LIMIT
 #define MAX_VOLTAGE_LIMIT				4100		// Over voltage limit (milliVolts)		(actual max: 4.2V)
+#endif
+
+#ifndef CHARGE_DISABLE_VOLTAGE
 #define CHARGE_DISABLE_VOLTAGE          4000        // Voltage to stop charging at
+#endif
 
 // make sure we don't enable charging if we're too close to the voltage limit
 #if MAX_VOLTAGE_LIMIT - 100 < CHARGE_DISABLE_VOLTAGE
 #error "Charging maximum voltage is too close to voltage trip limit!"
 #endif
 
+#ifndef MAX_DISCHARGE_TEMPERATURE_LIMIT
 #define MAX_DISCHARGE_TEMPERATURE_LIMIT	60000	    // Max temperature limit (milliCelcius)	(recommended release: 60.00C)
+#endif
+
+#ifndef MAX_CHARGE_TEMPERATURE_LIMIT
 #define MAX_CHARGE_TEMPERATURE_LIMIT	45000	    // Max temperature limit (milliCelcius)	(recommended release: 45.00C)
+#endif
 
+#ifndef PID_DESIRED_TEMPERATURE
+#define PID_DESIRED_TEMPERATURE         38000       // Desired temperature   (milliCelcius) 
+#endif
+
+#ifndef MAX_CURRENT_LIMIT
 #define MAX_CURRENT_LIMIT				75000		// Max current limit (Milliamperes)		(Max continuous discharge is 15A per cell)
-#define MAX_CHARGING_CURRENT 			-20000		// Max current per cell is 1.5 Amps (Standard charge)
+#endif
 
+#ifndef MAX_CHARGING_CURRENT
+#define MAX_CHARGING_CURRENT 			-20000		// Max current per cell is 1.5 Amps (Standard charge)
+#endif
+
+#ifndef BALANCING_TOLERANCE_START
 #define BALANCING_TOLERANCE_START       50          //mV differential from lowest module that will start battery balancing
+#endif
+
+#ifndef BALANCING_TOLERANCE_STOP
 #define BALANCING_TOLERANCE_STOP        20          //mV differential from lowest module that will stop battery balancing
+#endif
 //--------------------------------------------------------------------------------
 // Helpers
 #define STARTUP_WAIT_TIME				100000 // Number of iterations to wait for battery charging instructions on startup

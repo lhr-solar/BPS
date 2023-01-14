@@ -1,7 +1,9 @@
-/* Copyright (c) 2022 UT Longhorn Racing Solar */
+/* Copyright (c) 2018-2022 UT Longhorn Racing Solar */
 
 #include "BSP_Lights.h"
 #include "stm32f4xx.h"
+#include "stm32f4xx_gpio.h"
+#include "stm32f4xx_rcc.h"
 
 // Just some lookup for the values
 static const uint32_t LIGHT_VALS[LIGHTS_MAX] = {

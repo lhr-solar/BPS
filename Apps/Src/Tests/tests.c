@@ -1,3 +1,4 @@
+/* Copyright (c) 2018-2022 UT Longhorn Racing Solar */
 /** tests.c
  * File containing all tests that were
  * previously in main.c
