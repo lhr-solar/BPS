@@ -6,9 +6,6 @@
  */
 
 #include "Voltage.h"
-#ifndef SIMULATION
-#include "LTC6811.h"
-#endif
 #include "config.h"
 #include <stdlib.h>
 #include "os.h"
@@ -16,6 +13,8 @@
 #include "Amps.h"
 #ifdef SIMULATION
 #include "Simulator.h"
+#else
+#include "LTC6811.h"
 #endif
 
 // median filter

@@ -94,8 +94,16 @@ void EnterFaultState() {
             BSP_Light_On(WIRE);  
             break;
         case Fault_HANDLER:
+        #ifdef SIMULATION
+            sprintf(err, "$$$ Entered fault in state {%d} - FAULT HANDLER\n", stateCount - 1);
+            Simulator_Log_Location(LOG_INFO, err);
+        #endif    
             break;
         case Fault_OS:
+        #ifdef SIMULATION
+            sprintf(err, "$$$ Entered fault in state {%d} - OS ERROR\n", stateCount - 1);
+            Simulator_Log_Location(LOG_INFO, err);
+        #endif
             break;
         case Fault_WDOG:
         #ifdef SIMULATION

@@ -3,7 +3,9 @@
 #include "config.h"
 #include "BSP_UART.h"
 #include "BSP_PLL.h"
+#ifndef SIMULATION
 #include "stm32f4xx.h"
+#endif
 
 void foo(void){
     return;

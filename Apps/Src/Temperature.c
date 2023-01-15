@@ -40,7 +40,7 @@ static cell_asic *Minions;
 
 #ifdef SIMULATION
 // keep track of which temperature channel we are using
-uint8_t currentChannel = 0;
+static uint8_t currentChannel = 0;
 #endif
 
 //TODO: tune PID with actual pack and fans, and then change values below to appropiate value

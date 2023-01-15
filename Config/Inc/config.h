@@ -19,7 +19,6 @@ typedef enum SafetyStatus_e {SAFE = 0, DANGER = 1, OVERVOLTAGE = 2, UNDERVOLTAGE
 
 #define NUM_MINIONS	4					 // Number of minion boards
 
-
 //--------------------------------------------------------------------------------
 // Battery Fault Checks
 #define NUM_FAULT_POINTS				4
@@ -92,6 +91,7 @@ typedef enum SafetyStatus_e {SAFE = 0, DANGER = 1, OVERVOLTAGE = 2, UNDERVOLTAGE
 // Helpers
 #define STARTUP_WAIT_TIME				100000 // Number of iterations to wait for battery charging instructions on startup
 
+#define PWM_PERIOD                      4000   // Number of clock cycles per PWM period
 //--------------------------------------------------------------------------------
 // Voltage Sensor Configurations
 // Defines how many voltage sensors are connected to each board
