@@ -28,7 +28,7 @@ ErrorStatus Fans_Set(uint8_t fan, uint32_t speed){
     //Range of pulse is 0-4000
     //First check to make sure that change is within range of values
     //Load new value into Compare and Capture Register
-    return (speed < 0 || speed > TOPSPEED) ? BSP_PWM_Set(fan, TOPSPEED) : BSP_PWM_Set(fan, speed * DIVIDER); //if not in range, leave function with error code
+    return (speed < 0 || speed > TOPSPEED) ? BSP_PWM_Set(fan, TOPSPEED * DIVIDER) : BSP_PWM_Set(fan, speed * DIVIDER); //if not in range, leave function with error code
 }
 
 /**

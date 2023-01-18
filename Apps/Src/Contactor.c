@@ -72,10 +72,30 @@ void Contactor_Off(Contactors_t contactorChoice) {
 
 /**
  * @brief   Gets the state of the Contactor switch from one of its AUX pins.
- * @note	You cannot get the state of ALL_CONTACTORS. As such, if that param is passed, it will return the state of the array contactor.
+ * @note	If you pass in All_Contactors, you will get the state as true if any of the contactors are on.
  * @param   Contactor to get state of
  * @return  0 if contactor is off/open, 1 if on/closed
  */
 bool Contactor_GetState(Contactors_t contactorChoice) {
-	return Contactor_Get((uint8_t) contactorChoice);
+	bool retval;
+
+	switch (contactorChoice) {
+		case ARRAY_CONTACTOR:
+			retval = BSP_PWM_Get(ARRAY_CONTACTOR_OUT) ? true : false;
+			break;
+		case HVHIGH_CONTACTOR:
+			retval = BSP_PWM_Get(HVHIGH_CONTACTOR_OUT) ? true : false;
+			break;
+		case HVLOW_CONTACTOR:
+			retval = BSP_PWM_Get(HVLOW_CONTACTOR_OUT) ? true : false;
+			break;
+		case ALL_CONTACTORS:
+		default:
+			retval = (BSP_PWM_Get(HVLOW_CONTACTOR_OUT) | 
+					BSP_PWM_Get(HVHIGH_CONTACTOR_OUT) |
+					BSP_PWM_Get(ARRAY_CONTACTOR_OUT)) ? true : false;
+			break;
+		}
+
+	return retval;
 }

@@ -111,7 +111,7 @@ ErrorStatus BSP_PWM_Set(uint8_t pin, uint32_t speed){
     //Range of pulse is 0-4000
     //First check to make sure that change is within range of values
     //Load new value into Compare and Capture Register
-    if (speed>4000) speed = 4000;
+    if (speed > 4000) speed = 4000;
 
     switch (pin)
     {
@@ -167,35 +167,4 @@ int BSP_PWM_Get(uint8_t pin){
     default:
         return -1;
     }
-}
-
-
-/**
- * @brief   Gets the state of the Contactor switch from one of its AUX pins.
- * @note	THIS IS ALSO CODE THAT HAS NO HOME. You cannot get the state of ALL_CONTACTORS. As such, if that param is passed, it will return the state of the array contactor.
- * @param   Contactor to get state of
- * @return  0 if contactor is off/open, 1 if on/closed
- */
-bool Contactor_Get(uint8_t contactorChoice) {
-	bool contactorReturnValue = ((C1_PORT->IDR & GPIO_Pin_1) >> 1) ? 0 : 1; //read the one and only input pin
-
-	/* this is future support for multiple contactors, but we only have one pin right now
-	bool contactorReturnValue = false;
-	if (contactorChoice == ARRAY_CONTACTOR) {
-		contactorReturnValue = ((C1_PORT->IDR & GPIO_Pin_1) >> 1) ? 0 : 1;
-	}
-	else if (contactorChoice == HVHIGH_CONTACTOR) {
-		contactorReturnValue = ((C2_PORT->IDR & GPIO_Pin_5) >> 5) ? 0 : 1;
-	}
-	else if (contactorChoice == HVLOW_CONTACTOR) {
-		contactorReturnValue = ((C3_PORT->IDR & GPIO_Pin_1) >> 1) ? 0 : 1;
-	}
-	else if (contactorChoice == ALL_CONTACTORS) {
-		// return if ANY of the contactors are off.
-		contactorReturnValue = (((C1_PORT->IDR & GPIO_Pin_1) >> 1) ? 0 : 1)
-			&& (((C2_PORT->IDR & GPIO_Pin_5) >> 5) ? 0 : 1)
-			&& (((C3_PORT->IDR & GPIO_Pin_1) >> 1) ? 0 : 1);
-	}
-	*/
-	return contactorReturnValue;
 }

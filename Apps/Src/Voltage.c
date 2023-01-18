@@ -81,13 +81,15 @@ void Voltage_Init(cell_asic *boards){
 	VoltageFilter_init(&VoltageFilter, 0, 50000);
 }
 
-#ifndef SIMULATION
+
 /** Voltage_UpdateMeasurements
  * Stores and updates the new measurements received
  * @param pointer to new voltage measurements
  */
 void Voltage_UpdateMeasurements(void){
 	CPU_TS ts;
+	OS_ERR err;
+#ifndef SIMULATION
 	// Start Cell ADC Measurements
 	wakeup_sleep(NUM_MINIONS);
 	LTC6811_adcv(ADC_CONVERSION_MODE,ADC_DCP,CELL_CH_TO_CONVERT);
@@ -95,7 +97,6 @@ void Voltage_UpdateMeasurements(void){
 	
 	// Read Cell Voltage Registers
 	//take control of mutex
-	OS_ERR err;
   	OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
   	assertOSError(err);
 	LTC6811_rdcv_safe(0, NUM_MINIONS, Minions); // Set to read back all cell voltage registers
@@ -109,46 +110,13 @@ void Voltage_UpdateMeasurements(void){
 	// release minions asic mutex
 	OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
   	assertOSError(err);
-	
-	// run median filter
-	VoltageFilter_put(&VoltageFilter, rawVoltages);
-
-	// update public voltage values
-	OSMutexPend(&Voltage_Mutex, 0, OS_OPT_PEND_BLOCKING, &ts, &err);
-  	assertOSError(err);
-	VoltageFilter_get(&VoltageFilter, Voltages);
-	//release mutex
-	OSMutexPost(&Voltage_Mutex, OS_OPT_POST_NONE, &err);
-	assertOSError(err);
-}
 #else
-/** Voltage_UpdateMeasurements
- * Stores and updates the new measurements received
- * @param pointer to new voltage measurements
- */
-void Voltage_UpdateMeasurements(void){
-	CPU_TS ts;
-
-	// Read Voltages from simulator
-	//take control of mutex
-	OS_ERR err;
-#ifndef SIMULATION
-  	OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
-  	assertOSError(err);
-#endif
-
 	// package raw voltage values into single array
 	static uint16_t rawVoltages[NUM_BATTERY_MODULES];
 	for(int i = 0; i < NUM_BATTERY_MODULES; i++){
 		rawVoltages[i] = Simulator_getVoltage(i);
 	}
-
-#ifndef SIMULATION
-	// release minions asic mutex
-	OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
-  	assertOSError(err);
 #endif
-	
 	// run median filter
 	VoltageFilter_put(&VoltageFilter, rawVoltages);
 
@@ -160,7 +128,6 @@ void Voltage_UpdateMeasurements(void){
 	OSMutexPost(&Voltage_Mutex, OS_OPT_POST_NONE, &err);
 	assertOSError(err);
 }
-#endif
 
 /** Voltage_CheckStatus
  * Checks if all battery modules are safe
