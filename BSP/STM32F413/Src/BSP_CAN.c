@@ -151,6 +151,12 @@ ErrorStatus BSP_CAN_Write(uint32_t id, uint8_t data[], uint8_t length) {
         length = 8; //force length to be at 8 to avoid index out of bounds
     }
     gTxMessage.StdId = id;
+
+    //prevent null pointer exceptions
+    if(length > 8){
+        length = 8;
+    }
+
     gTxMessage.DLC = length;
 
     if (length > 8) {
@@ -160,7 +166,7 @@ ErrorStatus BSP_CAN_Write(uint32_t id, uint8_t data[], uint8_t length) {
 	for(int i = 0; i < length; i++){
         gTxMessage.Data[i] = data[i];
     }
-	
+
     uint8_t mailbox = CAN_Transmit(CAN1, &gTxMessage);
     if (mailbox == CAN_TxStatus_NoMailBox) {
         retVal = ERROR;

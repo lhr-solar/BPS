@@ -7,15 +7,12 @@
 void Task_PetWDog(void *p_arg) {
     (void)p_arg;
 
-    OS_ERR err;
-
     BSP_WDTimer_Init();
     BSP_WDTimer_Start();    
 
     while (1){
         //take WDog Mutex
-        OSMutexPend(&WDog_Mutex, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
-        assertOSError(err);
+        RTOS_BPS_MutexPend(&WDog_Mutex, OS_OPT_PEND_BLOCKING);
 
         // If WDog_BitMap is all set:
         // Reset watchdog timer
@@ -26,12 +23,9 @@ void Task_PetWDog(void *p_arg) {
             BSP_Light_Toggle(RUN);
             WDog_BitMap = 0;
         }
-   
         //release WDog Mutex
-        OSMutexPost(&WDog_Mutex, OS_OPT_POST_NONE, &err);
-        assertOSError(err);
-
-        OSTimeDly(10, OS_OPT_TIME_DLY, &err);
-        assertOSError(err);
+        RTOS_BPS_MutexPost(&WDog_Mutex, OS_OPT_POST_NONE);
+        
+        RTOS_BPS_DelayTick(10);
     }
 }

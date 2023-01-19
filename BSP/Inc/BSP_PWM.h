@@ -12,6 +12,9 @@
 
 #define C1_PORT GPIOB //TO MAKE THE CONTACTOR CODE WORK, REMOVE ONCE IT HAS A NEW HOME. This is the port for the input pin
 
+#define PWM_PERIOD 4000
+
+
 /**
  * @brief   Initialize all the GPIO pins meant for pwm
  * @param   None

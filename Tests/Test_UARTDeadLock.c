@@ -1,6 +1,7 @@
 /* Copyright (c) 2018-2022 UT Longhorn Racing Solar */
 #include <stdio.h>
 #include <stdint.h>
+#include "RTOS_BPS.h"
 #include "BSP_UART.h"
 #include "config.h"
 #include "os.h"
@@ -16,6 +17,10 @@ CPU_STK UART_Deadlocks2_Stk[512];
 int counter1 = 0;
 int counter2 = 0;
 
+void foo(){
+    return;
+}
+
 void UART_Deadlocks(void *p_arg){
     (void)p_arg;
     char* str1U = "Printing string 1 in thread 1 to USB";
@@ -24,20 +29,15 @@ void UART_Deadlocks(void *p_arg){
     char* str2B = "Printing string 2 in thread 1 to BLE";
     char* str3U = "Printing string 3 in thread 1 to USB";
     char* str3B = "Printing string 3 in thread 1 to BLE";
-    OS_ERR err;
-    CPU_TS ts;
 
     printf("initializing UART...\n");
-    BSP_UART_Init();
+    BSP_UART_Init(foo, foo, UART_USB);
+    BSP_UART_Init(foo, foo, UART_BLE);
     int counter = 0;
 
     while (1){
         //for(int i = 0; i < 4; i++) {
-        OSSemPend(&SafetyCheck_Sem4,
-                    0,
-                    OS_OPT_PEND_BLOCKING,
-                    &ts,
-                    &err);
+        RTOS_BPS_SemPend(&SafetyCheck_Sem4, OS_OPT_PEND_BLOCKING);
         //}
         BSP_UART_Write(str1U, 36, UART_USB);
         BSP_UART_ReadLine(str1U, UART_USB);
@@ -69,8 +69,6 @@ void UART_Deadlocks(void *p_arg){
 void UART_Deadlocks2(void *p_arg){
     (void)p_arg;
 
-    OS_ERR err;
-    CPU_TS ts;
     char* str1U = "Printing string 1 in thread 2 to USB";
     char* str1B = "Printing string 1 in thread 2 to BLE";
     char* str2U = "Printing string 2 in thread 2 to USB";
@@ -79,13 +77,13 @@ void UART_Deadlocks2(void *p_arg){
     char* str3B = "Printing string 3 in thread 2 to BLE";
 
     printf("initializing UART...\n");
-    BSP_UART_Init();
+
+    BSP_UART_Init(foo, foo, UART_USB);
+    BSP_UART_Init(foo, foo, UART_BLE);
     int counter = 0;
 
     while (1){
-        OSSemPost(&SafetyCheck_Sem4,
-                    OS_OPT_POST_ALL,
-                    &err);
+        RTOS_BPS_SemPost(&SafetyCheck_Sem4, OS_OPT_POST_ALL);
         BSP_UART_Write(str1U, 36, UART_USB);
         BSP_UART_ReadLine(str1U, UART_USB);
         printf("%s\n", str1U);
@@ -117,37 +115,22 @@ void UART_Deadlocks2(void *p_arg){
 int main() {
     OS_ERR err;
     OSInit(&err);
-    OSSemCreate(&SafetyCheck_Sem4,
-                "Safety Check Semaphore",
-                0,
-                &err);
-    OSTaskCreate(&UART_Deadlocks_TCB,				// TCB
+    RTOS_BPS_SemCreate(&SafetyCheck_Sem4, "Safety Check Semaphore", 0);
+    RTOS_BPS_TaskCreate(&UART_Deadlocks_TCB,				// TCB
 				"UART Deadlocks Test",	// Task Name (String)
 				UART_Deadlocks,				// Task function pointer
 				(void *)0,				// Task function args
 				1,			// Priority
-				UART_Deadlocks_Stk,				// Stack
-				256,	// Watermark limit for debugging
-				512,		// Stack size
-				0,						// Queue size (not needed)
-				10,						// Time quanta (time slice) 10 ticks
-				(void *)0,				// Extension pointer (not needed)
-				OS_OPT_TASK_STK_CHK | OS_OPT_TASK_SAVE_FP,	// Options
-				&err);					// return err code
+				UART_Deadlocks_Stk,	// Watermark limit for debugging
+				512);					// return err code
 	// ASSERT err
-    OSTaskCreate(&UART_Deadlocks2_TCB,				// TCB
+    RTOS_BPS_TaskCreate(&UART_Deadlocks2_TCB,				// TCB
 				"UART Deadlocks Test",	// Task Name (String)
 				UART_Deadlocks2,				// Task function pointer
 				(void *)0,				// Task function args
 				2,			// Priority
-				UART_Deadlocks2_Stk,				// Stack
-				256,	// Watermark limit for debugging
-				512,		// Stack size
-				0,						// Queue size (not needed)
-				10,						// Time quanta (time slice) 10 ticks
-				(void *)0,				// Extension pointer (not needed)
-				OS_OPT_TASK_STK_CHK | OS_OPT_TASK_SAVE_FP,	// Options
-				&err);					// return err code
+				UART_Deadlocks2_Stk,	// Watermark limit for debugging
+				512);					// return err code
     // ASSERT err
 	OSStart(&err);
 }

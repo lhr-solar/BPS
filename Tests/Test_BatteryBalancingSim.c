@@ -8,9 +8,12 @@
 
 cell_asic minions[NUM_MINIONS];
 
-int main() {
+void foo(){
+    return;
+}
 
-    BSP_UART_Init();    // Initialize printf
+int main() {
+    BSP_UART_Init(foo, foo, UART_USB);    // Initialize printf
 
     printf("Testing setting discharge bits.\r\n");
 
