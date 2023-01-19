@@ -1,9 +1,5 @@
 /* Copyright (c) 2018-2022 UT Longhorn Racing Solar */
-<<<<<<< HEAD
-#include "os.h"
-=======
 #include "RTOS_BPS.h"
->>>>>>> RTOS_Porting
 #include "Contactor.h"
 #include "Tasks.h"
 

@@ -43,16 +43,6 @@ void Task_Init(void *p_arg) {
 				(void *)0,				// Task function args
 				TASK_CRITICAL_STATE_PRIO,			// Priority
 				CriticalState_Stk,				// Stack
-<<<<<<< HEAD
-				WATERMARK_STACK_LIMIT,	// Watermark limit for debugging
-				TASK_CRITICAL_STATE_STACK_SIZE,		// Stack size
-				0,						// Queue size (not needed)
-				10,						// Time quanta (time slice) 10 ticks
-				(void *)0,				// Extension pointer (not needed)
-				OS_OPT_TASK_STK_CHK | OS_OPT_TASK_SAVE_FP,	// Options
-				&err);					// return err code
-		assertOSError(err);
-=======
 				TASK_CRITICAL_STATE_STACK_SIZE);
         //3
         // RTOS_BPS_TaskCreate(&PetWDog_TCB,				// TCB
@@ -62,7 +52,6 @@ void Task_Init(void *p_arg) {
 		// 		TASK_PETWDOG_PRIO,			// Priority
 		// 		PetWDog_Stk,				// Stack
 		// 		TASK_PETWDOG_STACK_SIZE);
->>>>>>> RTOS_Porting
         //4
         RTOS_BPS_TaskCreate(&VoltTempMonitor_TCB,				// TCB
 				"TASK_VOLT_TEMP_MONITOR_PRIO",	// Task Name (String)

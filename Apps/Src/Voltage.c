@@ -67,7 +67,7 @@ void Voltage_Init(cell_asic *boards){
 	LTC6811_rdcfg_safe(NUM_MINIONS, Minions);
 	// release mutex
   	RTOS_BPS_MutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE);
-	
+#endif
 	// Initialize median filter. There should be no modules with less than 0 volts or more than 5 volts
 	VoltageFilter_init(&VoltageFilter, 0, 50000);
 }
@@ -175,7 +175,6 @@ SafetyStatus Voltage_CheckStatus(void){
  * @return pointer to index of modules that are in danger
  */
 void Voltage_GetModulesInDanger(VoltageSafety_t* system){
-	OS_ERR err;
 // no simulator support for open wires
 #ifndef SIMULATION
 	uint32_t wires;

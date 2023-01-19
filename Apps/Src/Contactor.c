@@ -13,15 +13,6 @@ void Contactor_Init(void) {
 		Simulator_Log(LOG_INFO, "Contactor Initialized\n");
 	#endif
 	BSP_PWM_Init();
-
-	//setup the input pin
-    GPIO_InitTypeDef GPIO_C1Init;
-	GPIO_C1Init.GPIO_Pin = GPIO_Pin_1; //input pin is gpio B1
-    GPIO_C1Init.GPIO_Mode = GPIO_Mode_IN;
-    GPIO_C1Init.GPIO_Speed = GPIO_Speed_2MHz;
-    GPIO_C1Init.GPIO_PuPd = GPIO_PuPd_DOWN;
-    GPIO_C1Init.GPIO_OType = GPIO_OType_PP;
-    GPIO_Init(C1_PORT, &GPIO_C1Init);
 }
 
 /**

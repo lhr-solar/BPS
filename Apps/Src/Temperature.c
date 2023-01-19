@@ -95,7 +95,7 @@ void Temperature_Init(cell_asic *boards){
 	LTC6811_rdcfg_safe(NUM_MINIONS, Minions);
 	//release mutex
   	RTOS_BPS_MutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE);
-
+#endif
 	// set up the median filter with alternating temperatures of 1000 degrees and 0 degrees
 	for (int32_t filterIdx = 0; filterIdx < TEMPERATURE_MEDIAN_FILTER_DEPTH - 1; ++filterIdx) {
 		for (int32_t minion = 0; minion < NUM_MINIONS; ++minion) {
@@ -192,6 +192,8 @@ ErrorStatus Temperature_ChannelConfig(uint8_t tempChannel) {
 	LTC6811_stcomm();
 	//release mutex
   	RTOS_BPS_MutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE);
+
+#endif
 
 	return SUCCESS;
 }

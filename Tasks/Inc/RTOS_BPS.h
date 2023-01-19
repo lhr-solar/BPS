@@ -44,7 +44,7 @@ BPS_OS_SEM_CTR RTOS_BPS_SemPend(BPS_OS_SEM* sem, BPS_OS_OPT opt);
  */
 BPS_OS_SEM_CTR RTOS_BPS_SemPost(BPS_OS_SEM *sem4, BPS_OS_OPT opt);
 
-/*
+/**
  * @brief Initializes a mutex object.
  * @param *mut - pointer to a mutex to initialize
  * @param name - char* of the name of the mutex

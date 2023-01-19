@@ -16,11 +16,6 @@ extern cell_asic Minions[NUM_MINIONS];
 void Task_VoltTempMonitor(void *p_arg) {
     (void)p_arg; 
 
-<<<<<<< HEAD
-    OS_ERR err;
-
-=======
->>>>>>> RTOS_Porting
     Fans_Init();
     Voltage_Init(Minions);
     Temperature_Init(Minions);
@@ -47,14 +42,7 @@ void Task_VoltTempMonitor(void *p_arg) {
             RTOS_BPS_SemPost(&Fault_Sem4, OS_OPT_POST_1); 
         } else if((voltageStatus == SAFE) && (!voltageHasBeenChecked)) {
             // Signal to turn on contactor but only signal once
-<<<<<<< HEAD
-            OSSemPost(&SafetyCheck_Sem4,
-                        OS_OPT_POST_1,
-                        &err);
-            assertOSError(err);
-=======
             RTOS_BPS_SemPost(&SafetyCheck_Sem4, OS_OPT_POST_1);
->>>>>>> RTOS_Porting
             voltageHasBeenChecked = true;
         }
         //Send measurements to CAN queue

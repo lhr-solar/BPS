@@ -57,8 +57,6 @@ void Amps_Init(void) {
  * Stores and updates the new measurements received
  */
 void Amps_UpdateMeasurements(void) {
-	OS_ERR err;
-	CPU_TS ticks;
 	RTOS_BPS_MutexPend(&AmperesData_Mutex, OS_OPT_PEND_BLOCKING);
 	#ifdef SIMULATION
 		latestMeasureMilliAmps = Simulator_getCurrent();
