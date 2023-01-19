@@ -40,7 +40,8 @@ void Simulator_Init(char *jsonPath);
 void Simulator_Log(LoggingType_t lvl, char *str);
 
 //TODO: This is not atomic so output could be corrupted. Try replacing with something more secure
-#define Simulator_Log_Location(lvl, str)    \ 
+
+#define Simulator_Log_Location(lvl, str)    \
     do {                                    \
     Simulator_Log(lvl, __FILE__);           \
     Simulator_Log(LOG, "\t");               \
