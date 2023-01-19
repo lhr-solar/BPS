@@ -36,7 +36,7 @@ typedef enum {LOG, LOG_INFO, LOG_WARN, LOG_ERROR, LOG_OUTPUT, LOG_MISC, LOG_NUM_
 // initialize the simulator
 void Simulator_Init(char *jsonPath);
 
-// log something to the simualtor's log file
+// log something to the simulator's log file
 void Simulator_Log(LoggingType_t lvl, char *str);
 
 
