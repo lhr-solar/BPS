@@ -81,13 +81,13 @@ bool Contactor_GetState(Contactors_t contactorChoice) {
 
 	switch (contactorChoice) {
 		case ARRAY_CONTACTOR:
-			retval = BSP_PWM_Get(ARRAY_CONTACTOR_OUT) ? true : false;
+			retval = BSP_PWM_Get(ARRAY_CONTACTOR_OUT);
 			break;
 		case HVHIGH_CONTACTOR:
-			retval = BSP_PWM_Get(HVHIGH_CONTACTOR_OUT) ? true : false;
+			retval = BSP_PWM_Get(HVHIGH_CONTACTOR_OUT);
 			break;
 		case HVLOW_CONTACTOR:
-			retval = BSP_PWM_Get(HVLOW_CONTACTOR_OUT) ? true : false;
+			retval = BSP_PWM_Get(HVLOW_CONTACTOR_OUT);
 			break;
 		case ALL_CONTACTORS:
 		default:
