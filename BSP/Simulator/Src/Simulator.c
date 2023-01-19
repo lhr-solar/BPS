@@ -65,16 +65,6 @@ void Simulator_Log(LoggingType_t lvl, char *str) {
     printf("%s", msg);
 }
 
-// It knows what the input file is because the Makefile should make a #define for the file path called SIMULATOR_JSON_PATH
-#ifndef SIMULATOR_JSON_PATH
-#define JSON_PATH "Error: make sure you define the simulator JSON path in the Makefile!"
-#else
-// #define QUOTE_MARK "
-#define STR(X) # X
-#define STRINGIFY(X) STR(X)
-#define JSON_PATH STRINGIFY(SIMULATOR_JSON_PATH) 
-#endif
-
 /**
  * @brief   Shut down the simulator
  * @param   status - Look at man page for C exit() function 

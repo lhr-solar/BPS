@@ -39,8 +39,8 @@ void Simulator_Init(char *jsonPath);
 // log something to the simulator's log file
 void Simulator_Log(LoggingType_t lvl, char *str);
 
-
-#define Simulator_Log_Location(lvl, str)    \
+//TODO: This is not atomic so output could be corrupted. Try replacing with something more secure
+#define Simulator_Log_Location(lvl, str)    \ 
     do {                                    \
     Simulator_Log(lvl, __FILE__);           \
     Simulator_Log(LOG, "\t");               \
