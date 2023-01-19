@@ -33,7 +33,7 @@ typedef struct simulator_state {
 
 typedef enum {LOG, LOG_INFO, LOG_WARN, LOG_ERROR, LOG_OUTPUT, LOG_MISC, LOG_NUM_LEVELS} LoggingType_t;
 
-// intialize the simulator
+// initialize the simulator
 void Simulator_Init(char *jsonPath);
 
 // log something to the simualtor's log file
