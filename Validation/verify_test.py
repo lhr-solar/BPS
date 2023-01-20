@@ -94,6 +94,7 @@ def main():
         exit(0)
     else:
         print("Test failed")
+        print(bps_state)
         exit(-1)
     
 if __name__ == '__main__':

@@ -52,7 +52,7 @@ Creating Tests
 To add a test to regressions, create a files called ``<testname>.json`` and ``<testname>-out.json`` in 
 ``BSP/Simulator/Data/`` to specify the test states and requirements. Then modify the appropriate GitHub
 workflow (in ``.github/workflows/``) to add your test. The shell script ``Validation/test.sh`` is used to
-run the simulator on GitHub's servers with the proper conditions adn must be run with sudo. For example, 
+run the simulator on GitHub's servers with the proper conditions and must be run with sudo. For example, 
 this is how the footest test is added to the simple-tests workflow in ``.github/workflows/simple-tests.yml``::
 
     - name: footest 

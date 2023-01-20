@@ -148,8 +148,9 @@ ErrorStatus BSP_CAN_Write(uint32_t id, uint8_t data[], uint8_t length) {
     ErrorStatus retVal = SUCCESS;
     
     if (length > 8) {
-        length = 8; //force length to be at 8 to avoid index out of bounds
+        length = 8; //force length to be at 8 to avoid index out of bounds TODO: Return Error and handle properly
     }
+
     gTxMessage.StdId = id;
 
     //prevent null pointer exceptions
@@ -158,10 +159,6 @@ ErrorStatus BSP_CAN_Write(uint32_t id, uint8_t data[], uint8_t length) {
     }
 
     gTxMessage.DLC = length;
-
-    if (length > 8) {
-        length = 8;
-    }
 
 	for(int i = 0; i < length; i++){
         gTxMessage.Data[i] = data[i];

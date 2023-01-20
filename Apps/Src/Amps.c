@@ -68,8 +68,6 @@ void Amps_UpdateMeasurements(void) {
 		latestMeasureMilliAmps = LTC2315_GetCurrent();
 	#endif
 	RTOS_BPS_MutexPost(&AmperesData_Mutex, OS_OPT_POST_NONE);
-
-
 }
 
 /** Amps_CheckStatus
@@ -100,7 +98,7 @@ SafetyStatus Amps_CheckStatus(int32_t maxTemperature) {
  * @return true if charge, false if discharge
  */
 bool Amps_IsCharging(void) {
-	return latestMeasureMilliAmps + AMPS_NOISE_LIMIT < 0;
+    return latestMeasureMilliAmps + AMPS_NOISE_LIMIT < 0;
 }
 
 /** Amps_GetReading
@@ -108,7 +106,7 @@ bool Amps_IsCharging(void) {
  * @return milliamperes value
  */
 int32_t Amps_GetReading(void) {
-	return latestMeasureMilliAmps;
+    return latestMeasureMilliAmps;
 }
 
 /**
