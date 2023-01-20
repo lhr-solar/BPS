@@ -105,18 +105,19 @@ void RTOS_BPS_MutexPost(BPS_OS_MUTEX* mutex, BPS_OS_OPT options) {
  */
 void RTOS_BPS_DelaySecs(uint16_t dly){
     BPS_OS_ERR err;
-    OSTimeDlyHMSM(0, 0, dly, 0, OS_OPT_TIME_HMSM_NON_STRICT, &err);
+    OSTimeDlyHMSM(0, 0, (CPU_INT16U)dly, 0, OS_OPT_TIME_HMSM_NON_STRICT, &err);
     assertOSError(err);
 }
 
 /**
  * @brief: Creates a Millisecond-Based Time Delay.
  * @param dly Defines how many milliseconds to delay for.
+ * @note if a dly value is passed that is less time than the resolution of 1 tick, this code will error out
  * @return none
  */
 void RTOS_BPS_DelayMs(uint16_t dly){
     BPS_OS_ERR err;
-    OSTimeDlyHMSM(0, 0, 0, dly, OS_OPT_TIME_HMSM_NON_STRICT, &err);
+    OSTimeDlyHMSM(0, 0, 0, (CPU_INT32U)dly, OS_OPT_TIME_HMSM_NON_STRICT, &err);
     assertOSError(err);
 }
 

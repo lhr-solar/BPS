@@ -124,7 +124,7 @@ void Amps_Calibrate(void) {
     Amps_UpdateMeasurements();
 
     // keep calibrating until we read 0 Amps
-    RTOS_BPS_DelayMs(1);
+    RTOS_BPS_DelayTick(1); //TODO: Change this to DelayMs if resolution of ticks is <10ms
     Amps_UpdateMeasurements();
     #ifndef SIMULATION
     while (Amps_GetReading() != 0) {

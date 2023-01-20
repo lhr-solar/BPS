@@ -71,7 +71,6 @@ void RTOS_BPS_MutexPost(BPS_OS_MUTEX* mutex, BPS_OS_OPT options);
  * @param   *prio - task priority
  * @param   *p_stk_base - the stack
  * @param   stk_size - size of the stack
- * @param   *p_err - return error code
  * @return  nothing to see here
  */
 void RTOS_BPS_TaskCreate(
