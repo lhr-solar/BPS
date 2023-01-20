@@ -2,7 +2,6 @@
 #ifndef TASKS_H
 #define TASKS_H
 
-#include "os.h"
 #include "RTOS_BPS.h"
 
 #define TASK_INIT_PRIO                      0

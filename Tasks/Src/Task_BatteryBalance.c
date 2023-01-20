@@ -1,5 +1,4 @@
 /* Copyright (c) 2018-2022 UT Longhorn Racing Solar */
-#include "os.h"
 #include "Tasks.h"
 #include <stdlib.h>
 #include "BatteryBalancing.h"
@@ -18,7 +17,6 @@ void Task_BatteryBalance(void *p_arg) {
         WDog_BitMap |= WD_BALANCING;
 
         RTOS_BPS_MutexPost(&WDog_Mutex, OS_OPT_POST_NONE);
-
         RTOS_BPS_DelayMs(100);
     }
 }

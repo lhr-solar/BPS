@@ -3,7 +3,6 @@
 #include "Voltage.h"
 #include "BatteryBalancing.h"
 #include "config.h"
-#include "os.h"
 #include "Tasks.h"
 
 static void Balancing_ClearDischargeBit(int Cell, uint8_t total_ic, cell_asic *ic);

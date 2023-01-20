@@ -3,7 +3,6 @@
 #include "common.h"
 #include "config.h"
 #include "CANbus.h"
-#include "os.h"
 #include "Tasks.h"
 #include "stm32f4xx.h"
 #include "BSP_Lights.h"

@@ -11,7 +11,6 @@
 #include "config.h"
 #include "LTC6811.h"
 #include "common.h"
-#include "os.h"
 
 typedef struct voltage_safety{
     SafetyStatus wire_checks[TOTAL_VOLT_WIRES];

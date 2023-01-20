@@ -1,5 +1,4 @@
 /* Copyright (c) 2018-2022 UT Longhorn Racing Solar */
-#include "os.h"
 #include "config.h"
 #include "Contactor.h"
 #include "CANbus.h"
@@ -32,7 +31,7 @@ void Task_CriticalState(void *p_arg) {
                 TASK_PETWDOG_PRIO,          // Priority
                 PetWDog_Stk,                // Stack
                 TASK_PETWDOG_STACK_SIZE
-                );                      // return err code
+                );
 
     // Turn Contactor On
     Contactor_On(ALL_CONTACTORS);
@@ -45,7 +44,7 @@ void Task_CriticalState(void *p_arg) {
 				TASK_CHECK_CONTACTOR_PRIO,                  // Priority
 				CheckContactor_Stk,                         // Stack
 				TASK_CHECK_CONTACTOR_STACK_SIZE
-                );                                      // return err code
+                );
 
     // Push All Clear message to CAN Q
     CANMSG.id = ALL_CLEAR;

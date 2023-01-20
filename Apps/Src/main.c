@@ -6,7 +6,6 @@
 
 #include "common.h"
 #include "config.h"
-#include "os.h"
 #include "Tasks.h"
 #include "BSP_WDTimer.h"
 #include "Contactor.h"

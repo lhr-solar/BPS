@@ -1,5 +1,4 @@
 /* Copyright (c) 2018-2022 UT Longhorn Racing Solar */
-#include "os.h"
 #include "Tasks.h"
 #include "Contactor.h"
 #include "BSP_Lights.h"
@@ -170,7 +169,6 @@ void Task_FaultState(void *p_arg) {
     // BLOCKING =====================
     // Wait until a FAULT is signaled by another task.
     RTOS_BPS_SemPend(&Fault_Sem4, OS_OPT_PEND_BLOCKING);
-    
     EnterFaultState();
 }
 

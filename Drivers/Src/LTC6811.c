@@ -71,7 +71,6 @@ Copyright 2017 Linear Technology Corp. (LTC)
 #include "LTC6811.h"
 #include "config.h"
 #include "BSP_SPI.h"
-#include "os.h"
 #include "BSP_OS.h"
 #include "Tasks.h"
 
@@ -108,9 +107,7 @@ void LTC6811_Init(cell_asic *battMod){
   static bool mutexExists = false;
   if (mutexExists == false){
     RTOS_BPS_MutexCreate(&MinionsASIC_Mutex, "Minions ASIC Mutex");
-    RTOS_BPS_SemCreate(&MinionsIO_Sem4,
-                "Minions Sem4",
-                0);
+    RTOS_BPS_SemCreate(&MinionsIO_Sem4, "Minions Sem4", 0);
     mutexExists = true;
   }
 

@@ -1,7 +1,6 @@
 /* Copyright (c) 2018-2022 UT Longhorn Racing Solar */
 #include "CANbus.h"
 #include "BSP_CAN.h"
-#include "os.h"
 #include "RTOS_BPS.h"
 #include "Tasks.h"
 

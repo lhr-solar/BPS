@@ -92,12 +92,9 @@ Usage
         bsp_os_t spi_os;
         OS_SEM MinionsIO_Sem4;
         void LTC6811_Pend(void) {
-            CPU_TS ts;
-            OS_ERR err;
             RTOS_BPS_SemPend(&MinionsIO_Sem4, 0, OS_OPT_PEND_BLOCKING, &ts, &err);
         }
         void LTC6811_Post(void) {
-            OS_ERR err;
             RTOS_BPS_SemPost(&MinionsIO_Sem4, OS_OPT_POST_1, &err);
         }
         void LTC6811_Init(void) {

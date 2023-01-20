@@ -6,6 +6,7 @@
 
 #include "Amps.h"
 #include "LTC2315.h"
+#include "RTOS_BPS.h"
 #include "Tasks.h"
 #include "BSP_SPI.h"
 #include "CANbus.h"
@@ -13,7 +14,6 @@
 #ifdef SIMULATION
 #include "Simulator.h"
 #endif
-#include "RTOS_BPS.h"
 
 static OS_MUTEX AmperesData_Mutex;
 
@@ -30,7 +30,7 @@ void Amperes_Post(){
 }
 #endif
 
-#ifdef BAREMETAL
+#ifdef BAREMETAL //TODO: Remove all baremetal code since we do not have support for it anymore
 void Amperes_Pend(void) {
     return;
 }
@@ -46,28 +46,28 @@ static int32_t latestMeasureMilliAmps;
  * Initializes hardware to begin current monitoring.
  */
 void Amps_Init(void) {
-	RTOS_BPS_SemCreate(&AmperesIO_Sem, "AmperesIO Semaphore", 0);
-	spi_os.pend = Amperes_Pend;
-	spi_os.post = Amperes_Post;
-	LTC2315_Init(spi_os);
-	RTOS_BPS_MutexCreate(&AmperesData_Mutex, "Amperes Mutex");
+    RTOS_BPS_SemCreate(&AmperesIO_Sem, "AmperesIO Semaphore", 0);
+    spi_os.pend = Amperes_Pend;
+    spi_os.post = Amperes_Post;
+    LTC2315_Init(spi_os);
+    RTOS_BPS_MutexCreate(&AmperesData_Mutex, "Amperes Mutex");
 }
 
 /** Amps_UpdateMeasurements
  * Stores and updates the new measurements received
  */
 void Amps_UpdateMeasurements(void) {
-	RTOS_BPS_MutexPend(&AmperesData_Mutex, OS_OPT_PEND_BLOCKING);
-	#ifdef SIMULATION
-		latestMeasureMilliAmps = Simulator_getCurrent();
-		char* msg;
-		asprintf(&msg, "Milliamp measurement is %d\n", latestMeasureMilliAmps);
-    	Simulator_Log(LOG_INFO, msg);
-		free(msg);
-	#else 
-		latestMeasureMilliAmps = LTC2315_GetCurrent();
-	#endif
-	RTOS_BPS_MutexPost(&AmperesData_Mutex, OS_OPT_POST_NONE);
+    RTOS_BPS_MutexPend(&AmperesData_Mutex, OS_OPT_PEND_BLOCKING);
+    #ifdef SIMULATION
+        latestMeasureMilliAmps = Simulator_getCurrent();
+        char* msg;
+        asprintf(&msg, "Milliamp measurement is %d\n", latestMeasureMilliAmps);
+        Simulator_Log(LOG_INFO, msg);
+        free(msg);
+    #else 
+        latestMeasureMilliAmps = LTC2315_GetCurrent();
+    #endif
+    RTOS_BPS_MutexPost(&AmperesData_Mutex, OS_OPT_POST_NONE);
 }
 
 /** Amps_CheckStatus
@@ -76,20 +76,20 @@ void Amps_UpdateMeasurements(void) {
  * @return SAFE or DANGER
  */
 SafetyStatus Amps_CheckStatus(int32_t maxTemperature) {
-	SafetyStatus status;
+    SafetyStatus status;
 
-	// determine if we should allow charging or not
-	bool dischargingOnly = maxTemperature > MAX_CHARGE_TEMPERATURE_LIMIT;
-	int32_t chargingCurrentLimit = dischargingOnly ? 0 : MAX_CHARGING_CURRENT;
+    // determine if we should allow charging or not
+    bool dischargingOnly = maxTemperature > MAX_CHARGE_TEMPERATURE_LIMIT;
+    int32_t chargingCurrentLimit = dischargingOnly ? 0 : MAX_CHARGING_CURRENT;
 
-	RTOS_BPS_MutexPend(&AmperesData_Mutex, OS_OPT_PEND_BLOCKING);
-	if((latestMeasureMilliAmps >= chargingCurrentLimit)&&(latestMeasureMilliAmps < MAX_CURRENT_LIMIT)){
-		status = SAFE;
-	} else{
-		status = DANGER;
-	}
-	RTOS_BPS_MutexPost(&AmperesData_Mutex, OS_OPT_POST_NONE);
-	return status;
+    RTOS_BPS_MutexPend(&AmperesData_Mutex, OS_OPT_PEND_BLOCKING);
+    if((latestMeasureMilliAmps >= chargingCurrentLimit)&&(latestMeasureMilliAmps < MAX_CURRENT_LIMIT)){
+        status = SAFE;
+    } else{
+        status = DANGER;
+    }
+    RTOS_BPS_MutexPost(&AmperesData_Mutex, OS_OPT_POST_NONE);
+    return status;
 }
 
 /** Amps_IsCharging
@@ -114,23 +114,23 @@ int32_t Amps_GetReading(void) {
  * 
  */
 void Amps_Calibrate(void) {
-	// we have observed that when the BPS is initially powered, there is a delay before the LTC2315
-	// can be calibrated properly. This is not observed on pressing the reset button
-	
-	// initial calibration
-	#ifndef SIMULATION
-		LTC2315_Calibrate();
-	#endif
-	Amps_UpdateMeasurements();
+    // we have observed that when the BPS is initially powered, there is a delay before the LTC2315
+    // can be calibrated properly. This is not observed on pressing the reset button
+    
+    // initial calibration
+    #ifndef SIMULATION
+        LTC2315_Calibrate();
+    #endif
+    Amps_UpdateMeasurements();
 
-	// keep calibrating until we read 0 Amps
-	RTOS_BPS_DelayTick(1);
-	Amps_UpdateMeasurements();
-	#ifndef SIMULATION
-	while (Amps_GetReading() != 0) {
-		LTC2315_Calibrate();
-		RTOS_BPS_DelayTick(1);
-		Amps_UpdateMeasurements();
-	}
-	#endif
+    // keep calibrating until we read 0 Amps
+    RTOS_BPS_DelayMs(1);
+    Amps_UpdateMeasurements();
+    #ifndef SIMULATION
+    while (Amps_GetReading() != 0) {
+        LTC2315_Calibrate();
+        RTOS_BPS_DelayTick(1);
+        Amps_UpdateMeasurements();
+    }
+    #endif
 }

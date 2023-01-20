@@ -5,7 +5,6 @@
  * battery pack.
  */
 #include "Temperature.h"
-#include "os.h"
 #include "Tasks.h"
 #include "VoltageToTemp.h"
 #include "BSP_PLL.h"
@@ -77,35 +76,34 @@ static inline int32_t median(int32_t a, int32_t b, int32_t c) {
 void Temperature_Init(cell_asic *boards){
 // simulator bypasses ltc driver
 #ifndef SIMULATION
+    // Record pointer
+    Minions = boards;
+    
+    // Initialize peripherals
+    wakeup_sleep(NUM_MINIONS);
+    LTC6811_Init(Minions);
 
-	// Record pointer
-	Minions = boards;
-	
-	// Initialize peripherals
-	wakeup_sleep(NUM_MINIONS);
-	LTC6811_Init(Minions);
+    //take control of mutex
+      RTOS_BPS_MutexPend(&MinionsASIC_Mutex, OS_OPT_PEND_BLOCKING);
+    // Write Configuration Register
+    LTC6811_wrcfg(NUM_MINIONS, Minions);
 
-	//take control of mutex
-  	RTOS_BPS_MutexPend(&MinionsASIC_Mutex, OS_OPT_PEND_BLOCKING);
-	// Write Configuration Register
-	LTC6811_wrcfg(NUM_MINIONS, Minions);
-
-	// Read Configuration Register
-	wakeup_sleep(NUM_MINIONS);
-	LTC6811_rdcfg_safe(NUM_MINIONS, Minions);
-	//release mutex
-  	RTOS_BPS_MutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE);
+    // Read Configuration Register
+    wakeup_sleep(NUM_MINIONS);
+    LTC6811_rdcfg_safe(NUM_MINIONS, Minions);
+    //release mutex
+      RTOS_BPS_MutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE);
 #endif
-	// set up the median filter with alternating temperatures of 1000 degrees and 0 degrees
-	for (int32_t filterIdx = 0; filterIdx < TEMPERATURE_MEDIAN_FILTER_DEPTH - 1; ++filterIdx) {
-		for (int32_t minion = 0; minion < NUM_MINIONS; ++minion) {
-			for (int32_t sensor = 0; sensor < MAX_TEMP_SENSORS_PER_MINION_BOARD; ++sensor) {
-				rawTemperatures[minion][sensor][filterIdx] = (filterIdx & 0x1) ? 1000000 : 0;
-			}
-		}
-	}
-	// median filter should start pointing to the last set of temperature readings
-	medianFilterIdx = TEMPERATURE_MEDIAN_FILTER_DEPTH - 1;
+    // set up the median filter with alternating temperatures of 1000 degrees and 0 degrees
+    for (int32_t filterIdx = 0; filterIdx < TEMPERATURE_MEDIAN_FILTER_DEPTH - 1; ++filterIdx) {
+        for (int32_t minion = 0; minion < NUM_MINIONS; ++minion) {
+            for (int32_t sensor = 0; sensor < MAX_TEMP_SENSORS_PER_MINION_BOARD; ++sensor) {
+                rawTemperatures[minion][sensor][filterIdx] = (filterIdx & 0x1) ? 1000000 : 0;
+            }
+        }
+    }
+    // median filter should start pointing to the last set of temperature readings
+    medianFilterIdx = TEMPERATURE_MEDIAN_FILTER_DEPTH - 1;
 
 }
 
@@ -121,49 +119,49 @@ ErrorStatus Temperature_ChannelConfig(uint8_t tempChannel) {
 #ifdef SIMULATION
     currentChannel = tempChannel;
 #else
-	uint8_t muxAddress;
-	uint8_t otherMux;
-	
-	if (tempChannel >= MAX_TEMP_SENSORS_PER_MINION_BOARD/2) {
-		muxAddress = MUX2;
-		otherMux = MUX1;
-	}
-	else {
-		muxAddress = MUX1;
-		otherMux = MUX2;
-	}
-	
-	// need to make 0 to 7 since each mux only sees those channels
-	tempChannel %= MAX_TEMP_SENSORS_PER_MINION_BOARD/2;
+    uint8_t muxAddress;
+    uint8_t otherMux;
+    
+    if (tempChannel >= MAX_TEMP_SENSORS_PER_MINION_BOARD/2) {
+        muxAddress = MUX2;
+        otherMux = MUX1;
+    }
+    else {
+        muxAddress = MUX1;
+        otherMux = MUX2;
+    }
+    
+    // need to make 0 to 7 since each mux only sees those channels
+    tempChannel %= MAX_TEMP_SENSORS_PER_MINION_BOARD/2;
 
-	// MESSAGE FORMAT FOR MUX:
-	// 8 bytes needed in total
-	// First 2 bytes: START_CODE + 4 MSB of Mux Address
-	// Second 2 bytes: 4 LSB of Mux Address + END_CODE
-	// Third 2 bytes: START_CODE + 4 MSB of data
-	// Fourth 2 bytes: 4 LSB of data + END_CODE
+    // MESSAGE FORMAT FOR MUX:
+    // 8 bytes needed in total
+    // First 2 bytes: START_CODE + 4 MSB of Mux Address
+    // Second 2 bytes: 4 LSB of Mux Address + END_CODE
+    // Third 2 bytes: START_CODE + 4 MSB of data
+    // Fourth 2 bytes: 4 LSB of data + END_CODE
 
-	//take control of mutex
-  	RTOS_BPS_MutexPend(&MinionsASIC_Mutex, OS_OPT_PEND_BLOCKING);
-	
-	for (int board = 0; board < NUM_MINIONS; board++) {
-		/* Clear other mux */
-		
-		// Send Address
-		Minions[board].com.tx_data[0] = (AUX_I2C_START << 4) + ((otherMux & 0xF0)>>4); 				
-		Minions[board].com.tx_data[1] = ((otherMux & 0x0F) << 4) + AUX_I2C_NACK;
-		
-		// Sends what channel to open. 4th bit is the enable bit, the 4MSB bits will be by default high
-		// Turn all channels off
-		Minions[board].com.tx_data[2] = (AUX_I2C_BLANK << 4) + 0xF;
-		Minions[board].com.tx_data[3] = (0 << 4) + AUX_I2C_NACK_STOP;
+    //take control of mutex
+      RTOS_BPS_MutexPend(&MinionsASIC_Mutex, OS_OPT_PEND_BLOCKING);
+    
+    for (int board = 0; board < NUM_MINIONS; board++) {
+        /* Clear other mux */
+        
+        // Send Address
+        Minions[board].com.tx_data[0] = (AUX_I2C_START << 4) + ((otherMux & 0xF0)>>4); 				
+        Minions[board].com.tx_data[1] = ((otherMux & 0x0F) << 4) + AUX_I2C_NACK;
+        
+        // Sends what channel to open. 4th bit is the enable bit, the 4MSB bits will be by default high
+        // Turn all channels off
+        Minions[board].com.tx_data[2] = (AUX_I2C_BLANK << 4) + 0xF;
+        Minions[board].com.tx_data[3] = (0 << 4) + AUX_I2C_NACK_STOP;
 
-		// Rest is no transmit with all data bits set to high, makes sure there's nothing else we're sending
-		Minions[board].com.tx_data[4] = (AUX_I2C_NO_TRANSMIT << 4) + 0xF;
-		Minions[board].com.tx_data[5] = (0xF << 4) + AUX_I2C_NACK_STOP;
-	}
+        // Rest is no transmit with all data bits set to high, makes sure there's nothing else we're sending
+        Minions[board].com.tx_data[4] = (AUX_I2C_NO_TRANSMIT << 4) + 0xF;
+        Minions[board].com.tx_data[5] = (0xF << 4) + AUX_I2C_NACK_STOP;
+    }
 
-	// Send data
+    // Send data
     wakeup_sleep(NUM_MINIONS);
     LTC6811_wrcomm(NUM_MINIONS, Minions);
     delay_u(200);
@@ -188,10 +186,10 @@ ErrorStatus Temperature_ChannelConfig(uint8_t tempChannel) {
 
     // Send data
     LTC6811_wrcomm(NUM_MINIONS, Minions);
-	delay_u(200); //TODO: Should replace these with OS Time Delay Function
-	LTC6811_stcomm();
-	//release mutex
-  	RTOS_BPS_MutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE);
+    delay_u(200); //TODO: Should replace these with OS Time Delay Function
+    LTC6811_stcomm();
+    //release mutex
+      RTOS_BPS_MutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE);
 
 #endif
 
@@ -395,16 +393,16 @@ int32_t Temperature_GetTotalPackAvgTemperature(void){
  */
 ErrorStatus Temperature_SampleADC(uint8_t ADCMode) {
 #ifndef SIMULATION
-	//take control of mutex
-  	RTOS_BPS_MutexPend(&MinionsASIC_Mutex, OS_OPT_PEND_BLOCKING);
-	
-	LTC6811_adax(ADCMode, AUX_CH_GPIO1);							// Start ADC conversion on GPIO1
-	LTC6811_pollAdc();
-	
-	int8_t error = LTC6811_rdaux(AUX_CH_GPIO1, NUM_MINIONS, Minions);   // Update Minions with fresh values
-	//release mutex
-  	RTOS_BPS_MutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE);
-	return error != -1 ? SUCCESS : ERROR;
+    //take control of mutex
+      RTOS_BPS_MutexPend(&MinionsASIC_Mutex, OS_OPT_PEND_BLOCKING);
+    
+    LTC6811_adax(ADCMode, AUX_CH_GPIO1);							// Start ADC conversion on GPIO1
+    LTC6811_pollAdc();
+    
+    int8_t error = LTC6811_rdaux(AUX_CH_GPIO1, NUM_MINIONS, Minions);   // Update Minions with fresh values
+    //release mutex
+      RTOS_BPS_MutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE);
+    return error != -1 ? SUCCESS : ERROR;
 #else
     return SUCCESS;
 #endif

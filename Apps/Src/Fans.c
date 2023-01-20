@@ -18,7 +18,6 @@ void Fans_Init(void){
         Simulator_Log(LOG_INFO, "Fans Initialized\n");
     #endif
     BSP_PWM_Init();
-    Fans_SetAll(4); //start with all fans half speed
 }
 
 /**

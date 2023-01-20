@@ -3,6 +3,7 @@
 */
 
 #include "RTOS_BPS.h"
+#include "Tasks.h" // for OS errors
 
 /**
  * @brief   Creates a task that will be handled by the OS

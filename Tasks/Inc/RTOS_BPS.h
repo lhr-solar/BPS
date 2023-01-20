@@ -1,16 +1,11 @@
 /* Copyright (c) 2018-2022 UT Longhorn Racing Solar */
 /*RTOS_BPS library includes all the wrapper functions for a functioning RTOS - needed for cleaner code and portability
 */
-
-//need to add the proper #include files
-
-#include "os.h" // for RTOS stuff
-#include "Tasks.h" // for OS errors
-#include <stdint.h> 
-
 #ifndef RTOS_BPS_H
 #define RTOS_BPS_H
 
+#include "os.h" // for RTOS stuff
+#include <stdint.h> 
 
 // Currently using Micrium
 typedef OS_MUTEX    BPS_OS_MUTEX;
@@ -80,7 +75,7 @@ void RTOS_BPS_MutexPost(BPS_OS_MUTEX* mutex, BPS_OS_OPT options);
  * @return  nothing to see here
  */
 void RTOS_BPS_TaskCreate(
-    BPS_OS_TCB      *p_tcb,
+    BPS_OS_TCB   *p_tcb,
     char         *p_name,
     void         *p_task,
     void         *p_arg,

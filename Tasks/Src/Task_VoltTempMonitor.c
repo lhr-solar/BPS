@@ -1,7 +1,6 @@
 /* Copyright (c) 2018-2022 UT Longhorn Racing Solar */
 #include <string.h>
 #include "Tasks.h"
-#include "os.h"
 #include "Voltage.h"
 #include "Temperature.h"
 #include "Fans.h"

@@ -5,6 +5,7 @@
 
 #include "BSP_PWM.h"
 #include "Simulator.h"
+#include "common.h"
 
 //Parameters for PWM
 #define PWM_ON_TIME 2000 //This number is determined through testing
@@ -21,9 +22,6 @@
 
 typedef uint8_t CONT_CHOICE;
 typedef enum {ARRAY_CONTACTOR = 1, HVHIGH_CONTACTOR = 2, HVLOW_CONTACTOR = 4, ALL_CONTACTORS = 7} Contactors_t;
-#include "common.h"
-
-
 
 /**
  * @brief   A Contactor is a high power switch similar to what a relay is. The Contactor

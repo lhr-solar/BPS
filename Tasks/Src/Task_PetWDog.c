@@ -1,6 +1,5 @@
 /* Copyright (c) 2018-2022 UT Longhorn Racing Solar */
 #include "Tasks.h"
-#include "os.h"
 #include "BSP_WDTimer.h"
 #include "BSP_Lights.h"
 
@@ -25,7 +24,6 @@ void Task_PetWDog(void *p_arg) {
         }
         //release WDog Mutex
         RTOS_BPS_MutexPost(&WDog_Mutex, OS_OPT_POST_NONE);
-        
         RTOS_BPS_DelayTick(10);
     }
 }
