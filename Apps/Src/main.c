@@ -8,7 +8,6 @@
 #include "config.h"
 #include "Tasks.h"
 #include "BSP_WDTimer.h"
-#include "os.h"
 #include "Contactor.h"
 #include "BSP_PLL.h"
 #include "BSP_UART.h"

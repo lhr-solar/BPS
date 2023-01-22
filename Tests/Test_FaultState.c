@@ -60,13 +60,8 @@ int main(void) {
     OS_ERR err;
     BSP_PLL_Init();
     BSP_Lights_Init();
-<<<<<<< HEAD
-    BSP_Contactor_Init();
-    BSP_Contactor_On(ALL_CONTACTORS);
-=======
     Contactor_Init();
     Contactor_On(ALL_CONTACTORS);
->>>>>>> RTOS_Porting
 
     __disable_irq();
 

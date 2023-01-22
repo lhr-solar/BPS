@@ -51,6 +51,8 @@ void LTC6811_Deadlocks(void *p_arg){
         Voltage_UpdateMeasurements();
         printf("running Voltage_CheckStatus...\n");
         Voltage_CheckStatus();
+        printf("running Voltage_GetModulesInDanger...\n");
+        Voltage_GetModulesInDanger();
         printf("running Voltage_OpenWireSummary...\n");
         Voltage_OpenWireSummary();
         printf("running Volatge_OpenWire...\n");

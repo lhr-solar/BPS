@@ -10,26 +10,13 @@
 int main() {
     Contactor_Init();   // Initialize the contactor
 
-<<<<<<< HEAD
-    BSP_Contactor_On(ALL_CONTACTORS);     // Enable the contactor
-=======
     Contactor_On(ALL_CONTACTORS);     // Enable the contactor
->>>>>>> RTOS_Porting
 
     while(1) {
         // Delay for some time before doing anything else
         for(volatile int i = 0; i < 1000000; i++);
     
         // Read the contactor state
-<<<<<<< HEAD
-        bool contactorEnabled = BSP_Contactor_GetState(ARRAY_CONTACTOR);
-        
-        // Toggle the contactor state
-        if(contactorEnabled) {
-            BSP_Contactor_Off(ALL_CONTACTORS);
-        } else {
-            BSP_Contactor_On(ALL_CONTACTORS);
-=======
         bool contactorEnabled = Contactor_GetState(ARRAY_CONTACTOR);
         
         // Toggle the contactor state
@@ -37,7 +24,6 @@ int main() {
             Contactor_Off(ALL_CONTACTORS);
         } else {
             Contactor_On(ALL_CONTACTORS);
->>>>>>> RTOS_Porting
         }
     }
 }

@@ -110,8 +110,8 @@ void Task1(void *p_arg){
 //Task to prevent watchdog from tripping
 void Task2(void *p_arg){
 
-    RTOS_BPS_SemPend(&SafetyCheck_Sem4, OS_OPT_POST_1);
-    RTOS_BPS_SemPend(&SafetyCheck_Sem4, OS_OPT_POST_1);
+    RTOS_BPS_SemPend(&SafetyCheck_Sem4, OS_OPT_POST_1); //Set semaphore once since Amperes Task doesn't run
+    RTOS_BPS_SemPend(&SafetyCheck_Sem4, OS_OPT_POST_1); //Set semaphore once since Battery Balancing Task doesn't run
 
     while(1){
         RTOS_BPS_MutexPend(&WDog_Mutex, OS_OPT_PEND_BLOCKING);
@@ -127,22 +127,11 @@ void Task2(void *p_arg){
 // Similar to the production code main. Does not mess with contactor 
 #ifndef SIMULATION
 int main(void) {
-<<<<<<< HEAD
-#else
-int main(int argc, char **argv) {
-    Simulator_Init(argv[1]);
-#endif
-
-    //Resetting the contactor
-    BSP_Contactor_Init();
-    BSP_Contactor_Off(ALL_CONTACTORS);
-=======
     OS_ERR err;
     
     //Resetting the contactor
     Contactor_Init();
     Contactor_Off(ALL_CONTACTORS);
->>>>>>> RTOS_Porting
 
     if (BSP_WDTimer_DidSystemReset()) {
         Fault_BitMap = Fault_WDOG;

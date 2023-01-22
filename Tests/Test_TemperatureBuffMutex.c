@@ -76,7 +76,7 @@ void Task_Dummy(void *p_args) {
     while(1) {
         printf("3\r\n");
         RTOS_BPS_SemPost(&tmr_Sem4, OS_OPT_PEND_BLOCKING);
-        for(int i = 0; i < 1000000; i++);
+        for(volatile int i = 0; i < 1000000; i++);
     }
 }
 

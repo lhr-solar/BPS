@@ -228,13 +228,14 @@ Purpose
 
 Usage
     The peripheral should be initialized by calling ``Contactor_Init()`` before any of the other functions are called. See 
-    ``BPS/BSP/Contactor.h`` for details on individual functions. The AUX pin we have connected to the contactor is negative 
+    ``Contactor.h`` for details on individual functions. The AUX pin we have connected to the contactor is negative 
     logic so ``Contactor_GetState()`` reads negative logic for the state of the contactors.
 
 Additional Considerations
     The contactor is one of the most important safety features in the vehicle, so the contactor should only be turned on (closed) 
-    if the BPS is sure that the battery pack is in a safe state. All 3 of the contactors set pins are in parallel so calling 
-    ``Contactor_Off()`` or ``Contactor_Off()`` will turn all of them on or off.
+    if the BPS is sure that the battery pack is in a safe state. There are 2 pins controlling the contactors. While the layout of which
+    contactors are controlled by what will change, calling ``Contactor_On()`` or ``Contactor_Off()`` with the ``#define`` listed in
+    "enum Contactors_t" will control that specific contactor.
 
 Fans
 ====
