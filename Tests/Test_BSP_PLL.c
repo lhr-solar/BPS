@@ -19,9 +19,7 @@ int main(void){
     BSP_PLL_Init();
     while(1){
         test = BSP_PLL_GetSystemClock();
-        printf("\r%d", test);
+        printf("\r%ld", test);
     }
-    
-    
-    exit(0);
+    return 0;
 }

@@ -96,6 +96,6 @@ bool Contactor_GetState(Contactors_t contactorChoice) {
 					BSP_PWM_Get(ARRAY_CONTACTOR_OUT);
 			break;
 		}
-
+        
     return retval;
 }

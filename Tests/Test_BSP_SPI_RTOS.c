@@ -9,6 +9,7 @@
 #include "BSP_PLL.h"
 #include "BSP_Lights.h"
 #include "stm32f4xx.h"
+#include "RTOS_BPS.h"
 
 OS_TCB Task1_TCB, Task2_TCB;
 CPU_STK Task1_Stk[256];
@@ -17,21 +18,12 @@ OS_SEM semaphore;
 bool initFlag = false;
 
 void pend(void) {
-    OS_ERR err;
-    CPU_TS ts;
-    OSSemPend(&semaphore,
-                0,
-                OS_OPT_PEND_BLOCKING,
-                &ts,
-                &err);
+    RTOS_BPS_SemPend(&semaphore, OS_OPT_PEND_BLOCKING);
 }
 
 void post(void) {
-    OS_ERR err;
     //BSP_Light_On(FAULT);
-    OSSemPost(&semaphore,
-            OS_OPT_PEND_BLOCKING,
-            &err);
+    RTOS_BPS_SemPost(&semaphore, OS_OPT_PEND_BLOCKING);
     //BSP_Light_Toggle(OVOLT);
     //for (volatile int i = 0; i < 1000000; i++);
 }
@@ -43,15 +35,11 @@ void Task1(void *p_arg){
     OS_CPU_SysTickInit(SystemCoreClock / (CPU_INT32U) OSCfg_TickRate_Hz);
 
     bsp_os_t spi_os;
-    OS_ERR err;
-    OSSemCreate(&semaphore,
-                "SPI Semaphore",
-                0,
-                &err);
+    RTOS_BPS_SemCreate(&semaphore, "SPI Semaphore", 0);
     spi_os.pend = pend;
     spi_os.post = post;
 
-    BSP_SPI_Init(spi_ltc6811, &spi_os);
+    BSP_SPI_Init(spi_ltc6811, &spi_os, 0);
 
     uint8_t data[32/*4+NUM_MINIONS*8*/] = {0xAB, 0xCD, 0xEF, 0x6E, 0x00, 0x00};  
 
@@ -74,7 +62,7 @@ void Task2(void *p_arg){
     while(1){
         BSP_Light_Toggle(UVOLT);
         // for (volatile int i = 0; i < 1000000; i++);
-        OSTimeDly(15, OS_OPT_TIME_DLY, &err);
+        RTOS_BPS_DelayTick(15);
     }
 }
 
@@ -88,34 +76,22 @@ int main(void) {
     OSInit(&err);
     while(err != OS_ERR_NONE);
 
-    OSTaskCreate(&Task1_TCB,
+    RTOS_BPS_TaskCreate(&Task1_TCB,
                 "Task 1",
                 Task1,
                 (void *)0,
                 1,
                 Task1_Stk,
-                16,
-                256,
-                0,
-                0,
-                (void *)0,
-                OS_OPT_TASK_SAVE_FP | OS_OPT_TASK_STK_CHK,
-                &err);
+                256);
     while(err != OS_ERR_NONE);
 
-    OSTaskCreate(&Task2_TCB,
+    RTOS_BPS_TaskCreate(&Task2_TCB,
                 "Task 2",
                 Task2,
                 (void *)0,
                 2,
                 Task2_Stk,
-                16,
-                256,
-                0,
-                0,
-                (void *)0,
-                OS_OPT_TASK_SAVE_FP | OS_OPT_TASK_STK_CHK,
-                &err);
+                256);
     while(err != OS_ERR_NONE);
 
     __enable_irq();

@@ -5,6 +5,7 @@
 
 #include "BSP_PWM.h"
 #include "Simulator.h"
+#include "common.h"
 
 //Parameters for PWM
 #define PWM_ON_TIME 2000 //This number is determined through testing

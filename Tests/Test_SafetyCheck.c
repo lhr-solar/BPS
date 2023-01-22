@@ -1,7 +1,7 @@
 /* Copyright (c) 2018-2022 UT Longhorn Racing Solar */
 #include "common.h"
 #include "config.h"
-#include "os.h"
+#include "RTOS_BPS.h"
 #include "Tasks.h"
 #include "BSP_UART.h"
 
@@ -9,35 +9,24 @@ OS_TCB Init_TCB;
 CPU_STK Init_Stk[DEFAULT_STACK_SIZE];
 
 static void Voltage_UpdateMeasurements(void) {
-    printf("V0\r\n");
-
-    OS_ERR err;
-    OSTimeDly(1,
-            OS_OPT_TIME_DLY,
-            &err);
-
+    printf("V0\r\n");\
+    RTOS_BPS_DelayTick(1);
     printf("V1\r\n");
 }
 
 static SafetyStatus Voltage_CheckStatus(void) {
     static int cnt = 0;
-
     if(cnt == 15) {
         return DANGER;
     }
-
     cnt++;
-
     return SAFE;
 }
 
 static SafetyStatus Voltage_OpenWire(void) {
     printf("O0\r\n");
-    
-    OS_ERR err;
-    OSTimeDly(1,
-            OS_OPT_TIME_DLY,
-            &err);
+
+    RTOS_BPS_DelayTick(1);
 
     printf("O1\r\n");
 
@@ -54,10 +43,7 @@ static SafetyStatus Voltage_OpenWire(void) {
 static void Temperature_UpdateAllMeasurements(void) {
     printf("T0\r\n");
 
-    OS_ERR err;
-    OSTimeDly(1,
-            OS_OPT_TIME_DLY,
-            &err);
+    RTOS_BPS_DelayTick(1);
 
     printf("T1\r\n");
 }
@@ -77,11 +63,8 @@ static SafetyStatus Temperature_CheckStatus(int8_t isCharging) {
 
 static void Current_UpdateMeasurements(void) {
     printf("A0\r\n");
-    
-    OS_ERR err;
-    OSTimeDly(1,
-            OS_OPT_TIME_DLY,
-            &err);
+
+    RTOS_BPS_DelayTick(1);
 
     printf("A1\r\n");
 }
@@ -106,18 +89,12 @@ static int8_t Current_IsCharging(void) {
 void FaultState(void *p_arg) {
     (void)p_arg;
 
-    OS_ERR err;
-    CPU_TS ts;
 
     printf("Fault State\r\n");
 
     // BLOCKING =====================
     // Wait until a FAULT is signaled by another task.
-    OSSemPend(&Fault_Sem4,
-                0,
-                OS_OPT_PEND_BLOCKING,
-                &ts,
-                &err);
+    RTOS_BPS_SemPend(&Fault_Sem4, OS_OPT_PEND_BLOCKING);
 
     // Turn Contactor Off
 
@@ -141,20 +118,14 @@ void FaultState(void *p_arg) {
 void CriticalState(void *p_arg) {
     (void)p_arg;
 
-    OS_ERR err;
-    CPU_TS ts;
 
     printf("Critical State\r\n");
 
     // BLOCKING =====================
     // Wait until voltage, open wire, temperature, and current(Amperes) are all checked and safe
     for(int32_t check = 0; check < NUM_FAULT_POINTS; check++) {
-        OSSemPend(&SafetyCheck_Sem4,
-                    0,
-                    OS_OPT_PEND_BLOCKING,
-                    &ts,
-                    &err);
-        printf("CS:%d\r\n", check);
+        RTOS_BPS_SemPend(&SafetyCheck_Sem4, OS_OPT_PEND_BLOCKING);
+        printf("CS:%ld\r\n", check);
     }
 
     // Turn Contactor On
@@ -166,8 +137,6 @@ void CriticalState(void *p_arg) {
 
 void VoltTempMonitor(void *p_arg) {
     (void)p_arg;
-
-    OS_ERR err;
 
     printf("Volt Temp Monitor\r\n");
 
@@ -185,17 +154,10 @@ void VoltTempMonitor(void *p_arg) {
         // Check if voltage is NOT safe:
         SafetyStatus voltage_status = Voltage_CheckStatus();
         if(voltage_status != SAFE) {
-            OSSemPost(&Fault_Sem4,
-                        OS_OPT_POST_1,
-                        &err);
-            // assert
-        
+            RTOS_BPS_SemPost(&Fault_Sem4, OS_OPT_POST_1);        
         } else if((voltage_status == SAFE) && (!isfirst_voltage_check)) {
             // Signal to turn on contactor but only signal once
-            OSSemPost(&SafetyCheck_Sem4,
-                        OS_OPT_POST_1,
-                        &err);
-            // assert
+            RTOS_BPS_SemPost(&SafetyCheck_Sem4, OS_OPT_POST_1);
             isfirst_voltage_check = true;
         }
 
@@ -205,14 +167,10 @@ void VoltTempMonitor(void *p_arg) {
         SafetyStatus wire_status = Voltage_OpenWire();
 
         if(wire_status != SAFE) {
-            OSSemPost(&Fault_Sem4,
-                        OS_OPT_POST_1,
-                        &err);
+            RTOS_BPS_SemPost(&Fault_Sem4, OS_OPT_POST_1);
         } else if((wire_status == SAFE) && (!isfirst_openwire_Check)) {
             // Signal to turn on contactor but only signal once
-            OSSemPost(&SafetyCheck_Sem4,
-                        OS_OPT_POST_1,
-                        &err);
+            RTOS_BPS_SemPost(&SafetyCheck_Sem4, OS_OPT_POST_1);
             // assert
             isfirst_openwire_Check = true;
         }
@@ -224,14 +182,10 @@ void VoltTempMonitor(void *p_arg) {
         // Check if temperature is NOT safe:
         SafetyStatus temperature_status = Temperature_CheckStatus(Current_IsCharging());
         if(temperature_status != SAFE) {
-            OSSemPost(&Fault_Sem4,
-                        OS_OPT_POST_1,
-                        &err);
+            RTOS_BPS_SemPost(&Fault_Sem4, OS_OPT_POST_1);
         } else if((temperature_status == SAFE) && (!isfirst_temperature_check)) {
             // Signal to turn on contactor but only signal once
-            OSSemPost(&SafetyCheck_Sem4,
-                        OS_OPT_POST_1,
-                        &err);
+            RTOS_BPS_SemPost(&SafetyCheck_Sem4, OS_OPT_POST_1);
             // assert
             isfirst_temperature_check = true;
         }
@@ -242,8 +196,6 @@ void VoltTempMonitor(void *p_arg) {
 
 void AmperesMonitor(void *p_arg) {
     (void)p_arg;
-
-    OS_ERR err;
 
     printf("Amperes Monitor\r\n");
 
@@ -257,18 +209,18 @@ void AmperesMonitor(void *p_arg) {
         // Check if amperes is NOT safe:
 		SafetyStatus amperes_status = Current_CheckStatus(true);
 		if(amperes_status != SAFE) {
-            OSSemPost(&Fault_Sem4,
-                        OS_OPT_POST_1,
-                        &err);
+            RTOS_BPS_SemPost(&Fault_Sem4, OS_OPT_POST_1);
         } else if((amperes_status == SAFE) && (!isfirst_amperes_check)) {
             // Signal to turn on contactor but only signal once
-            OSSemPost(&SafetyCheck_Sem4,
-                        OS_OPT_POST_1,
-                        &err);
+            RTOS_BPS_SemPost(&SafetyCheck_Sem4, OS_OPT_POST_1);
             // assert
             isfirst_amperes_check = true;
         }
     }
+}
+
+void foo(){
+    return;
 }
 
 int main() {
@@ -286,87 +238,47 @@ int main() {
 
     // assert
 
-    BSP_UART_Init();
+    BSP_UART_Init(foo, foo, UART_USB);
 
-    OSTaskCreate(&Init_TCB,				// TCB
+    RTOS_BPS_TaskCreate(&Init_TCB,				// TCB
 				"Initialize System",	// Task Name (String)
 				Task_Init,				// Task function pointer
 				(void *)0,				// Task function args
 				TASK_INIT_PRIO,			// Priority
-				Init_Stk,				// Stack
-				WATERMARK_STACK_LIMIT,	// Watermark limit for debugging
-				DEFAULT_STACK_SIZE,		// Stack size
-				0,						// Queue size (not needed)
-				10,						// Time quanta (time slice) 10 ticks
-				(void *)0,				// Extension pointer (not needed)
-				OS_OPT_TASK_STK_CHK | OS_OPT_TASK_SAVE_FP,	// Options
-				&err);					// return err code
+				Init_Stk,	// Watermark limit for debugging
+				DEFAULT_STACK_SIZE);
 
-	// ASSERT err
-
-    OSTaskCreate(&FaultState_TCB,				// TCB
+    RTOS_BPS_TaskCreate(&FaultState_TCB,				// TCB
 				"Fault State",	// Task Name (String)
 				FaultState,				// Task function pointer
 				(void *)0,				// Task function args
 				TASK_FAULT_STATE_PRIO,			// Priority
-				AmperesMonitor_Stk,				// Stack
-				WATERMARK_STACK_LIMIT,	// Watermark limit for debugging
-				TASK_FAULT_STATE_STACK_SIZE,		// Stack size
-				0,						// Queue size (not needed)
-				10,						// Time quanta (time slice) 10 ticks
-				(void *)0,				// Extension pointer (not needed)
-				OS_OPT_TASK_STK_CHK | OS_OPT_TASK_SAVE_FP,	// Options
-				&err);					// return err code
+				AmperesMonitor_Stk,	// Watermark limit for debugging
+				TASK_FAULT_STATE_STACK_SIZE); 
 
-	// ASSERT err
-
-    OSTaskCreate(&CriticalState_TCB,				// TCB
+    RTOS_BPS_TaskCreate(&CriticalState_TCB,				// TCB
 				"Critical State",	// Task Name (String)
 				CriticalState,				// Task function pointer
 				(void *)0,				// Task function args
 				TASK_CRITICAL_STATE_PRIO,			// Priority
-				CriticalState_Stk,				// Stack
-				WATERMARK_STACK_LIMIT,	// Watermark limit for debugging
-				TASK_CRITICAL_STATE_STACK_SIZE,		// Stack size
-				0,						// Queue size (not needed)
-				10,						// Time quanta (time slice) 10 ticks
-				(void *)0,				// Extension pointer (not needed)
-				OS_OPT_TASK_STK_CHK | OS_OPT_TASK_SAVE_FP,	// Options
-				&err);					// return err code
+				CriticalState_Stk,	// Watermark limit for debugging
+				TASK_CRITICAL_STATE_STACK_SIZE); 
 
-	// ASSERT err
-
-    OSTaskCreate(&VoltTempMonitor_TCB,				// TCB
+    RTOS_BPS_TaskCreate(&VoltTempMonitor_TCB,				// TCB
 				"Voltage/Temperature Monitor",	// Task Name (String)
 				VoltTempMonitor,				// Task function pointer
 				(void *)0,				// Task function args
 				TASK_VOLT_TEMP_MONITOR_PRIO,			// Priority
-				VoltTempMonitor_Stk,				// Stack
-				WATERMARK_STACK_LIMIT,	// Watermark limit for debugging
-				TASK_VOLT_TEMP_MONITOR_STACK_SIZE,		// Stack size
-				0,						// Queue size (not needed)
-				10,						// Time quanta (time slice) 10 ticks
-				(void *)0,				// Extension pointer (not needed)
-				OS_OPT_TASK_STK_CHK | OS_OPT_TASK_SAVE_FP,	// Options
-				&err);					// return err code
+				VoltTempMonitor_Stk,	// Watermark limit for debugging
+				TASK_VOLT_TEMP_MONITOR_STACK_SIZE);	 
 
-	// ASSERT err
-
-    OSTaskCreate(&AmperesMonitor_TCB,				// TCB
+    RTOS_BPS_TaskCreate(&AmperesMonitor_TCB,				// TCB
 				"Amperes Monitor",	// Task Name (String)
 				AmperesMonitor,				// Task function pointer
 				(void *)0,				// Task function args
 				TASK_AMPERES_MONITOR_PRIO,			// Priority
-				AmperesMonitor_Stk,				// Stack
-				WATERMARK_STACK_LIMIT,	// Watermark limit for debugging
-				TASK_AMPERES_MONITOR_STACK_SIZE,		// Stack size
-				0,						// Queue size (not needed)
-				10,						// Time quanta (time slice) 10 ticks
-				(void *)0,				// Extension pointer (not needed)
-				OS_OPT_TASK_STK_CHK | OS_OPT_TASK_SAVE_FP,	// Options
-				&err);					// return err code
-
-	// ASSERT err
+				AmperesMonitor_Stk,	// Watermark limit for debugging
+				TASK_AMPERES_MONITOR_STACK_SIZE); 
 
     OSStart(&err);
 

@@ -4,7 +4,6 @@
 #define BSP_I2C_H
 
 #include "common.h"
-#include "os.h"
 
 #define EEPROM_BYTES 0x4000
 

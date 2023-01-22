@@ -18,51 +18,37 @@ void Task1(void *p_arg){
     BSP_UART_Init(NULL, NULL, UART_USB);
     Charge_Init();
     Charge_SetAccum(50000);
-    OS_ERR err;
     OS_CPU_SysTickInit(SystemCoreClock / (CPU_INT32U) OSCfg_TickRate_Hz);
    
     while(1) {
         printf("Charge after 5Amps for 100 milliseconds : %ld\n\r", charge_reading);
         Charge_Calculate(5000);
         charge_reading = Charge_GetPercent();
-        OSTimeDly(10, OS_OPT_TIME_DLY, &err);
-        assertOSError(err);
+        RTOS_BPS_DelayTick(10);
     }
 
     exit(0);
 }
 
 int main(void){
-    
-    
-
     OS_ERR err;
     BSP_PLL_Init();
 
     __disable_irq();
 
     OSInit(&err);
-    while(err != OS_ERR_NONE);
+    assertOSError(err);
 
-    OSTaskCreate(&Task1_TCB,
+    RTOS_BPS_TaskCreate(&Task1_TCB,
                 "Task 1",
                 Task1,
                 (void *)0,
                 1,
                 Task1_Stk,
-                16,
-                256,
-                0,
-                0,
-                (void *)0,
-                OS_OPT_TASK_SAVE_FP | OS_OPT_TASK_STK_CHK,
-                &err);
-    while(err != OS_ERR_NONE);
+                256);
 
     __enable_irq();
 
     OSStart(&err);
-
-
-    
+    assertOSError(err);
 }
