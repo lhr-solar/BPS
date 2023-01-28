@@ -17,7 +17,7 @@ void Task_CheckContactor(void *p_arg) {
         RTOS_BPS_DelayMs(250);
 
         // fault if the contactor is open
-        if (Contactor_GetState(HVHIGH_CONTACTOR) != true) {
+        if (Contactor_GetState(HV_CONTACTOR_OUT != true)) {
             Fault_BitMap |= Fault_ESTOP;
             RTOS_BPS_SemPost(&Fault_Sem4, OS_OPT_POST_1);
         }

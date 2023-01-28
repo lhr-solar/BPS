@@ -36,7 +36,8 @@ void EnterFaultState() {
 
     // Turn Contactor Off
     Contactor_Init();
-    Contactor_Off(ALL_CONTACTORS);
+    Contactor_Off(HV_CONTACTOR_OUT);
+    Contactor_Off(ARRAY_CONTACTOR_OUT);
     //Set Fans to full speed
     Fans_Init();
     Fans_SetAll(TOPSPEED);

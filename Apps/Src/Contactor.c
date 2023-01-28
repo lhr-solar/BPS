@@ -21,26 +21,9 @@ void Contactor_Init(void) {
  * @param   Contactor to turn on
  * @return  None
  */
-void Contactor_On(Contactors_t contactorChoice) {
+void Contactor_On(uint8_t contactorChoice) {
     // set output pins to start outputing with a duty cycle set by PWM_ON_TIME in the header file
-    switch (contactorChoice)
-    {
-    case ARRAY_CONTACTOR:
-        BSP_PWM_Set(ARRAY_CONTACTOR_OUT, PWM_ON_TIME);
-        break;
-    case HVHIGH_CONTACTOR:
-        BSP_PWM_Set(HVHIGH_CONTACTOR_OUT, PWM_ON_TIME);
-        break;
-    case HVLOW_CONTACTOR:
-        BSP_PWM_Set(HVLOW_CONTACTOR_OUT, PWM_ON_TIME);
-        break;
-    case ALL_CONTACTORS: //c1 and cfan are the only two possible contactors, so we operate on both
-        BSP_PWM_Set(CFAN, PWM_ON_TIME);
-        BSP_PWM_Set(C1, PWM_ON_TIME);
-        break;
-    default:
-        break;
-    }
+    BSP_PWM_Set(contactorChoice, PWM_ON_TIME);
 }
 
 /**
@@ -48,26 +31,9 @@ void Contactor_On(Contactors_t contactorChoice) {
  * @param   Contactor to turn off
  * @return  None
  */
-void Contactor_Off(Contactors_t contactorChoice) {
+void Contactor_Off(uint8_t contactorChoice) {
     // set output pin to a duty cycle of 0
-    switch (contactorChoice)
-        {
-        case ARRAY_CONTACTOR:
-            BSP_PWM_Set(ARRAY_CONTACTOR_OUT, 0);
-            break;
-        case HVHIGH_CONTACTOR:
-            BSP_PWM_Set(HVHIGH_CONTACTOR_OUT, 0);
-            break;
-        case HVLOW_CONTACTOR:
-            BSP_PWM_Set(HVLOW_CONTACTOR_OUT, 0);
-            break;
-        case ALL_CONTACTORS:
-            BSP_PWM_Set(CFAN, 0);
-            BSP_PWM_Set(C1, 0);
-            break;
-        default:
-            break;
-        }
+    BSP_PWM_Set(contactorChoice, 0);
 }
 
 /**
@@ -76,26 +42,6 @@ void Contactor_Off(Contactors_t contactorChoice) {
  * @param   Contactor to get state of
  * @return  0 if contactor is off/open, 1 if on/closed
  */
-bool Contactor_GetState(Contactors_t contactorChoice) {
-    bool retval;
-
-	switch (contactorChoice) {
-		case ARRAY_CONTACTOR:
-			retval = BSP_PWM_Get(ARRAY_CONTACTOR_OUT);
-			break;
-		case HVHIGH_CONTACTOR:
-			retval = BSP_PWM_Get(HVHIGH_CONTACTOR_OUT);
-			break;
-		case HVLOW_CONTACTOR:
-			retval = BSP_PWM_Get(HVLOW_CONTACTOR_OUT);
-			break;
-		case ALL_CONTACTORS:
-		default:
-			retval = BSP_PWM_Get(HVLOW_CONTACTOR_OUT) || 
-					BSP_PWM_Get(HVHIGH_CONTACTOR_OUT) ||
-					BSP_PWM_Get(ARRAY_CONTACTOR_OUT);
-			break;
-		}
-        
-    return retval;
+bool Contactor_GetState(uint8_t contactorChoice) {
+    return BSP_PWM_Get(contactorChoice);
 }
