@@ -1,11 +1,11 @@
-/* Copyright (c) 2022 UT Longhorn Racing Solar */
+/* Copyright (c) 2018-2022 UT Longhorn Racing Solar */
 /** CAN_Queue.c
  * Queue that holds all CAN messages that Task_CANBusConsumer needs to send.
  */
 
 #include "CAN_Queue.h"
-#include "os.h"
 #include "CANbus.h"
+#include "RTOS_BPS.h"
 #include "Tasks.h"
 
 // fifo
@@ -19,50 +19,30 @@ static OS_SEM canFifo_Sem4;
 static OS_MUTEX canFifo_Mutex;
 
 void CAN_Queue_Init(void) {
-    OS_ERR err;
-    CPU_TS ticks;
-    OSMutexCreate(&canFifo_Mutex, "CAN queue mutex", &err);
-    assertOSError(err);
-    OSSemCreate(&canFifo_Sem4,
-                "CAN queue semaphore",
-                0,
-                &err);
-    assertOSError(err);
-    OSMutexPend(&canFifo_Mutex, 0, OS_OPT_POST_NONE, &ticks, &err);
-    assertOSError(err);
+    RTOS_BPS_MutexCreate(&canFifo_Mutex, "CAN queue mutex");
+    RTOS_BPS_SemCreate(&canFifo_Sem4, "CAN queue semaphore", 0);
+    RTOS_BPS_MutexPend(&canFifo_Mutex, OS_OPT_PEND_BLOCKING);
     CAN_fifo_renew(&canFifo);
-    OSMutexPost(&canFifo_Mutex, OS_OPT_POST_NONE, &err);
-    assertOSError(err);
+    RTOS_BPS_MutexPost(&canFifo_Mutex, OS_OPT_POST_NONE);
 }
 
 ErrorStatus CAN_Queue_Post(CANMSG_t message) {
-    OS_ERR err;
-    CPU_TS ticks;
-    OSMutexPend(&canFifo_Mutex, 0, OS_OPT_POST_NONE, &ticks, &err);
-    assertOSError(err);
+    RTOS_BPS_MutexPend(&canFifo_Mutex, OS_OPT_PEND_BLOCKING);
     bool success = CAN_fifo_put(&canFifo, message);
-    OSMutexPost(&canFifo_Mutex, OS_OPT_POST_NONE, &err);
-    assertOSError(err);
+    RTOS_BPS_MutexPost(&canFifo_Mutex, OS_OPT_POST_NONE);
 
     if (success) {
-        OSSemPost(&canFifo_Sem4, OS_OPT_POST_1, &err);
-        assertOSError(err);
+        RTOS_BPS_SemPost(&canFifo_Sem4, OS_OPT_POST_1);
     }
 
     return success ? SUCCESS : ERROR;
 }
 
 ErrorStatus CAN_Queue_Pend(CANMSG_t *message) {
-    OS_ERR err;
-	CPU_TS ticks;
-    
-    OSSemPend(&canFifo_Sem4, 0, OS_OPT_PEND_BLOCKING, &ticks, &err);
-    assertOSError(err);
-    OSMutexPend(&canFifo_Mutex, 0, OS_OPT_POST_NONE, &ticks, &err);
-    assertOSError(err);
+    RTOS_BPS_SemPend(&canFifo_Sem4, OS_OPT_PEND_BLOCKING);
+    RTOS_BPS_MutexPend(&canFifo_Mutex, OS_OPT_PEND_BLOCKING);
     bool result = CAN_fifo_get(&canFifo, message);
-    OSMutexPost(&canFifo_Mutex, OS_OPT_POST_NONE, &err);
-    assertOSError(err);
+    RTOS_BPS_MutexPost(&canFifo_Mutex, OS_OPT_POST_NONE);
     return result ? SUCCESS : ERROR;
 }
 

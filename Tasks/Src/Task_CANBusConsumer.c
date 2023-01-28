@@ -1,5 +1,4 @@
-/* Copyright (c) 2022 UT Longhorn Racing Solar */
-#include "os.h"
+/* Copyright (c) 2018-2022 UT Longhorn Racing Solar */
 #include "Tasks.h"
 #include "BSP_CAN.h"
 #include "CANbus.h"

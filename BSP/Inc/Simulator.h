@@ -4,7 +4,7 @@
  * Simulator.h - Simulator Functionality
 */
 
-#ifndef SIMULTOR_H
+#ifndef SIMULATOR_H
 #define SIMULATOR_H
 
 #include "config.h"
@@ -33,12 +33,13 @@ typedef struct simulator_state {
 
 typedef enum {LOG, LOG_INFO, LOG_WARN, LOG_ERROR, LOG_OUTPUT, LOG_MISC, LOG_NUM_LEVELS} LoggingType_t;
 
-// intialize the simulator
+// initialize the simulator
 void Simulator_Init(char *jsonPath);
 
-// log something to the simualtor's log file
+// log something to the simulator's log file
 void Simulator_Log(LoggingType_t lvl, char *str);
 
+//TODO: This is not atomic so output could be corrupted. Try replacing with something more secure
 
 #define Simulator_Log_Location(lvl, str)    \
     do {                                    \

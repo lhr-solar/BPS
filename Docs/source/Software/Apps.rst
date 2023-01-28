@@ -1,5 +1,5 @@
 ************
-Application
+Applications
 ************
 
 Amps
@@ -218,6 +218,40 @@ continue with the rest of the initialization.
         
 ``OSInit()`` initializes the operating system. ``AsserOSError()`` checks whether there are any errors in the RTOS functions. 
 If there are no errors ``OSTaskCreate()`` points the program to ``Task_Init()`` which executes the rest of the BPS startup.
+
+Contactor
+=============
+
+Purpose
+    The contactor BSP interfaces with the :term:`GPIO <GPIO>` pins connected to the contactor. These pins are used to control the 
+    contactor (PB0) and to check the state of the contactor (PB1).
+
+Usage
+    The peripheral should be initialized by calling ``Contactor_Init()`` before any of the other functions are called. See 
+    ``Contactor.h`` for details on individual functions. The AUX pin we have connected to the contactor is negative 
+    logic so ``Contactor_GetState()`` reads negative logic for the state of the contactors.
+
+Additional Considerations
+    The contactor is one of the most important safety features in the vehicle, so the contactor should only be turned on (closed) 
+    if the BPS is sure that the battery pack is in a safe state. There are 2 pins controlling the contactors. While the layout of which
+    contactors are controlled by what will change, calling ``Contactor_On()`` or ``Contactor_Off()`` with the ``#define`` listed in
+    "enum Contactors_t" will control that specific contactor.
+
+Fans
+====
+
+Purpose
+    The Fans driver is used to control the speed of the fans depending on the temperature of the Battery
+    Pack. It uses pins PC6, PC7, PB14, PB15 with the alternative function of :term:`Pulse-Width Modulation 
+    <Pulse Width Modulation>` enabled for as many speeds as needed for a total of 4 fans. The fans 
+    use PWM, so the speed can be reduced to save energy.
+
+Usage
+    It sets the speeds of individual fans and can also return the value of those speeds. The 
+    ``Fans.h`` file has more information on how to use each function.
+
+Additional Considerations
+    None
 
 Temperature
 ===========

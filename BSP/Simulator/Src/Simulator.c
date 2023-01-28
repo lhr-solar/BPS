@@ -41,11 +41,12 @@ static uint16_t DUMMY_VOLTAGES[NUM_BATTERY_MODULES] = {[0 ... NUM_BATTERY_MODULE
 static uint16_t DUMMY_TEMPS[NUM_TEMPERATURE_SENSORS] = {[0 ... NUM_TEMPERATURE_SENSORS - 1] = 30000};
 
 // LUT which corresponds Logging Level type to string to print out in LogFile
+//When Logging data that should be parsed, data should be enclosed in {}
 static const char* LoggingLUT[LOG_NUM_LEVELS] = {
     [LOG_INFO] = "[INFO] ",
     [LOG_WARN] = "[WARNING] ",
     [LOG_ERROR] = "[ERROR] ",
-    [LOG_OUTPUT] = "[OUTPUT] ",
+    [LOG_OUTPUT] = "[OUTPUT] ", //This logging level is output to JSON file to run unit tests. Use this when output should be parsed
     [LOG] = "",
     [LOG_MISC] = "[MISC] ",
 };
@@ -61,18 +62,8 @@ void Simulator_Log(LoggingType_t lvl, char *str) {
     strcpy(prefix, LoggingLUT[lvl]); //This is because strcat cannot concat const
     char* msg = strcat(prefix, str);
     write(simulatorLog, msg, strlen(msg));
-    printf("%s %s", prefix, str);
+    printf("%s", msg);
 }
-
-// It knows what the input file is because the Makefile should make a #define for the file path called SIMULATOR_JSON_PATH
-#ifndef SIMULATOR_JSON_PATH
-#define JSON_PATH "Error: make sure you define the simulator JSON path in the Makefile!"
-#else
-// #define QUOTE_MARK "
-#define STR(X) # X
-#define STRINGIFY(X) STR(X)
-#define JSON_PATH STRINGIFY(SIMULATOR_JSON_PATH) 
-#endif
 
 /**
  * @brief   Shut down the simulator
@@ -126,9 +117,6 @@ static void readInputFile(char *jsonPath) {
             tail->next = temp;
             tail = tail->next;
         }
-        char buffer[50];
-        sprintf(buffer, "\nExecuting state #%d...\n", stateCount);
-        Simulator_Log(LOG, buffer);
         // Try and get every field we should have in each state.
         // If null, it doesn't exist.
         cJSON* time = cJSON_GetObjectItem(state, "time");
@@ -138,7 +126,7 @@ static void readInputFile(char *jsonPath) {
         cJSON* voltageArray = cJSON_GetObjectItem(state, "voltages");
         // temperatureArray should have 31*2 elements.
         cJSON* temperatureArray = cJSON_GetObjectItem(state, "temperatures");
-        cJSON* current = cJSON_GetObjectItem(state, "current");
+        cJSON* currentObj = cJSON_GetObjectItem(state, "current");
         cJSON* charge = cJSON_GetObjectItem(state, "charge");
         cJSON* canList = cJSON_GetObjectItem(state, "can");
     
@@ -180,18 +168,20 @@ static void readInputFile(char *jsonPath) {
                 tail->temperatures[idx] = cJSON_GetArrayItem(temperatureArray, idx)->valueint;
             }
         }
-        if (!current) { // current in mA
+        if (!currentObj) { // current in mA
             printf("Current simulator state does not have a specified current value. Using 30...\n");
             tail->current = 30;
+        } else {
+            tail->current = currentObj->valueint;
         }
         if (!charge) {
             printf("Current simulator state does not have a specified charge value. Using 25,000,000...\n");
             tail->charge = 25000000;
+        } else {
+            tail->charge = charge->valueint;
         }
         if (!canList) {
-            char buffer[67];
-            sprintf(buffer, "No CAN messages to simulate in this state. (State Count = %d)\n", stateCount);
-            Simulator_Log(LOG_MISC, buffer);
+            printf("No CAN messages to simulate in this state. (State Count = %d)\n", stateCount);
         } else { // otherwise, there are some potential CAN messages. 
             // for every CAN message...
             for (cJSON* msg = canList->child; msg != NULL; msg = msg->next) {
@@ -231,16 +221,17 @@ void CtrlCHandler(int n) {
 void Simulator_Init(char *jsonPath) {
     // generate unique name for log file
     startTime = time(NULL);
-    char filename[30];
+    char* filename;
     // make the file name the test file
     char* tempName = jsonPath + strlen(jsonPath);
     while (*tempName != '/') tempName--;
     tempName++; // remove the '/'
     // makes the output nice
-    sprintf(filename, "bps-sim-%s.log", tempName);
+    asprintf(&filename, "bps-sim-%s.log", tempName);
 
     // create the log file
     simulatorLog = open(filename, O_CREAT | O_WRONLY, 0664);
+    free(filename);
     if (simulatorLog < 0) {
         printf("error opening file %s\n", jsonPath);
         exit(-1);
@@ -273,6 +264,7 @@ void Simulator_Init(char *jsonPath) {
 static void Simulator_Transition(void) {
     // advance to the current state
     time_t currentTime = time(NULL);
+    //wait until time for state is completed before moving to next state
     while (startTime + states->time < currentTime) {
         simulator_state *prev = states;
         states = states->next;
@@ -285,7 +277,6 @@ static void Simulator_Transition(void) {
         }
     }
 }
-
 
 // Functions for accessing simulator state. Each field should have a function associated with it
 

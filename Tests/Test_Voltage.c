@@ -1,4 +1,4 @@
-/* Copyright (c) 2020 UT Longhorn Racing Solar */
+/* Copyright (c) 2018-2022 UT Longhorn Racing Solar */
 
 #include "common.h"
 #include "config.h"
@@ -195,13 +195,7 @@ void legacy_test(void) {
 void Task1(void *p_arg){
 	OS_CPU_SysTickInit(SystemCoreClock / (CPU_INT32U) OSCfg_TickRate_Hz);
 
-
-    OS_ERR err;
-    OSSemCreate(&Fault_Sem4,
-                "Fault/Tripped Semaphore",
-                0,
-                &err);
-    assertOSError(err);
+    RTOS_BPS_SemCreate(&Fault_Sem4, "Fault/Tripped Semaphore", 0);
 
     test();
 }
@@ -214,19 +208,13 @@ int main(void) {
     OSInit(&err);
     assertOSError(err);
 
-    OSTaskCreate(&Task1_TCB,
+    RTOS_BPS_TaskCreate(&Task1_TCB,
                 "Task 1",
                 Task1,
                 (void *)0,
                 1,
                 Task1_Stk,
-                16,
-                256,
-                0,
-                0,
-                (void *)0,
-                OS_OPT_TASK_SAVE_FP | OS_OPT_TASK_STK_CHK,
-                &err);
+                256);
     assertOSError(err);
 
     OSStart(&err);

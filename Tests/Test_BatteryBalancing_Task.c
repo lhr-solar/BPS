@@ -1,4 +1,4 @@
-/* Copyright (c) 2021 UT Longhorn Racing Solar */
+/* Copyright (c) 2018-2022 UT Longhorn Racing Solar */
 
 #include "BatteryBalancing.h"
 #include "Voltage.h"
@@ -34,14 +34,12 @@ extern cell_asic Minions[NUM_MINIONS];
 
 void Task_UpdateVoltage(void* p_arg) {
     (void) p_arg;
-    OS_ERR err;
 
     Voltage_Init(Minions);
 
     while (1) {
         Voltage_UpdateMeasurements();
-        OSTimeDly(5, OS_OPT_TIME_DLY, &err);
-        assertOSError(err);
+        RTOS_BPS_DelayTick(5);
     }
 }
 
@@ -50,38 +48,24 @@ void Task1(void* p_arg) {
     OS_ERR err;
 
     /*
-    OSTaskCreate(
+    RTOS_BPS_TaskCreate(
         &BatteryBalance_TCB,				// TCB
         "TASK_BATTERY_BALANCE",	// Task Name (String)
         Task_BatteryBalance,				// Task function pointer
         (void *)0,				// Task function args
         6,			            // Priority
-        BatteryBalance_Stk,				// Stack
-        WATERMARK_STACK_LIMIT,	// Watermark limit for debugging
-        DEFAULT_STACK_SIZE,		// Stack size
-        0,						// Queue size (not needed)
-        10,						// Time quanta (time slice) 10 ticks
-        (void *)0,				// Extension pointer (not needed)
-        OS_OPT_TASK_STK_CHK | OS_OPT_TASK_SAVE_FP,	// Options
-        &err
-    );					// return err code}
+        BatteryBalance_Stk,	// Watermark limit for debugging
+        DEFAULT_STACK_SIZE);					// return err code}
     */
 
-    OSTaskCreate(
+    RTOS_BPS_TaskCreate(
         &UpdateVoltage_TCB,				// TCB
         "TASK_UPDATE_VOLTAGE",	// Task Name (String)
         Task_UpdateVoltage,				// Task function pointer
         (void *)0,				// Task function args
         5,			            // Priority
-        UpdateVoltage_Stk,				// Stack
-        WATERMARK_STACK_LIMIT,	// Watermark limit for debugging
-        DEFAULT_STACK_SIZE,		// Stack size
-        0,						// Queue size (not needed)
-        10,						// Time quanta (time slice) 10 ticks
-        (void *)0,				// Extension pointer (not needed)
-        OS_OPT_TASK_STK_CHK | OS_OPT_TASK_SAVE_FP,	// Options
-        &err
-    );					// return err code}
+        UpdateVoltage_Stk,	// Watermark limit for debugging
+        DEFAULT_STACK_SIZE);					// return err code}
 
     OSTaskDel(NULL, &err);
 }
@@ -93,20 +77,13 @@ int main(void) {
     OSInit(&err);
     assertOSError(err);
     
-    OSTaskCreate(&Task1_TCB,
+    RTOS_BPS_TaskCreate(&Task1_TCB,
                 "Task 1",
                 Task1,
                 (void *)0,
                 1,
                 Task1_Stk,
-                16,
-                256,
-                0,
-                0,
-                (void *)0,
-                OS_OPT_TASK_SAVE_FP | OS_OPT_TASK_STK_CHK,
-                &err);
-    assertOSError(err);
+                256);
 
     OSStart(&err);
     return 0;

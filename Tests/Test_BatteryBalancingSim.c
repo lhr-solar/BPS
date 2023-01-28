@@ -1,3 +1,4 @@
+/* Copyright (c) 2018-2022 UT Longhorn Racing Solar */
 #include "common.h"
 #include "config.h"
 #include "LTC6811.h"
@@ -7,9 +8,12 @@
 
 cell_asic minions[NUM_MINIONS];
 
-int main() {
+void foo(){
+    return;
+}
 
-    BSP_UART_Init();    // Initialize printf
+int main() {
+    BSP_UART_Init(foo, foo, UART_USB);    // Initialize printf
 
     printf("Testing setting discharge bits.\r\n");
 

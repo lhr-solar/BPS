@@ -1,4 +1,4 @@
-// /* Copyright (c) 2022 UT Longhorn Racing Solar */
+/* Copyright (c) 2018-2022 UT Longhorn Racing Solar */
 
 // /* CLI.c
 //  * Command Line Interface wrapper to 
@@ -9,7 +9,7 @@
 // #include "Voltage.h"
 // #include "Amps.h"
 // #include "Temperature.h"
-// #include "BSP_Contactor.h"
+// #include "Contactor.h"
 // #include "BSP_WDTimer.h"
 // #include "BSP_Lights.h"
 // #include "config.h"
@@ -20,7 +20,6 @@
 // #include "Images.h"
 // #include "BSP_ADC.h"
 // #include "EEPROM.h"
-// #include "os.h"
 // #include "Tasks.h"
 // #include <string.h>
 
@@ -279,7 +278,7 @@
 // void CLI_LTC6811(void) {
 // 	OS_ERR err;
 //     CPU_TS ts;
-// 	OSMutexPend(&MinionsASIC_Mutex, 0, OS_OPT_PEND_BLOCKING, &ts, &err);
+// 	RTOS_Mutex_Pend(&MinionsASIC_Mutex, OS_OPT_PEND_BLOCKING);
 // 	assertOSError(err);
 // 	for(uint8_t current_ic = 0; current_ic < NUM_MINIONS; current_ic++) {
 // 		printf("Minion board %d: ", current_ic);
@@ -330,8 +329,7 @@
 // 		printf("\n\rPEC: %d\n\r", Minions[current_ic].sctrlb.rx_pec_match);
 // 	}
 // 	//release mutex
-//   	OSMutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE, &err);
-//   	assertOSError(err);
+//   	RTOS_BPS_MutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE);
 // }
 
 // /** CLI_Contactor
@@ -340,7 +338,7 @@
 //  * @param hashTokens is the array of hashed tokens
 //  */
 // void CLI_Contactor(int* hashTokens) {
-// 	State contactor = BSP_Contactor_GetState();
+// 	State contactor = Contactor_GetState();
 // 	if(hashTokens[1] == 0) {
 // 		if(contactor == ON) {
 // 			printf("Contactor is Enabled\n\r");
@@ -638,7 +636,7 @@
 // 	while(1) {
 // 		if(BSP_UART_ReadLine(response, 3) > 0) {
 // 			if(CLI_StringHash(response) == CLI_SHUTDOWN_HASH) {
-// 				BSP_Contactor_Off();
+// 				Contactor_Off();
 // 				printf("Contactor is off\n\r");
 // 				break;
 // 			} else {

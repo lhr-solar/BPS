@@ -1,4 +1,4 @@
-/* Copyright (c) 2022 UT Longhorn Racing Solar */
+/* Copyright (c) 2018-2022 UT Longhorn Racing Solar */
 
 #include "BSP_CAN.h"
 #include "stm32f4xx.h"
@@ -148,15 +148,18 @@ ErrorStatus BSP_CAN_Write(uint32_t id, uint8_t data[], uint8_t length) {
     ErrorStatus retVal = SUCCESS;
     
     if (length > 8) {
-        length = 8; //force length to be at 8 to avoid index out of bounds
+        length = 8; //force length to be at 8 to avoid index out of bounds TODO: Return Error and handle properly
     }
+
     gTxMessage.StdId = id;
     gTxMessage.DLC = length;
+
 	for(int i = 0; i < length; i++){
         gTxMessage.Data[i] = data[i];
     }
-	
+
     uint8_t mailbox = CAN_Transmit(CAN1, &gTxMessage);
+    
     if (mailbox == CAN_TxStatus_NoMailBox) {
         retVal = ERROR;
     }
@@ -194,7 +197,7 @@ ErrorStatus BSP_CAN_Read(uint32_t *id, uint8_t *data) {
 // This probably doesn't work because it's missing the equivalent fixes to the Tx Handler,
 // but it isn't part of the BPS requirements, so I'm not going to mess with it until I need it 
 void CAN1_RX0_IRQHandler(void) {
-    #ifdef RTOS
+    #ifdef RTOS //TODO: Replace with RTOS independent code (i.e replae with wrappers)
     CPU_SR_ALLOC();
     CPU_CRITICAL_ENTER();
     OSIntEnter();

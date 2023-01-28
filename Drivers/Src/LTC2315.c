@@ -1,6 +1,6 @@
+/* Copyright (c) 2018-2022 UT Longhorn Racing Solar */
 #include "LTC2315.h"
 #include "BSP_SPI.h"
-#include "os.h"
 #include "Tasks.h"
 #include "BSP_PLL.h"
 #include <stdio.h>
@@ -43,7 +43,6 @@ static void LTC2315_wakeup_sleep()
  */
 void LTC2315_Init(bsp_os_t spi_os) {
     BSP_SPI_Init(spi_ltc2315, &spi_os, true);
-
     LTC2315_wakeup_sleep();
 }
 
@@ -84,8 +83,7 @@ uint16_t LTC2315_Read() {
     if ((count > MAX_PEC_ERRORS) && (rxdata[0] == 0xff) && (rxdata[1] == 0xff)) {
       // trip BPS
       Fault_BitMap |= Fault_CRC;
-      OSSemPost(&Fault_Sem4, OS_OPT_POST_1, &err);
-      assertOSError(err);
+      RTOS_BPS_SemPost(&Fault_Sem4, OS_OPT_POST_1);
     }
 
     ++count;

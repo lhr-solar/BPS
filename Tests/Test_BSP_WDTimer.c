@@ -1,4 +1,4 @@
-/* Copyright (c) 2020 UT Longhorn Racing Solar */
+/* Copyright (c) 2018-2022 UT Longhorn Racing Solar */
 
 #include "common.h"
 #include "config.h"
@@ -33,7 +33,7 @@ int main(){
             }
         
             BSP_WDTimer_Reset();
-            printf("reset %d\n", resetCount);
+            printf("reset %ld\n", resetCount);
             bool checkSysReset = BSP_WDTimer_DidSystemReset();
             printf("Has the system been reset (1 = yes, 0 = no): %d\n\n", checkSysReset);
             resetCount--;

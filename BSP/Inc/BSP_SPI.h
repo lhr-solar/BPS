@@ -1,12 +1,10 @@
-/* Copyright (c) 2022 UT Longhorn Racing Solar */
+/* Copyright (c) 2018-2022 UT Longhorn Racing Solar */
 
 #ifndef BSP_SPI_H
 #define BSP_SPI_H
 
 #include "common.h"
-#include "os.h"
 #include "BSP_OS.h"
-
 
 /**
  * @note    This is for the RTOS version of the BPS 

@@ -12,7 +12,7 @@
 // Contactor 1
 #define C1 4 // contactor 1 on pwm output 4
 // Contactor 2 - this is for the contactor connected to the fan board
-#define CFAN 2 // right now we are using fan pin 3 as the contactor output
+#define CFAN 3 // right now we are using fan pin 3 as the contactor output
 
 //These are defining how the contactors are wired, the array contactor is assumed to be wired to the fan board
 #define ARRAY_CONTACTOR_OUT CFAN
@@ -21,7 +21,6 @@
 
 typedef uint8_t CONT_CHOICE;
 typedef enum {ARRAY_CONTACTOR = 1, HVHIGH_CONTACTOR = 2, HVLOW_CONTACTOR = 4, ALL_CONTACTORS = 7} Contactors_t;
-
 
 /**
  * @brief   A Contactor is a high power switch similar to what a relay is. The Contactor

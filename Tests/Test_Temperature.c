@@ -1,4 +1,4 @@
-/* Copyright (c) 2020 UT Longhorn Racing Solar */
+/* Copyright (c) 2018-2022 UT Longhorn Racing Solar */
 
 #include "common.h"
 #include "config.h"
@@ -48,8 +48,6 @@ CPU_STK Task1_Stk[DEFAULT_STACK_SIZE];
 cell_asic minions[NUM_MINIONS];
 
 void test(void) {
-    OS_ERR err;
-
     BSP_UART_Init(NULL, NULL, UART_USB);    // Initialize printf
 
     Temperature_Init(minions);
@@ -82,7 +80,7 @@ void test(void) {
         BSP_SPI_Read(spi_ltc6811, rxbuf, 8);
         rxbuf[0] = 0;
         */
-        OSTimeDly(400, OS_OPT_TIME_DLY, &err);
+        RTOS_BPS_DelayTick(400);
     }
 }
 
@@ -101,20 +99,13 @@ int main(void) {
     OSInit(&err);
     assertOSError(err);
 
-    OSTaskCreate(&Task1_TCB,
+    RTOS_BPS_TaskCreate(&Task1_TCB,
                 "Task 1",
                 Task1,
                 (void *)0,
                 1,
                 Task1_Stk,
-                16,
-                256,
-                0,
-                0,
-                (void *)0,
-                OS_OPT_TASK_SAVE_FP | OS_OPT_TASK_STK_CHK,
-                &err);
-    assertOSError(err);
+                256);
 
     OSStart(&err);
 }

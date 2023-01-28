@@ -1,9 +1,12 @@
-/* Copyright (c) 2022 UT Longhorn Racing Solar */
+/* Copyright (c) 2018-2022 UT Longhorn Racing Solar */
 
 #include "BSP_SPI.h"
 #include "stm32f4xx.h"
 #include "os.h"
 #include "BSP_OS.h"
+#include "stm32f4xx_gpio.h"
+#include "stm32f4xx_rcc.h"
+#include "stm32f4xx_spi.h"
 
 // These are the sizes of the fifos.
 // You can write/read more than this at once,
@@ -374,7 +377,7 @@ void BSP_SPI_SetStateCS(spi_port_t port, uint8_t state) {
 
 void SPI1_IRQHandler(void){
 	// Save the CPU registers
-	CPU_SR_ALLOC();
+	CPU_SR_ALLOC(); //TODO: Replace with RTOS independent code (i.e replae with wrappers)
 
 	// Protect a critical section
 	CPU_CRITICAL_ENTER();
@@ -432,8 +435,5 @@ void SPI3_IRQHandler(){
 	//make the kernel aware that the interrupt has ended
 	OSIntExit();
 }
-
-
-
 
 #endif

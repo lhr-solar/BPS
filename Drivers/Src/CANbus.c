@@ -1,6 +1,7 @@
+/* Copyright (c) 2018-2022 UT Longhorn Racing Solar */
 #include "CANbus.h"
 #include "BSP_CAN.h"
-#include "os.h"
+#include "RTOS_BPS.h"
 #include "Tasks.h"
 
 /* Locking mechanism for the CAN bus.
@@ -24,12 +25,7 @@ static OS_SEM	CANbus_ReceiveSem4;
  * @note	Do not call directly.
  */
 static void CANbus_Release(void) {
-	OS_ERR err;
-
-	OSSemPost(&CANbus_MailSem4,
-			  OS_OPT_POST_1,
-			  &err);
-	assertOSError(err);
+	RTOS_BPS_SemPost(&CANbus_MailSem4, OS_OPT_POST_1);
 }
 
 /**
@@ -37,12 +33,7 @@ static void CANbus_Release(void) {
  * @note	Do not call directly.
  */
 static void CANbus_CountIncoming(void) {
-	OS_ERR err;
-
-	OSSemPost(&CANbus_ReceiveSem4,
-			  OS_OPT_POST_1,
-			  &err);
-	assertOSError(err);
+	RTOS_BPS_SemPost(&CANbus_ReceiveSem4, OS_OPT_POST_1);
 }
 
 /**
@@ -51,30 +42,11 @@ static void CANbus_CountIncoming(void) {
  * @return  None
  */
 void CANbus_Init(bool loopback) {
-	OS_ERR err;
 
-	OSMutexCreate(&CANbus_TxMutex,
-				  "CAN TX Lock",
-				  &err);
-	assertOSError(err);
-
-	OSMutexCreate(&CANbus_RxMutex,
-				  "CAN RX Lock",
-				  &err);
-	assertOSError(err);
-
-	OSSemCreate(&CANbus_MailSem4,
-                "CAN Mailbox Semaphore",
-                3,	// Number of mailboxes
-                &err);
-	assertOSError(err);
-
-	OSSemCreate(&CANbus_ReceiveSem4,
-                "CAN Queue Counter Semaphore",
-                0,
-                &err);
-	assertOSError(err);
-
+	RTOS_BPS_MutexCreate(&CANbus_TxMutex, "CAN TX Lock");
+	RTOS_BPS_MutexCreate(&CANbus_RxMutex, "CAN RX Lock");
+	RTOS_BPS_SemCreate(&CANbus_MailSem4, "CAN Mailbox Semaphore", 3); // # of mailboxes
+	RTOS_BPS_SemCreate(&CANbus_ReceiveSem4, "CAN Queue Counter Semaphore", 0);
 	// Initialize and pass interrupt hooks
     BSP_CAN_Init(CANbus_CountIncoming, CANbus_Release, loopback);
 }
@@ -83,9 +55,6 @@ void CANbus_Init(bool loopback) {
 static ErrorStatus CANbus_SendMsg(CANId_t id, CANPayload_t payload) {
 	uint8_t txdata[8];
 	uint8_t data_length = 0;
-	
-	OS_ERR err;
-	CPU_TS ts;
 
 	// TODO: is it really best to keep the list of
 	//		 valid messages to be sending in the driver?
@@ -125,20 +94,12 @@ static ErrorStatus CANbus_SendMsg(CANId_t id, CANPayload_t payload) {
 	// This is because the software is responsible for
 	// choosing the mailbox to put the message into,
 	// leaving a possible race condition if not protected.
-	OSMutexPend(&CANbus_TxMutex,
-				0,
-				OS_OPT_PEND_BLOCKING,
-				&ts,
-				&err);
-	assertOSError(err);
+	RTOS_BPS_MutexPend(&CANbus_TxMutex, OS_OPT_PEND_BLOCKING);
 
 	// Write the data to the bus
 	ErrorStatus retVal = BSP_CAN_Write(id, txdata, data_length);
 
-	OSMutexPost(&CANbus_TxMutex,
-				OS_OPT_POST_1,
-				&err);
-	assertOSError(err);
+	RTOS_BPS_MutexPost(&CANbus_TxMutex, OS_OPT_POST_1);
 
 	return retVal;
 }
@@ -151,16 +112,8 @@ static ErrorStatus CANbus_SendMsg(CANId_t id, CANPayload_t payload) {
  * @return  ERROR if error, SUCCESS otherwise
  */
 ErrorStatus CANbus_BlockAndSend(CANId_t id, CANPayload_t payload) {
-	CPU_TS ts;
-	OS_ERR err;
-
 	// Pend for a mailbox (blocking)
-	OSSemPend(&CANbus_MailSem4,
-			  0,
-			  OS_OPT_PEND_BLOCKING,
-			  &ts,
-			  &err);
-	assertOSError(err);
+	RTOS_BPS_SemPend(&CANbus_MailSem4,OS_OPT_PEND_BLOCKING);
 	ErrorStatus result = CANbus_SendMsg(id, payload);
 	if (result == ERROR) {
 		CANbus_Release();
@@ -177,18 +130,9 @@ ErrorStatus CANbus_BlockAndSend(CANId_t id, CANPayload_t payload) {
  * @param   payload : the data that will be sent.
  * @return  ERROR if data wasn't sent, otherwise it was sent.
  */
-ErrorStatus CANbus_Send(CANId_t id, CANPayload_t payload) {
-    CPU_TS ts;
-	OS_ERR err;
-	
+ErrorStatus CANbus_Send(CANId_t id, CANPayload_t payload) {	
 	// Check to see if a mailbox is available
-	OSSemPend(&CANbus_MailSem4,
-			  0,
-			  OS_OPT_PEND_NON_BLOCKING,
-			  &ts,
-			  &err);
-	assertOSError(err);
-
+	RTOS_BPS_SemPend(&CANbus_MailSem4, OS_OPT_PEND_NON_BLOCKING);
 	// Send the message
 	ErrorStatus result = CANbus_SendMsg(id, payload);
 	if (result == ERROR) {
@@ -198,27 +142,15 @@ ErrorStatus CANbus_Send(CANId_t id, CANPayload_t payload) {
 }
 
 static ErrorStatus CANbus_GetMsg(CANId_t *id, uint8_t *buffer) {
-	CPU_TS ts;
-	OS_ERR err;
-	
 	// The mutex is require to access the CAN receive queue.
-	OSMutexPend(&CANbus_RxMutex,
-				0,
-				OS_OPT_PEND_BLOCKING,
-				&ts,
-				&err);
-	assertOSError(err);
-
+	RTOS_BPS_MutexPend(&CANbus_RxMutex, OS_OPT_PEND_BLOCKING);
 	// Write the data to the bus
 	uint32_t id_int;
 	uint8_t retVal = BSP_CAN_Read(&id_int, buffer);
 
 	*id = id_int;
 
-	OSMutexPost(&CANbus_RxMutex,
-				OS_OPT_POST_1,
-				&err);
-	assertOSError(err);
+	RTOS_BPS_MutexPost(&CANbus_RxMutex, OS_OPT_POST_1);
 
 	return retVal;
 }
@@ -230,17 +162,8 @@ static ErrorStatus CANbus_GetMsg(CANId_t *id, uint8_t *buffer) {
  * @return  ERROR if there was no message, SUCCESS otherwise.
  */
 ErrorStatus CANbus_Receive(CANId_t *id, uint8_t *buffer) {
-	CPU_TS ts;
-	OS_ERR err;
-	
 	// Check to see if a mailbox is available
-	OSSemPend(&CANbus_ReceiveSem4,
-			  0,
-			  OS_OPT_PEND_NON_BLOCKING,
-			  &ts,
-			  &err);
-	assertOSError(err);
-
+	RTOS_BPS_SemPend(&CANbus_ReceiveSem4, OS_OPT_PEND_NON_BLOCKING);
 	// Send the message
 	return CANbus_GetMsg(id, buffer);
 }
@@ -252,16 +175,7 @@ ErrorStatus CANbus_Receive(CANId_t *id, uint8_t *buffer) {
  * @return  ERROR if there was an error, SUCCESS otherwise.
  */
 ErrorStatus CANbus_WaitToReceive(CANId_t *id, uint8_t *buffer) {
-	CPU_TS ts;
-	OS_ERR err;
-
 	// Pend for a mailbox (blocking)
-	OSSemPend(&CANbus_ReceiveSem4,
-			  0,
-			  OS_OPT_PEND_BLOCKING,
-			  &ts,
-			  &err);
-	assertOSError(err);
-
+	RTOS_BPS_SemPend(&CANbus_ReceiveSem4, OS_OPT_PEND_BLOCKING);
 	return CANbus_GetMsg(id, buffer);
 }

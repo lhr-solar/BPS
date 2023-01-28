@@ -1,4 +1,4 @@
-/* Copyright (c) 2022 UT Longhorn Racing Solar */
+/* Copyright (c) 2018-2022 UT Longhorn Racing Solar */
 
 #ifndef __BSP_LIGHTS_H
 #define __BSP_LIGHTS_H

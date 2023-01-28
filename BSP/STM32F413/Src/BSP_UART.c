@@ -1,7 +1,10 @@
-/* Copyright (c) 2022 UT Longhorn Racing Solar */
+/* Copyright (c) 2018-2022 UT Longhorn Racing Solar */
 
 #include "BSP_UART.h"
 #include "stm32f4xx.h"
+#include "stm32f4xx_gpio.h"
+#include "stm32f4xx_usart.h"
+#include "stm32f4xx_rcc.h"
 
 #define TX_SIZE     128
 #define RX_SIZE     64
@@ -224,7 +227,7 @@ uint32_t BSP_UART_Write(char *str, uint32_t len, UART_Port usart) {
 }
 
 void USART2_IRQHandler(void) {
-#ifdef RTOS
+#ifdef RTOS //TODO: Replace with RTOS independent code (i.e replae with wrappers)
     CPU_SR_ALLOC();
     CPU_CRITICAL_ENTER();
     OSIntEnter();

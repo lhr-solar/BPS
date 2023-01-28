@@ -6,11 +6,12 @@ Controls speed of fans which cool down the battery pack. Uses Pins PC6, 7 and PB
 #ifndef FANS_H
 #define FANS_H
 
-#include "BSP_PWM.h" //PWM_Period is defined here
+#include "BSP_PWM.h" 
 #include "common.h"
 #include "config.h"
+#include "Simulator.h"
 
-#define DIVIDER 500 //Speed increments
+#define DIVIDER 500 //Speed increments TODO: change divider to 100 and have more speeds
 #define TOPSPEED PWM_PERIOD/DIVIDER //top speed achievable
 
 /**
@@ -21,17 +22,17 @@ Controls speed of fans which cool down the battery pack. Uses Pins PC6, 7 and PB
 void Fans_Init(void);
 
 /**
- * @brief   Sets fan duty cycle
- * @param   dutyCycle: int for duty cycle amount in range 0-8
- * @param   fan: fan number whose speed should be changed
- * @return  ErrorStatus
+ * @brief This function will change the speed of the fans
+ * @param fan Number of fan to change speed (1-4)
+ * @param speed Speed of Fan(0-TOPSPEED)
+ * @return ErrorStatus will return 1 if successful, 0 if error occurred
  */
 ErrorStatus Fans_Set(uint8_t fan, uint32_t speed);
 
 /**
- * @brief   Get current speed of specific fan
- * @param   fan Number
- * @return  Current PWM duty cycle if fans
+ * @brief   Reads the duty cycle for a specified fan
+ * @param   fan Gets the duty cycle for this fan
+ * @return  int representation of the fan speed from 0-8, -1 if an error occurred
  */
 int Fans_GetSpeed(uint8_t fan);
 

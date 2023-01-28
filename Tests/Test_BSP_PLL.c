@@ -1,4 +1,4 @@
-/* Copyright (c) 2020 UT Longhorn Racing Solar */
+/* Copyright (c) 2018-2022 UT Longhorn Racing Solar */
 
 #include "common.h"
 #include "config.h"
@@ -19,9 +19,7 @@ int main(void){
     BSP_PLL_Init();
     while(1){
         test = BSP_PLL_GetSystemClock();
-        printf("\r%d", test);
+        printf("\r%ld", test);
     }
-    
-    
-    exit(0);
+    return 0;
 }

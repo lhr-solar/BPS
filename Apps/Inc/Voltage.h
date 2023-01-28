@@ -1,4 +1,4 @@
-/* Copyright (c) 2022 UT Longhorn Racing Solar */
+/* Copyright (c) 2018-2022 UT Longhorn Racing Solar */
 
 /** Voltage.h
  * Voltage file that holds all voltage related information of BeVolt's battery pack.
@@ -11,7 +11,6 @@
 #include "config.h"
 #include "LTC6811.h"
 #include "common.h"
-#include "os.h"
 
 typedef struct voltage_safety{
     SafetyStatus wire_checks[TOTAL_VOLT_WIRES];

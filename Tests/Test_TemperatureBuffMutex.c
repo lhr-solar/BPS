@@ -1,6 +1,7 @@
+/* Copyright (c) 2018-2022 UT Longhorn Racing Solar */
 #include "common.h"
 #include "config.h"
-#include "os.h"
+#include "RTOS_BPS.h"
 #include "Tasks.h"
 #include "Temperature.h"
 
@@ -19,18 +20,13 @@ OS_SEM tmr_Sem4;
 cell_asic minions[NUM_MINIONS];
 
 void trigger(OS_TMR *p_tmr, void *p_arg) {
-    OS_ERR err;
-    OSSemPost(&tmr_Sem4,
-            OS_OPT_POST_1,
-            &err);
-    // assert
+    RTOS_BPS_SemPost(&tmr_Sem4, OS_OPT_POST_1); 
 }
 
 void Task_TestTempMutex1(void *p_args) {
     (void)p_args;
 
     OS_ERR err;
-    CPU_TS ts;
 
     OSTmrCreate(&tmr,
                 "Temperature Timer",
@@ -40,13 +36,9 @@ void Task_TestTempMutex1(void *p_args) {
                 trigger,
                 NULL,
                 &err);
-    // assert
+    assertOSError(err);
 
-    OSSemCreate(&tmr_Sem4,
-                "Temperature Timer Semaphore",
-                1,
-                &err);
-    // assert
+    RTOS_BPS_SemCreate(&tmr_Sem4, "Temperature Timer Semaphore", 1);
 
     Temperature_Init(minions);
 
@@ -58,27 +50,21 @@ void Task_TestTempMutex1(void *p_args) {
         //         &err);
         // assert
 
-        OSSemPend(&tmr_Sem4,
-                10,
-                OS_OPT_PEND_BLOCKING,
-                &ts,
-                &err);
+        RTOS_BPS_SemPend(&tmr_Sem4, OS_OPT_PEND_BLOCKING);
         // assert
 
-        SafetyStatus temperature_status = Temperature_CheckStatus(1);
+        Temperature_CheckStatus(1);
     }
 }
 
 void Task_TestTempMutex2(void *p_args) {
     (void)p_args;
 
-    OS_ERR err;
-
     while(1) {
         printf("2\r\n");
-        SafetyStatus temperature_status = Temperature_CheckStatus(1);
+        Temperature_CheckStatus(1);
         for(int i = 0; i < 16; i++) {
-            printf("%d\r\n", Temperature_GetModuleTemperature(i));
+            printf("%ld\r\n", Temperature_GetModuleTemperature(i));
         }
         // for(int i = 0; i < 1000000; i++);
     }
@@ -87,15 +73,10 @@ void Task_TestTempMutex2(void *p_args) {
 void Task_Dummy(void *p_args) {
     (void)p_args;
 
-    OS_ERR err;
-
     while(1) {
         printf("3\r\n");
-        OSSemPost(&tmr_Sem4,
-                OS_OPT_PEND_BLOCKING,
-                &err);
-        // assert
-        for(int i = 0; i < 1000000; i++);
+        RTOS_BPS_SemPost(&tmr_Sem4, OS_OPT_PEND_BLOCKING);
+        for(volatile int i = 0; i < 1000000; i++);
     }
 }
 
@@ -106,50 +87,29 @@ int main() {
     OSInit(&err);
     // assert
 
-	OSTaskCreate(&Temp1_TCB,				// TCB
+	RTOS_BPS_TaskCreate(&Temp1_TCB,				// TCB
 				"Temperature Buffer Mutex1",	// Task Name (String)
 				Task_TestTempMutex1,				// Task function pointer
 				(void *)0,				// Task function args
 				2,			            // Priority
-				Temp1_Stk,				// Stack
-				WATERMARK_STACK_LIMIT,	// Watermark limit for debugging
-				DEFAULT_STACK_SIZE,		// Stack size
-				0,						// Queue size (not needed)
-				10,						// Time quanta (time slice) 10 ticks
-				(void *)0,				// Extension pointer (not needed)
-				OS_OPT_TASK_STK_CHK | OS_OPT_TASK_SAVE_FP,	// Options
-				&err);					// return err code
-	// assert
+				Temp1_Stk,	// Watermark limit for debugging
+				DEFAULT_STACK_SIZE); 
 
-    OSTaskCreate(&Temp2_TCB,				// TCB
+    RTOS_BPS_TaskCreate(&Temp2_TCB,				// TCB
 				"Temperature Buffer Mutex2",	// Task Name (String)
 				Task_TestTempMutex2,				// Task function pointer
 				(void *)0,				// Task function args
 				3,			            // Priority
-				Temp2_Stk,				// Stack
-				WATERMARK_STACK_LIMIT,	// Watermark limit for debugging
-				DEFAULT_STACK_SIZE,		// Stack size
-				0,						// Queue size (not needed)
-				10,						// Time quanta (time slice) 10 ticks
-				(void *)0,				// Extension pointer (not needed)
-				OS_OPT_TASK_STK_CHK | OS_OPT_TASK_SAVE_FP,	// Options
-				&err);					// return err code
-	// assert
+				Temp2_Stk,	// Watermark limit for debugging
+				DEFAULT_STACK_SIZE); 
 
-    OSTaskCreate(&Dummy_TCB,				// TCB
+    RTOS_BPS_TaskCreate(&Dummy_TCB,				// TCB
 				"Dummy",	// Task Name (String)
 				Task_Dummy,				// Task function pointer
 				(void *)0,				// Task function args
 				4,			            // Priority
-				Dummy_Stk,				// Stack
-				WATERMARK_STACK_LIMIT,	// Watermark limit for debugging
-				DEFAULT_STACK_SIZE,		// Stack size
-				0,						// Queue size (not needed)
-				10,						// Time quanta (time slice) 10 ticks
-				(void *)0,				// Extension pointer (not needed)
-				OS_OPT_TASK_STK_CHK | OS_OPT_TASK_SAVE_FP,	// Options
-				&err);					// return err code
-	// assert
+				Dummy_Stk,	// Watermark limit for debugging
+				DEFAULT_STACK_SIZE); 
 
 	OSStart(&err);
 

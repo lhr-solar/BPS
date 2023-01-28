@@ -1,10 +1,9 @@
-/* Copyright (c) 2022 UT Longhorn Racing Solar */
+/* Copyright (c) 2018-2022 UT Longhorn Racing Solar */
 
 #ifndef BSP_I2C_H
 #define BSP_I2C_H
 
 #include "common.h"
-#include "os.h"
 
 #define EEPROM_BYTES 0x4000
 
