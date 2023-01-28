@@ -5,6 +5,9 @@
 #define CONTACTOR_H
 
 #include "BSP_PWM.h" //PWM_Period is defined in here
+#ifdef SIMULATION
+#include "Simulator.h"
+#endif
 
 //Parameters for PWM
 #define PWM_ON_TIME 3500
