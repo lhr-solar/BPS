@@ -1,4 +1,6 @@
 #include "Contactor.h"
+#include "BSP_PLL.h"
+
 
 /* This is a basic test to verify that our contactor
  * code and hardware work. This should start with the
@@ -7,6 +9,7 @@
  */
 
 int main() {
+    BSP_PLL_Init();
     Contactor_Init();   // Initialize the contactor
 
     while(1) {
