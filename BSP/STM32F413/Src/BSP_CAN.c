@@ -2,6 +2,7 @@
 
 #include "BSP_CAN.h"
 #include "stm32f4xx.h"
+#include "stm32f4xx_can.h"
 #include "os.h"
 
 // The message information that we care to receive
@@ -250,4 +251,8 @@ void CAN1_TX_IRQHandler(void) {
     #ifdef RTOS
     OSIntExit();      // Signal to uC/OS
     #endif
+}
+
+bool foundMailBox(CAN_TypeDef* CANx){
+    return findMailBox(CANx);
 }

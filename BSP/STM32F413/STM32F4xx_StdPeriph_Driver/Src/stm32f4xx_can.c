@@ -780,6 +780,26 @@ uint8_t CAN_Transmit(CAN_TypeDef* CANx, CanTxMsg* TxMessage)
   return transmit_mailbox;
 }
 
+bool findMailBox(CAN_TypeDef* CANx){
+
+  /* Select one empty transmit mailbox */
+  if ((CANx->TSR&CAN_TSR_TME0) == CAN_TSR_TME0)
+  {
+    return true;
+  }
+  else if ((CANx->TSR&CAN_TSR_TME1) == CAN_TSR_TME1)
+  {
+    return true;
+  }
+  else if ((CANx->TSR&CAN_TSR_TME2) == CAN_TSR_TME2)
+  {
+    return true;
+  }
+
+  return false;
+
+}
+
 /**
   * @brief  Checks the transmission status of a CAN Frame.
   * @param  CANx: where x can be 1,2 or 3 to select the CAN peripheral.

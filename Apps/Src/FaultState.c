@@ -131,18 +131,10 @@ void EnterFaultState() {
     // also don't call CAN if the watchdog tripped, since CAN won't be initialized
     
     if ((Fault_BitMap & (Fault_OS | Fault_WDOG)) == 0) {
-        CANData_t data;
-        data.b = 1;
-        CANPayload_t Message;
-        Message.data = data;
         //Deinitialize CAN registers
         CAN_DeInit(CAN1);
         //Reinit CAN in fault state
         CANbus_Init(false, true);
-        CANbus_BlockAndSend_FaultState(TRIP, Message);
-        data.b = 0;
-        // Push Contactor State message to CAN Q
-        CANbus_BlockAndSend_FaultState(CONTACTOR_STATE, Message);
     }
     
 
@@ -152,6 +144,37 @@ void EnterFaultState() {
     BSP_WDTimer_Init(); //This is in case we did not pass check contactor and watchdog timer was not initialized
     BSP_WDTimer_Start(); 
     while(1) {
+        //Send Trip Message
+        CANPayload_t tripPayload;
+        tripPayload.idx = 0;
+        tripPayload.data.w = 1;
+        CANbus_BlockAndSend_FaultState(TRIP, tripPayload);
+        for(int i = 0; i < 10000; i++);
+        tripPayload.data.w = 0;
+        CANbus_BlockAndSend_FaultState(CONTACTOR_STATE, tripPayload);
+
+        for(int i = 0; i < 10000; i++);
+        
+        //Send Current Readings
+        int32_t latestMeasureMilliAmps = Amps_GetReading(); 
+        CANPayload_t ampPayload;
+        ampPayload.idx = 0;
+        ampPayload.data.w = latestMeasureMilliAmps;
+        CANbus_BlockAndSend_FaultState(CURRENT_DATA, ampPayload);
+
+        for(int i = 0; i < 10000; i++);
+
+        //Send Voltage Readings
+        for (int i = 0; i < NUM_BATTERY_MODULES; i++){ //send all battery module voltage data
+            int voltage = Voltage_GetModuleMillivoltage(i);
+            CANPayload_t voltPayload;
+            voltPayload.idx = i;
+            voltPayload.data.w = voltage;
+            CANbus_BlockAndSend_FaultState(VOLT_DATA, voltPayload);
+        }
+
+
+
 #ifdef DEBUGMODE
         if (BSP_UART_ReadLine(command)) CLI_Handler(command); // CLI
 #endif

@@ -67,8 +67,6 @@ void Task1(void *p_arg){
                 OS_OPT_TASK_SAVE_FP | OS_OPT_TASK_STK_CHK,
                 &err);
 
-    CAN_Queue_Init();
-
     OSTaskDel(NULL, &err);
 }
 
@@ -82,7 +80,6 @@ void Task2(void *p_arg){
    
     while(1) {
        BSP_CAN_Write(0x10A, message, length);
-       BSP_CAN_Read(id, readData);
     }
 
     exit(0);
@@ -104,23 +101,6 @@ void Task3(void *p_arg){
     while(1){
         BSP_Light_Toggle(EXTRA);
         OSTimeDly(25, OS_OPT_TIME_DLY, &err);
-    }
-
-    exit(0);
-}
-
-//Send Message In Fault State
-void Task3(void *p_arg){
-    uint8_t message[8] = {0x01, 0x82,0x00,0x36,0x75,0,0,0x96};
-    uint8_t readData[8] = {0,0,0,0,0,0,0,0};
-    uint32_t id[1];
-  
-    uint8_t length = 8;
-    BSP_CAN_Init(NULL, NULL, false);
-   
-    while(1) {
-       BSP_CAN_Write(0x10A, message, length);
-       BSP_CAN_Read(id, readData);
     }
 
     exit(0);

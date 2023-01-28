@@ -44,36 +44,12 @@ static void CANbus_CountIncoming(void) {
  */
 void CANbus_Init(bool loopback, bool faultState) {
 	if(!faultState){
-			OS_ERR err;
-
-			OSMutexCreate(&CANbus_TxMutex,
-						"CAN TX Lock",
-						&err);
-			assertOSError(err);
-
-			OSMutexCreate(&CANbus_RxMutex,
-						"CAN RX Lock",
-						&err);
-			assertOSError(err);
-
-			OSSemCreate(&CANbus_MailSem4,
-						"CAN Mailbox Semaphore",
-						3,	// Number of mailboxes
-						&err);
-			assertOSError(err);
-
-			OSSemCreate(&CANbus_ReceiveSem4,
-						"CAN Queue Counter Semaphore",
-						0,
-						&err);
-			assertOSError(err);
+		RTOS_BPS_MutexCreate(&CANbus_TxMutex, "CAN TX Lock");
+		RTOS_BPS_MutexCreate(&CANbus_RxMutex, "CAN RX Lock");
+		RTOS_BPS_SemCreate(&CANbus_MailSem4, "CAN Mailbox Semaphore", 3); // # of mailboxes
+		RTOS_BPS_SemCreate(&CANbus_ReceiveSem4, "CAN Queue Counter Semaphore", 0);
 	}
 
-
-	RTOS_BPS_MutexCreate(&CANbus_TxMutex, "CAN TX Lock");
-	RTOS_BPS_MutexCreate(&CANbus_RxMutex, "CAN RX Lock");
-	RTOS_BPS_SemCreate(&CANbus_MailSem4, "CAN Mailbox Semaphore", 3); // # of mailboxes
-	RTOS_BPS_SemCreate(&CANbus_ReceiveSem4, "CAN Queue Counter Semaphore", 0);
 	// Initialize and pass interrupt hooks
     BSP_CAN_Init(CANbus_CountIncoming, CANbus_Release, loopback, faultState);
 }
@@ -169,6 +145,8 @@ static ErrorStatus CANbus_SendMsg_FaultState(CANId_t id, CANPayload_t payload) {
 			return ERROR;	// Do nothing if invalid
 	}
 
+	while(!foundMailBox(CAN1)){}
+
 	// Write the data to the bus
 	ErrorStatus retVal = BSP_CAN_Write(id, txdata, data_length);
 
@@ -192,8 +170,6 @@ ErrorStatus CANbus_BlockAndSend(CANId_t id, CANPayload_t payload) {
 	return result;
 }
 
-uint8_t boxedMessages = 0;
-
 /**
  * @brief   Transmits data onto the CANbus without mailbox semaphores.
  * @param   id : CAN id of the message
@@ -203,11 +179,8 @@ uint8_t boxedMessages = 0;
 ErrorStatus CANbus_BlockAndSend_FaultState(CANId_t id, CANPayload_t payload) {
 	ErrorStatus result = SUCCESS;
 
-	//Wait for another mailbox to oepn
-	while(boxedMessages > 2){}
-	boxedMessages++;
 	result = CANbus_SendMsg_FaultState(id, payload);
-	boxedMessages--;
+
 	return result;
 }
 

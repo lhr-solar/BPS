@@ -616,7 +616,8 @@ void CAN_TTComModeCmd(CAN_TypeDef* CANx, FunctionalState NewState);
 /* CAN Frames Transmission functions ******************************************/
 uint8_t CAN_Transmit(CAN_TypeDef* CANx, CanTxMsg* TxMessage);
 uint8_t CAN_TransmitStatus(CAN_TypeDef* CANx, uint8_t TransmitMailbox);
-void CAN_CancelTransmit(CAN_TypeDef* CANx, uint8_t Mailbox);
+void CAN_CancelTransCAN_Transmitmit(CAN_TypeDef* CANx, uint8_t Mailbox);
+bool findMailBox(CAN_TypeDef* CANx);
 
 /* CAN Frames Reception functions *********************************************/
 void CAN_Receive(CAN_TypeDef* CANx, uint8_t FIFONumber, CanRxMsg* RxMessage);

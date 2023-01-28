@@ -5,6 +5,7 @@
 
 #include "common.h"
 #include "config.h"
+#include "stm32f4xx.h"
 
 /**
  * @brief   Initializes the CAN module that communicates with the rest of the electrical system.
@@ -34,5 +35,14 @@ ErrorStatus BSP_CAN_Write(uint32_t id, uint8_t data[], uint8_t length);
  * @return  ERROR if nothing was received so ignore id and data that was received. SUCCESS indicates data was received and stored.
  */
 ErrorStatus BSP_CAN_Read(uint32_t *id, uint8_t *data);
+
+/**
+ * @brief Gets the mailbox that a message would be placed in, or no box if none are available.
+ * @param CANx: Type of message being sent.
+ * @param TxMessage: Message payload.
+ * @return The number of the mailbox that is used for transmission or
+ *         CAN_TxStatus_NoMailBox if there is no empty mailbox.
+*/
+bool foundMailBox(CAN_TypeDef* CANx);
 
 #endif
