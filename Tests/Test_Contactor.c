@@ -14,13 +14,13 @@ int main() {
 
     while(1) {
         // Delay for some time before doing anything else
-        Contactor_On(ARRAY_CONTACTOR);
+        Contactor_On(ARRAY_CONTACTOR_OUT);
         for(volatile int i = 0; i < 5000000; i++);
-        Contactor_On(HVLOW_CONTACTOR);
+        Contactor_On(HV_CONTACTOR_OUT);
         for(volatile int i = 0; i < 5000000; i++);
-        Contactor_Off(ARRAY_CONTACTOR);
+        Contactor_Off(ARRAY_CONTACTOR_OUT);
         for(volatile int i = 0; i < 5000000; i++);
-        Contactor_Off(HVLOW_CONTACTOR);
+        Contactor_Off(HV_CONTACTOR_OUT);
         for(volatile int i = 0; i < 5000000; i++);
     }
 }
