@@ -43,5 +43,5 @@ void Contactor_Off(uint8_t contactorChoice) {
  * @return  0 if contactor is off/open, 1 if on/closed
  */
 bool Contactor_GetState(uint8_t contactorChoice) {
-    return BSP_PWM_Get(contactorChoice);
+    return BSP_Contactor_Get(contactorChoice);
 }

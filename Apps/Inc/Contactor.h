@@ -12,14 +12,11 @@
 //Parameters for PWM
 #define PWM_ON_TIME 3500
 
-// Contactor 1
-#define C1 4 // contactor 1 on pwm output 4
-// Contactor 2 - this is for the contactor connected to the fan board
-#define CFAN 3 // right now we are using fan pin 3 as the contactor output
-
+#define CFAN 3
 //These are defining how the contactors are wired, the array contactor is assumed to be wired to the fan board
-#define ARRAY_CONTACTOR_OUT CFAN
-#define HV_CONTACTOR_OUT C1
+#define ARRAY_CONTACTOR CFAN // right now we are using fan pin 3 as the contactor output
+#define HVHIGH_CONTACTOR 4 // contactor 1 on pwm output 4
+#define HVLOW_CONTACTOR 4 // contactor 2 on pwm output 4
 
 /**
  * @brief   A Contactor is a high power switch similar to what a relay is. The Contactor

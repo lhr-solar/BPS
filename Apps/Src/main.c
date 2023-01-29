@@ -39,8 +39,9 @@ int main() {
 
     //Resetting the contactor
     Contactor_Init();
-    Contactor_Off(HV_CONTACTOR_OUT);
-    Contactor_Off(ARRAY_CONTACTOR_OUT);
+    Contactor_Off(HVLOW_CONTACTOR);
+    Contactor_Off(ARRAY_CONTACTOR);
+    Contactor_Off(HVHIGH_CONTACTOR);
 
     BSP_Lights_Init();
 

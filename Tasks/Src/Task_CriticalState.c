@@ -34,8 +34,9 @@ void Task_CriticalState(void *p_arg) {
                 );
 
     // Turn Contactor On
-    Contactor_On(HV_CONTACTOR_OUT);
-    Contactor_On(ARRAY_CONTACTOR_OUT);
+    Contactor_On(HVHIGH_CONTACTOR);
+    Contactor_On(ARRAY_CONTACTOR);
+    Contactor_On(HVLOW_CONTACTOR);
 
     // launch check contactor task
     RTOS_BPS_TaskCreate(&CheckContactor_TCB,                       // TCB

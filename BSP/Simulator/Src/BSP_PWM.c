@@ -89,7 +89,7 @@ int BSP_PWM_Get(uint8_t pin){
  * @param   Contactor to get state of
  * @return  0 if contactor is off/open, 1 if on/closed
  */
-bool Contactor_Get(uint8_t contactorChoice) {
+bool BSP_Contactor_Get(uint8_t contactorChoice) {
     return pinSpeeds[4] != 0;
 }
 
