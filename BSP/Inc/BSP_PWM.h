@@ -10,6 +10,8 @@
 #include "config.h"
 #include "common.h"
 
+#define PWM_PERIOD 4000
+
 /**
  * @brief   Initialize all the GPIO pins meant for pwm
  * @param   None
@@ -32,4 +34,11 @@ ErrorStatus BSP_PWM_Set(uint8_t pin, uint32_t speed);
  */
 int BSP_PWM_Get(uint8_t pin);
 
+/**
+ * @brief   Gets the state of the Contactor switch from one of its AUX pins.
+ * @note	THIS IS ALSO CODE THAT HAS NO HOME. You cannot get the state of ALL_CONTACTORS. As such, if that param is passed, it will return the state of the array contactor.
+ * @param   Contactor to get state of
+ * @return  0 if contactor is off/open, 1 if on/closed
+ */
+bool BSP_Contactor_Get(uint8_t contactorChoice);
 #endif

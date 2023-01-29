@@ -21,9 +21,9 @@ void BSP_PWM_Init(void){
     RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM12, ENABLE);
 
     //Enable Port Clocks
-    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
-    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE); //HV Contactor
-    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC, ENABLE);
+	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
+	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE); //HV Contactor
+	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC, ENABLE);
 
     //Configure TIM pins by configuring corresponding GPIO pins
     GPIO_PinAFConfig(GPIOB, GPIO_PinSource0, GPIO_AF_TIM3); //this one will always be contactor
@@ -45,25 +45,25 @@ void BSP_PWM_Init(void){
     GPIO_Init(GPIOB, &GPIO_INIT_STRUCT);
 
     //Configure Time base unit
-    TIMER_INIT_STRUCT.TIM_Period = PWM_PERIOD;
-      TIMER_INIT_STRUCT.TIM_Prescaler = 0x0000;
-    TIMER_INIT_STRUCT.TIM_ClockDivision = TIM_CKD_DIV1;
-    TIMER_INIT_STRUCT.TIM_CounterMode = TIM_CounterMode_Up;
-    TIMER_INIT_STRUCT.TIM_RepetitionCounter = 0x0000;
+	TIMER_INIT_STRUCT.TIM_Period = PWM_PERIOD;
+  	TIMER_INIT_STRUCT.TIM_Prescaler = 0x0000;
+	TIMER_INIT_STRUCT.TIM_ClockDivision = TIM_CKD_DIV1;
+	TIMER_INIT_STRUCT.TIM_CounterMode = TIM_CounterMode_Up;
+	TIMER_INIT_STRUCT.TIM_RepetitionCounter = 0x0000;
     TIM_TimeBaseInit(TIM3, &TIMER_INIT_STRUCT);
     TIM_TimeBaseInit(TIM8, &TIMER_INIT_STRUCT);
     TIM_TimeBaseInit(TIM12, &TIMER_INIT_STRUCT);
 
     //Fill in TIM_OCInitStruct with desired parameters
-    TIMER_OC_STRUCT.TIM_OCMode = TIM_OCMode_PWM1;
-    TIMER_OC_STRUCT.TIM_OutputState = TIM_OutputState_Enable;
-    TIMER_OC_STRUCT.TIM_OutputNState = TIM_OutputNState_Disable;
-    TIMER_OC_STRUCT.TIM_Pulse = 0; //start with everything off
-    TIMER_OC_STRUCT.TIM_OCPolarity = TIM_OCPolarity_High;
-    TIMER_OC_STRUCT.TIM_OCNPolarity = TIM_OCPolarity_High;
-    TIMER_OC_STRUCT.TIM_OCIdleState = TIM_OCIdleState_Reset;
-    TIMER_OC_STRUCT.TIM_OCNIdleState = TIM_OCNIdleState_Reset;
-    //Configure all channels with the output compare
+	TIMER_OC_STRUCT.TIM_OCMode = TIM_OCMode_PWM1;
+	TIMER_OC_STRUCT.TIM_OutputState = TIM_OutputState_Enable;
+	TIMER_OC_STRUCT.TIM_OutputNState = TIM_OutputNState_Disable;
+	TIMER_OC_STRUCT.TIM_Pulse = 0; //start with everything off
+	TIMER_OC_STRUCT.TIM_OCPolarity = TIM_OCPolarity_High;
+	TIMER_OC_STRUCT.TIM_OCNPolarity = TIM_OCPolarity_High;
+	TIMER_OC_STRUCT.TIM_OCIdleState = TIM_OCIdleState_Reset;
+	TIMER_OC_STRUCT.TIM_OCNIdleState = TIM_OCNIdleState_Reset;
+	//Configure all channels with the output compare
     TIM_OC3Init(TIM3, &TIMER_OC_STRUCT);
     TIM_OC1Init(TIM8, &TIMER_OC_STRUCT);
     TIM_OC2Init(TIM8, &TIMER_OC_STRUCT);
@@ -165,4 +165,34 @@ int BSP_PWM_Get(uint8_t pin){
     default:
         return -1;
     }
+}
+
+/**
+ * @brief   Gets the state of the Contactor switch from one of its AUX pins.
+ * @note	THIS IS ALSO CODE THAT HAS NO HOME. You cannot get the state of ALL_CONTACTORS. As such, if that param is passed, it will return the state of the array contactor.
+ * @param   Contactor to get state of
+ * @return  0 if contactor is off/open, 1 if on/closed
+ */
+bool BSP_Contactor_Get(uint8_t contactorChoice) {
+	bool contactorReturnValue = ((GPIOB->IDR & GPIO_Pin_1) >> 1) ? 0 : 1; //read the one and only input pin
+
+	/* this is future support for multiple contactors, but we only have one pin right now
+	bool contactorReturnValue = false;
+	if (contactorChoice == ARRAY_CONTACTOR) {
+		contactorReturnValue = ((C1_PORT->IDR & GPIO_Pin_1) >> 1) ? 0 : 1;
+	}
+	else if (contactorChoice == HVHIGH_CONTACTOR) {
+		contactorReturnValue = ((C2_PORT->IDR & GPIO_Pin_5) >> 5) ? 0 : 1;
+	}
+	else if (contactorChoice == HVLOW_CONTACTOR) {
+		contactorReturnValue = ((C3_PORT->IDR & GPIO_Pin_1) >> 1) ? 0 : 1;
+	}
+	else if (contactorChoice == ALL_CONTACTORS) {
+		// return if ANY of the contactors are off.
+		contactorReturnValue = (((C1_PORT->IDR & GPIO_Pin_1) >> 1) ? 0 : 1)
+			&& (((C2_PORT->IDR & GPIO_Pin_5) >> 5) ? 0 : 1)
+			&& (((C3_PORT->IDR & GPIO_Pin_1) >> 1) ? 0 : 1);
+	}
+	*/
+	return contactorReturnValue;
 }

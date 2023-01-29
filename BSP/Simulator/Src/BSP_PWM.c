@@ -12,10 +12,11 @@ static uint32_t pinSpeeds[] = {0, 0, 0, 0, 0};
 /**
  * @brief   Sets up contactor and fan pin timers for outputting PWM signals
  */
+
 void BSP_PWM_Init(void){
     //initialize all pins pertaining to fans and contactors for PWM here
     initialized = true;
-    Simulator_Log(LOG_INFO,"PWM initialized\n");
+    Simulator_Log(LOG_INFO,"Initialized PWM interface\n");
 }
 
 /**
@@ -81,3 +82,14 @@ int BSP_PWM_Get(uint8_t pin){
 
     return pinSpeeds[pin];
 }
+
+/**
+ * @brief   Gets the state of the Contactor switch from one of its AUX pins.
+ * @note	THIS IS ALSO CODE THAT HAS NO HOME. You cannot get the state of ALL_CONTACTORS. As such, if that param is passed, it will return the state of the array contactor.
+ * @param   Contactor to get state of
+ * @return  0 if contactor is off/open, 1 if on/closed
+ */
+bool BSP_Contactor_Get(uint8_t contactorChoice) {
+    return pinSpeeds[4] != 0;
+}
+
