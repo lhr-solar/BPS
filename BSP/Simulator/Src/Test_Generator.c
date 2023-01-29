@@ -24,7 +24,7 @@
 int randomRange(int lower, int upper){
     return (rand() % (upper - lower + 1)) + lower;
 }
-#define randomRange(lower, upper) ((rand() % (upper - lower + 1)) + lower)
+#define randomRange(lower, upper) ((rand() % (upper - lower)) + lower)
 
 static struct State states[jsonLength];
 
@@ -41,6 +41,7 @@ int main(int argc, char **argv){
     int inputsize;
     char* inputargs;
 
+    //input string parsing
     if(argc > 1){
     //argc more than 1 means the user has passed arguments that will be processed
             //allocate space for all the arguments that the user typed
@@ -51,29 +52,23 @@ int main(int argc, char **argv){
         }
 
         inputsize =(int) (strptr - *(argv + 1) - (argc - 2)); //don't wanna count null terminators so we subtract out number of command line arguments
-        inputargs = (char *)malloc(inputsize);
-        //printf("Allocataing %d locations", inputsize);
-        
+        inputargs = (char *)malloc(inputsize);        
 
         //add all tests to our inputargs array
-        int* j = (int *)malloc(sizeof(int));
-        *j = 0; //j will keep track of the number of while loop iterations
+        int inputcounter = 0;//inputcounter keeps track of the index we are storing the inputarg
         for(int i=1; i<argc; i++){
-            strptr = *(argv + i);
-            while (*strptr != '\0'){
-                //iterating through all the command line arguments to see if a was typed, because then we just run all the tests
-                if(*strptr == 'A' || *strptr == 'a'){
+            for(int j=0; argv[i][j] != '\0'; j++){
+                if(argv[i][j] == 'A' || argv[i][j] == 'a'){
                     printf("Running all tests\n");
                     generateData('a');
                     runTest('a');
                     return 0;
                 }
-                *(inputargs + *j) = *strptr;
-                strptr++;
-                (*j)++;
+                inputargs[inputcounter] = argv[i][j];
+                inputcounter++;
             }
         }
-        free(j);
+
 
     }else{
 
@@ -83,25 +78,25 @@ int main(int argc, char **argv){
         scanf("%m[^\n]", &userinput); //dynamically allocate memory for user input
         int inputlen = strlen(userinput);
         inputargs = (char *) malloc(sizeof(char) * inputlen); //allocate space for the array
-        inputsize = 0;
+        int inputcounter = 0;
         for(int i=0; i<inputlen; i++){
-            if(isalnum(*(userinput + i))){
-                if(*(userinput + i) == 'A' || *(userinput + i) == 'a'){
+            if(isalnum(userinput[i])){
+                if(userinput[i] == 'A' || userinput[i] == 'a'){
                     printf("Running all tests\n");
                     generateData('a');
                     runTest('a');
                     return 0;
                 }
-                *(inputargs + inputsize) = *(userinput + i);
-                inputsize++;
+                inputargs[inputcounter] = userinput[i];
+                inputcounter++;
             }
         }
     }
 
     //Iterate through the collected command line args and run all the specified tests
     for(int i=0; i<inputsize; i++){
-        generateData(*(inputargs + i));
-        runTest(*(inputargs + i));
+        generateData(inputargs[i]);
+        runTest(inputargs[i]);
     }
     return 0;
 }
@@ -203,10 +198,11 @@ void generateData(char selection){
             for(char i='0'; i<='9'; i++){
                 generateData(i);
             }
+            generateData('B');
             break;
         case 'B':
         case 'b':
-            writeOut("NoError.json");
+            writeOut("B-NoError");
             break;
         case 'C':
         case 'c':
@@ -222,7 +218,6 @@ void generateData(char selection){
  * @param charging Whether or not the car is in a charging state
 */
 void initializeVariables(bool charging){
-    int flipcurrent = charging ? -1 : 1; //we need to set the current to a negative value if the car is charging
     for(int i=0; i<jsonLength; i++) {    
         states[i].time = 10; //all state times to 10
 
@@ -230,15 +225,18 @@ void initializeVariables(bool charging){
 
         states[i].adcLow = 0;
 
+        int voltagecenter = randomRange((MIN_VOLTAGE_LIMIT + BALANCING_TOLERANCE_START) * 10, (MAX_VOLTAGE_LIMIT - BALANCING_TOLERANCE_START) * 10);
         for(int j=0; j<NUM_BATTERY_MODULES; j++) {
-            states[i].voltages[j] = randomRange(MIN_VOLTAGE_LIMIT * 10, MAX_VOLTAGE_LIMIT * 10);
+            int lowerlimit = voltagecenter - (BALANCING_TOLERANCE_STOP * 10);
+            int upperlimit = voltagecenter + (BALANCING_TOLERANCE_STOP * 10);
+            states[i].voltages[j] = randomRange(lowerlimit, upperlimit);
         }
 
         for(int j=0; j<NUM_TEMPERATURE_SENSORS; j++){
             states[i].temperatures[j] = randomRange(0, MAX_CHARGE_TEMPERATURE_LIMIT);
         }
 
-        states[i].current = flipcurrent * randomRange(0, MAX_CURRENT_LIMIT);
+        states[i].current = charging ? randomRange(MAX_CHARGING_CURRENT, 0) : randomRange(0, MAX_CURRENT_LIMIT);
 
         states[i].charge = 50000000;
     }
@@ -267,14 +265,14 @@ bool writeOut(char* filename){
         for(int j=0; j<NUM_BATTERY_MODULES-1; j++){
             fprintf(f, "%d, ", states[i].voltages[j]);
         }
-        fprintf(f, "%d\n        ],\n", states[i].voltages[NUM_BATTERY_MODULES]);
+        fprintf(f, "%d\n        ],\n", states[i].voltages[NUM_BATTERY_MODULES-1]);
 
         //print temperatures
         fprintf(f, "        \"temperatures\": [\n            ");
         for(int j=0; j<NUM_TEMPERATURE_SENSORS-1; j++){
             fprintf(f, "%d, ", states[i].temperatures[j]);
         }
-        fprintf(f, "%d\n        ],\n", states[i].temperatures[NUM_TEMPERATURE_SENSORS]);
+        fprintf(f, "%d\n        ],\n", states[i].temperatures[NUM_TEMPERATURE_SENSORS-1]);
 
         fprintf(f,"        \"current\": %d,\n", states[i].current);
         fprintf(f, "        \"charge\": %d\n", states[i].charge);
@@ -299,6 +297,7 @@ void runTest(char input){
         for(char i='0'; i<='9'; i++){
             runTest(i);
         }
+        runTest('B');
     }else{
         // run the specified test
         char* command;

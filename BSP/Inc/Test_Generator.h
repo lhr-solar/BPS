@@ -1,6 +1,6 @@
 #ifndef TESTGENERATOR_H
 #define TESTGENERATOR_H
-#define jsonLength 10 //length of the generated jsonfiles
+#define jsonLength 5 //length of the generated jsonfiles
 
 #include "config.h"
 
