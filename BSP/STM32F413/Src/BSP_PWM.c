@@ -1,4 +1,4 @@
- /* Copyright (c) 2018-2022 UT Longhorn Racing Solar */
+/* Copyright (c) 2018-2022 UT Longhorn Racing Solar */
 
 #include "BSP_PWM.h"
 
@@ -87,17 +87,15 @@ void BSP_PWM_Init(void){
     TIM_Cmd(TIM12, ENABLE);
     //END OF PWM Init method
 
-
-    //THIS IS EXTRA CODE THAT HAS NO HOME, SO I'M PUTTING IT IN THE PWM FILE FOR NOW.
     //This deals with setting up the input pin for the contactor
     //setup the input pin
     GPIO_InitTypeDef GPIO_C1Init;
-	GPIO_C1Init.GPIO_Pin = GPIO_Pin_1; //input pin is gpio B1
+    GPIO_C1Init.GPIO_Pin = GPIO_Pin_1; //input pin is gpio B1
     GPIO_C1Init.GPIO_Mode = GPIO_Mode_IN;
     GPIO_C1Init.GPIO_Speed = GPIO_Speed_2MHz;
     GPIO_C1Init.GPIO_PuPd = GPIO_PuPd_DOWN;
     GPIO_C1Init.GPIO_OType = GPIO_OType_PP;
-    GPIO_Init(C1_PORT, &GPIO_C1Init);
+    GPIO_Init(GPIOB, &GPIO_C1Init);
 }
 
 /**
@@ -111,7 +109,7 @@ ErrorStatus BSP_PWM_Set(uint8_t pin, uint32_t speed){
     //Range of pulse is 0-4000
     //First check to make sure that change is within range of values
     //Load new value into Compare and Capture Register
-    if (speed>4000) speed = 4000;
+    if (speed > 4000) speed = 4000;
 
     switch (pin)
     {
@@ -169,15 +167,14 @@ int BSP_PWM_Get(uint8_t pin){
     }
 }
 
-
 /**
  * @brief   Gets the state of the Contactor switch from one of its AUX pins.
  * @note	THIS IS ALSO CODE THAT HAS NO HOME. You cannot get the state of ALL_CONTACTORS. As such, if that param is passed, it will return the state of the array contactor.
  * @param   Contactor to get state of
  * @return  0 if contactor is off/open, 1 if on/closed
  */
-bool Contactor_Get(uint8_t contactorChoice) {
-	bool contactorReturnValue = ((C1_PORT->IDR & GPIO_Pin_1) >> 1) ? 0 : 1; //read the one and only input pin
+bool BSP_Contactor_Get(uint8_t contactorChoice) {
+	bool contactorReturnValue = ((GPIOB->IDR & GPIO_Pin_1) >> 1) ? 0 : 1; //read the one and only input pin
 
 	/* this is future support for multiple contactors, but we only have one pin right now
 	bool contactorReturnValue = false;

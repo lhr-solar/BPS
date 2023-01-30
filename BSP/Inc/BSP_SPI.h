@@ -4,9 +4,7 @@
 #define BSP_SPI_H
 
 #include "common.h"
-#include "os.h"
 #include "BSP_OS.h"
-
 
 /**
  * @note    This is for the RTOS version of the BPS 

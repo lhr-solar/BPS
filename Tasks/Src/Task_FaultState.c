@@ -1,5 +1,4 @@
 /* Copyright (c) 2018-2022 UT Longhorn Racing Solar */
-#include "os.h"
 #include "Tasks.h"
 #include "Contactor.h"
 #include "BSP_Lights.h"
@@ -37,7 +36,9 @@ void EnterFaultState() {
 
     // Turn Contactor Off
     Contactor_Init();
-    Contactor_Off(ALL_CONTACTORS);
+    Contactor_Off(HVHIGH_CONTACTOR);
+    Contactor_Off(ARRAY_CONTACTOR);
+    Contactor_Off(HVLOW_CONTACTOR);
     //Set Fans to full speed
     Fans_Init();
     Fans_SetAll(TOPSPEED);
@@ -94,8 +95,16 @@ void EnterFaultState() {
             BSP_Light_On(WIRE);  
             break;
         case Fault_HANDLER:
+        #ifdef SIMULATION
+            sprintf(err, "$$$ Entered fault in state {%d} - FAULT HANDLER\n", stateCount - 1);
+            Simulator_Log_Location(LOG_INFO, err);
+        #endif    
             break;
         case Fault_OS:
+        #ifdef SIMULATION
+            sprintf(err, "$$$ Entered fault in state {%d} - OS ERROR\n", stateCount - 1);
+            Simulator_Log_Location(LOG_INFO, err);
+        #endif
             break;
         case Fault_WDOG:
         #ifdef SIMULATION
@@ -158,13 +167,10 @@ void EnterFaultState() {
 
 void Task_FaultState(void *p_arg) {
     (void)p_arg;
-    OS_ERR err;
-    CPU_TS ts;
 
     // BLOCKING =====================
     // Wait until a FAULT is signaled by another task.
-    OSSemPend(&Fault_Sem4, 0, OS_OPT_PEND_BLOCKING, &ts, &err);
-    
+    RTOS_BPS_SemPend(&Fault_Sem4, OS_OPT_PEND_BLOCKING);
     EnterFaultState();
 }
 

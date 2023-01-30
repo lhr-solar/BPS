@@ -377,7 +377,7 @@ void BSP_SPI_SetStateCS(spi_port_t port, uint8_t state) {
 
 void SPI1_IRQHandler(void){
 	// Save the CPU registers
-	CPU_SR_ALLOC();
+	CPU_SR_ALLOC(); //TODO: Replace with RTOS independent code (i.e replae with wrappers)
 
 	// Protect a critical section
 	CPU_CRITICAL_ENTER();
@@ -435,8 +435,5 @@ void SPI3_IRQHandler(){
 	//make the kernel aware that the interrupt has ended
 	OSIntExit();
 }
-
-
-
 
 #endif

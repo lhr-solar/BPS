@@ -1,5 +1,6 @@
-/* Copyright (c) 2018-2022 UT Longhorn Racing Solar */
-#include "BSP_Contactor.h"
+#include "Contactor.h"
+#include "BSP_PLL.h"
+
 
 /* This is a basic test to verify that our contactor
  * code and hardware work. This should start with the
@@ -8,22 +9,18 @@
  */
 
 int main() {
-    BSP_Contactor_Init();   // Initialize the contactor
-
-    BSP_Contactor_On(ALL_CONTACTORS);     // Enable the contactor
+    BSP_PLL_Init();
+    Contactor_Init();   // Initialize the contactor
 
     while(1) {
         // Delay for some time before doing anything else
-        for(volatile int i = 0; i < 1000000; i++);
-    
-        // Read the contactor state
-        bool contactorEnabled = BSP_Contactor_GetState(ARRAY_CONTACTOR);
-        
-        // Toggle the contactor state
-        if(contactorEnabled) {
-            BSP_Contactor_Off(ALL_CONTACTORS);
-        } else {
-            BSP_Contactor_On(ALL_CONTACTORS);
-        }
+        Contactor_On(ARRAY_CONTACTOR_OUT);
+        for(volatile int i = 0; i < 5000000; i++);
+        Contactor_On(HV_CONTACTOR_OUT);
+        for(volatile int i = 0; i < 5000000; i++);
+        Contactor_Off(ARRAY_CONTACTOR_OUT);
+        for(volatile int i = 0; i < 5000000; i++);
+        Contactor_Off(HV_CONTACTOR_OUT);
+        for(volatile int i = 0; i < 5000000; i++);
     }
 }

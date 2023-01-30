@@ -227,7 +227,7 @@ uint32_t BSP_UART_Write(char *str, uint32_t len, UART_Port usart) {
 }
 
 void USART2_IRQHandler(void) {
-#ifdef RTOS
+#ifdef RTOS //TODO: Replace with RTOS independent code (i.e replae with wrappers)
     CPU_SR_ALLOC();
     CPU_CRITICAL_ENTER();
     OSIntEnter();

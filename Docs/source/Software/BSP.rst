@@ -18,39 +18,6 @@ Additional Considerations
     This queue cannot be accessed outside the file. If the queue exceeds it's limit, we will lose
     messages.
 
-Contactor BSP
-=============
-
-Purpose
-    The contactor BSP interfaces with the :term:`GPIO <GPIO>` pins connected to the contactor. These pins are used to control the 
-    contactor (PB0) and to check the state of the contactor (PB1).
-
-Usage
-    The peripheral should be initialized by calling ``BSP_Contactor_Init()`` before any of the other functions are called. See 
-    ``BPS/BSP/BSP_Contactor.h`` for details on individual functions. The AUX pin we have connected to the contactor is negative 
-    logic so ``BSP_Contactor_GetState()`` reads negative logic for the state of the contactors.
-
-Additional Considerations
-    The contactor is one of the most important safety features in the vehicle, so the contactor should only be turned on (closed) 
-    if the BPS is sure that the battery pack is in a safe state. All 3 of the contactors set pins are in parallel so calling 
-    ``BSP_Contactor_Off()`` or ``BSP_Contactor_Off()`` will turn all of them on or off.
-
-Fans BSP: Manthan Upadhyaya
-==================================
-
-Purpose
-    The Fans driver is used to control the speed of the fans depending on the temperature of the Battery
-    Pack. It uses pins PC6, PC7, PB14, PB15 with the alternative function of :term:`Pulse-Width Modulation 
-    <Pulse Width Modulation>` enabled for as many speeds as needed for a total of 4 fans. The fans 
-    use PWM, so the speed can be reduced to save energy.
-
-Usage
-    It sets the speeds of individual fans and can also return the value of those speeds. The 
-    ``BSP_Fans.h`` file has more information on how to use each function.
-
-Additional Considerations
-    None
-
 I2C BSP: Manthan Upadhyaya
 =================================
 
@@ -125,13 +92,10 @@ Usage
         bsp_os_t spi_os;
         OS_SEM MinionsIO_Sem4;
         void LTC6811_Pend(void) {
-            CPU_TS ts;
-            OS_ERR err;
-            OSSemPend(&MinionsIO_Sem4, 0, OS_OPT_PEND_BLOCKING, &ts, &err);
+            RTOS_BPS_SemPend(&MinionsIO_Sem4, 0, OS_OPT_PEND_BLOCKING, &ts, &err);
         }
         void LTC6811_Post(void) {
-            OS_ERR err;
-            OSSemPost(&MinionsIO_Sem4, OS_OPT_POST_1, &err);
+            RTOS_BPS_SemPost(&MinionsIO_Sem4, OS_OPT_POST_1, &err);
         }
         void LTC6811_Init(void) {
             spi_os.pend = LTC6811_Pend;

@@ -8,27 +8,31 @@ Uses Pins PC6,7 and PB14,15
 #include "Fans.h"
 #include "Contactor.h"
 
+/**
+ * @brief   Initialize all the GPIO pins connected to each Fan
+ * @param   None
+ * @return  None
+ */
 void Fans_Init(void){
     #ifdef SIMULATION
-		Simulator_Log(LOG_INFO, "Fans Initialized\n");
-	#endif
+        Simulator_Log(LOG_INFO, "Fans Initialized\n");
+    #endif
     BSP_PWM_Init();
 }
 
 /**
  * @brief This function will change the speed of the fans
  * @param fan Number of fan to change speed (1-4)
- * @param speed Speed of Fan(0-8)
+ * @param speed Speed of Fan(0-TOPSPEED)
  * @return ErrorStatus will return 1 if successful, 0 if error occurred
  */
-
 ErrorStatus Fans_Set(uint8_t fan, uint32_t speed){
     //don't mess with the contactor
     if (fan == CFAN) return ERROR;
     //Range of pulse is 0-4000
     //First check to make sure that change is within range of values
     //Load new value into Compare and Capture Register
-    return (speed < 0 || speed > TOPSPEED) ? ERROR : BSP_PWM_Set(fan, speed * DIVIDER); //if not in range, leave function with error code
+    return (speed < 0 || speed > TOPSPEED) ? BSP_PWM_Set(fan, TOPSPEED * DIVIDER) : BSP_PWM_Set(fan, speed * DIVIDER); //if not in range, leave function with error code
 }
 
 /**
@@ -39,7 +43,7 @@ ErrorStatus Fans_Set(uint8_t fan, uint32_t speed){
 int Fans_GetSpeed(uint8_t fan){
     if (fan == CFAN) return -1;
     int fanspeed = BSP_PWM_Get(fan);
-    return fanspeed == -1 ? -1 : fanspeed / DIVIDER;
+    return fanspeed == -1 ? -1 : (fanspeed / DIVIDER);
 }
 
 /**

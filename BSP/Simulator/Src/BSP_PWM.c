@@ -12,10 +12,11 @@ static uint32_t pinSpeeds[] = {0, 0, 0, 0, 0};
 /**
  * @brief   Sets up contactor and fan pin timers for outputting PWM signals
  */
+
 void BSP_PWM_Init(void){
     //initialize all pins pertaining to fans and contactors for PWM here
     initialized = true;
-    Simulator_Log(LOG_INFO,"PWM initialized\n");
+    Simulator_Log(LOG_INFO,"Initialized PWM interface\n");
 }
 
 /**
@@ -88,12 +89,7 @@ int BSP_PWM_Get(uint8_t pin){
  * @param   Contactor to get state of
  * @return  0 if contactor is off/open, 1 if on/closed
  */
-bool Contactor_Get(uint8_t contactorChoice) {
-    if(!initialized) {
-        Simulator_Log_Location(LOG_ERROR, "Used PWM without initialization!\n");
-        exit(-1);
-    }
-    
+bool BSP_Contactor_Get(uint8_t contactorChoice) {
     return pinSpeeds[4] != 0;
 }
 

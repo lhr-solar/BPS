@@ -2,8 +2,7 @@
 #ifndef TASKS_H
 #define TASKS_H
 
-#include "os.h"
-#include <stdint.h>
+#include "RTOS_BPS.h"
 
 #define TASK_INIT_PRIO                      0
 #define TASK_FAULT_STATE_PRIO               1
@@ -77,7 +76,7 @@ void Task_Init(void *p_arg);
  * Used to assert if there has been an error in one of the OS functions
  * Kills the car if there is an OS error
  **/
-void assertOSError(OS_ERR err);
+void assertOSError(BPS_OS_ERR err);
 
 /*
  * Thread Control Blocks that contain information about each thread
