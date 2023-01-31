@@ -231,15 +231,17 @@ void Simulator_Init(char *jsonPath) {
 
     // create the log file
     simulatorLog = open(filename, O_CREAT | O_WRONLY, 0664);
-    free(filename);
+
     if (simulatorLog < 0) {
-        printf("error opening file %s\n", jsonPath);
+        printf("error opening file %s\n", filename);
         exit(-1);
     }
     if (write(simulatorLog, "simulator started...\n", 21) < 0) {
-        printf("error writing file %s\n", jsonPath);
+        printf("error writing file %s\n", filename);
         exit(-1);
     }
+    free(filename);
+
     
     // register the Ctrl-C handler
     sigset_t s;
