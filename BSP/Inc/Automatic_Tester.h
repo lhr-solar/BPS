@@ -63,4 +63,11 @@ bool writeOut(char* filename);
 */
 void runTest(char input);
 
+/**
+ * @brief Writes the expected output of the simulator
+ * @param filename The filename that the output file will have
+ * @note The method will automatically which test generate the expected output by the filename
+*/
+bool writeVerification(char* filename);
+
 #endif

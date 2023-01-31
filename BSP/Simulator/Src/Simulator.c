@@ -227,7 +227,7 @@ void Simulator_Init(char *jsonPath) {
     while (*tempName != '/') tempName--;
     tempName++; // remove the '/'
     // makes the output nice
-    asprintf(&filename, "bps-sim-%s.log", tempName);
+    asprintf(&filename, "BSP/Simulator/Simulator-Out/%s.log", tempName);
 
     // create the log file
     simulatorLog = open(filename, O_CREAT | O_WRONLY, 0664);

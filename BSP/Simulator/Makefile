@@ -12,7 +12,7 @@ CC = gcc
 ######################################
 # Source
 ######################################
-SRC = $(filter-out Src/Test_Generator.c, $(wildcard Src/*.c))	# BSP code
+SRC = $(filter-out Src/Automatic_Tester.c, $(wildcard Src/*.c))	# BSP code
 
 SRC1 = \
 $(wildcard $(TARGET_PATH)/Drivers/Src/*.c)	# Driver code
@@ -75,7 +75,7 @@ DEF = -D_XOPEN_SOURCE=700 -DSIMULATION -D$(OS)
 ######################################
 # Build
 ######################################
-all: $(TARGET_PATH)/$(TARGET) $(TARGET_PATH)/Test_Generator.out
+all: $(TARGET_PATH)/$(TARGET) $(TARGET_PATH)/Automatic_Tester.out
 
 $(TARGET_PATH)/$(TARGET): $(OBJ) $(BUILD_DIR)
 	$(CC) -o $@ $(OBJ) $(FLAGS) $(LIB)
@@ -86,9 +86,9 @@ $(BUILD_DIR)/%.o: %.c $(BUILD_DIR)
 $(BUILD_DIR):
 	mkdir $@
 
-$(TARGET_PATH)/Test_Generator.out: $(BUILD_DIR)/Test_Generator.o
-	$(CC) -o $@ $(BUILD_DIR)/Test_Generator.o $(FLAGS) $(LIB)
+$(TARGET_PATH)/Automatic_Tester.out: $(BUILD_DIR)/Automatic_Tester.o
+	$(CC) -o $@ $(BUILD_DIR)/Automatic_Tester.o $(FLAGS) $(LIB)
 
-$(BUILD_DIR)/Test_Generator.o: Src/Test_Generator.c 
+$(BUILD_DIR)/Automatic_Tester.o: Src/Automatic_Tester.c 
 	$(CC) -c -o $@ $< $(FLAGS) $(DEF)
 

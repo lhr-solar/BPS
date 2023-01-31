@@ -1,5 +1,9 @@
 {
     "forbidden_states": {
+        "Contactor": [
+            ["ContactorC1", "enabled"],
+            ["ContactorCFAN", "enabled"]
+        ]
     },
     "end_state": {
         "Contactor": [
@@ -8,7 +12,7 @@
         ],
         "Light": [
             ["FAULT", "1"],
-            ["UVOLT", "1"]
+            ["OCURR", "1"]
         ],
         "Fan": [
             ["0", "4000"],

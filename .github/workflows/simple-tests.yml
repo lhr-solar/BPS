@@ -25,13 +25,14 @@ jobs:
     # run tests in sudo for rtprio to work
     - name: Unit Test 
       run: |
-        sudo ./Validation/test.sh critical_overcurrent
-        sudo ./Validation/test.sh critical_overtemp_discharging
-        sudo ./Validation/test.sh critical_overvolt
-        sudo ./Validation/test.sh critical_undervolt
-        sudo ./Validation/test.sh overcurrent
-        sudo ./Validation/test.sh overtemp_charging
-        sudo ./Validation/test.sh overtemp_discharging
-        sudo ./Validation/test.sh overvolt
-        sudo ./Validation/test.sh undervolt
+        sudo python3 Validation/verify_test.py BSP/Simulator/Data/ManualTests/critical_overcurrent.json
+        sudo python3 Validation/verify_test.py BSP/Simulator/Data/ManualTests/critical_overtemp_discharging.json
+        sudo python3 Validation/verify_test.py BSP/Simulator/Data/ManualTests/critical_overvolt.json
+        sudo python3 Validation/verify_test.py BSP/Simulator/Data/ManualTests/critical_undervolt.json
+        sudo python3 Validation/verify_test.py BSP/Simulator/Data/ManualTests/overcurrent.json
+        sudo python3 Validation/verify_test.py BSP/Simulator/Data/ManualTests/overtemp_charging.json
+        sudo python3 Validation/verify_test.py BSP/Simulator/Data/ManualTests/overtemp_discharging.json
+        sudo python3 Validation/verify_test.py BSP/Simulator/Data/ManualTests/overvolt.json
+        sudo python3 Validation/verify_test.py BSP/Simulator/Data/ManualTests/undervolt.json
+        ./Automatic_Tester.out a
     # add more tests here

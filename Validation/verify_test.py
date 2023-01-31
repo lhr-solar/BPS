@@ -5,12 +5,12 @@ behavior and does not reach any forbidden states
 """
 import argparse
 import json
+import os
 
 from typing import Dict, List
 from parse_simulator import parse, LOG_FILEPATH, PERIPHERALS
 
-TEST_FILEPATH: str = "./BSP/Simulator/Data/"
-LOG_PREFIX: str = "bps-sim-"
+LOG_PREFIX: str = "BSP/Simulator/Simulator-Out/bps-sim-"
 PERIPHERALS_MULTIPLE: List[str] = [
     "Light",
     "Fan",
@@ -83,10 +83,21 @@ def verify_output(out_json: str, bps_state: Dict[str, List[List[str]]]) -> bool:
     return verified
 
 def main():
+    os.system("ulimit -r unlimited")
+
     args = parse_args()
     test_name = args.test_name
-    out_filepath = TEST_FILEPATH + test_name + "-out" + ".json"
-    log_filepath = LOG_FILEPATH + LOG_PREFIX + test_name + ".json.log"
+    out_filepath = test_name[:test_name.rfind('.')]
+    out_filepath = out_filepath + "-out.json"
+
+    #seperate out the actual file name
+    log_filepath = test_name[test_name.rfind('/')+1:]
+    log_filepath = LOG_FILEPATH + log_filepath + ".log"
+    
+    #run the simulator 
+    os.system("./bps-simulator.out "+ test_name)
+
+    #run the verification
     bps_state = parse(log_filepath)
     out_json = parse_output(out_filepath)
     if verify_output(out_json, bps_state):
@@ -94,7 +105,6 @@ def main():
         exit(0)
     else:
         print("Test failed")
-        print(bps_state)
         exit(-1)
     
 if __name__ == '__main__':

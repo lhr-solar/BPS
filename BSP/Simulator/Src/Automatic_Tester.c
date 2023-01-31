@@ -1,4 +1,4 @@
-#include "Test_Generator.h"
+#include "Automatic_Tester.h"
 #include <time.h> // for creating unique logfile names
 // for open() syscall
 #include <sys/types.h>  // for stat() and struct stat as well
@@ -12,7 +12,6 @@
 #include <signal.h>
 // for boolean
 #include <stdbool.h>
-#include "cJSON.h" // for json parser
 #include <stdlib.h> // for calloc/free
 
 /**
@@ -21,9 +20,6 @@
  * @param   upper The upper bound, exclusive
  * @return  Random number between lower and upper
  */
-int randomRange(int lower, int upper){
-    return (rand() % (upper - lower + 1)) + lower;
-}
 #define randomRange(lower, upper) ((rand() % (upper - lower)) + lower)
 
 static struct State states[jsonLength];
@@ -64,7 +60,7 @@ int main(int argc, char **argv){
                     runTest('a');
                     return 0;
                 }
-                inputargs[inputcounter] = argv[i][j];
+                inputargs[inputcounter] = toupper(argv[i][j]);
                 inputcounter++;
             }
         }
@@ -78,7 +74,7 @@ int main(int argc, char **argv){
         scanf("%m[^\n]", &userinput); //dynamically allocate memory for user input
         int inputlen = strlen(userinput);
         inputargs = (char *) malloc(sizeof(char) * inputlen); //allocate space for the array
-        int inputcounter = 0;
+        inputsize = 0;
         for(int i=0; i<inputlen; i++){
             if(isalnum(userinput[i])){
                 if(userinput[i] == 'A' || userinput[i] == 'a'){
@@ -87,8 +83,9 @@ int main(int argc, char **argv){
                     runTest('a');
                     return 0;
                 }
-                inputargs[inputcounter] = userinput[i];
-                inputcounter++;
+                inputargs[inputsize] = toupper(userinput[i]);
+
+                inputsize++;
             }
         }
     }
@@ -98,6 +95,7 @@ int main(int argc, char **argv){
         generateData(inputargs[i]);
         runTest(inputargs[i]);
     }
+
     return 0;
 }
 
@@ -249,10 +247,13 @@ void initializeVariables(bool charging){
 */
 bool writeOut(char* filename){
     char* filepath;
-    asprintf(&filepath, "BSP/Simulator/Data/%s.json", filename);
+    asprintf(&filepath, "BSP/Simulator/Data/AutomatedTests/%s.json", filename);
     printf("Writing out %s\n", filepath);
     FILE *f;
     f = fopen(filepath, "w");
+    if(f == 0){
+        return false; //throw error if file is not openable
+    }
     fprintf(f, "[\n");
     for (int i=0; i<jsonLength; i++) {
         fprintf(f, "    {\n");
@@ -283,8 +284,75 @@ bool writeOut(char* filename){
         }
     }
     fprintf(f, "]\n");
-
     fclose(f);
+
+    return writeVerification(filename);
+}
+
+bool writeVerification(char* filename){
+    char selection = filename[0];
+
+    char* filepath;
+    asprintf(&filepath, "BSP/Simulator/Data/AutomatedTests/%s-out.json", filename);
+    printf("Writing out %s\n", filepath);
+    FILE *f;
+    f = fopen(filepath, "w");
+    if(f == 0){
+        return false; //throw error if file is not openable
+    }
+
+
+    fprintf(f, "{\n    \"forbidden_states\": {\n");
+    //if we are in a critical state, forbidden states exist
+    if(selection <='4' && selection >= '0'){
+        fprintf(f, "        \"Contactor\": [\n            [\"ContactorC1\", \"enabled\"],\n            [\"ContactorCFAN\", \"enabled\"]\n        ]\n");
+    }
+    fprintf(f, "    },\n");
+    fprintf(f, "    \"end_state\": {\n");
+    //end state for all problematic states should have contactors open
+    if(isdigit(selection)){
+        fprintf(f,"        \"Contactor\": [\n            [\"ContactorC1\", \"disabled\"],\n            [\"ContactorCFAN\", \"disabled\"]\n        ],\n");
+    }else{
+        fprintf(f,"        \"Contactor\": [\n            [\"ContactorC1\", \"enabled\"],\n            [\"ContactorCFAN\", \"enabled\"]\n        ],\n");
+    }
+
+    //specific fault state for each test case
+    fprintf(f, "        \"Light\": [\n");
+    switch(selection){
+        case '0':
+        case '5':
+            fprintf(f,"            [\"FAULT\", \"1\"],\n            [\"OCURR\", \"1\"]\n");
+            break;
+        case '1':
+        case '2':
+        case '6':
+        case '7':
+            fprintf(f,"            [\"FAULT\", \"1\"],\n            [\"OTEMP\", \"1\"]\n");
+            break;
+        case '3':
+        case '8':
+            fprintf(f,"            [\"FAULT\", \"1\"],\n            [\"OVOLT\", \"1\"]\n");
+            break;
+        case '4':
+        case '9':
+            fprintf(f,"            [\"FAULT\", \"1\"],\n            [\"UVOLT\", \"1\"]\n");
+            break;
+        case 'B':
+            fprintf(f,"            [\"FAULT\", \"0\"]\n");
+            break;
+    }
+    fprintf(f, "        ],\n");
+
+    //fan end state
+    fprintf(f, "        \"Fan\": [\n");
+    if(isdigit(selection)){ //only the tests with errors will max out the fans
+        fprintf(f,"            [\"0\", \"4000\"],\n            [\"1\", \"4000\"],\n            [\"2\", \"4000\"]\n");
+    }
+    fprintf(f,"        ]\n");
+
+    fprintf(f,"    }\n}");
+    fclose(f);
+
     return true;
 }
 
@@ -301,7 +369,8 @@ void runTest(char input){
     }else{
         // run the specified test
         char* command;
-        asprintf(&command, "./bps-simulator.out `ls BSP/Simulator/Data/%c-*`", input); //generate command
+        asprintf(&command, "python3 Validation/verify_test.py `ls BSP/Simulator/Data/AutomatedTests/%c-* | head -n 1`", input); //generate command
+        printf("%s\n", command);
         system(command); //run command
     }
 }
