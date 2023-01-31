@@ -226,8 +226,13 @@ void Simulator_Init(char *jsonPath) {
     char* tempName = jsonPath + strlen(jsonPath);
     while (*tempName != '/') tempName--;
     tempName++; // remove the '/'
+
+    char* outputdir = "BSP/Simulator/Simulator-Out";
     // makes the output nice
-    asprintf(&filename, "BSP/Simulator/Simulator-Out/%s.log", tempName);
+    asprintf(&filename, "%s/%s.log", outputdir, tempName);
+
+    // check if the output folder exists, if not, then make it
+    mkdir(outputdir, S_IRWXU);
 
     // create the log file
     simulatorLog = open(filename, O_CREAT | O_WRONLY, 0664);
