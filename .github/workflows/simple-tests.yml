@@ -25,7 +25,6 @@ jobs:
     # run tests in sudo for rtprio to work
     - name: Unit Test 
       run: |
-        sudo ulimit -r unlimited
         python3 Validation/verify_test.py BSP/Simulator/Data/ManualTests/critical_overcurrent.json
         python3 Validation/verify_test.py BSP/Simulator/Data/ManualTests/critical_overtemp_discharging.json
         python3 Validation/verify_test.py BSP/Simulator/Data/ManualTests/critical_overvolt.json
