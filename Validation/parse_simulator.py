@@ -9,7 +9,7 @@ import re
 
 from typing import Dict, List
 
-LOG_FILEPATH: str = "./BSP/Simulator/Simulator-Out/"
+LOG_FILEPATH: str = "BSP/Simulator/Simulator-Out/"
 PERIPHERALS: List[str] = [
     "ADC",
     "CAN",

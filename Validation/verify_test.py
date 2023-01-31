@@ -83,8 +83,6 @@ def verify_output(out_json: str, bps_state: Dict[str, List[List[str]]]) -> bool:
     return verified
 
 def main():
-    os.system("ulimit -r unlimited")
-
     args = parse_args()
     test_name = args.test_name
     out_filepath = test_name[:test_name.rfind('.')]
