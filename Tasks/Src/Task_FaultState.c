@@ -153,7 +153,7 @@ void EnterFaultState() {
     BSP_WDTimer_Start(); 
     while(1) {
 #ifdef DEBUGMODE
-        if (BSP_UART_ReadLine(command)) CLI_Handler(command); // CLI
+        if (BSP_UART_ReadLine(command, UART_USB)) CLI_Handler(command); // CLI
 #endif
         BSP_WDTimer_Reset(); // WDOG Reset
 #ifdef SIMULATION
