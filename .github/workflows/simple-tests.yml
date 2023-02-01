@@ -25,14 +25,14 @@ jobs:
     # run tests in sudo for rtprio to work
     - name: Unit Test 
       run: |
-        sudo python3 Validation/verify_test.py BSP/Simulator/Data/ManualTests/critical_overcurrent.json
-        sudo python3 Validation/verify_test.py BSP/Simulator/Data/ManualTests/critical_overtemp_discharging.json
-        sudo python3 Validation/verify_test.py BSP/Simulator/Data/ManualTests/critical_overvolt.json
-        sudo python3 Validation/verify_test.py BSP/Simulator/Data/ManualTests/critical_undervolt.json
-        sudo python3 Validation/verify_test.py BSP/Simulator/Data/ManualTests/overcurrent.json
-        sudo python3 Validation/verify_test.py BSP/Simulator/Data/ManualTests/overtemp_charging.json
-        sudo python3 Validation/verify_test.py BSP/Simulator/Data/ManualTests/overtemp_discharging.json
-        sudo python3 Validation/verify_test.py BSP/Simulator/Data/ManualTests/overvolt.json
-        sudo python3 Validation/verify_test.py BSP/Simulator/Data/ManualTests/undervolt.json
-        ./Automatic_Tester.out a
+        sudo bash Validation/test.sh BSP/Simulator/Data/ManualTests/critical_overcurrent.json
+        sudo bash Validation/test.sh BSP/Simulator/Data/ManualTests/critical_overtemp_discharging.json
+        sudo bash Validation/test.sh BSP/Simulator/Data/ManualTests/critical_overvolt.json
+        sudo bash Validation/test.sh BSP/Simulator/Data/ManualTests/critical_undervolt.json
+        sudo bash Validation/test.sh BSP/Simulator/Data/ManualTests/overcurrent.json
+        sudo bash Validation/test.sh BSP/Simulator/Data/ManualTests/overtemp_charging.json
+        sudo bash Validation/test.sh BSP/Simulator/Data/ManualTests/overtemp_discharging.json
+        sudo bash Validation/test.sh BSP/Simulator/Data/ManualTests/overvolt.json
+        sudo bash Validation/test.sh BSP/Simulator/Data/ManualTests/undervolt.json
+        sudo bash Validation/automatedTest.sh 
     # add more tests here
