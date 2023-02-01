@@ -93,6 +93,7 @@ def main():
     log_filepath = LOG_FILEPATH + log_filepath + ".log"
     
     #run the simulator 
+    os.system("ulimit -r unlimited")
     os.system("./bps-simulator.out "+ test_name)
 
     #run the verification
