@@ -145,23 +145,25 @@ void EnterFaultState() {
     BSP_WDTimer_Start(); 
     while(1) {
         //Send Trip Message
-        CANPayload_t tripPayload;
+        CANPayload_t payload;
         tripPayload.idx = 0;
+
         tripPayload.data.w = 1;
         CANbus_BlockAndSend_FaultState(TRIP, tripPayload);
-        for(int i = 0; i < 10000; i++);
+        for(volatile int i = 0; i < 10000; i++);
+
+        // contactor message
         tripPayload.data.w = 0;
         CANbus_BlockAndSend_FaultState(CONTACTOR_STATE, tripPayload);
-
         for(int i = 0; i < 10000; i++);
         
         //Send Current Readings
         int32_t latestMeasureMilliAmps = Amps_GetReading(); 
         CANPayload_t ampPayload;
         ampPayload.idx = 0;
+
         ampPayload.data.w = latestMeasureMilliAmps;
         CANbus_BlockAndSend_FaultState(CURRENT_DATA, ampPayload);
-
         for(int i = 0; i < 10000; i++);
 
         //Send Voltage Readings
@@ -173,7 +175,13 @@ void EnterFaultState() {
             CANbus_BlockAndSend_FaultState(VOLT_DATA, voltPayload);
         }
 
-
+        CANPayload_t tempPayload;
+        CANbus_BlockAndSend_FaultState(CURRENT_DATA, ampPayload);
+        for (int i = 0; i < NUM_BATTERY_MODULES; i++){ //send all battery module voltage data
+            tempPayload.idx = i;
+            tempPayload.data.w = Temperature_GetModuleTemperature(i);
+            CANbus_BlockAndSend_FaultState(TEMP_DATA, tempPayload);
+        }
 
 #ifdef DEBUGMODE
         if (BSP_UART_ReadLine(command)) CLI_Handler(command); // CLI
