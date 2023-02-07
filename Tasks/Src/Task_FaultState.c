@@ -127,6 +127,12 @@ void EnterFaultState() {
         #endif
             BSP_Light_On(WIRE); //This is normally for Open Wire, but is used for ESTOP since we do not check Open Wire as of 1/9/2023
             break;
+        case Fault_EXT:
+        #ifdef SIMULATION
+            sprintf(err, "$$$ Entered fault in state {%d} - EXTERNAL FAULT\n", stateCount - 1);
+            Simulator_Log_Location(LOG_INFO, err);
+        #endif
+            break;
     }
 
     EEPROM_LogError(Fault_BitMap);
