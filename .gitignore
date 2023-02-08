@@ -14,3 +14,4 @@ Docs/build/*
 Docs/source/_build/*
 .vscode/*
 *.result
+*.swp
