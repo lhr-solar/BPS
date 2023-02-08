@@ -11,11 +11,13 @@
 #include "Simulator.h"
 #endif
 #include "BSP_Lights.h"
-#include "BSP_PLL.h"
 #include "CAN_Queue.h"
+#include "BSP_PLL.h"
 #include "BSP_WDTimer.h"
 #include "Contactor.h"
 #include "RTOS_BPS.h"
+#include "Voltage.h"
+#include "Temperature.h"
 
 /******************************************************************************
  * VoltTempMonitor Task Test Plan
@@ -120,18 +122,33 @@ void Task2(void *p_arg){
         RTOS_BPS_MutexPost(&WDog_Mutex, OS_OPT_POST_NONE);
         //delay of 100ms
         RTOS_BPS_DelayTick(10);
-        //BSP_Light_Toggle(RUN);
+        BSP_Light_Toggle(RUN);
+
+        printf("****************Module Voltages****************\r\n");
+        for(int i = 0; i < NUM_BATTERY_MODULES; i++) {
+            printf("\t%d: %dmV\r\n", i, Voltage_GetModuleMillivoltage(i));
+        }
+
+        printf("******************Module Temperatures*****************\r\n");
+        for(int i = 0; i < NUM_MINIONS; i++) {
+            printf("Minion %d:\r\n", i);
+            printf("\tTemperature:\r\n");
+
+            for(int j = 0; j < MAX_TEMP_SENSORS_PER_MINION_BOARD; j++) {
+                printf("\t%d: %ldmC\r\n", j, Temperature_GetSingleTempSensor(i, j));
+            }
+        }
     }
 }
 
-// Similar to the production code main. Does not mess with contactor 
-#ifndef SIMULATION
 int main(void) {
     OS_ERR err;
     
     //Resetting the contactor
     Contactor_Init();
-    Contactor_Off(ALL_CONTACTORS);
+    Contactor_Off(HVLOW_CONTACTOR);
+    Contactor_Off(HVHIGH_CONTACTOR);
+    Contactor_Off(ARRAY_CONTACTOR);
 
     if (BSP_WDTimer_DidSystemReset()) {
         Fault_BitMap = Fault_WDOG;
