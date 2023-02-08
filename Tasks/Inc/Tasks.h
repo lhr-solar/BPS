@@ -78,6 +78,12 @@ void Task_Init(void *p_arg);
  **/
 void assertOSError(BPS_OS_ERR err);
 
+/**
+ * Used to Enter Fault State in case OS is not working
+ **/
+
+void EnterFaultState(void);
+
 /*
  * Thread Control Blocks that contain information about each thread
  */

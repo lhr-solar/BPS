@@ -43,7 +43,6 @@ OS_TCB Task2_TCB;
 CPU_STK Task2_Stk[DEFAULT_STACK_SIZE];
 
 OS_ERR p_err;
-void EnterFaultState(void);
 
 // Initialization task for this test
 void Task1(void *p_arg){

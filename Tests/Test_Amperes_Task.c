@@ -32,8 +32,6 @@
  *    verify that the contactor opens (the contactor should have closed earlier on startup)
  *****************************************************************************/
 
-void EnterFaultState(void);
-
 // Used by Task1
 OS_TCB Task1_TCB;
 CPU_STK Task1_Stk[DEFAULT_STACK_SIZE];

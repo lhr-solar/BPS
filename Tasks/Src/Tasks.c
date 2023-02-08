@@ -63,8 +63,6 @@ uint32_t WDog_BitMap = 0;
 uint32_t Fault_BitMap = 0; //This is a variable that sets certain bits based on what caused the fault
 uint8_t Fault_Flag    = 0; //This is a flag that replaces the semaphore in case the OS fails
 
-void EnterFaultState(void);
-
 /**
  * Used to assert if there has been an error in one of the OS functions
  * Kills the car if there is an OS error
