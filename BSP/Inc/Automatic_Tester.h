@@ -1,5 +1,7 @@
-#ifndef TESTGENERATOR_H
-#define TESTGENERATOR_H
+/* Copyright (c) 2018-2022 UT Longhorn Racing Solar */
+
+#ifndef AUTOMATIC_TESTER_H
+#define AUTOMATIC_TESTER_H
 #define jsonLength 5 //length of the generated jsonfiles
 
 #include "config.h"

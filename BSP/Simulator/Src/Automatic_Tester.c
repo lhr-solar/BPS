@@ -1,3 +1,4 @@
+/* Copyright (c) 2018-2022 UT Longhorn Racing Solar */
 #include "Automatic_Tester.h"
 #include <time.h> // for creating unique logfile names
 // for open() syscall
