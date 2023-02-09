@@ -372,6 +372,11 @@ void runTest(char input){
         char* command;
         asprintf(&command, "python3 Validation/verify_test.py `ls BSP/Simulator/Data/AutomatedTests/%c-* | head -n 1`", input); //generate command
         printf("%s\n", command);
-        system(command); //run command
+        if(system(command) != 0){
+           //check if test was successful, if not we need to throw error and exit
+           system("cat BSP/Simulator/Simulator-Out/%c-*");
+           system("echo -e \"The json file used was \n\"; cat BSP/Simulator/Data/AutomatedTests/%c-*");
+           exit(-1); 
+        } 
     }
 }
