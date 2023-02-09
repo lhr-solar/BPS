@@ -23,7 +23,7 @@ typedef enum SafetyStatus_e {SAFE = 0, DANGER = 1, OVERVOLTAGE = 2, UNDERVOLTAGE
 
 //--------------------------------------------------------------------------------
 // Battery Fault Checks
-#define NUM_FAULT_POINTS				4
+#define NUM_FAULT_POINTS				5
 
 //--------------------------------------------------------------------------------
 // Battery Pack layout

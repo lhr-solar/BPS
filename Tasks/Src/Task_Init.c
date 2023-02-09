@@ -104,6 +104,16 @@ void Task_Init(void *p_arg) {
             TASK_IDLE_STACK_SIZE);
     
     CAN_Queue_Init();
+
+    // If a contactor is on before we turn it on in critical state, it may have failed and welded shut
+    if(Contactor_GetState(HVHIGH_CONTACTOR) || Contactor_GetState(HVLOW_CONTACTOR)) {
+        Fault_BitMap |= Fault_ESTOP;
+        RTOS_BPS_SemPost(&Fault_Sem4, OS_OPT_POST_1);
+    } else {
+        // Signal to turn on contactor but only signal once
+        RTOS_BPS_SemPost(&SafetyCheck_Sem4, OS_OPT_POST_1);
+    }
+
     //delete task
     OSTaskDel(NULL, &err); // Delete task
 }
