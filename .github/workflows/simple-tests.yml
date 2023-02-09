@@ -34,5 +34,6 @@ jobs:
         sudo bash Validation/test.sh BSP/Simulator/Data/ManualTests/overtemp_discharging.json
         sudo bash Validation/test.sh BSP/Simulator/Data/ManualTests/overvolt.json
         sudo bash Validation/test.sh BSP/Simulator/Data/ManualTests/undervolt.json
-        sudo bash Validation/automatedTest.sh 
+        echo -e "End of Manual Tests \n\n"
+        sudo bash Validation/automatedTest.sh
     # add more tests here
