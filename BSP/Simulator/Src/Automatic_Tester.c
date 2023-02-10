@@ -14,6 +14,7 @@
 // for boolean
 #include <stdbool.h>
 #include <stdlib.h> // for calloc/free
+#include <errno.h>
 
 /**
  * @brief   Generates random numbers between a range
@@ -24,6 +25,8 @@
 #define randomRange(lower, upper) ((rand() % (upper - lower)) + lower)
 
 static struct State states[jsonLength];
+
+char* fp = "/BSP/Simulator/Data/AutomatedTests/";
 
 /**
  * @brief The output of this file automates the generation of test files and runs them using the simulator
@@ -53,12 +56,12 @@ int main(int argc, char **argv){
 
         //add all tests to our inputargs array
         int inputcounter = 0;//inputcounter keeps track of the index we are storing the inputarg
-        for(int i=1; i<argc; i++){
-            for(int j=0; argv[i][j] != '\0'; j++){
-                if(argv[i][j] == 'A' || argv[i][j] == 'a'){
+        for(int i = 1; i < argc; i++){
+            for(int j = 0; argv[i][j] != '\0'; j++){
+                if(argv[i][j] == ALL_ERR || argv[i][j] == (ALL_ERR + 32)){
                     printf("Running all tests\n");
-                    generateData('a');
-                    runTest('a');
+                    generateData(ALL_ERR);
+                    runTest(ALL_ERR);
                     return 0;
                 }
                 inputargs[inputcounter] = toupper(argv[i][j]);
@@ -70,18 +73,32 @@ int main(int argc, char **argv){
     }else{
 
         //if there are no CLI parameters, ask the user for which test to run
-        printf("\n0-Critical Overcurrent\n1-Critical Overtemp while charging\n2-Critical Overtemp while discharging\n3-Critical Overvolt\n4-Critical Undervolt\n5-Overcurrent\n6-Overtemp while charging\n7-Overtemp while discharging\n8-Overvolt\n9-Undervolt\nA-Generate All Error Tests\nB-No Error Test\nC-All Edge Cases Error Test\nSelect a Test to run by typing the corresponding character:");
+        printf("\n\r%c-Critical Overcurrent \
+                \n\r%c-Critical Overtemp while discharging \
+                \n\r%c-Critical Overvolt \
+                \n\r%c-Critical Undervolt \
+                \n\r%c-Overcurrent \
+                \n\r%c-Overtemp while charging \
+                \n\r%c-Overtemp while discharging \
+                \n\r%c-Overvolt \
+                \n\r%c-Undervolt \
+                \n\r%c-Generate All Error Tests \
+                \n\r%c-No Error Test \
+                \n\r%c-All Edge Cases Error Test \
+                \n\rSelect a Test to run by typing the corresponding character: ", \
+                CRIT_OCURR, CRIT_OTEMP_DSCHRGE, CRIT_OVOLT, CRIT_UVOLT, OCURR, \
+                OTEMP_CHRG, OTEMP_DSCHRG, OVOLT, UVOLT, ALL_ERR, NONE, ALL_EDGE);
         char* userinput;
         scanf("%m[^\n]", &userinput); //dynamically allocate memory for user input
         int inputlen = strlen(userinput);
         inputargs = (char *) malloc(sizeof(char) * inputlen); //allocate space for the array
         inputsize = 0;
-        for(int i=0; i<inputlen; i++){
+        for(int i = 0; i < inputlen; i++){
             if(isalnum(userinput[i])){
-                if(userinput[i] == 'A' || userinput[i] == 'a'){
+                if(userinput[i] == ALL_ERR || userinput[i] == (ALL_ERR + 32)){
                     printf("Running all tests\n");
-                    generateData('a');
-                    runTest('a');
+                    generateData(ALL_ERR);
+                    runTest(ALL_ERR);
                     return 0;
                 }
                 inputargs[inputsize] = toupper(userinput[i]);
@@ -92,7 +109,7 @@ int main(int argc, char **argv){
     }
 
     //Iterate through the collected command line args and run all the specified tests
-    for(int i=0; i<inputsize; i++){
+    for(int i = 0; i < inputsize; i++){
         generateData(inputargs[i]);
         runTest(inputargs[i]);
     }
@@ -104,31 +121,17 @@ int main(int argc, char **argv){
 /**
  * @brief   Generates the test json, outputs it to file test.json
  * @param   selection Selects which test to generate
- *          0-Critical Overcurrent
- *          1-Critical Overtemp while charging
- *          2-Critical Overtemp while discharging
- *          3-Critical Overvolt
- *          4-Critical Undervolt
- *          5-Overcurrent
- *          6-Overtemp while charging
- *          7-Overtemp while discharging
- *          8-Overvolt
- *          9-Undervolt
- *          A-Generate All Error Tests
- *          B-No Error Test
- *          C-All Edge Cases Error Test
  * @return  None
  */
 void generateData(char selection){
     int index, victim; //temperary indexing variables
     //initialization
     switch(selection){
-        case '1':
-        case '6':
+        case OTEMP_CHRG:
             initializeVariables(true);
             break;
-        case '2':
-        case '7':
+        case CRIT_OTEMP_DSCHRGE:
+        case OTEMP_DSCHRG:
             initializeVariables(false);
             break;
         default:
@@ -136,79 +139,74 @@ void generateData(char selection){
             rand()%2==0 ? initializeVariables(true) : initializeVariables(false);
             break;
     }
-
+    char* filename;
     //now we throw an error into the data so that simulator will trip
     switch (selection){
-        case '0':
+        case CRIT_OCURR:
             states[0].current = MAX_CURRENT_LIMIT + 1;
-            writeOut("0-Critical-OverCurrent");
+            asprintf(&filename, "%c-Critical-OverCurrent", selection);
             break;
-        case '1':
-            victim = randomRange(0, NUM_TEMPERATURE_SENSORS);
-            states[0].temperatures[victim] = MAX_CHARGE_TEMPERATURE_LIMIT + 1;
-            writeOut("1-Critical-ChargingOverTemperature");
-            break;
-        case '2':
+        case CRIT_OTEMP_DSCHRGE:
             victim = randomRange(0, NUM_TEMPERATURE_SENSORS);
             states[0].temperatures[victim] = MAX_DISCHARGE_TEMPERATURE_LIMIT + 1;
-            writeOut("2-Critical-DischargingOverTemperature");
+            asprintf(&filename, "%c-Critical-DischargingOverTemperature", selection);
             break;
-        case '3':
+        case CRIT_OVOLT:
             victim = randomRange(0, NUM_BATTERY_MODULES);
             states[0].voltages[victim] = (MAX_VOLTAGE_LIMIT + 1)*10;
-            writeOut("3-Critical-OverVoltage");
+            asprintf(&filename, "%c-Critical-OverVoltage", selection);
             break;
-        case '4':
+        case CRIT_UVOLT:
             victim = randomRange(0, NUM_BATTERY_MODULES);
             states[0].voltages[victim] = (MIN_VOLTAGE_CHARGING_LIMIT - 1)*10;
-            writeOut("4-Critical-UnderVoltage");
+            asprintf(&filename, "%c-Critical-UnderVoltage", selection);
             break;
-        case '5':
+        case OCURR:
             index = randomRange(1,jsonLength);
             states[index].current = MAX_CURRENT_LIMIT + 1;
-            writeOut("5-OverCurrent");
+            asprintf(&filename, "%c-OverCurrent", selection);
             break;
-        case '6':
+        case OTEMP_CHRG:
             index = randomRange(1,jsonLength);
             victim = randomRange(0, NUM_TEMPERATURE_SENSORS);
             states[index].temperatures[victim] = MAX_CHARGE_TEMPERATURE_LIMIT + 1;
-            writeOut("6-ChargingOverTemperature");
+            asprintf(&filename, "%c-ChargingOverTemperature", selection);
             break;
-        case '7':
+        case OTEMP_DSCHRG:
             index = randomRange(1,jsonLength - 1);
             victim = randomRange(0, NUM_TEMPERATURE_SENSORS);
             states[index].temperatures[victim] = MAX_DISCHARGE_TEMPERATURE_LIMIT + 1;
-            writeOut("7-DischargingOverTemperature");
+            asprintf(&filename, "%c-DishargingOverTemperature", selection);
             break;
-        case '8':
+        case OVOLT:
             index = randomRange(1,jsonLength - 1);
             victim = randomRange(0, NUM_BATTERY_MODULES);
             states[index].voltages[victim] = (MAX_VOLTAGE_LIMIT + 1)*10;
-            writeOut("8-OverVoltage");
+            asprintf(&filename, "%c-DishargingOverTemperature", selection);
             break;
-        case '9':
+        case UVOLT:
             index = randomRange(1,jsonLength);
             victim = randomRange(0, NUM_BATTERY_MODULES);
             states[index].voltages[victim] = (MIN_VOLTAGE_CHARGING_LIMIT - 1)*10;
-            writeOut("9-UnderVoltage");
+            asprintf(&filename, "%c-Undervoltage", selection);
             break;
-        case 'A':
-        case 'a':
-            for(char i='0'; i<='9'; i++){
+        case ALL_ERR:
+            for(char i = '0'; i < ALL_ERR; i++){
                 generateData(i);
             }
-            generateData('B');
+            generateData(NONE);
             break;
-        case 'B':
-        case 'b':
-            writeOut("B-NoError");
+        case NONE:
+            asprintf(&filename, "%c-NoError", selection);
             break;
-        case 'C':
-        case 'c':
+        case ALL_EDGE:
             //to do
             break;
         default:
             break;
+    }
+    if (selection != ALL_ERR) {
+        writeOut(filename);
     }
 }
 
@@ -217,8 +215,8 @@ void generateData(char selection){
  * @param charging Whether or not the car is in a charging state
 */
 void initializeVariables(bool charging){
-    for(int i=0; i<jsonLength; i++) {    
-        states[i].time = 10; //all state times to 10
+    for(int i = 0; i < jsonLength; i++) {    
+        states[i].time = 1; //all state times to 1
 
         states[i].adcHigh = 0;
 
@@ -248,15 +246,19 @@ void initializeVariables(bool charging){
 */
 bool writeOut(char* filename){
     char* filepath;
-    asprintf(&filepath, "BSP/Simulator/Data/AutomatedTests/%s.json", filename);
+    char *cwd;
+    cwd = getcwd(NULL, 0);
+    asprintf(&filepath, "%s%s%s.json", cwd, fp, filename);
+    free(cwd);
     printf("Writing out %s\n", filepath);
     FILE *f;
     f = fopen(filepath, "w");
-    if(f == 0){
-        return false; //throw error if file is not openable
+    if (f == NULL) {
+        fprintf(stderr, "can't open %s: %s\n", filepath, strerror(errno));
+        return false;
     }
     fprintf(f, "[\n");
-    for (int i=0; i<jsonLength; i++) {
+    for (int i = 0; i < jsonLength; i++) {
         fprintf(f, "    {\n");
         fprintf(f, "        \"time\": %d,\n", states[i].time);
         fprintf(f, "        \"adcHigh\": %d,\n", states[i].adcHigh);
@@ -294,14 +296,17 @@ bool writeVerification(char* filename){
     char selection = filename[0];
 
     char* filepath;
-    asprintf(&filepath, "BSP/Simulator/Data/AutomatedTests/%s-out.json", filename);
+    char *cwd;
+    cwd = getcwd(NULL, 0);
+    asprintf(&filepath, "%s%s%s-out.json", cwd, fp, filename);
+    free(cwd);
     printf("Writing out %s\n", filepath);
     FILE *f;
     f = fopen(filepath, "w");
-    if(f == 0){
-        return false; //throw error if file is not openable
+    if (f == NULL) {
+        fprintf(stderr, "can't open %s: %s\n", filepath, strerror(errno));
+        return false;
     }
-
 
     fprintf(f, "{\n    \"forbidden_states\": {\n");
     //if we are in a critical state, forbidden states exist
@@ -320,25 +325,24 @@ bool writeVerification(char* filename){
     //specific fault state for each test case
     fprintf(f, "        \"Light\": [\n");
     switch(selection){
-        case '0':
-        case '5':
+        case CRIT_OCURR:
+        case OCURR:
             fprintf(f,"            [\"FAULT\", \"1\"],\n            [\"OCURR\", \"1\"]\n");
             break;
-        case '1':
-        case '2':
-        case '6':
-        case '7':
+        case CRIT_OTEMP_DSCHRGE:
+        case OTEMP_CHRG:
+        case OTEMP_DSCHRG:
             fprintf(f,"            [\"FAULT\", \"1\"],\n            [\"OTEMP\", \"1\"]\n");
             break;
-        case '3':
-        case '8':
+        case CRIT_OVOLT:
+        case OVOLT:
             fprintf(f,"            [\"FAULT\", \"1\"],\n            [\"OVOLT\", \"1\"]\n");
             break;
-        case '4':
-        case '9':
+        case CRIT_UVOLT:
+        case UVOLT:
             fprintf(f,"            [\"FAULT\", \"1\"],\n            [\"UVOLT\", \"1\"]\n");
             break;
-        case 'B':
+        case NONE:
             fprintf(f,"            [\"FAULT\", \"0\"]\n");
             break;
     }
@@ -362,15 +366,15 @@ bool writeVerification(char* filename){
  * @param input The specific test to run, refer to generateData() to see what each char means
 */
 void runTest(char input){
-    if (input == 'a' || input == 'A'){
-        for(char i='0'; i<='9'; i++){
+    if (input == ALL_ERR || input == (ALL_ERR + 32)){
+        for(char i = '0'; i < ALL_ERR; i++){
             runTest(i);
         }
-        runTest('B');
+        runTest(NONE);
     }else{
         // run the specified test
         char* command;
-        asprintf(&command, "python3 Validation/verify_test.py `ls BSP/Simulator/Data/AutomatedTests/%c-* | head -n 1`", input); //generate command
+        asprintf(&command, " python3 Validation/verify_test.py `find BSP/Simulator/Data/AutomatedTests/ -name \"%c-*\" ! -name \"*-out.json\"`", input); //generate command
         printf("%s\n", command);
         if(system(command) != 0){
            //check if test was successful, if not we need to throw error and exit

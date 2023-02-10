@@ -16,6 +16,20 @@ struct State {
     int charge;
 };
 
+typedef enum {
+    CRIT_OCURR = '0',
+    CRIT_OTEMP_DSCHRGE = '1',
+    CRIT_OVOLT = '2',
+    CRIT_UVOLT = '3',
+    OCURR = '4',
+    OTEMP_CHRG = '5',
+    OTEMP_DSCHRG = '6',
+    OVOLT = '7',
+    UVOLT = '8',
+    ALL_ERR = '9',
+    NONE = 'A',
+    ALL_EDGE = 'B'
+} ERR_t;
 
 /**
  * @brief The output of this file automates the generation of test files and running them using the simulator
@@ -29,19 +43,6 @@ int main(int argc, char **argv);
 /**
  * @brief   Generates the test json, outputs it to file test.json
  * @param   selection Selects which test to generate
- *          0-Critical Overcurrent
- *          1-Critical Overtemp while charging
- *          2-Critical Overtemp while discharging
- *          3-Critical Overvolt
- *          4-Critical Undervolt
- *          5-Overcurrent
- *          6-Overtemp while charging
- *          7-Overtemp while discharging
- *          8-Overvolt
- *          9-Undervolt
- *          A-Generate All Error Tests
- *          B-No Error Test
- *          C-All Edge Cases Error Test
  * @return  None
  */
 void generateData(char selection);
