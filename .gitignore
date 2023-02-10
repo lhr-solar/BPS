@@ -12,7 +12,6 @@ RTE_Components.h
 __pycache__
 Docs/build/*
 Docs/source/_build/*
-BSP/Simulator/Data/AutomatedTests/*
 BSP/Simulator/Simulator-Out/*
 .vscode/*
 *.result
