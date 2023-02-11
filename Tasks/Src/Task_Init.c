@@ -26,12 +26,12 @@ void Task_Init(void *p_arg) {
 
     // 1
     RTOS_BPS_TaskCreate(&CheckContactor_TCB,    // TCB
-				"Task_CheckContactor",          // Task Name (String)
-				Task_CheckContactor,            // Task function pointer
-				(void *)0,                      // Task function args
-				TASK_CHECK_CONTACTOR_PRIO,      // Priority
-				CheckContactor_Stk,             // Stack
-				TASK_CHECK_CONTACTOR_STACK_SIZE
+                "Task_CheckContactor",          // Task Name (String)
+                Task_CheckContactor,            // Task function pointer
+                (void *)0,                      // Task function args
+                TASK_CHECK_CONTACTOR_PRIO,      // Priority
+                CheckContactor_Stk,             // Stack
+                TASK_CHECK_CONTACTOR_STACK_SIZE
                 );
     //3
     // RTOS_BPS_TaskCreate(&PetWDog_TCB,	    // TCB
