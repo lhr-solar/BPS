@@ -125,7 +125,6 @@ extern OS_SEM Fault_Sem4;
 extern OS_MUTEX WDog_Mutex;
 extern OS_MUTEX MinionsASIC_Mutex;
 extern uint32_t WDog_BitMap;
-extern uint32_t Fault_BitMap;
 extern uint8_t Fault_Flag;
 
 typedef enum {
@@ -140,5 +139,7 @@ typedef enum {
     Fault_CRC     = 0x100,
     Fault_ESTOP   = 0x200
 }Fault_Set;
+
+extern Fault_Set Fault_BitMap;
 
 #endif

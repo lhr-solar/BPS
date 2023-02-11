@@ -60,7 +60,7 @@ BPS_OS_MUTEX MinionsASIC_Mutex;
  */
 cell_asic Minions[NUM_MINIONS];
 uint32_t WDog_BitMap = 0;
-uint32_t Fault_BitMap = 0; //This is a variable that sets certain bits based on what caused the fault
+Fault_Set Fault_BitMap = 0; //This is a variable that sets certain bits based on what caused the fault
 uint8_t Fault_Flag    = 0; //This is a flag that replaces the semaphore in case the OS fails
 
 /**
