@@ -49,8 +49,6 @@ void Task1(void *p_arg){
 
     OS_CPU_SysTickInit(SystemCoreClock / (CPU_INT32U) OSCfg_TickRate_Hz);
 
-    RTOS_BPS_SemCreate(&Fault_Sem4, "Fault/Tripped Semaphore", 0);
-
     RTOS_BPS_SemCreate(&SafetyCheck_Sem4, "Safety Check Semaphore", 0);
 
     RTOS_BPS_TaskCreate(&CriticalState_TCB,				// TCB

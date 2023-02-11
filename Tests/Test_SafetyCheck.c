@@ -86,35 +86,6 @@ static int8_t Current_IsCharging(void) {
     return 1;
 }
 
-void FaultState(void *p_arg) {
-    (void)p_arg;
-
-
-    printf("Fault State\r\n");
-
-    // BLOCKING =====================
-    // Wait until a FAULT is signaled by another task.
-    RTOS_BPS_SemPend(&Fault_Sem4, OS_OPT_PEND_BLOCKING);
-
-    // Turn Contactor Off
-
-    // Turn Strobe Light On
-
-    // Turn LEDs On
-
-    // Record State of BPS into EEPROM
-
-    // Push Trip message to CAN Q
-
-    // Push Contactor State message to CAN Q
-    printf("F\r\n");
-
-    while(1) {
-        // CLI
-        // WDOG Reset
-    }
-}
-
 void CriticalState(void *p_arg) {
     (void)p_arg;
 

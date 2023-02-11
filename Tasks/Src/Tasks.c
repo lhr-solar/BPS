@@ -29,7 +29,6 @@ BPS_OS_TCB Init_TCB;
 /**
  * @brief   Stacks
  */
-BPS_CPU_STK FaultState_Stk[TASK_FAULT_STATE_STACK_SIZE];
 BPS_CPU_STK CriticalState_Stk[TASK_CANBUS_CONSUMER_STACK_SIZE];
 BPS_CPU_STK PetWDog_Stk[TASK_PETWDOG_STACK_SIZE];
 BPS_CPU_STK VoltTempMonitor_Stk[TASK_VOLT_TEMP_MONITOR_STACK_SIZE];
@@ -58,7 +57,7 @@ BPS_OS_MUTEX MinionsASIC_Mutex;
  * Global Variables
  */
 cell_asic Minions[NUM_MINIONS];
-uint32_t WDog_BitMap = 0;
+WDOGBits_e WDog_BitMap = WD_NONE;
 Fault_Set Fault_BitMap = 0; //This is a variable that sets certain bits based on what caused the fault
 uint8_t Fault_Flag    = 0; //This is a flag that replaces the semaphore in case the OS fails
 
