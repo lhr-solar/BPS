@@ -18,7 +18,7 @@ void Task2(void *p_arg){
     RTOS_BPS_DelayTick(250);
 
     Fault_BitMap = Fault_OW;   // set this to whatever you want
-    RTOS_BPS_SemPost(&Fault_Sem4, OS_OPT_POST_1);
+    EnterFaultState();
     
     BSP_Lights_Init();
    
@@ -35,16 +35,6 @@ void Task1(void *p_arg){
 
     OS_CPU_SysTickInit(SystemCoreClock / (CPU_INT32U) OSCfg_TickRate_Hz);
 
-    RTOS_BPS_SemCreate(&Fault_Sem4, "Fault/Tripped Semaphore", 0);
-
-    RTOS_BPS_TaskCreate(&FaultState_TCB,				// TCB
-				"TASK_FAULT_STATE_PRIO",	// Task Name (String)
-				Task_FaultState,				// Task function pointer
-				(void *)0,				// Task function args
-				TASK_FAULT_STATE_PRIO,			// Priority
-				FaultState_Stk,	// Watermark limit for debugging
-				TASK_FAULT_STATE_STACK_SIZE);					// return err code
-    
     RTOS_BPS_TaskCreate(&Task2_TCB,
                 "Task 2",
                 Task2,

@@ -47,7 +47,6 @@ BPS_CPU_STK Init_Stk[TASK_INIT_STACK_SIZE];
  * Semaphores
  */
 BPS_OS_SEM SafetyCheck_Sem4;
-BPS_OS_SEM Fault_Sem4;
 
 /**
  * Mutexes
@@ -73,7 +72,7 @@ void assertOSError(BPS_OS_ERR err){
     if(err != OS_ERR_NONE) {
         Fault_BitMap |= Fault_OS;
         Fault_Flag = 1;
-        RTOS_BPS_SemPost(&Fault_Sem4, OS_OPT_POST_1);
+        EnterFaultState();
         // We should not get to this point if the call above worked.
         // Thus, we need to manually enter a fault state, since the
         // OS obviously is not functioning correctly.
