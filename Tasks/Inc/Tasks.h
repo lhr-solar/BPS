@@ -69,6 +69,8 @@ void Task_Idle(void *p_arg);
 
 void Task_Init(void *p_arg);
 
+void EnterFaultState();
+
 
 /**
  * Used to assert if there has been an error in one of the OS functions
