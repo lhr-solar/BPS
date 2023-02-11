@@ -26,7 +26,7 @@ void Task_Init(void *p_arg) {
 
     RTOS_BPS_MutexCreate(&WDog_Mutex, "Watchdog Mutex");
 
-    //1
+    /*
     RTOS_BPS_TaskCreate(&FaultState_TCB,	    // TCB
             "TASK_FAULT_STATE",	                // Task Name (String)
             Task_FaultState,			        // Task function pointer
@@ -34,6 +34,8 @@ void Task_Init(void *p_arg) {
             TASK_FAULT_STATE_PRIO,	            // Priority
             FaultState_Stk,			            // Stack
             TASK_FAULT_STATE_STACK_SIZE);
+        */
+       
     //2
     RTOS_BPS_TaskCreate(&CriticalState_TCB,	    // TCB
             "TASK_CRITICAL_STATE",	            // Task Name (String)

@@ -19,11 +19,6 @@
 extern uint8_t stateCount;
 #endif
 
-/*
- * Note: do not call this directly if it can be helped.
- * Instead, call an RTOS function to unblock the mutex
- * that the Fault Task is pending on.
- */
 void EnterFaultState() {
 
 #ifndef SIMULATION
@@ -163,15 +158,6 @@ void EnterFaultState() {
         Simulator_Shutdown(0);
 #endif
     }
-}
-
-void Task_FaultState(void *p_arg) {
-    (void)p_arg;
-
-    // BLOCKING =====================
-    // Wait until a FAULT is signaled by another task.
-    RTOS_BPS_SemPend(&Fault_Sem4, OS_OPT_PEND_BLOCKING);
-    EnterFaultState();
 }
 
 // Rebind all the possible fault handlers to the fault state
