@@ -148,7 +148,7 @@ ErrorStatus BSP_CAN_Write(uint32_t id, uint8_t data[], uint8_t length) {
     ErrorStatus retVal = SUCCESS;
     
     if (length > 8) {
-        length = 8; //force length to be at 8 to avoid index out of bounds TODO: Return Error and handle properly
+        return ERROR;
     }
 
     gTxMessage.StdId = id;
