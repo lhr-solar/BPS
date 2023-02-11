@@ -91,19 +91,12 @@ The following testing information is specifically for terminal development.
     E.g. A test for Voltage.c should be Test_Voltage.c file, a test for BSP_SPI.c should be named Test_BSP_SPI.c
 2. All test files should be placed into the Tests folder.
 
-### Using GDB:
-NOTE: The below is one way to debug the program. GDB is not that compatible with debugging the code so another method of debugging is also available.
+### Using GDB with OPENOCD
+OpenOCD is a debugger program that is open source and compatible with the STM32F413. 
 GDB is a debugger program that can be used to step through a program as it is being run on the board. To use, you need two terminals open, as well as a USB connection to the ST-Link programmer (as if you were going to flash the program to the board). 
-1. In one terminal, run ```st-util```. This will launch a program that will interface with the board. 
+1. Run ```./openocd-debug.sh``` in one terminal.
 2. In the other terminal, start gdb with the command ```gdb-multiarch ./Objects/bps-leader.elf``` (assuming that you are doing this in the root of the project directory.
-3. This will launch GDB and read in all of the symbols from the program that you are running on the board. In order to actually connect gdb to the board, exectue the command ```target extended-remote localhost:4242```, which will connect to the st-util command from earlier.
-
-### Using OPENOCD
-OpenOCD is another debugger program that is open source and compatible with the STM32F413. 
-
-1. Run ```st-util``` in one terminal.
-2. Replace step 2 above with ```./openocd-debug.sh```.
-3. Replace step 3 above with ```target extended-remote localhost:3333```
+3. This will launch GDB and read in all of the symbols from the program that you are running on the board. In order to actually connect gdb to the board, execute the command ```target extended-remote localhost:4242```, which will connect to the st-util command from earlier.
 
 **Note:** If you get an error message for Permission denied, try giving openocd read/write permissions using chmod: ```chmod 764 openocd```
 
