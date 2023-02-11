@@ -58,7 +58,6 @@ void Task1(void *p_arg){
     RTOS_BPS_MutexCreate(&WDog_Mutex, "Watchdog Mutex");
 
     // Spawn tasks needed for Amperes readings to affect contactor
-
     //1
     RTOS_BPS_TaskCreate(&CriticalState_TCB,				// TCB
             "TASK_CRITICAL_STATE_PRIO",	// Task Name (String)

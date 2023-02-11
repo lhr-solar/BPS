@@ -12,5 +12,4 @@
 
 typedef void (*callback_t)(void);
 
-
 #endif
