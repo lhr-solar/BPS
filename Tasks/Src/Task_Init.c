@@ -16,9 +16,6 @@ void Task_Init(void *p_arg) {
 #endif
 
     OS_ERR err;
-    RTOS_BPS_SemCreate(&Fault_Sem4,
-                "Fault/Tripped Semaphore",
-                0);
 
     RTOS_BPS_SemCreate(&SafetyCheck_Sem4,
                 "Safety Check Semaphore",
