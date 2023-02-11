@@ -41,6 +41,17 @@ int main(int argc, char **argv){
     int inputsize;
     char* inputargs;
 
+    //make the directory for the automated tests if it doesn't exist
+    char *cwd;
+    char *automatedTestFolder;
+    cwd = getcwd(NULL, 0);
+    asprintf(&automatedTestFolder, "%s%s", cwd, fp);
+    mkdir(automatedTestFolder, 0777);
+    free(cwd);
+    free(automatedTestFolder);
+
+
+
     //input string parsing
     if(argc > 1){
     //argc more than 1 means the user has passed arguments that will be processed
