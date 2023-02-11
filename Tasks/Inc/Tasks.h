@@ -45,8 +45,6 @@ enum WDogBits_e {
 
 void Task_Init(void *p_arg);
 
-void EnterFaultState(); // here despite not being a task, so compilation works
-
 void Task_CriticalState(void *p_arg);
 
 void Task_PetWDog(void *p_arg);

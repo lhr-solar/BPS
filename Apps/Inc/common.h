@@ -11,5 +11,7 @@
 #include <math.h>
 
 typedef void (*callback_t)(void);
+void EnterFaultState();
+
 
 #endif
