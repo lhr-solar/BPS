@@ -47,7 +47,6 @@ BPS_CPU_STK Init_Stk[TASK_INIT_STACK_SIZE];
  * Semaphores
  */
 BPS_OS_SEM SafetyCheck_Sem4;
-BPS_OS_SEM Fault_Sem4;
 
 /**
  * Mutexes
