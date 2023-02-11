@@ -154,7 +154,7 @@ void VoltTempMonitor(void *p_arg) {
         // Check if voltage is NOT safe:
         SafetyStatus voltage_status = Voltage_CheckStatus();
         if(voltage_status != SAFE) {
-            RTOS_BPS_SemPost(&Fault_Sem4, OS_OPT_POST_1);        
+            EnterFaultState();        
         } else if((voltage_status == SAFE) && (!isfirst_voltage_check)) {
             // Signal to turn on contactor but only signal once
             RTOS_BPS_SemPost(&SafetyCheck_Sem4, OS_OPT_POST_1);
@@ -167,7 +167,7 @@ void VoltTempMonitor(void *p_arg) {
         SafetyStatus wire_status = Voltage_OpenWire();
 
         if(wire_status != SAFE) {
-            RTOS_BPS_SemPost(&Fault_Sem4, OS_OPT_POST_1);
+            EnterFaultState();
         } else if((wire_status == SAFE) && (!isfirst_openwire_Check)) {
             // Signal to turn on contactor but only signal once
             RTOS_BPS_SemPost(&SafetyCheck_Sem4, OS_OPT_POST_1);
@@ -182,7 +182,7 @@ void VoltTempMonitor(void *p_arg) {
         // Check if temperature is NOT safe:
         SafetyStatus temperature_status = Temperature_CheckStatus(Current_IsCharging());
         if(temperature_status != SAFE) {
-            RTOS_BPS_SemPost(&Fault_Sem4, OS_OPT_POST_1);
+            EnterFaultState();
         } else if((temperature_status == SAFE) && (!isfirst_temperature_check)) {
             // Signal to turn on contactor but only signal once
             RTOS_BPS_SemPost(&SafetyCheck_Sem4, OS_OPT_POST_1);
@@ -209,7 +209,7 @@ void AmperesMonitor(void *p_arg) {
         // Check if amperes is NOT safe:
 		SafetyStatus amperes_status = Current_CheckStatus(true);
 		if(amperes_status != SAFE) {
-            RTOS_BPS_SemPost(&Fault_Sem4, OS_OPT_POST_1);
+            EnterFaultState();
         } else if((amperes_status == SAFE) && (!isfirst_amperes_check)) {
             // Signal to turn on contactor but only signal once
             RTOS_BPS_SemPost(&SafetyCheck_Sem4, OS_OPT_POST_1);
@@ -247,14 +247,6 @@ int main() {
 				TASK_INIT_PRIO,			// Priority
 				Init_Stk,	// Watermark limit for debugging
 				DEFAULT_STACK_SIZE);
-
-    RTOS_BPS_TaskCreate(&FaultState_TCB,				// TCB
-				"Fault State",	// Task Name (String)
-				FaultState,				// Task function pointer
-				(void *)0,				// Task function args
-				TASK_FAULT_STATE_PRIO,			// Priority
-				AmperesMonitor_Stk,	// Watermark limit for debugging
-				TASK_FAULT_STATE_STACK_SIZE); 
 
     RTOS_BPS_TaskCreate(&CriticalState_TCB,				// TCB
 				"Critical State",	// Task Name (String)

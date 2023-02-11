@@ -38,7 +38,7 @@ void Task_VoltTempMonitor(void *p_arg) {
         if(voltageStatus != SAFE) {
             if (voltageStatus == UNDERVOLTAGE) Fault_BitMap = Fault_UVOLT;
             if (voltageStatus == OVERVOLTAGE) Fault_BitMap = Fault_OVOLT;
-            RTOS_BPS_SemPost(&Fault_Sem4, OS_OPT_POST_1); 
+            EnterFaultState(); 
         } else if((voltageStatus == SAFE) && (!voltageHasBeenChecked)) {
             // Signal to turn on contactor but only signal once
             RTOS_BPS_SemPost(&SafetyCheck_Sem4, OS_OPT_POST_1);
@@ -68,7 +68,7 @@ void Task_VoltTempMonitor(void *p_arg) {
         
         if(wireStatus != SAFE) {
             Fault_BitMap = Fault_OW;
-            RTOS_BPS_SemPost(&Fault_Sem4, OS_OPT_POST_1);
+            EnterFaultState();
         } else if((wireStatus == SAFE) && (!openWireHasBeenChecked)) {
             // Signal to turn on contactor but only signal once
             RTOS_BPS_SemPost(&SafetyCheck_Sem4, OS_OPT_POST_1); 
@@ -83,7 +83,7 @@ void Task_VoltTempMonitor(void *p_arg) {
         SafetyStatus temperatureStatus = Temperature_CheckStatus(Amps_IsCharging());
         if(temperatureStatus != SAFE) {
             Fault_BitMap = Fault_OTEMP;
-            RTOS_BPS_SemPost(&Fault_Sem4, OS_OPT_POST_1);
+            EnterFaultState();
         } else if((temperatureStatus == SAFE) && (!temperatureHasBeenChecked)) {
             // Signal to turn on contactor but only signal once
             RTOS_BPS_SemPost(&SafetyCheck_Sem4, OS_OPT_POST_1);
