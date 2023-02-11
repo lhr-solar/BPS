@@ -44,12 +44,15 @@ int main(int argc, char **argv){
     //make the directory for the automated tests if it doesn't exist
     char *cwd;
     char *automatedTestFolder;
+    char *chmod;
     cwd = getcwd(NULL, 0);
     asprintf(&automatedTestFolder, "%s%s", cwd, fp);
     mkdir(automatedTestFolder, 0777);
+    asprintf(&chmod,"sudo chmod -R 777 %s", automatedTestFolder);
+    system(chmod);
+    free(chmod);
     free(cwd);
     free(automatedTestFolder);
-
 
 
     //input string parsing
@@ -385,13 +388,15 @@ void runTest(char input){
     }else{
         // run the specified test
         char* command;
-        asprintf(&command, " python3 Validation/verify_test.py `find BSP/Simulator/Data/AutomatedTests/ -name \"%c-*\" ! -name \"*-out.json\"`", input); //generate command
+        asprintf(&command, "python3 Validation/verify_test.py `find BSP/Simulator/Data/AutomatedTests/ -name \"%c-*\" ! -name \"*-out.json\"`", input); //generate command
         printf("%s\n", command);
         if(system(command) != 0){
            //check if test was successful, if not we need to throw error and exit
-           system("cat BSP/Simulator/Simulator-Out/%c-*");
-           system("echo -e \"The json file used was \n\"; cat BSP/Simulator/Data/AutomatedTests/%c-*");
-           exit(-1); 
+            asprintf(&command, "cat BSP/Simulator/Simulator-Out/%c-*", input);
+            system(command);
+            asprintf(&command, "echo -e \"The json file used was \n\"; cat BSP/Simulator/Data/AutomatedTests/%c-*", input);
+            system(command);
+            exit(-1); 
         } 
     }
 }
