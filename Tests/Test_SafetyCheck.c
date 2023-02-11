@@ -239,7 +239,7 @@ int main() {
     // assert
 
     BSP_UART_Init(foo, foo, UART_USB);
-    /*
+
     RTOS_BPS_TaskCreate(&Init_TCB,				// TCB
 				"Initialize System",	// Task Name (String)
 				Task_Init,				// Task function pointer
@@ -247,15 +247,6 @@ int main() {
 				TASK_INIT_PRIO,			// Priority
 				Init_Stk,	// Watermark limit for debugging
 				DEFAULT_STACK_SIZE);
-                */
-
-    RTOS_BPS_TaskCreate(&FaultState_TCB,				// TCB
-				"Fault State",	// Task Name (String)
-				FaultState,				// Task function pointer
-				(void *)0,				// Task function args
-				TASK_FAULT_STATE_PRIO,			// Priority
-				AmperesMonitor_Stk,	// Watermark limit for debugging
-				TASK_FAULT_STATE_STACK_SIZE); 
 
     RTOS_BPS_TaskCreate(&CriticalState_TCB,				// TCB
 				"Critical State",	// Task Name (String)
