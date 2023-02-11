@@ -1,0 +1,2 @@
+pyserial
+prompt_toolkit
