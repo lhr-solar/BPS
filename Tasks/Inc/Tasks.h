@@ -5,6 +5,10 @@
 #include "RTOS_BPS.h"
 
 #define TASK_INIT_PRIO                      0
+<<<<<<< HEAD
+=======
+#define TASK_CRITICAL_STATE_PRIO            2
+>>>>>>> f28e3ac2 (Made things easier to debug)
 #define TASK_PETWDOG_PRIO                   3
 #define TASK_CHECK_CONTACTOR_PRIO           4
 #define TASK_CANBUS_CONSUMER_PRIO           5
@@ -97,6 +101,10 @@ extern OS_TCB Init_TCB;
 /**
  * Stacks for each thread
  */
+<<<<<<< HEAD
+=======
+extern CPU_STK CriticalState_Stk[TASK_CANBUS_CONSUMER_STACK_SIZE];
+>>>>>>> f28e3ac2 (Made things easier to debug)
 extern CPU_STK PetWDog_Stk[TASK_PETWDOG_STACK_SIZE];
 extern CPU_STK VoltTempMonitor_Stk[TASK_VOLT_TEMP_MONITOR_STACK_SIZE];
 extern CPU_STK AmperesMonitor_Stk[TASK_AMPERES_MONITOR_STACK_SIZE];
