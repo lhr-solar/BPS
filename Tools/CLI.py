@@ -4,9 +4,17 @@ import serial
 import prompt_toolkit as pr
 import multiprocessing as mp
 
+"""
+TODO: separate threads/processes for
+        serial io
+        recv parsing/graphing
+        user cli
+"""
+
 class CommandLineInterface():
 
     # base ASCII value we will encode numbers from; range of encodable numbers is 0 to 94; 0 maps to 33 and 94 maps to 127
+    # TODO: put these constant tables in json to be more humanly readable
     OUTPUT_BASE_VALUE = 33
     OUTPUT_DICT = { # note: try to avoid changing these values as the C code will also need to be changed
         'volts':0,
@@ -45,7 +53,40 @@ class CommandLineInterface():
                                     timeout=None, 
                                     xonxoff=0, 
                                     rtscts=0))
+
+        output_command_handler = {key:self._default_output_handler for key in self.OUTPUT_DICT.keys()}
+        misc_command_handler = {'help':self.help}
+        self.command_handler = {**output_command_handler, **misc_command_handler}
         
+    def run(self):
+        while True:
+            try:
+                input = pr.prompt('☀️🚗🔍 # ',
+                                history=pr.history.FileHistory('cli_history.log'),
+                                auto_suggest=pr.auto_suggest.AutoSuggestFromHistory(),
+                                completer=self.auto_complete)
+                self.command_handler[input.split(' ')[0]](input.split(' '))
+            except EOFError:
+                break
+            except self.InvalidArgCError as e:
+                print(e)
+
+    def help(self, *args):
+        print(self)
+
+    def _write(self, data:bytearray):
+        self.serial.write(data)
+
+    def _read(self):
+        return self.serial.readline()
+
+    def _default_output_handler(self, arguments:list) -> None:
+        if len(arguments) != 2: raise self.InvalidArgCError(len(arguments), 2)
+        outputarray = bytearray([
+                self.OUTPUT_DICT.get(arguments[0]) | 
+                {'on':(1 << 8), 'off':0}.get(arguments[1]) ])
+        self._write(outputarray)
+
     def __str__(self):
         num_rows = 3
         cmd_list = list(self.OUTPUT_DICT.keys())
@@ -59,32 +100,16 @@ class CommandLineInterface():
             '-------------------------Help Menu-------------------------',
             'The available commands are:',
             formatted_cmd_list_str,
-            'Keep in mind: all values are 1-indexed',
             '-----------------------------------------------------------']
         
         return '\r\n'.join(output)
 
-    def help(self):
-        print(self)
-
-    def _write(self, data:bytearray):
-        self.serial.write(data)
-
-    def _read(self):
-        return self.serial.readline()
-
-    def run(self):
-        while True:
-            try:
-                input = pr.prompt('☀️🚗🔍 # ',
-                                history=pr.history.FileHistory('cli_history.log'),
-                                auto_suggest=pr.auto_suggest.AutoSuggestFromHistory(),
-                                completer=self.auto_complete)
-            except EOFError:
-                break
-
-            print(input)
-            if 'help' in input: self.help()
+    class InvalidArgCError(Exception):
+        def __init__(self, args_given:int, args_expected:int):
+            self.args_given = args_given
+            self.args_expected = args_expected
+        def __str__(self):
+            return f'Invalid Arguments: {self.args_given} argument(s) supplied; {self.args_expected} argument(s) expected.'
 
 
 def main():
