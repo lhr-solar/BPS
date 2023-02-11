@@ -51,7 +51,7 @@ void CANbus_Init(bool loopback, bool faultState) {
 	}
 
 	// Initialize and pass interrupt hooks
-    BSP_CAN_Init(CANbus_CountIncoming, CANbus_Release, loopback, faultState);
+    BSP_CAN_Init(CANbus_CountIncoming, CANbus_Release, loopback);
 }
 
 // Static method, call CANbus_Send or CANbus_BlockAndSend instead
@@ -145,7 +145,7 @@ static ErrorStatus CANbus_SendMsg_FaultState(CANId_t id, CANPayload_t payload) {
 			return ERROR;	// Do nothing if invalid
 	}
 
-	while(!foundMailBox(CAN1)){}
+	while(!BSP_CAN_FindMailBox(CAN1)){}
 
 	// Write the data to the bus
 	ErrorStatus retVal = BSP_CAN_Write(id, txdata, data_length);

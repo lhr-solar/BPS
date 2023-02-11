@@ -14,11 +14,19 @@
 #include "config.h"
 #ifndef SIMULATION
 #include "stm32f4xx.h"
+#include "BSP_PLL.h"
 #else
 #include "Simulator.h"
 extern uint8_t stateCount;
 #endif
 
+void delay_u(uint16_t micro);
+
+/*
+ * Note: do not call this directly if it can be helped.
+ * Instead, call an RTOS function to unblock the mutex
+ * that the Fault Task is pending on.
+ */
 void EnterFaultState() {
 
 #ifndef SIMULATION
@@ -146,42 +154,44 @@ void EnterFaultState() {
     while(1) {
         //Send Trip Message
         CANPayload_t payload;
-        tripPayload.idx = 0;
-
-        tripPayload.data.w = 1;
-        CANbus_BlockAndSend_FaultState(TRIP, tripPayload);
-        for(volatile int i = 0; i < 10000; i++);
+        payload.idx = 0;
+        payload.data.w = 1;
+        CANbus_BlockAndSend_FaultState(TRIP, payload);
+        delay_u(20000);
 
         // contactor message
-        tripPayload.data.w = 0;
-        CANbus_BlockAndSend_FaultState(CONTACTOR_STATE, tripPayload);
-        for(int i = 0; i < 10000; i++);
+        payload.data.w = 2;
+        CANbus_BlockAndSend_FaultState(CONTACTOR_STATE, payload);
+        delay_u(20000);
         
-        //Send Current Readings
-        int32_t latestMeasureMilliAmps = Amps_GetReading(); 
-        CANPayload_t ampPayload;
-        ampPayload.idx = 0;
+        // //Send Current Readings
+        // //int32_t latestMeasureMilliAmps = Amps_GetReading(); 
+        // payload.idx = 0;
+        // payload.data.w = 3;
+        // CANbus_BlockAndSend_FaultState(CURRENT_DATA, payload);
+        // delay_u(2000);
+        
 
-        ampPayload.data.w = latestMeasureMilliAmps;
-        CANbus_BlockAndSend_FaultState(CURRENT_DATA, ampPayload);
-        for(int i = 0; i < 10000; i++);
+        // //Send Voltage Readings
+        // for (int i = 0; i < NUM_BATTERY_MODULES; i++){ //send all battery module voltage data
+        //     //int voltage = Voltage_GetModuleMillivoltage(i);
+        //     payload.idx = i;
+        //     //payload.data.w = voltage;
+        //     payload.data.w = 4;
+        //     CANbus_BlockAndSend_FaultState(VOLT_DATA, payload);
+        //     delay_u(2000);
+        // }
 
-        //Send Voltage Readings
-        for (int i = 0; i < NUM_BATTERY_MODULES; i++){ //send all battery module voltage data
-            int voltage = Voltage_GetModuleMillivoltage(i);
-            CANPayload_t voltPayload;
-            voltPayload.idx = i;
-            voltPayload.data.w = voltage;
-            CANbus_BlockAndSend_FaultState(VOLT_DATA, voltPayload);
-        }
+        // delay_u(200);
 
-        CANPayload_t tempPayload;
-        CANbus_BlockAndSend_FaultState(CURRENT_DATA, ampPayload);
-        for (int i = 0; i < NUM_BATTERY_MODULES; i++){ //send all battery module voltage data
-            tempPayload.idx = i;
-            tempPayload.data.w = Temperature_GetModuleTemperature(i);
-            CANbus_BlockAndSend_FaultState(TEMP_DATA, tempPayload);
-        }
+        // CANbus_BlockAndSend_FaultState(CURRENT_DATA, payload);
+        // for (int i = 0; i < NUM_BATTERY_MODULES; i++){ //send all battery module voltage data
+        //     payload.idx = i;
+        //     //payload.data.w = Temperature_GetModuleTemperature(i);
+        //     payload.data.w = 5;
+        //     CANbus_BlockAndSend_FaultState(TEMP_DATA, payload);
+        //     delay_u(2000);
+        // }
 
 #ifdef DEBUGMODE
         if (BSP_UART_ReadLine(command)) CLI_Handler(command); // CLI

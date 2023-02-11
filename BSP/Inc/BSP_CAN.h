@@ -15,7 +15,7 @@
  * @param   faultState  : fault state determines whether to implement Rx and Tx interrupts
  * @return  None
  */
-void BSP_CAN_Init(callback_t rxEvent, callback_t txEnd, bool loopback, bool faultState);
+void BSP_CAN_Init(callback_t rxEvent, callback_t txEnd, bool loopback);
 
 /**
  * @brief   Transmits the data onto the CAN bus with the specified id
@@ -43,6 +43,6 @@ ErrorStatus BSP_CAN_Read(uint32_t *id, uint8_t *data);
  * @return The number of the mailbox that is used for transmission or
  *         CAN_TxStatus_NoMailBox if there is no empty mailbox.
 */
-bool foundMailBox(CAN_TypeDef* CANx);
+bool BSP_CAN_FindMailBox(CAN_TypeDef* CANx);
 
 #endif

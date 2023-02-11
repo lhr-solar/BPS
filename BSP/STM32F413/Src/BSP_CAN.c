@@ -4,6 +4,7 @@
 #include "stm32f4xx.h"
 #include "stm32f4xx_can.h"
 #include "os.h"
+#include "Tasks.h"
 
 // The message information that we care to receive
 typedef struct _msg {
@@ -35,7 +36,7 @@ static void (*gTxEnd)(void);
  * @param   faultState  : fault state determines whether to implement Rx and Tx interrupts 
  * @return  None
  */
-void BSP_CAN_Init(callback_t rxEvent, callback_t txEnd, bool loopback, bool faultState) {
+void BSP_CAN_Init(callback_t rxEvent, callback_t txEnd, bool loopback) {
     GPIO_InitTypeDef GPIO_InitStructure;
     CAN_InitTypeDef CAN_InitStructure;
     NVIC_InitTypeDef NVIC_InitStructure;
@@ -117,7 +118,7 @@ void BSP_CAN_Init(callback_t rxEvent, callback_t txEnd, bool loopback, bool faul
     gRxMessage.FMI = 0;
 
     /* Enable interrupts if in normal state */
-    if(!faultState){
+    if(!Fault_Flag){
         /* Enable FIFO 0 message pending Interrupt */
         CAN_ITConfig(CAN1, CAN_IT_FMP0, ENABLE);
 
@@ -253,6 +254,6 @@ void CAN1_TX_IRQHandler(void) {
     #endif
 }
 
-bool foundMailBox(CAN_TypeDef* CANx){
+bool BSP_CAN_FindMailBox(CAN_TypeDef* CANx){
     return findMailBox(CANx);
 }

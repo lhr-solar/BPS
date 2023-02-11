@@ -1,17 +1,58 @@
+#include "common.h"
+#include "config.h"
 #include "Tasks.h"
-#include "stm32f4xx.h"
-#include "os.h"
+#include "BSP_WDTimer.h"
+#include "Contactor.h"
+#include "BSP_PLL.h"
+#include "BSP_UART.h"
+#include "EEPROM.h"
+#include "Charge.h"
 #include "BSP_Lights.h"
-#include "CANbus.h"
+#include "BSP_CAN.h"
 
 OS_TCB Init_Task_TCB;
-CPU_STK Init_Task_Stk[250];
+CPU_STK Init_Task_Stk[TASK_FAULT_STATE_STACK_SIZE];
 OS_TCB Init_Fault_Task_TCB;
-CPU_STK Init_Fault_Stk[250];
+CPU_STK Init_Fault_Stk[TASK_FAULT_STATE_STACK_SIZE];
 OS_TCB Init_CAN_Task_TCB;
-CPU_STK Init_CAN_Task_Stk[250];
+CPU_STK Init_CAN_Task_Stk[TASK_FAULT_STATE_STACK_SIZE];
 OS_TCB Init_Fault_Semaphore_Task_TCB;
-CPU_STK Init_Fault_Semaphore_Stk[250];
+CPU_STK Init_Fault_Semaphore_Stk[TASK_FAULT_STATE_STACK_SIZE];
+
+//Activate Semaphore
+void Task3(void *p_arg){
+
+    //Send messages before and after]
+    OS_ERR err;
+
+    OSTimeDly(250, OS_OPT_TIME_DLY, &err);
+
+    OSSemPost(&Fault_Sem4,
+        OS_OPT_POST_1,
+        &err);
+    assertOSError(err);
+
+    while(1){
+        BSP_Light_Toggle(EXTRA);
+        OSTimeDly(25, OS_OPT_TIME_DLY, &err);
+    }
+
+    OSTaskDel(NULL, &err);
+}
+
+void Task2(void *p_arg){
+    uint8_t message[8] = {0x01, 0x02,0x03,0x04,0x05,0x06,0x07,0x08};
+  
+    uint8_t length = 8;
+    BSP_CAN_Init(NULL, NULL, true);
+   
+    OS_ERR err;
+
+    for(int i = 0; i < 3; i++){
+       BSP_CAN_Write(0x10A, message, length);
+       OSTimeDly(25, OS_OPT_TIME_DLY, &err);
+    }
+}
 
 //Init Task
 void Task1(void *p_arg){
@@ -30,7 +71,7 @@ void Task1(void *p_arg){
 				Task_FaultState,				// Task function pointer
 				(void *)0,				// Task function args
 				TASK_FAULT_STATE_PRIO,			// Priority
-				Init_Fault_Stk,				// Stack
+				Init_Fault_Stk,			// Stack
 				WATERMARK_STACK_LIMIT,	// Watermark limit for debugging
 				TASK_FAULT_STATE_STACK_SIZE,		// Stack size
 				0,						// Queue size (not needed)
@@ -70,68 +111,40 @@ void Task1(void *p_arg){
     OSTaskDel(NULL, &err);
 }
 
-void Task2(void *p_arg){
-    uint8_t message[8] = {0x01, 0x82,0x00,0x36,0x75,0,0,0x96};
-    uint8_t readData[8] = {0,0,0,0,0,0,0,0};
-    uint32_t id[1];
-  
-    uint8_t length = 8;
-    BSP_CAN_Init(NULL, NULL, false);
-   
-    while(1) {
-       BSP_CAN_Write(0x10A, message, length);
-    }
-
-    exit(0);
-}
-
-//Activate Semaphore
-void Task3(void *p_arg){
-
-    //Send messages before and after
-    OS_ERR err;
-
-    OSTimeDly(250, OS_OPT_TIME_DLY, &err);
-
-    OSSemPost(&Fault_Sem4,
-        OS_OPT_POST_1,
-        &err);
-    assertOSError(err);
-
-    while(1){
-        BSP_Light_Toggle(EXTRA);
-        OSTimeDly(25, OS_OPT_TIME_DLY, &err);
-    }
-
-    exit(0);
-}
-
 int main(void) {
     OS_ERR err;
+
     BSP_PLL_Init();
+
+    //Resetting the contactor
+    Contactor_Init();
+    Contactor_Off(ALL_CONTACTORS);
+
     BSP_Lights_Init();
-    BSP_Contactor_Init();
-    BSP_Contactor_On();
+
+    // // If the WDTimer counts down to 0, then the BPS resets. If BPS has reset, enter a fault state.
+    // if (BSP_WDTimer_DidSystemReset()) {
+    //     Fault_BitMap = Fault_WDOG; //When function called in if statement, RCC flag cleared so set bitmap here
+    //     EnterFaultState();
+    // }
+
+    // set up EEPROM and state of charge
+    EEPROM_Init();
+    Charge_Init();
 
     __disable_irq();
 
     OSInit(&err);
-    while(err != OS_ERR_NONE);
+    assertOSError(err);
 
-    OSTaskCreate(&Init_Task_TCB,
+    RTOS_BPS_TaskCreate(&Init_Task_TCB,
         "Task 1",
         Task1,
         (void *)0,
-        TASK_FAULT_STATE_PRIO,
+        1,
         Init_Task_Stk,
-        WATERMARK_STACK_LIMIT,
-        TASK_FAULT_STATE_STACK_SIZE,
-        0,
-        10,
-        (void *)0,
-        OS_OPT_TASK_STK_CHK | OS_OPT_TASK_SAVE_FP,
-        &err);
-    while(err != OS_ERR_NONE);
+        TASK_FAULT_STATE_STACK_SIZE
+    );
 
     __enable_irq();
 
