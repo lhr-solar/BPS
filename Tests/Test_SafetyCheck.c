@@ -5,9 +5,6 @@
 #include "Tasks.h"
 #include "BSP_UART.h"
 
-OS_TCB Init_TCB;
-CPU_STK Init_Stk[DEFAULT_STACK_SIZE];
-
 static void Voltage_UpdateMeasurements(void) {
     printf("V0\r\n");\
     RTOS_BPS_DelayTick(1);

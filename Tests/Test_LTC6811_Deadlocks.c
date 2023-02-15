@@ -7,8 +7,7 @@
 #include "config.h"
 #include "BSP_SPI.h"
 #include "RTOS_BPS.h"
-
-OS_SEM SafetyCheck_Sem4;
+#include "Tasks.h"
 
 OS_TCB LTC6811_Deadlocks_TCB;
 CPU_STK LTC6811_Deadlocks_Stk[512];
@@ -23,13 +22,14 @@ int counter2 = 0;
 void LTC6811_Deadlocks(void *p_arg){
     (void)p_arg;
 
+    VoltageSafety_t system;
     cell_asic boards[NUM_MINIONS];
     printf("initializing...\n");
     bsp_os_t spi_os;
     OS_SEM semaphore;
     RTOS_BPS_SemCreate(&semaphore, "SPI Semaphore", 0);
-    spi_os.pend = pend;
-    spi_os.post = post;
+    spi_os.pend = (void*)RTOS_BPS_SemPend(&semaphore, OS_OPT_PEND_BLOCKING);
+    spi_os.post = (void*)RTOS_BPS_SemPost(&semaphore, OS_OPT_POST_1);
 
     BSP_SPI_Init(spi_ltc6811, &spi_os, 0);
     printf("SPI initialized\n");
@@ -52,7 +52,7 @@ void LTC6811_Deadlocks(void *p_arg){
         printf("running Voltage_CheckStatus...\n");
         Voltage_CheckStatus();
         printf("running Voltage_GetModulesInDanger...\n");
-        Voltage_GetModulesInDanger();
+        Voltage_GetModulesInDanger(&system);
         printf("running Voltage_OpenWireSummary...\n");
         Voltage_OpenWireSummary();
         printf("running Volatge_OpenWire...\n");
@@ -97,14 +97,15 @@ void LTC6811_Deadlocks(void *p_arg){
 
 void LTC6811_Deadlocks2(void *p_arg){
     (void)p_arg;
-
+    
+    VoltageSafety_t system;
     cell_asic boards[NUM_MINIONS];
     printf("initializing...\n");
     bsp_os_t spi_os;
     OS_SEM semaphore;
     RTOS_BPS_SemCreate(&semaphore, "SPI Semaphore", 0);
-    spi_os.pend = pend;
-    spi_os.post = post;
+    spi_os.pend = (void*)RTOS_BPS_SemPend(&semaphore, OS_OPT_PEND_BLOCKING);
+    spi_os.post = (void*)RTOS_BPS_SemPost(&semaphore, OS_OPT_POST_1);
 
     BSP_SPI_Init(spi_ltc6811, &spi_os, 0);
     printf("SPI initialized\n");
@@ -124,6 +125,8 @@ void LTC6811_Deadlocks2(void *p_arg){
         Voltage_UpdateMeasurements();
         printf("running Voltage_CheckStatus...\n");
         Voltage_CheckStatus();
+        printf("running Voltage_GetModulesInDanger...\n");
+        Voltage_GetModulesInDanger(&system);
         printf("running Voltage_OpenWireSummary...\n");
         Voltage_OpenWireSummary();
         printf("running Volatge_OpenWire...\n");
