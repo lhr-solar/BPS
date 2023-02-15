@@ -117,7 +117,7 @@ void RTOS_BPS_DelaySecs(uint16_t dly){
  */
 void RTOS_BPS_DelayMs(uint16_t dly){
     BPS_OS_ERR err;
-    OSTimeDlyHMSM(0, 0, 0, (CPU_INT32U)dly, OS_OPT_TIME_HMSM_NON_STRICT, &err);
+    OSTimeDly(dly/10, OS_OPT_TIME_DLY, &err);
     assertOSError(err);
 }
 
