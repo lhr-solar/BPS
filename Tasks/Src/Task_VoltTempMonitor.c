@@ -28,9 +28,7 @@ void Task_VoltTempMonitor(void *p_arg) {
     CANData_t CanData;
     CANPayload_t CanPayload;
     CANMSG_t CanMsg;
-    volatile int counter = 0;
     while(1) {
-        counter++;
         // BLOCKING =====================
         // Update Voltage Measurements
         Voltage_UpdateMeasurements();
@@ -40,7 +38,7 @@ void Task_VoltTempMonitor(void *p_arg) {
         if(voltageStatus != SAFE) {
             if (voltageStatus == UNDERVOLTAGE) Fault_BitMap = Fault_UVOLT;
             if (voltageStatus == OVERVOLTAGE) Fault_BitMap = Fault_OVOLT;
-            EnterFaultState(); 
+            RTOS_BPS_SemPost(&Fault_Sem4, OS_OPT_POST_1); 
         } else if((voltageStatus == SAFE) && (!voltageHasBeenChecked)) {
             // Signal to turn on contactor but only signal once
             RTOS_BPS_SemPost(&SafetyCheck_Sem4, OS_OPT_POST_1);
@@ -70,7 +68,7 @@ void Task_VoltTempMonitor(void *p_arg) {
         
         if(wireStatus != SAFE) {
             Fault_BitMap = Fault_OW;
-            EnterFaultState();
+            RTOS_BPS_SemPost(&Fault_Sem4, OS_OPT_POST_1);
         } else if((wireStatus == SAFE) && (!openWireHasBeenChecked)) {
             // Signal to turn on contactor but only signal once
             RTOS_BPS_SemPost(&SafetyCheck_Sem4, OS_OPT_POST_1); 
@@ -85,7 +83,7 @@ void Task_VoltTempMonitor(void *p_arg) {
         SafetyStatus temperatureStatus = Temperature_CheckStatus(Amps_IsCharging());
         if(temperatureStatus != SAFE) {
             Fault_BitMap = Fault_OTEMP;
-            EnterFaultState();
+            RTOS_BPS_SemPost(&Fault_Sem4, OS_OPT_POST_1);
         } else if((temperatureStatus == SAFE) && (!temperatureHasBeenChecked)) {
             // Signal to turn on contactor but only signal once
             RTOS_BPS_SemPost(&SafetyCheck_Sem4, OS_OPT_POST_1);

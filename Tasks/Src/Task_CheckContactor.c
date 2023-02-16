@@ -19,7 +19,7 @@ void Task_CheckContactor(void *p_arg) {
         // fault if the contactor is open
         if (Contactor_GetState(HVHIGH_CONTACTOR) != true) {
             Fault_BitMap |= Fault_ESTOP;
-            EnterFaultState();
+            RTOS_BPS_SemPost(&Fault_Sem4, OS_OPT_POST_1);
         }
     }
 }

@@ -29,6 +29,7 @@ BPS_OS_TCB Init_TCB;
 /**
  * @brief   Stacks
  */
+BPS_CPU_STK FaultState_Stk[TASK_FAULT_STATE_STACK_SIZE];
 BPS_CPU_STK CriticalState_Stk[TASK_CANBUS_CONSUMER_STACK_SIZE];
 BPS_CPU_STK PetWDog_Stk[TASK_PETWDOG_STACK_SIZE];
 BPS_CPU_STK VoltTempMonitor_Stk[TASK_VOLT_TEMP_MONITOR_STACK_SIZE];
@@ -46,6 +47,7 @@ BPS_CPU_STK Init_Stk[TASK_INIT_STACK_SIZE];
  * Semaphores
  */
 BPS_OS_SEM SafetyCheck_Sem4;
+BPS_OS_SEM Fault_Sem4;
 
 /**
  * Mutexes
@@ -57,9 +59,11 @@ BPS_OS_MUTEX MinionsASIC_Mutex;
  * Global Variables
  */
 cell_asic Minions[NUM_MINIONS];
-WDOGBits_e WDog_BitMap = WD_NONE;
-Fault_Set Fault_BitMap = 0; //This is a variable that sets certain bits based on what caused the fault
+uint32_t WDog_BitMap = 0;
+uint32_t Fault_BitMap = 0; //This is a variable that sets certain bits based on what caused the fault
 uint8_t Fault_Flag    = 0; //This is a flag that replaces the semaphore in case the OS fails
+
+void EnterFaultState(void);
 
 /**
  * Used to assert if there has been an error in one of the OS functions
@@ -69,7 +73,7 @@ void assertOSError(BPS_OS_ERR err){
     if(err != OS_ERR_NONE) {
         Fault_BitMap |= Fault_OS;
         Fault_Flag = 1;
-        EnterFaultState();
+        RTOS_BPS_SemPost(&Fault_Sem4, OS_OPT_POST_1);
         // We should not get to this point if the call above worked.
         // Thus, we need to manually enter a fault state, since the
         // OS obviously is not functioning correctly.

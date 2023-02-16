@@ -12,6 +12,8 @@
 // Used for simulator logging and fault states
 // See Fault State files
 #include "Tasks.h"
+extern uint32_t Fault_BitMap;
+extern void EnterFaultState();
 
 // Funny macros from Tianda
 #define __FILENAME__ (__builtin_strrchr(__FILE__, '/') + 1)

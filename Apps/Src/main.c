@@ -18,6 +18,8 @@
 #include "Simulator.h"
 #endif
 
+void EnterFaultState(void);
+
 // the simulator take command line args, the embedded version does not
 #ifdef SIMULATION
 int main(int argc, char **argv) {
