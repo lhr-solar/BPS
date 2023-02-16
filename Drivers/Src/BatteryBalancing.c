@@ -7,6 +7,7 @@
 
 static void Balancing_ClearDischargeBit(int Cell, uint8_t total_ic, cell_asic *ic);
 static void Balancing_GetICNumber(uint8_t i, uint8_t* ICNumber, uint8_t* ModuleNumber);
+static void Balancing_GetICNumber(uint8_t i, uint8_t* ICNumber, uint8_t* ModuleNumber);
 static void Balancing_SetDischargeBit(uint8_t module, cell_asic ic[]);
 
 /**
@@ -75,16 +76,22 @@ static void Balancing_ClearDischargeBit(int Cell, uint8_t total_ic, cell_asic *i
 
 /**
  * @brief   Recieves module number out of 31 and stores the module number and its IC number in two buffers
- * @param   i module number out of NUM_BATTERY_MODULES
+ * @param   i module number out of 31
  * @param   ICNumber buffer for IC number
  * @param   ModuleNumber buffer for module number
  * @return  None
  */
 static void Balancing_GetICNumber(uint8_t i, uint8_t* ICNumber, uint8_t* ModuleNumber) {
-	//TODO: Find a way to generalize getting the IC number and Module number per board
-	//TODO: Find a way to generalize getting module number given IC number and Module number per board (used in Temperature.c)
-	*ICNumber = i / MAX_VOLT_SENSORS_PER_MINION_BOARD; //IC number is between 0 and NUM_MINIONS
-	*ModuleNumber = i % MAX_VOLT_SENSORS_PER_MINION_BOARD; //Module Number is between 0 and MAX_VOLT_SENSORS_PER_MINION_BOARD
+	uint8_t total = 0;
+	uint8_t NUM_MODULES_PER_MINION[4] = {8,8,8,7};
+	for(int m = 0; m < NUM_MINIONS; m++) {
+		total += NUM_MODULES_PER_MINION[m];
+		if(i < total) {
+			*ICNumber = m;
+			*ModuleNumber = i - total;
+			return;
+		}
+	}
 }
 
 /**

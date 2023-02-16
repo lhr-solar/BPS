@@ -132,7 +132,7 @@ void LTC6811_rdcv_safe(uint8_t reg, // Controls which cell voltage register is r
     if(count == MAX_PEC_ERRORS){
       //trip BPS
       Fault_BitMap |= Fault_CRC;
-      EnterFaultState();
+      RTOS_BPS_SemPost(&Fault_Sem4, OS_OPT_POST_1);
     }
     count++;
   }
@@ -154,7 +154,7 @@ void LTC6811_rdaux_safe(uint8_t reg, //Determines which GPIO voltage register is
     if(count == MAX_PEC_ERRORS){
       //trip BPS
       Fault_BitMap |= Fault_CRC;
-      EnterFaultState();
+      RTOS_BPS_SemPost(&Fault_Sem4, OS_OPT_POST_1);
     }
     count++;
   }
@@ -177,7 +177,7 @@ void LTC6811_rdstat_safe(uint8_t reg, //Determines which Stat  register is read 
     if(count == MAX_PEC_ERRORS){
       //trip BPS
       Fault_BitMap |= Fault_CRC;
-      EnterFaultState();
+      RTOS_BPS_SemPost(&Fault_Sem4, OS_OPT_POST_1);
     }
     count++;
   }
@@ -196,7 +196,7 @@ void LTC6811_rdcfg_safe(uint8_t total_ic, //Number of ICs in the system
     if(count == MAX_PEC_ERRORS){
       //trip BPS
       Fault_BitMap |= Fault_CRC;
-      EnterFaultState();
+      RTOS_BPS_SemPost(&Fault_Sem4, OS_OPT_POST_1);
     }
     count++;
   }
@@ -216,7 +216,7 @@ void LTC6811_rdpwm_safe(uint8_t total_ic, //Number of ICs in the system
     if(count == MAX_PEC_ERRORS){
       //trip BPS
       Fault_BitMap |= Fault_CRC;
-      EnterFaultState();
+      RTOS_BPS_SemPost(&Fault_Sem4, OS_OPT_POST_1);
     }
     count++;
   }
@@ -235,7 +235,7 @@ void LTC6811_rdcomm_safe(uint8_t total_ic, //Number of ICs in the system
     if(count == MAX_PEC_ERRORS){
       //trip BPS
       Fault_BitMap |= Fault_CRC;
-      EnterFaultState();
+      RTOS_BPS_SemPost(&Fault_Sem4, OS_OPT_POST_1);
     }
     count++;
   }

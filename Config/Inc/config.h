@@ -17,7 +17,7 @@ typedef enum SafetyStatus_e {SAFE = 0, DANGER = 1, OVERVOLTAGE = 2, UNDERVOLTAGE
 //--------------------------------------------------------------------------------
 // Basic Parameters of BPS layout
 
-#define NUM_MINIONS	1					 // Number of minion boards
+#define NUM_MINIONS	4					 // Number of minion boards
 
 //--------------------------------------------------------------------------------
 // Battery Fault Checks
@@ -26,33 +26,33 @@ typedef enum SafetyStatus_e {SAFE = 0, DANGER = 1, OVERVOLTAGE = 2, UNDERVOLTAGE
 //--------------------------------------------------------------------------------
 // Battery Pack layout
 #ifndef NUM_BATTERY_MODULES
-#define NUM_BATTERY_MODULES				12		// Number of battery modules
-#endif
-
-#ifndef NUM_TEMP_SENSORS_PER_MOD
-#define NUM_TEMP_SENSORS_PER_MOD		1		// Number of temperature sensors per battery module
+#define NUM_BATTERY_MODULES				31		// Number of battery modules
 #endif
 
 #ifndef NUM_TEMPERATURE_SENSORS
-#define NUM_TEMPERATURE_SENSORS			16      //(NUM_BATTERY_MODULES * NUM_TEMP_SENSORS_PER_MOD)		// Number of temperature sensors
+#define NUM_TEMPERATURE_SENSORS			62		// Number of temperature sensors
+#endif
+
+#ifndef NUM_TEMP_SENSORS_PER_MOD
+#define NUM_TEMP_SENSORS_PER_MOD		2		// Number of temperature sensors per battery module
 #endif
 
 //--------------------------------------------------------------------------------
 // MAX and MIN limits of lithium ion cells
 #ifndef MIN_VOLTAGE_CHARGING_LIMIT
-#define MIN_VOLTAGE_CHARGING_LIMIT      550        // Under voltage limit for charging (milliVolts) 
+#define MIN_VOLTAGE_CHARGING_LIMIT      2550        // Under voltage limit for charging (milliVolts) 
 #endif
 
 #ifndef MIN_VOLTAGE_LIMIT
-#define MIN_VOLTAGE_LIMIT				1000		// Under voltage limit (milliVolts)	(actual min: 2.5V)
+#define MIN_VOLTAGE_LIMIT				2700		// Under voltage limit (milliVolts)	(actual min: 2.5V)
 #endif
 
 #ifndef MAX_VOLTAGE_LIMIT
-#define MAX_VOLTAGE_LIMIT				1500		// Over voltage limit (milliVolts)		(actual max: 4.2V)
+#define MAX_VOLTAGE_LIMIT				4100		// Over voltage limit (milliVolts)		(actual max: 4.2V)
 #endif
 
 #ifndef CHARGE_DISABLE_VOLTAGE
-#define CHARGE_DISABLE_VOLTAGE          1000        // Voltage to stop charging at
+#define CHARGE_DISABLE_VOLTAGE          4000        // Voltage to stop charging at
 #endif
 
 // make sure we don't enable charging if we're too close to the voltage limit
@@ -95,13 +95,14 @@ typedef enum SafetyStatus_e {SAFE = 0, DANGER = 1, OVERVOLTAGE = 2, UNDERVOLTAGE
 //--------------------------------------------------------------------------------
 // Voltage Sensor Configurations
 // Defines how many voltage sensors are connected to each board
-#define MAX_VOLT_SENSORS_PER_MINION_BOARD	12	// User defined. The LTC6811 can actually measure 12 modules.
-#define TOTAL_VOLT_WIRES					(MAX_VOLT_SENSORS_PER_MINION_BOARD * NUM_MINIONS)
+#define MAX_VOLT_SENSORS_PER_MINION_BOARD	8	// User defined. The LTC6811 can actually measure 12 modules.
+#define NUM_PINS_PER_LTC 					(MAX_VOLT_SENSORS_PER_MINION_BOARD + 1) // one extra for ground
+#define TOTAL_VOLT_WIRES					(NUM_PINS_PER_LTC * NUM_MINIONS - 1)
 
 //--------------------------------------------------------------------------------
 // Temperature Sensor Configurations
 // Define how many temperature sensors are connected to each board
-#define MAX_TEMP_SENSORS_PER_MINION_BOARD	16
+#define MAX_TEMP_SENSORS_PER_MINION_BOARD	(MAX_VOLT_SENSORS_PER_MINION_BOARD * NUM_TEMP_SENSORS_PER_MOD)
 
 //--------------------------------------------------------------------------------
 // HeartBeat Delay Ticks
@@ -115,5 +116,8 @@ typedef enum SafetyStatus_e {SAFE = 0, DANGER = 1, OVERVOLTAGE = 2, UNDERVOLTAGE
 
 // used to determine if we are charging
 #define AMPS_NOISE_LIMIT 250 // milliamps
+
+// number of independently controlled fans
+#define NUM_FANS 4
 
 #endif

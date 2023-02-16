@@ -83,7 +83,7 @@ uint16_t LTC2315_Read() {
     if ((count > MAX_PEC_ERRORS) && (rxdata[0] == 0xff) && (rxdata[1] == 0xff)) {
       // trip BPS
       Fault_BitMap |= Fault_CRC;
-      EnterFaultState();
+      RTOS_BPS_SemPost(&Fault_Sem4, OS_OPT_POST_1);
     }
 
     ++count;
