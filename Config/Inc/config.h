@@ -17,7 +17,7 @@ typedef enum SafetyStatus_e {SAFE = 0, DANGER = 1, OVERVOLTAGE = 2, UNDERVOLTAGE
 //--------------------------------------------------------------------------------
 // Basic Parameters of BPS layout
 
-#define NUM_MINIONS	1					 // Number of minion boards
+#define NUM_MINIONS	2					 // Number of minion boards
 
 //--------------------------------------------------------------------------------
 // Battery Fault Checks
@@ -26,7 +26,7 @@ typedef enum SafetyStatus_e {SAFE = 0, DANGER = 1, OVERVOLTAGE = 2, UNDERVOLTAGE
 //--------------------------------------------------------------------------------
 // Battery Pack layout
 #ifndef NUM_BATTERY_MODULES
-#define NUM_BATTERY_MODULES				12		// Number of battery modules
+#define NUM_BATTERY_MODULES				24		// Number of battery modules
 #endif
 
 #ifndef NUM_TEMP_SENSORS_PER_MOD
@@ -34,7 +34,7 @@ typedef enum SafetyStatus_e {SAFE = 0, DANGER = 1, OVERVOLTAGE = 2, UNDERVOLTAGE
 #endif
 
 #ifndef NUM_TEMPERATURE_SENSORS
-#define NUM_TEMPERATURE_SENSORS			16      //(NUM_BATTERY_MODULES * NUM_TEMP_SENSORS_PER_MOD)		// Number of temperature sensors
+#define NUM_TEMPERATURE_SENSORS			32      //(NUM_BATTERY_MODULES * NUM_TEMP_SENSORS_PER_MOD)		// Number of temperature sensors
 #endif
 
 //--------------------------------------------------------------------------------

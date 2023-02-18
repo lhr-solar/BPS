@@ -65,15 +65,6 @@ void Task1(void *p_arg){
             CriticalState_Stk,	// Watermark limit for debugging
             TASK_CRITICAL_STATE_STACK_SIZE);					// return err code
 
-    //3
-    // RTOS_BPS_TaskCreate(&PetWDog_TCB,				// TCB
-	// 		"TASK_PETWDOG_PRIO",	// Task Name (String)
-	// 		Task_PetWDog,				// Task function pointer
-	// 		(void *)0,				// Task function args
-	// 		TASK_PETWDOG_PRIO,			// Priority
-	// 		PetWDog_Stk,	// Watermark limit for debugging
-	// 		TASK_PETWDOG_STACK_SIZE);					// return err code
-    // Spawn Task_VoltTempMonitor with PRIO 4
     RTOS_BPS_TaskCreate(&VoltTempMonitor_TCB,				// TCB
 			"TASK_VOLT_TEMP_MONITOR_PRIO",	// Task Name (String)
 			Task_VoltTempMonitor,				// Task function pointer
@@ -108,7 +99,6 @@ void Task2(void *p_arg){
         RTOS_BPS_MutexPend(&WDog_Mutex, OS_OPT_PEND_BLOCKING);
         WDog_BitMap |= WD_AMPERES;
         WDog_BitMap |= WD_BALANCING;
-        WDog_BitMap |= WD_VOLT_TEMP;
         RTOS_BPS_MutexPost(&WDog_Mutex, OS_OPT_POST_NONE);
         //delay of 100ms
         RTOS_BPS_DelayTick(10);
