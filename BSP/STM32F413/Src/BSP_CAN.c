@@ -1,7 +1,6 @@
 /* Copyright (c) 2018-2022 UT Longhorn Racing Solar */
 
 #include "BSP_CAN.h"
-#include "stm32f4xx.h"
 #include "stm32f4xx_can.h"
 #include "os.h"
 #include "Tasks.h"
@@ -71,7 +70,6 @@ void BSP_CAN_Init(callback_t rxEvent, callback_t txEnd, bool loopback) {
     RCC_APB1PeriphClockCmd(RCC_APB1Periph_CAN1, ENABLE);
 
     /* CAN register init */
-    //CAN_DeInit(CAN1);
 
     /* CAN cell init */
     CAN_InitStructure.CAN_TTCM = DISABLE;
