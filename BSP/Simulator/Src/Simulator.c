@@ -30,6 +30,7 @@ uint8_t stateCount = 0;
 
 // linked list of simulator states
 static simulator_state *states = NULL;
+BPS_OS_MUTEX SimMutex;
 
 // timing information to handle the state transitions
 // note that this only has a granularity of 1 second, so it's not super precise
@@ -50,6 +51,8 @@ static const char* LoggingLUT[LOG_NUM_LEVELS] = {
     [LOG] = "",
     [LOG_MISC] = "[MISC] ",
 };
+
+bool OS_Started = false;
 
 /**
  * @brief   Log something to simulator log file
@@ -251,6 +254,8 @@ void Simulator_Init(char *jsonPath) {
     // initialize the fake inputs
     readInputFile(jsonPath);
 
+    RTOS_BPS_MutexCreate(&SimMutex, "Simulator Mutex");
+
     // log the starting time
     startTime = time(NULL);
 }
@@ -261,6 +266,9 @@ void Simulator_Init(char *jsonPath) {
  * @return  None
  */
 static void Simulator_Transition(void) {
+    if(OS_Started){
+        RTOS_BPS_MutexPend(&SimMutex, OS_OPT_PEND_NON_BLOCKING);
+    }
     // advance to the current state
     time_t currentTime = time(NULL);
     //wait until time for state is completed before moving to next state
@@ -274,6 +282,9 @@ static void Simulator_Transition(void) {
             Simulator_Log(LOG, "\nFinished last state!\n");
             Simulator_Shutdown(0);
         }
+    }
+    if(OS_Started){
+        RTOS_BPS_MutexPost(&SimMutex, OS_OPT_POST_ALL);
     }
 }
 
