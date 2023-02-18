@@ -5,6 +5,7 @@
 
 #include "common.h"
 #include "config.h"
+#include "stm32f4xx.h"
 
 /**
  * @brief   Initializes the CAN module that communicates with the rest of the electrical system.

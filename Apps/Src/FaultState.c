@@ -12,9 +12,9 @@
 #include "CANbus.h"
 #include "BSP_UART.h"
 #include "config.h"
-#ifndef SIMULATION
 #include "stm32f4xx_can.h"
 #include "BSP_PLL.h"
+#ifndef SIMULATION
 #else
 #include "Simulator.h"
 extern uint8_t stateCount;
