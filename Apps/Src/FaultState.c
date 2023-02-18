@@ -164,34 +164,30 @@ void EnterFaultState() {
         CANbus_BlockAndSend_FaultState(CONTACTOR_STATE, payload);
         delay_u(20000);
         
-        // //Send Current Readings
-        // //int32_t latestMeasureMilliAmps = Amps_GetReading(); 
-        // payload.idx = 0;
-        // payload.data.w = 3;
-        // CANbus_BlockAndSend_FaultState(CURRENT_DATA, payload);
-        // delay_u(2000);
+        //Send Current Readings
+        payload.idx = 0;
+        payload.data.w = Amps_GetReading();
+        CANbus_BlockAndSend_FaultState(CURRENT_DATA, payload);
+        delay_u(20000);
         
 
-        // //Send Voltage Readings
-        // for (int i = 0; i < NUM_BATTERY_MODULES; i++){ //send all battery module voltage data
-        //     //int voltage = Voltage_GetModuleMillivoltage(i);
-        //     payload.idx = i;
-        //     //payload.data.w = voltage;
-        //     payload.data.w = 4;
-        //     CANbus_BlockAndSend_FaultState(VOLT_DATA, payload);
-        //     delay_u(2000);
-        // }
+        //Send Voltage Readings
+        for (int i = 0; i < NUM_BATTERY_MODULES; i++){ //send all battery module voltage data
+            int voltage = Voltage_GetModuleMillivoltage(i);
+            payload.idx = i;
+            payload.data.w = voltage;
+            CANbus_BlockAndSend_FaultState(VOLT_DATA, payload);
+            delay_u(20000);
+        }
 
-        // delay_u(200);
-
-        // CANbus_BlockAndSend_FaultState(CURRENT_DATA, payload);
-        // for (int i = 0; i < NUM_BATTERY_MODULES; i++){ //send all battery module voltage data
-        //     payload.idx = i;
-        //     //payload.data.w = Temperature_GetModuleTemperature(i);
-        //     payload.data.w = 5;
-        //     CANbus_BlockAndSend_FaultState(TEMP_DATA, payload);
-        //     delay_u(2000);
-        // }
+        delay_u(20000);
+        CANbus_BlockAndSend_FaultState(CURRENT_DATA, payload);
+        for (int i = 0; i < NUM_BATTERY_MODULES; i++){ //send all battery module voltage data
+            payload.idx = i;
+            payload.data.w = Temperature_GetModuleTemperature(i);
+            CANbus_BlockAndSend_FaultState(TEMP_DATA, payload);
+            delay_u(20000);
+        }
 
 #ifdef DEBUGMODE
         if (BSP_UART_ReadLine(command)) CLI_Handler(command); // CLI
