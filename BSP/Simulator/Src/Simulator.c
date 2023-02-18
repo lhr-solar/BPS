@@ -51,6 +51,8 @@ static const char* LoggingLUT[LOG_NUM_LEVELS] = {
     [LOG_MISC] = "[MISC] ",
 };
 
+extern void BSP_PWM_SetKillSwitch(bool); // extern call to pwm kill switch functionality
+
 /**
  * @brief   Log something to simulator log file
  * @param   lvl - Choose level at which to log at. Levels defined in LoggingType enum.
@@ -129,6 +131,8 @@ static void readInputFile(char *jsonPath) {
         cJSON* currentObj = cJSON_GetObjectItem(state, "current");
         cJSON* charge = cJSON_GetObjectItem(state, "charge");
         cJSON* canList = cJSON_GetObjectItem(state, "can");
+        // Kill switch.
+        cJSON* killSwitch = cJSON_GetObjectItem(state, "kill_switch");
     
         // Check which state fields aren't present in the current sim state JSON.
         // Lots of nasty if/else's here, not much way around this.
@@ -197,6 +201,12 @@ static void readInputFile(char *jsonPath) {
                     printf("Error: CAN message read/write type invalid! [%s]\n", read_write);
                     exit(-1);
                 }
+            }
+        }
+        if (killSwitch) {
+            if (strcmp(killSwitch->valuestring, "yes") == 0) { // if "kill_switch": "yes",
+                // kill switch will set contactors off.
+                BSP_PWM_SetKillSwitch(true);
             }
         }
         stateCount++; // keep track of which state we are on.
