@@ -15,6 +15,7 @@
 #include <stdbool.h>
 #include <stdlib.h> // for calloc/free
 #include <errno.h>
+#include <assert.h>
 
 /**
  * @brief   Generates random numbers between a range
@@ -220,7 +221,7 @@ void generateData(char selection){
             break;
     }
     if (selection != ALL_ERR) {
-        writeOut(filename);
+        assert(writeOut(filename));
     }
 }
 
