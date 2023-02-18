@@ -70,10 +70,5 @@ int main() {
     OS_Started = true;
     #endif      
     OSStart(&err);
-    while(1){
-        if(err != OS_ERR_NONE){
-            exit(-1);
-        }
-    }
     // Should not get here or else there is an error
 }
