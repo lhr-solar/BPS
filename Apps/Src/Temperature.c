@@ -42,9 +42,6 @@ static cell_asic *Minions;
 // Variables to help with PID calculation
 static int32_t ErrorSum = 0;
 static int32_t Error;
-static int32_t Rate;
-static int32_t PreviousError = 0;
-
 
 /**
  * @brief find the median of three values
