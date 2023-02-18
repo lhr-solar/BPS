@@ -24,14 +24,23 @@ void Task_Init(void *p_arg) {
 
     RTOS_BPS_MutexCreate(&WDog_Mutex, "Watchdog Mutex");
 
+    // 1
+    RTOS_BPS_TaskCreate(&CheckContactor_TCB,    // TCB
+				"Task_CheckContactor",          // Task Name (String)
+				Task_CheckContactor,            // Task function pointer
+				(void *)0,                      // Task function args
+				TASK_CHECK_CONTACTOR_PRIO,      // Priority
+				CheckContactor_Stk,             // Stack
+				TASK_CHECK_CONTACTOR_STACK_SIZE
+                );
     //2
-    RTOS_BPS_TaskCreate(&CriticalState_TCB,	    // TCB
-            "TASK_CRITICAL_STATE",	            // Task Name (String)
-            Task_CriticalState,				    // Task function pointer
-            (void *)0,				            // Task function args
-            TASK_CRITICAL_STATE_PRIO,		    // Priority
-            CriticalState_Stk,				    // Stack
-            TASK_CRITICAL_STATE_STACK_SIZE);
+    // RTOS_BPS_TaskCreate(&CriticalState_TCB,	    // TCB
+    //         "TASK_CRITICAL_STATE",	            // Task Name (String)
+    //         Task_CriticalState,				    // Task function pointer
+    //         (void *)0,				            // Task function args
+    //         TASK_CRITICAL_STATE_PRIO,		    // Priority
+    //         CriticalState_Stk,				    // Stack
+    //         TASK_CRITICAL_STATE_STACK_SIZE);
     //3
     // RTOS_BPS_TaskCreate(&PetWDog_TCB,	    // TCB
     // 		"TASK_PETWDOG",	                    // Task Name (String)
@@ -105,15 +114,6 @@ void Task_Init(void *p_arg) {
             TASK_IDLE_STACK_SIZE);
     
     CAN_Queue_Init();
-
-    // If a contactor is on before we turn it on in critical state, it may have failed and welded shut
-    if(Contactor_GetState(HVHIGH_CONTACTOR) || Contactor_GetState(HVLOW_CONTACTOR)) {
-        Fault_BitMap |= Fault_ESTOP;
-        RTOS_BPS_SemPost(&Fault_Sem4, OS_OPT_POST_1);
-    } else {
-        // Signal to turn on contactor but only signal once
-        RTOS_BPS_SemPost(&SafetyCheck_Sem4, OS_OPT_POST_1);
-    }
 
     //delete task
     OSTaskDel(NULL, &err); // Delete task
