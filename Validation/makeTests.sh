@@ -2,7 +2,7 @@ errors=0
 for x in Tests/Test_*; do
     make clean
     x="${x%.*}"; x="${x#*_}"
-    sim=''
+    sim='stm32f413'
     if [[ "$x" == *"Simulator"* ]]; then
         sim='simulator'
     fi
