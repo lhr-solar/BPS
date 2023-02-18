@@ -32,7 +32,6 @@ static void (*gTxEnd)(void);
  * @param   rxEvent     : the function to execute when recieving a message. NULL for no action.
  * @param   txEnd       : the function to execute after transmitting a message. NULL for no action.
  * @param   loopback    : if we should use loopback mode (for testing)
- * @param   faultState  : fault state determines whether to implement Rx and Tx interrupts 
  * @return  None
  */
 void BSP_CAN_Init(callback_t rxEvent, callback_t txEnd, bool loopback) {
@@ -140,6 +139,15 @@ void BSP_CAN_Init(callback_t rxEvent, callback_t txEnd, bool loopback) {
         }
     }
 }
+
+/**
+ * @brief   Calls stm-level CAN_DeInit
+ * @return  None
+ */
+void BSP_CAN_DeInit() {
+    CAN_DeInit(CAN1);
+}
+
 /**
  * @brief   Transmits the data onto the CAN bus with the specified id
  * @param   id : Message of ID. Also indicates the priority of message. The lower the value, the higher the priority.
@@ -250,8 +258,4 @@ void CAN1_TX_IRQHandler(void) {
     #ifdef RTOS
     OSIntExit();      // Signal to uC/OS
     #endif
-}
-
-bool BSP_CAN_FindMailBox(CAN_TypeDef* CANx){
-    return findMailBox(CANx);
 }

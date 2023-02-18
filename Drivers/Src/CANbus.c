@@ -54,6 +54,14 @@ void CANbus_Init(bool loopback, bool faultState) {
     BSP_CAN_Init(CANbus_CountIncoming, CANbus_Release, loopback);
 }
 
+/**
+ * @brief   Deinitializes the CAN system
+ * @return  None
+ */
+void CANbus_DeInit() {
+	BSP_CAN_DeInit();
+}
+
 // Static method, call CANbus_Send or CANbus_BlockAndSend instead
 static ErrorStatus CANbus_SendMsg(CANId_t id, CANPayload_t payload) {
 	uint8_t txdata[8];
@@ -145,10 +153,11 @@ static ErrorStatus CANbus_SendMsg_FaultState(CANId_t id, CANPayload_t payload) {
 			return ERROR;	// Do nothing if invalid
 	}
 
-	while(!BSP_CAN_FindMailBox(CAN1)){}
-
-	// Write the data to the bus
 	ErrorStatus retVal = BSP_CAN_Write(id, txdata, data_length);
+	// Write the data to the bus
+	while((retVal = ERROR)){
+		retVal = BSP_CAN_Write(id, txdata, data_length);
+	}
 
 	return retVal;
 }	

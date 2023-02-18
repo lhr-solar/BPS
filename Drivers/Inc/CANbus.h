@@ -52,6 +52,12 @@ typedef struct {
 void CANbus_Init(bool loopback, bool faultState);
 
 /**
+ * @brief   Deitializes the CAN system 
+ * @return  None
+ */
+void CANbus_DeInit();
+
+/**
  * @brief   Transmits data onto the CANbus. This is non-blocking and will fail with an error if
  * 			the CAN mailboxes are fully occupied. Be sure to check the return code or call CANbus_BlockAndSend.
  * @param   id : CAN id of the message

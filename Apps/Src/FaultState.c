@@ -12,10 +12,7 @@
 #include "CANbus.h"
 #include "BSP_UART.h"
 #include "config.h"
-#include "stm32f4xx_can.h"
-#include "BSP_PLL.h"
-#ifndef SIMULATION
-#else
+#ifdef SIMULATION
 #include "Simulator.h"
 extern uint8_t stateCount;
 #endif
@@ -140,7 +137,7 @@ void EnterFaultState() {
     
     if ((Fault_BitMap & (Fault_OS | Fault_WDOG)) == 0) {
         //Deinitialize CAN registers
-        CAN_DeInit(CAN1);
+        CANbus_DeInit();
         //Reinit CAN in fault state
         CANbus_Init(false, true);
     }
