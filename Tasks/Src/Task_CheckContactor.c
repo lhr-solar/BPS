@@ -18,7 +18,7 @@ void Task_CheckContactor(void *p_arg) {
     // If a contactor is on before we turn it on in critical state, it may have failed and welded shut
     if(Contactor_GetState(HVHIGH_CONTACTOR) || Contactor_GetState(HVLOW_CONTACTOR)) {
         Fault_BitMap |= Fault_ESTOP;
-        RTOS_BPS_SemPost(&Fault_Sem4, OS_OPT_POST_1);
+        EnterFaultState();
     } else {
         RTOS_BPS_SemPost(&SafetyCheck_Sem4, OS_OPT_POST_1);
     }
