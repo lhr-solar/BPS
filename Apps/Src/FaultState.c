@@ -13,7 +13,7 @@
 #include "BSP_UART.h"
 #include "config.h"
 #ifndef SIMULATION
-#include "stm32f4xx.h"
+#include "stm32f4xx_can.h"
 #include "BSP_PLL.h"
 #else
 #include "Simulator.h"
