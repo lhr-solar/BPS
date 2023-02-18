@@ -1,6 +1,7 @@
 /* Copyright (c) 2018-2022 UT Longhorn Racing Solar */
 
 #include "common.h"
+#include "sys/stat.h"
 #include "BSP_UART.h"
 
 #define STDIN_FILENO  0
@@ -31,5 +32,10 @@ int _lseek(int file, int ptr, int dir)
     return 0;
 }
 
+int _isatty(int fd) {
+    return -1;
+}
 
-
+int _fstat(int fd, struct stat *statbuf) {
+    return -1;
+}
