@@ -33,7 +33,7 @@ int _lseek(int file, int ptr, int dir)
 }
 
 int _isatty(int fd) {
-    return -1;
+    return 0;
 }
 
 int _fstat(int fd, struct stat *statbuf) {
