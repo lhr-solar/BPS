@@ -8,16 +8,7 @@
 
 static bool initialized = false;
 static uint32_t pinSpeeds[] = {0, 0, 0, 0, 0};
-static bool killSwitchLockdown = false;
-
-/**
- * @brief Only used for simulator purposes.
- * 
- * @param val to set kill switch to
- */
-void BSP_PWM_SetKillSwitch(bool val) {
-    killSwitchLockdown = val;
-}
+bool killSwitchLockdown = false;
 
 /**
  * @brief   Sets up contactor and fan pin timers for outputting PWM signals
