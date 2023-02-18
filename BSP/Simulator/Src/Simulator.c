@@ -239,8 +239,7 @@ void Simulator_Init(char *jsonPath) {
     if (write(simulatorLog, "simulator started...\n", 21) < 0) {
         printf("error writing file %s\n", jsonPath);
         exit(-1);
-    }
-    
+    }    
     // register the Ctrl-C handler
     sigset_t s;
     sigemptyset(&s);
