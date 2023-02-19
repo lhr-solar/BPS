@@ -28,9 +28,7 @@ void Task_VoltTempMonitor(void *p_arg) {
     CANData_t CanData;
     CANPayload_t CanPayload;
     CANMSG_t CanMsg;
-    volatile int counter = 0;
     while(1) {
-        counter++;
         // BLOCKING =====================
         // Update Voltage Measurements
         Voltage_UpdateMeasurements();
