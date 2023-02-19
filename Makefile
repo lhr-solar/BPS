@@ -16,10 +16,19 @@ export DEFINES
 TEST = none
 export TEST
 
+ifneq ($(TEST), none)
+TEST_FILE := Test_$(TEST).c
+endif
+
 OS = RTOS
 export OS
 
 stm32f413:
+ifneq ($(TEST), none)
+	@echo "Making STM32 build for file ${PURPLE}'${TEST_FILE}'${NC}"
+else
+	@echo "Making STM32 build with ${RED}NO${NC}test."
+endif
 	$(MAKE) -C BSP -C STM32F413 -j
 
 simulator:
