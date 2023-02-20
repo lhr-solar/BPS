@@ -53,8 +53,6 @@ static const char* LoggingLUT[LOG_NUM_LEVELS] = {
     [LOG_MISC] = "[MISC] ",
 };
 
-extern void BSP_PWM_SetKillSwitch(bool); // extern call to pwm kill switch functionality
-
 /**
  * @brief   Log something to simulator log file
  * @param   lvl - Choose level at which to log at. Levels defined in LoggingType enum.
