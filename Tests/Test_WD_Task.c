@@ -15,8 +15,6 @@ CPU_STK Task1_Stk[256];
 OS_TCB Task2_TCB;
 CPU_STK Task2_Stk[256];
 
-void EnterFaultState();
-
 void Task2(void *p_arg){
     OS_ERR err;
     

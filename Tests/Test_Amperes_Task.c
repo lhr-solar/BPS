@@ -32,8 +32,6 @@
  *    verify that the contactor opens (the contactor should have closed earlier on startup)
  *****************************************************************************/
 
-void EnterFaultState(void);
-
 // Used by Task1
 OS_TCB Task1_TCB;
 CPU_STK Task1_Stk[DEFAULT_STACK_SIZE];
@@ -46,10 +44,6 @@ void Task1(void *p_arg){
 	OS_CPU_SysTickInit(SystemCoreClock / (CPU_INT32U) OSCfg_TickRate_Hz);
 
     OS_ERR err;
-    
-    RTOS_BPS_SemCreate(&Fault_Sem4,
-                "Fault/Tripped Semaphore",
-                0);
 
     RTOS_BPS_SemCreate(&SafetyCheck_Sem4,
                 "Safety Check Semaphore",
