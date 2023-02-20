@@ -36,8 +36,8 @@ static void ADC_InitDMA(void) {
 }
 
 /**
- * @brief   Initializes the ADC module. This is to measure the hall effect sensors
- *          on the Current Monitor Board.
+ * @brief   Initializes the ADC module for pins PA2 & PA3. Uses DMA for multiple channels
+ * NOTE:	Channel 2 is read first.
  * @param   None
  * @return  None
  */

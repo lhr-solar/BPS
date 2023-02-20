@@ -5,19 +5,19 @@ Design Overview
 Battery pack structure
 ======================
 
-BeVolt’s battery pack uses 434 Samsung INR18650-30Q li-ion cells.
+The battery pack uses 288 LG INR21700-M50 li-ion cells.
 
-There are 31 modules connected in series, with 14 cells connected in parallel in each module. 
+There are 32 modules connected in series, with 9 cells connected in parallel in each module. 
 
 .. note::
   Due to weight requirements, we may remove a module from the pack during the scrutineering phase. 
   
-Each module will have at least two temperature sensors.
+Each module will have at least one temperature sensor.
 
 Architecture
 ============
 
-BeVolt’s BPS v1.x uses a leader-minion architecture. The minion boards measure all the data and send it to the master board. 
+The BPS v1.x uses a leader-minion architecture. The minion boards measure all the data and send it to the master board. 
 There are two types of minion boards: Amperes and module. 
 
 The Amperes minion board only measures the current of the whole battery pack. The module minion boards measure both the temperature and voltage of the battery modules. 
@@ -56,9 +56,6 @@ The Amperes minion board uses :term:`Shunt Resistor sensors <Shunt Resistor>` to
 
 Each minion board can evaluate up to 12 modules and 16 temperature sensors.
 
-Two display boards are present, one on the dashboard and one for the BPS. 
-The BPS Display board is separate from the dashboard to keep it independent from all other systems while debugging.
-
 The BPS will also power the fans in the battery box.
 
 .. figure:: ../_static/system_overview.png
@@ -84,6 +81,3 @@ UART
 | ``UART3`` - for USB, has subpriority level 0
 
 **Note**: The OS interrupts (``PendSV`` and ``Systick``) should have the lowest priority amongst all other interrupts. 
-
-
-

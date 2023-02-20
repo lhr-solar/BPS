@@ -2,8 +2,6 @@
 This repo contains all code related to LHR Solar's Battery Protection System (BPS)
 The [Documentation](https://bps.readthedocs.io/en/latest/) for the BPS contains other useful software and an in depth explanation of our architecture.
 
-NOTE: As of 2023, the simulator for the BPS repository is deprecated.
-
 ## Setup
 Development is done in a Linux environment to build and flash the BPS program.
 
@@ -77,7 +75,7 @@ To build a new test, you need to use the following command:
 ## Flashing
 When calling any of the following commands, make sure you are in the top most level of the directory.
 You must be on a Linux VM or dual boot machine. Consider using [VMWARE](https://kb.vmware.com/s/article/2057907) 
-using this free license [key](https://gist.github.com/williamgh2019/cc2ad94cc18cb930a0aab42ed8d39e6f)
+and googling for a free license key.
 
 1. Install `st-util`
 2. Connect your computer to the BPS using a Nucleo programmer
@@ -96,7 +94,7 @@ OpenOCD is a debugger program that is open source and compatible with the STM32F
 GDB is a debugger program that can be used to step through a program as it is being run on the board. To use, you need two terminals open, as well as a USB connection to the ST-Link programmer (as if you were going to flash the program to the board). 
 1. Run ```./openocd-debug.sh``` in one terminal.
 2. In the other terminal, start gdb with the command ```gdb-multiarch ./Objects/bps-leader.elf``` (assuming that you are doing this in the root of the project directory.
-3. This will launch GDB and read in all of the symbols from the program that you are running on the board. In order to actually connect gdb to the board, execute the command ```target extended-remote localhost:4242```, which will connect to the st-util command from earlier.
+3. This will launch GDB and read in all of the symbols from the program that you are running on the board. In order to actually connect gdb to the board, execute the command ```target extended-remote localhost:3333```, which will connect to the st-util command from earlier.
 
 **Note:** If you get an error message for Permission denied, try giving openocd read/write permissions using chmod: ```chmod 764 openocd```
 
@@ -118,7 +116,7 @@ You can check the log file by doing `cat bps-sim-<logged time>.log`.
 ## Rules
 Make sure to have fun!
 
-Commit frequently into your own branches. Create a Pull Request whenever you are ready to add you working code to the master branch. Make sure that your code compiles without any errors or warnings before you open a pull request. At least one approver must approve your pull request before it can be merged. The reviewers will make sure everything is up to par with the coding standards.
+Commit frequently into your own branches. Create a Pull Request whenever you are ready to add you working code to the master branch. 
 
 ### Code Reviews
 You can review a pull request even if you are not an approver. In addition to helping us catch bugs, code reviews are a good opportunity to learn more about the BPS codebase. Some examples on what you can include in a code review are:

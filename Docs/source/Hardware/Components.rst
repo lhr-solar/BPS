@@ -46,3 +46,8 @@ Description
     Cool down battery pack.
 Usage
     Use PWM to change speed of fans and save power.
+
+Horn
+====
+Description 
+    Makes Noise. Also draws around 3.6A at 12V

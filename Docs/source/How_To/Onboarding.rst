@@ -17,14 +17,6 @@ First Steps
 3. Check the README (scroll down) in the `BPS repository <https://github.com/lhr-solar/BPS>`_ for instructions on how to set up your environment.
 4. Check out our starter projects. These are designed to introduce new members to the BPS architecture and C programming.
 
-BPS Starter Project
-*******************
-The description for the BPS starter project can be found `here <https://docs.google.com/document/d/1mnr5hS6oYJ3UnO-METVs7p3KIAmd1dFCfAg1XT5Y6k0/view>`__ (requires access to the google drive).
-
-Sunlight Starter Project
-************************
-If you want a Sunlight starter project, bug Clark until he makes one. It will probably focus on socket programming.
-
 Help, I'm Stuck!
 ################
 In software development, it is fairly common to come across a problem that you do not know how to solve. When this happens to you (I know it will happen

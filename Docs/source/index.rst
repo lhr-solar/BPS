@@ -24,11 +24,12 @@ Welcome to the BeVolt BPS documentation!
    :maxdepth: 2
    :caption: Software
 
-   Software/BSP
+   Software/Tasks
+   Software/Apps
    Software/Drivers
    Software/RTOS
-   Software/Apps
-   Software/Tasks
+   Software/BSP
+   
 
 .. toctree::
    :hidden:
@@ -37,7 +38,6 @@ Welcome to the BeVolt BPS documentation!
 
    Hardware/Boards
    Hardware/Components
-   Hardware/battery-compartment.rst
 
 .. toctree::
    :hidden:

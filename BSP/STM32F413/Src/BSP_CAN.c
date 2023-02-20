@@ -27,7 +27,7 @@ static void (*gRxEvent)(void);
 static void (*gTxEnd)(void);
 
 /**
- * @brief   Initializes the CAN module that communicates with the rest of the electrical system.
+ * @brief   Initializes the CAN module that communicates with the rest of the electrical system at 125kbps.
  * @param   rxEvent     : the function to execute when recieving a message. NULL for no action.
  * @param   txEnd       : the function to execute after transmitting a message. NULL for no action.
  * @param   loopback    : if we should use loopback mode (for testing)
@@ -140,7 +140,7 @@ void BSP_CAN_Init(callback_t rxEvent, callback_t txEnd, bool loopback) {
 /**
  * @brief   Transmits the data onto the CAN bus with the specified id
  * @param   id : Message of ID. Also indicates the priority of message. The lower the value, the higher the priority.
- * @param   data : data to be transmitted. The max is 8 bytes.
+ * @param   data : pointer to array of data to be transmitted. The maximum is 8 bytes.
  * @param   length : num of bytes of data to be transmitted. This must be <= 8 bytes or else the rest of the message is dropped.
  * @return  ERROR if module was unable to transmit the data onto the CAN bus. SUCCESS indicates data was transmitted.
  */
