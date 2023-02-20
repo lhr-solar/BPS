@@ -64,7 +64,13 @@ void Simulator_Log(LoggingType_t lvl, char *str) {
     char prefix[128];
     strcpy(prefix, LoggingLUT[lvl]); //This is because strcat cannot concat const
     char* msg = strcat(prefix, str);
+    if(OS_Started){
+        RTOS_BPS_MutexPend(&SimMutex, OS_OPT_PEND_BLOCKING);
+    }
     write(simulatorLog, msg, strlen(msg));
+    if(OS_Started){
+        RTOS_BPS_MutexPost(&SimMutex, OS_OPT_POST_ALL);
+    }
     printf("%s", msg);
 }
 
@@ -266,9 +272,6 @@ void Simulator_Init(char *jsonPath) {
  * @return  None
  */
 static void Simulator_Transition(void) {
-    if(OS_Started){
-        RTOS_BPS_MutexPend(&SimMutex, OS_OPT_PEND_NON_BLOCKING);
-    }
     // advance to the current state
     time_t currentTime = time(NULL);
     //wait until time for state is completed before moving to next state
@@ -282,9 +285,6 @@ static void Simulator_Transition(void) {
             Simulator_Log(LOG, "\nFinished last state!\n");
             Simulator_Shutdown(0);
         }
-    }
-    if(OS_Started){
-        RTOS_BPS_MutexPost(&SimMutex, OS_OPT_POST_ALL);
     }
 }
 
