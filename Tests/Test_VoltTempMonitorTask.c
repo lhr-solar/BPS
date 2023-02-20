@@ -103,21 +103,6 @@ void Task2(void *p_arg){
         //delay of 100ms
         RTOS_BPS_DelayTick(10);
         BSP_Light_Toggle(RUN);
-
-        printf("****************Module Voltages****************\r\n");
-        for(int i = 0; i < NUM_BATTERY_MODULES; i++) {
-            printf("\t%d: %dmV\r\n", i, Voltage_GetModuleMillivoltage(i));
-        }
-
-        printf("******************Module Temperatures*****************\r\n");
-        for(int i = 0; i < NUM_MINIONS; i++) {
-            printf("Minion %d:\r\n", i);
-            printf("\tTemperature:\r\n");
-
-            for(int j = 0; j < MAX_TEMP_SENSORS_PER_MINION_BOARD; j++) {
-                printf("\t%d: %ldmC\r\n", j, Temperature_GetSingleTempSensor(i, j));
-            }
-        }
     }
 }
 
