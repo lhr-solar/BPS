@@ -29,6 +29,14 @@ void BSP_CAN_Init(callback_t rxEvent, callback_t txEnd, bool loopback) {
 }
 
 /**
+ * @brief   Calls stm-level CAN_DeInit
+ * @return  None
+ */
+void BSP_CAN_DeInit() {
+    Simulator_Log(LOG_INFO, "CAN Deinitialized\n");
+}
+
+/**
  * @brief   Transmits the data onto the CAN bus with the specified id
  * @param   id : Message of ID. Also indicates the priority of message. The lower the value, the higher the priority.
  * @param   data : data to be transmitted. The max is 8 bytes.

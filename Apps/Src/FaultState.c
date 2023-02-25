@@ -12,12 +12,20 @@
 #include "CANbus.h"
 #include "BSP_UART.h"
 #include "config.h"
+#include "BSP_PLL.h"
 #ifdef SIMULATION
 #include "Simulator.h"
 extern uint8_t stateCount;
 #endif
 
-void delay_u(uint16_t micro);
+void delay_u_copy(uint16_t micro)
+{
+  uint32_t delay = BSP_PLL_GetSystemClock() / 1000000;
+	for(uint32_t i = 0; i < micro; i++)
+	{
+		for(uint32_t j = 0; j < delay; j++);
+	}
+}
 
 /*
  * Note: do not call this directly if it can be helped.
@@ -157,21 +165,21 @@ void EnterFaultState() {
         payload.data.w = 1;
         CANbus_BlockAndSend_FaultState(TRIP, payload);
         payload_id++;
-        delay_u(20000);
+        delay_u_copy(20000);
 
         // contactor message
         payload.idx = payload_id;
         payload.data.w = 2;
         CANbus_BlockAndSend_FaultState(CONTACTOR_STATE, payload);
         payload_id++;
-        delay_u(20000);
+        delay_u_copy(20000);
         
         //Send Current Readings
         payload.idx = payload_id;
         payload.data.w = Amps_GetReading();
         CANbus_BlockAndSend_FaultState(CURRENT_DATA, payload);
         payload_id++;
-        delay_u(20000);
+        delay_u_copy(20000);
         
 
         //Send Voltage Readings
@@ -181,17 +189,17 @@ void EnterFaultState() {
             payload.data.w = voltage;
             CANbus_BlockAndSend_FaultState(VOLT_DATA, payload);
             payload_id++;
-            delay_u(20000);
+            delay_u_copy(20000);
         }
 
-        delay_u(20000);
+        delay_u_copy(20000);
         CANbus_BlockAndSend_FaultState(CURRENT_DATA, payload);
         for (int i = 0; i < NUM_BATTERY_MODULES; i++){ //send all battery module voltage data
             payload.idx = payload_id;
             payload.data.w = Temperature_GetModuleTemperature(i);
             CANbus_BlockAndSend_FaultState(TEMP_DATA, payload);
             payload_id++;
-            delay_u(20000);
+            delay_u_copy(20000);
         }
 
 #ifdef DEBUGMODE
