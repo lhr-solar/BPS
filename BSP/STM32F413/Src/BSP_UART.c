@@ -215,7 +215,7 @@ uint32_t BSP_UART_Write(char *str, uint32_t len, UART_Port usart) {
             // Wait for space to open up
             while(txfifo_is_full(fifo));
             // Disable the interrupt again
-            USART_ITConfig(usart_handle, USART_IT_TC, RESET);
+//            USART_ITConfig(usart_handle, USART_IT_TC, RESET);
         } else {
             sent++;  
         }

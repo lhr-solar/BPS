@@ -105,7 +105,7 @@ void CLI_UartRxCallback(void) {
 void CLI_Init(void) {
     RTOS_BPS_SemCreate(&UartRx_Sem4, "CLI UART Rx Semaphore", 0);
     BSP_UART_Init(CLI_UartRxCallback, NULL, UART_USB);	
-    printf("From Leader: CLI Initialized\n");
+//    printf("From Leader: CLI Initialized\n");
 }
  
 // /** CLI_Help
@@ -677,8 +677,9 @@ void CLI_All(void) {
 }
 
 void CLI_Ping(void) {
-    static int i;
-    printf("pong %i\n", i++);
+//    static int i;
+    BSP_UART_Write("pong\n\r", 6, UART_USB);
+//    printf("pong %i\n\r", i++);
 }
 
 /** CLI_Handler

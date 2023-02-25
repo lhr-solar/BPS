@@ -190,7 +190,7 @@ def cli_parseUserInput():
     cmd = CLI_ERR
 
     if in_toks[0] == "ping":
-        return cli_ping()
+        return cli_ping(in_toks)
     elif in_toks[0] == "help":
         cli_help()
     elif in_toks[0] == "volts":
@@ -237,11 +237,14 @@ def cli_execCmd(uart, cmd):
     
     if (cmd != CLI_ERR):
         uart.write(bytes(cmd + '\n\r', encoding="ascii"))
-        result = uart.read_until('\n\r').decode("ascii")
-        print(":".join("{:02x}".format(ord(c)) for c in result))
+#        result = uart.read().decode("ascii")
+        result = uart.read_until(b'\r').decode("ascii")
+        result = uart.read_until(b'\r').decode("ascii")
+#        print(":".join("{:02x}".format(ord(c)) for c in result))
+        print(result)
 
 # Main function
-boardUart = init(1)
+boardUart = init(0)
 #cliHistFile = os.path.expanduser("~/.bps-console-history")
 #readline.add_history("cli history init")
 #readline.read_history_file(cliHistFile)
