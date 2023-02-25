@@ -155,7 +155,7 @@ static ErrorStatus CANbus_SendMsg_FaultState(CANId_t id, CANPayload_t payload) {
 
 	ErrorStatus retVal = BSP_CAN_Write(id, txdata, data_length);
 	// Write the data to the bus
-	while((retVal = ERROR)){
+	while((retVal == ERROR)){
 		retVal = BSP_CAN_Write(id, txdata, data_length);
 	}
 

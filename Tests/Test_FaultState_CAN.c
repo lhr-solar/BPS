@@ -11,13 +11,11 @@
 #include "BSP_CAN.h"
 
 OS_TCB Init_Task_TCB;
-CPU_STK Init_Task_Stk[TASK_FAULT_STATE_STACK_SIZE];
-OS_TCB Init_Fault_Task_TCB;
-CPU_STK Init_Fault_Stk[TASK_FAULT_STATE_STACK_SIZE];
+CPU_STK Init_Task_Stk[256];
 OS_TCB Init_CAN_Task_TCB;
-CPU_STK Init_CAN_Task_Stk[TASK_FAULT_STATE_STACK_SIZE];
+CPU_STK Init_CAN_Task_Stk[256];
 OS_TCB Init_Fault_Semaphore_Task_TCB;
-CPU_STK Init_Fault_Semaphore_Stk[TASK_FAULT_STATE_STACK_SIZE];
+CPU_STK Init_Fault_Semaphore_Stk[256];
 
 //Activate Semaphore
 void Task3(void *p_arg){
@@ -27,10 +25,7 @@ void Task3(void *p_arg){
 
     OSTimeDly(250, OS_OPT_TIME_DLY, &err);
 
-    OSSemPost(&Fault_Sem4,
-        OS_OPT_POST_1,
-        &err);
-    assertOSError(err);
+    EnterFaultState();
 
     while(1){
         BSP_Light_Toggle(EXTRA);
@@ -60,53 +55,23 @@ void Task1(void *p_arg){
 
     OS_CPU_SysTickInit(SystemCoreClock / (CPU_INT32U) OSCfg_TickRate_Hz);
 
-    OSSemCreate(&Fault_Sem4,
-        "Fault/Tripped FaultState_TCSemaphore",
-        0,
-        &err);
-    assertOSError(err);
+    RTOS_BPS_TaskCreate(&Init_CAN_Task_TCB,
+        "Init_CAN",
+        Task2,
+        (void *)0,
+        TASK_CANBUS_CONSUMER_PRIO,
+        Init_CAN_Task_Stk,
+        256
+    );
 
-    OSTaskCreate(&Init_Fault_Task_TCB,				// TCB
-				"INIT_FAULT_STATE_TASK",	// Task Name (String)
-				Task_FaultState,				// Task function pointer
-				(void *)0,				// Task function args
-				TASK_FAULT_STATE_PRIO,			// Priority
-				Init_Fault_Stk,			// Stack
-				WATERMARK_STACK_LIMIT,	// Watermark limit for debugging
-				TASK_FAULT_STATE_STACK_SIZE,		// Stack size
-				0,						// Queue size (not needed)
-				10,						// Time quanta (time slice) 10 ticks
-				(void *)0,				// Extension pointer (not needed)
-				OS_OPT_TASK_STK_CHK | OS_OPT_TASK_SAVE_FP,	// Options
-				&err);
-
-    OSTaskCreate(&Init_CAN_Task_TCB,
-                "Init_CAN",
-                Task2,
-                (void *)0,
-                TASK_CANBUS_CONSUMER_PRIO,
-                Init_CAN_Task_Stk,
-                WATERMARK_STACK_LIMIT,
-                TASK_FAULT_STATE_STACK_SIZE,
-                0,
-                10,
-                (void *)0,
-                OS_OPT_TASK_STK_CHK | OS_OPT_TASK_SAVE_FP,
-                &err);
-
-    OSTaskCreate(&Init_Fault_Semaphore_Task_TCB,
-                "Increment_Fault_Sempahore",
-                Task3,
-                (void *)0,
-                10,
-                Init_Fault_Semaphore_Stk,
-                16,
-                256,
-                0,
-                0,
-                (void *)0,
-                OS_OPT_TASK_SAVE_FP | OS_OPT_TASK_STK_CHK,
-                &err);
+    RTOS_BPS_TaskCreate(&Init_Fault_Semaphore_Task_TCB,
+        "Increment_Fault_Sempahore",
+        Task3,
+        (void *)0,
+        10,
+        Init_Fault_Semaphore_Stk,
+        256
+    );
 
     OSTaskDel(NULL, &err);
 }
@@ -116,19 +81,8 @@ int main(void) {
 
     BSP_PLL_Init();
 
-    //Resetting the contactor
-    Contactor_Init();
-    Contactor_Off(ALL_CONTACTORS);
-
     BSP_Lights_Init();
 
-    // // If the WDTimer counts down to 0, then the BPS resets. If BPS has reset, enter a fault state.
-    // if (BSP_WDTimer_DidSystemReset()) {
-    //     Fault_BitMap = Fault_WDOG; //When function called in if statement, RCC flag cleared so set bitmap here
-    //     EnterFaultState();
-    // }
-
-    // set up EEPROM and state of charge
     EEPROM_Init();
     Charge_Init();
 
@@ -143,7 +97,7 @@ int main(void) {
         (void *)0,
         1,
         Init_Task_Stk,
-        TASK_FAULT_STATE_STACK_SIZE
+        256
     );
 
     __enable_irq();
