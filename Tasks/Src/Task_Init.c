@@ -33,14 +33,6 @@ void Task_Init(void *p_arg) {
 				CheckContactor_Stk,             // Stack
 				TASK_CHECK_CONTACTOR_STACK_SIZE
                 );
-    //2
-    // RTOS_BPS_TaskCreate(&CriticalState_TCB,	    // TCB
-    //         "TASK_CRITICAL_STATE",	            // Task Name (String)
-    //         Task_CriticalState,				    // Task function pointer
-    //         (void *)0,				            // Task function args
-    //         TASK_CRITICAL_STATE_PRIO,		    // Priority
-    //         CriticalState_Stk,				    // Stack
-    //         TASK_CRITICAL_STATE_STACK_SIZE);
     //3
     // RTOS_BPS_TaskCreate(&PetWDog_TCB,	    // TCB
     // 		"TASK_PETWDOG",	                    // Task Name (String)

@@ -15,7 +15,7 @@ void Task_CheckContactor(void *p_arg) {
     CanPayload.idx    = 0;
     CanPayload.data.b = 1;
 
-    // If a contactor is on before we turn it on in critical state, it may have failed and welded shut
+    // If a contactor is on before we turn it on in this task, it may have failed and welded shut
     if(Contactor_GetState(HVHIGH_CONTACTOR) || Contactor_GetState(HVLOW_CONTACTOR)) {
         Fault_BitMap |= Fault_ESTOP;
         EnterFaultState();
