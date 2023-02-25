@@ -148,44 +148,51 @@ void EnterFaultState() {
 #endif
     BSP_WDTimer_Init(); //This is in case we did not pass check contactor and watchdog timer was not initialized
     BSP_WDTimer_Start(); 
+    int payload_id;
     while(1) {
+        payload_id = 0;
         //Send Trip Message
         CANPayload_t payload;
-        payload.idx = 0;
+        payload.idx = payload_id;
         payload.data.w = 1;
         CANbus_BlockAndSend_FaultState(TRIP, payload);
+        payload_id++;
         delay_u(20000);
 
         // contactor message
-        payload.idx = 1;
+        payload.idx = payload_id;
         payload.data.w = 2;
         CANbus_BlockAndSend_FaultState(CONTACTOR_STATE, payload);
+        payload_id++;
         delay_u(20000);
         
-        // //Send Current Readings
-        // payload.idx = 0;
-        // payload.data.w = Amps_GetReading();
-        // CANbus_BlockAndSend_FaultState(CURRENT_DATA, payload);
-        // delay_u(20000);
+        //Send Current Readings
+        payload.idx = payload_id;
+        payload.data.w = Amps_GetReading();
+        CANbus_BlockAndSend_FaultState(CURRENT_DATA, payload);
+        payload_id++;
+        delay_u(20000);
         
 
-        // //Send Voltage Readings
-        // for (int i = 0; i < NUM_BATTERY_MODULES; i++){ //send all battery module voltage data
-        //     int voltage = Voltage_GetModuleMillivoltage(i);
-        //     payload.idx = i;
-        //     payload.data.w = voltage;
-        //     CANbus_BlockAndSend_FaultState(VOLT_DATA, payload);
-        //     delay_u(20000);
-        // }
+        //Send Voltage Readings
+        for (int i = 0; i < NUM_BATTERY_MODULES; i++){ //send all battery module voltage data
+            int voltage = Voltage_GetModuleMillivoltage(i);
+            payload.idx = payload_id;
+            payload.data.w = voltage;
+            CANbus_BlockAndSend_FaultState(VOLT_DATA, payload);
+            payload_id++;
+            delay_u(20000);
+        }
 
-        // delay_u(20000);
-        // CANbus_BlockAndSend_FaultState(CURRENT_DATA, payload);
-        // for (int i = 0; i < NUM_BATTERY_MODULES; i++){ //send all battery module voltage data
-        //     payload.idx = i;
-        //     payload.data.w = Temperature_GetModuleTemperature(i);
-        //     CANbus_BlockAndSend_FaultState(TEMP_DATA, payload);
-        //     delay_u(20000);
-        // }
+        delay_u(20000);
+        CANbus_BlockAndSend_FaultState(CURRENT_DATA, payload);
+        for (int i = 0; i < NUM_BATTERY_MODULES; i++){ //send all battery module voltage data
+            payload.idx = payload_id;
+            payload.data.w = Temperature_GetModuleTemperature(i);
+            CANbus_BlockAndSend_FaultState(TEMP_DATA, payload);
+            payload_id++;
+            delay_u(20000);
+        }
 
 #ifdef DEBUGMODE
         if (BSP_UART_ReadLine(command)) CLI_Handler(command); // CLI
