@@ -295,6 +295,77 @@ Additional Considerations
     Finally, ``Voltage_OpenWire()`` is modified upon the fact that the last LTC module only has 7 
     batteries connected to it. If changes to hardware are made, this function will require changes as well.
 
+Fault State
+===========
+
+Purpose
+    The Fault State is called when a fault condition is set off in the BPS. These fault 
+    conditions can be found :ref:`here <Design Requirements>`. Entry into the fault state
+    is achieved through a simple function call, ``EnterFaultState()``.
+
+Functionality:
+    1) The contactors are turned off.
+    
+    2) All the fans are set to maximum speed.
+    
+    3) The proper LED's are turned on and off. When the fault LED is turned on, the strobelight turns on.
+    
+    4) The fault condition is logged into the EEPROM.
+    
+    5) A message is sent along the CAN bus to the BPS display board to notify the driver that the BPS is tripped.
+   
+    6) The WatchDog timer is continually reset to prevent the BPS from going into fault again.
+
+Common Fault types:
+    a. Undervoltage
+        An undervoltage fault is signaled by the "UVOLT" light on the BPS leader board.
+        This means that at least one of our battery modules is not providing enough voltage,
+        the limit being specified in ``config.h``. 
+    b. Overvoltage
+        An overvoltage fault is signaled by the "OVOLT" light on the BPS leader board.
+        This means that at least one of our battery modules is exceeding the maximum
+        voltage limit specified in ``config.h``.
+    c. Overtemperature
+        An overtemperature fault is signaled by the "OTEMP" light on the BPS leader board.
+        This means that at least one of the battery modules' temperature is exceeding the
+        maximum temperature we consider safe.
+    d. Overcurrent
+        An overcurrent fault is signaled by the "OCURR" light on the BPS leader board.
+        This means that the current measured coming out of the battery pack is exceeding
+        our maximum operating current.
+    e. Watchdog
+        A watchdog fault is signaled by the "WDOG" light on the BPS leader board.
+        The watchdog fault is tripped whenever the watchdog isn't reset before
+        it finishes counting down. Typically this means that the BPS is in an infinite loop
+        somewhere, and could be an RTOS issue (deadlock) or a section of bad code.
+    f. Other
+        "Other" is a bit tricky to identify the source of. Typically, the BPS will experience
+        an "OTHER" fault due to a CRC failure, where the BPS and expected minion boards fail
+        their CRC check for communicating to each other. This is seen commonly when accidentally
+        running the full BPS code but only testing a specific feature, without all expected
+        peripherals and boards plugged in.
+
+.. note::
+    This list is NOT comprehensive, and only lists some of the more common faults seen
+    when testing and debugging. For the full list of fault states, please see ``FaultState.c``.
+
+Shared Resources
+    The Fault State makes heavy use of the the ``Fault_BitMap`` variable. This variable is set by the 
+    other tasks so the Fault task does not have to call other functions to find out what caused the fault. 
+    The variable used to set ``Fault_BitMap`` is ``enum Fault_Set``. The description of this enum is in 
+    the file ``tasks.h``.
+    The variable ``Fault_Flag`` is also used by some functions to bypass OS functions in the case of
+    a fault. If the variable is set to 1, functions such as ``OS_SemPend`` & ``OS_SemPost`` are skipped.
+
+Timing Requirements
+    The contactor must be shut off as soon as possible after a fault is detected.
+
+Additional Considerations
+    Although the BPS goes into fault state when the battery is in danger, it also goes into fault 
+    state when there is an issue with the RTOS. Since the BPS must always run during the race, care 
+    must be taken to minimize the chances of this happening. It also goes into a fault state when 
+    the hard fault handler is called.
+
 **********************
 Mutexes and Semaphores
 **********************
@@ -315,13 +386,6 @@ When the :ref:`Critical State <Critical state Task: Manthan Upadhyaya>` runs, it
 Voltage, Open Wire, and Temperature are safe. This process is done by the Critical State Task using a blocking 
 Pend function on the Safety Check Semaphore. The task uses a blocking pend (wont move past the function until the 
 semaphore is pended ``NUM_FAULT_POINTS`` amount of times).
-
-Fault Semaphore
-===============
-
-When the :ref:`Fault State <Fault State Task: Manthan Upadhyaya>` runs, it uses a blocking pend on this semaphore. 
-When a task notices a fault condition, this semphore will be posted and the fault state task will enter the BPS 
-fault state.
 
 Amperes IO Semaphore
 ====================
