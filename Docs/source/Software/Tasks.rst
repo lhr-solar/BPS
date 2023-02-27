@@ -157,59 +157,6 @@ Yields
 Additional Considerations
     None
 
-Fault State Task: Manthan Upadhyaya
-===================================
-
-Purpose
-    The Fault State Task is called when a fault condition is set off in the BPS. These fault 
-    conditions can be found :ref:`here <Design Requirements>`. 
-
-Functionality:
-    1) All other tasks are prevented from running. This is because this is the highest priority task and interrupts are disabled.
-
-    2) The contactor is turned off.
-    
-    3) All the fans are set to maximum speed.
-    
-    4) The proper LED's are turned on and off. When the fault LED is turned on, the strobelight turns on.
-    
-    5) The fault condition is logged into the EEPROM.
-    
-    6) A message is sent along the CAN bus to the BPS display board to notify the driver that the BPS is tripped.
-   
-.. note::
-    Since the contactor is turned off, none of the other systems are on to read the CAN message. There is an LED on the 
-    controls minion board that is hardwired to turn on when the BPS enters a fault state. For this purpose and due to 
-    difficulty in implementing CAN with disabled interrupts, step 6 is skipped.
-    
-    7) The WatchDog timer is continually reset to prevent the BPS from going into fault again.
-
-Priority
-    This task has the second highest priority (1) when the Init task is running. However, after the 
-    init task destroys itself, it has the highest priority. It will never be interrupted because
-    we do not require any other monitoring to occur if we already know that a fault condition has 
-    occured.
-
-Shared Resources
-    It uses the ``Fault_Sem4`` which is used to block the task from running until something sets it. It also uses
-    the ``Fault_BitMap`` variable. This variable is set by the other tasks so the Fault task does
-    not have to call other functions to find out what caused the fault. The variable used to set 
-    ``Fault_BitMap`` is ``enum Fault_Set``. The description of this enum is in the file ``tasks.h``.
-    The variable ``Fault_Flag`` is also used by some functions to bypass OS functions in the case of
-    a fault. If the variable is set to 1, functions such as ``OS_SemPend`` & ``OS_SemPost`` are skipped.
-
-Timing Requirements
-    The contactor must be shut off as soon as possible after a fault is detected.
-
-Yields
-    It will yield when waiting for a fault. After a fault is detected, it will never yield.
-
-Additional Considerations
-    Although the BPS goes into fault state when the battery is in danger, it also goes into fault 
-    state when there is an issue with the RTOS. Since the BPS must always run during the race, care 
-    must be taken to minimize the chances of this happening. It also goes into a fault state when 
-    the hard fault handler is called.
-
 Idle Task
 =========
 
