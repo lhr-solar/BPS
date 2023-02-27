@@ -28,7 +28,7 @@ NC=\033[0m # No Color
 ######################################
 # Source
 ######################################
-SRC = $(wildcard Src/*.c)	# BSP code
+SRC = $(filter-out Src/Automatic_Tester.c, $(wildcard Src/*.c))	# BSP code
 
 SRC1 = \
 $(wildcard $(TARGET_PATH)/Drivers/Src/*.c)	# Driver code
@@ -91,7 +91,7 @@ DEF = -D_XOPEN_SOURCE=700 -DSIMULATION -D$(OS)
 ######################################
 # Build
 ######################################
-all: $(TARGET_PATH)/$(TARGET)
+all: $(TARGET_PATH)/$(TARGET) $(TARGET_PATH)/Automatic_Tester.out
 
 $(TARGET_PATH)/$(TARGET): $(OBJ) $(BUILD_DIR) linking
 ifeq ($(READABLE), true)
@@ -117,3 +117,10 @@ linking:
 
 $(BUILD_DIR):
 	mkdir $@
+
+$(TARGET_PATH)/Automatic_Tester.out: $(BUILD_DIR)/Automatic_Tester.o
+	$(CC) -o $@ $(BUILD_DIR)/Automatic_Tester.o $(FLAGS) $(LIB)
+
+$(BUILD_DIR)/Automatic_Tester.o: Src/Automatic_Tester.c 
+	$(CC) -c -o $@ $< $(FLAGS) $(DEF)
+
