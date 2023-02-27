@@ -62,9 +62,11 @@ int main() {
         (void *)0,				        // Task function args
         TASK_INIT_PRIO,			        // Priority
         Init_Stk,				        // Stack
-        DEFAULT_STACK_SIZE);	        // Stack size
-                
+        DEFAULT_STACK_SIZE
+    );	        // Stack size
+    #ifdef SIMULATION
+    OS_Started = true;
+    #endif      
     OSStart(&err);
-
     // Should not get here or else there is an error
 }

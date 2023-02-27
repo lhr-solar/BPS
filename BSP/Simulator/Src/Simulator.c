@@ -30,6 +30,7 @@ uint8_t stateCount = 0;
 
 // linked list of simulator states
 static simulator_state *states = NULL;
+BPS_OS_MUTEX SimMutex;
 
 // timing information to handle the state transitions
 // note that this only has a granularity of 1 second, so it's not super precise
@@ -51,6 +52,8 @@ static const char* LoggingLUT[LOG_NUM_LEVELS] = {
     [LOG_MISC] = "[MISC] ",
 };
 
+bool OS_Started = false;
+
 /**
  * @brief   Log something to simulator log file
  * @param   lvl - Choose level at which to log at. Levels defined in LoggingType enum.
@@ -61,7 +64,13 @@ void Simulator_Log(LoggingType_t lvl, char *str) {
     char prefix[128];
     strcpy(prefix, LoggingLUT[lvl]); //This is because strcat cannot concat const
     char* msg = strcat(prefix, str);
+    if(OS_Started){
+        RTOS_BPS_MutexPend(&SimMutex, OS_OPT_PEND_BLOCKING);
+    }
     write(simulatorLog, msg, strlen(msg));
+    if(OS_Started){
+        RTOS_BPS_MutexPost(&SimMutex, OS_OPT_POST_ALL);
+    }
     printf("%s", msg);
 }
 
@@ -239,8 +248,7 @@ void Simulator_Init(char *jsonPath) {
     if (write(simulatorLog, "simulator started...\n", 21) < 0) {
         printf("error writing file %s\n", jsonPath);
         exit(-1);
-    }
-    
+    }    
     // register the Ctrl-C handler
     sigset_t s;
     sigemptyset(&s);
@@ -251,6 +259,8 @@ void Simulator_Init(char *jsonPath) {
 
     // initialize the fake inputs
     readInputFile(jsonPath);
+
+    RTOS_BPS_MutexCreate(&SimMutex, "Simulator Mutex");
 
     // log the starting time
     startTime = time(NULL);
