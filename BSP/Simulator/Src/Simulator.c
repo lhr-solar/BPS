@@ -226,20 +226,27 @@ void Simulator_Init(char *jsonPath) {
     char* tempName = jsonPath + strlen(jsonPath);
     while (*tempName != '/') tempName--;
     tempName++; // remove the '/'
+
+    char* outputdir = "BSP/Simulator/Simulator-Out";
     // makes the output nice
-    asprintf(&filename, "bps-sim-%s.log", tempName);
+    asprintf(&filename, "%s/%s.log", outputdir, tempName);
+
+    // check if the output folder exists, if not, then make it
+    mkdir(outputdir, S_IRWXU);
 
     // create the log file
     simulatorLog = open(filename, O_CREAT | O_WRONLY, 0664);
-    free(filename);
+
     if (simulatorLog < 0) {
-        printf("error opening file %s\n", jsonPath);
+        printf("error opening file %s\n", filename);
         exit(-1);
     }
     if (write(simulatorLog, "simulator started...\n", 21) < 0) {
-        printf("error writing file %s\n", jsonPath);
+        printf("error writing file %s\n", filename);
         exit(-1);
     }
+    free(filename);
+
     
     // register the Ctrl-C handler
     sigset_t s;
