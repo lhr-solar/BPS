@@ -121,7 +121,9 @@ int main(void) {
     BSP_UART_Init(NULL, NULL, UART_USB);
     //Resetting the contactor
     Contactor_Init();
-    Contactor_Off();
+    Contactor_Off(HVLOW_CONTACTOR);
+    Contactor_Off(HVHIGH_CONTACTOR);
+    Contactor_Off(ARRAY_CONTACTOR);
 
     // If the WDTimer counts down to 0, then the BPS resets. If BPS has reset, enter a fault state.
     if (BSP_WDTimer_DidSystemReset()) {
