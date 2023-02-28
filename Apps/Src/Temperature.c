@@ -337,7 +337,7 @@ uint8_t *Temperature_GetModulesInDanger(void){
         for (int j = 0; j < MAX_TEMP_SENSORS_PER_MINION_BOARD; j++) {
             if (i * MAX_TEMP_SENSORS_PER_MINION_BOARD + j >= NUM_TEMPERATURE_SENSORS) break;
             if (temperatures[i][j] > temperatureLimit) {
-                ModuleTempStatus[(i * (NUM_TEMP_SENSORS_PER_MOD/2)) + (j % (NUM_TEMP_SENSORS_PER_MOD/2))] = 1;
+                ModuleTempStatus[(i * MAX_TEMP_SENSORS_PER_MINION_BOARD + j) / NUM_TEMP_SENSORS_PER_MOD] = 1;
             }
         }
     }

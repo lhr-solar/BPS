@@ -10,9 +10,25 @@ TARGET_PATH = ../..
 CC = gcc
 
 ######################################
+# Cleanliness
+######################################
+READABLE = true
+# COLORS
+RED=\033[0;31m
+GREEN=\033[0;32m
+ORANGE=\033[0;33m
+BLUE=\033[0;34m
+PURPLE=\033[0;35m
+CYAN=\033[0;36m
+LIGHTGRAY=\033[0;37m
+DARKGRAY=\033[1;30m
+YELLOW=\033[0;33m
+NC=\033[0m # No Color
+
+######################################
 # Source
 ######################################
-SRC = $(wildcard Src/*.c)	# BSP code
+SRC = $(filter-out Src/Automatic_Tester.c, $(wildcard Src/*.c))	# BSP code
 
 SRC1 = \
 $(wildcard $(TARGET_PATH)/Drivers/Src/*.c)	# Driver code
@@ -75,13 +91,36 @@ DEF = -D_XOPEN_SOURCE=700 -DSIMULATION -D$(OS)
 ######################################
 # Build
 ######################################
-all: $(TARGET_PATH)/$(TARGET)
+all: $(TARGET_PATH)/$(TARGET) $(TARGET_PATH)/Automatic_Tester.out
 
-$(TARGET_PATH)/$(TARGET): $(OBJ) $(BUILD_DIR)
+$(TARGET_PATH)/$(TARGET): $(OBJ) $(BUILD_DIR) linking
+ifeq ($(READABLE), true)
+	@$(CC) -o $@ $(OBJ) $(FLAGS) $(LIB)
+else
 	$(CC) -o $@ $(OBJ) $(FLAGS) $(LIB)
+endif
 
-$(BUILD_DIR)/%.o: %.c $(BUILD_DIR)
+$(BUILD_DIR)/%.o: %.c $(BUILD_DIR) c_compile_msg
+ifeq ($(READABLE), true)
+	@$(CC) -c -o $@ $< $(FLAGS) $(DEF)
+else
 	$(CC) -c -o $@ $< $(FLAGS) $(DEF)
+endif
+
+.INTERMEDIATE: c_compile_msg
+.INTERMEDIATE: linking
+
+c_compile_msg:
+	@echo "${GREEN}Compiling C files...${NC}"
+linking:
+	@echo "${BLUE}Linking and building bps-simulator executable...${NC}"
 
 $(BUILD_DIR):
 	mkdir $@
+
+$(TARGET_PATH)/Automatic_Tester.out: $(BUILD_DIR)/Automatic_Tester.o
+	$(CC) -o $@ $(BUILD_DIR)/Automatic_Tester.o $(FLAGS) $(LIB)
+
+$(BUILD_DIR)/Automatic_Tester.o: Src/Automatic_Tester.c 
+	$(CC) -c -o $@ $< $(FLAGS) $(DEF)
+

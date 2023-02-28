@@ -5,7 +5,6 @@
 #include "RTOS_BPS.h"
 
 #define TASK_INIT_PRIO                      0
-#define TASK_FAULT_STATE_PRIO               1
 #define TASK_CRITICAL_STATE_PRIO            2
 #define TASK_PETWDOG_PRIO                   3
 #define TASK_CHECK_CONTACTOR_PRIO           4
@@ -20,7 +19,6 @@
 #define DEFAULT_STACK_SIZE                  256
 #define WATERMARK_STACK_LIMIT               DEFAULT_STACK_SIZE/2
 
-#define TASK_FAULT_STATE_STACK_SIZE         DEFAULT_STACK_SIZE
 #define TASK_CRITICAL_STATE_STACK_SIZE      DEFAULT_STACK_SIZE
 #define TASK_PETWDOG_STACK_SIZE             DEFAULT_STACK_SIZE
 #define TASK_VOLT_TEMP_MONITOR_STACK_SIZE   512
@@ -37,15 +35,14 @@
 /**
  * enum to keep track of which tasks correspond to each bit in WDog_BitMap
  */
-enum WDogBits_e {
+typedef enum {
+    WD_NONE = 0x0,
     WD_VOLT_TEMP = 0x1,
     WD_AMPERES = 0x2,
     WD_BALANCING = 0x4,
-};
+} WDOGBits_e;
 
 void Task_Init(void *p_arg);
-
-void Task_FaultState(void *p_arg);
 
 void Task_CriticalState(void *p_arg);
 
@@ -71,12 +68,20 @@ void Task_Idle(void *p_arg);
 
 void Task_Init(void *p_arg);
 
+void EnterFaultState();
+
 
 /**
  * Used to assert if there has been an error in one of the OS functions
  * Kills the car if there is an OS error
  **/
 void assertOSError(BPS_OS_ERR err);
+
+/**
+ * Used to Enter Fault State in case OS is not working
+ **/
+
+void EnterFaultState(void);
 
 /*
  * Thread Control Blocks that contain information about each thread
@@ -97,7 +102,6 @@ extern OS_TCB Init_TCB;
 /**
  * Stacks for each thread
  */
-extern CPU_STK FaultState_Stk[TASK_FAULT_STATE_STACK_SIZE];
 extern CPU_STK CriticalState_Stk[TASK_CANBUS_CONSUMER_STACK_SIZE];
 extern CPU_STK PetWDog_Stk[TASK_PETWDOG_STACK_SIZE];
 extern CPU_STK VoltTempMonitor_Stk[TASK_VOLT_TEMP_MONITOR_STACK_SIZE];
@@ -115,11 +119,9 @@ extern CPU_STK Init_Stk[TASK_INIT_STACK_SIZE];
  *  Semaphores, Mutexes, & Bitmaps that are used by multiple threads
  */
 extern OS_SEM SafetyCheck_Sem4;
-extern OS_SEM Fault_Sem4;
 extern OS_MUTEX WDog_Mutex;
 extern OS_MUTEX MinionsASIC_Mutex;
-extern uint32_t WDog_BitMap;
-extern uint32_t Fault_BitMap;
+extern WDOGBits_e WDog_BitMap;
 extern uint8_t Fault_Flag;
 
 typedef enum {
@@ -134,5 +136,7 @@ typedef enum {
     Fault_CRC     = 0x100,
     Fault_ESTOP   = 0x200
 }Fault_Set;
+
+extern Fault_Set Fault_BitMap;
 
 #endif

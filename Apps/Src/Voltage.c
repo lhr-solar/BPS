@@ -149,8 +149,8 @@ void Voltage_GetModulesInDanger(VoltageSafety_t* system){
     //put all the bits from each minion's system_open_wire variable into one variable
     for(int k = 0; k < NUM_MINIONS; k++){
         wires = (Minions[k].system_open_wire & 0x1FF);	//there are at most 8 modules per IC, bit 0 is GND
-        for(int s = 0; s < NUM_PINS_PER_LTC; s++){
-            if(k == 3 && s == NUM_PINS_PER_LTC-1){
+        for(int s = 0; s <= MAX_VOLT_SENSORS_PER_MINION_BOARD; s++){
+            if((k == NUM_MINIONS - 1) && (s == MAX_VOLT_SENSORS_PER_MINION_BOARD)){
                 break;	//the last IC has only 7 modules 
             }
             openWires[openWireIdx] = (wires >> s) & 1;

@@ -149,7 +149,7 @@ static void readInputFile(char *jsonPath) {
             memcpy(tail->voltages, DUMMY_VOLTAGES, sizeof(uint16_t) * NUM_BATTERY_MODULES);
         } else { // otherwise, the voltage array exists; check size, then copy elements over.
             if (cJSON_GetArraySize(voltageArray) != NUM_BATTERY_MODULES) {
-                printf("Voltage array in simulator state %d does not have 31 elements in it! Please fix. Exiting...\n", stateCount);
+                printf("Voltage array in simulator state %d has %d elements instead of %d! Please fix. Exiting...\n", stateCount, cJSON_GetArraySize(voltageArray), NUM_BATTERY_MODULES);
                 exit(-1);
             }
             for (int idx = 0; idx < NUM_BATTERY_MODULES; idx++) {
@@ -161,7 +161,7 @@ static void readInputFile(char *jsonPath) {
             memcpy(tail->temperatures, DUMMY_TEMPS, sizeof(uint16_t) * NUM_TEMPERATURE_SENSORS);
         } else { // otherwise, the temperature array exists; check size, then copy elements over.
             if (cJSON_GetArraySize(temperatureArray) != NUM_TEMPERATURE_SENSORS) {
-                printf("Temperature array in simulator state %d does not have 62 elements in it! Please fix. Exiting...\n", stateCount);
+                printf("Temperature array in simulator state %d has %d elements instead of %d! Please fix. Exiting...\n", stateCount, cJSON_GetArraySize(temperatureArray), NUM_TEMPERATURE_SENSORS);
                 exit(-1);
             }
             for (int idx = 0; idx < NUM_TEMPERATURE_SENSORS; idx++) {
@@ -226,20 +226,27 @@ void Simulator_Init(char *jsonPath) {
     char* tempName = jsonPath + strlen(jsonPath);
     while (*tempName != '/') tempName--;
     tempName++; // remove the '/'
+
+    char* outputdir = "BSP/Simulator/Simulator-Out";
     // makes the output nice
-    asprintf(&filename, "bps-sim-%s.log", tempName);
+    asprintf(&filename, "%s/%s.log", outputdir, tempName);
+
+    // check if the output folder exists, if not, then make it
+    mkdir(outputdir, S_IRWXU);
 
     // create the log file
     simulatorLog = open(filename, O_CREAT | O_WRONLY, 0664);
-    free(filename);
+
     if (simulatorLog < 0) {
-        printf("error opening file %s\n", jsonPath);
+        printf("error opening file %s\n", filename);
         exit(-1);
     }
     if (write(simulatorLog, "simulator started...\n", 21) < 0) {
-        printf("error writing file %s\n", jsonPath);
+        printf("error writing file %s\n", filename);
         exit(-1);
     }
+    free(filename);
+
     
     // register the Ctrl-C handler
     sigset_t s;
