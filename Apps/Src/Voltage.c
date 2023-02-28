@@ -53,19 +53,19 @@ void Voltage_Init(cell_asic *boards){
     LTC6811_Init(Minions);
     
     //take control of mutex
-      RTOS_BPS_MutexPend(&MinionsASIC_Mutex, OS_OPT_PEND_BLOCKING);
+    RTOS_BPS_MutexPend(&MinionsASIC_Mutex, OS_OPT_PEND_BLOCKING);
     // Write Configuration Register
     LTC6811_wrcfg(NUM_MINIONS, Minions);
     //release mutex
-      RTOS_BPS_MutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE);
+    RTOS_BPS_MutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE);
 
-    // Read Configuration Register
-    // take control of mutex
-      RTOS_BPS_MutexPend(&MinionsASIC_Mutex, OS_OPT_PEND_BLOCKING);
     wakeup_sleep(NUM_MINIONS);
+    // take control of mutex
+    RTOS_BPS_MutexPend(&MinionsASIC_Mutex, OS_OPT_PEND_BLOCKING);
+    // Read Configuration Register
     LTC6811_rdcfg_safe(NUM_MINIONS, Minions);
     // release mutex
-      RTOS_BPS_MutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE);
+    RTOS_BPS_MutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE);
 #endif
     // Initialize median filter. There should be no modules with less than 0 volts or more than 5 volts
     VoltageFilter_init(&VoltageFilter, 0, 50000);
@@ -90,9 +90,11 @@ void Voltage_UpdateMeasurements(void){
     LTC6811_rdcv_safe(0, NUM_MINIONS, Minions); // Set to read back all cell voltage registers
     //copies values from cells.c_codes to private array
 
+    // printf("Raw Voltages\n");
     // package raw voltage values into single array
-    for(int i = 0; i < NUM_BATTERY_MODULES; i++){
+    for(uint8_t i = 0; i < NUM_BATTERY_MODULES; i++){
         rawVoltages[i] = Minions[i / MAX_VOLT_SENSORS_PER_MINION_BOARD].cells.c_codes[i % MAX_VOLT_SENSORS_PER_MINION_BOARD];
+        // printf("Voltage %d: %d\n", i, rawVoltages[i]);
     }
     // release minions asic mutex
     RTOS_BPS_MutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE);
@@ -108,6 +110,9 @@ void Voltage_UpdateMeasurements(void){
     // update public voltage values
     RTOS_BPS_MutexPend(&Voltage_Mutex, OS_OPT_PEND_BLOCKING);
     VoltageFilter_get(&VoltageFilter, Voltages);
+    // for(uint8_t i = 0; i < NUM_BATTERY_MODULES; i++){
+    //     printf("Filtered Voltages %d: %d\n", i, Voltages[i]);
+    // }
     RTOS_BPS_MutexPost(&Voltage_Mutex, OS_OPT_POST_NONE);
 }
 

@@ -62,9 +62,9 @@ void Task_VoltTempMonitor(void *p_arg) {
         // BLOCKING =====================
         // Check if open wire is NOT safe:
 	
-	// TODO: get OpenWire to not take forever and actually run this
+	    // TODO: get OpenWire to not take forever and actually run this
         // SafetyStatus wireStatus = Voltage_OpenWire();
-	SafetyStatus wireStatus = SAFE;
+	    SafetyStatus wireStatus = SAFE;
         
         if(wireStatus != SAFE) {
             Fault_BitMap = Fault_OW;
@@ -94,8 +94,6 @@ void Task_VoltTempMonitor(void *p_arg) {
         if (temperatureStatus == SAFE) {
             Fans_SetAll(Temperature_PID_Output(Temperature_GetTotalPackAvgTemperature(), PID_DESIRED_TEMPERATURE));
         }
-
-
 
         //Check if car should be allowed to charge or not
         for (uint8_t board = 0; board < NUM_MINIONS; board++) {

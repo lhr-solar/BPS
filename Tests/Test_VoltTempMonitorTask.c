@@ -18,6 +18,7 @@
 #include "RTOS_BPS.h"
 #include "Voltage.h"
 #include "Temperature.h"
+#include "BSP_UART.h"
 
 /******************************************************************************
  * VoltTempMonitor Task Test Plan
@@ -110,6 +111,7 @@ int main(void) {
     OS_ERR err;
     
     //Resetting the contactor
+    BSP_UART_Init(NULL, NULL, UART_USB);
     Contactor_Init();
     Contactor_Off(HVLOW_CONTACTOR);
     Contactor_Off(HVHIGH_CONTACTOR);
