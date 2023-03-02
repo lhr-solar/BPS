@@ -10,13 +10,20 @@
 void Task_CheckContactor(void *p_arg) {
     (void)p_arg;
     
-    CANMSG_t CANMSG;
-    CANPayload_t CanPayload; 
-    CanPayload.idx    = 0;
-    CanPayload.data.b = 1;
+    CANMSG_t CanMsg = {.payload = {.idx = 0, .data.b = 1}};
+
+    // launch watchdog task
+    RTOS_BPS_TaskCreate(&PetWDog_TCB,              // TCB
+                "TASK_PETWDOG_PRIO",        // Task Name (String)
+                Task_PetWDog,               // Task function pointer
+                (void *)0,                  // Task function args
+                TASK_PETWDOG_PRIO,          // Priority
+                PetWDog_Stk,                // Stack
+                TASK_PETWDOG_STACK_SIZE
+                );
 
     // If a contactor is on before we turn it on in this task, it may have failed and welded shut
-    if(Contactor_GetState(HVHIGH_CONTACTOR) || Contactor_GetState(HVLOW_CONTACTOR)) {
+    if (Contactor_GetState(HVHIGH_CONTACTOR) || Contactor_GetState(HVLOW_CONTACTOR)) {
         Fault_BitMap |= Fault_ESTOP;
         EnterFaultState();
     } else {
@@ -29,28 +36,17 @@ void Task_CheckContactor(void *p_arg) {
         RTOS_BPS_SemPend(&SafetyCheck_Sem4,OS_OPT_PEND_BLOCKING);
     }
 
-    // launch watchdog task
-    RTOS_BPS_TaskCreate(&PetWDog_TCB,              // TCB
-                "TASK_PETWDOG_PRIO",        // Task Name (String)
-                Task_PetWDog,               // Task function pointer
-                (void *)0,                  // Task function args
-                TASK_PETWDOG_PRIO,          // Priority
-                PetWDog_Stk,                // Stack
-                TASK_PETWDOG_STACK_SIZE
-                );
-
     // Turn Contactor On
     Contactor_On(HVHIGH_CONTACTOR);
     Contactor_On(ARRAY_CONTACTOR);
     Contactor_On(HVLOW_CONTACTOR);
 
     // Push All Clear message to CAN Q
-    CANMSG.id = ALL_CLEAR;
-    CANMSG.payload = CanPayload;
-    CAN_Queue_Post(CANMSG);
+    CanMsg.id = ALL_CLEAR;
+    CAN_Queue_Post(CanMsg);
     // Push Contactor State message to CAN Q
-    CANMSG.id = CONTACTOR_STATE;
-    CAN_Queue_Post(CANMSG);
+    CanMsg.id = CONTACTOR_STATE;
+    CAN_Queue_Post(CanMsg);
 
     while(1) {
         //delay of 250ms
