@@ -58,7 +58,7 @@ void Task_VoltTempMonitor(void *p_arg) {
                 charge_enable = false;
             }
         }
-
+        
         // BLOCKING =====================
         // Check if open wire is NOT safe:
 	
@@ -78,7 +78,6 @@ void Task_VoltTempMonitor(void *p_arg) {
         // BLOCKING =====================
         // Update Temperature Measurements
         Temperature_UpdateAllMeasurements();
-
         // Check if temperature is NOT safe: for all modules
         SafetyStatus temperatureStatus = Temperature_CheckStatus(Amps_IsCharging());
         if(temperatureStatus != SAFE) {
@@ -137,9 +136,6 @@ void Task_VoltTempMonitor(void *p_arg) {
             }
         }
 
-        // Control Fans depending on temperature
-        // Right now this just sets them to maximum speed
-        // Once we get a thermal model of the battery box, we can replace this with someting better
         Fans_SetAll(TOPSPEED);
 
         //signal watchdog

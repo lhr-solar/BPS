@@ -45,6 +45,10 @@ CPU_STK Task2_Stk[DEFAULT_STACK_SIZE];
 
 OS_ERR p_err;
 
+void foo(void){
+    return;
+}
+
 // Initialization task for this test
 void Task1(void *p_arg){
     
@@ -67,12 +71,12 @@ void Task1(void *p_arg){
             TASK_CRITICAL_STATE_STACK_SIZE);					// return err code
 
     RTOS_BPS_TaskCreate(&VoltTempMonitor_TCB,				// TCB
-			"TASK_VOLT_TEMP_MONITOR_PRIO",	// Task Name (String)
-			Task_VoltTempMonitor,				// Task function pointer
-			(void *)0,				// Task function args
-			TASK_VOLT_TEMP_MONITOR_PRIO,			// Priority
-			VoltTempMonitor_Stk,	// Watermark limit for debugging
-			TASK_VOLT_TEMP_MONITOR_STACK_SIZE);					// return err code
+            "TASK_VOLT_TEMP_MONITOR_PRIO",	// Task Name (String)
+            Task_VoltTempMonitor,				// Task function pointer
+            (void *)0,				// Task function args
+            TASK_VOLT_TEMP_MONITOR_PRIO,			// Priority
+            VoltTempMonitor_Stk,	// Watermark limit for debugging
+            TASK_VOLT_TEMP_MONITOR_STACK_SIZE);					// return err code
 
     // Spawn CANBUS Consumer, PRIO 7
     RTOS_BPS_TaskCreate(&CANBusConsumer_TCB,				// TCB
@@ -86,8 +90,8 @@ void Task1(void *p_arg){
     // Initialize CAN queue
     CAN_Queue_Init();
 
-	//delete task
-	OSTaskDel(NULL, &p_err); // Delete task
+    //delete task
+    OSTaskDel(NULL, &p_err); // Delete task
 }
 
 //Task to prevent watchdog from tripping
@@ -103,7 +107,6 @@ void Task2(void *p_arg){
         RTOS_BPS_MutexPost(&WDog_Mutex, OS_OPT_POST_NONE);
         //delay of 100ms
         RTOS_BPS_DelayTick(10);
-        BSP_Light_Toggle(RUN);
     }
 }
 
@@ -111,7 +114,6 @@ int main(void) {
     OS_ERR err;
     
     //Resetting the contactor
-    BSP_UART_Init(NULL, NULL, UART_USB);
     Contactor_Init();
     Contactor_Off(HVLOW_CONTACTOR);
     Contactor_Off(HVHIGH_CONTACTOR);
@@ -123,6 +125,7 @@ int main(void) {
     }
 
     BSP_PLL_Init();
+    BSP_UART_Init(foo, foo, UART_USB);
     BSP_Lights_Init();
     OSInit(&err);
     assertOSError(err);

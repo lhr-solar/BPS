@@ -18,7 +18,7 @@
 
 // median filter
 #define MEDIAN_FILTER_TYPE uint16_t
-#define MEDIAN_FILTER_DEPTH 5
+#define MEDIAN_FILTER_DEPTH 3
 #define MEDIAN_FILTER_CHANNELS NUM_BATTERY_MODULES
 #define MEDIAN_FILTER_NAME VoltageFilter
 #include "MedianFilter.h"
@@ -90,17 +90,22 @@ void Voltage_UpdateMeasurements(void){
     LTC6811_rdcv_safe(0, NUM_MINIONS, Minions); // Set to read back all cell voltage registers
     //copies values from cells.c_codes to private array
 
-    // printf("Raw Voltages\n");
+    printf("Updated Voltage Measurements\n\r");
     // package raw voltage values into single array
     for(uint8_t i = 0; i < NUM_BATTERY_MODULES; i++){
         rawVoltages[i] = Minions[i / MAX_VOLT_SENSORS_PER_MINION_BOARD].cells.c_codes[i % MAX_VOLT_SENSORS_PER_MINION_BOARD];
-        // printf("Voltage %d: %d\n", i, rawVoltages[i]);
+    }
+    for (uint8_t i = 0; i < NUM_MINIONS; i++){
+        printf("Minion %d:\n\r", i);
+        for (uint8_t j = 0; j < MAX_VOLT_SENSORS_PER_MINION_BOARD; j++) {
+            printf("J: %d, Val: %d\n\r", j, Minions[i].cells.c_codes[j]);
+        }
     }
     // release minions asic mutex
     RTOS_BPS_MutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE);
 #else
     // package raw voltage values into single array
-    for(int i = 0; i < NUM_BATTERY_MODULES; i++){
+    for(uint8_t i = 0; i < NUM_BATTERY_MODULES; i++){
         rawVoltages[i] = Simulator_getVoltage(i);
     }
 #endif
@@ -110,9 +115,6 @@ void Voltage_UpdateMeasurements(void){
     // update public voltage values
     RTOS_BPS_MutexPend(&Voltage_Mutex, OS_OPT_PEND_BLOCKING);
     VoltageFilter_get(&VoltageFilter, Voltages);
-    // for(uint8_t i = 0; i < NUM_BATTERY_MODULES; i++){
-    //     printf("Filtered Voltages %d: %d\n", i, Voltages[i]);
-    // }
     RTOS_BPS_MutexPost(&Voltage_Mutex, OS_OPT_POST_NONE);
 }
 
