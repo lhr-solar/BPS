@@ -20,16 +20,14 @@ void Task_CheckContactor(void *p_arg) {
                 TASK_PETWDOG_STACK_SIZE
                 );
 
-    // If a contactor is on before we turn it on in this task, it may have failed and welded shut
+    // If a contactor is on before we turn it on in this task, it may have failed and welded closed
     if (Contactor_GetState(HVHIGH_CONTACTOR) || Contactor_GetState(HVLOW_CONTACTOR)) {
         Fault_BitMap |= Fault_ESTOP;
         EnterFaultState();
-    } else {
-        RTOS_BPS_SemPost(&SafetyCheck_Sem4, OS_OPT_POST_1);
     }
 
     // BLOCKING =====================
-    // Wait until voltage, open wire, temperature, contactors, and current(Amperes) are all checked and safe
+    // Wait until voltage, open wire, temperature, and current(Amperes) are all checked and safe
     for (int i = 0; i < NUM_FAULT_POINTS; i++){
         RTOS_BPS_SemPend(&SafetyCheck_Sem4,OS_OPT_PEND_BLOCKING);
     }
