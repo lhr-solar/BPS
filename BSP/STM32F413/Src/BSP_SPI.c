@@ -87,15 +87,15 @@ static inline void SPI_WaitTx(spi_port_t port){
 /** SPI_WriteRead
  * @brief   Sends and receives a byte of data on the SPI line.
  * @param   txData single byte that will be sent to the device.
- * @return  rxData single byte that was read from the device.
+ * @return  rxData single byte that was read from the device. Returns 0xFF00 on error
  */
-static uint8_t SPI_WriteRead(spi_port_t port, uint8_t txData){
-    if(port >= NUM_SPI_BUSSES) return -1;
-	
+static uint16_t SPI_WriteRead(spi_port_t port, uint8_t txData){
+    if(port >= NUM_SPI_BUSSES) return 0xFF00; //set first 8 bits to 1 to signal error
+
 	SPI_Wait(port);
 	SPI_BUSSES[port]->DR = txData & 0x00FF;
 	SPI_Wait(port);
-	return SPI_BUSSES[port]->DR & 0x00FF;
+	return SPI_BUSSES[port]->DR & 0x00FF; //normal return will have the first 8 bits as 0
 }
 
 /**
@@ -281,13 +281,14 @@ void BSP_SPI_SetClock(spi_speed_t speed) {
  * @param   port    the SPI port to write to
  * @param   txBuf   data array that contains the data to be sent.
  * @param   txLen   length of data array.
- * @return  None
+ * @return  0 for Fail, 
  */
-void BSP_SPI_Write(spi_port_t port, uint8_t *txBuf, uint32_t txLen) {
+bool BSP_SPI_Write(spi_port_t port, uint8_t *txBuf, uint32_t txLen) {
 	// If we're below an experimentally-determined value, just use polling
 	if(txLen < 8 || SPI_OPERATING_MODES[port] == SPI_BAREMETAL) { 
 		for(int i = 0; i < txLen; i++) {
-			SPI_WriteRead(port, txBuf[i]);
+			uint16_t errorstatus = SPI_WriteRead(port, txBuf[i]);
+			if(errorstatus==0xFF00) return false;
 		}
 	} else {
 		// If we have a lot of data, we use interrupts to mitigate it
@@ -304,6 +305,7 @@ void BSP_SPI_Write(spi_port_t port, uint8_t *txBuf, uint32_t txLen) {
 		}
 		SPI_Wait(port);
 	}
+	return true;
 }
 
 /**
@@ -317,13 +319,15 @@ void BSP_SPI_Write(spi_port_t port, uint8_t *txBuf, uint32_t txLen) {
  * @param   rxLen   length of data array.
  * @return  None
  */
-void BSP_SPI_Read(spi_port_t port, uint8_t *rxBuf, uint32_t rxLen) {
+bool BSP_SPI_Read(spi_port_t port, uint8_t *rxBuf, uint32_t rxLen) {
 	// bool first = true;
 
 	// If we have only a little amount of data, just use polling
 	if(rxLen < 8 || SPI_OPERATING_MODES[port] == SPI_BAREMETAL) {
 		for(int i = 0; i < rxLen; i++) {
-			rxBuf[i] = SPI_WriteRead(port, 0x00);
+			uint16_t data = SPI_WriteRead(port, 0x00);
+			if(data==0xFF00) return false;
+			rxBuf[i] = data;
 		}
 	} else {
 		SPI_I2S_ITConfig(SPI_BUSSES[port], SPI_I2S_IT_RXNE, ENABLE);
@@ -351,6 +355,7 @@ void BSP_SPI_Read(spi_port_t port, uint8_t *rxBuf, uint32_t rxLen) {
 		}
 		SPI_I2S_ITConfig(SPI_BUSSES[port], SPI_I2S_IT_RXNE, DISABLE);
 	}
+	return true;
 }
 
 /**

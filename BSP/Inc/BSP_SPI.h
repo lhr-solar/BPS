@@ -47,7 +47,7 @@ void BSP_SPI_SetClock(spi_speed_t speed);
  * @param   txLen   length of data array.
  * @return  None
  */
-void BSP_SPI_Write(spi_port_t port, uint8_t *txBuf, uint32_t txLen);
+bool BSP_SPI_Write(spi_port_t port, uint8_t *txBuf, uint32_t txLen);
 
 /**
  * @brief   Gets the data from SPI. With the way the LTC6811 communication works, the LTC6811 will 
@@ -59,7 +59,7 @@ void BSP_SPI_Write(spi_port_t port, uint8_t *txBuf, uint32_t txLen);
  * @param   rxLen   length of data array.
  * @return  None
  */
-void BSP_SPI_Read(spi_port_t port, uint8_t *rxBuf, uint32_t rxLen);
+bool BSP_SPI_Read(spi_port_t port, uint8_t *rxBuf, uint32_t rxLen);
 
 /**
  * @brief   Sets the state of the chip select output pin. Set the state to low/0 to notify the 
