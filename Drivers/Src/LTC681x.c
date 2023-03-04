@@ -66,30 +66,12 @@ static void cs_set(uint8_t state){
 	BSP_SPI_SetStateCS(spi_ltc6811, state);
 }
 
-void delay_u(uint16_t micro)
-{
-  uint32_t delay = BSP_PLL_GetSystemClock() / 1000000;
-	for(uint32_t i = 0; i < micro; i++)
-	{
-		for(uint32_t j = 0; j < delay; j++);
-	}
-}
-
-void delay_m(uint16_t milli)
-{
-  uint32_t delay = BSP_PLL_GetSystemClock() / 1000;
-	for(uint32_t i = 0; i < milli; i++)
-	{
-		for(uint32_t j = 0; j < delay; j++);
-	}
-}
-
 void wakeup_idle(uint8_t total_ic)
 {
   for (int i =0; i<total_ic; i++)
   {
     cs_set(0);
-    delay_m(5); //Guarantees the isoSPI will be in ready mode
+    BSP_delay_m(5); //Guarantees the isoSPI will be in ready mode
     spi_read8();
     cs_set(1);
   }
@@ -101,9 +83,9 @@ void wakeup_sleep(uint8_t total_ic)
   for (int i =0; i<total_ic; i++)
   {
     cs_set(0);
-    delay_u(500); // Guarantees the LTC6813 will be in standby
+    BSP_delay_u(500); // Guarantees the LTC6813 will be in standby
     cs_set(1);
-    delay_u(150);
+    BSP_delay_u(150);
   }
 }
 
@@ -1196,7 +1178,7 @@ int16_t LTC681x_run_cell_adc_st(uint8_t adc_reg,uint8_t total_ic, cell_asic ic[]
         LTC681x_clraux();
         LTC681x_axst(2,self_test);
         LTC681x_pollAdc();
-        delay_m(10);
+        BSP_delay_m(10);
         wakeup_idle(total_ic);
         LTC681x_rdaux(0, total_ic,ic);
         for (int cic = 0; cic < total_ic; cic++)
