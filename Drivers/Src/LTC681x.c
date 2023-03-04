@@ -46,6 +46,7 @@ Copyright 2017 Linear Technology Corp. (LTC)
 #include "BSP_SPI.h"
 #include "BSP_PLL.h"
 #include "config.h"
+#include "Tasks.h"
 
 static uint8_t spi_read8(void){
   uint8_t data = 0;
@@ -53,14 +54,22 @@ static uint8_t spi_read8(void){
 	return data;
 }
 
-static void spi_write_multi8(uint8_t *txBuf, uint32_t txSize){
-	BSP_SPI_Write(spi_ltc6811, txBuf, txSize);
+static bool spi_write_multi8(uint8_t *txBuf, uint32_t txSize){
+  bool status = BSP_SPI_Write(spi_ltc6811, txBuf, txSize);
+  if(status==false){
+    Fault_BitMap |= Fault_CRC;
+    EnterFaultState();
+  }
+	return status;
 }
 
-static void spi_write_read_multi8(uint8_t *txBuf, uint32_t txSize, uint8_t *rxBuf, uint32_t rxSize){
-  BSP_SPI_Write(spi_ltc6811, txBuf, txSize);
-  BSP_SPI_Read(spi_ltc6811, rxBuf, rxSize);
-}
+static bool spi_write_read_multi8(uint8_t *txBuf, uint32_t txSize, uint8_t *rxBuf, uint32_t rxSize){
+  bool status = BSP_SPI_Write(spi_ltc6811, txBuf, txSize) && BSP_SPI_Read(spi_ltc6811, rxBuf, rxSize); //return a fail if either one fails
+  if(status==false){
+    Fault_BitMap |= Fault_CRC;
+    EnterFaultState();
+  }
+	return status;}
 
 static void cs_set(uint8_t state){
 	BSP_SPI_SetStateCS(spi_ltc6811, state);
