@@ -57,7 +57,7 @@ bool BSP_SPI_Write(spi_port_t port, uint8_t *txBuf, uint32_t txLen);
  * @param   port    the SPI port to read from
  * @param   rxBuf   data array to store the data that is received.
  * @param   rxLen   length of data array.
- * @return  None
+ * @return  false for fail, true for success
  */
 bool BSP_SPI_Read(spi_port_t port, uint8_t *rxBuf, uint32_t rxLen);
 
@@ -67,7 +67,7 @@ bool BSP_SPI_Read(spi_port_t port, uint8_t *rxBuf, uint32_t rxLen);
  *          make the LTC6811 go to standby.
  * @param   port    the SPI port to select/deselct on
  * @param   state   0 for select, 1 to deselect
- * @return  None
+ * @return  false for fail, true for success
  */
 void BSP_SPI_SetStateCS(spi_port_t port, uint8_t state);
 
