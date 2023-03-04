@@ -39,12 +39,12 @@ uint32_t BSP_PLL_GetSystemClock(void) {
  * @param   # of microseconds to delay
  * @return  None
 */
-void BSP_delay_u(uint16_t micro)
+void BSP_PLL_delay_u(uint16_t micro)
 {
     uint32_t delay = BSP_PLL_GetSystemClock() / 1000000;
-	for(uint32_t i = 0; i < micro; i++)
+	for(volatile uint32_t i = 0; i < micro; i++)
 	{
-		for(uint32_t j = 0; j < delay; j++);
+		for(volatile uint32_t j = 0; j < delay; j++);
 	}
 }
 
@@ -53,11 +53,11 @@ void BSP_delay_u(uint16_t micro)
  * @param   # of milliseconds to delay
  * @return  None
 */
-void BSP_delay_m(uint16_t milli)
+void BSP_PLL_delay_m(uint16_t milli)
 {
   uint32_t delay = BSP_PLL_GetSystemClock() / 1000;
-	for(uint32_t i = 0; i < milli; i++)
+	for(volatile uint32_t i = 0; i < milli; i++)
 	{
-		for(uint32_t j = 0; j < delay; j++);
+		for(volatile uint32_t j = 0; j < delay; j++);
 	}
 }

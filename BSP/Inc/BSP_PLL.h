@@ -24,13 +24,13 @@ uint32_t BSP_PLL_GetSystemClock(void);
  * @param   # of milliseconds to delay
  * @return  None
 */
-void BSP_delay_m(uint16_t milli);
+void BSP_PLL_delay_m(uint16_t milli);
 
 /**
  * @brief   Delays in param micro seconds
  * @param   # of microseconds to delay
  * @return  None
 */
-void BSP_delay_u(uint16_t micro);
+void BSP_PLL_delay_u(uint16_t micro);
 
 #endif
