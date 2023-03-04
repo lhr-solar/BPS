@@ -4,7 +4,11 @@
 #include "config.h"
 #include "os.h"
 #include "Tasks.h"
+#ifndef SIMULATION
 #include "stm32f4xx.h"
+#else
+#include "Simulator.h"
+#endif
 #include "Contactor.h"
 #include "BSP_Lights.h"
 #include "BSP_PLL.h"
@@ -15,7 +19,7 @@ OS_TCB Task2_TCB;
 CPU_STK Task2_Stk[256];
 
 /******************************************************************************
- * Critical State Task Test Plan
+ * Check Contactor Task Test Plan
  * 
  * 1. Build the BPS code for the stm32f413 for this test file (see README.md)
  * 2. Flash the BPS (see README.md)
@@ -43,17 +47,22 @@ void Task2(void *p_arg){    //This task is meant to cause contactor to remain op
 void Task1(void *p_arg){
     OS_ERR err;
 
+#ifndef SIMULATION
     OS_CPU_SysTickInit(SystemCoreClock / (CPU_INT32U) OSCfg_TickRate_Hz);
+#else
+    OS_CPU_SysTickInit();
+#endif
 
     RTOS_BPS_SemCreate(&SafetyCheck_Sem4, "Safety Check Semaphore", 0);
 
-    RTOS_BPS_TaskCreate(&CriticalState_TCB,				// TCB
-				"TASK_CRITICAL_STATE_PRIO",	// Task Name (String)
-				Task_CriticalState,				// Task function pointer
-				(void *)0,				// Task function args
-				TASK_CRITICAL_STATE_PRIO,			// Priority
-				CriticalState_Stk,	// Watermark limit for debugging
-				TASK_CRITICAL_STATE_STACK_SIZE);					// return err code
+    RTOS_BPS_TaskCreate(&CheckContactor_TCB,    // TCB
+				"Task_CheckContactor",          // Task Name (String)
+				Task_CheckContactor,            // Task function pointer
+				(void *)0,                      // Task function args
+				TASK_CHECK_CONTACTOR_PRIO,      // Priority
+				CheckContactor_Stk,             // Stack
+				TASK_CHECK_CONTACTOR_STACK_SIZE
+                );
     
     RTOS_BPS_TaskCreate(&Task2_TCB,
                 "Task 2",
@@ -67,13 +76,25 @@ void Task1(void *p_arg){
     assertOSError(err);
 }
 
-int main(void) {
+#ifdef SIMULATION
+int main(int argc, char **argv) {
+#else
+int main() {
+#endif
+
+#ifdef SIMULATION
+    // the first command line argument is the path to the JSON file
+    Simulator_Init(argv[1]);
+#endif
+
     OS_ERR err;
     BSP_PLL_Init();
     BSP_Lights_Init();
     Contactor_Init();
 
+#ifndef SIMULATION
     __disable_irq();
+#endif
 
     OSInit(&err);
     assertOSError(err);
@@ -87,7 +108,9 @@ int main(void) {
                 256);
     assertOSError(err);
 
+#ifndef SIMULATION
     __enable_irq();
+#endif
 
     OSStart(&err);
     assertOSError(err);
