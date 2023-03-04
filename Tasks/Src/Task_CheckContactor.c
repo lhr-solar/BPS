@@ -3,8 +3,6 @@
 #include "Contactor.h"
 #include "CANbus.h"
 #include "Tasks.h"
-#include "BSP_UART.h"
-#include "Voltage.h"
 #include "CAN_Queue.h"
 
 void Task_CheckContactor(void *p_arg) {
