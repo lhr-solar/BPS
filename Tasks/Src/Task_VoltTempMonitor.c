@@ -17,7 +17,7 @@ void Task_VoltTempMonitor(void *p_arg) {
 
     Fans_Init();
     Voltage_Init(Minions);
-    Temperature_Init(Minions);
+    // Temperature_Init(Minions);
 
     // SafetyCheck_Sem4 must only be signaled once per parameter at system boot up.
     // These flags indicate was signaled for that parameter
@@ -29,9 +29,11 @@ void Task_VoltTempMonitor(void *p_arg) {
     CANPayload_t CanPayload;
     CANMSG_t CanMsg;
     while(1) {
+        // START:
         // BLOCKING =====================
         // Update Voltage Measurements
         Voltage_UpdateMeasurements();
+        goto DOG;
         
         // Check if voltage is NOT safe:
         SafetyStatus voltageStatus = Voltage_CheckStatus();
@@ -59,6 +61,7 @@ void Task_VoltTempMonitor(void *p_arg) {
             }
         }
         
+
         // BLOCKING =====================
         // Check if open wire is NOT safe:
 	
@@ -137,7 +140,7 @@ void Task_VoltTempMonitor(void *p_arg) {
         }
 
         Fans_SetAll(TOPSPEED);
-
+        DOG:
         //signal watchdog
         RTOS_BPS_MutexPend(&WDog_Mutex, OS_OPT_PEND_BLOCKING);
 
@@ -146,6 +149,6 @@ void Task_VoltTempMonitor(void *p_arg) {
         RTOS_BPS_MutexPost(&WDog_Mutex, OS_OPT_POST_NONE); 
         
         //delay of 50ms
-        RTOS_BPS_DelayMs(50);
+        RTOS_BPS_DelayMs(1000);
     }
 }

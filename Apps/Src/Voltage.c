@@ -45,7 +45,9 @@ void Voltage_Init(cell_asic *boards){
     // Record pointer
     Minions = boards;
     //initialize mutex
-    RTOS_BPS_MutexCreate(&Voltage_Mutex, "Voltage Buffer Mutex");
+    static bool initialized = false;
+    if (!initialized) RTOS_BPS_MutexCreate(&Voltage_Mutex, "Voltage Buffer Mutex");
+    initialized = true;
                     
 // simulator bypasses ltc driver
 #ifndef SIMULATION
@@ -78,6 +80,7 @@ void Voltage_Init(cell_asic *boards){
  */
 void Voltage_UpdateMeasurements(void){
     uint16_t rawVoltages[NUM_BATTERY_MODULES];
+    uint32_t tmp = 0;
 #ifndef SIMULATION
     // Start Cell ADC Measurements
     wakeup_sleep(NUM_MINIONS);
@@ -87,6 +90,7 @@ void Voltage_UpdateMeasurements(void){
     // Read Cell Voltage Registers
     //take control of mutex
     RTOS_BPS_MutexPend(&MinionsASIC_Mutex, OS_OPT_PEND_BLOCKING);
+    wakeup_sleep(NUM_MINIONS);
     LTC6811_rdcv_safe(0, NUM_MINIONS, Minions); // Set to read back all cell voltage registers
     //copies values from cells.c_codes to private array
 
@@ -94,7 +98,9 @@ void Voltage_UpdateMeasurements(void){
     // package raw voltage values into single array
     for(uint8_t i = 0; i < NUM_BATTERY_MODULES; i++){
         rawVoltages[i] = Minions[i / MAX_VOLT_SENSORS_PER_MINION_BOARD].cells.c_codes[i % MAX_VOLT_SENSORS_PER_MINION_BOARD];
+        tmp += rawVoltages[i];
     }
+    // printf("raw v avg: %ld\n\r", tmp / NUM_BATTERY_MODULES);
     for (uint8_t i = 0; i < NUM_MINIONS; i++){
         printf("Minion %d:\n\r", i);
         for (uint8_t j = 0; j < MAX_VOLT_SENSORS_PER_MINION_BOARD; j++) {
@@ -109,11 +115,13 @@ void Voltage_UpdateMeasurements(void){
         rawVoltages[i] = Simulator_getVoltage(i);
     }
 #endif
+    printf("here\n");
     // run median filter
-    VoltageFilter_put(&VoltageFilter, rawVoltages);
+    
 
     // update public voltage values
     RTOS_BPS_MutexPend(&Voltage_Mutex, OS_OPT_PEND_BLOCKING);
+    VoltageFilter_put(&VoltageFilter, rawVoltages);
     VoltageFilter_get(&VoltageFilter, Voltages);
     RTOS_BPS_MutexPost(&Voltage_Mutex, OS_OPT_POST_NONE);
 }
