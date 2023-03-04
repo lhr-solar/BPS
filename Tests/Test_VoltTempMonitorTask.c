@@ -57,13 +57,13 @@ void Task1(void *p_arg){
 
     // Spawn tasks needed for Amperes readings to affect contactor
     //1
-    RTOS_BPS_TaskCreate(&CriticalState_TCB,				// TCB
-            "TASK_CRITICAL_STATE_PRIO",	// Task Name (String)
-            Task_CriticalState,				// Task function pointer
-            (void *)0,				// Task function args
-            TASK_CRITICAL_STATE_PRIO,			// Priority
-            CriticalState_Stk,	// Watermark limit for debugging
-            TASK_CRITICAL_STATE_STACK_SIZE);					// return err code
+    RTOS_BPS_TaskCreate(&CheckContactor_TCB,    // TCB
+				"Task_CheckContactor",          // Task Name (String)
+				Task_CheckContactor,            // Task function pointer
+				(void *)0,                      // Task function args
+				TASK_CHECK_CONTACTOR_PRIO,      // Priority
+				CheckContactor_Stk,             // Stack
+				TASK_CHECK_CONTACTOR_STACK_SIZE);
 
     RTOS_BPS_TaskCreate(&VoltTempMonitor_TCB,				// TCB
 			"TASK_VOLT_TEMP_MONITOR_PRIO",	// Task Name (String)
@@ -104,28 +104,15 @@ void Task2(void *p_arg){
         //delay of 100ms
         RTOS_BPS_DelayTick(10);
         BSP_Light_Toggle(RUN);
-<<<<<<< HEAD
-
-        // printf("****************Module Voltages****************\r\n");
-        // for(int i = 0; i < NUM_BATTERY_MODULES; i++) {
-        //     printf("\t%d: %dmV\r\n", i, Voltage_GetModuleMillivoltage(i));
-        // }
-
-        // printf("******************Module Temperatures*****************\r\n");
-        // for(int i = 0; i < NUM_MINIONS; i++) {
-        //     printf("Minion %d:\r\n", i);
-        //     printf("\tTemperature:\r\n");
-
-        //     for(int j = 0; j < MAX_TEMP_SENSORS_PER_MINION_BOARD; j++) {
-        //         printf("\t%d: %ldmC\r\n", j, Temperature_GetSingleTempSensor(i, j));
-        //     }
-        // }
-=======
->>>>>>> master
     }
 }
 
-int main(void) {
+// Similar to the production code main. Does not mess with contactor 
+#ifdef SIMULATION
+int main(int argc, char **argv) {
+#else
+int main() {
+#endif
     OS_ERR err;
     
     //Resetting the contactor

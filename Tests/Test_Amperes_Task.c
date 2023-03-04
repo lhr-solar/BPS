@@ -4,7 +4,11 @@
 #include "config.h"
 #include "CANbus.h"
 #include "Tasks.h"
+#ifdef SIMULATION
+#include "Simulator.h"
+#else
 #include "stm32f4xx.h"
+#endif
 #include "BSP_Lights.h"
 #include "BSP_PLL.h"
 #include "CAN_Queue.h"
@@ -41,7 +45,11 @@ CPU_STK Task2_Stk[DEFAULT_STACK_SIZE];
 
 // Initialization task for this test
 void Task1(void *p_arg){
-	OS_CPU_SysTickInit(SystemCoreClock / (CPU_INT32U) OSCfg_TickRate_Hz);
+#ifndef SIMULATION
+    OS_CPU_SysTickInit(SystemCoreClock / (CPU_INT32U) OSCfg_TickRate_Hz);
+#else
+    OS_CPU_SysTickInit();
+#endif
 
     OS_ERR err;
 
@@ -53,13 +61,13 @@ void Task1(void *p_arg){
 
     // Spawn tasks needed for Amperes readings to affect contactor
     //1
-    RTOS_BPS_TaskCreate(&CriticalState_TCB,				// TCB
-            "TASK_CRITICAL_STATE_PRIO",	// Task Name (String)
-            Task_CriticalState,				// Task function pointer
-            (void *)0,				// Task function args
-            TASK_CRITICAL_STATE_PRIO,			// Priority
-            CriticalState_Stk,	// Watermark limit for debugging
-            TASK_CRITICAL_STATE_STACK_SIZE);					// return err code
+    RTOS_BPS_TaskCreate(&CheckContactor_TCB,    // TCB
+				"Task_CheckContactor",          // Task Name (String)
+				Task_CheckContactor,            // Task function pointer
+				(void *)0,                      // Task function args
+				TASK_CHECK_CONTACTOR_PRIO,      // Priority
+				CheckContactor_Stk,             // Stack
+				TASK_CHECK_CONTACTOR_STACK_SIZE);
 
     // Spawn Task_AmperesMonitor with PRIO 5
     RTOS_BPS_TaskCreate(&AmperesMonitor_TCB,				// TCB
@@ -104,7 +112,7 @@ void Task2(void *p_arg){
         RTOS_BPS_DelayTick(10);
 
         if (count == 0) {
-            printf("Amps: %ld\n\r", Amps_GetReading());
+            printf("Amps: %ld\n\r", (int64_t)Amps_GetReading());
         }
         count = (count + 1) % 10;
 
@@ -113,9 +121,18 @@ void Task2(void *p_arg){
 }
 
 // Similar to the production code main. Does not check watchdog or mess with contactor 
-int main(void) {
-    OS_ERR err;
+#ifdef SIMULATION
+int main(int argc, char **argv) {
+#else
+int main() {
+#endif
 
+#ifdef SIMULATION
+    // the first command line argument is the path to the JSON file
+    Simulator_Init(argv[1]);
+#endif
+
+    OS_ERR err;
 
     BSP_PLL_Init();
     BSP_UART_Init(NULL, NULL, UART_USB);

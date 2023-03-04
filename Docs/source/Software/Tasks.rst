@@ -10,9 +10,9 @@ Purpose
     is dangerously high.
 
 Functionality
-    1) First it checks the current and if it is safe, signals the critical state task. This only occurs once.
+    1) First it checks the current and if it is safe, signals the check contactor task. This only occurs once.
 
-    2) If the current is above 75A, it signals the fault state task.
+    2) If the current is above 75A, it calls the fault state function.
 
     3) After every updated measurement, it sends the current data to the CAN queue and updates the BPS's State of Charge.
 
@@ -31,7 +31,7 @@ Timing Requirements
     frequently at once every 100 milliseconds. 
 
 Yields
-    It yields when it signals the critical state task that the current is safe, when it detects a
+    It yields when it signals the check contactor task that the current is safe, when it detects a
     fault, when it tries to use a shared resource, and when it sends an :term:`SPI <SPI>` message.
 
 Additional Considerations
@@ -128,21 +128,21 @@ Yields
 Additional Considerations
     For information on how to use the CLI and its list of valid commands, click on :ref:`CLI section<CLI-app>`.
 
-Critical State Task: Manthan Upadhyaya
-======================================
+Check Contactor Task: Manthan Upadhyaya
+=======================================
 
 Purpose
-    The Critical State Task initializes the BPS when it first turns on.
+    The Check Contactor Task initializes the BPS when it first turns on.
 
 Functionality:
-    1) It waits for the VoltTemp and Amperes task to post the SafetyCheck :term:`semaphore <Semaphore>` 4 times. One for voltage, one for temperature, one for current, and one for open wire.
+    1) It waits for the Check Contactor, VoltTemp and Amperes task to post the SafetyCheck :term:`semaphore <Semaphore>` 5 times. One for voltage, one for temperature, one for current, one for open wire, and one for welded contactors.
     2) It creates the Pet Watchdog Task after the checks are completed (since the checks take longer than the watchdog timer).
     3) If all of these checks are safe, the task will send the All Clear message and the Contactor On message across the CAN line. It will also turn the contactor on.
-    4) The task will then destroy itself since it is no longer needed
+    4) Finally, the task enters a while-loop where it triggers a fault if the contactor is open.
 
 Priority
     It's priority 2, underneath the fault state task. This is because if a fault occurs during the 
-    critical state task, the fault task must be called.
+    check contactor task, the fault task must be called.
 
 Shared Resources
     All it uses is the ``SafetyCheck_Sem4``.
@@ -152,7 +152,7 @@ Timing Requirements
 
 Yields
     While initializing, it yields to other tasks to let them check their specific fault conditions.
-    After initializing, it destroys itself and yields to the next highest priority task.
+    Faults if it detects a welded contactor at init or an open contactor during operation.
 
 Additional Considerations
     None
@@ -274,7 +274,7 @@ Yields
 Additional Considerations
     If we add more tasks (or split up tasks such as voltage and temperature) and want to have the 
     watchdog timer look over them, we can add more bits to the timer and just check if they are set. This task
-    is created in the Critical State Task becuase it takes longer than the watchdog time to intialize all the tasks.
+    is created in the Check Contactor Task because it takes longer than the watchdog time to intialize all the tasks.
 
 Voltage Temperature Monitor Task: Sijin Woo
 ===========================================
@@ -295,7 +295,7 @@ Functionality
     temperature) are deemed safe, this task signals to turn the contactor on once.
 
 Priority
-    This task has priority level 4, so it will not interrupt the fault state, critical state, and watchdog tasks.
+    This task has priority level 4, so it will not interrupt the fault state, check contactor, and watchdog tasks.
 
 Shared Resources
     This task uses the ``CANBus_MsgQ`` queue, the ``Fault_Sem4``, and the ``SafetyCheck_Sem4``. 

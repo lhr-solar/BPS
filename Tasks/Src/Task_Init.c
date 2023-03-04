@@ -2,6 +2,7 @@
 #include "config.h"
 #include "Tasks.h"
 #include "CAN_Queue.h"
+#include "Contactor.h"
 #include "RTOS_BPS.h"
 #ifndef SIMULATION
 #include "stm32f4xx.h"
@@ -23,14 +24,15 @@ void Task_Init(void *p_arg) {
 
     RTOS_BPS_MutexCreate(&WDog_Mutex, "Watchdog Mutex");
 
-    //2
-    RTOS_BPS_TaskCreate(&CriticalState_TCB,	    // TCB
-            "TASK_CRITICAL_STATE",	            // Task Name (String)
-            Task_CriticalState,				    // Task function pointer
-            (void *)0,				            // Task function args
-            TASK_CRITICAL_STATE_PRIO,		    // Priority
-            CriticalState_Stk,				    // Stack
-            TASK_CRITICAL_STATE_STACK_SIZE);
+    // 1
+    RTOS_BPS_TaskCreate(&CheckContactor_TCB,    // TCB
+				"Task_CheckContactor",          // Task Name (String)
+				Task_CheckContactor,            // Task function pointer
+				(void *)0,                      // Task function args
+				TASK_CHECK_CONTACTOR_PRIO,      // Priority
+				CheckContactor_Stk,             // Stack
+				TASK_CHECK_CONTACTOR_STACK_SIZE
+                );
     //3
     // RTOS_BPS_TaskCreate(&PetWDog_TCB,	    // TCB
     // 		"TASK_PETWDOG",	                    // Task Name (String)
@@ -104,6 +106,7 @@ void Task_Init(void *p_arg) {
             TASK_IDLE_STACK_SIZE);
     
     CAN_Queue_Init();
+
     //delete task
     OSTaskDel(NULL, &err); // Delete task
 }
