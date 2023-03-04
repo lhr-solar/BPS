@@ -28,7 +28,7 @@ typedef enum SafetyStatus_e {SAFE = 0, DANGER = 1, OVERVOLTAGE = 2, UNDERVOLTAGE
 //--------------------------------------------------------------------------------
 // Battery Pack layout
 #ifndef NUM_BATTERY_MODULES
-#define NUM_BATTERY_MODULES				(((12 * NUM_MINIONS) > 32) ?	32 : (12 * NUM_MINIONS))	// Number of battery modules
+#define NUM_BATTERY_MODULES				(((MAX_VOLT_SENSORS_PER_MINION_BOARD * NUM_MINIONS) > 32) ? 32 : (MAX_VOLT_SENSORS_PER_MINION_BOARD * NUM_MINIONS))	// Number of battery modules
 #endif
 
 #ifndef NUM_TEMP_SENSORS_PER_MOD
@@ -36,7 +36,7 @@ typedef enum SafetyStatus_e {SAFE = 0, DANGER = 1, OVERVOLTAGE = 2, UNDERVOLTAGE
 #endif
 
 #ifndef NUM_TEMPERATURE_SENSORS
-#define NUM_TEMPERATURE_SENSORS			(((16 * NUM_MINIONS) > 32) ?	32 : (16 * NUM_MINIONS)) // Number of temperature sensors
+#define NUM_TEMPERATURE_SENSORS			(((MAX_TEMP_SENSORS_PER_MINION_BOARD * NUM_MINIONS) > 32) ? 32 : (MAX_TEMP_SENSORS_PER_MINION_BOARD * NUM_MINIONS)) // Number of temperature sensors
 #endif
 
 //--------------------------------------------------------------------------------
@@ -97,7 +97,10 @@ typedef enum SafetyStatus_e {SAFE = 0, DANGER = 1, OVERVOLTAGE = 2, UNDERVOLTAGE
 //--------------------------------------------------------------------------------
 // Voltage Sensor Configurations
 // Defines how many voltage sensors are connected to each board
+#ifndef MAX_VOLT_SENSORS_PER_MINION_BOARD
 #define MAX_VOLT_SENSORS_PER_MINION_BOARD	12	// User defined. The LTC6811 can actually measure 12 modules.
+#endif
+
 #define TOTAL_VOLT_WIRES					(MAX_VOLT_SENSORS_PER_MINION_BOARD * NUM_MINIONS)
 
 //--------------------------------------------------------------------------------

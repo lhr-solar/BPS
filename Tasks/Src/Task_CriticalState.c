@@ -39,14 +39,14 @@ void Task_CriticalState(void *p_arg) {
     Contactor_On(HVLOW_CONTACTOR);
 
     // launch check contactor task
-    RTOS_BPS_TaskCreate(&CheckContactor_TCB,                       // TCB
-				"Task_CheckContactor",                      // Task Name (String)
-				Task_CheckContactor,                        // Task function pointer
-				(void *)0,                                  // Task function args
-				TASK_CHECK_CONTACTOR_PRIO,                  // Priority
-				CheckContactor_Stk,                         // Stack
-				TASK_CHECK_CONTACTOR_STACK_SIZE
-                );
+    // RTOS_BPS_TaskCreate(&CheckContactor_TCB,                       // TCB
+	// 			"Task_CheckContactor",                      // Task Name (String)
+	// 			Task_CheckContactor,                        // Task function pointer
+	// 			(void *)0,                                  // Task function args
+	// 			TASK_CHECK_CONTACTOR_PRIO,                  // Priority
+	// 			CheckContactor_Stk,                         // Stack
+	// 			TASK_CHECK_CONTACTOR_STACK_SIZE
+    //             );
 
     // Push All Clear message to CAN Q
     CANMSG.id = ALL_CLEAR;
