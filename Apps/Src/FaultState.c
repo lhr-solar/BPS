@@ -146,7 +146,7 @@ void EnterFaultState() {
 #ifdef DEBUGMODE
     char command[COMMAND_SIZE];
 #endif
-    BSP_WDTimer_Init(); //This is in case we did not pass critical state and watchdog timer was not initialized
+    BSP_WDTimer_Init(); //This is in case we did not pass check contactor and watchdog timer was not initialized
     BSP_WDTimer_Start(); 
     while(1) {
 #ifdef DEBUGMODE

@@ -60,7 +60,7 @@ The following tasks make up the BPS' engine and are shown from highest to lowest
 
 - :ref:`Initialization <Initialization Task: Alex Koo>`
 - :ref:`Fault State <Fault State Task: Manthan Upadhyaya>`
-- :ref:`Critical State <Critical state Task: Manthan Upadhyaya>`
+- :ref:`Check Contactor <Check Contactor Task: Manthan Upadhyaya>`
 - :ref:`Pet Watchdog <Pet WatchDog Task: Harshitha Gorla & Clark Poon>`
 - :ref:`Voltage/Temperature monitor <Voltage Temperature Monitor Task: Sijin Woo>`
 - :ref:`Amperes monitor <Amperes Task: Manthan Upadhyaya>`

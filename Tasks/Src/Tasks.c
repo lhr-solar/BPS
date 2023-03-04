@@ -13,7 +13,6 @@
  * @brief   TCBs
  */
 BPS_OS_TCB FaultState_TCB;
-BPS_OS_TCB CriticalState_TCB;
 BPS_OS_TCB PetWDog_TCB;
 BPS_OS_TCB VoltTempMonitor_TCB;
 BPS_OS_TCB AmperesMonitor_TCB;
@@ -29,7 +28,6 @@ BPS_OS_TCB Init_TCB;
 /**
  * @brief   Stacks
  */
-BPS_CPU_STK CriticalState_Stk[TASK_CANBUS_CONSUMER_STACK_SIZE];
 BPS_CPU_STK PetWDog_Stk[TASK_PETWDOG_STACK_SIZE];
 BPS_CPU_STK VoltTempMonitor_Stk[TASK_VOLT_TEMP_MONITOR_STACK_SIZE];
 BPS_CPU_STK AmperesMonitor_Stk[TASK_AMPERES_MONITOR_STACK_SIZE];

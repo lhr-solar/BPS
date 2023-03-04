@@ -4,6 +4,9 @@
 #include "RTOS_BPS.h"
 #include "Tasks.h"
 #include "BSP_UART.h"
+#ifdef SIMULATION
+#include "Simulator.h"
+#endif
 
 static void Voltage_UpdateMeasurements(void) {
     printf("V0\r\n");\
@@ -83,17 +86,17 @@ static int8_t Current_IsCharging(void) {
     return 1;
 }
 
-void CriticalState(void *p_arg) {
+void CheckContactor(void *p_arg) {
     (void)p_arg;
 
 
-    printf("Critical State\r\n");
+    printf("Check Contactor\r\n");
 
     // BLOCKING =====================
     // Wait until voltage, open wire, temperature, and current(Amperes) are all checked and safe
     for(int32_t check = 0; check < NUM_FAULT_POINTS; check++) {
         RTOS_BPS_SemPend(&SafetyCheck_Sem4, OS_OPT_PEND_BLOCKING);
-        printf("CS:%ld\r\n", check);
+        printf("CS:%ld\r\n", (int64_t)check);
     }
 
     // Turn Contactor On
@@ -191,7 +194,17 @@ void foo(){
     return;
 }
 
+#ifdef SIMULATION
+int main(int argc, char **argv) {
+#else
 int main() {
+#endif
+
+#ifdef SIMULATION
+    // the first command line argument is the path to the JSON file
+    Simulator_Init(argv[1]);
+#endif
+    
     OS_ERR err;
 
     CPU_Init();
@@ -216,13 +229,13 @@ int main() {
 				Init_Stk,	// Watermark limit for debugging
 				DEFAULT_STACK_SIZE);
 
-    RTOS_BPS_TaskCreate(&CriticalState_TCB,				// TCB
-				"Critical State",	// Task Name (String)
-				CriticalState,				// Task function pointer
-				(void *)0,				// Task function args
-				TASK_CRITICAL_STATE_PRIO,			// Priority
-				CriticalState_Stk,	// Watermark limit for debugging
-				TASK_CRITICAL_STATE_STACK_SIZE); 
+    RTOS_BPS_TaskCreate(&CheckContactor_TCB,    // TCB
+				"Task_CheckContactor",          // Task Name (String)
+				CheckContactor,            // Task function pointer
+				(void *)0,                      // Task function args
+				TASK_CHECK_CONTACTOR_PRIO,      // Priority
+				CheckContactor_Stk,             // Stack
+				TASK_CHECK_CONTACTOR_STACK_SIZE);
 
     RTOS_BPS_TaskCreate(&VoltTempMonitor_TCB,				// TCB
 				"Voltage/Temperature Monitor",	// Task Name (String)

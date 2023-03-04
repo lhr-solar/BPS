@@ -5,7 +5,6 @@
 #include "RTOS_BPS.h"
 
 #define TASK_INIT_PRIO                      0
-#define TASK_CRITICAL_STATE_PRIO            2
 #define TASK_PETWDOG_PRIO                   3
 #define TASK_CHECK_CONTACTOR_PRIO           4
 #define TASK_CANBUS_CONSUMER_PRIO           5
@@ -19,7 +18,6 @@
 #define DEFAULT_STACK_SIZE                  256
 #define WATERMARK_STACK_LIMIT               DEFAULT_STACK_SIZE/2
 
-#define TASK_CRITICAL_STATE_STACK_SIZE      DEFAULT_STACK_SIZE
 #define TASK_PETWDOG_STACK_SIZE             DEFAULT_STACK_SIZE
 #define TASK_VOLT_TEMP_MONITOR_STACK_SIZE   512
 #define TASK_AMPERES_MONITOR_STACK_SIZE     DEFAULT_STACK_SIZE
@@ -43,8 +41,6 @@ typedef enum {
 } WDOGBits_e;
 
 void Task_Init(void *p_arg);
-
-void Task_CriticalState(void *p_arg);
 
 void Task_PetWDog(void *p_arg);
 
@@ -87,7 +83,6 @@ void EnterFaultState(void);
  * Thread Control Blocks that contain information about each thread
  */
 extern OS_TCB FaultState_TCB;
-extern OS_TCB CriticalState_TCB;
 extern OS_TCB PetWDog_TCB;
 extern OS_TCB VoltTempMonitor_TCB;
 extern OS_TCB AmperesMonitor_TCB;
@@ -102,7 +97,6 @@ extern OS_TCB Init_TCB;
 /**
  * Stacks for each thread
  */
-extern CPU_STK CriticalState_Stk[TASK_CANBUS_CONSUMER_STACK_SIZE];
 extern CPU_STK PetWDog_Stk[TASK_PETWDOG_STACK_SIZE];
 extern CPU_STK VoltTempMonitor_Stk[TASK_VOLT_TEMP_MONITOR_STACK_SIZE];
 extern CPU_STK AmperesMonitor_Stk[TASK_AMPERES_MONITOR_STACK_SIZE];

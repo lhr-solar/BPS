@@ -382,9 +382,9 @@ whenever a transfer is complete. This ISR is in the BSP SPI module.
 Safety Check Semaphore
 ======================
 
-When the :ref:`Critical State <Critical state Task: Manthan Upadhyaya>` runs, it checks to see if the Amperes, 
-Voltage, Open Wire, and Temperature are safe. This process is done by the Critical State Task using a blocking 
-Pend function on the Safety Check Semaphore. The task uses a blocking pend (wont move past the function until the 
+When the :ref:`Check Contactor <Check Contactor Task: Manthan Upadhyaya>` runs, it checks to see if the Amperes, 
+Voltage, Open Wire, and Temperature are safe. This process is done by the Check Contactor Task using a blocking 
+Pend function on the Safety Check Semaphore. The task uses a blocking pend (won't move past the function until the 
 semaphore is pended ``NUM_FAULT_POINTS`` amount of times).
 
 Amperes IO Semaphore
