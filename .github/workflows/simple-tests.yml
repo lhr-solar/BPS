@@ -25,14 +25,16 @@ jobs:
     # run tests in sudo for rtprio to work
     - name: Unit Test 
       run: |
-        sudo ./Validation/test.sh critical_overcurrent
-        sudo ./Validation/test.sh critical_overtemp_discharging
-        sudo ./Validation/test.sh critical_overvolt
-        sudo ./Validation/test.sh critical_undervolt
-        sudo ./Validation/test.sh overcurrent
-        sudo ./Validation/test.sh overtemp_charging
-        sudo ./Validation/test.sh overtemp_discharging
-        sudo ./Validation/test.sh overvolt
-        sudo ./Validation/test.sh undervolt
+        sudo bash Validation/test.sh critical_overcurrent.json
+        sudo bash Validation/test.sh critical_overtemp_discharging.json
+        sudo bash Validation/test.sh critical_overvolt.json
+        sudo bash Validation/test.sh critical_undervolt.json
+        sudo bash Validation/test.sh overcurrent.json
+        sudo bash Validation/test.sh overtemp_charging.json
+        sudo bash Validation/test.sh overtemp_discharging.json
+        sudo bash Validation/test.sh overvolt.json
+        sudo bash Validation/test.sh undervolt.json
         sudo ./Validation/test.sh killswitch
+        echo -e "End of Manual Tests \n\n"
+        sudo bash Validation/automatedTest.sh
     # add more tests here

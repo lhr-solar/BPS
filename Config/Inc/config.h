@@ -17,7 +17,9 @@ typedef enum SafetyStatus_e {SAFE = 0, DANGER = 1, OVERVOLTAGE = 2, UNDERVOLTAGE
 //--------------------------------------------------------------------------------
 // Basic Parameters of BPS layout
 
-#define NUM_MINIONS	4					 // Number of minion boards
+#ifndef NUM_MINIONS
+#define NUM_MINIONS	3					 // Number of minion boards
+#endif
 
 //--------------------------------------------------------------------------------
 // Battery Fault Checks
@@ -26,15 +28,15 @@ typedef enum SafetyStatus_e {SAFE = 0, DANGER = 1, OVERVOLTAGE = 2, UNDERVOLTAGE
 //--------------------------------------------------------------------------------
 // Battery Pack layout
 #ifndef NUM_BATTERY_MODULES
-#define NUM_BATTERY_MODULES				31		// Number of battery modules
-#endif
-
-#ifndef NUM_TEMPERATURE_SENSORS
-#define NUM_TEMPERATURE_SENSORS			62		// Number of temperature sensors
+#define NUM_BATTERY_MODULES				(((12 * NUM_MINIONS) > 32) ?	32 : (12 * NUM_MINIONS))	// Number of battery modules
 #endif
 
 #ifndef NUM_TEMP_SENSORS_PER_MOD
-#define NUM_TEMP_SENSORS_PER_MOD		2		// Number of temperature sensors per battery module
+#define NUM_TEMP_SENSORS_PER_MOD		1		// Number of temperature sensors per battery module
+#endif
+
+#ifndef NUM_TEMPERATURE_SENSORS
+#define NUM_TEMPERATURE_SENSORS			(((16 * NUM_MINIONS) > 32) ?	32 : (16 * NUM_MINIONS)) // Number of temperature sensors
 #endif
 
 //--------------------------------------------------------------------------------
@@ -95,14 +97,13 @@ typedef enum SafetyStatus_e {SAFE = 0, DANGER = 1, OVERVOLTAGE = 2, UNDERVOLTAGE
 //--------------------------------------------------------------------------------
 // Voltage Sensor Configurations
 // Defines how many voltage sensors are connected to each board
-#define MAX_VOLT_SENSORS_PER_MINION_BOARD	8	// User defined. The LTC6811 can actually measure 12 modules.
-#define NUM_PINS_PER_LTC 					(MAX_VOLT_SENSORS_PER_MINION_BOARD + 1) // one extra for ground
-#define TOTAL_VOLT_WIRES					(NUM_PINS_PER_LTC * NUM_MINIONS - 1)
+#define MAX_VOLT_SENSORS_PER_MINION_BOARD	12	// User defined. The LTC6811 can actually measure 12 modules.
+#define TOTAL_VOLT_WIRES					(MAX_VOLT_SENSORS_PER_MINION_BOARD * NUM_MINIONS)
 
 //--------------------------------------------------------------------------------
 // Temperature Sensor Configurations
 // Define how many temperature sensors are connected to each board
-#define MAX_TEMP_SENSORS_PER_MINION_BOARD	(MAX_VOLT_SENSORS_PER_MINION_BOARD * NUM_TEMP_SENSORS_PER_MOD)
+#define MAX_TEMP_SENSORS_PER_MINION_BOARD	16
 
 //--------------------------------------------------------------------------------
 // HeartBeat Delay Ticks
@@ -116,8 +117,5 @@ typedef enum SafetyStatus_e {SAFE = 0, DANGER = 1, OVERVOLTAGE = 2, UNDERVOLTAGE
 
 // used to determine if we are charging
 #define AMPS_NOISE_LIMIT 250 // milliamps
-
-// number of independently controlled fans
-#define NUM_FANS 4
 
 #endif

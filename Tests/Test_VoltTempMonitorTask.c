@@ -11,11 +11,13 @@
 #include "Simulator.h"
 #endif
 #include "BSP_Lights.h"
-#include "BSP_PLL.h"
 #include "CAN_Queue.h"
+#include "BSP_PLL.h"
 #include "BSP_WDTimer.h"
 #include "Contactor.h"
 #include "RTOS_BPS.h"
+#include "Voltage.h"
+#include "Temperature.h"
 
 /******************************************************************************
  * VoltTempMonitor Task Test Plan
@@ -41,7 +43,6 @@ OS_TCB Task2_TCB;
 CPU_STK Task2_Stk[DEFAULT_STACK_SIZE];
 
 OS_ERR p_err;
-void EnterFaultState(void);
 
 // Initialization task for this test
 void Task1(void *p_arg){
@@ -49,8 +50,6 @@ void Task1(void *p_arg){
 #ifndef SIMULATION
     OS_CPU_SysTickInit(SystemCoreClock / (CPU_INT32U) OSCfg_TickRate_Hz);
 #endif
-    
-    RTOS_BPS_SemCreate(&Fault_Sem4, "Fault/Tripped Semaphore", 0);
 
     RTOS_BPS_SemCreate(&SafetyCheck_Sem4, "Safety Check Semaphore", 0);
 
@@ -66,15 +65,6 @@ void Task1(void *p_arg){
             CriticalState_Stk,	// Watermark limit for debugging
             TASK_CRITICAL_STATE_STACK_SIZE);					// return err code
 
-    //3
-    RTOS_BPS_TaskCreate(&PetWDog_TCB,				// TCB
-			"TASK_PETWDOG_PRIO",	// Task Name (String)
-			Task_PetWDog,				// Task function pointer
-			(void *)0,				// Task function args
-			TASK_PETWDOG_PRIO,			// Priority
-			PetWDog_Stk,	// Watermark limit for debugging
-			TASK_PETWDOG_STACK_SIZE);					// return err code
-    // Spawn Task_VoltTempMonitor with PRIO 4
     RTOS_BPS_TaskCreate(&VoltTempMonitor_TCB,				// TCB
 			"TASK_VOLT_TEMP_MONITOR_PRIO",	// Task Name (String)
 			Task_VoltTempMonitor,				// Task function pointer
@@ -102,28 +92,47 @@ void Task1(void *p_arg){
 //Task to prevent watchdog from tripping
 void Task2(void *p_arg){
 
-    RTOS_BPS_SemPend(&SafetyCheck_Sem4, OS_OPT_POST_1); //Set semaphore once since Amperes Task doesn't run
-    RTOS_BPS_SemPend(&SafetyCheck_Sem4, OS_OPT_POST_1); //Set semaphore once since Battery Balancing Task doesn't run
+    RTOS_BPS_SemPost(&SafetyCheck_Sem4, OS_OPT_POST_1); //Set semaphore once since Amperes Task doesn't run
+    RTOS_BPS_SemPost(&SafetyCheck_Sem4, OS_OPT_POST_1); //Set semaphore once since Battery Balancing Task doesn't run
 
     while(1){
         RTOS_BPS_MutexPend(&WDog_Mutex, OS_OPT_PEND_BLOCKING);
         WDog_BitMap |= WD_AMPERES;
         WDog_BitMap |= WD_BALANCING;
+        WDog_BitMap |= WD_VOLT_TEMP;
         RTOS_BPS_MutexPost(&WDog_Mutex, OS_OPT_POST_NONE);
         //delay of 100ms
         RTOS_BPS_DelayTick(10);
-        //BSP_Light_Toggle(RUN);
+        BSP_Light_Toggle(RUN);
+<<<<<<< HEAD
+
+        // printf("****************Module Voltages****************\r\n");
+        // for(int i = 0; i < NUM_BATTERY_MODULES; i++) {
+        //     printf("\t%d: %dmV\r\n", i, Voltage_GetModuleMillivoltage(i));
+        // }
+
+        // printf("******************Module Temperatures*****************\r\n");
+        // for(int i = 0; i < NUM_MINIONS; i++) {
+        //     printf("Minion %d:\r\n", i);
+        //     printf("\tTemperature:\r\n");
+
+        //     for(int j = 0; j < MAX_TEMP_SENSORS_PER_MINION_BOARD; j++) {
+        //         printf("\t%d: %ldmC\r\n", j, Temperature_GetSingleTempSensor(i, j));
+        //     }
+        // }
+=======
+>>>>>>> master
     }
 }
 
-// Similar to the production code main. Does not mess with contactor 
-#ifndef SIMULATION
 int main(void) {
     OS_ERR err;
     
     //Resetting the contactor
     Contactor_Init();
-    Contactor_Off(ALL_CONTACTORS);
+    Contactor_Off(HVLOW_CONTACTOR);
+    Contactor_Off(HVHIGH_CONTACTOR);
+    Contactor_Off(ARRAY_CONTACTOR);
 
     if (BSP_WDTimer_DidSystemReset()) {
         Fault_BitMap = Fault_WDOG;

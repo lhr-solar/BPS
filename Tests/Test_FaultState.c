@@ -51,7 +51,9 @@ int main(void) {
     BSP_PLL_Init();
     BSP_Lights_Init();
     Contactor_Init();
-    Contactor_On(ALL_CONTACTORS);
+    Contactor_Off(HVLOW_CONTACTOR);
+    Contactor_Off(HVHIGH_CONTACTOR);
+    Contactor_Off(ARRAY_CONTACTOR);
 
     __disable_irq();
 

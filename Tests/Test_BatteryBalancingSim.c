@@ -4,8 +4,6 @@
 #include "LTC6811.h"
 #include "BSP_UART.h"
 
-#define NUM_MINIONS 4
-
 cell_asic minions[NUM_MINIONS];
 
 void foo(){

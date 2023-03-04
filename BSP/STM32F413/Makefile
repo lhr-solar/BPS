@@ -239,13 +239,13 @@ $(BUILD_DIR):
 .INTERMEDIATE: build_msg
 
 c_compile_msg:
-	@echo "${GREEN}Compiling C files...${NC}"
+	@echo -e "${GREEN}Compiling C files...${NC}"
 
 asm_compile_msg:
-	@echo "${GREEN}Compiling ASM files...${NC}"
+	@echo -e "${GREEN}Compiling ASM files...${NC}"
 
 build_msg:
-	@echo "${CYAN}Generating BPS executable...${NC}"
+	@echo -e "${CYAN}Generating BPS executable...${NC}"
 
 
 #######################################

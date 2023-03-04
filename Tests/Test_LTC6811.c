@@ -1,13 +1,11 @@
 /* Copyright (c) 2018-2022 UT Longhorn Racing Solar */
 
 #include "common.h"
+#include "Tasks.h"
 #include "config.h"
 #include "LTC6811.h"
 #include "BSP_UART.h"
-#include "common.h"
-#include "config.h"
 #include "BSP_SPI.h"
-#include "BSP_UART.h"
 #include "LTC6811.h"
 #include "RTOS_BPS.h"
 #include "BSP_PLL.h"

@@ -4,6 +4,7 @@
 #include "config.h"
 #include "Voltage.h"
 #include "BSP_UART.h"
+#include "BSP_Lights.h"
 #include "Tasks.h"
 #include "BSP_PLL.h"
 #include "stm32f4xx.h"
@@ -109,95 +110,16 @@ void test(void) {
 
     printf("\r\nTesting Voltage_GetTotalPackVoltage...\r\n");
     printf("Total pack voltage: %lu millivolts\r\n", Voltage_GetTotalPackVoltage());
-
-    while(1);
-}
-
-// keeping this for now, since the system was previously verified for bare-metal with this test
-void legacy_test(void) {
-
-    BSP_UART_Init(NULL, NULL, UART_USB);    // Initialize printf
-
-    printf("Testing Voltage functions.\r\n");
-
-    Voltage_Init(minions);
-
-    Voltage_UpdateMeasurements();
-
-    for(int i = 0; i < NUM_BATTERY_MODULES; i++) {
-        printf("\t%d: %dmV\r\n", i, Voltage_GetModuleMillivoltage(i));
-    }
-
-    printf("Testing Voltage functions in loop.\r\n");
-
-    while(1) {
-
-        printf("All good!\r");
-
-        Voltage_UpdateMeasurements();
-        
-        printf("Printing voltage values.\r\n");
-        for(int i = 0; i < NUM_BATTERY_MODULES; i++) {
-            printf("\t%d: %dmV\r\n", i, Voltage_GetModuleMillivoltage(i));
-        }
-
-        if(Voltage_CheckStatus() != SAFE) {
-            printf("DANGER!! Voltage Levels in Danger :(\r\n");
-            break;
-        }
-        
-        if(Voltage_OpenWire() != SAFE) {
-            printf("DANGER!! There is an open wire :(\r\n");
-            break;
-        }
-
-    }
-
-    printf("Printing voltage values.\r\n");
-    for(int i = 0; i < NUM_BATTERY_MODULES; i++) {
-        printf("\t%d: %dmV\r\n", i, Voltage_GetModuleMillivoltage(i));
-    }
-
-    printf("Printing pins open wires.\r\n");
-    for(int i = 0; i < NUM_MINIONS; i++) {
-        printf("\tMinion %d: 0x%lx\r\n", i, minions[i].system_open_wire);
-    }
-
-    printf("Printing modules that failed.\r\n");
-    VoltageSafety_t dangerBatt;
-    Voltage_GetModulesInDanger(&dangerBatt);
-    for(int i = 0; i < TOTAL_VOLT_WIRES; i++) {
-        printf("\t%d: ", i);
-        if(i < NUM_BATTERY_MODULES){
-            if(dangerBatt.module_checks[i] == SAFE && dangerBatt.wire_checks[i] == SAFE){
-                printf("SAFE\r\n");
-            }
-            else{
-                printf("DANGER\r\n");
-            }
-        }
-        else{
-            if(dangerBatt.wire_checks[i] == SAFE) {
-                printf("SAFE\r\n");
-
-            // TODO: once Voltage_GetModulesInDanger is updated, add the specific cases for UNDERVOLTAGE, OVERVOLTAGE, OPENWIRE
-            } else {
-                printf("DANGER\r\n");
-            }
-        }
-        
-    }
-
-    while(1);
 }
 
 // Task for this test
 void Task1(void *p_arg){
 	OS_CPU_SysTickInit(SystemCoreClock / (CPU_INT32U) OSCfg_TickRate_Hz);
 
-    RTOS_BPS_SemCreate(&Fault_Sem4, "Fault/Tripped Semaphore", 0);
-
-    test();
+    while (1) {
+        test();
+        BSP_Light_Toggle(RUN);
+    }
 }
 
 // Similar to the production code main. Does not check watchdog or mess with contactor 
