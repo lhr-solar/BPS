@@ -31,7 +31,7 @@ void BSP_SPI_Init(spi_port_t port, bsp_os_t *spi_os, bool baremetal) {
  * @param   txLen   length of data array.
  * @return  None
  */
-bool BSP_SPI_Write(spi_port_t port, uint8_t *txBuf, uint32_t txLen) {
+ErrorStatus BSP_SPI_Write(spi_port_t port, uint8_t *txBuf, uint32_t txLen) {
     char* spi = port ? "SPI3 LTC2315" : "SPI LTC6811";
     char* msg;
     if(!initialized) {
@@ -40,7 +40,7 @@ bool BSP_SPI_Write(spi_port_t port, uint8_t *txBuf, uint32_t txLen) {
         free(msg);
         Fault_BitMap |= Fault_CRC;
         EnterFaultState();
-        return false;
+        return ERROR;
     }
     char* data;
     memcpy(&data, txBuf, txLen);
@@ -51,7 +51,7 @@ bool BSP_SPI_Write(spi_port_t port, uint8_t *txBuf, uint32_t txLen) {
     strcat(msg, "}\n");
     Simulator_Log(LOG_INFO, msg);
     free(msg);
-    return true;
+    return SUCCESS;
 }
 
 /**
@@ -64,7 +64,7 @@ bool BSP_SPI_Write(spi_port_t port, uint8_t *txBuf, uint32_t txLen) {
  * @param   rxLen   length of data array.
  * @return  None
  */
-bool BSP_SPI_Read(spi_port_t port, uint8_t *rxBuf, uint32_t rxLen) {
+ErrorStatus BSP_SPI_Read(spi_port_t port, uint8_t *rxBuf, uint32_t rxLen) {
     char* spi = port ? "SPI3 LTC2315" : "SPI LTC6811";
     char* msg;
     if(!initialized) {
@@ -73,12 +73,12 @@ bool BSP_SPI_Read(spi_port_t port, uint8_t *rxBuf, uint32_t rxLen) {
         free(msg);
         Fault_BitMap |= Fault_CRC;
         EnterFaultState();
-        return false;
+        return ERROR;
     }
     asprintf(&msg, "%s {read}\n", spi);
     Simulator_Log(LOG_INFO, msg);
     free(msg);
-    return true;
+    return SUCCESS;
 }
 
 /**
