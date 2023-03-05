@@ -281,7 +281,7 @@ void BSP_SPI_SetClock(spi_speed_t speed) {
  * @param   port    the SPI port to write to
  * @param   txBuf   data array that contains the data to be sent.
  * @param   txLen   length of data array.
- * @return  false for fail, true for success
+ * @return  ERROR on fail, SUCCESS on successful write
  */
 ErrorStatus BSP_SPI_Write(spi_port_t port, uint8_t *txBuf, uint32_t txLen) {
 	// If we're below an experimentally-determined value, just use polling
@@ -317,7 +317,7 @@ ErrorStatus BSP_SPI_Write(spi_port_t port, uint8_t *txBuf, uint32_t txLen) {
  * @param   port    the SPI port to read from
  * @param   rxBuf   data array to store the data that is received.
  * @param   rxLen   length of data array.
- * @return  false for fail, true for success
+ * @return  ERROR on fail, SUCCESS on successful write
  */
 ErrorStatus BSP_SPI_Read(spi_port_t port, uint8_t *rxBuf, uint32_t rxLen) {
 	// bool first = true;

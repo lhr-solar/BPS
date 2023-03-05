@@ -29,7 +29,7 @@ void BSP_SPI_Init(spi_port_t port, bsp_os_t *spi_os, bool baremetal) {
  * @param   port    the SPI port to write to
  * @param   txBuf   data array that contains the data to be sent.
  * @param   txLen   length of data array.
- * @return  None
+ * @return  ERROR on fail, SUCCESS on successful write
  */
 ErrorStatus BSP_SPI_Write(spi_port_t port, uint8_t *txBuf, uint32_t txLen) {
     char* spi = port ? "SPI3 LTC2315" : "SPI LTC6811";
@@ -62,7 +62,7 @@ ErrorStatus BSP_SPI_Write(spi_port_t port, uint8_t *txBuf, uint32_t txLen) {
  * @note    Blocking statement
  * @param   rxBuf   data array to store the data that is received.
  * @param   rxLen   length of data array.
- * @return  None
+ * @return  ERROR on fail, SUCCESS on successful write
  */
 ErrorStatus BSP_SPI_Read(spi_port_t port, uint8_t *rxBuf, uint32_t rxLen) {
     char* spi = port ? "SPI3 LTC2315" : "SPI LTC6811";
