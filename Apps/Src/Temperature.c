@@ -15,8 +15,6 @@
 // if you change this, you also need to change the calls to median()
 #define TEMPERATURE_MEDIAN_FILTER_DEPTH 3
 
-void BSP_PLL_delay_u(uint16_t micro);
-
 // median filter for temperature values
 static int32_t medianFilterIdx = TEMPERATURE_MEDIAN_FILTER_DEPTH - 1;
 static int32_t rawTemperatures[NUM_MINIONS][MAX_TEMP_SENSORS_PER_MINION_BOARD][TEMPERATURE_MEDIAN_FILTER_DEPTH];
