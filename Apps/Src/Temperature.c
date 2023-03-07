@@ -162,7 +162,7 @@ ErrorStatus Temperature_ChannelConfig(uint8_t tempChannel) {
     // Send data
     wakeup_sleep(NUM_MINIONS);
     LTC6811_wrcomm(NUM_MINIONS, Minions);
-    BSP_PLL_delay_u(200);
+    BSP_PLL_DelayU(200);
     LTC6811_stcomm();
 
     for (int board = 0; board < NUM_MINIONS; board++) {
