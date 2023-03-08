@@ -184,7 +184,7 @@ ErrorStatus Temperature_ChannelConfig(uint8_t tempChannel) {
 
     // Send data
     LTC6811_wrcomm(NUM_MINIONS, Minions);
-    BSP_PLL_delay_u(200); //TODO: Should replace these with OS Time Delay Function
+    BSP_PLL_DelayU(200); //TODO: Should replace these with OS Time Delay Function
     LTC6811_stcomm();
     //release mutex
       RTOS_BPS_MutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE);
