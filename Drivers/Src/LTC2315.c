@@ -74,7 +74,10 @@ uint16_t LTC2315_Read() {
     // Note: if this is ever changed to send more than 8bytes, we should make
     // sure BSP_SPI_Read() does not call the scheduler or the OS will error out
     // since the scheduler is locked
-    BSP_SPI_Read(spi_ltc2315, rxdata, 2);
+    if (BSP_SPI_Read(spi_ltc2315, rxdata, 2) == ERROR){
+        Fault_BitMap |= Fault_CRC;
+        EnterFaultState();
+    }
     BSP_SPI_SetStateCS(spi_ltc2315, 1);
 
     OSSchedUnlock(&err);

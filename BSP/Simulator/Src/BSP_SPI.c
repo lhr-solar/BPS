@@ -40,6 +40,8 @@ ErrorStatus BSP_SPI_Write(spi_port_t port, uint8_t *txBuf, uint32_t txLen) {
         free(msg);
         Fault_BitMap |= Fault_CRC;
         EnterFaultState();
+    }
+    if(port >= NUM_SPI_BUSSES) {
         return ERROR;
     }
     char* data;
@@ -73,6 +75,8 @@ ErrorStatus BSP_SPI_Read(spi_port_t port, uint8_t *rxBuf, uint32_t rxLen) {
         free(msg);
         Fault_BitMap |= Fault_CRC;
         EnterFaultState();
+    }
+    if(port >= NUM_SPI_BUSSES) {
         return ERROR;
     }
     asprintf(&msg, "%s {read}\n", spi);

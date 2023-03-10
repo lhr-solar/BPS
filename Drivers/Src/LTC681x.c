@@ -50,26 +50,28 @@ Copyright 2017 Linear Technology Corp. (LTC)
 
 static uint8_t spi_read8(void){
   uint8_t data = 0;
-  BSP_SPI_Read(spi_ltc6811, &data, 1);
+  if (BSP_SPI_Read(spi_ltc6811, &data, 1) == ERROR) {
+    Fault_BitMap |= Fault_CRC;
+    EnterFaultState();
+  }
 	return data;
 }
 
 static ErrorStatus spi_write_multi8(uint8_t *txBuf, uint32_t txSize){
-  ErrorStatus status = BSP_SPI_Write(spi_ltc6811, txBuf, txSize);
-  if(status==false){
+  if (BSP_SPI_Write(spi_ltc6811, txBuf, txSize) == ERROR){
     Fault_BitMap |= Fault_CRC;
     EnterFaultState();
   }
-	return status;
+	return SUCCESS;
 }
 
 static ErrorStatus spi_write_read_multi8(uint8_t *txBuf, uint32_t txSize, uint8_t *rxBuf, uint32_t rxSize){
-  ErrorStatus status = BSP_SPI_Write(spi_ltc6811, txBuf, txSize) && BSP_SPI_Read(spi_ltc6811, rxBuf, rxSize); //return a fail if either one fails
-  if(status==false){
+  if ((BSP_SPI_Write(spi_ltc6811, txBuf, txSize) && BSP_SPI_Read(spi_ltc6811, rxBuf, rxSize)) == ERROR){
     Fault_BitMap |= Fault_CRC;
     EnterFaultState();
   }
-	return status;}
+	return SUCCESS;
+}
 
 static void cs_set(uint8_t state){
 	BSP_SPI_SetStateCS(spi_ltc6811, state);
