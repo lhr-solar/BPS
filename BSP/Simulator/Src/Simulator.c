@@ -40,6 +40,8 @@ static uint16_t DUMMY_VOLTAGES[NUM_BATTERY_MODULES] = {[0 ... NUM_BATTERY_MODULE
 // units in mC, but config.h uses 45,000 as 45.00C, so we'll bump these up to 30k for 30C
 static uint16_t DUMMY_TEMPS[NUM_TEMPERATURE_SENSORS] = {[0 ... NUM_TEMPERATURE_SENSORS - 1] = 30000};
 
+extern bool killSwitchLockdown;
+
 // LUT which corresponds Logging Level type to string to print out in LogFile
 //When Logging data that should be parsed, data should be enclosed in {}
 static const char* LoggingLUT[LOG_NUM_LEVELS] = {
@@ -129,6 +131,8 @@ static void readInputFile(char *jsonPath) {
         cJSON* currentObj = cJSON_GetObjectItem(state, "current");
         cJSON* charge = cJSON_GetObjectItem(state, "charge");
         cJSON* canList = cJSON_GetObjectItem(state, "can");
+        // Kill switch.
+        cJSON* killSwitch = cJSON_GetObjectItem(state, "kill_switch");
     
         // Check which state fields aren't present in the current sim state JSON.
         // Lots of nasty if/else's here, not much way around this.
@@ -197,6 +201,12 @@ static void readInputFile(char *jsonPath) {
                     printf("Error: CAN message read/write type invalid! [%s]\n", read_write);
                     exit(-1);
                 }
+            }
+        }
+        if (killSwitch) {
+            if (strcmp(killSwitch->valuestring, "yes") == 0) { // if "kill_switch": "yes",
+                // kill switch will set contactors off.
+                killSwitchLockdown = true;
             }
         }
         stateCount++; // keep track of which state we are on.
