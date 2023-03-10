@@ -34,6 +34,7 @@ jobs:
         sudo bash Validation/test.sh overtemp_discharging.json
         sudo bash Validation/test.sh overvolt.json
         sudo bash Validation/test.sh undervolt.json
+        sudo bash Validation/test.sh killswitch.json
         echo -e "End of Manual Tests \n\n"
         sudo bash Validation/automatedTest.sh
     # add more tests here

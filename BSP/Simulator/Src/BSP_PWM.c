@@ -8,6 +8,7 @@
 
 static bool initialized = false;
 static uint32_t pinSpeeds[] = {0, 0, 0, 0, 0};
+bool killSwitchLockdown = false;
 
 /**
  * @brief   Sets up contactor and fan pin timers for outputting PWM signals
@@ -42,6 +43,10 @@ ErrorStatus BSP_PWM_Set(uint8_t pin, uint32_t speed){
         speed = 4000;
     }
     
+    if (killSwitchLockdown == true && pin >= 3) {
+        speed = 0;
+    }
+
     char *cont = (pin == 3) ? "{CFAN}" : "{C1}";
     char *status = (speed == 0) ? "{disabled}" : "{enabled}";
 
