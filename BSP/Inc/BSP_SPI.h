@@ -5,6 +5,7 @@
 
 #include "common.h"
 #include "BSP_OS.h"
+#include "config.h"
 
 /**
  * @note    This is for the RTOS version of the BPS 
@@ -45,9 +46,9 @@ void BSP_SPI_SetClock(spi_speed_t speed);
  * @param   port    the SPI port to write to
  * @param   txBuf   data array that contains the data to be sent.
  * @param   txLen   length of data array.
- * @return  None
+ * @return  ERROR on fail, SUCCESS on successful write
  */
-void BSP_SPI_Write(spi_port_t port, uint8_t *txBuf, uint32_t txLen);
+ErrorStatus BSP_SPI_Write(spi_port_t port, uint8_t *txBuf, uint32_t txLen);
 
 /**
  * @brief   Gets the data from SPI. With the way the LTC6811 communication works, the LTC6811 will 
@@ -57,9 +58,9 @@ void BSP_SPI_Write(spi_port_t port, uint8_t *txBuf, uint32_t txLen);
  * @param   port    the SPI port to read from
  * @param   rxBuf   data array to store the data that is received.
  * @param   rxLen   length of data array.
- * @return  None
+ * @return  ERROR on fail, SUCCESS on successful write
  */
-void BSP_SPI_Read(spi_port_t port, uint8_t *rxBuf, uint32_t rxLen);
+ErrorStatus BSP_SPI_Read(spi_port_t port, uint8_t *rxBuf, uint32_t rxLen);
 
 /**
  * @brief   Sets the state of the chip select output pin. Set the state to low/0 to notify the 
