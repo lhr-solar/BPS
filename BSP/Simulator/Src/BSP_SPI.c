@@ -29,9 +29,9 @@ void BSP_SPI_Init(spi_port_t port, bsp_os_t *spi_os, bool baremetal) {
  * @param   port    the SPI port to write to
  * @param   txBuf   data array that contains the data to be sent.
  * @param   txLen   length of data array.
- * @return  None
+ * @return  ERROR on fail, SUCCESS on successful write
  */
-void BSP_SPI_Write(spi_port_t port, uint8_t *txBuf, uint32_t txLen) {
+ErrorStatus BSP_SPI_Write(spi_port_t port, uint8_t *txBuf, uint32_t txLen) {
     char* spi = port ? "SPI3 LTC2315" : "SPI LTC6811";
     char* msg;
     if(!initialized) {
@@ -40,6 +40,9 @@ void BSP_SPI_Write(spi_port_t port, uint8_t *txBuf, uint32_t txLen) {
         free(msg);
         Fault_BitMap |= Fault_CRC;
         EnterFaultState();
+    }
+    if(port >= NUM_SPI_BUSSES) {
+        return ERROR;
     }
     char* data;
     memcpy(&data, txBuf, txLen);
@@ -50,6 +53,7 @@ void BSP_SPI_Write(spi_port_t port, uint8_t *txBuf, uint32_t txLen) {
     strcat(msg, "}\n");
     Simulator_Log(LOG_INFO, msg);
     free(msg);
+    return SUCCESS;
 }
 
 /**
@@ -60,9 +64,9 @@ void BSP_SPI_Write(spi_port_t port, uint8_t *txBuf, uint32_t txLen) {
  * @note    Blocking statement
  * @param   rxBuf   data array to store the data that is received.
  * @param   rxLen   length of data array.
- * @return  None
+ * @return  ERROR on fail, SUCCESS on successful write
  */
-void BSP_SPI_Read(spi_port_t port, uint8_t *rxBuf, uint32_t rxLen) {
+ErrorStatus BSP_SPI_Read(spi_port_t port, uint8_t *rxBuf, uint32_t rxLen) {
     char* spi = port ? "SPI3 LTC2315" : "SPI LTC6811";
     char* msg;
     if(!initialized) {
@@ -72,9 +76,13 @@ void BSP_SPI_Read(spi_port_t port, uint8_t *rxBuf, uint32_t rxLen) {
         Fault_BitMap |= Fault_CRC;
         EnterFaultState();
     }
+    if(port >= NUM_SPI_BUSSES) {
+        return ERROR;
+    }
     asprintf(&msg, "%s {read}\n", spi);
     Simulator_Log(LOG_INFO, msg);
     free(msg);
+    return SUCCESS;
 }
 
 /**
