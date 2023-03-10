@@ -104,13 +104,12 @@ void LTC6811_Post(void) {
 
 void LTC6811_Init(cell_asic *battMod){
   //only create the mutex the first time this function is called (called by Voltage_Init() and Temperature_Init())
-  // guard against initializing multiple times
-  static bool initialized = false;
-  if (initialized) return;
-  initialized = true;
-
-  RTOS_BPS_MutexCreate(&MinionsASIC_Mutex, "Minions ASIC Mutex");
-  RTOS_BPS_SemCreate(&MinionsIO_Sem4, "Minions Sem4", 0);
+  static bool mutexExists = false;
+  if (mutexExists == false){
+    RTOS_BPS_MutexCreate(&MinionsASIC_Mutex, "Minions ASIC Mutex");
+    RTOS_BPS_SemCreate(&MinionsIO_Sem4, "Minions Sem4", 0);
+    mutexExists = true;
+  }
 
   spi_os.pend = LTC6811_Pend;
   spi_os.post = LTC6811_Post;
@@ -129,15 +128,14 @@ void LTC6811_rdcv_safe(uint8_t reg, // Controls which cell voltage register is r
                     )
 {
   uint8_t count = 0;
-  uint8_t status;
-  do {
-    status = LTC681x_rdcv(reg, total_ic, ic);
-    count++;
-    if (count == MAX_PEC_ERRORS) {
+  while(LTC681x_rdcv(reg,total_ic,ic) == -1){
+    if(count == MAX_PEC_ERRORS){
+      //trip BPS
       Fault_BitMap |= Fault_CRC;
       EnterFaultState();
     }
-  } while (status == -1);
+    count++;
+  }
 }
 
 /*
