@@ -15,8 +15,6 @@
 // if you change this, you also need to change the calls to median()
 #define TEMPERATURE_MEDIAN_FILTER_DEPTH 3
 
-void delay_u(uint16_t micro);
-
 // median filter for temperature values
 static int32_t medianFilterIdx = TEMPERATURE_MEDIAN_FILTER_DEPTH - 1;
 static int32_t rawTemperatures[NUM_MINIONS][MAX_TEMP_SENSORS_PER_MINION_BOARD][TEMPERATURE_MEDIAN_FILTER_DEPTH];
@@ -164,7 +162,7 @@ ErrorStatus Temperature_ChannelConfig(uint8_t tempChannel) {
     // Send data
     wakeup_sleep(NUM_MINIONS);
     LTC6811_wrcomm(NUM_MINIONS, Minions);
-    delay_u(200);
+    BSP_PLL_DelayU(200);
     LTC6811_stcomm();
 
     for (int board = 0; board < NUM_MINIONS; board++) {
@@ -186,7 +184,7 @@ ErrorStatus Temperature_ChannelConfig(uint8_t tempChannel) {
 
     // Send data
     LTC6811_wrcomm(NUM_MINIONS, Minions);
-    delay_u(200); //TODO: Should replace these with OS Time Delay Function
+    BSP_PLL_DelayU(200); //TODO: Should replace these with OS Time Delay Function
     LTC6811_stcomm();
     //release mutex
       RTOS_BPS_MutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE);
