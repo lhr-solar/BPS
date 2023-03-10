@@ -270,7 +270,7 @@ Usage
 Additional Considerations
     ``TEMP_ERR_OUT_BOUNDS`` was chosen to be it's current value because it is an impossibly high temperature that is returned
     as an error code. The temperature sensors can never read this value using the LMT87, it will cause an OVOLT fault, and is
-    a good debugging tool. ``delay_u()`` was used due to timing issues with the LTC. ``Temperature_ChannelConfig`` is called
+    a good debugging tool. Delays were also used due to timing issues with the LTC. ``Temperature_ChannelConfig`` is called
     twice whenever channel 1 of a mux is initalized due to the start up time of enabling the mux from a powered off state.
     
 
