@@ -10,16 +10,6 @@ void Task_CheckContactor(void *p_arg) {
     
     CANMSG_t CanMsg = {.payload = {.idx = 0, .data.b = 1}};
 
-    // launch watchdog task
-    RTOS_BPS_TaskCreate(&PetWDog_TCB,              // TCB
-                "TASK_PETWDOG_PRIO",        // Task Name (String)
-                Task_PetWDog,               // Task function pointer
-                (void *)0,                  // Task function args
-                TASK_PETWDOG_PRIO,          // Priority
-                PetWDog_Stk,                // Stack
-                TASK_PETWDOG_STACK_SIZE
-                );
-
     // If a contactor is on before we turn it on in this task, it may have failed and welded closed
     if (Contactor_GetState(HVHIGH_CONTACTOR) || Contactor_GetState(HVLOW_CONTACTOR)) {
         Fault_BitMap |= Fault_ESTOP;
