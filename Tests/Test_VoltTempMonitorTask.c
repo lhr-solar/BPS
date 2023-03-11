@@ -98,7 +98,6 @@ void Task1(void *p_arg){
 void Task2(void *p_arg){
 
     RTOS_BPS_SemPost(&SafetyCheck_Sem4, OS_OPT_POST_1); //Set semaphore once since Amperes Task doesn't run
-    RTOS_BPS_SemPost(&SafetyCheck_Sem4, OS_OPT_POST_1); //Set semaphore once since Battery Balancing Task doesn't run
 
     while(1){
         RTOS_BPS_MutexPend(&WDog_Mutex, OS_OPT_PEND_BLOCKING);

@@ -3,12 +3,14 @@
 #include "common.h"
 #include "config.h"
 #include "Temperature.h"
+#include "BSP_WDTimer.h"
+#include "stm32f4xx.h"
 #include "Voltage.h"
 #include "BSP_UART.h"
 #include "Tasks.h"
 #include "BSP_PLL.h"
-#include "stm32f4xx.h"
 #include "BSP_SPI.h"
+#include "BSP_Lights.h"
 
 /******************************************************************************
  * Temperature App Test Plan
@@ -41,6 +43,10 @@
  * 
  *****************************************************************************/
 
+void foo(void){
+    return;
+}
+
 // Task1
 OS_TCB Task1_TCB;
 CPU_STK Task1_Stk[DEFAULT_STACK_SIZE];
@@ -48,8 +54,6 @@ CPU_STK Task1_Stk[DEFAULT_STACK_SIZE];
 cell_asic minions[NUM_MINIONS];
 
 void test(void) {
-    BSP_UART_Init(NULL, NULL, UART_USB);    // Initialize printf
-
     Temperature_Init(minions);
 
     printf("Testing Temperature functions in loop.\r\n");
@@ -57,6 +61,7 @@ void test(void) {
     uint8_t isCharging = 0;
 
     while(1) {
+        BSP_Light_Toggle(RUN);
         printf("All good!\r");
         //uint8_t data[] = {0x2C, 0x3D, 0xFF, 0xFF, 0xFF, 0xFF};
         //uint16_t pec = pec15_calc(6, data);
@@ -94,7 +99,15 @@ void Task1(void *p_arg){
 // Similar to the production code main. Does not check watchdog or mess with contactor 
 int main(void) {
     OS_ERR err;
+
+    if (BSP_WDTimer_DidSystemReset()) {
+        Fault_BitMap = Fault_WDOG;
+        EnterFaultState();
+    }
+
     BSP_PLL_Init();
+    BSP_UART_Init(foo, foo, UART_USB);    // Initialize printf
+    BSP_Lights_Init();
 
     OSInit(&err);
     assertOSError(err);

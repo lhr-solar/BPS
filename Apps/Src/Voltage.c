@@ -90,17 +90,11 @@ void Voltage_UpdateMeasurements(void){
     LTC6811_rdcv_safe(0, NUM_MINIONS, Minions); // Set to read back all cell voltage registers
     //copies values from cells.c_codes to private array
 
-    printf("Updated Voltage Measurements\n\r");
     // package raw voltage values into single array
     for(uint8_t i = 0; i < NUM_BATTERY_MODULES; i++){
         rawVoltages[i] = Minions[i / MAX_VOLT_SENSORS_PER_MINION_BOARD].cells.c_codes[i % MAX_VOLT_SENSORS_PER_MINION_BOARD];
     }
-    for (uint8_t i = 0; i < NUM_MINIONS; i++){
-        printf("Minion %d:\n\r", i);
-        for (uint8_t j = 0; j < MAX_VOLT_SENSORS_PER_MINION_BOARD; j++) {
-            printf("J: %d, Val: %d\n\r", j, Minions[i].cells.c_codes[j]);
-        }
-    }
+
     // release minions asic mutex
     RTOS_BPS_MutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE);
 #else
