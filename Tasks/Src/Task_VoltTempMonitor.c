@@ -61,10 +61,10 @@ void Task_VoltTempMonitor(void *p_arg) {
         
         // BLOCKING =====================
         // Check if open wire is NOT safe:
-	
-	    // TODO: get OpenWire to not take forever and actually run this
+    
+        // TODO: get OpenWire to not take forever and actually run this
         // SafetyStatus wireStatus = Voltage_OpenWire();
-	    SafetyStatus wireStatus = SAFE;
+        SafetyStatus wireStatus = SAFE;
         
         if(wireStatus != SAFE) {
             Fault_BitMap = Fault_OW;
