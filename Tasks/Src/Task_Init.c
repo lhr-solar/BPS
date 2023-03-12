@@ -93,7 +93,6 @@ void Task_Init(void *p_arg) {
             CLI_Stk,				            // Stack
             TASK_CLI_STACK_SIZE,		        // Stack size
             );
-    assertOSError(err);
     */
     //10
     RTOS_BPS_TaskCreate(&Idle_TCB,				// TCB

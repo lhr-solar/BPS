@@ -76,8 +76,8 @@ void Temperature_Init(cell_asic *boards){
 #ifndef SIMULATION
     // Record pointer
     Minions = boards;
-    LTC6811_Init(Minions); // Initialize peripherals
     wakeup_sleep(NUM_MINIONS);
+    LTC6811_Init(Minions); // Initialize peripherals
 
     RTOS_BPS_MutexPend(&MinionsASIC_Mutex, OS_OPT_PEND_BLOCKING);
     LTC6811_wrcfg(NUM_MINIONS, Minions); // Write Configuration Register
@@ -223,8 +223,9 @@ ErrorStatus Temperature_UpdateSingleChannel(uint8_t channel){
     // Sample ADC channel
     Temperature_SampleADC(MD_422HZ_1KHZ);
 
-    // update the median filter
+#ifndef SIMULATION
     RTOS_BPS_MutexPend(&MinionsASIC_Mutex, OS_OPT_PEND_BLOCKING);
+#endif
     // Convert to Celsius
     for(int board = 0; board < NUM_MINIONS; board++) {
         // update adc value from GPIO1 stored in a_codes[0]; 
@@ -237,8 +238,9 @@ ErrorStatus Temperature_UpdateSingleChannel(uint8_t channel){
         }
 #endif
     }
+#ifndef SIMULATION
     RTOS_BPS_MutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE);
-
+#endif
     // increment the median filter index
     medianFilterIdx = (medianFilterIdx + 1) % TEMPERATURE_MEDIAN_FILTER_DEPTH;
 
