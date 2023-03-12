@@ -19,4 +19,18 @@ void BSP_PLL_Init(void);
  */
 uint32_t BSP_PLL_GetSystemClock(void);
 
+/**
+ * @brief   Delays in param milli seconds
+ * @param   # of milliseconds to delay
+ * @return  None
+*/
+void BSP_PLL_DelayM(uint32_t milli);
+
+/**
+ * @brief   Delays in param micro seconds
+ * @param   # of microseconds to delay
+ * @return  None
+*/
+void BSP_PLL_DelayU(uint32_t micro);
+
 #endif

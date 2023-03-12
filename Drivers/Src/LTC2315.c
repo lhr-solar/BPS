@@ -11,22 +11,15 @@ static int32_t offset;
 
 // Helper functions copied from LTC681x.c
 
-static void LTC2315_delay_u(uint16_t micro) {
-    uint32_t delay = BSP_PLL_GetSystemClock() / 1000000;
-	for(volatile uint32_t i = 0; i < micro; i++) {
-		for(volatile uint32_t j = 0; j < delay; j++);
-	}
-}
-
 /* Pulse CS
  * 2 pulses to go into nap mode,
  * 4 pulses to go into sleep mode.
  */
 static void LTC2315_cs_pulse(){
     BSP_SPI_SetStateCS(spi_ltc2315, 0);
-    LTC2315_delay_u(16);
+    BSP_PLL_DelayU(16);
     BSP_SPI_SetStateCS(spi_ltc2315, 1);
-    LTC2315_delay_u(16);
+    BSP_PLL_DelayU(16);
 }
 
 /* Wake isoSPI from sleep
@@ -34,9 +27,9 @@ static void LTC2315_cs_pulse(){
 static void LTC2315_wakeup_sleep()
 {
     BSP_SPI_SetStateCS(spi_ltc2315, 0);
-    LTC2315_delay_u(500); // Guarantees that isoSPI is awake
+    BSP_PLL_DelayU(500); // Guarantees that isoSPI is awake
     BSP_SPI_SetStateCS(spi_ltc2315, 1);
-    LTC2315_delay_u(150);
+    BSP_PLL_DelayU(150);
 }
 
 /* Initialize communication LTC2315
@@ -74,7 +67,10 @@ uint16_t LTC2315_Read() {
     // Note: if this is ever changed to send more than 8bytes, we should make
     // sure BSP_SPI_Read() does not call the scheduler or the OS will error out
     // since the scheduler is locked
-    BSP_SPI_Read(spi_ltc2315, rxdata, 2);
+    if (BSP_SPI_Read(spi_ltc2315, rxdata, 2) == ERROR){
+        Fault_BitMap |= Fault_CRC;
+        EnterFaultState();
+    }
     BSP_SPI_SetStateCS(spi_ltc2315, 1);
 
     OSSchedUnlock(&err);

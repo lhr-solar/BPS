@@ -46,42 +46,35 @@ Copyright 2017 Linear Technology Corp. (LTC)
 #include "BSP_SPI.h"
 #include "BSP_PLL.h"
 #include "config.h"
+#include "Tasks.h"
 
 static uint8_t spi_read8(void){
   uint8_t data = 0;
-  BSP_SPI_Read(spi_ltc6811, &data, 1);
+  if (BSP_SPI_Read(spi_ltc6811, &data, 1) == ERROR) {
+    Fault_BitMap |= Fault_CRC;
+    EnterFaultState();
+  }
 	return data;
 }
 
-static void spi_write_multi8(uint8_t *txBuf, uint32_t txSize){
-	BSP_SPI_Write(spi_ltc6811, txBuf, txSize);
+static ErrorStatus spi_write_multi8(uint8_t *txBuf, uint32_t txSize){
+  if (BSP_SPI_Write(spi_ltc6811, txBuf, txSize) == ERROR){
+    Fault_BitMap |= Fault_CRC;
+    EnterFaultState();
+  }
+	return SUCCESS;
 }
 
-static void spi_write_read_multi8(uint8_t *txBuf, uint32_t txSize, uint8_t *rxBuf, uint32_t rxSize){
-  BSP_SPI_Write(spi_ltc6811, txBuf, txSize);
-  BSP_SPI_Read(spi_ltc6811, rxBuf, rxSize);
+static ErrorStatus spi_write_read_multi8(uint8_t *txBuf, uint32_t txSize, uint8_t *rxBuf, uint32_t rxSize){
+  if ((BSP_SPI_Write(spi_ltc6811, txBuf, txSize) && BSP_SPI_Read(spi_ltc6811, rxBuf, rxSize)) == ERROR){
+    Fault_BitMap |= Fault_CRC;
+    EnterFaultState();
+  }
+	return SUCCESS;
 }
 
 static void cs_set(uint8_t state){
 	BSP_SPI_SetStateCS(spi_ltc6811, state);
-}
-
-void delay_u(uint16_t micro)
-{
-  uint32_t delay = BSP_PLL_GetSystemClock() / 1000000;
-	for (volatile uint32_t i = 0; i < micro; i++)
-	{
-		for (volatile uint32_t j = 0; j < delay; j++);
-	}
-}
-
-void delay_m(uint16_t milli)
-{
-  uint32_t delay = BSP_PLL_GetSystemClock() / 1000;
-	for (volatile uint32_t i = 0; i < milli; i++)
-	{
-		for (volatile uint32_t j = 0; j < delay; j++);
-	}
 }
 
 void wakeup_idle(uint8_t total_ic)
@@ -89,7 +82,7 @@ void wakeup_idle(uint8_t total_ic)
   for (int i =0; i<total_ic; i++)
   {
     cs_set(0);
-    delay_m(5); //Guarantees the isoSPI will be in ready mode
+    BSP_PLL_DelayM(5); //Guarantees the isoSPI will be in ready mode
     spi_read8();
     cs_set(1);
   }
@@ -101,9 +94,9 @@ void wakeup_sleep(uint8_t total_ic)
   for (int i =0; i<total_ic; i++)
   {
     cs_set(0);
-    delay_u(500); // Guarantees the LTC6813 will be in standby
+    BSP_PLL_DelayU(500); // Guarantees the LTC6813 will be in standby
     cs_set(1);
-    delay_u(150);
+    BSP_PLL_DelayU(150);
   }
 }
 
@@ -1196,7 +1189,7 @@ int16_t LTC681x_run_cell_adc_st(uint8_t adc_reg,uint8_t total_ic, cell_asic ic[]
         LTC681x_clraux();
         LTC681x_axst(2,self_test);
         LTC681x_pollAdc();
-        delay_m(10);
+        BSP_PLL_DelayM(10);
         wakeup_idle(total_ic);
         LTC681x_rdaux(0, total_ic,ic);
         for (int cic = 0; cic < total_ic; cic++)
