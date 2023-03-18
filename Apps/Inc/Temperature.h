@@ -24,6 +24,13 @@
 
 #define TEMP_ERR_OUT_BOUNDS 42424242
 
+//TODO: tune PID with actual pack and fans, and then change values below to appropiate value
+#define TEMPERATURE_PID_PROPORTIONAL 2
+#define TEMPERATURE_PID_INTEGRAL 250
+#define TEMPERATURE_PID_I_ZONE 3000
+#define TEMPERATURE_PID_I_MAX_ACCUM 500000
+#define TEMPERATURE_PID_MILICELCIUS_CONVERT 1000
+
 /** Temperature_Init
  * Initializes device drivers including SPI inside LTC6811_init and LTC6811 for Temperature Monitoring
  * @param boards LTC6811 data structure that contains the values of each register

@@ -8,6 +8,7 @@
 #include "Tasks.h"
 #include "VoltageToTemp.h"
 #include "BSP_PLL.h"
+#include "Fans.h"
 #ifdef SIMULATION
 #include "Simulator.h"
 #endif
@@ -41,13 +42,6 @@ static cell_asic *Minions;
 // keep track of which temperature channel we are using
 static uint8_t currentChannel = 0;
 #endif
-
-//TODO: tune PID with actual pack and fans, and then change values below to appropiate value
-#define PROPORTION 2
-#define INTEGRAL 250
-#define I_ZONE 3000
-#define I_MAX_ACCUM 500000
-#define MAX_FAN_SPEED 8
 
 // Variables to help with PID calculation
 static int32_t ErrorSum = 0;
@@ -424,37 +418,21 @@ int32_t Temperature_GetMaxTemperature(void) {
 int32_t Temperature_PID_Output(int32_t InputTemp, int32_t DesiredTemp) {
     Error = DesiredTemp - InputTemp;
 	
-	//Only read error sum in range
-	if(abs(Error) < I_ZONE){
-		ErrorSum += Error;
-	}else{
-		ErrorSum = 0;
-	}
+    //Only read error sum in range
+    ErrorSum += abs(Error) < TEMPERATURE_PID_I_ZONE ? Error : 0;
 
 	//Cap error sum at 500 read degrees
-	if(abs(ErrorSum) > I_MAX_ACCUM){
-		if(ErrorSum > 0){
-			ErrorSum = I_MAX_ACCUM;
-		}else{
-			ErrorSum = -I_MAX_ACCUM;
-		}
-	}
+    ErrorSum = abs(ErrorSum) > TEMPERATURE_PID_I_MAX_ACCUM ? ErrorSum > 0 ? TEMPERATURE_PID_I_MAX_ACCUM : -TEMPERATURE_PID_I_MAX_ACCUM : ErrorSum;
 
 	//5 is the estimated "hold output"
-	int32_t p_Output = ((-Error)/PROPORTION*1000) + 5; //Scale P-output to 0-8, Floor divide error by 1000
+	int32_t p_Output = ((-Error)/(TEMPERATURE_PID_PROPORTIONAL*TEMPERATURE_PID_MILICELCIUS_CONVERT)) + 5; //Scale P-output to 0-8, Floor divide error by 1000
 
-	//I output could totally fuck things up (and probably will on the first test), so disable it and make sure p is good first
+	//I output could totally fudge things up (and probably will on the first test), so disable it and make sure p is good first
 	//Keep I gains low or you'll get weird oscillation. abs(I output) should not currently exceed 2
-	int32_t i_Output = ((-ErrorSum)/INTEGRAL*1000);
+	int32_t i_Output = ((-ErrorSum)/(TEMPERATURE_PID_INTEGRAL*TEMPERATURE_PID_MILICELCIUS_CONVERT));
 
 	//Don't use D output
 	int32_t output = p_Output + i_Output;
-
-	if(output > MAX_FAN_SPEED){
-		return MAX_FAN_SPEED;
-	}else if(output < 0){
-		return 0;
-	}else{
-		return output;
-	}
+    output = output > TOPSPEED ? TOPSPEED : output < 0 ? 0 : output;
+    return output;
 }
