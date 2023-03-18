@@ -143,13 +143,11 @@ void EnterFaultState() {
     // TODO: create an interrupt-independent CAN interface, so we can use CAN from within a fault state
     // avoid infinite recursive faults, since our CAN Driver relies on the OS to work
     // also don't call CAN if the watchdog tripped, since CAN won't be initialized
-    
-    if ((Fault_BitMap & (Fault_OS | Fault_WDOG)) == 0) {
-        //Deinitialize CAN registers
-        CANbus_DeInit();
-        //Reinit CAN in fault state
-        CANbus_Init(false, true);
-    }
+
+    //Deinitialize CAN registers
+    CANbus_DeInit();
+    //Reinit CAN in fault state
+    CANbus_Init(false, true);
     
 
 #ifdef DEBUGMODE
