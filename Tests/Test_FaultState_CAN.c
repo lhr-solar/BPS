@@ -39,7 +39,7 @@ void Task2(void *p_arg){
     uint8_t message[8] = {0x01, 0x02,0x03,0x04,0x05,0x06,0x07,0x08};
   
     uint8_t length = 8;
-    BSP_CAN_Init(NULL, NULL, true);
+    BSP_CAN_Init(NULL, NULL, false, true);
    
     OS_ERR err;
 

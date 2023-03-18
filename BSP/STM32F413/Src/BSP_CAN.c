@@ -31,10 +31,11 @@ static void (*gTxEnd)(void);
  * @brief   Initializes the CAN module that communicates with the rest of the electrical system.
  * @param   rxEvent     : the function to execute when recieving a message. NULL for no action.
  * @param   txEnd       : the function to execute after transmitting a message. NULL for no action.
+ * @param   faultState  : if we should initialize CAN interrupts
  * @param   loopback    : if we should use loopback mode (for testing)
  * @return  None
  */
-void BSP_CAN_Init(callback_t rxEvent, callback_t txEnd, bool loopback) {
+void BSP_CAN_Init(callback_t rxEvent, callback_t txEnd, bool faultState, bool loopback) {
     GPIO_InitTypeDef GPIO_InitStructure;
     CAN_InitTypeDef CAN_InitStructure;
     NVIC_InitTypeDef NVIC_InitStructure;
@@ -115,7 +116,7 @@ void BSP_CAN_Init(callback_t rxEvent, callback_t txEnd, bool loopback) {
     gRxMessage.FMI = 0;
 
     /* Enable interrupts if in normal state */
-    if(!Fault_Flag){
+    if(!faultState){
         /* Enable FIFO 0 message pending Interrupt */
         CAN_ITConfig(CAN1, CAN_IT_FMP0, ENABLE);
 

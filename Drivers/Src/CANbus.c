@@ -48,10 +48,12 @@ void CANbus_Init(bool loopback, bool faultState) {
 		RTOS_BPS_MutexCreate(&CANbus_RxMutex, "CAN RX Lock");
 		RTOS_BPS_SemCreate(&CANbus_MailSem4, "CAN Mailbox Semaphore", 3); // # of mailboxes
 		RTOS_BPS_SemCreate(&CANbus_ReceiveSem4, "CAN Queue Counter Semaphore", 0);
+		// Initialize and pass interrupt hooks
+    	BSP_CAN_Init(CANbus_CountIncoming, CANbus_Release, faultState, loopback);
+	}else{
+		BSP_CAN_Init(NULL, NULL, faultState, loopback);
 	}
 
-	// Initialize and pass interrupt hooks
-    BSP_CAN_Init(CANbus_CountIncoming, CANbus_Release, loopback);
 }
 
 /**
@@ -153,11 +155,10 @@ static ErrorStatus CANbus_SendMsg_FaultState(CANId_t id, CANPayload_t payload) {
 			return ERROR;	// Do nothing if invalid
 	}
 
-	ErrorStatus retVal = BSP_CAN_Write(id, txdata, data_length);
-	// Write the data to the bus
-	while((retVal == ERROR)){
+	ErrorStatus retVal;
+	do{
 		retVal = BSP_CAN_Write(id, txdata, data_length);
-	}
+	} while(retVal != ERROR);
 
 	return retVal;
 }	
@@ -186,11 +187,7 @@ ErrorStatus CANbus_BlockAndSend(CANId_t id, CANPayload_t payload) {
  * @return  ERROR if error, SUCCESS otherwise
  */
 ErrorStatus CANbus_BlockAndSend_FaultState(CANId_t id, CANPayload_t payload) {
-	ErrorStatus result = SUCCESS;
-
-	result = CANbus_SendMsg_FaultState(id, payload);
-
-	return result;
+	return CANbus_SendMsg_FaultState(id, payload);
 }
 
 /**

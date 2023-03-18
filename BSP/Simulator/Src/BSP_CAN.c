@@ -12,18 +12,23 @@
 #include <unistd.h>
 
 static bool CAN_Initialized = false;
+static bool FaultState = false;
 // User parameters for CAN events
 static void (*gRxEvent)(void);
 static void (*gTxEnd)(void);
 
 /**
  * @brief   Initializes the CAN module that communicates with the rest of the electrical system.
- * @param   None
+ * @param   rxEvent     : the function to execute when recieving a message. NULL for no action.
+ * @param   txEnd       : the function to execute after transmitting a message. NULL for no action.
+ * @param   faultState  : if we should initialize CAN interrupts
+ * @param   loopback    : if we should use loopback mode (for testing)
  * @return  None
  */
-void BSP_CAN_Init(callback_t rxEvent, callback_t txEnd, bool loopback) {
+void BSP_CAN_Init(callback_t rxEvent, callback_t txEnd, bool faultState, bool loopback) {
     gTxEnd = txEnd;
     gRxEvent = rxEvent;
+    FaultState = faultState;
     CAN_Initialized = true;
     Simulator_Log(LOG_INFO, "CAN Initialized\n");
 }
@@ -33,6 +38,7 @@ void BSP_CAN_Init(callback_t rxEvent, callback_t txEnd, bool loopback) {
  * @return  None
  */
 void BSP_CAN_DeInit() {
+    CAN_Initialized = false;
     Simulator_Log(LOG_INFO, "CAN Deinitialized\n");
 }
 
