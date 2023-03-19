@@ -21,7 +21,7 @@ void Charge_Init(void){
 	// Grab from EEPROM what is the current Charge
 	charge = EEPROM_GetCharge();
 
-    BSP_Timer_Start();
+    BSP_Timer_Start_TickCounter();
 }
 
 /** Charge_Calculate
