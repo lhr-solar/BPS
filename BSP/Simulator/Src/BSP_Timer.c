@@ -21,11 +21,27 @@ void BSP_Timer_Init(void) {
 }
 
 /**
+ * @brief   Starts a one shot timer to execute a callback after a certain time
+ * 
+ * @param delay_us one shot time in microseconds
+ * @param callback callback to execute after `delay_us` time
+ */
+void BSP_Timer_Start_OneShot(uint32_t delay_us, callback_t callback) {
+    if (initialized) {
+        t = clock();
+        Simulator_Log(LOG_INFO, "One-shot timer started (pretend this triggers after some time)\n");
+    }
+    else {
+        Simulator_Log_Location(LOG_INFO,"Hard Fault: Initialize Timer before start\n");
+    }
+}
+
+/**
  * @brief   Starts the timer.
  * @param   None
  * @return  None
  */
-void BSP_Timer_Start(void) {
+void BSP_Timer_Start_TickCounter(void) {
     if (initialized) {
         t = clock();
         Simulator_Log(LOG_INFO,"Timer started\n");
