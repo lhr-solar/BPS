@@ -20,17 +20,6 @@ extern uint8_t stateCount;
 
 #define MESSAGE_BUFFER 20000
 
-//Copy of delay_u function for Fault State
-static void delay_u_faultState(uint32_t micro)
-{
-  uint32_t delay = BSP_PLL_GetSystemClock() / 1000000;
-  
-	for(volatile uint32_t i = 0; i < micro; i++)
-	{
-		for(volatile uint32_t j = 0; j < delay; j++);
-	}
-}
-
 /*
  * Note: do not call this directly if it can be helped.
  * Instead, call an RTOS function to unblock the mutex
@@ -163,17 +152,17 @@ void EnterFaultState() {
         CANPayload_t payload;
         payload.data.w = 1;
         CANbus_BlockAndSend_FaultState(TRIP, payload);
-        delay_u_faultState(MESSAGE_BUFFER);
+        BSP_PLL_DelayU(MESSAGE_BUFFER);
 
         //Send Contactor Readings
         payload.data.b = 0;
         CANbus_BlockAndSend_FaultState(CONTACTOR_STATE, payload);
-        delay_u_faultState(MESSAGE_BUFFER);
+        BSP_PLL_DelayU(MESSAGE_BUFFER);
         
         //Send Current Readings
         payload.data.w = Amps_GetReading();
         CANbus_BlockAndSend_FaultState(CURRENT_DATA, payload);
-        delay_u_faultState(MESSAGE_BUFFER);
+        BSP_PLL_DelayU(MESSAGE_BUFFER);
         
 
         //Send Voltage Readings
@@ -181,7 +170,7 @@ void EnterFaultState() {
             payload.idx = i;
             payload.data.w = Voltage_GetModuleMillivoltage(i);
             CANbus_BlockAndSend_FaultState(VOLT_DATA, payload);
-            delay_u_faultState(MESSAGE_BUFFER);
+            BSP_PLL_DelayU(MESSAGE_BUFFER);
         }
 
         //Send Temperature Readings
@@ -189,7 +178,7 @@ void EnterFaultState() {
             payload.idx = i;
             payload.data.w = Temperature_GetModuleTemperature(i);
             CANbus_BlockAndSend_FaultState(TEMP_DATA, payload);
-            delay_u_faultState(MESSAGE_BUFFER);
+            BSP_PLL_DelayU(MESSAGE_BUFFER);
         }
 
 #ifdef DEBUGMODE
