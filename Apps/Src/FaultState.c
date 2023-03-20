@@ -18,10 +18,13 @@
 extern uint8_t stateCount;
 #endif
 
+#define MESSAGE_BUFFER 20000
+
 //Copy of delay_u function for Fault State
 static void delay_u_faultState(uint32_t micro)
 {
   uint32_t delay = BSP_PLL_GetSystemClock() / 1000000;
+  
 	for(volatile uint32_t i = 0; i < micro; i++)
 	{
 		for(volatile uint32_t j = 0; j < delay; j++);
@@ -155,50 +158,38 @@ void EnterFaultState() {
 #endif
     BSP_WDTimer_Init(); //This is in case we did not pass check contactor and watchdog timer was not initialized
     BSP_WDTimer_Start(); 
-    uint8_t payload_idx;
     while(1) {
-        payload_idx = 0;
-        //Send Trip Message
+        //Send Trip Readings
         CANPayload_t payload;
-        payload.idx = payload_idx;
         payload.data.w = 1;
         CANbus_BlockAndSend_FaultState(TRIP, payload);
-        payload_idx++;
-        delay_u_faultState(20000);
+        delay_u_faultState(MESSAGE_BUFFER);
 
-        // contactor message
-        payload.idx = payload_idx;
+        //Send Contactor Readings
         payload.data.b = 0;
         CANbus_BlockAndSend_FaultState(CONTACTOR_STATE, payload);
-        payload_idx++;
-        delay_u_faultState(20000);
+        delay_u_faultState(MESSAGE_BUFFER);
         
         //Send Current Readings
-        payload.idx = payload_idx;
         payload.data.w = Amps_GetReading();
         CANbus_BlockAndSend_FaultState(CURRENT_DATA, payload);
-        payload_idx++;
-        delay_u_faultState(20000);
+        delay_u_faultState(MESSAGE_BUFFER);
         
 
         //Send Voltage Readings
         for (uint8_t i = 0; i < NUM_BATTERY_MODULES; i++){ //send all battery module voltage data
-            int voltage = Voltage_GetModuleMillivoltage(i);
-            payload.idx = payload_idx;
-            payload.data.w = voltage;
+            payload.idx = i;
+            payload.data.w = Voltage_GetModuleMillivoltage(i);
             CANbus_BlockAndSend_FaultState(VOLT_DATA, payload);
-            payload_idx++;
-            delay_u_faultState(20000);
+            delay_u_faultState(MESSAGE_BUFFER);
         }
 
-        delay_u_faultState(20000);
-        CANbus_BlockAndSend_FaultState(CURRENT_DATA, payload);
+        //Send Temperature Readings
         for (uint8_t i = 0; i < NUM_BATTERY_MODULES; i++){ //send all battery module temperature data
-            payload.idx = payload_idx;
+            payload.idx = i;
             payload.data.w = Temperature_GetModuleTemperature(i);
             CANbus_BlockAndSend_FaultState(TEMP_DATA, payload);
-            payload_idx++;
-            delay_u_faultState(20000);
+            delay_u_faultState(MESSAGE_BUFFER);
         }
 
 #ifdef DEBUGMODE

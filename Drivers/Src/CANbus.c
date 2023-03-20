@@ -37,7 +37,8 @@ static void CANbus_CountIncoming(void) {
 }
 
 /**
- * @brief   Initializes the CAN system
+ * @brief   Initializes the CAN system. If reinitializing for fault state, must
+ * deinitialize first.
  * @param   loopback	: if we should use loopback mode (for testing)	
  * @param 	faultState  : determines whether to implement Rx and Tx interrupts
  * @return  None
@@ -158,7 +159,7 @@ static ErrorStatus CANbus_SendMsg_FaultState(CANId_t id, CANPayload_t payload) {
 	ErrorStatus retVal;
 	do{
 		retVal = BSP_CAN_Write(id, txdata, data_length);
-	} while(retVal != ERROR);
+	} while(retVal == ERROR);
 
 	return retVal;
 }	
