@@ -118,7 +118,7 @@ static ErrorStatus CANbus_SendMsg(CANId_t id, CANPayload_t payload) {
 	return retVal;
 }
 
-static ErrorStatus CANbus_SendMsg_FaultState(CANId_t id, CANPayload_t payload) {
+ErrorStatus CANbus_SendMsg_FaultState(CANId_t id, CANPayload_t payload) {
 	uint8_t txdata[8];
 	uint8_t data_length = 0;
 
@@ -156,12 +156,8 @@ static ErrorStatus CANbus_SendMsg_FaultState(CANId_t id, CANPayload_t payload) {
 			return ERROR;	// Do nothing if invalid
 	}
 
-	ErrorStatus retVal;
-	do{
-		retVal = BSP_CAN_Write(id, txdata, data_length);
-	} while(retVal == ERROR);
-
-	return retVal;
+	while (BSP_CAN_Write(id, txdata, data_length) == ERROR);
+	return SUCCESS;
 }	
 
 /**

@@ -46,7 +46,7 @@ typedef struct {
 /**
  * @brief   Initializes the CAN system
  * @param   loopback	: if we should use loopback mode (for testing)	
- * @param   faultState  : fault state determines whether to implement Rx and Tx interrupts 
+ * @param   faultState  : fault state being true disables Tx and Rx interrupts 
  * @return  None
  */
 void CANbus_Init(bool loopback, bool faultState);
