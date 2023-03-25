@@ -26,9 +26,9 @@ export OS
 .PHONY: stm32f413
 stm32f413:
 ifneq ($(TEST), none)
-	@echo "Making STM32 build for file ${PURPLE}'${TEST_FILE}'${NC}"
+	@echo -e "Making STM32 build for file ${PURPLE}'${TEST_FILE}'${NC}"
 else
-	@echo "Making STM32 build with ${RED}NO${NC}test."
+	@echo -e "Making STM32 build with ${RED}NO${NC}test."
 endif
 	$(MAKE) -C BSP -C STM32F413 -j
 

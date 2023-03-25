@@ -64,7 +64,7 @@ void Simulator_Log(LoggingType_t lvl, char *str) {
     strcpy(prefix, LoggingLUT[lvl]); //This is because strcat cannot concat const
     char* msg = strcat(prefix, str);
     write(simulatorLog, msg, strlen(msg));
-    printf("%s", msg);
+    //printf("%s", msg);
 }
 
 /**
