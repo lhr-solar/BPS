@@ -100,7 +100,6 @@ void BSP_Timer_Start_OneShot(uint32_t delay_us, callback_t callback) {
 	uint32_t period;
 	uint16_t prescaler;
 	Timer_Micros_To_PeriodPrescaler(delay_us, &period, &prescaler, true);
-	printf("period: %.8lx prescale: %.4x\n\r", period, prescaler);
 	
 	TIM_SetAutoreload(tim_inst, period);
 	TIM_PrescalerConfig(tim_inst, prescaler, TIM_PSCReloadMode_Immediate);
