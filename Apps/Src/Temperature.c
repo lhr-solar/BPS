@@ -391,6 +391,7 @@ int32_t Temperature_GetTotalPackAvgTemperature(void){
 ErrorStatus Temperature_SampleADC(uint8_t ADCMode) {
 #ifndef SIMULATION    
     LTC6811_adax(ADCMode, AUX_CH_GPIO1); // Start ADC conversion on GPIO1
+    LTC6811_pollAdc(); //wait till adc is done returns time taken
 
     RTOS_BPS_MutexPend(&MinionsASIC_Mutex, OS_OPT_PEND_BLOCKING);
     int8_t error = LTC6811_rdaux(AUX_CH_GPIO1, NUM_MINIONS, Minions); // Update Minions with fresh values
