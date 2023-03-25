@@ -411,11 +411,11 @@ int32_t Temperature_GetMaxTemperature(void) {
 
 /**
  * @brief Gives fan speed based on Average temperature of pack and past error values
- * @param InputTemp - current temperature
+ * @param InputTemp - current temperature. Must not exceed 284 or -284 Celcius given that expected temp is 38 celcius.
  * @param DesiredTemp - desired temperature
  * @return FanSpeed: 0-8
  */
-int32_t Temperature_PID_Output(int32_t InputTemp, int32_t DesiredTemp) {
+int8_t Temperature_PID_Output(int32_t InputTemp, int32_t DesiredTemp) {
     Error = DesiredTemp - InputTemp;
 	
     //Only read error sum in range
@@ -427,14 +427,14 @@ int32_t Temperature_PID_Output(int32_t InputTemp, int32_t DesiredTemp) {
 
 	//5 is the estimated "hold output"
     //Scale P-output to 0-8, Floor divide error by 1000
-	int32_t p_Output = ((-Error)/(TEMPERATURE_PID_PROPORTIONAL*TEMPERATURE_PID_MILICELCIUS_CONVERT)) + TEMPERATURE_HOLD_FAN_SPEED;
+	int8_t p_Output = (int8_t)((-Error)/(TEMPERATURE_PID_PROPORTIONAL*TEMPERATURE_PID_MILICELCIUS_CONVERT)) + TEMPERATURE_HOLD_FAN_SPEED;
 
 	//I output could totally fudge things up (and probably will on the first test), so disable it and make sure p is good first
 	//Keep I gains low or you'll get weird oscillation. abs(I output) should not currently exceed 2
-	int32_t i_Output = ((-ErrorSum)/(TEMPERATURE_PID_INTEGRAL*TEMPERATURE_PID_MILICELCIUS_CONVERT));
+	int8_t i_Output = (int8_t)((-ErrorSum)/(TEMPERATURE_PID_INTEGRAL*TEMPERATURE_PID_MILICELCIUS_CONVERT));
 
 	//Don't use D output
-	int32_t output = p_Output + i_Output;
+	int8_t output = p_Output + i_Output;
     output = (output > TOPSPEED) ? TOPSPEED :
         (output < 0) ? 0 : output;
     return output;
