@@ -67,6 +67,7 @@ int main(){
 #include "SPI.h"
 #include "LTC6811.h"
 #include "UART.h"
+#include "Interrupt_Priorities.h"
 #include <string.h>
 void printCells(cell_asic *mods);
 void print_config(cell_asic *bms_ic);
@@ -610,9 +611,9 @@ int main() {
       /* Enable USART3 IRQ channel in the NVIC controller.
       When the USART3 interrupt is generated (in this example when
       data is received) the USART3_IRQHandler will be served */
-      NVIC_InitStructure.NVIC_IRQChannel = USART1_IRQn;
-      NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
-      NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
+      NVIC_InitStructure.NVIC_IRQChannel = USART3_IRQn;
+      NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = USART3_Preempt_Prio;
+      NVIC_InitStructure.NVIC_IRQChannelSubPriority = USART3_Sub_Prio;
       NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
       NVIC_Init(&NVIC_InitStructure);
      /****************************************************************
