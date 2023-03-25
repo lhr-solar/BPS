@@ -46,9 +46,16 @@ typedef struct {
 /**
  * @brief   Initializes the CAN system
  * @param   loopback	: if we should use loopback mode (for testing)	
+ * @param   faultState  : fault state being true disables Tx and Rx interrupts 
  * @return  None
  */
-void CANbus_Init(bool loopback);
+void CANbus_Init(bool loopback, bool faultState);
+
+/**
+ * @brief   Deitializes the CAN system 
+ * @return  None
+ */
+void CANbus_DeInit();
 
 /**
  * @brief   Transmits data onto the CANbus. This is non-blocking and will fail with an error if
@@ -67,6 +74,14 @@ ErrorStatus CANbus_Send(CANId_t id, CANPayload_t payload);
  * @return  ERROR if error, SUCCESS otherwise
  */
 ErrorStatus CANbus_BlockAndSend(CANId_t id, CANPayload_t payload);
+
+/**
+ * @brief   Transmits data onto the CANbus without mailbox semaphores.
+ * @param   id : CAN id of the message
+ * @param   payload : the data that will be sent.
+ * @return  ERROR if error, SUCCESS otherwise
+ */
+ErrorStatus CANbus_SendMsg_FaultState(CANId_t id, CANPayload_t payload);
 
 /**
  * @brief   Receives data from the CAN bus. This is a non-blocking operation.

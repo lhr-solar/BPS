@@ -10,18 +10,19 @@
  * @brief   Initializes the CAN module that communicates with the rest of the electrical system.
  * @param   rxEvent     : the function to execute when recieving a message. NULL for no action.
  * @param   txEnd       : the function to execute after transmitting a message. NULL for no action.
+ * @param   faultState  : if we should initialize CAN interrupts
  * @param   loopback    : if we should use loopback mode (for testing)
  * @return  None
  */
-void BSP_CAN_Init(callback_t rxEvent, callback_t txEnd, bool loopback);
+void BSP_CAN_Init(callback_t rxEvent, callback_t txEnd, bool faultState, bool loopback);
+
 
 /**
- * @brief   Transmits the data onto the CAN bus with the specified id
- * @param   id : Message of ID. Also indicates the priority of message. The lower the value, the higher the priority.
- * @param   data : data to be transmitted. The max is 8 bytes.
- * @param   length : num of bytes of data to be transmitted. This must be <= 8 bytes or else the rest of the message is dropped.
- * @return  ERROR if module was unable to transmit the data onto the CAN bus. SUCCESS indicates data was transmitted.
+ * @brief   Calls stm-level CAN_DeInit
+ * @return  None
  */
+void BSP_CAN_DeInit();
+
 ErrorStatus BSP_CAN_Write(uint32_t id, uint8_t data[], uint8_t length);
 
 /**

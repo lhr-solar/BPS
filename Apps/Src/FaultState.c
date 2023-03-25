@@ -12,13 +12,19 @@
 #include "CANbus.h"
 #include "BSP_UART.h"
 #include "config.h"
-#ifndef SIMULATION
-#include "stm32f4xx.h"
-#else
+#include "BSP_PLL.h"
+#ifdef SIMULATION
 #include "Simulator.h"
 extern uint8_t stateCount;
 #endif
 
+#define MESSAGE_BUFFER 20000
+
+/*
+ * Note: do not call this directly if it can be helped.
+ * Instead, call an RTOS function to unblock the mutex
+ * that the Fault Task is pending on.
+ */
 void EnterFaultState() {
 
 #ifndef SIMULATION
@@ -129,19 +135,12 @@ void EnterFaultState() {
     // TODO: create an interrupt-independent CAN interface, so we can use CAN from within a fault state
     // avoid infinite recursive faults, since our CAN Driver relies on the OS to work
     // also don't call CAN if the watchdog tripped, since CAN won't be initialized
-    /*
-    if ((Fault_BitMap & (Fault_OS | Fault_WDOG)) == 0) {
-        CANData_t data;
-        data.b = 1;
-        CANPayload_t Message;
-        Message.data = data;
-        // Push Trip message to CAN Q
-        CANbus_BlockAndSend(TRIP, Message);
-        // Push Contactor State message to CAN Q
-        data.b = 0;
-        CANbus_BlockAndSend(CONTACTOR_STATE, Message);
-    }
-    */
+
+    //Deinitialize CAN registers
+    CANbus_DeInit();
+    //Reinit CAN in fault state
+    CANbus_Init(false, true);
+    
 
 #ifdef DEBUGMODE
     char command[COMMAND_SIZE];
@@ -149,6 +148,39 @@ void EnterFaultState() {
     BSP_WDTimer_Init(); //This is in case we did not pass check contactor and watchdog timer was not initialized
     BSP_WDTimer_Start(); 
     while(1) {
+        //Send Trip Readings
+        CANPayload_t payload;
+        payload.data.w = 1;
+        CANbus_SendMsg_FaultState(TRIP, payload);
+        BSP_PLL_DelayU(MESSAGE_BUFFER);
+
+        //Send Contactor Readings
+        payload.data.b = 0;
+        CANbus_SendMsg_FaultState(CONTACTOR_STATE, payload);
+        BSP_PLL_DelayU(MESSAGE_BUFFER);
+        
+        //Send Current Readings
+        payload.data.w = Amps_GetReading();
+        CANbus_SendMsg_FaultState(CURRENT_DATA, payload);
+        BSP_PLL_DelayU(MESSAGE_BUFFER);
+        
+
+        //Send Voltage Readings
+        for (uint8_t i = 0; i < NUM_BATTERY_MODULES; i++){ //send all battery module voltage data
+            payload.idx = i;
+            payload.data.w = Voltage_GetModuleMillivoltage(i);
+            CANbus_SendMsg_FaultState(VOLT_DATA, payload);
+            BSP_PLL_DelayU(MESSAGE_BUFFER);
+        }
+
+        //Send Temperature Readings
+        for (uint8_t i = 0; i < NUM_BATTERY_MODULES; i++){ //send all battery module temperature data
+            payload.idx = i;
+            payload.data.w = Temperature_GetModuleTemperature(i);
+            CANbus_SendMsg_FaultState(TEMP_DATA, payload);
+            BSP_PLL_DelayU(MESSAGE_BUFFER);
+        }
+
 #ifdef DEBUGMODE
         if (BSP_UART_ReadLine(command)) CLI_Handler(command); // CLI
 #endif
