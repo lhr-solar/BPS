@@ -4,6 +4,7 @@
 #include "config.h"
 #include "BSP_Timer.h"
 #include "BSP_UART.h"
+#include "BSP_PLL.h"
 
 volatile uint32_t timer_delay_continue = 0;
 
@@ -12,10 +13,9 @@ void oneshot(void) {
 }
 
 int main(void){
-    uint32_t test;
-    uint32_t delay = 10000000;
-    uint32_t time = 1;        
+    uint32_t test;      
     
+    BSP_PLL_Init();
     BSP_Timer_Init();
     BSP_UART_Init(NULL, NULL, UART_USB);
     BSP_Timer_Start_TickCounter();
@@ -26,6 +26,10 @@ int main(void){
         test = BSP_Timer_GetTicksElapsed();
         printf("Ticks elapsed : %ld\n\r", test);
         BSP_Timer_Start_OneShot(2e6, oneshot);
+        printf("wait start\n\r");
+        while (!timer_delay_continue);
+        printf("wait done\n\r");
+        timer_delay_continue = 0;
     }
    
 }

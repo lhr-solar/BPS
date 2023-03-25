@@ -7,7 +7,7 @@
 
 // define timers used here (number here only, i.e. '1' for TIM1)
 #define BSP_TIMER_TICKCOUNTER		2
-#define BSP_TIMER_ONESHOT			3
+#define BSP_TIMER_ONESHOT			5
 
 // some preprocessor stuff to change timers 'easily'
 #define BSP_TIMER_CONCAT2_(x, y) x ## y
@@ -18,6 +18,7 @@
 #define BSP_TIMER_INST(timer_num) BSP_TIMER_CONCAT2(TIM, timer_num)
 #define BSP_TIMER_RCC(timer_num) BSP_TIMER_CONCAT2(RCC_APB1Periph_TIM, timer_num)
 #define BSP_TIMER_IRQ(timer_num) BSP_TIMER_CONCAT3(TIM, timer_num, _IRQHandler)
+#define BSP_TIMER_IRQn(timer_num) BSP_TIMER_CONCAT3(TIM, timer_num, _IRQn)
 
 // global constants
 static const uint32_t MICROSECONDS_PER_SECOND = 1e6;
@@ -73,8 +74,17 @@ void BSP_Timer_Init(void) {
 	TIM_TimeBaseStructInit(&timer_oneshot);
 
 	TIM_TimeBaseInit(BSP_TIMER_INST(BSP_TIMER_TICKCOUNTER), &timer_tickcounter);
-	TIM_TimeBaseInit(BSP_TIMER_INST(BSP_TIMER_ONESHOT), &timer_oneshot);
-	TIM_ITConfig(BSP_TIMER_INST(BSP_TIMER_ONESHOT), TIM_IT_Update, ENABLE);
+	TIM_TimeBaseInit(BSP_TIMER_INST(BSP_TIMER_ONESHOT), &timer_oneshot);\
+
+	// one shot nvic initialization
+	NVIC_InitTypeDef nvic_timer_oneshot = {
+		.NVIC_IRQChannel = BSP_TIMER_IRQn(BSP_TIMER_ONESHOT),
+		.NVIC_IRQChannelPreemptionPriority = 2,
+		.NVIC_IRQChannelSubPriority = 1,
+		.NVIC_IRQChannelCmd = ENABLE
+	};
+	NVIC_Init(&nvic_timer_oneshot);
+
 }
 
 /**
@@ -89,12 +99,18 @@ void BSP_Timer_Start_OneShot(uint32_t delay_us, callback_t callback) {
 	TimerOneShotCallback = callback;
 	uint32_t period;
 	uint16_t prescaler;
-	Timer_Micros_To_PeriodPrescaler(delay_us, &period, &prescaler, false);
+	Timer_Micros_To_PeriodPrescaler(delay_us, &period, &prescaler, true);
+	printf("period: %.8lx prescale: %.4x\n\r", period, prescaler);
 	
 	TIM_SetAutoreload(tim_inst, period);
 	TIM_PrescalerConfig(tim_inst, prescaler, TIM_PSCReloadMode_Immediate);
 
 	TIM_Cmd(tim_inst, ENABLE);
+
+	TIM_SetCounter (tim_inst, 0);
+	TIM_ClearITPendingBit (tim_inst, TIM_IT_Update);
+	TIM_ITConfig(tim_inst, TIM_IT_Update, ENABLE);
+	
 }
 
 /**
@@ -148,10 +164,11 @@ uint32_t BSP_Timer_GetMicrosElapsed(void) {
 extern void BSP_TIMER_IRQ(BSP_TIMER_ONESHOT)() {
 	TIM_TypeDef *tim_inst = BSP_TIMER_INST(BSP_TIMER_ONESHOT);
 	if (TIM_GetITStatus(tim_inst, TIM_IT_Update) != RESET) {
-		TIM_ClearITPendingBit(tim_inst, TIM_IT_Update);
-
 		// disable timer
+		TIM_ITConfig(BSP_TIMER_INST(BSP_TIMER_ONESHOT), TIM_IT_Update, DISABLE);
 		TIM_Cmd(tim_inst, DISABLE);
+
+		TIM_ClearITPendingBit(tim_inst, TIM_IT_Update);
 
 		TimerOneShotCallback();
 	}
