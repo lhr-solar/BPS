@@ -18,6 +18,7 @@
 #include "RTOS_BPS.h"
 #include "Voltage.h"
 #include "Temperature.h"
+#include "BSP_UART.h"
 
 /******************************************************************************
  * VoltTempMonitor Task Test Plan
@@ -44,6 +45,10 @@ CPU_STK Task2_Stk[DEFAULT_STACK_SIZE];
 
 OS_ERR p_err;
 
+void foo(void){
+    return;
+}
+
 // Initialization task for this test
 void Task1(void *p_arg){
     
@@ -56,22 +61,21 @@ void Task1(void *p_arg){
     RTOS_BPS_MutexCreate(&WDog_Mutex, "Watchdog Mutex");
 
     // Spawn tasks needed for Amperes readings to affect contactor
-    //1
-    RTOS_BPS_TaskCreate(&CheckContactor_TCB,    // TCB
-				"Task_CheckContactor",          // Task Name (String)
-				Task_CheckContactor,            // Task function pointer
-				(void *)0,                      // Task function args
-				TASK_CHECK_CONTACTOR_PRIO,      // Priority
-				CheckContactor_Stk,             // Stack
-				TASK_CHECK_CONTACTOR_STACK_SIZE);
-
+    RTOS_BPS_TaskCreate(&PetWDog_TCB,	    // TCB
+    		"TASK_PETWDOG",	                    // Task Name (String)
+    		Task_PetWDog,				        // Task function pointer
+    		(void *)0,				            // Task function args
+    		TASK_PETWDOG_PRIO,			        // Priority
+    		PetWDog_Stk,				        // Stack
+    		TASK_PETWDOG_STACK_SIZE);
+            
     RTOS_BPS_TaskCreate(&VoltTempMonitor_TCB,				// TCB
-			"TASK_VOLT_TEMP_MONITOR_PRIO",	// Task Name (String)
-			Task_VoltTempMonitor,				// Task function pointer
-			(void *)0,				// Task function args
-			TASK_VOLT_TEMP_MONITOR_PRIO,			// Priority
-			VoltTempMonitor_Stk,	// Watermark limit for debugging
-			TASK_VOLT_TEMP_MONITOR_STACK_SIZE);					// return err code
+            "TASK_VOLT_TEMP_MONITOR_PRIO",	// Task Name (String)
+            Task_VoltTempMonitor,				// Task function pointer
+            (void *)0,				// Task function args
+            TASK_VOLT_TEMP_MONITOR_PRIO,			// Priority
+            VoltTempMonitor_Stk,	// Watermark limit for debugging
+            TASK_VOLT_TEMP_MONITOR_STACK_SIZE);					// return err code
 
     // Spawn CANBUS Consumer, PRIO 7
     RTOS_BPS_TaskCreate(&CANBusConsumer_TCB,				// TCB
@@ -85,15 +89,14 @@ void Task1(void *p_arg){
     // Initialize CAN queue
     CAN_Queue_Init();
 
-	//delete task
-	OSTaskDel(NULL, &p_err); // Delete task
+    //delete task
+    OSTaskDel(NULL, &p_err); // Delete task
 }
 
 //Task to prevent watchdog from tripping
 void Task2(void *p_arg){
 
-    RTOS_BPS_SemPost(&SafetyCheck_Sem4, OS_OPT_POST_1); //Set semaphore once since Amperes Task doesn't run
-    RTOS_BPS_SemPost(&SafetyCheck_Sem4, OS_OPT_POST_1); //Set semaphore once since Battery Balancing Task doesn't run
+    // RTOS_BPS_SemPost(&SafetyCheck_Sem4, OS_OPT_POST_1); //Set semaphore once since Amperes Task doesn't run
 
     while(1){
         RTOS_BPS_MutexPend(&WDog_Mutex, OS_OPT_PEND_BLOCKING);
@@ -103,7 +106,6 @@ void Task2(void *p_arg){
         RTOS_BPS_MutexPost(&WDog_Mutex, OS_OPT_POST_NONE);
         //delay of 100ms
         RTOS_BPS_DelayTick(10);
-        BSP_Light_Toggle(RUN);
     }
 }
 
@@ -127,6 +129,7 @@ int main() {
     }
 
     BSP_PLL_Init();
+    BSP_UART_Init(foo, foo, UART_USB);
     BSP_Lights_Init();
     OSInit(&err);
     assertOSError(err);

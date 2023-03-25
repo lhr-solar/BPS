@@ -7,7 +7,7 @@
 #include "stm32f4xx_rcc.h"
 #include "Interrupt_Priorities.h"
 
-#define TX_SIZE     128
+#define TX_SIZE     2048
 #define RX_SIZE     64
 
 // Initialize the FIFOs

@@ -111,7 +111,8 @@ Note: when typing name it, don't type the `Test_` part or the `.c` part.
 
 Example: `make simulator TEST=SimulatorInit`.
 
-The simulator can be run with `./bps-simulator.out <path to JSON test>`.
+The simulator can be run with `./bps-simulator.out <path to JSON test>`. However, in order to run properly, `ulimit -r` must be set from within a script. In order to debug, edit the `test.sh` file
+to either debug, or just run a specific test.
 
 You can check the log file by doing `cat bps-sim-<logged time>.log`.
 
