@@ -13,7 +13,7 @@ void oneshot(void) {
 }
 
 int main(void){
-    uint32_t test;      
+    uint32_t test;   
     
     BSP_PLL_Init();
     BSP_Timer_Init();
@@ -26,9 +26,7 @@ int main(void){
         test = BSP_Timer_GetTicksElapsed();
         printf("Ticks elapsed : %ld\n\r", test);
         BSP_Timer_Start_OneShot(2e6, oneshot);
-        printf("wait start\n\r");
         while (!timer_delay_continue);
-        printf("wait done\n\r");
         timer_delay_continue = 0;
     }
    
