@@ -5,6 +5,7 @@
 #include "stm32f4xx.h"
 #include "os.h"
 #include "Tasks.h"
+#include "Tasks.h"
 
 // The message information that we care to receive
 typedef struct _msg {
