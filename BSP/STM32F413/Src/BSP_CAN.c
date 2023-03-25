@@ -4,6 +4,7 @@
 #include "Interrupt_Priorities.h"
 #include "stm32f4xx.h"
 #include "os.h"
+#include "Tasks.h"
 
 // The message information that we care to receive
 typedef struct _msg {
@@ -31,10 +32,11 @@ static void (*gTxEnd)(void);
  * @brief   Initializes the CAN module that communicates with the rest of the electrical system.
  * @param   rxEvent     : the function to execute when recieving a message. NULL for no action.
  * @param   txEnd       : the function to execute after transmitting a message. NULL for no action.
+ * @param   faultState  : if we should initialize CAN interrupts
  * @param   loopback    : if we should use loopback mode (for testing)
  * @return  None
  */
-void BSP_CAN_Init(callback_t rxEvent, callback_t txEnd, bool loopback) {
+void BSP_CAN_Init(callback_t rxEvent, callback_t txEnd, bool faultState, bool loopback) {
     GPIO_InitTypeDef GPIO_InitStructure;
     CAN_InitTypeDef CAN_InitStructure;
     NVIC_InitTypeDef NVIC_InitStructure;
@@ -69,7 +71,6 @@ void BSP_CAN_Init(callback_t rxEvent, callback_t txEnd, bool loopback) {
     RCC_APB1PeriphClockCmd(RCC_APB1Periph_CAN1, ENABLE);
 
     /* CAN register init */
-    //CAN_DeInit(CAN1);
 
     /* CAN cell init */
     CAN_InitStructure.CAN_TTCM = DISABLE;
@@ -115,8 +116,10 @@ void BSP_CAN_Init(callback_t rxEvent, callback_t txEnd, bool loopback) {
     gRxMessage.DLC = 0;
     gRxMessage.FMI = 0;
 
-    /* Enable FIFO 0 message pending Interrupt */
-    CAN_ITConfig(CAN1, CAN_IT_FMP0, ENABLE);
+    /* Enable interrupts if in normal state */
+    if(!faultState){
+        /* Enable FIFO 0 message pending Interrupt */
+        CAN_ITConfig(CAN1, CAN_IT_FMP0, ENABLE);
 
     // Enable Rx interrupts
     NVIC_InitStructure.NVIC_IRQChannel = CAN1_RX0_IRQn;
@@ -125,9 +128,9 @@ void BSP_CAN_Init(callback_t rxEvent, callback_t txEnd, bool loopback) {
     NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
     NVIC_Init(&NVIC_InitStructure);	
 
-    if(NULL != txEnd) {
-        // set up CAN Tx interrupts
-        CAN_ITConfig(CAN1, CAN_IT_TME, ENABLE);
+        if(NULL != txEnd) {
+            // set up CAN Tx interrupts
+            CAN_ITConfig(CAN1, CAN_IT_TME, ENABLE);
 
         // Enable Tx Interrupts
         NVIC_InitStructure.NVIC_IRQChannel = CAN1_TX_IRQn;
