@@ -88,14 +88,38 @@ void RTOS_BPS_TaskCreate(
  * @param dly Defines how many seconds to delay for.
  * @return none 
  */
-void RTOS_BPS_DelaySecs(uint16_t dly);
+void RTOS_BPS_DelaySecs(uint16_t delay_s);
 
 /**
  * @brief Creates a Millisecond-based Time Delay.
  * @param dly Defines how many milliseconds to delay for.
+ * @note if a dly value is passed that is less time than the resolution of 1 tick (100ms), 
+ *       this code will error out
  * @return none 
  */
-void RTOS_BPS_DelayMs(uint16_t dly);
+void RTOS_BPS_DelayMs(uint16_t delay_ms);
+
+/**
+ * @brief Creates a Microsecond-based Time Delay.
+ *        As anything less than 100ms will not work with an RTOS delay, 
+ *        this delay suspends the scheduler and uses a hardware timer to implement a 
+ *        microsecond-accurate delay.
+ * @param dly Defines how many milliseconds to delay for.
+ * @note !! Blocks the Scheduler !! Do not use for extended delays!
+ *       Use RTOS_BPS_DelayMs() or RTOS_BPS_DelaySecs() if possible
+ * 
+ *       Due to overhead from suspending the scheduler and setting up the delay, the 
+ *       actual delay time will be a few cycles slower than the requested delay time.
+ * @return none 
+ */
+void RTOS_BPS_DelayUs(uint32_t delay_us);
+
+/**
+ * @brief Creates a Tick-based Time Delay.
+ * @param dly Defines how many ticks to delay for.
+ * @return none 
+ */
+void RTOS_BPS_DelayTick(BPS_OS_TICK delay_ticks);
 
 /**
  * @brief Creates a semaphore with the initially specified count
@@ -105,12 +129,5 @@ void RTOS_BPS_DelayMs(uint16_t dly);
  * @param count - initial count for the semaphore
  */
 void RTOS_BPS_SemCreate(BPS_OS_SEM* sem, char* name, uint32_t count);
-
-/**
- * @brief Creates a Tick-based Time Delay.
- * @param dly Defines how many ticks to delay for.
- * @return none 
- */
-void RTOS_BPS_DelayTick(BPS_OS_TICK dly);
 
 #endif 
