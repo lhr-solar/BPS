@@ -200,7 +200,6 @@ void generateData(char selection){
             asprintf(&filename, "%c-DishargingOverTemperature", selection);
             break;
         case UVOLT:
-        case NONE:
             index = randomRange(1,jsonLength);
             victim = randomRange(0, NUM_BATTERY_MODULES);
             states[index].voltages[victim] = (MIN_VOLTAGE_CHARGING_LIMIT - 1)*10;
@@ -212,9 +211,9 @@ void generateData(char selection){
             }
             generateData(NONE);
             break;
-        // case NONE:
-        //     asprintf(&filename, "%c-NoError", selection);
-        //     break;
+        case NONE:
+            asprintf(&filename, "%c-NoError", selection);
+            break;
         case ALL_EDGE:
             //to do
             break;
