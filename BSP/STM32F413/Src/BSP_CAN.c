@@ -121,23 +121,24 @@ void BSP_CAN_Init(callback_t rxEvent, callback_t txEnd, bool faultState, bool lo
         /* Enable FIFO 0 message pending Interrupt */
         CAN_ITConfig(CAN1, CAN_IT_FMP0, ENABLE);
 
-    // Enable Rx interrupts
-    NVIC_InitStructure.NVIC_IRQChannel = CAN1_RX0_IRQn;
-    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = CAN1_RX0_Preempt_Prio;
-    NVIC_InitStructure.NVIC_IRQChannelSubPriority = CAN1_RX0_Sub_Prio;
-    NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-    NVIC_Init(&NVIC_InitStructure);	
+        // Enable Rx interrupts
+        NVIC_InitStructure.NVIC_IRQChannel = CAN1_RX0_IRQn;
+        NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = CAN1_RX0_Preempt_Prio;
+        NVIC_InitStructure.NVIC_IRQChannelSubPriority = CAN1_RX0_Sub_Prio;
+        NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+        NVIC_Init(&NVIC_InitStructure);	
 
         if(NULL != txEnd) {
             // set up CAN Tx interrupts
             CAN_ITConfig(CAN1, CAN_IT_TME, ENABLE);
 
-        // Enable Tx Interrupts
-        NVIC_InitStructure.NVIC_IRQChannel = CAN1_TX_IRQn;
-        NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = CAN1_TX_Preempt_Prio; // TODO: assess both of these priority settings
-        NVIC_InitStructure.NVIC_IRQChannelSubPriority = CAN1_TX_Sub_Prio;
-        NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-        NVIC_Init(&NVIC_InitStructure);
+            // Enable Tx Interrupts
+            NVIC_InitStructure.NVIC_IRQChannel = CAN1_TX_IRQn;
+            NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = CAN1_TX_Preempt_Prio; // TODO: assess both of these priority settings
+            NVIC_InitStructure.NVIC_IRQChannelSubPriority = CAN1_TX_Sub_Prio;
+            NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+            NVIC_Init(&NVIC_InitStructure);
+        }
     }
 }
 
