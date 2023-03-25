@@ -5,8 +5,9 @@ on:
   push:
 
 jobs:
+  strategy:
+    max-parallel: 1
   test:
-
     runs-on: ubuntu-latest
 
     steps:
@@ -27,3 +28,5 @@ jobs:
       run: sudo bash Validation/Simulator_Tests.sh
     # add more tests here
 
+max-parallel: 1
+jobs.strategy:
