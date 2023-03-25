@@ -8,6 +8,7 @@
 // for open() syscall
 #include <sys/types.h>  // for stat() and struct stat as well
 #include <sys/stat.h>
+#include <pthread.h>
 #include <fcntl.h>
 // for write() and read()
 #include <unistd.h>
@@ -30,7 +31,6 @@ uint8_t stateCount = 0;
 
 // linked list of simulator states
 static simulator_state *states = NULL;
-BPS_OS_MUTEX SimMutex;
 
 // timing information to handle the state transitions
 // note that this only has a granularity of 1 second, so it's not super precise
@@ -52,7 +52,7 @@ static const char* LoggingLUT[LOG_NUM_LEVELS] = {
     [LOG_MISC] = "[MISC] ",
 };
 
-bool OS_Started = false;
+static pthread_mutex_t sim_mutex;
 
 /**
  * @brief   Log something to simulator log file
@@ -249,12 +249,12 @@ void Simulator_Init(char *jsonPath) {
     const struct sigaction act = {.sa_handler = CtrlCHandler, .sa_mask = s, .sa_flags = 0};
     sigaction(SIGINT, &act, NULL);
 
+    pthread_mutex_init(&sim_mutex, NULL);
+
     Simulator_Log(LOG, "\nSimulator intialized\n");    
 
     // initialize the fake inputs
     readInputFile(jsonPath);
-
-    RTOS_BPS_MutexCreate(&SimMutex, "Simulator Mutex");
 
     // log the starting time
     startTime = time(NULL);
@@ -269,10 +269,7 @@ static void Simulator_Transition(void) {
     // advance to the current state
     time_t currentTime = time(NULL);
     //wait until time for state is completed before moving to next state
-    if (OS_Started) {
-        RTOS_BPS_MutexPend(&SimMutex, OS_OPT_PEND_BLOCKING);
-    }
-
+    pthread_mutex_lock(&sim_mutex);
     while (startTime + states->time < currentTime) {
         simulator_state *prev = states;
         states = states->next;
@@ -284,9 +281,7 @@ static void Simulator_Transition(void) {
             Simulator_Shutdown(0);
         }
     }
-    if (OS_Started) {
-        RTOS_BPS_MutexPost(&SimMutex, OS_OPT_POST_ALL);
-    }
+    pthread_mutex_unlock(&sim_mutex);
 }
 
 // Functions for accessing simulator state. Each field should have a function associated with it
