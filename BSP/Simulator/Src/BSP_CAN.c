@@ -18,14 +18,31 @@ static void (*gTxEnd)(void);
 
 /**
  * @brief   Initializes the CAN module that communicates with the rest of the electrical system.
- * @param   None
+ * @param   rxEvent     : the function to execute when recieving a message. NULL for no action.
+ * @param   txEnd       : the function to execute after transmitting a message. NULL for no action.
+ * @param   faultState  : initialize CAN interrupts if false
+ * @param   loopback    : if we should use loopback mode (for testing)
  * @return  None
  */
-void BSP_CAN_Init(callback_t rxEvent, callback_t txEnd, bool loopback) {
+void BSP_CAN_Init(callback_t rxEvent, callback_t txEnd, bool faultState, bool loopback) {
     gTxEnd = txEnd;
     gRxEvent = rxEvent;
     CAN_Initialized = true;
-    Simulator_Log(LOG_INFO, "CAN Initialized\n");
+    if(faultState){
+        Simulator_Log(LOG_INFO, "CAN Initialized in fault state\n");
+    }else{
+        Simulator_Log(LOG_INFO, "CAN Initialized in normal state\n");
+    }
+    
+}
+
+/**
+ * @brief   Calls stm-level CAN_DeInit
+ * @return  None
+ */
+void BSP_CAN_DeInit() {
+    CAN_Initialized = false;
+    Simulator_Log(LOG_INFO, "CAN Deinitialized\n");
 }
 
 /**

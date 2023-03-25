@@ -14,8 +14,8 @@
  */
 
 int main(int argc, char **argv) {
-    Simulator_Init("cantest");
-    BSP_CAN_Init(NULL, NULL, false);
+    Simulator_Init(argv[1]);
+    BSP_CAN_Init(NULL, NULL, false, false);
     BSP_CAN_Write(0, (uint8_t*)"ABCDEFGH", 8);
     BSP_CAN_Write(1, (uint8_t*)"LHRSOLAR", 8);
     BSP_CAN_Write(2, (uint8_t*)"DEADBEEF", 8);

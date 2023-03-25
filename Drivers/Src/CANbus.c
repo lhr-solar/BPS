@@ -37,18 +37,32 @@ static void CANbus_CountIncoming(void) {
 }
 
 /**
- * @brief   Initializes the CAN system
+ * @brief   Initializes the CAN system. If reinitializing for fault state, must
+ * deinitialize first.
  * @param   loopback	: if we should use loopback mode (for testing)	
+ * @param 	faultState  : determines whether to implement Rx and Tx interrupts
  * @return  None
  */
-void CANbus_Init(bool loopback) {
+void CANbus_Init(bool loopback, bool faultState) {
+	if(!faultState){
+		RTOS_BPS_MutexCreate(&CANbus_TxMutex, "CAN TX Lock");
+		RTOS_BPS_MutexCreate(&CANbus_RxMutex, "CAN RX Lock");
+		RTOS_BPS_SemCreate(&CANbus_MailSem4, "CAN Mailbox Semaphore", 3); // # of mailboxes
+		RTOS_BPS_SemCreate(&CANbus_ReceiveSem4, "CAN Queue Counter Semaphore", 0);
+		// Initialize and pass interrupt hooks
+    	BSP_CAN_Init(CANbus_CountIncoming, CANbus_Release, faultState, loopback);
+	}else{
+		BSP_CAN_Init(NULL, NULL, faultState, loopback);
+	}
 
-	RTOS_BPS_MutexCreate(&CANbus_TxMutex, "CAN TX Lock");
-	RTOS_BPS_MutexCreate(&CANbus_RxMutex, "CAN RX Lock");
-	RTOS_BPS_SemCreate(&CANbus_MailSem4, "CAN Mailbox Semaphore", 3); // # of mailboxes
-	RTOS_BPS_SemCreate(&CANbus_ReceiveSem4, "CAN Queue Counter Semaphore", 0);
-	// Initialize and pass interrupt hooks
-    BSP_CAN_Init(CANbus_CountIncoming, CANbus_Release, loopback);
+}
+
+/**
+ * @brief   Deinitializes the CAN system
+ * @return  None
+ */
+void CANbus_DeInit() {
+	BSP_CAN_DeInit();
 }
 
 // Static method, call CANbus_Send or CANbus_BlockAndSend instead
@@ -103,6 +117,48 @@ static ErrorStatus CANbus_SendMsg(CANId_t id, CANPayload_t payload) {
 
 	return retVal;
 }
+
+ErrorStatus CANbus_SendMsg_FaultState(CANId_t id, CANPayload_t payload) {
+	uint8_t txdata[8];
+	uint8_t data_length = 0;
+
+	// TODO: is it really best to keep the list of
+	//		 valid messages to be sending in the driver?
+	switch (id) {
+		// Handle messages with one byte of data
+		case TRIP:
+		case ALL_CLEAR:
+		case CONTACTOR_STATE:
+		case WDOG_TRIGGERED:
+		case CAN_ERROR:
+		case CHARGE_ENABLE:
+			data_length = 1;
+			memcpy(txdata, &payload.data.b, sizeof(payload.data.b));
+			break;
+
+		// Handle messages with 4 byte data
+		case CURRENT_DATA:
+		case SOC_DATA:
+			data_length = 4;
+			memcpy(txdata, &payload.data.w, sizeof(payload.data.w));
+			break;
+
+		// Handle messages with idx + 4 byte data
+		case VOLT_DATA:
+		case TEMP_DATA:
+			data_length = 5;
+			txdata[0] = payload.idx;
+			memcpy(&txdata[1], &payload.data.w, sizeof(payload.data.w));
+			break;
+
+		// Handle invalid messages
+		default:
+			return ERROR;	// Do nothing if invalid
+	}
+
+	while (BSP_CAN_Write(id, txdata, data_length) == ERROR);
+	return SUCCESS;
+}	
 
 /**
  * @brief   Transmits data onto the CANbus. If there are no mailboxes available,
