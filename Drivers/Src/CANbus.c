@@ -178,16 +178,6 @@ ErrorStatus CANbus_BlockAndSend(CANId_t id, CANPayload_t payload) {
 }
 
 /**
- * @brief   Transmits data onto the CANbus without mailbox semaphores.
- * @param   id : CAN id of the message
- * @param   payload : the data that will be sent.
- * @return  ERROR if error, SUCCESS otherwise
- */
-ErrorStatus CANbus_BlockAndSend_FaultState(CANId_t id, CANPayload_t payload) {
-	return CANbus_SendMsg_FaultState(id, payload);
-}
-
-/**
  * @brief   Transmits data onto the CANbus.
  *          This is non-blocking and will fail with an error if
  * 			the CAN mailboxes are fully occupied. Be sure to

@@ -151,17 +151,17 @@ void EnterFaultState() {
         //Send Trip Readings
         CANPayload_t payload;
         payload.data.w = 1;
-        CANbus_BlockAndSend_FaultState(TRIP, payload);
+        CANbus_SendMsg_FaultState(TRIP, payload);
         BSP_PLL_DelayU(MESSAGE_BUFFER);
 
         //Send Contactor Readings
         payload.data.b = 0;
-        CANbus_BlockAndSend_FaultState(CONTACTOR_STATE, payload);
+        CANbus_SendMsg_FaultState(CONTACTOR_STATE, payload);
         BSP_PLL_DelayU(MESSAGE_BUFFER);
         
         //Send Current Readings
         payload.data.w = Amps_GetReading();
-        CANbus_BlockAndSend_FaultState(CURRENT_DATA, payload);
+        CANbus_SendMsg_FaultState(CURRENT_DATA, payload);
         BSP_PLL_DelayU(MESSAGE_BUFFER);
         
 
@@ -169,7 +169,7 @@ void EnterFaultState() {
         for (uint8_t i = 0; i < NUM_BATTERY_MODULES; i++){ //send all battery module voltage data
             payload.idx = i;
             payload.data.w = Voltage_GetModuleMillivoltage(i);
-            CANbus_BlockAndSend_FaultState(VOLT_DATA, payload);
+            CANbus_SendMsg_FaultState(VOLT_DATA, payload);
             BSP_PLL_DelayU(MESSAGE_BUFFER);
         }
 
@@ -177,7 +177,7 @@ void EnterFaultState() {
         for (uint8_t i = 0; i < NUM_BATTERY_MODULES; i++){ //send all battery module temperature data
             payload.idx = i;
             payload.data.w = Temperature_GetModuleTemperature(i);
-            CANbus_BlockAndSend_FaultState(TEMP_DATA, payload);
+            CANbus_SendMsg_FaultState(TEMP_DATA, payload);
             BSP_PLL_DelayU(MESSAGE_BUFFER);
         }
 

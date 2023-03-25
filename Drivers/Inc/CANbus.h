@@ -81,7 +81,7 @@ ErrorStatus CANbus_BlockAndSend(CANId_t id, CANPayload_t payload);
  * @param   payload : the data that will be sent.
  * @return  ERROR if error, SUCCESS otherwise
  */
-ErrorStatus CANbus_BlockAndSend_FaultState(CANId_t id, CANPayload_t payload);
+ErrorStatus CANbus_SendMsg_FaultState(CANId_t id, CANPayload_t payload);
 
 /**
  * @brief   Receives data from the CAN bus. This is a non-blocking operation.
