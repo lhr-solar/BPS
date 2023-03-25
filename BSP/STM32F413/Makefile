@@ -160,13 +160,18 @@ ASFLAGS = $(MCU) $(AS_DEFS) $(AS_INCLUDES) $(OPT) -Wall -fdata-sections -ffuncti
 CFLAGS = $(MCU) $(C_DEFS) $(C_INCLUDES) $(OPT) -Wall -Werror -fdata-sections -ffunction-sections 
 CFLAGS_SPECIAL = $(CFLAGS)
 CFLAGS_SPECIAL += -ftrack-macro-expansion=0 -fno-diagnostics-show-caret
+
 ifeq ($(DEBUG), 1)
 CFLAGS += -g3 -gdwarf-2
 endif
 
 # custom user defines here
 ifneq ($(DEFINES), none)
-CFLAGS += $(DEFINES)
+# need to split defines
+PREFIXED = $(addprefix -D,$(DEFINES))
+SPLIT = $(subst /, -D, $(PREFIXED))
+
+CFLAGS += $(SPLIT)
 endif
 
 
@@ -209,9 +214,6 @@ $(BUILD_DIR)/config_msgs.o: config_msgs.c Makefile | $(BUILD_DIR)
 	@$(CC) -c $(CFLAGS_SPECIAL) $(TOP_DIR)/Config/Src/config_msgs.c -o $@
 
 $(BUILD_DIR)/%.o: %.c Makefile | $(BUILD_DIR) c_compile_msg
-ifeq ($($<), config_msgs.c)
-	echo abcabcabcbacbacbacbabcab
-endif
 ifeq ($(READABLE), true) 
 	@$(CC) -c $(CFLAGS) -Wa,-a,-ad,-alms=$(BUILD_DIR)/$(notdir $(<:.c=.lst)) $< -o $@
 else
@@ -248,14 +250,13 @@ $(BUILD_DIR):
 .INTERMEDIATE: build_msg
 
 c_compile_msg:
-	@echo -e "${GREEN}Compiling C files...${NC}"
+	@echo "${GREEN}Compiling C files...${NC}"
 
 asm_compile_msg:
-	@echo -e "${GREEN}Compiling ASM files...${NC}"
+	@echo "${GREEN}Compiling ASM files...${NC}"
 
 build_msg:
-	@echo -e "${CYAN}Generating BPS executable...${NC}"
-
+	@echo "${CYAN}Generating BPS executable...${NC}"
 
 #######################################
 # clean up
