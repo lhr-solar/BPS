@@ -22,5 +22,5 @@ jobs:
     - name: make stm32f413
       run: make stm32f413
     - name: make tests
-      run: sudo bash ./Validation/makeTests.sh
+      run: sudo sh ./Validation/makeTests.sh
       shell: bash

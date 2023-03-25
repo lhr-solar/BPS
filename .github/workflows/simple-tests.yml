@@ -24,6 +24,6 @@ jobs:
     # simple test for verifying testing infrastructure
     # run tests in sudo for rtprio to work
     - name: Unit Test 
-      run: sudo Validation/Simulator_Tests.sh
+      run: sudo bash Validation/Simulator_Tests.sh
     # add more tests here
 
