@@ -3,7 +3,18 @@
 */
 
 #include "RTOS_BPS.h"
-#include "Tasks.h" // for OS errors
+#include "Tasks.h"      // for OS errors
+#include "BSP_Timer.h"  // for fine-grained RTOS delays
+
+// Helper structures for RTOS_BPS_DelayUs() -------------------
+
+static volatile uint32_t DelayUsContinue = 0;
+
+static void DelayUsCallback(void) {
+    DelayUsContinue = 1;
+}
+
+// End Helper structures for RTOS_BPS_DelayUs() ---------------
 
 /**
  * @brief   Creates a task that will be handled by the OS
@@ -100,35 +111,66 @@ void RTOS_BPS_MutexPost(BPS_OS_MUTEX* mutex, BPS_OS_OPT options) {
 
 /**
  * @brief: Creates a Second-Based Time Delay.
- * @param dly Defines how many seconds to delay for.
+ * @param delay_s Defines how many seconds to delay for.
  * @return none
  */
-void RTOS_BPS_DelaySecs(uint16_t dly){
+void RTOS_BPS_DelaySecs(uint16_t delay_s){
     BPS_OS_ERR err;
-    OSTimeDlyHMSM(0, 0, (CPU_INT16U)dly, 0, OS_OPT_TIME_HMSM_NON_STRICT, &err);
+    OSTimeDlyHMSM(0, 0, (CPU_INT16U)delay_s, 0, OS_OPT_TIME_HMSM_NON_STRICT, &err);
     assertOSError(err);
 }
 
 /**
  * @brief: Creates a Millisecond-Based Time Delay.
  * @param dly Defines how many milliseconds to delay for.
- * @note if a dly value is passed that is less time than the resolution of 1 tick, this code will error out
+ * @note if a dly value is passed that is less time than the resolution of 1 tick (100ms), 
+ *       this code will error out
  * @return none
  */
-void RTOS_BPS_DelayMs(uint16_t dly){
+void RTOS_BPS_DelayMs(uint16_t delay_ms){
     BPS_OS_ERR err;
-    OSTimeDlyHMSM(0, 0, 0, (CPU_INT32U)dly, OS_OPT_TIME_HMSM_NON_STRICT, &err);
+    OSTimeDlyHMSM(0, 0, 0, (CPU_INT32U)delay_ms, OS_OPT_TIME_HMSM_NON_STRICT, &err);
+    assertOSError(err);
+}
+
+/**
+ * @brief Creates a Microsecond-based Time Delay.
+ *        As anything less than 100ms will not work with an RTOS delay, 
+ *        this delay suspends the scheduler and uses a hardware timer to implement a 
+ *        microsecond-accurate delay.
+ * @param dly Defines how many milliseconds to delay for.
+ * @note !! Blocks the Scheduler !! Do not use for extended delays!
+ *       Use RTOS_BPS_DelayMs() or RTOS_BPS_DelaySecs() if possible
+ * 
+ *       Due to overhead from suspending the scheduler and setting up the delay, the 
+ *       actual delay time will be a few cycles slower than the requested delay time.
+ * @return none 
+ */
+void RTOS_BPS_DelayUs(uint32_t delay_us) {
+    BPS_OS_ERR err;
+    
+    // lock the scheduler
+    OSSchedLock(&err);
+    assertOSError(err);
+
+    // delay
+    BSP_Timer_Start_OneShot(delay_us, DelayUsCallback);
+    while (!DelayUsContinue);
+    DelayUsContinue = 0;
+
+    // unlock the scheduler
+    OSSchedUnlock(&err);
     assertOSError(err);
 }
 
 /**
  * @brief: Creates a Tick-Based Time Delay.
- * @param dly Defines how many ticks to delay for.
+ * @param delay_ticks Defines how many ticks to delay for.
  * @return none
  */
-void RTOS_BPS_DelayTick(BPS_OS_TICK dly){
+void RTOS_BPS_DelayTick(BPS_OS_TICK delay_ticks){
     BPS_OS_ERR err;
-    OSTimeDly(dly, OS_OPT_TIME_DLY, &err);
+    OSTimeDly(delay_ticks, OS_OPT_TIME_DLY, &err);
     assertOSError(err);
 }
 
