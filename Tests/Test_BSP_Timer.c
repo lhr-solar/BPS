@@ -12,9 +12,7 @@ void oneshot(void) {
 }
 
 int main(void){
-    uint32_t test;
-    uint32_t delay = 10000000;
-    uint32_t time = 1;        
+    uint32_t test;   
     
     BSP_Timer_Init();
     BSP_UART_Init(NULL, NULL, UART_USB);
@@ -26,6 +24,8 @@ int main(void){
         test = BSP_Timer_GetTicksElapsed();
         printf("Ticks elapsed : %ld\n\r", test);
         BSP_Timer_Start_OneShot(2e6, oneshot);
+        while (!timer_delay_continue);
+        timer_delay_continue = 0;
     }
    
 }

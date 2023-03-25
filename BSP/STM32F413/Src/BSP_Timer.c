@@ -73,8 +73,11 @@ void BSP_Timer_Init(void) {
 	TIM_TimeBaseStructInit(&timer_oneshot);
 
 	TIM_TimeBaseInit(BSP_TIMER_INST(BSP_TIMER_TICKCOUNTER), &timer_tickcounter);
+	printf("%p initialized\n\r", BSP_TIMER_INST(BSP_TIMER_TICKCOUNTER));
 	TIM_TimeBaseInit(BSP_TIMER_INST(BSP_TIMER_ONESHOT), &timer_oneshot);
+	printf("%p initialized\n\r", BSP_TIMER_INST(BSP_TIMER_ONESHOT));
 	TIM_ITConfig(BSP_TIMER_INST(BSP_TIMER_ONESHOT), TIM_IT_Update, ENABLE);
+	printf("%p interrupts initialized\n\r", BSP_TIMER_INST(BSP_TIMER_ONESHOT));
 }
 
 /**
