@@ -26,7 +26,7 @@ int simulatorLog;
 FILE* simFile;
 
 // Used to prevent another thread from printing out using non thread-safe write in Simulator_Log
-pthread_mutex_t SimulatorLog_Sem;
+static pthread_mutex_t SimulatorLog_Sem;
 
 // Counter for current state we are on
 uint8_t stateCount = 0;
