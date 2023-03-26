@@ -1,4 +1,8 @@
 /* Copyright (c) 2018-2022 UT Longhorn Racing Solar */
+/* Interrupt_Priorities.h
+ * File to define Preemptive and Sub Interrupt Priorities.
+ */
+
 #ifndef INTERRUPT_PRIORITIES_H
 #define INTERRUPT_PRIORITIES_H
 
