@@ -5,6 +5,9 @@
 #include "stm32f4xx_gpio.h"
 #include "stm32f4xx_rcc.h"
 
+//TODO: Combine these definitions together and explicitly define the struct with idx value. Example 
+//can be found in FaultState.c
+
 // Just some lookup for the values
 static const uint32_t LIGHT_VALS[LIGHTS_MAX] = {
 	GPIO_Pin_4,	// RUN, 

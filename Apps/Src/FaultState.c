@@ -20,6 +20,24 @@ extern uint8_t stateCount;
 
 #define MESSAGE_BUFFER 20000
 
+struct FaultToOut_t {
+    Light light; 
+    char* string;
+};
+
+static const struct FaultToOut_t FaultDict[Fault_Max] = {
+    [Fault_UVOLT]       = {.light = UVOLT, .string = "UVOLT"}, //do not have enough led's so some are reused
+    [Fault_OVOLT]       = {.light = OVOLT, .string = "OVOLT"},
+    [Fault_OTEMP]       = {.light = OTEMP, .string = "OTEMP"},
+    [Fault_OCURR]       = {.light = OCURR, .string = "OCURR"},
+    [Fault_OW]          = {.light = WIRE, .string = "OW"},
+    [Fault_HANDLER]     = {.light = EXTRA, .string = "HANDLER"},
+    [Fault_OS]          = {.light = EXTRA, .string = "OS"},
+    [Fault_WDOG]        = {.light = WDOG, .string = "WDOG"},
+    [Fault_CRC]         = {.light = WIRE, .string = "CRC"},
+    [Fault_ESTOP]       = {.light = WIRE, .string = "ESTOP"}
+};
+
 /*
  * Note: do not call this directly if it can be helped.
  * Instead, call an RTOS function to unblock the mutex
@@ -34,6 +52,13 @@ void EnterFaultState() {
     OSSchedLock(&oserr);
     assertOSError(oserr);
 #endif
+
+    if (Fault_Flag) { //if we are re-entering this function
+        Fault_BitMap |= Fault_OS;
+    }
+    else {
+        Fault_Flag = 1; //set fault flag to 1 so data can be accessed without OS functions
+    }
 
     // Turn Contactor Off
     Contactor_Init();
@@ -59,6 +84,16 @@ void EnterFaultState() {
     #ifdef SIMULATION
     char err[100] = {0};
     #endif
+    for (uint16_t i = 1; i < Fault_Max; i <<= 1){
+        if (Fault_BitMap & i) {
+            #ifdef SIMULATION
+                sprintf(err, "$$$ Entered fault in state {%d} - %s\n", stateCount - 1, FaultDict[i].string);
+                Simulator_Log_Location(LOG_INFO, err);
+            #endif
+            BSP_Light_On(FaultDict[i].light); //allow multiple lights to be turned on
+        }
+    }
+    /*
     switch (Fault_BitMap){
         case Fault_UVOLT:
         #ifdef SIMULATION
@@ -129,6 +164,7 @@ void EnterFaultState() {
             BSP_Light_On(WIRE); //This is normally for Open Wire, but is used for ESTOP since we do not check Open Wire as of 1/9/2023
             break;
     }
+    */
 
     //EEPROM_LogError(Fault_BitMap);
 
