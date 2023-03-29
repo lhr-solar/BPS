@@ -421,20 +421,20 @@ int8_t Temperature_PID_Output(int32_t InputTemp, int32_t DesiredTemp) {
     //Only read error sum in range
     ErrorSum += abs(Error) < TEMPERATURE_PID_I_ZONE ? Error : 0;
 
-	//Cap error sum at 500 read degrees
+    //Cap error sum at 500 read degrees
     ErrorSum = (abs(ErrorSum) < TEMPERATURE_PID_I_MAX_ACCUM) ? ErrorSum :
         (ErrorSum > 0 ? TEMPERATURE_PID_I_MAX_ACCUM : -TEMPERATURE_PID_I_MAX_ACCUM);
 
-	//5 is the estimated "hold output"
+    //5 is the estimated "hold output"
     //Scale P-output to 0-8, Floor divide error by 1000
-	int8_t p_Output = (int8_t)((-Error)/(TEMPERATURE_PID_PROPORTIONAL*TEMPERATURE_PID_MILICELCIUS_CONVERT)) + TEMPERATURE_HOLD_FAN_SPEED;
+    int8_t p_Output = (int8_t)((-Error)/(TEMPERATURE_PID_PROPORTIONAL*TEMPERATURE_PID_MILICELCIUS_CONVERT)) + TEMPERATURE_HOLD_FAN_SPEED;
 
-	//I output could totally fudge things up (and probably will on the first test), so disable it and make sure p is good first
-	//Keep I gains low or you'll get weird oscillation. abs(I output) should not currently exceed 2
-	int8_t i_Output = (int8_t)((-ErrorSum)/(TEMPERATURE_PID_INTEGRAL*TEMPERATURE_PID_MILICELCIUS_CONVERT));
-
-	//Don't use D output
-	int8_t output = p_Output + i_Output;
+    //I output could totally fudge things up (and probably will on the first test), so disable it and make sure p is good first
+    //Keep I gains low or you'll get weird oscillation. abs(I output) should not currently exceed 2 
+    int8_t i_Output = (int8_t)((-ErrorSum)/(TEMPERATURE_PID_INTEGRAL*TEMPERATURE_PID_MILICELCIUS_CONVERT));
+    
+    //Don't use D output
+    int8_t output = p_Output + i_Output;
     output = (output > TOPSPEED) ? TOPSPEED :
         (output < 0) ? 0 : output;
     return output;
