@@ -123,7 +123,7 @@ static void USART_USB_Init() {
 
     // Enable NVIC
     NVIC_InitTypeDef NVIC_InitStructure;
-  	NVIC_InitStructure.NVIC_IRQChannel = USART3_IRQn;
+    NVIC_InitStructure.NVIC_IRQChannel = USART3_IRQn;
     NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = USART3_Preempt_Prio;
     NVIC_InitStructure.NVIC_IRQChannelSubPriority = USART3_Sub_Prio;
     NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
