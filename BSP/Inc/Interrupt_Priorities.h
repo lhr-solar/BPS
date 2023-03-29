@@ -1,6 +1,9 @@
 /* Copyright (c) 2018-2022 UT Longhorn Racing Solar */
 /* Interrupt_Priorities.h
- * File to define Preemptive and Sub Interrupt Priorities.
+ * File to define Preemptive and Sub Interrupt Priorities. Belongs in the BSP layer as all references to these values are within BSP files.
+ * Preemption Priority - allows an ISR to be preempted (interrupted) by another interrupt of higher priority.
+ * Subpriority - determines which of two, equal priority interrupts to start with
+ * When updating subpriorities, make sure there are no alternative interrupts with equal priorities that need to be run in a certain order
  */
 
 #ifndef INTERRUPT_PRIORITIES_H
