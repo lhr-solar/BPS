@@ -1,6 +1,7 @@
 /* Copyright (c) 2018-2022 UT Longhorn Racing Solar */
 
 #include "BSP_SPI.h"
+#include "Interrupt_Priorities.h"
 #include "stm32f4xx.h"
 #include "os.h"
 #include "BSP_OS.h"
@@ -167,13 +168,15 @@ void BSP_SPI_Init(spi_port_t port, bsp_os_t *spi_os){
         GPIO_Init(GPIOD, &GPIO_InitStruct);
         SPI_os[spi_ltc6811] = spi_os;
 
-        //Configure SPI1 interrupt priority
-        NVIC_InitTypeDef NVIC_InitStruct;
-        NVIC_InitStruct.NVIC_IRQChannel = SPI1_IRQn;
-        NVIC_InitStruct.NVIC_IRQChannelPreemptionPriority = 0;
-        NVIC_InitStruct.NVIC_IRQChannelSubPriority = 0;
-        NVIC_InitStruct.NVIC_IRQChannelCmd = ENABLE;
-        NVIC_Init(&NVIC_InitStruct);
+        if(SPI_OPERATING_MODES[spi_ltc6811] == SPI_RTOS) {
+            //Configure SPI1 interrupt priority
+            NVIC_InitTypeDef NVIC_InitStruct;
+            NVIC_InitStruct.NVIC_IRQChannel = SPI1_IRQn;
+            NVIC_InitStruct.NVIC_IRQChannelPreemptionPriority = SPI1_Preempt_Prio;
+            NVIC_InitStruct.NVIC_IRQChannelSubPriority = SPI1_Sub_Prio;
+            NVIC_InitStruct.NVIC_IRQChannelCmd = ENABLE;
+            NVIC_Init(&NVIC_InitStruct);
+        }
 
     } else if(port == spi_ltc2315) {
         //      SPI configuration:
@@ -226,13 +229,15 @@ void BSP_SPI_Init(spi_port_t port, bsp_os_t *spi_os){
         GPIO_Init(GPIOA, &GPIO_InitStruct);
         SPI_os[spi_ltc2315] = spi_os;
 
-        //Configure SPI3 interrupt priority
-        NVIC_InitTypeDef NVIC_InitStruct;
-        NVIC_InitStruct.NVIC_IRQChannel = SPI3_IRQn;
-        NVIC_InitStruct.NVIC_IRQChannelPreemptionPriority = 0;
-        NVIC_InitStruct.NVIC_IRQChannelSubPriority = 1;
-        NVIC_InitStruct.NVIC_IRQChannelCmd = ENABLE;
-        NVIC_Init(&NVIC_InitStruct);
+        if(SPI_OPERATING_MODES[spi_ltc2315] == SPI_RTOS) {
+            //Configure SPI3 interrupt priority
+            NVIC_InitTypeDef NVIC_InitStruct;
+            NVIC_InitStruct.NVIC_IRQChannel = SPI3_IRQn;
+            NVIC_InitStruct.NVIC_IRQChannelPreemptionPriority = SPI3_Preempt_Prio;
+            NVIC_InitStruct.NVIC_IRQChannelSubPriority = SPI3_Sub_Prio;
+            NVIC_InitStruct.NVIC_IRQChannelCmd = ENABLE;
+            NVIC_Init(&NVIC_InitStruct);
+        }
     }
 }
 
