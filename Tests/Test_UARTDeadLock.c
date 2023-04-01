@@ -5,8 +5,9 @@
 #include "BSP_UART.h"
 #include "config.h"
 #include "os.h"
+#include "Tasks.h"
 
-OS_SEM SafetyCheck_Sem4;
+//OS_SEM SafetyCheck_Sem4;
 
 OS_TCB UART_Deadlocks_TCB;
 CPU_STK UART_Deadlocks_Stk[512];
