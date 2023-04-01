@@ -93,80 +93,8 @@ void EnterFaultState() {
             BSP_Light_On(FaultDict[i].light); //allow multiple lights to be turned on
         }
     }
-    /*
-    switch (Fault_BitMap){
-        case Fault_UVOLT:
-        #ifdef SIMULATION
-            sprintf(err, "$$$ Entered fault in state {%d} - UNDERVOLT\n", stateCount - 1);
-            Simulator_Log_Location(LOG_INFO, err);
-        #endif
-            BSP_Light_On(UVOLT);
-            break;
-        case Fault_OVOLT:
-        #ifdef SIMULATION
-            sprintf(err, "$$$ Entered fault in state {%d} - OVERVOLT\n", stateCount - 1);
-            Simulator_Log_Location(LOG_INFO, err);
-        #endif
-            BSP_Light_On(OVOLT);
-            break;
-        case Fault_OTEMP:
-        #ifdef SIMULATION
-            sprintf(err, "$$$ Entered fault in state {%d} - OVERTEMP\n", stateCount - 1);
-            Simulator_Log_Location(LOG_INFO, err);
-        #endif
-            BSP_Light_On(OTEMP);
-            break;
-        case Fault_OCURR:
-        #ifdef SIMULATION
-            sprintf(err, "$$$ Entered fault in state {%d} - OVERCURRENT\n", stateCount - 1);
-            Simulator_Log_Location(LOG_INFO, err);
-        #endif
-            BSP_Light_On(OCURR);
-            break;
-        case Fault_OW:
-        #ifdef SIMULATION
-            sprintf(err, "$$$ Entered fault in state {%d} - WIRE\n", stateCount - 1);
-            Simulator_Log_Location(LOG_INFO, err);
-        #endif
-            BSP_Light_On(WIRE);  
-            break;
-        case Fault_HANDLER:
-        #ifdef SIMULATION
-            sprintf(err, "$$$ Entered fault in state {%d} - FAULT HANDLER\n", stateCount - 1);
-            Simulator_Log_Location(LOG_INFO, err);
-        #endif    
-            break;
-        case Fault_OS:
-        #ifdef SIMULATION
-            sprintf(err, "$$$ Entered fault in state {%d} - OS ERROR\n", stateCount - 1);
-            Simulator_Log_Location(LOG_INFO, err);
-        #endif
-            break;
-        case Fault_WDOG:
-        #ifdef SIMULATION
-            sprintf(err, "$$$ Entered fault in state {%d} - WATCHDOG\n", stateCount - 1);
-            Simulator_Log_Location(LOG_INFO, err);
-        #endif
-            BSP_Light_On(WDOG);
-            break;
-        case Fault_CRC: //Cannot get Fault_CRC in Simulation
-        #ifdef SIMULATION
-            sprintf(err, "$$$ Entered fault in state {%d} - CRC\n", stateCount - 1);
-            Simulator_Log_Location(LOG_INFO, err);
-        #endif
-            BSP_Light_On(EXTRA);
-            break;
-        case Fault_ESTOP:
-        #ifdef SIMULATION
-            sprintf(err, "$$$ Entered fault in state {%d} - ELECTRICAL STOP\n", stateCount - 1);
-            Simulator_Log_Location(LOG_INFO, err);
-        #endif
-            BSP_Light_On(WIRE); //This is normally for Open Wire, but is used for ESTOP since we do not check Open Wire as of 1/9/2023
-            break;
-    }
-    */
 
-    //EEPROM_LogError(Fault_BitMap);
+    EEPROM_LogError(Fault_BitMap);
 
     // TODO: create an interrupt-independent CAN interface, so we can use CAN from within a fault state
     // avoid infinite recursive faults, since our CAN Driver relies on the OS to work
