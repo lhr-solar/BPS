@@ -299,14 +299,19 @@ void Simulator_Init(char *jsonPath) {
  * @return  None
  */
 static void Simulator_Transition(void) {
+    // for debugging
+    static uint16_t stateCount = 0;
     // advance to the current state
     time_t currentTime = time(NULL);
     //wait until time for state is completed before moving to next state
-    while (startTime + states->time < currentTime) {
+    if (startTime + states->time < currentTime) {
         simulator_state *prev = states;
         states = states->next;
         startTime += prev->time;
         free(prev);
+
+        // debugging will remove later
+        printf("\n\n\n\n\n\n\nTransition count: %d\n\n\n\n\n\n", ++stateCount);
 
         if (states == NULL) {
             Simulator_Log(LOG, "\nFinished last state!\n");
