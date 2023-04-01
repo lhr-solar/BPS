@@ -23,6 +23,6 @@ jobs:
       run: make simulator
     # simple test for verifying testing infrastructure
     # run tests in sudo for rtprio to work
-    - name: Unit Test 
+    - name: Simulator Test 
       run: sudo bash Validation/Simulator_Tests.sh
     # add more tests here

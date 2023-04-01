@@ -212,10 +212,6 @@ void generateData(char selection){
             generateData(NONE);
             break;
         case NONE:
-            index = randomRange(1,jsonLength - 1);
-            victim = randomRange(0, NUM_BATTERY_MODULES);
-            states[index].voltages[victim] = (MAX_VOLTAGE_LIMIT + 1)*10;
-            //test erroring out on no error test
             asprintf(&filename, "%c-NoError", selection);
             break;
         case ALL_EDGE:

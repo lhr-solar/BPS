@@ -255,7 +255,7 @@ void Simulator_Init(char *jsonPath) {
     mkdir(outputdir, S_IRWXU);
 
     // create the log file
-    simulatorLog = open(filename, O_CREAT | O_WRONLY, 0664);
+    simulatorLog = creat(filename, 0664);
 
     if (simulatorLog < 0) {
         printf("error opening file %s\n", filename);
