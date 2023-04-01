@@ -17,7 +17,7 @@ static bool initialized = false;
  * @param   port The SPI port to initialize.
  * @return  None
  */
-void BSP_SPI_Init(spi_port_t port, bsp_os_t *spi_os, bool baremetal) {
+void BSP_SPI_Init(spi_port_t port, bsp_os_t *spi_os) {
     initialized = true;
     Simulator_Log(LOG_INFO,"SPI initialized\n");
     Simulator_Log(LOG_INFO,"SPI3 initialized\n");
