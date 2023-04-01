@@ -5,8 +5,9 @@
 #include "stm32f4xx_gpio.h"
 #include "stm32f4xx_usart.h"
 #include "stm32f4xx_rcc.h"
+#include "Interrupt_Priorities.h"
 
-#define TX_SIZE     128
+#define TX_SIZE     2048
 #define RX_SIZE     64
 
 // Initialize the FIFOs
@@ -73,8 +74,8 @@ static void USART_BLE_Init() {
 
     // Enable NVIC
     NVIC_InitTypeDef NVIC_InitStructure;
-    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 2;
-    NVIC_InitStructure.NVIC_IRQChannelSubPriority = 1;
+    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = USART2_Preempt_Prio;
+    NVIC_InitStructure.NVIC_IRQChannelSubPriority = USART2_Sub_Prio;
     NVIC_InitStructure.NVIC_IRQChannel = USART2_IRQn;
     NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
     NVIC_Init(&NVIC_InitStructure);
@@ -122,9 +123,9 @@ static void USART_USB_Init() {
 
     // Enable NVIC
     NVIC_InitTypeDef NVIC_InitStructure;
-  	NVIC_InitStructure.NVIC_IRQChannel = USART3_IRQn;
-    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 2;
-    NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
+    NVIC_InitStructure.NVIC_IRQChannel = USART3_IRQn;
+    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = USART3_Preempt_Prio;
+    NVIC_InitStructure.NVIC_IRQChannelSubPriority = USART3_Sub_Prio;
     NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
     NVIC_Init(&NVIC_InitStructure);
 

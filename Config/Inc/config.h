@@ -97,7 +97,10 @@ typedef enum SafetyStatus_e {SAFE = 0, DANGER = 1, OVERVOLTAGE = 2, UNDERVOLTAGE
 //--------------------------------------------------------------------------------
 // Voltage Sensor Configurations
 // Defines how many voltage sensors are connected to each board
+#ifndef MAX_VOLT_SENSORS_PER_MINION_BOARD
 #define MAX_VOLT_SENSORS_PER_MINION_BOARD	12	// User defined. The LTC6811 can actually measure 12 modules.
+#endif
+
 #define TOTAL_VOLT_WIRES					(MAX_VOLT_SENSORS_PER_MINION_BOARD * NUM_MINIONS)
 
 //--------------------------------------------------------------------------------

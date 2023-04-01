@@ -1,7 +1,12 @@
 /* Copyright (c) 2018-2022 UT Longhorn Racing Solar */
 
 #include "BSP_CAN.h"
+<<<<<<< HEAD
 #include "stm32f4xx_can.h"
+=======
+#include "Interrupt_Priorities.h"
+#include "stm32f4xx.h"
+>>>>>>> master
 #include "os.h"
 #include "Tasks.h"
 
@@ -122,8 +127,8 @@ void BSP_CAN_Init(callback_t rxEvent, callback_t txEnd, bool faultState, bool lo
 
         // Enable Rx interrupts
         NVIC_InitStructure.NVIC_IRQChannel = CAN1_RX0_IRQn;
-        NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x1;
-        NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x1;
+        NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = CAN1_RX0_Preempt_Prio;
+        NVIC_InitStructure.NVIC_IRQChannelSubPriority = CAN1_RX0_Sub_Prio;
         NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
         NVIC_Init(&NVIC_InitStructure);	
 
@@ -133,8 +138,8 @@ void BSP_CAN_Init(callback_t rxEvent, callback_t txEnd, bool faultState, bool lo
 
             // Enable Tx Interrupts
             NVIC_InitStructure.NVIC_IRQChannel = CAN1_TX_IRQn;
-            NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x1; // TODO: assess both of these priority settings
-            NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x0;
+            NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = CAN1_TX_Preempt_Prio; // TODO: assess both of these priority settings
+            NVIC_InitStructure.NVIC_IRQChannelSubPriority = CAN1_TX_Sub_Prio;
             NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
             NVIC_Init(&NVIC_InitStructure);
         }

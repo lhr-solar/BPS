@@ -24,6 +24,6 @@ void Task_PetWDog(void *p_arg) {
         }
         //release WDog Mutex
         RTOS_BPS_MutexPost(&WDog_Mutex, OS_OPT_POST_NONE);
-        RTOS_BPS_DelayTick(10);
+        RTOS_BPS_DelayMs(500);
     }
 }

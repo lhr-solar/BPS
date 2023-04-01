@@ -18,8 +18,6 @@
 extern uint8_t stateCount;
 #endif
 
-// #define MESSAGE_BUFFER 2000
-
 struct FaultToOut_t {
     Light light; 
     char* string;
@@ -125,7 +123,6 @@ void EnterFaultState() {
         payload.data.w = Amps_GetReading();
         CANbus_SendMsg_FaultState(CURRENT_DATA, payload);
         
-
         //Send Voltage Readings
         for (uint8_t i = 0; i < NUM_BATTERY_MODULES; i++){ //send all battery module voltage data
             payload.idx = i;

@@ -31,16 +31,15 @@ void Task_Init(void *p_arg) {
                 (void *)0,                      // Task function args
                 TASK_CHECK_CONTACTOR_PRIO,      // Priority
                 CheckContactor_Stk,             // Stack
-                TASK_CHECK_CONTACTOR_STACK_SIZE
-                );
+                TASK_CHECK_CONTACTOR_STACK_SIZE);
     //3
-    // RTOS_BPS_TaskCreate(&PetWDog_TCB,	    // TCB
-    // 		"TASK_PETWDOG",	                    // Task Name (String)
-    // 		Task_PetWDog,				        // Task function pointer
-    // 		(void *)0,				            // Task function args
-    // 		TASK_PETWDOG_PRIO,			        // Priority
-    // 		PetWDog_Stk,				        // Stack
-    // 		TASK_PETWDOG_STACK_SIZE);
+    RTOS_BPS_TaskCreate(&PetWDog_TCB,	    // TCB
+            "TASK_PETWDOG",	                    // Task Name (String)
+            Task_PetWDog,				        // Task function pointer
+            (void *)0,				            // Task function args
+            TASK_PETWDOG_PRIO,			        // Priority
+            PetWDog_Stk,				        // Stack
+            TASK_PETWDOG_STACK_SIZE);
     //4
     RTOS_BPS_TaskCreate(&VoltTempMonitor_TCB,	// TCB
             "TASK_VOLT_TEMP_MONITOR",	        // Task Name (String)
@@ -94,7 +93,6 @@ void Task_Init(void *p_arg) {
             CLI_Stk,				            // Stack
             TASK_CLI_STACK_SIZE,		        // Stack size
             );
-    assertOSError(err);
     */
     //10
     RTOS_BPS_TaskCreate(&Idle_TCB,				// TCB
