@@ -57,21 +57,29 @@ void Task1(void *p_arg){
 
     // Spawn tasks needed for Amperes readings to affect contactor
     //1
-    RTOS_BPS_TaskCreate(&CheckContactor_TCB,    // TCB
-				"Task_CheckContactor",          // Task Name (String)
-				Task_CheckContactor,            // Task function pointer
-				(void *)0,                      // Task function args
-				TASK_CHECK_CONTACTOR_PRIO,      // Priority
-				CheckContactor_Stk,             // Stack
-				TASK_CHECK_CONTACTOR_STACK_SIZE);
+    // RTOS_BPS_TaskCreate(&CheckContactor_TCB,    // TCB
+    //             "Task_CheckContactor",          // Task Name (String)
+    //             Task_CheckContactor,            // Task function pointer
+    //             (void *)0,                      // Task function args
+    //             TASK_CHECK_CONTACTOR_PRIO,      // Priority
+    //             CheckContactor_Stk,             // Stack
+    //             TASK_CHECK_CONTACTOR_STACK_SIZE);
+    RTOS_BPS_TaskCreate(&PetWDog_TCB,              // TCB
+                "TASK_PETWDOG_PRIO",        // Task Name (String)
+                Task_PetWDog,               // Task function pointer
+                (void *)0,                  // Task function args
+                TASK_PETWDOG_PRIO,          // Priority
+                PetWDog_Stk,                // Stack
+                TASK_PETWDOG_STACK_SIZE
+                );
 
     RTOS_BPS_TaskCreate(&VoltTempMonitor_TCB,				// TCB
-			"TASK_VOLT_TEMP_MONITOR_PRIO",	// Task Name (String)
-			Task_VoltTempMonitor,				// Task function pointer
-			(void *)0,				// Task function args
-			TASK_VOLT_TEMP_MONITOR_PRIO,			// Priority
-			VoltTempMonitor_Stk,	// Watermark limit for debugging
-			TASK_VOLT_TEMP_MONITOR_STACK_SIZE);					// return err code
+            "TASK_VOLT_TEMP_MONITOR_PRIO",	// Task Name (String)
+            Task_VoltTempMonitor,				// Task function pointer
+            (void *)0,				// Task function args
+            TASK_VOLT_TEMP_MONITOR_PRIO,			// Priority
+            VoltTempMonitor_Stk,	// Watermark limit for debugging
+            TASK_VOLT_TEMP_MONITOR_STACK_SIZE);					// return err code
 
     // Spawn CANBUS Consumer, PRIO 7
     RTOS_BPS_TaskCreate(&CANBusConsumer_TCB,				// TCB
@@ -85,8 +93,8 @@ void Task1(void *p_arg){
     // Initialize CAN queue
     CAN_Queue_Init();
 
-	//delete task
-	OSTaskDel(NULL, &p_err); // Delete task
+    //delete task
+    OSTaskDel(NULL, &p_err); // Delete task
 }
 
 //Task to prevent watchdog from tripping

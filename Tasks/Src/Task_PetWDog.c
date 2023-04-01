@@ -6,7 +6,7 @@
 void Task_PetWDog(void *p_arg) {
     (void)p_arg;
 
-    BSP_WDTimer_Init();
+    BSP_WDTimer_Init(false);
     BSP_WDTimer_Start();    
 
     while (1){
