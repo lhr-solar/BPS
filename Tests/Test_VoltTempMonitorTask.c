@@ -18,10 +18,6 @@
 #include "RTOS_BPS.h"
 #include "Voltage.h"
 #include "Temperature.h"
-<<<<<<< HEAD
-=======
-#include "BSP_UART.h"
->>>>>>> master
 
 /******************************************************************************
  * VoltTempMonitor Task Test Plan
@@ -47,13 +43,10 @@ OS_TCB Task2_TCB;
 CPU_STK Task2_Stk[DEFAULT_STACK_SIZE];
 
 OS_ERR p_err;
-<<<<<<< HEAD
-=======
 
 void foo(void){
     return;
 }
->>>>>>> master
 
 // Initialization task for this test
 void Task1(void *p_arg){

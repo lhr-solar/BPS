@@ -1,12 +1,8 @@
 /* Copyright (c) 2018-2022 UT Longhorn Racing Solar */
 
 #include "BSP_CAN.h"
-<<<<<<< HEAD
-#include "stm32f4xx_can.h"
-=======
 #include "Interrupt_Priorities.h"
 #include "stm32f4xx.h"
->>>>>>> master
 #include "os.h"
 #include "Tasks.h"
 
