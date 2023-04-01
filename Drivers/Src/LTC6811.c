@@ -91,17 +91,6 @@ void LTC6811_Post(void) {
 }
 #endif
 
-
-#ifdef BAREMETAL
-void LTC6811_Pend(void) {
-    return;
-}
-
-void LTC6811_Post(void) {
-    return;
-}
-#endif
-
 void LTC6811_Init(cell_asic *battMod){
   //only create the mutex the first time this function is called (called by Voltage_Init() and Temperature_Init())
   static bool mutexExists = false;

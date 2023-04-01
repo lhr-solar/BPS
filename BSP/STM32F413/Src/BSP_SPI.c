@@ -57,12 +57,6 @@ enum spi_status {
     SPI_ERROR = 0xFF00
 };
 
-enum spi_operation {
-    SPI_RTOS = 0,
-    SPI_BAREMETAL = 1
-};
-static enum spi_operation SPI_OPERATING_MODES[NUM_SPI_BUSSES] = {0};
-
 static txfifo_t spiTxFifos[NUM_SPI_BUSSES];
 static rxfifo_t spiRxFifos[NUM_SPI_BUSSES];
 
@@ -76,17 +70,8 @@ static inline void SPI_Wait(spi_port_t port){
 
 // Use this inline function to wait until SPI communication is complete
 static inline void SPI_WaitTx(spi_port_t port){
-    switch(SPI_OPERATING_MODES[port]) {
-    case SPI_RTOS:
-        SPI_I2S_ITConfig(SPI_BUSSES[port], SPI_I2S_IT_TXE, ENABLE);
-        SPI_os[port]->pend();
-        break;
-    case SPI_BAREMETAL:
-        SPI_Wait(port);
-        break;
-    default:
-        return;
-    }
+    SPI_I2S_ITConfig(SPI_BUSSES[port], SPI_I2S_IT_TXE, ENABLE);
+    SPI_os[port]->pend();
 }
 
 /** SPI_WriteRead
@@ -109,7 +94,7 @@ static uint16_t SPI_WriteRead(spi_port_t port, uint8_t txData){
  * @param   spi_os pointer to struct that holds the SPI specific pend()/post() functions 
  * @return  None
  */
-void BSP_SPI_Init(spi_port_t port, bsp_os_t *spi_os, bool baremetal){
+void BSP_SPI_Init(spi_port_t port, bsp_os_t *spi_os){
     //      SPI configuration:
     //          speed : 125kbps
     //          CPOL : 1 (polarity of clock during idle is high)
@@ -128,8 +113,6 @@ void BSP_SPI_Init(spi_port_t port, bsp_os_t *spi_os, bool baremetal){
         spiTxFifos[i] = txfifo_new();
         spiRxFifos[i] = rxfifo_new();
     }
-
-    SPI_OPERATING_MODES[port] = baremetal ? SPI_BAREMETAL : SPI_RTOS;
 
     // I don't think there's any way around hardcoding this one
 
@@ -184,15 +167,13 @@ void BSP_SPI_Init(spi_port_t port, bsp_os_t *spi_os, bool baremetal){
         GPIO_Init(GPIOD, &GPIO_InitStruct);
         SPI_os[spi_ltc6811] = spi_os;
 
-        if(SPI_OPERATING_MODES[spi_ltc6811] == SPI_RTOS) {
-            //Configure SPI1 interrupt priority
-            NVIC_InitTypeDef NVIC_InitStruct;
-            NVIC_InitStruct.NVIC_IRQChannel = SPI1_IRQn;
-            NVIC_InitStruct.NVIC_IRQChannelPreemptionPriority = 0;
-            NVIC_InitStruct.NVIC_IRQChannelSubPriority = 0;
-            NVIC_InitStruct.NVIC_IRQChannelCmd = ENABLE;
-            NVIC_Init(&NVIC_InitStruct);
-        }
+        //Configure SPI1 interrupt priority
+        NVIC_InitTypeDef NVIC_InitStruct;
+        NVIC_InitStruct.NVIC_IRQChannel = SPI1_IRQn;
+        NVIC_InitStruct.NVIC_IRQChannelPreemptionPriority = 0;
+        NVIC_InitStruct.NVIC_IRQChannelSubPriority = 0;
+        NVIC_InitStruct.NVIC_IRQChannelCmd = ENABLE;
+        NVIC_Init(&NVIC_InitStruct);
 
     } else if(port == spi_ltc2315) {
         //      SPI configuration:
@@ -245,15 +226,13 @@ void BSP_SPI_Init(spi_port_t port, bsp_os_t *spi_os, bool baremetal){
         GPIO_Init(GPIOA, &GPIO_InitStruct);
         SPI_os[spi_ltc2315] = spi_os;
 
-        if(SPI_OPERATING_MODES[spi_ltc2315] == SPI_RTOS) {
-            //Configure SPI3 interrupt priority
-            NVIC_InitTypeDef NVIC_InitStruct;
-            NVIC_InitStruct.NVIC_IRQChannel = SPI3_IRQn;
-            NVIC_InitStruct.NVIC_IRQChannelPreemptionPriority = 0;
-            NVIC_InitStruct.NVIC_IRQChannelSubPriority = 1;
-            NVIC_InitStruct.NVIC_IRQChannelCmd = ENABLE;
-            NVIC_Init(&NVIC_InitStruct);
-        }
+        //Configure SPI3 interrupt priority
+        NVIC_InitTypeDef NVIC_InitStruct;
+        NVIC_InitStruct.NVIC_IRQChannel = SPI3_IRQn;
+        NVIC_InitStruct.NVIC_IRQChannelPreemptionPriority = 0;
+        NVIC_InitStruct.NVIC_IRQChannelSubPriority = 1;
+        NVIC_InitStruct.NVIC_IRQChannelCmd = ENABLE;
+        NVIC_Init(&NVIC_InitStruct);
     }
 }
 
@@ -290,7 +269,7 @@ void BSP_SPI_SetClock(spi_speed_t speed) {
  */
 ErrorStatus BSP_SPI_Write(spi_port_t port, uint8_t *txBuf, uint32_t txLen) {
     // If we're below an experimentally-determined value, just use polling
-    if(txLen < 8 || SPI_OPERATING_MODES[port] == SPI_BAREMETAL) { 
+    if(txLen < 8) { 
         for(int i = 0; i < txLen; i++) {
             uint16_t errorstatus = SPI_WriteRead(port, txBuf[i]);
             if (errorstatus == SPI_ERROR) {
@@ -330,7 +309,7 @@ ErrorStatus BSP_SPI_Read(spi_port_t port, uint8_t *rxBuf, uint32_t rxLen) {
     // bool first = true;
 
     // If we have only a little amount of data, just use polling
-    if(rxLen < 8 || SPI_OPERATING_MODES[port] == SPI_BAREMETAL) {
+    if(rxLen < 8) {
         for(int i = 0; i < rxLen; i++) {
             uint16_t data = SPI_WriteRead(port, 0x00);
             if (data == SPI_ERROR) {

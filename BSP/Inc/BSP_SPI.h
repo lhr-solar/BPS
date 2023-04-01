@@ -29,7 +29,7 @@ typedef enum {
  * @param   spi_os pointer to struct that holds the SPI specific pend()/post() functions 
  * @return  None
  */
-void BSP_SPI_Init(spi_port_t port, bsp_os_t *spi_os, bool baremetal);
+void BSP_SPI_Init(spi_port_t port, bsp_os_t *spi_os);
 
 /**
  * @brief   Sets the LTC6811's SPI port clock to either the fast speed for

@@ -30,16 +30,6 @@ void Amperes_Post(){
 }
 #endif
 
-#ifdef BAREMETAL //TODO: Remove all baremetal code since we do not have support for it anymore
-void Amperes_Pend(void) {
-    return;
-}
-
-void Amperes_Post(void) {
-    return;
-}
-#endif
-
 static int32_t latestMeasureMilliAmps;
 
 /** Amps_Init
