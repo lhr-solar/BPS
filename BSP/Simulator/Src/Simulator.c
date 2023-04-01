@@ -139,6 +139,9 @@ static void readInputFile(char *jsonPath) {
         cJSON* canList = cJSON_GetObjectItem(state, "can");
         // Kill switch.
         cJSON* killSwitch = cJSON_GetObjectItem(state, "kill_switch");
+        cJSON* currentcount = cJSON_GetObjectItem(state, "statecount");
+
+        tail->currentcount = currentcount->valueint;
     
         // Check which state fields aren't present in the current sim state JSON.
         // Lots of nasty if/else's here, not much way around this.
@@ -225,7 +228,7 @@ static void readInputFile(char *jsonPath) {
                 killSwitchLockdown = true;
             }
         }
-        stateCount++; // keep track of which state we are on.
+        stateCount++; // keep track of which state we've parsed
     }
 }
 
@@ -298,6 +301,7 @@ void Simulator_Init(char *jsonPath) {
  * @param   None
  * @return  None
  */
+/*
 static void Simulator_Transition(void) {
     // for debugging
     static uint16_t stateCount = 0;
@@ -319,41 +323,70 @@ static void Simulator_Transition(void) {
         }
     }
 }
+*/
+
+void updateSimTimeAndInfo() {
+    time_t currentTime = time(0);
+    char* msg;
+    asprintf(&msg, "\n\n\n\n\nCurrent state count, Time now, Time to transition: %d, %ld, %ld\n\n\n\n\n\n", 
+    states->currentcount,
+    currentTime, 
+    startTime+states->time);
+    Simulator_Log(LOG_INFO, msg);
+    free(msg);
+
+    if (currentTime >= startTime + states->time) {
+        startTime += states->time;
+        simulator_state* current = states;
+        states = states->next;
+        free(current);
+        if (states == NULL) {
+            Simulator_Log(LOG, "\nFinished last state!\n");
+            Simulator_Shutdown(0);
+        }
+    }
+}
 
 // Functions for accessing simulator state. Each field should have a function associated with it
 
 // get the adcHigh
 uint16_t Simulator_getAdcHigh(void) {
-    Simulator_Transition();
+    //Simulator_Transition();
+    updateSimTimeAndInfo();
     return states->adcHigh;
 }
 
 // get the adcLow
 uint16_t Simulator_getAdcLow(void) {
-    Simulator_Transition();
+    //Simulator_Transition();
+    updateSimTimeAndInfo();
     return states->adcLow;
 }
 
 // get the voltages
 uint16_t Simulator_getVoltage(int i) {
-    Simulator_Transition();
+    //Simulator_Transition();
+    updateSimTimeAndInfo();
     return states->voltages[i];
 }
 
 // get a single temperature sensor
 int32_t Simulator_getTemperature(int i) {
-    Simulator_Transition();
+    //Simulator_Transition();
+    updateSimTimeAndInfo();
     return states->temperatures[i];
 }
 
 // get the current
 int32_t Simulator_getCurrent(void) {
-    Simulator_Transition();
+    //Simulator_Transition();
+    updateSimTimeAndInfo();
     return states->current;
 }
 
 // get the charge (stored in the EEPROM)
 uint32_t Simulator_getCharge(void) {
-    Simulator_Transition();
+    //Simulator_Transition();
+    updateSimTimeAndInfo();
     return states->charge;
 }

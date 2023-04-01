@@ -27,6 +27,7 @@ typedef struct simulator_state {
     int32_t current;
     uint32_t charge; // in units of 1 million = 1%
     struct simulator_state *next;
+    uint32_t currentcount;
 } simulator_state;
 
 typedef enum {LOG, LOG_INFO, LOG_WARN, LOG_ERROR, LOG_OUTPUT, LOG_MISC, LOG_NUM_LEVELS} LoggingType_t;
