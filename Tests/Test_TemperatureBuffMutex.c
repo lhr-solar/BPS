@@ -19,7 +19,7 @@ OS_SEM tmr_Sem4;
 
 cell_asic minions[NUM_MINIONS];
 
-void trigger(OS_TMR *p_tmr, void *p_arg) {
+void trigger(void *p_tmr, void *p_arg) {
     RTOS_BPS_SemPost(&tmr_Sem4, OS_OPT_POST_1); 
 }
 
