@@ -1,6 +1,7 @@
 /* Copyright (c) 2018-2022 UT Longhorn Racing Solar */
 
 #include "BSP_SPI.h"
+#include "Interrupt_Priorities.h"
 #include "stm32f4xx.h"
 #include "os.h"
 #include "BSP_OS.h"
@@ -188,8 +189,8 @@ void BSP_SPI_Init(spi_port_t port, bsp_os_t *spi_os, bool baremetal){
             //Configure SPI1 interrupt priority
             NVIC_InitTypeDef NVIC_InitStruct;
             NVIC_InitStruct.NVIC_IRQChannel = SPI1_IRQn;
-            NVIC_InitStruct.NVIC_IRQChannelPreemptionPriority = 0;
-            NVIC_InitStruct.NVIC_IRQChannelSubPriority = 0;
+            NVIC_InitStruct.NVIC_IRQChannelPreemptionPriority = SPI1_PREEMPT_PRIO;
+            NVIC_InitStruct.NVIC_IRQChannelSubPriority = SPI1_SUB_PRIO;
             NVIC_InitStruct.NVIC_IRQChannelCmd = ENABLE;
             NVIC_Init(&NVIC_InitStruct);
         }
@@ -249,8 +250,8 @@ void BSP_SPI_Init(spi_port_t port, bsp_os_t *spi_os, bool baremetal){
             //Configure SPI3 interrupt priority
             NVIC_InitTypeDef NVIC_InitStruct;
             NVIC_InitStruct.NVIC_IRQChannel = SPI3_IRQn;
-            NVIC_InitStruct.NVIC_IRQChannelPreemptionPriority = 0;
-            NVIC_InitStruct.NVIC_IRQChannelSubPriority = 1;
+            NVIC_InitStruct.NVIC_IRQChannelPreemptionPriority = SPI3_PREEMPT_PRIO;
+            NVIC_InitStruct.NVIC_IRQChannelSubPriority = SPI3_SUB_PRIO;
             NVIC_InitStruct.NVIC_IRQChannelCmd = ENABLE;
             NVIC_Init(&NVIC_InitStruct);
         }

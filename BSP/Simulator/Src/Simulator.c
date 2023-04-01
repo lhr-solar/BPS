@@ -25,6 +25,9 @@
 int simulatorLog;
 FILE* simFile;
 
+// Used to prevent another thread from printing out using non thread-safe write in Simulator_Log
+static pthread_mutex_t SimulatorLog_Sem;
+
 // Counter for current state we are on
 uint8_t stateCount = 0;
 
@@ -63,8 +66,14 @@ void Simulator_Log(LoggingType_t lvl, char *str) {
     char prefix[128];
     strcpy(prefix, LoggingLUT[lvl]); //This is because strcat cannot concat const
     char* msg = strcat(prefix, str);
+    pthread_mutex_lock(&SimulatorLog_Sem);
     write(simulatorLog, msg, strlen(msg));
+<<<<<<< HEAD
     //printf("%s", msg);
+=======
+    pthread_mutex_unlock(&SimulatorLog_Sem);
+    printf("%s", msg);
+>>>>>>> master
 }
 
 /**
@@ -75,6 +84,7 @@ void Simulator_Log(LoggingType_t lvl, char *str) {
 void Simulator_Shutdown(int status) {
     Simulator_Log(LOG, "\nShutting down the simulator...\n");
     close(simulatorLog);
+    pthread_mutex_destroy(&SimulatorLog_Sem);
     exit(status);
 }
 
@@ -242,6 +252,10 @@ void Simulator_Init(char *jsonPath) {
     // generate unique name for log file
     startTime = time(NULL);
     char* filename;
+
+    // initialize mutex for logging
+    pthread_mutex_init(&SimulatorLog_Sem, NULL);
+
     // make the file name the test file
     char* tempName = jsonPath + strlen(jsonPath);
     while (*tempName != '/') tempName--;

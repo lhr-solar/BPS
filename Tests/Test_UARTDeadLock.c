@@ -7,8 +7,6 @@
 #include "os.h"
 #include "Tasks.h"
 
-//OS_SEM SafetyCheck_Sem4;
-
 OS_TCB UART_Deadlocks_TCB;
 CPU_STK UART_Deadlocks_Stk[512];
 
@@ -116,7 +114,6 @@ void UART_Deadlocks2(void *p_arg){
 int main() {
     OS_ERR err;
     OSInit(&err);
-    RTOS_BPS_SemCreate(&SafetyCheck_Sem4, "Safety Check Semaphore", 0);
     RTOS_BPS_TaskCreate(&UART_Deadlocks_TCB,				// TCB
 				"UART Deadlocks Test",	// Task Name (String)
 				UART_Deadlocks,				// Task function pointer

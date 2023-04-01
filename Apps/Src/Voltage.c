@@ -18,7 +18,7 @@
 
 // median filter
 #define MEDIAN_FILTER_TYPE uint16_t
-#define MEDIAN_FILTER_DEPTH 5
+#define MEDIAN_FILTER_DEPTH 3
 #define MEDIAN_FILTER_CHANNELS NUM_BATTERY_MODULES
 #define MEDIAN_FILTER_NAME VoltageFilter
 #include "MedianFilter.h"
@@ -53,19 +53,19 @@ void Voltage_Init(cell_asic *boards){
     LTC6811_Init(Minions);
     
     //take control of mutex
-      RTOS_BPS_MutexPend(&MinionsASIC_Mutex, OS_OPT_PEND_BLOCKING);
+    RTOS_BPS_MutexPend(&MinionsASIC_Mutex, OS_OPT_PEND_BLOCKING);
     // Write Configuration Register
     LTC6811_wrcfg(NUM_MINIONS, Minions);
     //release mutex
-      RTOS_BPS_MutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE);
+    RTOS_BPS_MutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE);
 
-    // Read Configuration Register
-    // take control of mutex
-      RTOS_BPS_MutexPend(&MinionsASIC_Mutex, OS_OPT_PEND_BLOCKING);
     wakeup_sleep(NUM_MINIONS);
+    // take control of mutex
+    RTOS_BPS_MutexPend(&MinionsASIC_Mutex, OS_OPT_PEND_BLOCKING);
+    // Read Configuration Register
     LTC6811_rdcfg_safe(NUM_MINIONS, Minions);
     // release mutex
-      RTOS_BPS_MutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE);
+    RTOS_BPS_MutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE);
 #endif
     // Initialize median filter. There should be no modules with less than 0 volts or more than 5 volts
     VoltageFilter_init(&VoltageFilter, 0, 50000);
@@ -77,6 +77,7 @@ void Voltage_Init(cell_asic *boards){
  * @param pointer to new voltage measurements
  */
 void Voltage_UpdateMeasurements(void){
+    uint16_t rawVoltages[NUM_BATTERY_MODULES];
 #ifndef SIMULATION
     // Start Cell ADC Measurements
     wakeup_sleep(NUM_MINIONS);
@@ -90,16 +91,15 @@ void Voltage_UpdateMeasurements(void){
     //copies values from cells.c_codes to private array
 
     // package raw voltage values into single array
-    static uint16_t rawVoltages[NUM_BATTERY_MODULES];
-    for(int i = 0; i < NUM_BATTERY_MODULES; i++){
+    for(uint8_t i = 0; i < NUM_BATTERY_MODULES; i++){
         rawVoltages[i] = Minions[i / MAX_VOLT_SENSORS_PER_MINION_BOARD].cells.c_codes[i % MAX_VOLT_SENSORS_PER_MINION_BOARD];
     }
+
     // release minions asic mutex
     RTOS_BPS_MutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE);
 #else
     // package raw voltage values into single array
-    static uint16_t rawVoltages[NUM_BATTERY_MODULES];
-    for(int i = 0; i < NUM_BATTERY_MODULES; i++){
+    for(uint8_t i = 0; i < NUM_BATTERY_MODULES; i++){
         rawVoltages[i] = Simulator_getVoltage(i);
     }
 #endif
@@ -186,9 +186,9 @@ void Voltage_GetModulesInDanger(VoltageSafety_t* system){
  */
 void Voltage_OpenWireSummary(void){
     wakeup_idle(NUM_MINIONS);
-      RTOS_BPS_MutexPend(&MinionsASIC_Mutex, OS_OPT_PEND_BLOCKING);
+    RTOS_BPS_MutexPend(&MinionsASIC_Mutex, OS_OPT_PEND_BLOCKING);
     LTC6811_run_openwire_multi(NUM_MINIONS, Minions, true);
-      RTOS_BPS_MutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE);
+    RTOS_BPS_MutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE);
 }
 
 /** Voltage_OpenWire
@@ -199,7 +199,7 @@ SafetyStatus Voltage_OpenWire(void){
     SafetyStatus status = SAFE;
     wakeup_idle(NUM_MINIONS);
     
-      RTOS_BPS_MutexPend(&MinionsASIC_Mutex, OS_OPT_PEND_BLOCKING);
+    RTOS_BPS_MutexPend(&MinionsASIC_Mutex, OS_OPT_PEND_BLOCKING);
     
     LTC6811_run_openwire_multi(NUM_MINIONS, Minions, false);
 
