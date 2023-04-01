@@ -415,7 +415,7 @@ int32_t Temperature_GetMaxTemperature(void) {
  * @param DesiredTemp - desired temperature
  * @return FanSpeed: 0-8
  */
-int8_t Temperature_PID_Output(int32_t InputTemp, int32_t DesiredTemp) {
+uint8_t Temperature_PID_Output(int32_t InputTemp, int32_t DesiredTemp) {
     Error = DesiredTemp - InputTemp;
 	
     //Only read error sum in range
@@ -425,17 +425,16 @@ int8_t Temperature_PID_Output(int32_t InputTemp, int32_t DesiredTemp) {
     ErrorSum = (abs(ErrorSum) < TEMPERATURE_PID_I_MAX_ACCUM) ? ErrorSum :
         (ErrorSum > 0 ? TEMPERATURE_PID_I_MAX_ACCUM : -TEMPERATURE_PID_I_MAX_ACCUM);
 
-    //5 is the estimated "hold output"
-    //Scale P-output to 0-8, Floor divide error by 1000
-    int8_t p_Output = (int8_t)((-Error)/(TEMPERATURE_PID_PROPORTIONAL*TEMPERATURE_PID_MILICELCIUS_CONVERT)) + TEMPERATURE_HOLD_FAN_SPEED;
+    int32_t p_Output = (int32_t)((-Error)/(TEMPERATURE_PID_PROPORTIONAL));
+    //realistic range of -15,000 to 15,0000
 
     //I output could totally fudge things up (and probably will on the first test), so disable it and make sure p is good first
-    //Keep I gains low or you'll get weird oscillation. abs(I output) should not currently exceed 2 
-    int8_t i_Output = (int8_t)((-ErrorSum)/(TEMPERATURE_PID_INTEGRAL*TEMPERATURE_PID_MILICELCIUS_CONVERT));
+    int32_t i_Output = (int32_t)((-ErrorSum)/(TEMPERATURE_PID_INTEGRAL));
+    //max ranges of -2000, 2000
     
+    int32_t output = ((p_Output + i_Output) / TEMPERATURE_PID_MILLICELCIUS_CONVERT) + TEMPERATURE_HOLD_FAN_SPEED;
+    //realistic range of -10 to 20
+
     //Don't use D output
-    int8_t output = p_Output + i_Output;
-    output = (output > TOPSPEED) ? TOPSPEED :
-        (output < 0) ? 0 : output;
-    return output;
+    return (uint8_t) output > TOPSPEED ? TOPSPEED : output;
 }
