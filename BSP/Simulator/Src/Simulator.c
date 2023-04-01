@@ -68,12 +68,8 @@ void Simulator_Log(LoggingType_t lvl, char *str) {
     char* msg = strcat(prefix, str);
     pthread_mutex_lock(&SimulatorLog_Sem);
     write(simulatorLog, msg, strlen(msg));
-<<<<<<< HEAD
-    //printf("%s", msg);
-=======
     pthread_mutex_unlock(&SimulatorLog_Sem);
     printf("%s", msg);
->>>>>>> master
 }
 
 /**
