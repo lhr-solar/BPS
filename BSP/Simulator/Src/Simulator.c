@@ -160,7 +160,18 @@ static void readInputFile(char *jsonPath) {
                         cJSON_AddItemToArray(voltageArray, x); //If size is larger, then this will work
                     }
                 } //TODO: If NUM_BATTERY_MODULES is smaller than voltageArray size, then it should never be accessed, but we should try making this more robust
-            }
+                else {
+                    //find if there exists a fault value in the array
+                    for (uint8_t i = 0;i < cJSON_GetArraySize(voltageArray);i++) {
+                        if (cJSON_GetArrayItem(voltageArray,i)->valueint > MAX_VOLTAGE_LIMIT || cJSON_GetArrayItem(voltageArray,i)->valueint < MIN_VOLTAGE_LIMIT) {
+                            if (i >= NUM_BATTERY_MODULES) {
+                                cJSON_SetIntValue(cJSON_GetArrayItem(voltageArray,0), cJSON_GetArrayItem(voltageArray,i)->valueint);
+                                
+                            }
+                        }
+                    }
+                }
+           }
             for (int idx = 0; idx < NUM_BATTERY_MODULES; idx++) {
                 tail->voltages[idx] = cJSON_GetArrayItem(voltageArray, idx)->valueint;
             }
