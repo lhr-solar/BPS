@@ -23,7 +23,7 @@ struct FaultToOut_t {
     char* string;
 };
 
-static const struct FaultToOut_t FaultDict[Fault_Max] = {
+static const struct FaultToOut_t FaultDict[FAULT_MAX] = {
     [Fault_UVOLT]       = {.light = UVOLT, .string = "UVOLT"}, //do not have enough led's so some are reused
     [Fault_OVOLT]       = {.light = OVOLT, .string = "OVOLT"},
     [Fault_OTEMP]       = {.light = OTEMP, .string = "OTEMP"},
@@ -82,7 +82,7 @@ void EnterFaultState() {
     #ifdef SIMULATION
     char err[100] = {0};
     #endif
-    for (uint16_t i = 1; i < Fault_Max; i <<= 1){
+    for (uint16_t i = 1; i < FAULT_MAX; i <<= 1){
         if (Fault_BitMap & i) {
             #ifdef SIMULATION
                 sprintf(err, "$$$ Entered fault in state {%d} - %s\n", stateCount - 1, FaultDict[i].string);
@@ -107,7 +107,7 @@ void EnterFaultState() {
 #ifdef DEBUGMODE
     char command[COMMAND_SIZE];
 #endif
-    BSP_WDTimer_Init(true); //This is in case we did not pass check contactor and watchdog timer was not initialized
+    BSP_WDTimer_Init(true); //re-initialize for fault state
     BSP_WDTimer_Start(); 
     while(1) {
         //Send Trip Readings

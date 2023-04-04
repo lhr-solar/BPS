@@ -178,7 +178,7 @@ static void readInputFile(char *jsonPath) {
             if (cJSON_GetArraySize(temperatureArray) != NUM_TEMPERATURE_SENSORS) {
                 printf("Temperature array in simulator state %d has %d elements instead of %d! Please fix. Exiting...\n", stateCount, cJSON_GetArraySize(temperatureArray), NUM_TEMPERATURE_SENSORS);
                 if (NUM_TEMPERATURE_SENSORS > cJSON_GetArraySize(temperatureArray)) {
-                    cJSON *x = cJSON_CreateNumber(30000);
+                    cJSON *x = cJSON_CreateNumber(30000); 
                     for (uint8_t i = cJSON_GetArraySize(temperatureArray); i < NUM_BATTERY_MODULES; i++){
                         cJSON_AddItemToArray(temperatureArray, x); //If size is larger, then this will work
                     }
