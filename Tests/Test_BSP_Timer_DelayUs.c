@@ -4,6 +4,7 @@
 #include "config.h"
 #include "BSP_Timer.h"
 #include "BSP_UART.h"
+#include "stm32f4xx.h"
 #include "BSP_PLL.h"
 #include "RTOS_BPS.h"
 #include "Tasks.h"
@@ -12,22 +13,47 @@ CPU_STK Task1_Stk[DEFAULT_STACK_SIZE];
 
 OS_TCB Task2_TCB;
 CPU_STK Task2_Stk[DEFAULT_STACK_SIZE];
+
+OS_TCB Init_TCB;
+CPU_STK Init_Stk[DEFAULT_STACK_SIZE];
+
 void Task1(void *p_arg);
 void Task2(void *p_arg);
-
+void Init(void *p_arg);
 //idle
+
+void Init(void *p_arg) {
+    OS_ERR err;
+    OS_CPU_SysTickInit(SystemCoreClock / (CPU_INT32U) OSCfg_TickRate_Hz);
+    RTOS_BPS_TaskCreate(&Task1_TCB,
+                "Task 1",
+                Task1,
+                (void *)0,
+                1,
+                Task1_Stk,
+                DEFAULT_STACK_SIZE);
+    RTOS_BPS_TaskCreate(&Task2_TCB,
+                "Task 2",
+                Task2,
+                (void *)0,
+                1,
+                Task2_Stk,
+                DEFAULT_STACK_SIZE);
+    OSTaskDel(NULL,&err);
+}
+
 void Task1(void *p_arg) {
     while (1) {
         uint32_t time = BSP_Timer_GetTicksElapsed();
-        printf("Task 1 time: %d\n", time);
+        printf("Task 1 time: %ld\n", time);
         RTOS_BPS_DelayMs(100);
     }
 }
 
 void Task2(void *p_arg) {
     while (1) {
-        uint32_t time = BSP_Timer_GetTicksElapsed();
-        printf("Task 2 time: %d\n", time);
+        //uint32_t time = BSP_Timer_GetTicksElapsed();
+        printf("Task 2 ran!\n");
         for (int i = 0;i<100000;i++) {
             RTOS_BPS_DelayUs(1);
         }
@@ -38,24 +64,9 @@ void Task2(void *p_arg) {
 int main(void) {
     OS_ERR err;
     BSP_PLL_Init();
-    OS_CPU_SysTickInit(SystemCoreClock / (CPU_INT32U) OSCfg_TickRate_Hz);
     BSP_Timer_Init();
     OSInit(&err);
     assertOSError(err);
-    RTOS_BPS_TaskCreate(&Task1_TCB,
-                "Task 1",
-                Task1,
-                (void *)0,
-                1,
-                Task1_Stk,
-                DEFAULT_STACK_SIZE);
-    assertOSError(err);
-    RTOS_BPS_TaskCreate(&Task2_TCB,
-                "Task 2",
-                Task2,
-                (void *)0,
-                1,
-                Task2_Stk,
-                DEFAULT_STACK_SIZE);
-    assertOSError(err);
+    OSStart(&err);
+
 }
