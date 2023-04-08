@@ -17,6 +17,7 @@
 #include "Contactor.h"
 #include "RTOS_BPS.h"
 #include "Voltage.h"
+#include "BSP_UART.h"
 #include "Temperature.h"
 
 /******************************************************************************
@@ -103,10 +104,9 @@ void Task2(void *p_arg){
         RTOS_BPS_MutexPend(&WDog_Mutex, OS_OPT_PEND_BLOCKING);
         WDog_BitMap |= WD_AMPERES;
         WDog_BitMap |= WD_BALANCING;
-        WDog_BitMap |= WD_VOLT_TEMP;
         RTOS_BPS_MutexPost(&WDog_Mutex, OS_OPT_POST_NONE);
         //delay of 100ms
-        RTOS_BPS_DelayTick(10);
+        RTOS_BPS_DelayTick(1);
     }
 }
 

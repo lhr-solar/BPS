@@ -12,9 +12,9 @@ void BSP_WDTimer_Init(bool fault) {
     // Independent Watchdog Init
     // IWDG has a timeout value of 4.096 / 16 seconds (about 250 ms).
     // When last checked(4/1/2023), BPS ran at 5Hz
-	IWDG_WriteAccessCmd(IWDG_WriteAccess_Enable);       // Enable access to the IWDG_PR and IWDG_RLR registers
-	IWDG_SetPrescaler(IWDG_Prescaler_32);               // Prescaler divider feeding the counter clock
-	IWDG_SetReload(fault ? (IWDG_RLR_RL) : (IWDG_RLR_RL / 16));                    // Reload value set to 0xFFF / 8
+	IWDG_WriteAccessCmd(IWDG_WriteAccess_Enable); // Enable access to the IWDG_PR and IWDG_RLR registers
+	IWDG_SetPrescaler(IWDG_Prescaler_32); // Prescaler divider feeding the counter clock
+	IWDG_SetReload(fault ? (IWDG_RLR_RL) : (IWDG_RLR_RL / 8)); // Reload value set to 0xFFF / 8
 }
 
 /**
