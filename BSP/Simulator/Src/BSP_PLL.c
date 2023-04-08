@@ -41,7 +41,7 @@ uint32_t BSP_PLL_GetSystemClock(void) {
 */
 void BSP_PLL_DelayU(uint32_t micro)
 {
-    uint32_t delay = BSP_PLL_GetSystemClock() / 1e6;
+    return;
 }
 
 /**
@@ -51,5 +51,5 @@ void BSP_PLL_DelayU(uint32_t micro)
 */
 void BSP_PLL_DelayM(uint32_t milli)
 {
-  uint32_t delay = BSP_PLL_GetSystemClock() / 1e3;
+    return;
 }

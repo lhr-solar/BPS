@@ -38,19 +38,19 @@ static callback_t TimerOneShotCallback;
  * 		   -1 if requested period is too large
  */
 static uint32_t Timer_Micros_To_PeriodPrescaler(uint32_t delay_us, 
-												uint32_t *period, 
-												uint16_t *prescaler,
-												bool timer_32bit) {
-	uint32_t delay_clock_cycles = (TimerFrequency / MICROSECONDS_PER_SECOND) * delay_us;
-	uint32_t prescale_value = 1, period_value = delay_clock_cycles;
+                                                uint32_t *period, 
+                                                uint16_t *prescaler,
+                                                bool timer_32bit) {
+    uint32_t delay_clock_cycles = (TimerFrequency / MICROSECONDS_PER_SECOND) * delay_us;
+    uint32_t prescale_value = 1, period_value = delay_clock_cycles;
 
-	while (period_value > (timer_32bit ? UINT32_MAX : UINT16_MAX)) {
-		prescale_value <<= 1;
-		period_value >>= 1;
-	}
-	*period = period_value;
-	*prescaler = (uint16_t)(prescale_value - 1);
-	return (prescale_value > UINT16_MAX) ? -1 : (delay_clock_cycles - (period_value * prescale_value));
+    while (period_value > (timer_32bit ? UINT32_MAX : UINT16_MAX)) {
+        prescale_value <<= 1;
+        period_value >>= 1;
+    }
+    *period = period_value;
+    *prescaler = (uint16_t)(prescale_value - 1);
+    return (prescale_value > UINT16_MAX) ? -1 : (delay_clock_cycles - (period_value * prescale_value));
 }
 
 /**
@@ -60,30 +60,30 @@ static uint32_t Timer_Micros_To_PeriodPrescaler(uint32_t delay_us,
  */
 void BSP_Timer_Init(void) {
     // enable clock(s)
-	RCC_APB1PeriphClockCmd(BSP_TIMER_RCC(BSP_TIMER_TICKCOUNTER), ENABLE);
-	RCC_APB1PeriphClockCmd(BSP_TIMER_RCC(BSP_TIMER_ONESHOT), ENABLE);
+    RCC_APB1PeriphClockCmd(BSP_TIMER_RCC(BSP_TIMER_TICKCOUNTER), ENABLE);
+    RCC_APB1PeriphClockCmd(BSP_TIMER_RCC(BSP_TIMER_ONESHOT), ENABLE);
 
-	RCC_ClocksTypeDef RCC_Clocks;
-	RCC_GetClocksFreq(&RCC_Clocks);
-	TimerFrequency = RCC_Clocks.PCLK2_Frequency;
+    RCC_ClocksTypeDef RCC_Clocks;
+    RCC_GetClocksFreq(&RCC_Clocks);
+    TimerFrequency = RCC_Clocks.PCLK2_Frequency;
 
-	TIM_TimeBaseInitTypeDef timer_tickcounter;
-	TIM_TimeBaseStructInit(&timer_tickcounter);
+    TIM_TimeBaseInitTypeDef timer_tickcounter;
+    TIM_TimeBaseStructInit(&timer_tickcounter);
 
-	TIM_TimeBaseInitTypeDef timer_oneshot;
-	TIM_TimeBaseStructInit(&timer_oneshot);
+    TIM_TimeBaseInitTypeDef timer_oneshot;
+    TIM_TimeBaseStructInit(&timer_oneshot);
 
-	TIM_TimeBaseInit(BSP_TIMER_INST(BSP_TIMER_TICKCOUNTER), &timer_tickcounter);
-	TIM_TimeBaseInit(BSP_TIMER_INST(BSP_TIMER_ONESHOT), &timer_oneshot);\
+    TIM_TimeBaseInit(BSP_TIMER_INST(BSP_TIMER_TICKCOUNTER), &timer_tickcounter);
+    TIM_TimeBaseInit(BSP_TIMER_INST(BSP_TIMER_ONESHOT), &timer_oneshot);\
 
-	// one shot nvic initialization
-	NVIC_InitTypeDef nvic_timer_oneshot = {
-		.NVIC_IRQChannel = BSP_TIMER_IRQn(BSP_TIMER_ONESHOT),
-		.NVIC_IRQChannelPreemptionPriority = 2,
-		.NVIC_IRQChannelSubPriority = 1,
-		.NVIC_IRQChannelCmd = ENABLE
-	};
-	NVIC_Init(&nvic_timer_oneshot);
+    // one shot nvic initialization
+    NVIC_InitTypeDef nvic_timer_oneshot = {
+        .NVIC_IRQChannel = BSP_TIMER_IRQn(BSP_TIMER_ONESHOT),
+        .NVIC_IRQChannelPreemptionPriority = 2,
+        .NVIC_IRQChannelSubPriority = 1,
+        .NVIC_IRQChannelCmd = ENABLE
+    };
+    NVIC_Init(&nvic_timer_oneshot);
 
 }
 
@@ -94,22 +94,22 @@ void BSP_Timer_Init(void) {
  * @param callback callback to execute after `delay_us` time
  */
 void BSP_Timer_Start_OneShot(uint32_t delay_us, callback_t callback) {
-	TIM_TypeDef *tim_inst = BSP_TIMER_INST(BSP_TIMER_ONESHOT);
+    TIM_TypeDef *tim_inst = BSP_TIMER_INST(BSP_TIMER_ONESHOT);
 
-	TimerOneShotCallback = callback;
-	uint32_t period;
-	uint16_t prescaler;
-	Timer_Micros_To_PeriodPrescaler(delay_us, &period, &prescaler, true);
-	
-	TIM_SetAutoreload(tim_inst, period);
-	TIM_PrescalerConfig(tim_inst, prescaler, TIM_PSCReloadMode_Immediate);
+    TimerOneShotCallback = callback;
+    uint32_t period;
+    uint16_t prescaler;
+    Timer_Micros_To_PeriodPrescaler(delay_us, &period, &prescaler, true);
+    
+    TIM_SetAutoreload(tim_inst, period);
+    TIM_PrescalerConfig(tim_inst, prescaler, TIM_PSCReloadMode_Immediate);
 
-	TIM_Cmd(tim_inst, ENABLE);
+    TIM_Cmd(tim_inst, ENABLE);
 
-	TIM_SetCounter (tim_inst, 0);
-	TIM_ClearITPendingBit (tim_inst, TIM_IT_Update);
-	TIM_ITConfig(tim_inst, TIM_IT_Update, ENABLE);
-	
+    TIM_SetCounter (tim_inst, 0);
+    TIM_ClearITPendingBit (tim_inst, TIM_IT_Update);
+    TIM_ITConfig(tim_inst, TIM_IT_Update, ENABLE);
+    
 }
 
 /**
@@ -118,7 +118,7 @@ void BSP_Timer_Start_OneShot(uint32_t delay_us, callback_t callback) {
  * @return  None
  */
 void BSP_Timer_Start_TickCounter(void) {
-	TIM_TypeDef *tim_inst = BSP_TIMER_INST(BSP_TIMER_TICKCOUNTER);
+    TIM_TypeDef *tim_inst = BSP_TIMER_INST(BSP_TIMER_TICKCOUNTER);
     TIM_Cmd(tim_inst, ENABLE);
 }
 
@@ -129,8 +129,8 @@ void BSP_Timer_Start_TickCounter(void) {
  */
 uint32_t BSP_Timer_GetTicksElapsed(void) {
     /* Get system clocks */
-	uint32_t counter = TIM2->CNT;       // find current value of up counter
-	TIM2->CNT = 0;
+    uint32_t counter = TIM2->CNT;       // find current value of up counter
+    TIM2->CNT = 0;
 
     return counter;
 }
@@ -142,8 +142,8 @@ uint32_t BSP_Timer_GetTicksElapsed(void) {
  */
 uint32_t BSP_Timer_GetRunFreq(void) {
     RCC_ClocksTypeDef RCC_Clocks;
-	RCC_GetClocksFreq(&RCC_Clocks);
-	// Return value is 40,000,000
+    RCC_GetClocksFreq(&RCC_Clocks);
+    // Return value is 40,000,000
     return RCC_Clocks.PCLK2_Frequency; // Tested using UART and this appears to be the proper clock used by the timer.
 }
 
@@ -153,22 +153,22 @@ uint32_t BSP_Timer_GetRunFreq(void) {
  * @return  Microseconds 
  */
 uint32_t BSP_Timer_GetMicrosElapsed(void) {
-	// TODO: pretty sure this is all wrong
-	uint32_t ticks = BSP_Timer_GetTicksElapsed();
-	uint32_t freq = BSP_Timer_GetRunFreq();
-	uint32_t micros_elap = ticks / (freq / MICROSECONDS_PER_SECOND); // Math to ensure that we do not overflow (16Mhz or 80Mhz)
-	return micros_elap;
+    // TODO: pretty sure this is all wrong
+    uint32_t ticks = BSP_Timer_GetTicksElapsed();
+    uint32_t freq = BSP_Timer_GetRunFreq();
+    uint32_t micros_elap = ticks / (freq / MICROSECONDS_PER_SECOND); // Math to ensure that we do not overflow (16Mhz or 80Mhz)
+    return micros_elap;
 } 
 
 extern void BSP_TIMER_IRQ(BSP_TIMER_ONESHOT)() {
-	TIM_TypeDef *tim_inst = BSP_TIMER_INST(BSP_TIMER_ONESHOT);
-	if (TIM_GetITStatus(tim_inst, TIM_IT_Update) != RESET) {
-		// disable timer
-		TIM_ITConfig(BSP_TIMER_INST(BSP_TIMER_ONESHOT), TIM_IT_Update, DISABLE);
-		TIM_Cmd(tim_inst, DISABLE);
+    TIM_TypeDef *tim_inst = BSP_TIMER_INST(BSP_TIMER_ONESHOT);
+    if (TIM_GetITStatus(tim_inst, TIM_IT_Update) != RESET) {
+        // disable timer
+        TIM_ITConfig(BSP_TIMER_INST(BSP_TIMER_ONESHOT), TIM_IT_Update, DISABLE);
+        TIM_Cmd(tim_inst, DISABLE);
 
-		TIM_ClearITPendingBit(tim_inst, TIM_IT_Update);
+        TIM_ClearITPendingBit(tim_inst, TIM_IT_Update);
 
-		TimerOneShotCallback();
-	}
+        TimerOneShotCallback();
+    }
 }
