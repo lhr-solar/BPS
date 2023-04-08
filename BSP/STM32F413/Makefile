@@ -158,8 +158,7 @@ C_INCLUDES =  \
 ASFLAGS = $(MCU) $(AS_DEFS) $(AS_INCLUDES) $(OPT) -Wall -fdata-sections -ffunction-sections
 
 CFLAGS = $(MCU) $(C_DEFS) $(C_INCLUDES) $(OPT) -Wall -Werror -fdata-sections -ffunction-sections 
-CFLAGS_SPECIAL = $(CFLAGS)
-CFLAGS_SPECIAL += -ftrack-macro-expansion=0 -fno-diagnostics-show-caret
+CFLAGS_SPECIAL = $(CFLAGS) -ftrack-macro-expansion=0 -fno-diagnostics-show-caret
 
 ifeq ($(DEBUG), 1)
 CFLAGS += -g3 -gdwarf-2
