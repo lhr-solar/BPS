@@ -34,7 +34,7 @@ void BSP_PLL_Init(void) {
 	// If still fail then we will fault
 	while (status == ERROR) {
 		if (pllAttempts >= PLL_ATTEMPTS_MAX) {
-			Fault_BitMap |= Fault_CRC; // Could probably use a better fault choice than CRC
+			Fault_BitMap |= Fault_ALL; // Could probably use a better fault choice than CRC
 			EnterFaultState();
 		}
 		pllAttempts++;

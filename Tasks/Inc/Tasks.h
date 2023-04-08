@@ -128,7 +128,8 @@ typedef enum {
     Fault_OS      = 0x040,
     Fault_WDOG    = 0x080,
     Fault_CRC     = 0x100,
-    Fault_ESTOP   = 0x200
+    Fault_ESTOP   = 0x200,
+    Fault_ALL     = 0x3FF
 }Fault_Set;
 
 extern Fault_Set Fault_BitMap;
