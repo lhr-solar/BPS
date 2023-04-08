@@ -69,7 +69,7 @@ void Simulator_Log(LoggingType_t lvl, char *str) {
     pthread_mutex_lock(&SimulatorLog_Sem);
     write(simulatorLog, msg, strlen(msg));
     pthread_mutex_unlock(&SimulatorLog_Sem);
-    printf("%s", msg);
+    //printf("%s", msg);
 }
 
 /**
@@ -160,6 +160,7 @@ static void readInputFile(char *jsonPath) {
         } else { // otherwise, the voltage array exists; check size, then copy elements over.
             if (cJSON_GetArraySize(voltageArray) != NUM_BATTERY_MODULES) {
                 printf("Voltage array in simulator state %d has %d elements instead of %d! Please fix.\n", stateCount, cJSON_GetArraySize(voltageArray), NUM_BATTERY_MODULES);
+                Simulator_Shutdown(-2);
                 if (NUM_BATTERY_MODULES > cJSON_GetArraySize(voltageArray)) {
                     cJSON *x = cJSON_CreateNumber(3000);
                     for (uint8_t i = cJSON_GetArraySize(voltageArray); i < NUM_BATTERY_MODULES; i++){
@@ -177,6 +178,7 @@ static void readInputFile(char *jsonPath) {
         } else { // otherwise, the temperature array exists; check size, then copy elements over.
             if (cJSON_GetArraySize(temperatureArray) != NUM_TEMPERATURE_SENSORS) {
                 printf("Temperature array in simulator state %d has %d elements instead of %d! Please fix. Exiting...\n", stateCount, cJSON_GetArraySize(temperatureArray), NUM_TEMPERATURE_SENSORS);
+                Simulator_Shutdown(-2);
                 if (NUM_TEMPERATURE_SENSORS > cJSON_GetArraySize(temperatureArray)) {
                     cJSON *x = cJSON_CreateNumber(30000);
                     for (uint8_t i = cJSON_GetArraySize(temperatureArray); i < NUM_BATTERY_MODULES; i++){
