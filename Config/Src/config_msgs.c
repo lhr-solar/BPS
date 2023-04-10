@@ -18,56 +18,34 @@
 #define XSTR(x) STR(x)
 #define STR(x) #x
 
-#ifdef NUM_BATTERY_MODULES
-#pragma message ("Custom number of battery modules set to " XSTR(NUM_BATTERY_MODULES))
-#endif
+#include "config.h"
 
-#ifdef NUM_TEMPERATURE_SENSORS
-#pragma message ("Custom number of temperature sensors set to " XSTR(NUM_TEMPERATURE_SENSORS))
-#endif
+#pragma message ("NUM_MINIONS set to " XSTR(NUM_MINIONS))
 
-#ifdef NUM_TEMP_SENSORS_PER_MOD
-#pragma message ("Custom number of temp sensors per battery module set to " XSTR(NUM_TEMP_SENSORS_PER_MOD))
-#endif
+#pragma message ("NUM_BATTERY_MODULES set to " XSTR(NUM_BATTERY_MODULES))
 
-#ifdef MIN_VOLTAGE_CHARGING_LIMIT
-#pragma message ("Custom minimum voltage charge limit set to " XSTR(MIN_VOLTAGE_CHARGING_LIMIT))
-#endif
+#pragma message ("NUM_TEMPERATURE_SENSORS set to " XSTR(NUM_TEMPERATURE_SENSORS))
 
-#ifdef MIN_VOLTAGE_LIMIT
-#pragma message ("Custom minimum voltage set to " XSTR(MIN_VOLTAGE_LIMIT))
-#endif
+#pragma message ("NUM_TEMP_SENSORS_PER_MOD set to " XSTR(NUM_TEMP_SENSORS_PER_MOD))
 
-#ifdef MAX_VOLTAGE_LIMIT
-#pragma message ("Custom maximum voltage set to " XSTR(MAX_VOLTAGE_LIMIT))
-#endif
+#pragma message ("MIN_VOLTAGE_CHARGING_LIMIT set to " XSTR(MIN_VOLTAGE_CHARGING_LIMIT))
 
-#ifdef CHARGE_DISABLE_VOLTAGE
-#pragma message ("Custom charge disable voltage set to " XSTR(CHARGE_DISABLE_VOLTAGE))
-#endif
+#pragma message ("MIN_VOLTAGE_LIMIT set to " XSTR(MIN_VOLTAGE_LIMIT))
 
-#ifdef MAX_DISCHARGE_TEMPERATURE_LIMIT
-#pragma message ("Custom maximum discharge temperature set to " XSTR(MAX_DISCHARGE_TEMPERATURE_LIMIT))
-#endif
+#pragma message ("MAX_VOLTAGE_LIMIT set to " XSTR(MAX_VOLTAGE_LIMIT))
 
-#ifdef MAX_CHARGE_TEMPERATURE_LIMIT
-#pragma message ("Custom maximum charge temperature set to " XSTR(MAX_CHARGE_TEMPERATURE_LIMIT))
-#endif
+#pragma message ("CHARGE_DISABLE_VOLTAGE set to " XSTR(CHARGE_DISABLE_VOLTAGE))
 
-#ifdef MAX_CURRENT_LIMIT
-#pragma message ("Custom maximum current set to " XSTR(MAX_CURRENT_LIMIT))
-#endif
+#pragma message ("MAX_DISCHARGE_TEMPERATURE_LIMIT set to " XSTR(MAX_DISCHARGE_TEMPERATURE_LIMIT))
 
-#ifdef MAX_CHARGING_CURRENT
-#pragma message ("Custom charge current set to " XSTR(MAX_CHARGING_CURRENT))
-#endif
+#pragma message ("MAX_CHARGE_TEMPERATURE_LIMIT set to " XSTR(MAX_CHARGE_TEMPERATURE_LIMIT))
 
-#ifdef BALANCING_TOLERANCE_START
-#pragma message ("Custom balance tolerance start set to " XSTR(BALANCING_TOLERANCE_START))
-#endif
+#pragma message ("MAX_CURRENT_LIMIT set to " XSTR(MAX_CURRENT_LIMIT))
 
-#ifdef BALANCING_TOLERANCE_STOP
-#pragma message ("Custom balance tolerance stop set to " XSTR(BALANCING_TOLERANCE_STOP))
-#endif
+#pragma message ("MAX_CHARGING_CURRENT set to " XSTR(MAX_CHARGING_CURRENT))
+
+#pragma message ("BALANCING_TOLERANCE_START start set to " XSTR(BALANCING_TOLERANCE_START))
+
+#pragma message ("BALANCING_TOLERANCE_STOP stop set to " XSTR(BALANCING_TOLERANCE_STOP))
 
 // I don't think the other #defines in config.h should be editable
