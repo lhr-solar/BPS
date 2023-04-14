@@ -32,7 +32,7 @@ static const struct FaultToOut_t FaultDict[FAULT_MAX] = {
     [Fault_HANDLER]     = {.light = EXTRA, .string = "HANDLER"},
     [Fault_OS]          = {.light = EXTRA, .string = "OS"},
     [Fault_WDOG]        = {.light = WDOG, .string = "WDOG"},
-    [Fault_CRC]         = {.light = WIRE, .string = "CRC"},
+    [Fault_CRC]         = {.light = CAN, .string = "CRC"},
     [Fault_ESTOP]       = {.light = WIRE, .string = "ESTOP"}
 };
 
@@ -102,7 +102,6 @@ void EnterFaultState() {
     CANbus_DeInit();
     //Reinit CAN in fault state
     CANbus_Init(false, true);
-    
 
 #ifdef DEBUGMODE
     char command[COMMAND_SIZE];

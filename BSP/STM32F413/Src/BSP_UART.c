@@ -39,6 +39,11 @@ static txfifo_t *tx_fifos[NUM_UART]     = {&usbTxFifo, &bleTxFifo};
 static bool     *lineRecvd[NUM_UART]    = {&usbLineReceived, &bleLineReceived};
 static USART_TypeDef *handles[NUM_UART] = {USART3, USART2};
 
+// This function is just a fake callback in case we do not need one for UART
+static void foo() {
+    return;
+}
+
 static void USART_BLE_Init() {
     bleTxFifo = txfifo_new();
     bleRxFifo = rxfifo_new();
@@ -139,13 +144,13 @@ void BSP_UART_Init(callback_t rxCallback, callback_t txCallback, UART_Port usart
     switch(usart){
     case UART_USB:
         USART_USB_Init();
-        usbRxCallback = rxCallback;
-        usbTxCallback = txCallback;
+        usbRxCallback = (rxCallback == NULL) ? foo : rxCallback;
+        usbTxCallback = (txCallback == NULL) ? foo : txCallback;
         break;
     case UART_BLE:
         USART_BLE_Init();
-        bleRxCallback = rxCallback;
-        bleTxCallback = txCallback;
+        bleRxCallback = (rxCallback == NULL) ? foo : rxCallback;
+        bleTxCallback = (txCallback == NULL) ? foo : txCallback;
         break;
     default:
         // Error

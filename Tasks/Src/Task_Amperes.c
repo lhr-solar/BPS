@@ -32,7 +32,6 @@ void Task_AmperesMonitor(void *p_arg) {
 		if(amperesStatus != SAFE) {
 		    Fault_BitMap = Fault_OCURR;
             EnterFaultState();
-			
         } else if((amperesStatus == SAFE) && (!amperesHasBeenChecked)) {
             // Signal to turn on contactor but only signal once
             RTOS_BPS_SemPost(&SafetyCheck_Sem4, OS_OPT_POST_1);

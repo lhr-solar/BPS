@@ -8,7 +8,6 @@
 #include "Amps.h"
 #include "CAN_Queue.h"
 
-
 //declared in Tasks.c
 extern cell_asic Minions[NUM_MINIONS];
 
