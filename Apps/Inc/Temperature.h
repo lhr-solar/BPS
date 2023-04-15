@@ -24,6 +24,15 @@
 
 #define TEMP_ERR_OUT_BOUNDS 42424242
 
+//TODO: tune PID with actual pack and fans, and then change values below to appropiate value
+#define TEMPERATURE_PID_PROPORTIONAL 4
+#define TEMPERATURE_PID_INTEGRAL 250
+#define TEMPERATURE_PID_I_ZONE 5000
+#define TEMPERATURE_PID_I_MAX_ACCUM 500000
+#define TEMPERATURE_HOLD_FAN_SPEED 5
+#define TEMPERATURE_PID_MILLICELCIUS_CONVERT 1000
+#define TEMPERATURE_PID_MAX_INPUT 255999 + PID_DESIRED_TEMPERATURE
+
 /** Temperature_Init
  * Initializes device drivers including SPI inside LTC6811_init and LTC6811 for Temperature Monitoring
  * @param boards LTC6811 data structure that contains the values of each register
@@ -128,7 +137,7 @@ int32_t Temperature_GetMaxTemperature(void);
  * @brief Gives fan speed based on Average temperature of pack and past error values
  * @param InputTemp - current temperature
  * @param DesiredTemp - desired temperature
- * @return FanSpeed: 0-4000 PWM
+ * @return FanSpeed: 0-8
  */
-int32_t Temperature_PID_Output(int32_t InputTemp, int32_t DesiredTemp);
+uint8_t Temperature_PID_Output(uint32_t InputTemp, uint32_t DesiredTemp);
 #endif

@@ -26,7 +26,7 @@ void Fans_Init(void){
  * @param speed Speed of Fan(0-TOPSPEED)
  * @return ErrorStatus will return 1 if successful, 0 if error occurred
  */
-ErrorStatus Fans_Set(uint8_t fan, uint32_t speed){
+ErrorStatus Fans_Set(uint8_t fan, uint8_t speed){
     //don't mess with the contactor
     if (fan == CFAN) return ERROR;
     //Range of pulse is 0-4000
@@ -51,7 +51,7 @@ int Fans_GetSpeed(uint8_t fan){
  * @param   dutyCycle: int for duty cycle amount in range 0-8
  * @return  ErrorStatus
  */
-ErrorStatus Fans_SetAll(uint32_t speed) {
+ErrorStatus Fans_SetAll(uint8_t speed) {
     ErrorStatus result = SUCCESS;
     for (uint8_t i = 0; i < 4; i++){
         if (i == CFAN) continue;
