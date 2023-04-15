@@ -96,7 +96,7 @@ void CheckContactor(void *p_arg) {
     // Wait until voltage, open wire, temperature, and current(Amperes) are all checked and safe
     for(int32_t check = 0; check < NUM_FAULT_POINTS; check++) {
         RTOS_BPS_SemPend(&SafetyCheck_Sem4, OS_OPT_PEND_BLOCKING);
-        printf("CS:%ld\r\n", (int64_t)check);
+        printf("CS:%lld\r\n", (int64_t)check);
     }
 
     // Turn Contactor On
