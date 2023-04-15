@@ -1,5 +1,7 @@
 ulimit -r unlimited
 
+set -e # to exit bash script upon any commmand failing
+
 python3 Validation/verify_test.py BSP/Simulator/Data/ManualTests/critical_overcurrent.json
 python3 Validation/verify_test.py BSP/Simulator/Data/ManualTests/critical_overtemp_discharging.json
 python3 Validation/verify_test.py BSP/Simulator/Data/ManualTests/critical_overvolt.json

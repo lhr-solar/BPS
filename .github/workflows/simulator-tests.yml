@@ -1,5 +1,5 @@
 # workflow for running quick, simple tests in the simulator. Runs on every push
-name: Simple Tests
+name: Simulator Tests
 
 on:
   push:
