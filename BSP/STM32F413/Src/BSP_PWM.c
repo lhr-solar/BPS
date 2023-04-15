@@ -94,7 +94,7 @@ void BSP_PWM_Init(void){
     GPIO_B1Init.GPIO_Mode = GPIO_Mode_IN;
     GPIO_B1Init.GPIO_Speed = GPIO_Speed_2MHz;
     GPIO_B1Init.GPIO_PuPd = GPIO_PuPd_UP;
-    GPIO_B1Init.GPIO_OType = GPIO_OType_OD;
+    GPIO_B1Init.GPIO_OType = GPIO_OType_PP;
     GPIO_Init(GPIOB, &GPIO_B1Init);
 }
 
