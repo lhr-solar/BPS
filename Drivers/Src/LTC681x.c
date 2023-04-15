@@ -79,7 +79,7 @@ static void cs_set(uint8_t state){
 
 void wakeup_idle(uint8_t total_ic)
 {
-  // for (int i =0; i<total_ic; i++)
+  // for (int i =0; i<total_ic; i++) TODO: Verify we do not need delays for these functions by running BPS in car
   // {
   //   cs_set(0);
   //   BSP_PLL_DelayU(500); //Guarantees the isoSPI will be in ready mode
