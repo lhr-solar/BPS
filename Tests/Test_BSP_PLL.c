@@ -16,7 +16,18 @@ int main(void){
         }
         time--;
     }                           //delay is to show the clock going from 16MHz to 80MHz once BSP_PLL_Init() is called
-    BSP_PLL_Init();
+
+    if(BSP_PLL_Init() == ERROR){
+        // if initializing PLL fails, something is very wrong
+        while(1){
+            printf("PLL init has failed");
+            volatile uint16_t horse = -1;
+            while(horse!=0){
+                --horse; // stall some time before printing out
+            }
+        }
+    }
+
     while(1){
         test = BSP_PLL_GetSystemClock();
         printf("\r%ld", test);

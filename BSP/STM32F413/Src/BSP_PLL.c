@@ -3,7 +3,6 @@
 #include "BSP_PLL.h"
 #include "stm32f4xx.h"
 #include "stm32f4xx_rcc.h"
-#include "Tasks.h"
 
 // PLL_VCO = (HSE_VALUE or HSI_VALUE / PLL_M) * PLL_N 
 #define PLL_M 8
@@ -24,7 +23,7 @@
  * @param   None
  * @return  None
  */
-void BSP_PLL_Init(void) {
+ErrorStatus BSP_PLL_Init(void) {
     RCC_HSEConfig(RCC_HSE_ON);
 	
 	ErrorStatus status = RCC_WaitForHSEStartUp();
@@ -34,8 +33,8 @@ void BSP_PLL_Init(void) {
 	// If still fail then we will fault
 	while (status == ERROR) {
 		if (pllAttempts >= PLL_ATTEMPTS_MAX) {
-			Fault_BitMap |= Fault_CRC; // Could probably use a better fault choice than CRC
-			EnterFaultState();
+			//return a error for waiting too long
+			return ERROR;
 		}
 		pllAttempts++;
 		status = RCC_WaitForHSEStartUp();
@@ -70,7 +69,7 @@ void BSP_PLL_Init(void) {
 		
 	// Update the system clock variable
 	SystemCoreClockUpdate();
-	
+	return SUCCESS;
 }
 
 /**

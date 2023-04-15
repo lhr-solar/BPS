@@ -32,7 +32,12 @@ int main() {
     
     OS_ERR err;
 
-    BSP_PLL_Init();
+    if(BSP_PLL_Init() == ERROR){
+        // if initializing PLL fails, something is very wrong
+        Fault_BitMap |= Fault_CRC;
+        EnterFaultState();
+    }
+
     BSP_UART_Init(NULL, NULL, UART_USB);	
 
     //Resetting the contactor
