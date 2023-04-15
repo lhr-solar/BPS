@@ -94,8 +94,7 @@ def main():
     
     #run the simulator 
     print("Running test " + test_name)
-    status = os.system("./bps-simulator.out "+ test_name)
-    if(os.WEXITSTATUS(status) != 0):
+    if(os.WEXITSTATUS(os.system("./bps-simulator.out "+ test_name)) != 0):
         print("Your code broke the simulator. Test Failed")
         exit(-1)
 

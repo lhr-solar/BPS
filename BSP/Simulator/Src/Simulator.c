@@ -266,8 +266,8 @@ void Simulator_Init(char *jsonPath) {
     // check if the output folder exists, if not, then make it
     mkdir(outputdir, S_IRWXU);
 
-    // create the log file
-    simulatorLog = creat(filename, 0664);
+    // create the log file, overwriting any existing log file
+    simulatorLog = creat(filename, 0664); //0664 is octal 664 which speicifies the file permissions for the created file
 
     if (simulatorLog < 0) {
         printf("error opening file %s\n", filename);
