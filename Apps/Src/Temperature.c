@@ -411,11 +411,15 @@ int32_t Temperature_GetMaxTemperature(void) {
 
 /**
  * @brief Gives fan speed based on Average temperature of pack and past error values
- * @param InputTemp - current temperature. Must not exceed 284 or -284 Celcius given that expected temp is 38 celcius.
+ * @param InputTemp - current temperature. Must not exceed 293 or -294 Celcius given that expected temp is 38 celcius.
  * @param DesiredTemp - desired temperature
  * @return FanSpeed: 0-8
  */
-uint8_t Temperature_PID_Output(int32_t InputTemp, int32_t DesiredTemp) {
+uint8_t Temperature_PID_Output(uint32_t InputTemp, uint32_t DesiredTemp) {
+    if(InputTemp > TEMPERATURE_PID_MAX_INPUT){
+        return TOPSPEED;
+    }
+
     Error = DesiredTemp - InputTemp;
 	
     //Only read error sum in range
