@@ -24,7 +24,7 @@ void BSP_WDTimer_Init(bool fault) {
  */
 bool BSP_WDTimer_DidSystemReset(void) {
     if (RCC_GetFlagStatus(RCC_FLAG_IWDGRST) != RESET) {
-        RCC_ClearFlag();		// Clear reset flags. May be optional
+        RCC_ClearFlag();		// Clear reset flags
         return true;
     }
     return false;

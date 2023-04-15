@@ -40,7 +40,6 @@ int main() {
     Contactor_Off(HVLOW_CONTACTOR);
     Contactor_Off(ARRAY_CONTACTOR);
     Contactor_Off(HVHIGH_CONTACTOR);
-
     BSP_Lights_Init();
 
     // If the WDTimer counts down to 0, then the BPS resets. If BPS has reset, enter a fault state.
@@ -50,8 +49,8 @@ int main() {
     }
 
     // set up EEPROM and state of charge
-    // EEPROM_Init();
-    // Charge_Init();
+    EEPROM_Init();
+    Charge_Init();
 
     OSInit(&err);
     assertOSError(err);

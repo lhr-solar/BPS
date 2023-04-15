@@ -11,6 +11,8 @@
 #include "Temperature.h"
 #include "Charge.h"
 
+int n = 0;
+
 void Task_AmperesMonitor(void *p_arg) {
     (void)p_arg;
 
@@ -62,7 +64,7 @@ void Task_AmperesMonitor(void *p_arg) {
         WDog_BitMap |= WD_AMPERES;
 
         RTOS_BPS_MutexPost(&WDog_Mutex, OS_OPT_POST_NONE);
-        
+        //printf("%d\n\r", n++);
         //delay of 10ms
         RTOS_BPS_DelayMs(10);
     }
