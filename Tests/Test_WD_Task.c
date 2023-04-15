@@ -15,9 +15,7 @@ CPU_STK Task1_Stk[256];
 OS_TCB Task2_TCB;
 CPU_STK Task2_Stk[256];
 
-void Task2(void *p_arg){
-    OS_ERR err;
-    
+void Task2(void *p_arg){    
     BSP_Lights_Init();
    
     while(1) {
@@ -26,7 +24,7 @@ void Task2(void *p_arg){
         // Comment out the following lines to test watchdog timeout
         RTOS_BPS_MutexPend(&WDog_Mutex, OS_OPT_PEND_BLOCKING);
         WDog_BitMap = 7;
-        RTOS_BPS_MutexPost(&WDog_Mutex, OS_OPT_POST_NONE, &err);
+        RTOS_BPS_MutexPost(&WDog_Mutex, OS_OPT_POST_NONE);
     }
 
     exit(0);

@@ -1,0 +1,28 @@
+# workflow for running quick, simple tests in the simulator. Runs on every push
+name: Simulator Tests
+
+on:
+  push:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 1
+    steps:
+    - uses: actions/checkout@v3
+    - name: Install tools
+      run: |
+        sudo apt -y update
+        sudo apt -y install gcc-arm-none-eabi
+    - name: Initialize submodules
+      run: git submodule update --init --recursive
+    - name: clean
+      run: make clean
+    - name: make simulator
+      run: make simulator
+    # simple test for verifying testing infrastructure
+    # run tests in sudo for rtprio to work
+    - name: Simulator Test 
+      run: sudo bash Validation/Simulator_Tests.sh
+    # add more tests here

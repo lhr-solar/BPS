@@ -29,7 +29,7 @@ int main() {
         minions[i].config.tx_data[4] &= 0x00;
     } 
     
-    minions[3].config.tx_data[4] |= 0x01;
+    minions[NUM_MINIONS - 1].config.tx_data[4] |= 0x01;
     LTC6811_wrcfg(NUM_MINIONS, minions);
 
     LTC6811_rdcfg(NUM_MINIONS, minions);

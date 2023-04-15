@@ -397,6 +397,7 @@ void runTest(char input){
             system(command);
             asprintf(&command, "echo -e \"The json file used was \n\"; cat BSP/Simulator/Data/AutomatedTests/%c-*", input);
             system(command);
+            printf("Error occurred when simulating test %c \n", input);
             exit(-1); 
         } 
     }

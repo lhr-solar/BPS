@@ -111,9 +111,9 @@ endif
 .INTERMEDIATE: linking
 
 c_compile_msg:
-	@echo "${GREEN}Compiling C files...${NC}"
+	@echo -e "${GREEN}Compiling C files...${NC}"
 linking:
-	@echo "${BLUE}Linking and building bps-simulator executable...${NC}"
+	@echo -e "${BLUE}Linking and building bps-simulator executable...${NC}"
 
 $(BUILD_DIR):
 	mkdir $@
