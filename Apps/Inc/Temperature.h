@@ -137,7 +137,7 @@ int32_t Temperature_GetMaxTemperature(void);
  * @brief Gives fan speed based on Average temperature of pack and past error values
  * @param InputTemp - current temperature
  * @param DesiredTemp - desired temperature
- * @return FanSpeed: 0-4000 PWM
+ * @return FanSpeed: 0-8
  */
 uint8_t Temperature_PID_Output(uint32_t InputTemp, uint32_t DesiredTemp);
 #endif

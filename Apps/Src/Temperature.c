@@ -411,7 +411,8 @@ int32_t Temperature_GetMaxTemperature(void) {
 
 /**
  * @brief Gives fan speed based on Average temperature of pack and past error values
- * @param InputTemp - current temperature. Must not exceed 293 or -294 Celcius given that expected temp is 38 celcius.
+ * @param InputTemp - current temperature. Should not exceed 293 or -294 Celcius given that expected temp is 38 celcius.
+ * If the temperature exceeds these bounds, the fans will be set to max speed. 
  * @param DesiredTemp - desired temperature
  * @return FanSpeed: 0-8
  */
