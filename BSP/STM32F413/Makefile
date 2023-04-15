@@ -12,7 +12,7 @@ READABLE = true
 # optimization
 # change to -Og if you want the compiler to generate assembly that is very close
 # to your source code. Change to -O3 for best performance
-OPT = -O0
+OPT = -O3
 
 # COLORS
 RED=\033[0;31m
