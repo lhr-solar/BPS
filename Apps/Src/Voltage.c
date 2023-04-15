@@ -119,7 +119,6 @@ void Voltage_UpdateMeasurements(void){
 SafetyStatus Voltage_CheckStatus(void){
     for(int i = 0; i < NUM_BATTERY_MODULES; i++){
         uint16_t voltage = Voltage_GetModuleMillivoltage(i);
-            
         // VOLTAGE_LIMITS are in floating point. The LTC6811 sends the voltage data
         // as unsigned 16-bit fixed point integers with a resolution of 0.00001
         if(voltage > MAX_VOLTAGE_LIMIT) {
