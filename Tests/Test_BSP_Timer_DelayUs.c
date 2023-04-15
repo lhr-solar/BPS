@@ -14,8 +14,8 @@ CPU_STK Task1_Stk[DEFAULT_STACK_SIZE];
 OS_TCB Task2_TCB;
 CPU_STK Task2_Stk[DEFAULT_STACK_SIZE];
 
-OS_TCB Init_TCB;
-CPU_STK Init_Stk[DEFAULT_STACK_SIZE];
+//OS_TCB Init_TCB;
+//CPU_STK Init_Stk[DEFAULT_STACK_SIZE];
 
 void Task1(void *p_arg);
 void Task2(void *p_arg);
@@ -25,6 +25,7 @@ void Init(void *p_arg);
 void Init(void *p_arg) {
     OS_ERR err;
     OS_CPU_SysTickInit(SystemCoreClock / (CPU_INT32U) OSCfg_TickRate_Hz);
+    printf("Clock speed: %ld", BSP_Timer_GetRunFreq());
     RTOS_BPS_TaskCreate(&Task1_TCB,
                 "Task 1",
                 Task1,
@@ -45,18 +46,18 @@ void Init(void *p_arg) {
 void Task1(void *p_arg) {
     while (1) {
         uint32_t time = BSP_Timer_GetTicksElapsed();
-        printf("Task 1 time: %ld\n", time);
-        RTOS_BPS_DelayMs(100);
+        printf("Task 1 time: %ld\n\r", time);
+        RTOS_BPS_DelayMs(1000);
     }
 }
 
 void Task2(void *p_arg) {
     while (1) {
-        //uint32_t time = BSP_Timer_GetTicksElapsed();
-        printf("Task 2 ran!\n");
-        for (int i = 0;i<100000;i++) {
-            RTOS_BPS_DelayUs(1);
-        }
+        BSP_Timer_GetTicksElapsed();
+        RTOS_BPS_DelayUs(900);
+        uint32_t time = BSP_Timer_GetTicksElapsed();
+        printf("Task 2 time: %ld\n\r", time);
+        RTOS_BPS_DelayMs(100);
 
     }
 }
@@ -65,7 +66,16 @@ int main(void) {
     OS_ERR err;
     BSP_PLL_Init();
     BSP_Timer_Init();
+    BSP_UART_Init(NULL, NULL, UART_USB);
+    BSP_Timer_Start_TickCounter();
     OSInit(&err);
+    RTOS_BPS_TaskCreate(&Init_TCB,
+        "Init Task",
+        Init,
+        (void*) 0,
+        1, 
+        Init_Stk,
+        256);
     assertOSError(err);
     OSStart(&err);
 
