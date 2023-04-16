@@ -4,6 +4,7 @@
 #include "config.h"
 #include "os.h"
 #include "Tasks.h"
+#include "BSP_WDTimer.h"
 #ifndef SIMULATION
 #include "stm32f4xx.h"
 #else
@@ -33,11 +34,13 @@ void Task2(void *p_arg){    //This task is meant to cause contactor to remain op
 
     RTOS_BPS_SemPost(&SafetyCheck_Sem4, OS_OPT_POST_1);
     RTOS_BPS_SemPost(&SafetyCheck_Sem4, OS_OPT_POST_1);
+    RTOS_BPS_SemPost(&SafetyCheck_Sem4, OS_OPT_POST_1);
+    RTOS_BPS_SemPost(&SafetyCheck_Sem4, OS_OPT_POST_1);
 
     BSP_Lights_Init();
    
     while(1) {
-        BSP_Light_Toggle(EXTRA);
+        BSP_Light_Toggle(RUN);
         RTOS_BPS_DelayTick(25);   // heartbeat
     }
 
@@ -88,6 +91,12 @@ int main() {
 #endif
 
     OS_ERR err;
+
+    if (BSP_WDTimer_DidSystemReset()) {
+        Fault_BitMap = Fault_WDOG; //When function called in if statement, RCC flag cleared so set bitmap here
+        EnterFaultState();
+    }
+
     BSP_PLL_Init();
     BSP_Lights_Init();
     Contactor_Init();

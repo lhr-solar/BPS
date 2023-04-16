@@ -37,6 +37,7 @@ static uint32_t EEPROM_driverErrorCount = 0;
  * Initializes EEPROM application
  */
 void EEPROM_Init(void) {
+    return; //TODO: THIS IS UNTIL WE FIX THESE DRIVERS. ISSUE TICKET ON GITHUB
     // initialize the EEPROM
     M24128_Init();
 
@@ -63,6 +64,8 @@ void EEPROM_Init(void) {
  * set-up programs and the CLI.
  */
 void EEPROM_Reset(void) {
+    //TODO: THIS IS UNTIL WE FIX THESE DRIVERS. ISSUE TICKET ON GITHUB
+    return;
     // initialize the EEPROM
     M24128_Init();
 
@@ -78,6 +81,8 @@ void EEPROM_Reset(void) {
  * @return uint32_t stored charge value
  */
 uint32_t EEPROM_GetCharge(void) {
+    return 45000;
+    //TODO: THIS IS UNTIL WE FIX THESE DRIVERS. ISSUE TICKET ON GITHUB
     uint32_t charge;
     EEPROM_RETRY(M24128_Read(EEPROM_CHARGE_ADDR, sizeof(charge), (uint8_t *) &charge)); // retry if unsuccessful
     return charge;
@@ -89,6 +94,8 @@ uint32_t EEPROM_GetCharge(void) {
  * @param charge The value to set the EEPROM's stored state of charge to
  */
 void EEPROM_SetCharge(uint32_t charge) {
+    return;
+    //TODO: THIS IS UNTIL WE FIX THESE DRIVERS. ISSUE TICKET ON GITHUB
     // this gets called a lot during normal operation, and I think it is ok if it fails sometimes, so I won't make it retry
     ErrorStatus result = M24128_Write(EEPROM_CHARGE_ADDR, sizeof(charge), (uint8_t *) &charge);
     if (result == ERROR) {
@@ -102,6 +109,8 @@ void EEPROM_SetCharge(uint32_t charge) {
  * @param error The error to log
  */
 void EEPROM_LogError(uint32_t error) {
+    return;
+    //TODO: THIS IS UNTIL WE FIX THESE DRIVERS. ISSUE TICKET ON GITHUB
     if (EEPROM_errorLoggingDisabled) return;
     // assumes sizeof(EEPROM_TERMINATOR) == sizeof(error)
     // retry writes if unsuccessful
@@ -118,6 +127,7 @@ void EEPROM_LogError(uint32_t error) {
  * @return              the number of errors read
  */
 uint16_t EEPROM_GetErrors(uint32_t *errors, uint16_t maxErrors) {
+    //TODO: THIS IS UNTIL WE FIX THESE DRIVERS. ISSUE TICKET ON GITHUB
     if (EEPROM_errorLoggingDisabled) return 0;
 
     uint16_t numErrors = 0;

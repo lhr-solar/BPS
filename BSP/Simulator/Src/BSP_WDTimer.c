@@ -16,9 +16,10 @@ volatile bool initialized = false;
  * @param   None
  * @return  None
  */
-void BSP_WDTimer_Init(void) {
+void BSP_WDTimer_Init(bool fault) {
     initialized = true;
-    Simulator_Log(LOG_INFO, "Initialized the watchdog timer\n");
+    char* str = fault ? "Initialized the watchdog timer in fault state\n" : "Initialized the watchdog timer\n";
+    Simulator_Log(LOG_INFO, str);
 }
 
 /**

@@ -60,7 +60,7 @@ int main(void) {
     OS_ERR err;
     BSP_PLL_Init();
     BSP_Lights_Init();
-    //BSP_WDTimer_Init();
+    //BSP_WDTimer_Init(false);
 
     if (BSP_WDTimer_DidSystemReset()) {
 		EnterFaultState();

@@ -18,7 +18,23 @@
 extern uint8_t stateCount;
 #endif
 
-#define MESSAGE_BUFFER 20000
+struct FaultToOut_t {
+    Light light; 
+    char* string;
+};
+
+static const struct FaultToOut_t FaultDict[FAULT_MAX] = {
+    [Fault_UVOLT]       = {.light = UVOLT, .string = "UVOLT"}, //do not have enough led's so some are reused
+    [Fault_OVOLT]       = {.light = OVOLT, .string = "OVOLT"},
+    [Fault_OTEMP]       = {.light = OTEMP, .string = "OTEMP"},
+    [Fault_OCURR]       = {.light = OCURR, .string = "OCURR"},
+    [Fault_OW]          = {.light = WIRE, .string = "OW"},
+    [Fault_HANDLER]     = {.light = EXTRA, .string = "HANDLER"},
+    [Fault_OS]          = {.light = EXTRA, .string = "OS"},
+    [Fault_WDOG]        = {.light = WDOG, .string = "WDOG"},
+    [Fault_CRC]         = {.light = CAN, .string = "CRC"},
+    [Fault_ESTOP]       = {.light = WIRE, .string = "ESTOP"}
+};
 
 /*
  * Note: do not call this directly if it can be helped.
@@ -34,6 +50,13 @@ void EnterFaultState() {
     OSSchedLock(&oserr);
     assertOSError(oserr);
 #endif
+
+    if (Fault_Flag) { //if we are re-entering this function
+        Fault_BitMap |= Fault_OS;
+    }
+    else {
+        Fault_Flag = 1; //set fault flag to 1 so data can be accessed without OS functions
+    }
 
     // Turn Contactor Off
     Contactor_Init();
@@ -59,75 +82,14 @@ void EnterFaultState() {
     #ifdef SIMULATION
     char err[100] = {0};
     #endif
-    switch (Fault_BitMap){
-        case Fault_UVOLT:
-        #ifdef SIMULATION
-            sprintf(err, "$$$ Entered fault in state {%d} - UNDERVOLT\n", stateCount - 1);
-            Simulator_Log_Location(LOG_INFO, err);
-        #endif
-            BSP_Light_On(UVOLT);
-            break;
-        case Fault_OVOLT:
-        #ifdef SIMULATION
-            sprintf(err, "$$$ Entered fault in state {%d} - OVERVOLT\n", stateCount - 1);
-            Simulator_Log_Location(LOG_INFO, err);
-        #endif
-            BSP_Light_On(OVOLT);
-            break;
-        case Fault_OTEMP:
-        #ifdef SIMULATION
-            sprintf(err, "$$$ Entered fault in state {%d} - OVERTEMP\n", stateCount - 1);
-            Simulator_Log_Location(LOG_INFO, err);
-        #endif
-            BSP_Light_On(OTEMP);
-            break;
-        case Fault_OCURR:
-        #ifdef SIMULATION
-            sprintf(err, "$$$ Entered fault in state {%d} - OVERCURRENT\n", stateCount - 1);
-            Simulator_Log_Location(LOG_INFO, err);
-        #endif
-            BSP_Light_On(OCURR);
-            break;
-        case Fault_OW:
-        #ifdef SIMULATION
-            sprintf(err, "$$$ Entered fault in state {%d} - WIRE\n", stateCount - 1);
-            Simulator_Log_Location(LOG_INFO, err);
-        #endif
-            BSP_Light_On(WIRE);  
-            break;
-        case Fault_HANDLER:
-        #ifdef SIMULATION
-            sprintf(err, "$$$ Entered fault in state {%d} - FAULT HANDLER\n", stateCount - 1);
-            Simulator_Log_Location(LOG_INFO, err);
-        #endif    
-            break;
-        case Fault_OS:
-        #ifdef SIMULATION
-            sprintf(err, "$$$ Entered fault in state {%d} - OS ERROR\n", stateCount - 1);
-            Simulator_Log_Location(LOG_INFO, err);
-        #endif
-            break;
-        case Fault_WDOG:
-        #ifdef SIMULATION
-            sprintf(err, "$$$ Entered fault in state {%d} - WATCHDOG\n", stateCount - 1);
-            Simulator_Log_Location(LOG_INFO, err);
-        #endif
-            BSP_Light_On(WDOG);
-            break;
-        case Fault_CRC: //Cannot get Fault_CRC in Simulation
-        #ifdef SIMULATION
-            sprintf(err, "$$$ Entered fault in state {%d} - CRC\n", stateCount - 1);
-            Simulator_Log_Location(LOG_INFO, err);
-        #endif
-            BSP_Light_On(EXTRA);
-            break;
-        case Fault_ESTOP:
-        #ifdef SIMULATION
-            sprintf(err, "$$$ Entered fault in state {%d} - ELECTRICAL STOP\n", stateCount - 1);
-            Simulator_Log_Location(LOG_INFO, err);
-        #endif
-            BSP_Light_On(WIRE); //This is normally for Open Wire, but is used for ESTOP since we do not check Open Wire as of 1/9/2023
-            break;
+    for (uint16_t i = 1; i < FAULT_MAX; i <<= 1){
+        if (Fault_BitMap & i) {
+            #ifdef SIMULATION
+                sprintf(err, "$$$ Entered fault in state {%d} - %s\n", stateCount - 1, FaultDict[i].string);
+                Simulator_Log_Location(LOG_INFO, err);
+            #endif
+            BSP_Light_On(FaultDict[i].light); //allow multiple lights to be turned on
+        }
     }
 
     EEPROM_LogError(Fault_BitMap);
@@ -139,38 +101,32 @@ void EnterFaultState() {
     //Deinitialize CAN registers
     CANbus_DeInit();
     //Reinit CAN in fault state
-    CANbus_Init(false, true);
-    
+    CANbus_Init(BPS_CAN_LOOPBACK, true);
 
 #ifdef DEBUGMODE
     char command[COMMAND_SIZE];
 #endif
-    BSP_WDTimer_Init(); //This is in case we did not pass check contactor and watchdog timer was not initialized
+    BSP_WDTimer_Init(true); //re-initialize for fault state
     BSP_WDTimer_Start(); 
     while(1) {
         //Send Trip Readings
         CANPayload_t payload;
         payload.data.w = 1;
         CANbus_SendMsg_FaultState(TRIP, payload);
-        BSP_PLL_DelayU(MESSAGE_BUFFER);
 
         //Send Contactor Readings
         payload.data.b = 0;
         CANbus_SendMsg_FaultState(CONTACTOR_STATE, payload);
-        BSP_PLL_DelayU(MESSAGE_BUFFER);
         
         //Send Current Readings
         payload.data.w = Amps_GetReading();
         CANbus_SendMsg_FaultState(CURRENT_DATA, payload);
-        BSP_PLL_DelayU(MESSAGE_BUFFER);
         
-
         //Send Voltage Readings
         for (uint8_t i = 0; i < NUM_BATTERY_MODULES; i++){ //send all battery module voltage data
             payload.idx = i;
             payload.data.w = Voltage_GetModuleMillivoltage(i);
             CANbus_SendMsg_FaultState(VOLT_DATA, payload);
-            BSP_PLL_DelayU(MESSAGE_BUFFER);
         }
 
         //Send Temperature Readings
@@ -178,7 +134,6 @@ void EnterFaultState() {
             payload.idx = i;
             payload.data.w = Temperature_GetModuleTemperature(i);
             CANbus_SendMsg_FaultState(TEMP_DATA, payload);
-            BSP_PLL_DelayU(MESSAGE_BUFFER);
         }
 
 #ifdef DEBUGMODE

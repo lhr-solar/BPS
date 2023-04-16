@@ -5,15 +5,15 @@
 #include "RTOS_BPS.h"
 
 #define TASK_INIT_PRIO                      0
-#define TASK_PETWDOG_PRIO                   3
-#define TASK_CHECK_CONTACTOR_PRIO           4
-#define TASK_CANBUS_CONSUMER_PRIO           5
-#define TASK_VOLT_TEMP_MONITOR_PRIO         6
-#define TASK_AMPERES_MONITOR_PRIO           7
-#define TASK_BATTERY_BALANCE_PRIO           8
-#define TASK_LOG_INFO_PRIO                  9 
-#define TASK_CLI_PRIO                       10  
-#define TASK_IDLE_PRIO                      11
+#define TASK_PETWDOG_PRIO                   1
+#define TASK_CHECK_CONTACTOR_PRIO           2
+#define TASK_CANBUS_CONSUMER_PRIO           3
+#define TASK_VOLT_TEMP_MONITOR_PRIO         4
+#define TASK_AMPERES_MONITOR_PRIO           5
+#define TASK_BATTERY_BALANCE_PRIO           6
+#define TASK_LOG_INFO_PRIO                  7 
+#define TASK_CLI_PRIO                       8  
+#define TASK_IDLE_PRIO                      9
 
 #define DEFAULT_STACK_SIZE                  256
 #define WATERMARK_STACK_LIMIT               DEFAULT_STACK_SIZE/2
@@ -128,7 +128,8 @@ typedef enum {
     Fault_OS      = 0x040,
     Fault_WDOG    = 0x080,
     Fault_CRC     = 0x100,
-    Fault_ESTOP   = 0x200
+    Fault_ESTOP   = 0x200,
+    FAULT_MAX
 }Fault_Set;
 
 extern Fault_Set Fault_BitMap;

@@ -4,16 +4,17 @@
 #include "stm32f4xx.h"
 
 /**
- * @brief   Initialize the watch dog timer.
- * @param   None
+ * @brief   Initialize the watch dog timer. If in fault state, set watchdog reload to max value so we don't trip for watchdog in fault state again.
+ * @param   fault: true if in fault state, false otherwise
  * @return  None
  */
-void BSP_WDTimer_Init(void) {
+void BSP_WDTimer_Init(bool fault) {
     // Independent Watchdog Init
     // IWDG has a timeout value of 4.096 / 8 seconds (about 500 ms).
-	IWDG_WriteAccessCmd(IWDG_WriteAccess_Enable);       // Enable access to the IWDG_PR and IWDG_RLR registers
-	IWDG_SetPrescaler(IWDG_Prescaler_32);               // Prescaler divider feeding the counter clock
-	IWDG_SetReload(IWDG_RLR_RL / 4);                    // Reload value set to 0xFFF / 8
+    // When last checked(4/1/2023), BPS ran at 5Hz
+	IWDG_WriteAccessCmd(IWDG_WriteAccess_Enable); // Enable access to the IWDG_PR and IWDG_RLR registers
+	IWDG_SetPrescaler(IWDG_Prescaler_32); // Prescaler divider feeding the counter clock
+	IWDG_SetReload(fault ? (IWDG_RLR_RL) : (IWDG_RLR_RL / 8)); // Reload value set to 0xFFF / 8
 }
 
 /**
@@ -23,7 +24,7 @@ void BSP_WDTimer_Init(void) {
  */
 bool BSP_WDTimer_DidSystemReset(void) {
     if (RCC_GetFlagStatus(RCC_FLAG_IWDGRST) != RESET) {
-        RCC_ClearFlag();		// Clear reset flags. May be optional
+        RCC_ClearFlag();		// Clear reset flags
         return true;
     }
     return false;

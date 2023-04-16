@@ -21,42 +21,43 @@
  */
 void BSP_PLL_Init(void) {
     RCC_HSEConfig(RCC_HSE_ON);
-	
-	ErrorStatus status = RCC_WaitForHSEStartUp();
+    
+    ErrorStatus status = RCC_WaitForHSEStartUp();
 
-	if(status == SUCCESS){
-		// Flash 3 wait state, prefetch buffer and cache ON
-		FLASH_SetLatency(FLASH_Latency_3);
-		FLASH_PrefetchBufferCmd(ENABLE);
-		FLASH_InstructionCacheCmd(ENABLE);
-		FLASH_DataCacheCmd(ENABLE);
-		
-		// HCLK = SYSCLK
-		RCC_HCLKConfig(RCC_SYSCLK_Div1);
-		
-		// PCLK2 = HCLK/2
-		RCC_PCLK2Config(RCC_HCLK_Div2);
-		
-		// PCLK1 = HCLK/4
-		RCC_PCLK1Config(RCC_HCLK_Div4);
-		
-		// Configure the main PLL clock to 80 MHz
-		RCC_PLLConfig(RCC_PLLSource_HSE, PLL_M, PLL_N, PLL_P, PLL_Q, 2);	// 2 is arbitrary number
-		
-		// Enable the main PLL
-		RCC_PLLCmd(ENABLE);
-		
-		// Wait till the main PLL is ready
-		while (RCC_GetFlagStatus(RCC_FLAG_PLLRDY) == RESET);
-		
-		// Select the main PLL as system clock source
-		RCC_SYSCLKConfig(RCC_SYSCLKSource_PLLCLK);
-		
-		// Update the system clock variable
-		SystemCoreClockUpdate();
-	}else{
-		while(1);	// Spin for error
-	}
+    if(status == SUCCESS){
+        // Flash 3 wait state, prefetch buffer and cache ON
+        FLASH_SetLatency(FLASH_Latency_3);
+        FLASH_PrefetchBufferCmd(ENABLE);
+        FLASH_InstructionCacheCmd(ENABLE);
+        FLASH_DataCacheCmd(ENABLE);
+        
+        // HCLK = SYSCLK
+        RCC_HCLKConfig(RCC_SYSCLK_Div1);
+        
+        // PCLK2 = HCLK/2
+        RCC_PCLK2Config(RCC_HCLK_Div2);
+        
+        // PCLK1 = HCLK/4
+        RCC_PCLK1Config(RCC_HCLK_Div4);
+        
+        // Configure the main PLL clock to 80 MHz
+        RCC_PLLConfig(RCC_PLLSource_HSE, PLL_M, PLL_N, PLL_P, PLL_Q, 2);	// 2 is arbitrary number
+        
+        // Enable the main PLL
+        RCC_PLLCmd(ENABLE);
+        
+        // Wait till the main PLL is ready
+        while (RCC_GetFlagStatus(RCC_FLAG_PLLRDY) == RESET);
+        
+        // Select the main PLL as system clock source
+        RCC_SYSCLKConfig(RCC_SYSCLKSource_PLLCLK);
+        
+        // Update the system clock variable
+        SystemCoreClockUpdate();
+    }
+    else {
+        while(1);	// Spin for error
+    }
 }
 
 /**
@@ -73,13 +74,12 @@ uint32_t BSP_PLL_GetSystemClock(void) {
  * @param   # of microseconds to delay
  * @return  None
 */
-void BSP_PLL_DelayU(uint32_t micro)
-{
-    uint32_t delay = BSP_PLL_GetSystemClock() / 1000000;
-	for(volatile uint32_t i = 0; i < micro; i++)
-	{
-		for(volatile uint32_t j = 0; j < delay; j++);
-	}
+void BSP_PLL_DelayU(uint32_t micro) {
+    uint32_t delay = BSP_PLL_GetSystemClock() / 1e6;
+    delay /= 10; //Through testing, this gets more accurate delays
+    for(volatile uint32_t i = 0; i < micro; i++) {
+        for(volatile uint32_t j = 0; j < delay; j++);
+    }
 }
 
 /**
@@ -87,11 +87,10 @@ void BSP_PLL_DelayU(uint32_t micro)
  * @param   # of milliseconds to delay
  * @return  None
 */
-void BSP_PLL_DelayM(uint32_t milli)
-{
-  uint32_t delay = BSP_PLL_GetSystemClock() / 1000;
-	for(volatile uint32_t i = 0; i < milli; i++)
-	{
-		for(volatile uint32_t j = 0; j < delay; j++);
-	}
+void BSP_PLL_DelayM(uint32_t milli) {
+    uint32_t delay = BSP_PLL_GetSystemClock() / 1e3;
+    delay /= 10; //Through testing, this gets more accurate delays
+    for(volatile uint32_t i = 0; i < milli; i++) {
+        for(volatile uint32_t j = 0; j < delay; j++);
+    }
 }
