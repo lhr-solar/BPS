@@ -41,7 +41,7 @@ void BSP_PLL_Init(void) {
         RCC_PCLK1Config(RCC_HCLK_Div4);
         
         // Configure the main PLL clock to 80 MHz
-        RCC_PLLConfig(RCC_PLLSource_HSE, PLL_M, PLL_N, PLL_P, PLL_Q, 2);	// 2 is arbitrary number
+        RCC_PLLConfig(RCC_PLLSource_HSE, PLL_M, PLL_N, PLL_P, PLL_Q, 2);    // 2 is arbitrary number
         
         // Enable the main PLL
         RCC_PLLCmd(ENABLE);
@@ -56,7 +56,7 @@ void BSP_PLL_Init(void) {
         SystemCoreClockUpdate();
     }
     else {
-        while(1);	// Spin for error
+        while(1);    // Spin for error
     }
 }
 
@@ -76,10 +76,10 @@ uint32_t BSP_PLL_GetSystemClock(void) {
 */
 void BSP_PLL_DelayUs(uint32_t micro) {
     uint32_t delay = BSP_PLL_GetSystemClock() / 1000000;
-	delay /= 10;		// inner loop takes about 10 cycles @ GCC -O3
-	for (volatile uint32_t i = 0; i < micro; i++) {
-		for (volatile uint32_t j = 0; j < delay; j++);
-	}
+    delay /= 10;        // inner loop takes about 10 cycles @ GCC -O3
+    for (volatile uint32_t i = 0; i < micro; i++) {
+        for (volatile uint32_t j = 0; j < delay; j++);
+    }
 }
 
 /**
@@ -88,9 +88,9 @@ void BSP_PLL_DelayUs(uint32_t micro) {
  * @return  None
 */
 void BSP_PLL_DelayMs(uint32_t milli) {
-  	uint32_t delay = BSP_PLL_GetSystemClock() / 1000;
-  	delay /= 10;		// inner loop takes about 10 cycles @ GCC -O3
-	for (volatile uint32_t i = 0; i < milli; i++) {
-		for (volatile uint32_t j = 0; j < delay; j++);
-	}
+    uint32_t delay = BSP_PLL_GetSystemClock() / 1000;
+    delay /= 10;        // inner loop takes about 10 cycles @ GCC -O3
+    for (volatile uint32_t i = 0; i < milli; i++) {
+        for (volatile uint32_t j = 0; j < delay; j++);
+    }
 }
