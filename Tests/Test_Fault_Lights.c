@@ -53,6 +53,6 @@ void FakeEnterFaultState() {
 int main() {
     for (Fault_BitMap = 1; Fault_BitMap < Fault_Max; Fault_BitMap <<= 1){
         FakeEnterFaultState(); // Test each light individually
-        BSP_PLL_DelayM(500);
+        BSP_PLL_DelayMs(500);
     }
 }

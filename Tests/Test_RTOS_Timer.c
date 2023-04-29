@@ -38,11 +38,11 @@ void Task1(void *p_arg){
     for (;;) {
         BSP_Light_Toggle(RUN);
 
-        RTOS_BPS_DelayUs(LIGHT_DELAY_MILLISECONDS * 1000); // do 1ms at a time
+        RTOS_BPS_DelayUs(LIGHT_DELAY_MILLISECONDS * 1000);
 
         // the OS timer still runs when RTOS_BPS_DelayUs is running 
         // so we must delay by a lot of ticks to catch up
-        RTOS_BPS_DelayTick(LIGHT_DELAY_MILLISECONDS / 10);
+        RTOS_BPS_DelayTick(LIGHT_DELAY_MILLISECONDS / 10 + 1);
     }
 }
 
@@ -51,9 +51,9 @@ void Task2(void *p_arg){
     for (;;) {
         BSP_Light_Toggle(UVOLT);
 
-        RTOS_BPS_DelayUs(LIGHT_DELAY_MILLISECONDS * 1000); // do 1 ms at a time
+        RTOS_BPS_DelayUs(LIGHT_DELAY_MILLISECONDS * 1000);
 
-        RTOS_BPS_DelayTick(LIGHT_DELAY_MILLISECONDS / 10);
+        RTOS_BPS_DelayTick(LIGHT_DELAY_MILLISECONDS / 10 + 1);
     }
 }
 

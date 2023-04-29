@@ -39,7 +39,7 @@ uint32_t BSP_PLL_GetSystemClock(void) {
  * @param   # of microseconds to delay
  * @return  None
 */
-void BSP_PLL_DelayU(uint32_t micro)
+void BSP_PLL_DelayUs(uint32_t micro)
 {
     return;
 }
@@ -49,7 +49,7 @@ void BSP_PLL_DelayU(uint32_t micro)
  * @param   # of milliseconds to delay
  * @return  None
 */
-void BSP_PLL_DelayM(uint32_t milli)
+void BSP_PLL_DelayMs(uint32_t milli)
 {
     return;
 }

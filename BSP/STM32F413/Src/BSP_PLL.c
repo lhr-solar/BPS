@@ -74,7 +74,7 @@ uint32_t BSP_PLL_GetSystemClock(void) {
  * @param   # of microseconds to delay
  * @return  None
 */
-void BSP_PLL_DelayU(uint32_t micro) {
+void BSP_PLL_DelayUs(uint32_t micro) {
     uint32_t delay = BSP_PLL_GetSystemClock() / 1000000;
 	delay /= 10;		// inner loop takes about 10 cycles @ GCC -O3
 	for (volatile uint32_t i = 0; i < micro; i++) {
@@ -87,7 +87,7 @@ void BSP_PLL_DelayU(uint32_t micro) {
  * @param   # of milliseconds to delay
  * @return  None
 */
-void BSP_PLL_DelayM(uint32_t milli) {
+void BSP_PLL_DelayMs(uint32_t milli) {
   	uint32_t delay = BSP_PLL_GetSystemClock() / 1000;
   	delay /= 10;		// inner loop takes about 10 cycles @ GCC -O3
 	for (volatile uint32_t i = 0; i < milli; i++) {

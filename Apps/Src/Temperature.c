@@ -154,7 +154,7 @@ ErrorStatus Temperature_ChannelConfig(uint8_t tempChannel) {
     // Send data
     wakeup_sleep(NUM_MINIONS);
     LTC6811_wrcomm(NUM_MINIONS, Minions);
-    BSP_PLL_DelayU(200);
+    RTOS_BPS_DelayUs(200);
     LTC6811_stcomm();
 
     for (uint8_t board = 0; board < NUM_MINIONS; board++) {
@@ -176,7 +176,7 @@ ErrorStatus Temperature_ChannelConfig(uint8_t tempChannel) {
 
     // Send data
     LTC6811_wrcomm(NUM_MINIONS, Minions);
-    BSP_PLL_DelayU(200);
+    RTOS_BPS_DelayUs(200);
     LTC6811_stcomm();
     //release mutex
     RTOS_BPS_MutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE);

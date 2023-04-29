@@ -142,7 +142,7 @@ void RTOS_BPS_DelayMs(uint16_t delay_ms){
 }
 
 /**
- * @brief Creates a Microsecond-based Time Delay.
+ * @brief Creates an accurate Microsecond-based Time Delay.
  *        As anything less than 100ms will not work with an RTOS delay, 
  *        this delay suspends the scheduler and uses a hardware timer to implement a 
  *        microsecond-accurate delay.

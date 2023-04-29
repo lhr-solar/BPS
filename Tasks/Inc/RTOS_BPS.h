@@ -100,13 +100,14 @@ void RTOS_BPS_DelaySecs(uint16_t delay_s);
 void RTOS_BPS_DelayMs(uint16_t delay_ms);
 
 /**
- * @brief Creates a Microsecond-based Time Delay.
+ * @brief Creates an accurate Microsecond-based Time Delay.
  *        As anything less than 100ms will not work with an RTOS delay, 
  *        this delay suspends the scheduler and uses a hardware timer to implement a 
  *        microsecond-accurate delay.
  * @param dly Defines how many milliseconds to delay for.
  * @note !! Blocks the Scheduler !! Do not use for extended delays!
- *       Use RTOS_BPS_DelayMs() or RTOS_BPS_DelaySecs() if possible
+ *       Use RTOS_BPS_DelayMs() or RTOS_BPS_DelaySecs() if possible.
+ *       Delays longer than 1 tick (10ms) cause undefined behavior.
  * 
  *       Due to overhead from suspending the scheduler and setting up the delay, the 
  *       actual delay time will be a few cycles slower than the requested delay time.
