@@ -22,11 +22,7 @@
 #include "BSP_CAN.h" // CAN testing
 
 // file descriptor of simulator log file
-int simulatorLog;
-FILE* simFile;
-
-// Used to prevent another thread from printing out using non thread-safe write in Simulator_Log
-static pthread_mutex_t SimulatorLog_Sem;
+FILE* simulatorLog;
 
 // Counter for current state we are on
 uint8_t stateCount = 0;
@@ -63,12 +59,10 @@ static const char* LoggingLUT[LOG_NUM_LEVELS] = {
  * @return  None
  */
 void Simulator_Log(LoggingType_t lvl, char *str) {
-    char prefix[128];
+    char prefix[256];
     strcpy(prefix, LoggingLUT[lvl]); //This is because strcat cannot concat const
     char* msg = strcat(prefix, str);
-    pthread_mutex_lock(&SimulatorLog_Sem);
-    write(simulatorLog, msg, strlen(msg));
-    pthread_mutex_unlock(&SimulatorLog_Sem);
+    fprintf(simulatorLog, "%s", msg);
     //printf("%s", msg);
 }
 
@@ -79,8 +73,7 @@ void Simulator_Log(LoggingType_t lvl, char *str) {
  */
 void Simulator_Shutdown(int status) {
     Simulator_Log(LOG, "\nShutting down the simulator...\n");
-    close(simulatorLog);
-    pthread_mutex_destroy(&SimulatorLog_Sem);
+    fclose(simulatorLog);
     exit(status);
 }
 
@@ -109,7 +102,7 @@ static void readInputFile(char *jsonPath) {
         printf("error reading file %s", jsonPath);
         exit(-1);
     }
-    simFile = fdopen(simulatorLog, "w");
+
     // parses the input file as a json
     cJSON *json = cJSON_ParseWithLength(inFile, length);
 
@@ -251,9 +244,6 @@ void Simulator_Init(char *jsonPath) {
     startTime = time(NULL);
     char* filename;
 
-    // initialize mutex for logging
-    pthread_mutex_init(&SimulatorLog_Sem, NULL);
-
     // make the file name the test file
     char* tempName = jsonPath + strlen(jsonPath);
     while (*tempName != '/') tempName--;
@@ -267,16 +257,8 @@ void Simulator_Init(char *jsonPath) {
     mkdir(outputdir, S_IRWXU);
 
     // create the log file, overwriting any existing log file
-    simulatorLog = creat(filename, 0664); //0664 is octal 664 which speicifies the file permissions for the created file
+    simulatorLog = fopen(filename, "w");
 
-    if (simulatorLog < 0) {
-        printf("error opening file %s\n", filename);
-        exit(-1);
-    }
-    if (write(simulatorLog, "simulator started...\n", 21) < 0) {
-        printf("error writing file %s\n", filename);
-        exit(-1);
-    }
     free(filename);
 
     
