@@ -21,7 +21,7 @@
 #define BSP_TIMER_IRQn(timer_num) BSP_TIMER_CONCAT3(TIM, timer_num, _IRQn)
 
 // global constants
-static const uint32_t MICROSECONDS_PER_SECOND = 1e6;
+static const uint32_t MICROSECONDS_PER_SECOND = (int)1e6;
 static uint32_t TimerFrequency = 0;
 
 // globals

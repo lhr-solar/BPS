@@ -3,6 +3,7 @@
 */
 
 #include "RTOS_BPS.h"
+#include "os_cfg_app.h"
 #include "Tasks.h"      // for OS errors
 #include "BSP_Timer.h"  // for fine-grained RTOS delays
 
@@ -11,7 +12,14 @@
 static volatile uint32_t DelayUsContinue = 0;
 
 static void DelayUsCallback(void) {
+    CPU_SR_ALLOC();
+    CPU_CRITICAL_ENTER();
+    OSIntEnter();
+    CPU_CRITICAL_EXIT();
+
     DelayUsContinue = 1;
+
+    OSIntExit();
 }
 
 // End Helper structures for RTOS_BPS_DelayUs() ---------------
@@ -140,7 +148,8 @@ void RTOS_BPS_DelayMs(uint16_t delay_ms){
  *        microsecond-accurate delay.
  * @param dly Defines how many milliseconds to delay for.
  * @note !! Blocks the Scheduler !! Do not use for extended delays!
- *       Use RTOS_BPS_DelayMs() or RTOS_BPS_DelaySecs() if possible
+ *       Use RTOS_BPS_DelayMs() or RTOS_BPS_DelaySecs() if possible.
+ *       Delays longer than 1 tick (10ms) cause undefined behavior.
  * 
  *       Due to overhead from suspending the scheduler and setting up the delay, the 
  *       actual delay time will be a few cycles slower than the requested delay time.
