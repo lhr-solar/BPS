@@ -11,6 +11,7 @@
 #include "Contactor.h"
 #include "BSP_PLL.h"
 #include "BSP_UART.h"
+#include "BSP_Timer.h"
 #include "EEPROM.h"
 #include "Charge.h"
 #include "BSP_Lights.h"
@@ -42,6 +43,7 @@ int main() {
     Contactor_Off(HVHIGH_CONTACTOR);
     
     BSP_Lights_Init();
+    BSP_Timer_Init();
 
     // If the WDTimer counts down to 0, then the BPS resets. If BPS has reset, enter a fault state.
     if (BSP_WDTimer_DidSystemReset()) {
