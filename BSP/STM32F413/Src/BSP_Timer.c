@@ -6,8 +6,8 @@
 #include "stm32f4xx_rcc.h"
 
 // define timers used here (number here only, i.e. '1' for TIM1)
-#define BSP_TIMER_TICKCOUNTER		2
-#define BSP_TIMER_ONESHOT			5
+#define BSP_TIMER_TICKCOUNTER        2
+#define BSP_TIMER_ONESHOT            5
 
 // some preprocessor stuff to change timers 'easily'
 #define BSP_TIMER_CONCAT2_(x, y) x ## y
@@ -29,13 +29,13 @@ static callback_t TimerOneShotCallback;
 
 /**
  * @brief little helper function to find valid timer period and prescaler values 
- * 		  for a given timer period. maximizes the period and minimizes the prescaler.
+ *        for a given timer period. maximizes the period and minimizes the prescaler.
  * @param delay_us timer period in microseconds
  * @param period period will be placed here
  * @param prescaler prescaler will be placed here
  * @param timer_32bit true if 32 bit timer (TIM2/TIM5), false if 16 bit timer (other timers)
  * @return error (in clock cycles) betweeen requested period and actual period,
- * 		   -1 if requested period is too large
+ *         -1 if requested period is too large
  */
 static uint32_t Timer_Micros_To_PeriodPrescaler(uint32_t delay_us, 
                                                 uint32_t *period, 
@@ -92,6 +92,10 @@ void BSP_Timer_Init(void) {
  * 
  * @param delay_us one shot time in microseconds
  * @param callback callback to execute after `delay_us` time
+ * 
+ * @note Calling this multiple times concurrently results in undefined behavior.
+ *       Define more one shot timers if >1 are needed concurrently. 
+ *       Look at RTOS_BPS_DelayUs() for an example use case
  */
 void BSP_Timer_Start_OneShot(uint32_t delay_us, callback_t callback) {
     TIM_TypeDef *tim_inst = BSP_TIMER_INST(BSP_TIMER_ONESHOT);
@@ -130,7 +134,7 @@ void BSP_Timer_Start_TickCounter(void) {
 uint32_t BSP_Timer_GetTicksElapsed(void) {
     /* Get system clocks */
     uint32_t counter = TIM2->CNT;       // find current value of up counter
-    TIM2->CNT = 0;
+    TIM2->CNT = 0;                      // reset up counter
 
     return counter;
 }
@@ -141,10 +145,7 @@ uint32_t BSP_Timer_GetTicksElapsed(void) {
  * @return  frequency in Hz
  */
 uint32_t BSP_Timer_GetRunFreq(void) {
-    RCC_ClocksTypeDef RCC_Clocks;
-    RCC_GetClocksFreq(&RCC_Clocks);
-    // Return value is 40,000,000
-    return RCC_Clocks.PCLK2_Frequency; // Tested using UART and this appears to be the proper clock used by the timer.
+    return TimerFrequency;
 }
 
 /**
@@ -153,7 +154,6 @@ uint32_t BSP_Timer_GetRunFreq(void) {
  * @return  Microseconds 
  */
 uint32_t BSP_Timer_GetMicrosElapsed(void) {
-    // TODO: pretty sure this is all wrong
     uint32_t ticks = BSP_Timer_GetTicksElapsed();
     uint32_t freq = BSP_Timer_GetRunFreq();
     uint32_t micros_elap = ticks / (freq / MICROSECONDS_PER_SECOND); // Math to ensure that we do not overflow (16Mhz or 80Mhz)
