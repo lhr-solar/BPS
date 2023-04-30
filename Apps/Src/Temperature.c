@@ -196,6 +196,9 @@ int32_t milliVoltToCelsius(uint32_t milliVolt){
     if (milliVolt < sizeof(voltToTemp)/sizeof(voltToTemp[0])) {
         return voltToTemp[milliVolt];
     }
+    else if (milliVolt < 5200 && milliVolt > 4800) { //temperature sensor is disconneted for scrutineering
+        return 0; //safe value
+    }
     else {
         return TEMP_ERR_OUT_BOUNDS;
     }
@@ -294,11 +297,13 @@ SafetyStatus Temperature_CheckStatus(uint8_t isCharging){
     for (uint8_t i = 0; i < NUM_MINIONS; i++) {
         for (uint8_t j = 0; j < MAX_TEMP_SENSORS_PER_MINION_BOARD; j++) {
             if (i * MAX_TEMP_SENSORS_PER_MINION_BOARD + j >= NUM_TEMPERATURE_SENSORS) break;
+            if (i == 0 && j == 1) printf("Temperature = %ld\n\r", temperatures[0][1]);
             if ((temperatures[i][j] > temperatureLimit) || (temperatures[i][j] == TEMP_ERR_OUT_BOUNDS)) {
                 return DANGER;
             }
         }
     }
+    printf("\n\r");
 
     return SAFE;
 }

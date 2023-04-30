@@ -56,13 +56,15 @@ uint16_t LTC2315_Read() {
     OS_ERR err;
     uint8_t rxdata[2] = {0xff, 0xff};
 
-    LTC2315_wakeup_sleep();
+    // LTC2315_wakeup_sleep();
 
     uint8_t count = 0;
     do {
     OSSchedLock(&err);
     assertOSError(err);
 
+    LTC2315_wakeup_sleep();
+    
     BSP_SPI_SetStateCS(spi_ltc2315, 0);
     // Note: if this is ever changed to send more than 8bytes, we should make
     // sure BSP_SPI_Read() does not call the scheduler or the OS will error out
@@ -103,11 +105,11 @@ int32_t LTC2315_GetCurrent() {
      */
    
     int32_t reading = 0;
-    for (int i = 0; i < 10; ++i) {
+    for (int i = 0; i < 8; ++i) {
         reading += (int32_t)LTC2315_Read();
     }
 
-    reading /= 10;
+    reading /= 8;
 
     const int32_t PRECISION_MICRO_AMPS = 73242;
     int32_t milliamps = ((reading - offset) * PRECISION_MICRO_AMPS) / 1000;    // during testing, the gain seems to be inverted

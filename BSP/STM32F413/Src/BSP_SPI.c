@@ -337,7 +337,7 @@ ErrorStatus BSP_SPI_Read(spi_port_t port, uint8_t *rxBuf, uint32_t rxLen) {
             if (data == SPI_ERROR) {
                 return ERROR;
             }
-            rxBuf[i] = (uint8_t)data && 0xFF;
+            rxBuf[i] = (uint8_t)data & 0xFF;
         }
     } else {
         SPI_I2S_ITConfig(SPI_BUSSES[port], SPI_I2S_IT_RXNE, ENABLE);
