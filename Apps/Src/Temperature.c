@@ -196,7 +196,7 @@ int32_t milliVoltToCelsius(uint32_t milliVolt){
     if (milliVolt < sizeof(voltToTemp)/sizeof(voltToTemp[0])) {
         return voltToTemp[milliVolt];
     }
-    else if (milliVolt < 5200 && milliVolt > 4800) { //temperature sensor is disconneted for scrutineering
+    else if (milliVolt < 5200 && milliVolt > 4800) { //temperature sensor is disconnected for scrutineering
         return 0; //safe value
     }
     else {
@@ -302,7 +302,6 @@ SafetyStatus Temperature_CheckStatus(uint8_t isCharging){
             }
         }
     }
-    printf("\n\r");
 
     return SAFE;
 }
