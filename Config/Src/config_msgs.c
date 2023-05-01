@@ -48,4 +48,6 @@
 
 #pragma message ("BALANCING_TOLERANCE_STOP stop set to " XSTR(BALANCING_TOLERANCE_STOP))
 
+#pragma message ("BPS_CAN_LOOPBACK set to " XSTR(BPS_CAN_LOOPBACK))
+
 // I don't think the other #defines in config.h should be editable
