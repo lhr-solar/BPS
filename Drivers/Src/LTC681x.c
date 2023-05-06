@@ -45,6 +45,7 @@ Copyright 2017 Linear Technology Corp. (LTC)
 #include "LTC6811.h"
 #include "BSP_SPI.h"
 #include "BSP_PLL.h"
+#include "RTOS_BPS.h"
 #include "config.h"
 #include "Tasks.h"
 
@@ -82,7 +83,7 @@ void wakeup_idle(uint8_t total_ic)
   for (int i =0; i<total_ic; i++) // TODO: Verify we do not need delays for these functions by running BPS in car
   {
     cs_set(0);
-    BSP_PLL_DelayU(200); //Guarantees the isoSPI will be in ready mode
+    RTOS_BPS_DelayUs(200); //Guarantees the isoSPI will be in ready mode
     spi_read8();
     cs_set(1);
   }
@@ -94,9 +95,9 @@ void wakeup_sleep(uint8_t total_ic)
   for (int i =0; i<total_ic; i++)
   {
     cs_set(0);
-    BSP_PLL_DelayU(200); // Guarantees the LTC6813 will be in standby
+    RTOS_BPS_DelayUs(200); // Guarantees the LTC6813 will be in standby
     cs_set(1);
-    BSP_PLL_DelayU(200);
+    RTOS_BPS_DelayUs(200);
   }
 }
 
@@ -1189,7 +1190,7 @@ int16_t LTC681x_run_cell_adc_st(uint8_t adc_reg,uint8_t total_ic, cell_asic ic[]
         LTC681x_clraux();
         LTC681x_axst(2,self_test);
         LTC681x_pollAdc();
-        BSP_PLL_DelayM(10);
+        BSP_PLL_DelayMs(10);
         wakeup_idle(total_ic);
         LTC681x_rdaux(0, total_ic,ic);
         for (int cic = 0; cic < total_ic; cic++)

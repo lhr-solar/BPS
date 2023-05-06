@@ -11,7 +11,7 @@ void Task_CheckContactor(void *p_arg) {
     
     CANMSG_t CanMsg = {.payload = {.idx = 0, .data.b = 1}};
     
-    BSP_PLL_DelayM(30); // delay is needed for pull up resistor to stabilize before we check for contactor state
+    BSP_PLL_DelayMs(30); // delay is needed for pull up resistor to stabilize before we check for contactor state
     // If a contactor is on before we turn it on in this task, it may have failed and welded closed
     if (Contactor_GetState(HVHIGH_CONTACTOR) || Contactor_GetState(HVLOW_CONTACTOR)) {
         Fault_BitMap |= Fault_ESTOP;

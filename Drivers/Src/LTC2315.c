@@ -3,6 +3,7 @@
 #include "BSP_SPI.h"
 #include "Tasks.h"
 #include "BSP_PLL.h"
+#include "RTOS_BPS.h"
 #include <stdio.h>
 
 // offset for current reading
@@ -17,9 +18,9 @@ static int32_t offset;
  */
 static void LTC2315_cs_pulse(){
     BSP_SPI_SetStateCS(spi_ltc2315, 0);
-    BSP_PLL_DelayU(16);
+    BSP_PLL_DelayUs(16);
     BSP_SPI_SetStateCS(spi_ltc2315, 1);
-    BSP_PLL_DelayU(16);
+    BSP_PLL_DelayUs(16);
 }
 
 /* Wake isoSPI from sleep
@@ -27,9 +28,9 @@ static void LTC2315_cs_pulse(){
 static void LTC2315_wakeup_sleep()
 {
     BSP_SPI_SetStateCS(spi_ltc2315, 0);
-    BSP_PLL_DelayU(500); // Guarantees that isoSPI is awake
+    RTOS_BPS_DelayUs(500); // Guarantees that isoSPI is awake
     BSP_SPI_SetStateCS(spi_ltc2315, 1);
-    BSP_PLL_DelayU(150);
+    RTOS_BPS_DelayUs(150);
 }
 
 /* Initialize communication LTC2315

@@ -17,12 +17,11 @@ static int32_t charge;  // % of charge left with 0.000001% resolution
  */
 void Charge_Init(void){ 
 	return; //TODO: THIS IS UNTIL WE FIX THE EEPROM DRIVERS. ISSUE TICKET ON GITHUB
-	BSP_Timer_Init();
 	
 	// Grab from EEPROM what is the current Charge
 	charge = EEPROM_GetCharge();
 
-    BSP_Timer_Start();
+    BSP_Timer_Start_TickCounter();
 }
 
 /** Charge_Calculate
