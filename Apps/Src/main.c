@@ -34,7 +34,7 @@ int main() {
 
     if(BSP_PLL_Init() == ERROR){
         // if initializing PLL fails, something is very wrong
-        Fault_BitMap |= Fault_CRC;
+        Fault_BitMap |= Fault_OS;
         EnterFaultState();
     }
 

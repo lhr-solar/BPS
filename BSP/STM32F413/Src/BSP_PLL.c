@@ -33,11 +33,10 @@ ErrorStatus BSP_PLL_Init(void) {
 	// If still fail then we will fault
 	while (status == ERROR) {
 		if (pllAttempts >= PLL_ATTEMPTS_MAX) {
-			//return a error for waiting too long
+			//return an error for waiting too long
 			return ERROR;
 		}
 		pllAttempts++;
-		status = RCC_WaitForHSEStartUp();
 	}
 
 	// Flash 3 wait state, prefetch buffer and cache ON
