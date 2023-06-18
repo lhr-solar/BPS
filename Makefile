@@ -13,31 +13,23 @@ NC=\033[0m # No Color
 DEFINES = none
 export DEFINES
 
-TEST = none
-export TEST
-
-ifneq ($(TEST), none)
-TEST_FILE := Test_$(TEST).c
-endif
-
-OS = RTOS
-export OS
-
 .PHONY: stm32f413
 stm32f413:
 ifneq ($(TEST), none)
 	@echo -e "Making STM32 build for file ${PURPLE}'${TEST_FILE}'${NC}"
+	$(MAKE) -C Embedded-Sharepoint/BSP/STM32F413 TARGET=bsp-leader TEST=Tests/Test_$(TEST) -j
 else
 	@echo -e "Making STM32 build with ${RED}NO${NC}test."
+	$(MAKE) -C Embedded-Sharepoint/BSP/STM32F413 TARGET=bsp-leader TEST=none -j
 endif
-	$(MAKE) -C BSP -C STM32F413 -j
+	
 
 .PHONY: simulator
 simulator:
-	$(MAKE) -C BSP -C Simulator -j
+	$(MAKE) -C Simulator TEST=$(TEST) -j
 
 flash:
-	$(MAKE) -C BSP -C STM32F413 flash
+	$(MAKE) -C Embedded-Sharepoint/BSP/STM32F413 TEST=Tests/Test_$(TEST) flash
 
 .PHONY: help
 help:
