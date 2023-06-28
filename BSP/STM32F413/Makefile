@@ -49,7 +49,7 @@ $(wildcard $(TOP_DIR)/Tasks/Src/*.c)	\
 $(wildcard $(TOP_DIR)/Drivers/Src/*.c)	\
 $(wildcard $(TOP_DIR)/BSP/STM32F413/Src/*.c)	\
 $(wildcard $(TOP_DIR)/CMSIS/DSP_Lib/Source/*.c)	\
-$(wildcard $(TOP_DIR)/BSP/STM32F413/STM32F4xx_StdPeriph_Driver/Src/*.c)	\
+$(wildcard $(TOP_DIR)/BSP/STM32F413/STM32F4xx_HAL_Driver/Src/*.c)	\
 $(wildcard $(RTOS_DIR)/uCOS-III/Source/*.c)	\
 $(wildcard $(RTOS_DIR)/uCOS-III/Ports/ARM-Cortex-M4/Generic/GNU/*.c)	\
 $(wildcard $(RTOS_DIR)/uC-CPU/*.c)	\
@@ -124,7 +124,7 @@ AS_DEFS =
 # C defines
 C_DEFS =  \
 -DSTM32F413_423xx	\
--DUSE_STDPERIPH_DRIVER	\
+-DUSE_HAL_DRIVER	\
 -D$(OS)
 
 # AS includes
@@ -140,7 +140,7 @@ C_INCLUDES =  \
 -I$(TOP_DIR)/BSP/Inc	\
 -I$(TOP_DIR)/CMSIS/Device/ST/STM32F4xx/Include	\
 -I$(TOP_DIR)/CMSIS/Include	\
--I$(TOP_DIR)/BSP/STM32F413/STM32F4xx_StdPeriph_Driver/Inc	\
+-I$(TOP_DIR)/BSP/STM32F413/STM32F4xx_HAL_Driver/Inc	\
 -I$(RTOS_DIR)/uCOS-III/Source	\
 -I$(RTOS_DIR)/uCOS-III/Ports/ARM-Cortex-M4/Generic/GNU	\
 -I$(RTOS_DIR)/uC-CPU	\
