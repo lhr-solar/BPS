@@ -8,7 +8,6 @@
 #include "Amps.h"
 #include "CAN_Queue.h"
 
-
 //declared in Tasks.c
 extern cell_asic Minions[NUM_MINIONS];
 
@@ -146,6 +145,6 @@ void Task_VoltTempMonitor(void *p_arg) {
         RTOS_BPS_MutexPost(&WDog_Mutex, OS_OPT_POST_NONE); 
         
         //delay of 50ms
-        RTOS_BPS_DelayMs(50);
+        RTOS_BPS_DelayMs(20);
     }
 }

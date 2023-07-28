@@ -3,6 +3,7 @@
 #include "BSP_SPI.h"
 #include "Tasks.h"
 #include "BSP_PLL.h"
+#include "RTOS_BPS.h"
 #include <stdio.h>
 
 // offset for current reading
@@ -17,9 +18,9 @@ static int32_t offset;
  */
 static void LTC2315_cs_pulse(){
     BSP_SPI_SetStateCS(spi_ltc2315, 0);
-    BSP_PLL_DelayU(16);
+    BSP_PLL_DelayUs(16);
     BSP_SPI_SetStateCS(spi_ltc2315, 1);
-    BSP_PLL_DelayU(16);
+    BSP_PLL_DelayUs(16);
 }
 
 /* Wake isoSPI from sleep
@@ -27,9 +28,9 @@ static void LTC2315_cs_pulse(){
 static void LTC2315_wakeup_sleep()
 {
     BSP_SPI_SetStateCS(spi_ltc2315, 0);
-    BSP_PLL_DelayU(500); // Guarantees that isoSPI is awake
+    RTOS_BPS_DelayUs(500); // Guarantees that isoSPI is awake
     BSP_SPI_SetStateCS(spi_ltc2315, 1);
-    BSP_PLL_DelayU(150);
+    RTOS_BPS_DelayUs(150);
 }
 
 /* Initialize communication LTC2315
@@ -56,13 +57,13 @@ uint16_t LTC2315_Read() {
     OS_ERR err;
     uint8_t rxdata[2] = {0xff, 0xff};
 
-    LTC2315_wakeup_sleep();
-
     uint8_t count = 0;
     do {
     OSSchedLock(&err);
     assertOSError(err);
 
+    LTC2315_wakeup_sleep();
+    
     BSP_SPI_SetStateCS(spi_ltc2315, 0);
     // Note: if this is ever changed to send more than 8bytes, we should make
     // sure BSP_SPI_Read() does not call the scheduler or the OS will error out
@@ -103,11 +104,12 @@ int32_t LTC2315_GetCurrent() {
      */
    
     int32_t reading = 0;
-    for (int i = 0; i < 10; ++i) {
+    const int32_t averaging = 10;
+    for (int i = 0; i < averaging; ++i) {
         reading += (int32_t)LTC2315_Read();
     }
 
-    reading /= 10;
+    reading /= averaging;
 
     const int32_t PRECISION_MICRO_AMPS = 73242;
     int32_t milliamps = ((reading - offset) * PRECISION_MICRO_AMPS) / 1000;    // during testing, the gain seems to be inverted
@@ -120,11 +122,12 @@ int32_t LTC2315_GetCurrent() {
  */
 void LTC2315_Calibrate() {
     int32_t reading = 0;
-    for (int i = 0; i < 10; ++i) {
+    const int32_t averaging = 10;
+    for (int i = 0; i < averaging; ++i) {
         reading += (int32_t)LTC2315_Read();
     }
 
-    reading /= 10;
+    reading /= averaging;
 
     offset = reading;
 }

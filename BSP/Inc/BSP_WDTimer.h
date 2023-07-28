@@ -6,11 +6,11 @@
 #include "common.h"
 
 /**
- * @brief   Initialize the watch dog timer.
- * @param   None
+ * @brief   Initialize the watch dog timer. If in fault state, set watchdog reload to max value so we don't trip for watchdog in fault state again.
+ * @param   fault: true if in fault state, false otherwise
  * @return  None
  */
-void BSP_WDTimer_Init(void);
+void BSP_WDTimer_Init(bool fault);
 
 /**
  * @brief   Check if the watchdog made the uC reset previously.

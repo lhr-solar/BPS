@@ -8,6 +8,7 @@
 #include "Tasks.h"
 #include "VoltageToTemp.h"
 #include "BSP_PLL.h"
+#include "Fans.h"
 #ifdef SIMULATION
 #include "Simulator.h"
 #endif
@@ -40,17 +41,9 @@ static cell_asic *Minions;
 static uint8_t currentChannel = 0;
 #endif
 
-//TODO: tune PID with actual pack and fans, and then change values below to appropiate value
-#define PROPORTION -1234
-#define INTEGRAL 4321
-#define DERIVATIVE -9876
-#define MAX_FAN_SPEED 4000
-#define DIVISOR 25000
 // Variables to help with PID calculation
 static int32_t ErrorSum = 0;
 static int32_t Error;
-static int32_t Rate;
-static int32_t PreviousError = 0;
 
 
 /**
@@ -161,7 +154,7 @@ ErrorStatus Temperature_ChannelConfig(uint8_t tempChannel) {
     // Send data
     wakeup_sleep(NUM_MINIONS);
     LTC6811_wrcomm(NUM_MINIONS, Minions);
-    BSP_PLL_DelayU(200);
+    RTOS_BPS_DelayUs(200);
     LTC6811_stcomm();
 
     for (uint8_t board = 0; board < NUM_MINIONS; board++) {
@@ -183,7 +176,7 @@ ErrorStatus Temperature_ChannelConfig(uint8_t tempChannel) {
 
     // Send data
     LTC6811_wrcomm(NUM_MINIONS, Minions);
-    BSP_PLL_DelayU(200); //TODO: Should replace these with OS Time Delay Function
+    RTOS_BPS_DelayUs(200);
     LTC6811_stcomm();
     //release mutex
     RTOS_BPS_MutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE);
@@ -202,6 +195,9 @@ ErrorStatus Temperature_ChannelConfig(uint8_t tempChannel) {
 int32_t milliVoltToCelsius(uint32_t milliVolt){
     if (milliVolt < sizeof(voltToTemp)/sizeof(voltToTemp[0])) {
         return voltToTemp[milliVolt];
+    }
+    else if (milliVolt < 5200 && milliVolt > 4800) { //temperature sensor is disconnected for scrutineering
+        return 0; //safe value
     }
     else {
         return TEMP_ERR_OUT_BOUNDS;
@@ -414,24 +410,35 @@ int32_t Temperature_GetMaxTemperature(void) {
 
 /**
  * @brief Gives fan speed based on Average temperature of pack and past error values
- * @param InputTemp - current temperature
+ * @param InputTemp - current temperature. Should not exceed 293 or -294 Celcius given that expected temp is 38 celcius.
+ * If the temperature exceeds these bounds, the fans will be set to max speed. 
  * @param DesiredTemp - desired temperature
- * @return FanSpeed: 0-4000 PWM
+ * @return FanSpeed: 0-8
  */
-int32_t Temperature_PID_Output(int32_t InputTemp, int32_t DesiredTemp) {
+uint8_t Temperature_PID_Output(uint32_t InputTemp, uint32_t DesiredTemp) {
+    if(InputTemp > TEMPERATURE_PID_MAX_INPUT){
+        return TOPSPEED;
+    }
+
     Error = DesiredTemp - InputTemp;
-    ErrorSum = ErrorSum + Error;
+	
+    //Only read error sum in range
+    ErrorSum += abs(Error) < TEMPERATURE_PID_I_ZONE ? Error : 0;
 
-    if (PreviousError == 0) {PreviousError = Error;} //init previous val first time
+    //Cap error sum at 500 read degrees
+    ErrorSum = (abs(ErrorSum) < TEMPERATURE_PID_I_MAX_ACCUM) ? ErrorSum :
+        (ErrorSum > 0 ? TEMPERATURE_PID_I_MAX_ACCUM : -TEMPERATURE_PID_I_MAX_ACCUM);
 
-    Rate = Error - PreviousError;
-    PreviousError = Error;     //updates previous err value
+    int32_t p_Output = (int32_t)((-Error)/(TEMPERATURE_PID_PROPORTIONAL));
+    //realistic range of -15,000 to 15,0000
 
-    if (((PROPORTION*(Error) + INTEGRAL*(ErrorSum) + DERIVATIVE*(Rate))/DIVISOR) > MAX_FAN_SPEED) {
-        return MAX_FAN_SPEED;
-    }
-    if (((PROPORTION*(Error) + INTEGRAL*(ErrorSum) + DERIVATIVE*(Rate))/DIVISOR) <= 0) {
-        return 0;
-    }
-    return (PROPORTION*(Error) + INTEGRAL*(ErrorSum) + DERIVATIVE*(Rate))/DIVISOR;
+    //I output could totally fudge things up (and probably will on the first test), so disable it and make sure p is good first
+    int32_t i_Output = (int32_t)((-ErrorSum)/(TEMPERATURE_PID_INTEGRAL));
+    //max ranges of -2000, 2000
+    
+    int32_t output = ((p_Output + i_Output) / TEMPERATURE_PID_MILLICELCIUS_CONVERT) + TEMPERATURE_HOLD_FAN_SPEED;
+    //realistic range of -10 to 20
+
+    //Don't use D output
+    return (uint8_t) output > TOPSPEED ? TOPSPEED : output;
 }

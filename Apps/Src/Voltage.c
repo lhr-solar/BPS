@@ -119,7 +119,6 @@ void Voltage_UpdateMeasurements(void){
 SafetyStatus Voltage_CheckStatus(void){
     for(int i = 0; i < NUM_BATTERY_MODULES; i++){
         uint16_t voltage = Voltage_GetModuleMillivoltage(i);
-            
         // VOLTAGE_LIMITS are in floating point. The LTC6811 sends the voltage data
         // as unsigned 16-bit fixed point integers with a resolution of 0.00001
         if(voltage > MAX_VOLTAGE_LIMIT) {
@@ -240,12 +239,12 @@ uint32_t Voltage_GetOpenWire(void){
  * Gets the voltage of a certain battery module in the battery pack
  * @precondition moduleIdx < NUM_BATTERY_SENSORS
  * @param index of battery (0-indexed)
- * @return voltage of module at specified index
+ * @return voltage of module at specified index, 0xFFFF if error
  */
 uint16_t Voltage_GetModuleMillivoltage(uint8_t moduleIdx){
     // These if statements prevents a hardfault.
     if(moduleIdx >= NUM_BATTERY_MODULES) {
-        return 0xFFFF;  // return -1 which indicates error voltage
+        return 0xFFFF;
     }
     // Each board will measure the same number of modules except for the last board in the daisy chain.
     // To find which minion board the battery module (moduleIdx) is assigned to, we need to
@@ -253,7 +252,7 @@ uint16_t Voltage_GetModuleMillivoltage(uint8_t moduleIdx){
     // (indicated by MAX_VOLT_SENSORS_PER_MINION_BOARD). If the minion idx exceeds how many minion
     // boards are currently present, then return an error voltage.
     if((moduleIdx / MAX_VOLT_SENSORS_PER_MINION_BOARD) >= NUM_MINIONS) {
-        return 0xFFFF;  // return -1 which indicates error voltage
+        return 0xFFFF;
     }
 
     if (!Fault_Flag) {

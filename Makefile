@@ -26,9 +26,9 @@ export OS
 .PHONY: stm32f413
 stm32f413:
 ifneq ($(TEST), none)
-	@echo "Making STM32 build for file ${PURPLE}'${TEST_FILE}'${NC}"
+	@echo -e "Making STM32 build for file ${PURPLE}'${TEST_FILE}'${NC}"
 else
-	@echo "Making STM32 build with ${RED}NO${NC}test."
+	@echo -e "Making STM32 build with ${RED}NO${NC}test."
 endif
 	$(MAKE) -C BSP -C STM32F413 -j
 
@@ -56,7 +56,7 @@ help:
 	@echo -e "When building for the board, you can specify custom define values for config.h."
 	@echo -e "See Config/Inc/config.h for all values."
 	@echo -e "Specify with the following ${PURPLE}format${NC}(quotes ARE needed):"
-	@echo -e "		${ORANGE}make ${BLUE}DEFINES=${GREEN}\"-D VARIABLE=VALUE -D VARIABLE=VALUE\"\n"
+	@echo -e "		${ORANGE}make ${BLUE}DEFINES=${GREEN}\"VARIABLE=VALUE VARIABLE=VALUE\"\n"
 
 .PHONY: clean
 clean:

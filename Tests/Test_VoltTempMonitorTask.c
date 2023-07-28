@@ -17,8 +17,8 @@
 #include "Contactor.h"
 #include "RTOS_BPS.h"
 #include "Voltage.h"
-#include "Temperature.h"
 #include "BSP_UART.h"
+#include "Temperature.h"
 
 /******************************************************************************
  * VoltTempMonitor Task Test Plan
@@ -61,14 +61,15 @@ void Task1(void *p_arg){
     RTOS_BPS_MutexCreate(&WDog_Mutex, "Watchdog Mutex");
 
     // Spawn tasks needed for Amperes readings to affect contactor
-    RTOS_BPS_TaskCreate(&PetWDog_TCB,	    // TCB
-    		"TASK_PETWDOG",	                    // Task Name (String)
-    		Task_PetWDog,				        // Task function pointer
-    		(void *)0,				            // Task function args
-    		TASK_PETWDOG_PRIO,			        // Priority
-    		PetWDog_Stk,				        // Stack
-    		TASK_PETWDOG_STACK_SIZE);
-            
+    RTOS_BPS_TaskCreate(&PetWDog_TCB,              // TCB
+                "TASK_PETWDOG_PRIO",        // Task Name (String)
+                Task_PetWDog,               // Task function pointer
+                (void *)0,                  // Task function args
+                TASK_PETWDOG_PRIO,          // Priority
+                PetWDog_Stk,                // Stack
+                TASK_PETWDOG_STACK_SIZE
+                );
+
     RTOS_BPS_TaskCreate(&VoltTempMonitor_TCB,				// TCB
             "TASK_VOLT_TEMP_MONITOR_PRIO",	// Task Name (String)
             Task_VoltTempMonitor,				// Task function pointer
@@ -96,16 +97,16 @@ void Task1(void *p_arg){
 //Task to prevent watchdog from tripping
 void Task2(void *p_arg){
 
-    // RTOS_BPS_SemPost(&SafetyCheck_Sem4, OS_OPT_POST_1); //Set semaphore once since Amperes Task doesn't run
+    RTOS_BPS_SemPost(&SafetyCheck_Sem4, OS_OPT_POST_1); //Set semaphore once since Amperes Task doesn't run
+    RTOS_BPS_SemPost(&SafetyCheck_Sem4, OS_OPT_POST_1); //Set semaphore once since Battery Balancing Task doesn't run
 
     while(1){
         RTOS_BPS_MutexPend(&WDog_Mutex, OS_OPT_PEND_BLOCKING);
         WDog_BitMap |= WD_AMPERES;
         WDog_BitMap |= WD_BALANCING;
-        WDog_BitMap |= WD_VOLT_TEMP;
         RTOS_BPS_MutexPost(&WDog_Mutex, OS_OPT_POST_NONE);
         //delay of 100ms
-        RTOS_BPS_DelayTick(10);
+        RTOS_BPS_DelayTick(1);
     }
 }
 

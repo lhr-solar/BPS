@@ -21,17 +21,34 @@ void BSP_Timer_Init(void) {
 }
 
 /**
+ * @brief   Starts a one shot timer to execute a callback after a certain time
+ * 
+ * @param delay_us one shot time in microseconds
+ * @param callback callback to execute after `delay_us` time
+ */
+void BSP_Timer_Start_OneShot(uint32_t delay_us, callback_t callback) {
+    if (initialized) {
+        Simulator_Log(LOG_INFO, "One-shot timer started (pretend this triggers after some time)\n");
+        callback();
+    }
+    else {
+        Simulator_Log_Location(LOG_ERROR, "Used Timer (OneShot) without initialization\n");
+        exit(-1);
+    }
+}
+
+/**
  * @brief   Starts the timer.
  * @param   None
  * @return  None
  */
-void BSP_Timer_Start(void) {
+void BSP_Timer_Start_TickCounter(void) {
     if (initialized) {
-        t = clock();
         Simulator_Log(LOG_INFO,"Timer started\n");
     }
     else {
-        Simulator_Log_Location(LOG_INFO,"Hard Fault: Initialize Timer before start\n");
+        Simulator_Log_Location(LOG_ERROR, "Used Timer (TickCounter) without initialization\n");
+        exit(-1);
     }
 }
 
@@ -42,7 +59,7 @@ void BSP_Timer_Start(void) {
  */
 uint32_t BSP_Timer_GetTicksElapsed(void) {
     if(!initialized) {
-        Simulator_Log_Location(LOG_ERROR, "Used PWM without initialization!\n");
+        Simulator_Log_Location(LOG_ERROR, "Used Timer (GetTicksElapsed) without initialization!\n");
         exit(-1);
     }
 
@@ -62,10 +79,6 @@ uint32_t BSP_Timer_GetTicksElapsed(void) {
  * @return  0
  */
 uint32_t BSP_Timer_GetRunFreq(void) {
-    if(!initialized) {
-        Simulator_Log_Location(LOG_ERROR, "Used PWM without initialization!\n");
-        exit(-1);
-    }
     return 0;
 }
 
@@ -76,7 +89,7 @@ uint32_t BSP_Timer_GetRunFreq(void) {
  */
 uint32_t BSP_Timer_GetMicrosElapsed(void) {
     if(!initialized) {
-        Simulator_Log_Location(LOG_ERROR, "Used PWM without initialization!\n");
+        Simulator_Log_Location(LOG_ERROR, "Used Timer (GetMicrosElapsed) without initialization!\n");
         exit(-1);
     }
     uint32_t MicrosElasped = ((uint64_t) BSP_Timer_GetTicksElapsed() * MICROS_IN_SEC) / CLOCKS_PER_SEC;

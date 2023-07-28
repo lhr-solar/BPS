@@ -12,8 +12,6 @@ CPU_STK Task1_Stk[256];
 OS_TCB Task2_TCB;
 CPU_STK Task2_Stk[256];
 
-OS_SEM SafetyCheck_Sem4;
-
 void Task1(void *p_arg);
 void Task2(void *p_arg);
 

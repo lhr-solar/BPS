@@ -16,12 +16,12 @@ static int32_t charge;  // % of charge left with 0.000001% resolution
  * Info found on reference sheet stm32f413 page 535
  */
 void Charge_Init(void){ 
-	BSP_Timer_Init();
+	return; //TODO: THIS IS UNTIL WE FIX THE EEPROM DRIVERS. ISSUE TICKET ON GITHUB
 	
 	// Grab from EEPROM what is the current Charge
 	charge = EEPROM_GetCharge();
 
-    BSP_Timer_Start();
+    BSP_Timer_Start_TickCounter();
 }
 
 /** Charge_Calculate
@@ -30,6 +30,7 @@ void Charge_Init(void){
  * not a constant samping. Add on however much from the previous
  */
 void Charge_Calculate(int32_t milliamps){ 
+	return; //TODO: THIS IS UNTIL WE FIX THE EEPROM DRIVERS. ISSUE TICKET ON GITHUB
 	/* Update Charge, units of 0.000001% . 100,000,000 is charge at 100% */
 	
 	int64_t micro_sec = (int64_t)BSP_Timer_GetMicrosElapsed();
@@ -47,6 +48,7 @@ void Charge_Calculate(int32_t milliamps){
  * @param voltage fault type. 0 if under voltage, 1 if over voltage
  */
 void Charge_Calibrate(int8_t faultType){
+	return; //TODO: THIS IS UNTIL WE FIX THE EEPROM DRIVERS. ISSUE TICKET ON GITHUB
 	if (faultType == UNDERVOLTAGE) {
         charge = 0;
     } else {
@@ -68,6 +70,7 @@ uint32_t Charge_GetPercent(void){
  *                    with a resolution = 0.000001% (100,000,000 = 100%)
  */
 void Charge_SetAccum(int32_t accum){
+	return; //TODO: THIS IS UNTIL WE FIX THE EEPROM DRIVERS. ISSUE TICKET ON GITHUB
 	charge = accum;
 }
 

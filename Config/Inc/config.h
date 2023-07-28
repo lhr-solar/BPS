@@ -121,4 +121,9 @@ typedef enum SafetyStatus_e {SAFE = 0, DANGER = 1, OVERVOLTAGE = 2, UNDERVOLTAGE
 // used to determine if we are charging
 #define AMPS_NOISE_LIMIT 250 // milliamps
 
+//Is BPS CAN in Loopback or not
+#ifndef BPS_CAN_LOOPBACK
+#define BPS_CAN_LOOPBACK false 
+#endif
+
 #endif

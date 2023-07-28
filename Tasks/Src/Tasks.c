@@ -66,7 +66,6 @@ uint8_t Fault_Flag    = 0; //This is a flag that replaces the semaphore in case 
 void assertOSError(BPS_OS_ERR err){
     if(err != OS_ERR_NONE) {
         Fault_BitMap |= Fault_OS;
-        Fault_Flag = 1;
         EnterFaultState();
         // We should not get to this point if the call above worked.
         // Thus, we need to manually enter a fault state, since the

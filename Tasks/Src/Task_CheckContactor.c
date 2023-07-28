@@ -4,12 +4,14 @@
 #include "CANbus.h"
 #include "Tasks.h"
 #include "CAN_Queue.h"
+#include "BSP_PLL.h"
 
 void Task_CheckContactor(void *p_arg) {
     (void)p_arg;
     
     CANMSG_t CanMsg = {.payload = {.idx = 0, .data.b = 1}};
-
+    
+    BSP_PLL_DelayMs(30); // delay is needed for pull up resistor to stabilize before we check for contactor state
     // If a contactor is on before we turn it on in this task, it may have failed and welded closed
     if (Contactor_GetState(HVHIGH_CONTACTOR) || Contactor_GetState(HVLOW_CONTACTOR)) {
         Fault_BitMap |= Fault_ESTOP;
@@ -18,7 +20,7 @@ void Task_CheckContactor(void *p_arg) {
 
     // BLOCKING =====================
     // Wait until voltage, open wire, temperature, and current(Amperes) are all checked and safe
-    for (int i = 0; i < NUM_FAULT_POINTS; i++){
+    for (uint8_t i = 0; i < NUM_FAULT_POINTS; i++){
         RTOS_BPS_SemPend(&SafetyCheck_Sem4,OS_OPT_PEND_BLOCKING);
     }
 
