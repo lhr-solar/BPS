@@ -36,6 +36,7 @@ ErrorStatus BSP_PLL_Init(void) {
             //return an error for waiting too long
             return ERROR;
         }
+        status = RCC_WaitForHSEStartUp();
         pllAttempts++;
     }
 
