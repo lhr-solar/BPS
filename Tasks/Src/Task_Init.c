@@ -1,9 +1,10 @@
-/* Copyright (c) 2018-2022 UT Longhorn Racing Solar */
+/* Copyright (c) 2018-2023 UT Longhorn Racing Solar */
 #include "config.h"
 #include "Tasks.h"
 #include "CAN_Queue.h"
 #include "Contactor.h"
 #include "RTOS_BPS.h"
+#include "Print_Queue.h"
 #ifndef SIMULATION
 #include "stm32f4xx.h"
 #endif
@@ -94,6 +95,14 @@ void Task_Init(void *p_arg) {
             TASK_CLI_STACK_SIZE,		        // Stack size
             );
     */
+    RTOS_BPS_TaskCreate(&Print_TCB,
+            "TASK_PRINT_QUEUE_OUT",
+            Task_Print,
+            (void *) 0,
+            TASK_PRINT_PRIO,
+            Print_Stk,
+            TASK_PRINT_STACK_SIZE);
+
     RTOS_BPS_TaskCreate(&Idle_TCB,				// TCB
             "TASK_IDLE",	                    // Task Name (String)
             Task_Idle,				            // Task function pointer
@@ -103,6 +112,7 @@ void Task_Init(void *p_arg) {
             TASK_IDLE_STACK_SIZE);
     
     CAN_Queue_Init();
+    Print_Queue_Init();
 
     //delete task
     OSTaskDel(NULL, &err); // Delete task
