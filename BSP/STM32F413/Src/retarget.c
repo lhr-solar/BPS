@@ -2,16 +2,20 @@
 
 #include "common.h"
 #include "sys/stat.h"
-#include "BSP_UART.h"
+#include "Print_Queue.h"
 
 #define STDIN_FILENO  0
 #define STDOUT_FILENO 1
 #define STDERR_FILENO 2
 
 int _write(int fd, char *buffer, unsigned int len) {
-    if(buffer != NULL) {
-        BSP_UART_Write(buffer, len, UART_USB);
+
+    //Add stuff to thread-safe OS level queue instead of BSP calls
+
+    if(buffer != NULL){
+        Print_Queue_Append(buffer, len);
     }
+
     return len;
 }
 

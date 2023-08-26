@@ -86,6 +86,14 @@ void Task_Init(void *p_arg) {
             TASK_CLI_STACK_SIZE,		        // Stack size
             );
     */
+    RTOS_BPS_TaskCreate(&Print_TCB,
+            "TASK_PRINT_QUEUE_OUT",
+            Task_Print,
+            (void *) 0,
+            TASK_PRINT_PRIO,
+            Print_Stk,
+            TASK_PRINT_STACK_SIZE);
+
     RTOS_BPS_TaskCreate(&Idle_TCB,				// TCB
             "TASK_IDLE",	                    // Task Name (String)
             Task_Idle,				            // Task function pointer
