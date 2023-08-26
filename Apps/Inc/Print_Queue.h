@@ -6,6 +6,8 @@
 #ifndef PRINT_QUEUE_H
 #define PRINT_QUEUE_H
 
+#include <stdbool.h>
+
 void Print_Queue_Init(void);
 
 bool Print_Queue_Append(char *buffer, unsigned int len);

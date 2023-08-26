@@ -4,14 +4,14 @@
  */
 
 #include "Print_Queue.h"
-#include "RTOS_UART.h"
 #include "RTOS_BPS.h"
 
 #define FIFO_TYPE char*
 #define FIFO_SIZE (128)
-#define FIFO_NAME printFifo
+#define FIFO_NAME Print_Fifo
 #include "fifo.h"
 
+static Print_Fifo_t printFifo;
 static OS_MUTEX printFifo_Mutex;
 
 /**
@@ -20,10 +20,10 @@ static OS_MUTEX printFifo_Mutex;
  * @return none
  */
 void Print_Queue_Init() {
-    printFifo_new();
+    Print_Fifo_new();
 }
 
-bool New_Line_Check(){}
+bool New_Line_Check();
 
 /**
  * @brief Initializes the print queue
@@ -32,10 +32,10 @@ bool New_Line_Check(){}
  * @return If the write was successful (there was room in the buffer)
  */
 bool Print_Queue_Append(char *buffer, unsigned int len) {
-    bool result = printFifo_put(&printFifo, buffer);
+    bool result = Print_Fifo_put(&printFifo, buffer);
 
-    if(printFifo_is_full(&printFifo) || New_Line_Check()) {
-        RTOS_BPS_MutexPost(%printFifo_Mutex, OS_OPT_POST_1);
+    if(Print_Fifo_is_full(&printFifo) || New_Line_Check()) {
+        RTOS_BPS_MutexPost(&printFifo_Mutex, OS_OPT_POST_1);
     }
 
     return result;
@@ -51,12 +51,12 @@ bool Print_Queue_Append(char *buffer, unsigned int len) {
 
 void Print_Queue_Pend(char *message, unsigned int *len) {
     RTOS_BPS_MutexPend(&printFifo_Mutex, OS_OPT_PEND_NON_BLOCKING);
-    bool result = printFifo_get(&printFifo, message);
+    Print_Fifo_get(&printFifo, &message);
     RTOS_BPS_MutexPost(&printFifo_Mutex, OS_OPT_POST_NONE);
 }
 
 bool New_Line_Check(){
-    char* topChar;
-    printFifo_peek(&printFifo, topChar);
-    return (topChar == '\n');
+    char* topChar = NULL;
+    Print_Fifo_peek(&printFifo, &topChar);
+    return (*topChar == '\n');
 }
