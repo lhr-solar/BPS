@@ -34,7 +34,7 @@ TOP_DIR = ../..
 # Build path
 BUILD_DIR = $(TOP_DIR)/Objects
 # RTOS path
-RTOS_DIR = $(TOP_DIR)/RTOS/uCOS-III-STM32F4
+RTOS_DIR = $(TOP_DIR)/FreeRTOS-Kernel/
 
 ######################################
 # source
@@ -50,20 +50,24 @@ $(wildcard $(TOP_DIR)/Drivers/Src/*.c)	\
 $(wildcard $(TOP_DIR)/BSP/STM32F413/Src/*.c)	\
 $(wildcard $(TOP_DIR)/CMSIS/DSP_Lib/Source/*.c)	\
 $(wildcard $(TOP_DIR)/BSP/STM32F413/STM32F4xx_StdPeriph_Driver/Src/*.c)	\
-$(wildcard $(RTOS_DIR)/uCOS-III/Source/*.c)	\
-$(wildcard $(RTOS_DIR)/uCOS-III/Ports/ARM-Cortex-M4/Generic/GNU/*.c)	\
-$(wildcard $(RTOS_DIR)/uC-CPU/*.c)	\
-$(wildcard $(RTOS_DIR)/uC-CPU/ARM-Cortex-M4/GNU/*.c)	\
-$(wildcard $(RTOS_DIR)/uC-LIB/*.c)	\
-$(wildcard $(RTOS_DIR)/uC-LIB/Ports/ARM-Cortex-M4/GNU/*.c)	\
-$(wildcard $(RTOS_DIR)/uC-Serial/Driver/ST/*.c)	\
-$(wildcard $(RTOS_DIR)/uC-Serial/Line/*.c)	\
-$(wildcard $(RTOS_DIR)/uC-Serial/OS/*.c)	\
-$(wildcard $(RTOS_DIR)/uC-Serial/OS/uCOS-III/*.c)	\
-$(wildcard $(RTOS_DIR)/uC-Serial/Source/*.c)	\
-$(wildcard $(TOP_DIR)/Config/Src/*.c) 
+$(wildcard $(RTOS_DIR)/*.c)
+$(wildcard $(RTOS_DIR)/portable/RVDS/ARM_CM4F/*.c)
 
 MESSAGES = $(wildcard $(TOP_DIR)/Config/Src/*.c)
+
+#$(wildcard $(RTOS_DIR)/uCOS-III/Source/*.c)	\
+#$(wildcard $(RTOS_DIR)/uCOS-III/Ports/ARM-Cortex-M4/Generic/GNU/*.c)	\
+#$(wildcard $(RTOS_DIR)/uC-CPU/*.c)	\
+#$(wildcard $(RTOS_DIR)/uC-CPU/ARM-Cortex-M4/GNU/*.c)	\
+#$(wildcard $(RTOS_DIR)/uC-LIB/*.c)	\
+#$(wildcard $(RTOS_DIR)/uC-LIB/Ports/ARM-Cortex-M4/GNU/*.c)	\
+#$(wildcard $(RTOS_DIR)/uC-Serial/Driver/ST/*.c)	\
+#$(wildcard $(RTOS_DIR)/uC-Serial/Line/*.c)	\
+#$(wildcard $(RTOS_DIR)/uC-Serial/OS/*.c)	\
+#$(wildcard $(RTOS_DIR)/uC-Serial/OS/uCOS-III/*.c)	\
+#$(wildcard $(RTOS_DIR)/uC-Serial/Source/*.c)	\
+#$(wildcard $(TOP_DIR)/Config/Src/*.c) 	\
+
 
 ifneq ($(TEST), none)
 TEST_FILE := Test_$(TEST).c
@@ -78,9 +82,9 @@ endif
 # ASM sources
 ASM_SOURCES =  \
 $(TOP_DIR)/BSP/STM32F413/Src/startup_stm32f413xx.s	\
-$(wildcard $(RTOS_DIR)/uC-CPU/ARM-Cortex-M4/GNU/*.s)	\
-$(wildcard $(RTOS_DIR)/uC-LIB/Ports/ARM-Cortex-M4/GNU/*.s)	\
-$(wildcard $(RTOS_DIR)/uCOS-III/Ports/ARM-Cortex-M4/Generic/GNU/*.s)	
+#$(wildcard $(RTOS_DIR)/uC-CPU/ARM-Cortex-M4/GNU/*.s)	\
+#$(wildcard $(RTOS_DIR)/uC-LIB/Ports/ARM-Cortex-M4/GNU/*.s)	\
+#$(wildcard $(RTOS_DIR)/uCOS-III/Ports/ARM-Cortex-M4/Generic/GNU/*.s)	
 
 
 #######################################
@@ -141,17 +145,7 @@ C_INCLUDES =  \
 -I$(TOP_DIR)/CMSIS/Device/ST/STM32F4xx/Include	\
 -I$(TOP_DIR)/CMSIS/Include	\
 -I$(TOP_DIR)/BSP/STM32F413/STM32F4xx_StdPeriph_Driver/Inc	\
--I$(RTOS_DIR)/uCOS-III/Source	\
--I$(RTOS_DIR)/uCOS-III/Ports/ARM-Cortex-M4/Generic/GNU	\
--I$(RTOS_DIR)/uC-CPU	\
--I$(RTOS_DIR)/uC-CPU/ARM-Cortex-M4/GNU	\
--I$(RTOS_DIR)/uC-LIB	\
--I$(RTOS_DIR)/uC-LIB/Ports/ARM-Cortex-M4/GNU	\
--I$(RTOS_DIR)/uC-Serial/Driver/ST	\
--I$(RTOS_DIR)/uC-Serial/Line	\
--I$(RTOS_DIR)/uC-Serial/OS	\
--I$(RTOS_DIR)/uC-Serial/OS/uCOS-III	\
--I$(RTOS_DIR)/uC-Serial/Source	
+-I$(RTOS_DIR)/include	\
 
 
 # compile gcc flags
