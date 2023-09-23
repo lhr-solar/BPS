@@ -9,7 +9,7 @@
 #include "BSP_Lights.h"
 #include "BSP_PLL.h"
 
-OS_TCB Task1_TCB;
+StaticTask_t Task1_TCB;
 CPU_STK Task1_Stk[256];
 
 void Task1(void *p_arg){
@@ -42,13 +42,13 @@ int main(void) {
     OSInit(&err);
     while(err != OS_ERR_NONE);
 
-    RTOS_BPS_TaskCreate(&Task1_TCB,
-                "Task 1",
-                Task1,
-                (void *)0,
-                1,
-                Task1_Stk,
-                256);
+    xTaskCreateStatic(Task1,
+		"Task 1",
+		256,
+		(void *)0,,
+		1,
+		Task1_Stk,
+		&Task1_TCB);
     while(err != OS_ERR_NONE);
 
     __enable_irq();

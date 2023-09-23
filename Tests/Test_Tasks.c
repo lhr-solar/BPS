@@ -6,10 +6,10 @@
 #include "BSP_UART.h"
 #include "stm32f4xx.h"
 
-OS_TCB Task1_TCB;
+StaticTask_t Task1_TCB;
 CPU_STK Task1_Stk[256];
 
-OS_TCB Task2_TCB;
+StaticTask_t Task2_TCB;
 CPU_STK Task2_Stk[256];
 
 void Task1(void *p_arg);
@@ -26,13 +26,13 @@ void Task1(void *p_arg) {
     RTOS_BPS_DelayTick(1);
 
     // Create Task 2
-    RTOS_BPS_TaskCreate(&Task2_TCB,
-                "Task 2",
-                Task2,
-                (void *)0,
-                2,
-                Task2_Stk,
-                256);
+    xTaskCreateStatic(Task2,
+		"Task 2",
+		256,
+		(void *)0,,
+		2,
+		Task2_Stk,
+		&Task2_TCB);
 
     while(1) {
         for(int i = 0; i < 4; i++) {
@@ -64,13 +64,13 @@ int main(void) {
 
 	SafetyCheck_Sem4 = xSemaphoreCreateBinary();
 
-    RTOS_BPS_TaskCreate(&Task1_TCB,
-                "Task 1",
-                Task1,
-                (void *)0,
-                1,
-                Task1_Stk,
-                256);
+    xTaskCreateStatic(Task1,
+		"Task 1",
+		256,
+		(void *)0,,
+		1,
+		Task1_Stk,
+		&Task1_TCB);
 
     __enable_irq();
 

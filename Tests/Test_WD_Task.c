@@ -10,9 +10,9 @@
 #include "BSP_PLL.h"
 #include "BSP_WDTimer.h"
 
-OS_TCB Task1_TCB;
+StaticTask_t Task1_TCB;
 CPU_STK Task1_Stk[256];
-OS_TCB Task2_TCB;
+StaticTask_t Task2_TCB;
 CPU_STK Task2_Stk[256];
 
 void Task2(void *p_arg){    
@@ -37,21 +37,21 @@ void Task1(void *p_arg){
 
 WDog_Mutex = xSemaphoreCreateMutex();
     
-    RTOS_BPS_TaskCreate(&Task2_TCB,
-                "Task 2",
-                Task2,
-                (void *)0,
-                10,
-                Task2_Stk,
-                256);
+    xTaskCreateStatic(Task2,
+		"Task 2",
+		256,
+		(void *)0,,
+		10,
+		Task2_Stk,
+		&Task2_TCB);
 
-    RTOS_BPS_TaskCreate(&PetWDog_TCB,				// TCB
-				"TASK_PETWDOG_PRIO",	// Task Name (String)
-				Task_PetWDog,				// Task function pointer
-				(void *)0,				// Task function args
-				TASK_PETWDOG_PRIO,			// Priority
-				PetWDog_Stk,	// Watermark limit for debugging
-				TASK_PETWDOG_STACK_SIZE);					// return err code
+    xTaskCreateStatic(Task_PetWDog,
+		"TASK_PETWDOG_PRIO",
+		TASK_PETWDOG_STACK_SIZE,
+		(void *)0,
+		TASK_PETWDOG_PRIO,
+		PetWDog_Stk,
+		&PetWDog_TCB);					// return err code
 
     OSTaskDel(NULL, &err);
 }
@@ -71,13 +71,13 @@ int main(void) {
     OSInit(&err);
     while(err != OS_ERR_NONE);
 
-    RTOS_BPS_TaskCreate(&Task1_TCB,
-                "Task 1",
-                Task1,
-                (void *)0,
-                1,
-                Task1_Stk,
-                256);
+    xTaskCreateStatic(Task1,
+		"Task 1",
+		256,
+		(void *)0,,
+		1,
+		Task1_Stk,
+		&Task1_TCB);
     while(err != OS_ERR_NONE);
 
     __enable_irq();

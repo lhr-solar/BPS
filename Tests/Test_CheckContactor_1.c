@@ -14,9 +14,9 @@
 #include "BSP_PLL.h"
 #include "CAN_Queue.h"
 
-OS_TCB Task1_TCB;
+StaticTask_t Task1_TCB;
 CPU_STK Task1_Stk[256];
-OS_TCB Task2_TCB;
+StaticTask_t Task2_TCB;
 CPU_STK Task2_Stk[256];
 
 /******************************************************************************
@@ -59,30 +59,30 @@ void Task1(void *p_arg){
 
 	SafetyCheck_Sem4 = xSemaphoreCreateBinary();
 
-    RTOS_BPS_TaskCreate(&CheckContactor_TCB,    // TCB
-				"Task_CheckContactor",          // Task Name (String)
-				Task_CheckContactor,            // Task function pointer
-				(void *)0,                      // Task function args
-				TASK_CHECK_CONTACTOR_PRIO,      // Priority
-				CheckContactor_Stk,             // Stack
-				TASK_CHECK_CONTACTOR_STACK_SIZE
+    xTaskCreateStatic(Task_CheckContactor,
+		"Task_CheckContactor",
+		TASK_CHECK_CONTACTOR_STACK_SIZE,
+		(void *)0,
+		TASK_CHECK_CONTACTOR_PRIO,
+		CheckContactor_Stk,
+		&CheckContactor_TCB
                 );
 
-    RTOS_BPS_TaskCreate(&Task2_TCB,
-        "Task 2",
-        Task2,
-        (void *)0,
-        4,
-        Task2_Stk,
-        256);
-
-    RTOS_BPS_TaskCreate(&CANBusConsumer_TCB,				// TCB
-		"TASK_CANBUS_CONSUMER_PRIO",	// Task Name (String)
-		Task_CANBusConsumer,				// Task function pointer
-		(void *)false,				// don't use loopback mode
-		TASK_CANBUS_CONSUMER_PRIO,			// Priority
-		CANBusConsumer_Stk,	// Watermark limit for debugging
-		TASK_CANBUS_CONSUMER_STACK_SIZE);
+    xTaskCreateStatic(Task2,
+		"Task 2",
+		256,
+		(void *)0,,
+		4,
+		Task2_Stk,
+		&Task2_TCB);
+    
+    xTaskCreateStatic(Task_CANBusConsumer,
+        "TASK_CANBUS_CONSUMER",
+        TASK_CANBUS_CONSUMER_STACK_SIZE,
+        (void *)false,
+        TASK_CANBUS_CONSUMER_PRIO,
+        CANBusConsumer_Stk,
+        &CANBusConsumer_TCB);
 
     CAN_Queue_Init();
 
@@ -112,13 +112,13 @@ int main() {
     OSInit(&err);
     assertOSError(err);
 
-    RTOS_BPS_TaskCreate(&Task1_TCB,
-                "Task 1",
-                Task1,
-                (void *)0,
-                1,
-                Task1_Stk,
-                256);
+    xTaskCreateStatic(Task1,
+		"Task 1",
+		256,
+		(void *)0,,
+		1,
+		Task1_Stk,
+		&Task1_TCB);
 
 #ifndef SIMULATION
     __enable_irq();

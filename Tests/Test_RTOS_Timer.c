@@ -26,10 +26,10 @@
 
 #define LIGHT_DELAY_MILLISECONDS        500
 
-OS_TCB Task1_TCB;
+StaticTask_t Task1_TCB;
 CPU_STK Task1_Stk[DEFAULT_STACK_SIZE];
 
-OS_TCB Task2_TCB;
+StaticTask_t Task2_TCB;
 CPU_STK Task2_Stk[DEFAULT_STACK_SIZE];
 
 
@@ -71,21 +71,21 @@ int main() {
 
     // create two tasks with the same priority
 
-    RTOS_BPS_TaskCreate(&Task1_TCB,
-                "Task 1",
-                Task1,
-                (void *)0,
-                1,
-                Task1_Stk,
-                256);
+    xTaskCreateStatic(Task1,
+		"Task 1",
+		256,
+		(void *)0,,
+		1,
+		Task1_Stk,
+		&Task1_TCB);
 
-    RTOS_BPS_TaskCreate(&Task2_TCB,
-                "Task 2",
-                Task2,
-                (void *)0,
-                5,
-                Task2_Stk,
-                256);
+    xTaskCreateStatic(Task2,
+		"Task 2",
+		256,
+		(void *)0,,
+		5,
+		Task2_Stk,
+		&Task2_TCB);
 
     OSStart(&err);
 }

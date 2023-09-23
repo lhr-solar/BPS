@@ -169,7 +169,7 @@ ErrorStatus CANbus_SendMsg_FaultState(CANId_t id, CANPayload_t payload) {
  */
 ErrorStatus CANbus_BlockAndSend(CANId_t id, CANPayload_t payload) {
 	// Pend for a mailbox (blocking)
-	RTOS_BPS_SemPend(&CANbus_MailSem4,OS_OPT_PEND_BLOCKING);
+	xSemaphoreTake(CANbus_MailSem4, (TickType_t)portMAX_DELAY);
 	ErrorStatus result = CANbus_SendMsg(id, payload);
 	if (result == ERROR) {
 		CANbus_Release();

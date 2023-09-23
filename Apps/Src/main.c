@@ -58,13 +58,13 @@ int main() {
     OSInit(&err);
     assertOSError(err);
 
-    RTOS_BPS_TaskCreate(&Init_TCB,		// TCB
-        "TASK_INIT",	                // Task Name (String)
-        Task_Init,				        // Task function pointer
-        (void *)0,				        // Task function args
-        TASK_INIT_PRIO,			        // Priority
-        Init_Stk,				        // Stack
-        DEFAULT_STACK_SIZE);	        // Stack size
+    xTaskCreateStatic(Task_Init, // Task ptr
+        "TASK_INIT",             // Task name
+        DEFAULT_STACK_SIZE,      // Stack size
+        (void*)0,                // Args
+        TASK_INIT_PRIO,          // Prio
+        Init_Stk,                // Static stack pointer
+        &Init_TCB);              // TCB ptr
                 
     OSStart(&err);
 

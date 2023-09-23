@@ -7,10 +7,10 @@
 #include "FreeRTOS.h"
 #include "Tasks.h"
 
-OS_TCB UART_Deadlocks_TCB;
+StaticTask_t UART_Deadlocks_TCB;
 CPU_STK UART_Deadlocks_Stk[512];
 
-OS_TCB UART_Deadlocks2_TCB;
+StaticTask_t UART_Deadlocks2_TCB;
 CPU_STK UART_Deadlocks2_Stk[512];
 
 int counter1 = 0;
@@ -114,21 +114,21 @@ void UART_Deadlocks2(void *p_arg){
 int main() {
     OS_ERR err;
     OSInit(&err);
-    RTOS_BPS_TaskCreate(&UART_Deadlocks_TCB,				// TCB
-				"UART Deadlocks Test",	// Task Name (String)
-				UART_Deadlocks,				// Task function pointer
-				(void *)0,				// Task function args
-				1,			// Priority
-				UART_Deadlocks_Stk,	// Watermark limit for debugging
-				512);					// return err code
+    xTaskCreateStatic(UART_Deadlocks,
+		"UART Deadlocks Test",
+		512,
+		(void *)0,
+		1,
+		UART_Deadlocks_Stk,
+		&UART_Deadlocks_TCB);					// return err code
 	// ASSERT err
-    RTOS_BPS_TaskCreate(&UART_Deadlocks2_TCB,				// TCB
-				"UART Deadlocks Test",	// Task Name (String)
-				UART_Deadlocks2,				// Task function pointer
-				(void *)0,				// Task function args
-				2,			// Priority
-				UART_Deadlocks2_Stk,	// Watermark limit for debugging
-				512);					// return err code
+    xTaskCreateStatic(UART_Deadlocks2,
+		"UART Deadlocks Test",
+		512,
+		(void *)0,
+		2,
+		UART_Deadlocks2_Stk,
+		&UART_Deadlocks2_TCB);					// return err code
     // ASSERT err
 	OSStart(&err);
 }

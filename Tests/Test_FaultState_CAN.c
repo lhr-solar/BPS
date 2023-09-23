@@ -10,11 +10,11 @@
 #include "BSP_Lights.h"
 #include "BSP_CAN.h"
 
-OS_TCB Init_Task_TCB;
+StaticTask_t Init_Task_TCB;
 CPU_STK Init_Task_Stk[256];
-OS_TCB Init_CAN_Task_TCB;
+StaticTask_t Init_CAN_Task_TCB;
 CPU_STK Init_CAN_Task_Stk[256];
-OS_TCB Init_Fault_Semaphore_Task_TCB;
+StaticTask_t Init_Fault_Semaphore_Task_TCB;
 CPU_STK Init_Fault_Semaphore_Stk[256];
 
 //Activate Semaphore
@@ -55,22 +55,22 @@ void Task1(void *p_arg){
 
     OS_CPU_SysTickInit(SystemCoreClock / (CPU_INT32U) OSCfg_TickRate_Hz);
 
-    RTOS_BPS_TaskCreate(&Init_CAN_Task_TCB,
-        "Init_CAN",
-        Task2,
-        (void *)0,
-        TASK_CANBUS_CONSUMER_PRIO,
-        Init_CAN_Task_Stk,
-        256
+    xTaskCreateStatic(Task2,
+		"Init_CAN",
+		256,
+		(void *)0,,
+		TASK_CANBUS_CONSUMER_PRIO,
+		Init_CAN_Task_Stk,
+		&Init_CAN_Task_TCB
     );
 
-    RTOS_BPS_TaskCreate(&Init_Fault_Semaphore_Task_TCB,
-        "Increment_Fault_Sempahore",
-        Task3,
-        (void *)0,
-        10,
-        Init_Fault_Semaphore_Stk,
-        256
+    xTaskCreateStatic(Task3,
+		"Increment_Fault_Sempahore",
+		256,
+		(void *)0,,
+		10,
+		Init_Fault_Semaphore_Stk,
+		&Init_Fault_Semaphore_Task_TCB
     );
 
     OSTaskDel(NULL, &err);
@@ -91,13 +91,13 @@ int main(void) {
     OSInit(&err);
     assertOSError(err);
 
-    RTOS_BPS_TaskCreate(&Init_Task_TCB,
-        "Task 1",
-        Task1,
-        (void *)0,
-        1,
-        Init_Task_Stk,
-        256
+    xTaskCreateStatic(Task1,
+		"Task 1",
+		256,
+		(void *)0,,
+		1,
+		Init_Task_Stk,
+		&Init_Task_TCB
     );
 
     __enable_irq();

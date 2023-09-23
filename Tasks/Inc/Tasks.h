@@ -82,32 +82,33 @@ void EnterFaultState(void);
 /*
  * Thread Control Blocks that contain information about each thread
  */
-extern OS_TCB FaultState_TCB;
-extern OS_TCB PetWDog_TCB;
-extern OS_TCB VoltTempMonitor_TCB;
-extern OS_TCB AmperesMonitor_TCB;
-extern OS_TCB LogInfo_TCB;
-extern OS_TCB CANBusConsumer_TCB;
-extern OS_TCB CheckContactor_TCB;
-extern OS_TCB BatteryBalance_TCB;
-extern OS_TCB CLI_TCB;
-extern OS_TCB BLE_TCB;
-extern OS_TCB Idle_TCB;
-extern OS_TCB Init_TCB;
+extern StaticTask_t FaultState_TCB;
+extern StaticTask_t PetWDog_TCB;
+extern StaticTask_t VoltTempMonitor_TCB;
+extern StaticTask_t AmperesMonitor_TCB;
+extern StaticTask_t LogInfo_TCB;
+extern StaticTask_t CANBusConsumer_TCB;
+extern StaticTask_t CheckContactor_TCB;
+extern StaticTask_t BatteryBalance_TCB;
+extern StaticTask_t CLI_TCB;
+extern StaticTask_t BLE_TCB;
+extern StaticTask_t Idle_TCB;
+extern StaticTask_t Init_TCB;
+
 /**
  * Stacks for each thread
  */
-extern CPU_STK PetWDog_Stk[TASK_PETWDOG_STACK_SIZE];
-extern CPU_STK VoltTempMonitor_Stk[TASK_VOLT_TEMP_MONITOR_STACK_SIZE];
-extern CPU_STK AmperesMonitor_Stk[TASK_AMPERES_MONITOR_STACK_SIZE];
-extern CPU_STK LogInfo_Stk[TASK_LOG_INFO_STACK_SIZE];
-extern CPU_STK CANBusConsumer_Stk[TASK_CANBUS_CONSUMER_STACK_SIZE];
-extern CPU_STK CheckContactor_Stk[TASK_CHECK_CONTACTOR_STACK_SIZE];
-extern CPU_STK BatteryBalance_Stk[TASK_BATTERY_BALANCE_STACK_SIZE];
-extern CPU_STK CLI_Stk[TASK_CLI_STACK_SIZE];
-extern CPU_STK BLE_Stk[TASK_BLE_STACK_SIZE];
-extern CPU_STK Idle_Stk[TASK_IDLE_STACK_SIZE];
-extern CPU_STK Init_Stk[TASK_INIT_STACK_SIZE];
+extern StackType_t PetWDog_Stk[TASK_PETWDOG_STACK_SIZE];
+extern StackType_t VoltTempMonitor_Stk[TASK_VOLT_TEMP_MONITOR_STACK_SIZE];
+extern StackType_t AmperesMonitor_Stk[TASK_AMPERES_MONITOR_STACK_SIZE];
+extern StackType_t LogInfo_Stk[TASK_LOG_INFO_STACK_SIZE];
+extern StackType_t CANBusConsumer_Stk[TASK_CANBUS_CONSUMER_STACK_SIZE];
+extern StackType_t CheckContactor_Stk[TASK_CHECK_CONTACTOR_STACK_SIZE];
+extern StackType_t BatteryBalance_Stk[TASK_BATTERY_BALANCE_STACK_SIZE];
+extern StackType_t CLI_Stk[TASK_CLI_STACK_SIZE];
+extern StackType_t BLE_Stk[TASK_BLE_STACK_SIZE];
+extern StackType_t Idle_Stk[TASK_IDLE_STACK_SIZE];
+extern StackType_t Init_Stk[TASK_INIT_STACK_SIZE];
 
 /**
  *  Semaphores, Mutexes, & Bitmaps that are used by multiple threads

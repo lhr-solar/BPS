@@ -35,11 +35,11 @@
  *****************************************************************************/
 
 // Used by Task1
-OS_TCB Task1_TCB;
+StaticTask_t Task1_TCB;
 CPU_STK Task1_Stk[DEFAULT_STACK_SIZE];
 
 // Used by Task_Spam
-OS_TCB TaskSpam_TCB;
+StaticTask_t TaskSpam_TCB;
 CPU_STK TaskSpam_Stk[DEFAULT_STACK_SIZE];
 
 // Task to spam CAN messages to test CANBUS Consumer
@@ -106,22 +106,22 @@ void Task1(void *p_arg){
     // Spawn a thread to spam CAN messages
     // Has a higher priority than CANBUS Consumer because CAN messages will be sent 
     // by higher priority threads during the race
-    RTOS_BPS_TaskCreate(&TaskSpam_TCB,				// TCB
-            "TASK_SPAM",	// Task Name (String)
-            Task_Spam,				// Task function pointer
-            (void *)0,				// Task function args
-            6,			            // Priority
-            TaskSpam_Stk,	// Watermark limit for debugging
-            DEFAULT_STACK_SIZE);					// return err code}
+    xTaskCreateStatic(Task_Spam,
+		"TASK_SPAM",
+		DEFAULT_STACK_SIZE,
+		(void *)0,				// Task function args,
+		6,
+		TaskSpam_Stk,
+		&TaskSpam_TCB);					// return err code}
 
     // Spawn CANBUS Consumer, PRIO 7
-    RTOS_BPS_TaskCreate(&CANBusConsumer_TCB,				// TCB
-            "TASK_CANBUS_CONSUMER_PRIO",	// Task Name (String)
-            Task_CANBusConsumer,				// Task function pointer
-            (void *)true,				// Use loopback mode
-            TASK_CANBUS_CONSUMER_PRIO,			// Priority
-            CANBusConsumer_Stk,	// Watermark limit for debugging
-            TASK_CANBUS_CONSUMER_STACK_SIZE);					// return err code
+    xTaskCreateStatic(Task_CANBusConsumer,
+		"TASK_CANBUS_CONSUMER_PRIO",
+		TASK_CANBUS_CONSUMER_STACK_SIZE,
+		(void *)true,				// Use loopback mode,
+		TASK_CANBUS_CONSUMER_PRIO,
+		CANBusConsumer_Stk,
+		&CANBusConsumer_TCB);					// return err code
         
         // Initialize CAN queue
         CAN_Queue_Init();
@@ -137,13 +137,13 @@ int main(void) {
     OSInit(&err);
     assertOSError(err);
 
-    RTOS_BPS_TaskCreate(&Task1_TCB,
-                "Task 1",
-                Task1,
-                (void *)0,
-                1,
-                Task1_Stk,
-                256);
+    xTaskCreateStatic(Task1,
+		"Task 1",
+		256,
+		(void *)0,,
+		1,
+		Task1_Stk,
+		&Task1_TCB);
     assertOSError(err);
 
     OSStart(&err);

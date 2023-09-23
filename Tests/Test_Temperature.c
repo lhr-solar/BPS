@@ -48,7 +48,7 @@ void foo(void){
 }
 
 // Task1
-OS_TCB Task1_TCB;
+StaticTask_t Task1_TCB;
 CPU_STK Task1_Stk[DEFAULT_STACK_SIZE];
 
 cell_asic minions[NUM_MINIONS];
@@ -112,13 +112,13 @@ int main(void) {
     OSInit(&err);
     assertOSError(err);
 
-    RTOS_BPS_TaskCreate(&Task1_TCB,
-                "Task 1",
-                Task1,
-                (void *)0,
-                1,
-                Task1_Stk,
-                256);
+    xTaskCreateStatic(Task1,
+		"Task 1",
+		256,
+		(void *)0,,
+		1,
+		Task1_Stk,
+		&Task1_TCB);
 
     OSStart(&err);
 }

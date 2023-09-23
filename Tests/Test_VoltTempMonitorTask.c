@@ -37,10 +37,10 @@
  *****************************************************************************/
 
 // Used by Task1
-OS_TCB Task1_TCB;
+StaticTask_t Task1_TCB;
 CPU_STK Task1_Stk[DEFAULT_STACK_SIZE];
 
-OS_TCB Task2_TCB;
+StaticTask_t Task2_TCB;
 CPU_STK Task2_Stk[DEFAULT_STACK_SIZE];
 
 OS_ERR p_err;
@@ -61,31 +61,31 @@ void Task1(void *p_arg){
 WDog_Mutex = xSemaphoreCreateMutex();
 
     // Spawn tasks needed for Amperes readings to affect contactor
-    RTOS_BPS_TaskCreate(&PetWDog_TCB,              // TCB
-                "TASK_PETWDOG_PRIO",        // Task Name (String)
-                Task_PetWDog,               // Task function pointer
-                (void *)0,                  // Task function args
-                TASK_PETWDOG_PRIO,          // Priority
-                PetWDog_Stk,                // Stack
-                TASK_PETWDOG_STACK_SIZE
+    xTaskCreateStatic(Task_PetWDog,
+		"TASK_PETWDOG_PRIO",
+		TASK_PETWDOG_STACK_SIZE,
+		(void *)0,                  // Task function args,
+		TASK_PETWDOG_PRIO,
+		PetWDog_Stk,
+		&PetWDog_TCB
                 );
 
-    RTOS_BPS_TaskCreate(&VoltTempMonitor_TCB,				// TCB
-            "TASK_VOLT_TEMP_MONITOR_PRIO",	// Task Name (String)
-            Task_VoltTempMonitor,				// Task function pointer
-            (void *)0,				// Task function args
-            TASK_VOLT_TEMP_MONITOR_PRIO,			// Priority
-            VoltTempMonitor_Stk,	// Watermark limit for debugging
-            TASK_VOLT_TEMP_MONITOR_STACK_SIZE);					// return err code
+    xTaskCreateStatic(Task_VoltTempMonitor,
+		"TASK_VOLT_TEMP_MONITOR_PRIO",
+		TASK_VOLT_TEMP_MONITOR_STACK_SIZE,
+		(void *)0,				// Task function args,
+		TASK_VOLT_TEMP_MONITOR_PRIO,
+		VoltTempMonitor_Stk,
+		&VoltTempMonitor_TCB);					// return err code
 
     // Spawn CANBUS Consumer, PRIO 7
-    RTOS_BPS_TaskCreate(&CANBusConsumer_TCB,				// TCB
-            "TASK_CANBUS_CONSUMER_PRIO",	// Task Name (String)
-            Task_CANBusConsumer,				// Task function pointer
-            (void *)true,				// Use loopback mode
-            TASK_CANBUS_CONSUMER_PRIO,			// Priority
-            CANBusConsumer_Stk,	// Watermark limit for debugging
-            TASK_CANBUS_CONSUMER_STACK_SIZE);					// return err code
+    xTaskCreateStatic(Task_CANBusConsumer,
+		"TASK_CANBUS_CONSUMER_PRIO",
+		TASK_CANBUS_CONSUMER_STACK_SIZE,
+		(void *)true,				// Use loopback mode,
+		TASK_CANBUS_CONSUMER_PRIO,
+		CANBusConsumer_Stk,
+		&CANBusConsumer_TCB);					// return err code
 
     // Initialize CAN queue
     CAN_Queue_Init();
@@ -135,22 +135,22 @@ int main() {
     OSInit(&err);
     assertOSError(err);
 
-    RTOS_BPS_TaskCreate(&Task1_TCB,
-                "Task 1",
-                Task1,
-                (void *)0,
-                1,
-                Task1_Stk,
-                256);
+    xTaskCreateStatic(Task1,
+		"Task 1",
+		256,
+		(void *)0,,
+		1,
+		Task1_Stk,
+		&Task1_TCB);
 
     //Give same priority as amperes task thread
-    RTOS_BPS_TaskCreate(&Task2_TCB,
-                "Task 2",
-                Task2,
-                (void *)0,
-                5,
-                Task2_Stk,
-                256);
+    xTaskCreateStatic(Task2,
+		"Task 2",
+		256,
+		(void *)0,,
+		5,
+		Task2_Stk,
+		&Task2_TCB);
 
     OSStart(&err);
 }

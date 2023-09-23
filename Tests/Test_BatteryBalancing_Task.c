@@ -23,11 +23,11 @@
  ****************************************************************************/
 
 // Task1
-OS_TCB Task1_TCB;
+StaticTask_t Task1_TCB;
 CPU_STK Task1_Stk[DEFAULT_STACK_SIZE];
 
 // Task_UpdateVoltage
-OS_TCB UpdateVoltage_TCB;
+StaticTask_t UpdateVoltage_TCB;
 CPU_STK UpdateVoltage_Stk[DEFAULT_STACK_SIZE];
 
 extern cell_asic Minions[NUM_MINIONS];
@@ -47,25 +47,13 @@ void Task1(void* p_arg) {
 	OS_CPU_SysTickInit(SystemCoreClock / (CPU_INT32U) OSCfg_TickRate_Hz);
     OS_ERR err;
 
-    /*
-    RTOS_BPS_TaskCreate(
-        &BatteryBalance_TCB,				// TCB
-        "TASK_BATTERY_BALANCE",	// Task Name (String)
-        Task_BatteryBalance,				// Task function pointer
-        (void *)0,				// Task function args
-        6,			            // Priority
-        BatteryBalance_Stk,	// Watermark limit for debugging
-        DEFAULT_STACK_SIZE);					// return err code}
-    */
-
-    RTOS_BPS_TaskCreate(
-        &UpdateVoltage_TCB,				// TCB
-        "TASK_UPDATE_VOLTAGE",	// Task Name (String)
-        Task_UpdateVoltage,				// Task function pointer
-        (void *)0,				// Task function args
-        5,			            // Priority
-        UpdateVoltage_Stk,	// Watermark limit for debugging
-        DEFAULT_STACK_SIZE);					// return err code}
+    xTaskCreateStatic(Task_UpdateVoltage,
+        "TASK_UPDATE_VOLTAGE",
+        DEFAULT_STACK_SIZE,
+        (void *)0,
+        5,
+        UpdateVoltage_Stk,
+        &UpdateVoltage_TCB);
 
     OSTaskDel(NULL, &err);
 }
@@ -77,13 +65,13 @@ int main(void) {
     OSInit(&err);
     assertOSError(err);
     
-    RTOS_BPS_TaskCreate(&Task1_TCB,
-                "Task 1",
-                Task1,
-                (void *)0,
-                1,
-                Task1_Stk,
-                256);
+    xTaskCreateStatic(Task1,
+		"Task 1",
+		256,
+		(void *)0,,
+		1,
+		Task1_Stk,
+		&Task1_TCB);
 
     OSStart(&err);
     return 0;

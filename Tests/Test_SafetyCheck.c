@@ -221,37 +221,37 @@ int main() {
 
     BSP_UART_Init(foo, foo, UART_USB);
 
-    RTOS_BPS_TaskCreate(&Init_TCB,				// TCB
-				"Initialize System",	// Task Name (String)
-				Task_Init,				// Task function pointer
-				(void *)0,				// Task function args
-				TASK_INIT_PRIO,			// Priority
-				Init_Stk,	// Watermark limit for debugging
-				DEFAULT_STACK_SIZE);
+    xTaskCreateStatic(Task_Init,
+		"Initialize System",
+		DEFAULT_STACK_SIZE,
+		(void *)0,
+		TASK_INIT_PRIO,
+		Init_Stk,
+		&Init_TCB);
 
-    RTOS_BPS_TaskCreate(&CheckContactor_TCB,    // TCB
-				"Task_CheckContactor",          // Task Name (String)
-				CheckContactor,            // Task function pointer
-				(void *)0,                      // Task function args
-				TASK_CHECK_CONTACTOR_PRIO,      // Priority
-				CheckContactor_Stk,             // Stack
-				TASK_CHECK_CONTACTOR_STACK_SIZE);
+    xTaskCreateStatic(CheckContactor,
+		"Task_CheckContactor",
+		TASK_CHECK_CONTACTOR_STACK_SIZE,
+		(void *)0,
+		TASK_CHECK_CONTACTOR_PRIO,
+		CheckContactor_Stk,
+		&CheckContactor_TCB);
 
-    RTOS_BPS_TaskCreate(&VoltTempMonitor_TCB,				// TCB
-				"Voltage/Temperature Monitor",	// Task Name (String)
-				VoltTempMonitor,				// Task function pointer
-				(void *)0,				// Task function args
-				TASK_VOLT_TEMP_MONITOR_PRIO,			// Priority
-				VoltTempMonitor_Stk,	// Watermark limit for debugging
-				TASK_VOLT_TEMP_MONITOR_STACK_SIZE);	 
+    xTaskCreateStatic(VoltTempMonitor,
+		"Voltage/Temperature Monitor",
+		TASK_VOLT_TEMP_MONITOR_STACK_SIZE,
+		(void *)0,
+		TASK_VOLT_TEMP_MONITOR_PRIO,
+		VoltTempMonitor_Stk,
+		&VoltTempMonitor_TCB);	 
 
-    RTOS_BPS_TaskCreate(&AmperesMonitor_TCB,				// TCB
-				"Amperes Monitor",	// Task Name (String)
-				AmperesMonitor,				// Task function pointer
-				(void *)0,				// Task function args
-				TASK_AMPERES_MONITOR_PRIO,			// Priority
-				AmperesMonitor_Stk,	// Watermark limit for debugging
-				TASK_AMPERES_MONITOR_STACK_SIZE); 
+    xTaskCreateStatic(AmperesMonitor,
+		"Amperes Monitor",
+		TASK_AMPERES_MONITOR_STACK_SIZE,
+		(void *)0,
+		TASK_AMPERES_MONITOR_PRIO,
+		AmperesMonitor_Stk,
+		&AmperesMonitor_TCB); 
 
     OSStart(&err);
 

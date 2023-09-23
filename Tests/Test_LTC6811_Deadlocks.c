@@ -9,10 +9,10 @@
 #include "FreeRTOS.h"
 #include "Tasks.h"
 
-OS_TCB LTC6811_Deadlocks_TCB;
+StaticTask_t LTC6811_Deadlocks_TCB;
 CPU_STK LTC6811_Deadlocks_Stk[512];
 
-OS_TCB LTC6811_Deadlocks2_TCB;
+StaticTask_t LTC6811_Deadlocks2_TCB;
 CPU_STK LTC6811_Deadlocks2_Stk[512];
 
 int counter1 = 0;
@@ -176,21 +176,21 @@ int main() {
 
 	SafetyCheck_Sem4 = xSemaphoreCreateBinary();
 
-    RTOS_BPS_TaskCreate(&LTC6811_Deadlocks_TCB,				// TCB
-				"LTC6811 Deadlocks Test",	// Task Name (String)
-				LTC6811_Deadlocks,				// Task function pointer
-				(void *)0,				// Task function args
-				1,			// Priority
-				LTC6811_Deadlocks_Stk,	// Watermark limit for debugging
-				512);
+    xTaskCreateStatic(LTC6811_Deadlocks,
+		"LTC6811 Deadlocks Test",
+		512,
+		(void *)0,
+		1,
+		LTC6811_Deadlocks_Stk,
+		&LTC6811_Deadlocks_TCB);
 
-    RTOS_BPS_TaskCreate(&LTC6811_Deadlocks2_TCB,				// TCB
-				"LTC6811 Deadlocks Test",	// Task Name (String)
-				LTC6811_Deadlocks2,				// Task function pointer
-				(void *)0,				// Task function args
-				2,			// Priority
-				LTC6811_Deadlocks2_Stk,	// Watermark limit for debugging
-				512);
+    xTaskCreateStatic(LTC6811_Deadlocks2,
+		"LTC6811 Deadlocks Test",
+		512,
+		(void *)0,
+		2,
+		LTC6811_Deadlocks2_Stk,
+		&LTC6811_Deadlocks2_TCB);
 
 	OSStart(&err);
 }

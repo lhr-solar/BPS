@@ -31,21 +31,21 @@ void Task_InitWeldedContactor(void *p_arg) {
 WDog_Mutex = xSemaphoreCreateMutex();
 
     //2
-    RTOS_BPS_TaskCreate(&CheckContactor_TCB,    // TCB
-				"Task_CheckContactor",          // Task Name (String)
-				Task_CheckContactor,            // Task function pointer
-				(void *)0,                      // Task function args
-				TASK_CHECK_CONTACTOR_PRIO,      // Priority
-				CheckContactor_Stk,             // Stack
-				TASK_CHECK_CONTACTOR_STACK_SIZE);
+    xTaskCreateStatic(Task_CheckContactor,
+		"Task_CheckContactor",
+		TASK_CHECK_CONTACTOR_STACK_SIZE,
+		(void *)0,
+		TASK_CHECK_CONTACTOR_PRIO,
+		CheckContactor_Stk,
+		&CheckContactor_TCB);
     //10
-    RTOS_BPS_TaskCreate(&Idle_TCB,				// TCB
-            "TASK_IDLE",	                    // Task Name (String)
-            Task_Idle,				            // Task function pointer
-            (void *)0,				            // Task function args
-            TASK_IDLE_PRIO,			            // Priority
-            Idle_Stk,				            // Stack
-            TASK_IDLE_STACK_SIZE);
+    xTaskCreateStatic(Task_Idle,
+		"TASK_IDLE",
+		TASK_IDLE_STACK_SIZE,
+		(void *)0,				            // Task function args,
+		TASK_IDLE_PRIO,
+		Idle_Stk,
+		&Idle_TCB);
     
     CAN_Queue_Init();
 
@@ -89,13 +89,13 @@ int main() {
     OSInit(&err);
     assertOSError(err);
 
-    RTOS_BPS_TaskCreate(&Init_TCB,		// TCB
-        "TASK_INIT",	                // Task Name (String)
-        Task_InitWeldedContactor,	    // Task function pointer
-        (void *)0,				        // Task function args
-        TASK_INIT_PRIO,			        // Priority
-        Init_Stk,				        // Stack
-        DEFAULT_STACK_SIZE);	        // Stack size
+    xTaskCreateStatic(Task_InitWeldedContactor,
+		"TASK_INIT",
+		DEFAULT_STACK_SIZE,
+		(void *)0,				        // Task function args,
+		TASK_INIT_PRIO,
+		Init_Stk,
+		&Init_TCB);	        // Stack size
                 
     OSStart(&err);
 

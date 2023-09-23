@@ -24,75 +24,75 @@ void Task_Init(void *p_arg) {
 
 WDog_Mutex = xSemaphoreCreateMutex();
 
-    RTOS_BPS_TaskCreate(&PetWDog_TCB,	        // TCB
-                "TASK_PETWDOG",	                // Task Name (String)
-                Task_PetWDog,				    // Task function pointer
-                (void *)0,				        // Task function args
-                TASK_PETWDOG_PRIO,			    // Priority
-                PetWDog_Stk,				    // Stack
-                TASK_PETWDOG_STACK_SIZE);
-    RTOS_BPS_TaskCreate(&CheckContactor_TCB,    // TCB
-                "Task_CheckContactor",          // Task Name (String)
-                Task_CheckContactor,            // Task function pointer
-                (void *)0,                      // Task function args
-                TASK_CHECK_CONTACTOR_PRIO,      // Priority
-                CheckContactor_Stk,             // Stack
-                TASK_CHECK_CONTACTOR_STACK_SIZE);
-    RTOS_BPS_TaskCreate(&VoltTempMonitor_TCB,	// TCB
-            "TASK_VOLT_TEMP_MONITOR",	        // Task Name (String)
-            Task_VoltTempMonitor,				// Task function pointer
-            (void *)0,				            // Task function args
-            TASK_VOLT_TEMP_MONITOR_PRIO,		// Priority
-            VoltTempMonitor_Stk,				// Stack
-            TASK_VOLT_TEMP_MONITOR_STACK_SIZE);
-    RTOS_BPS_TaskCreate(&AmperesMonitor_TCB,	// TCB
-            "TASK_AMPERES_MONITOR",	            // Task Name (String)
-            Task_AmperesMonitor,				// Task function pointer
-            (void *)0,				            // Task function args
-            TASK_AMPERES_MONITOR_PRIO,			// Priority
-            AmperesMonitor_Stk,				    // Stack
-            TASK_AMPERES_MONITOR_STACK_SIZE);
+    xTaskCreateStatic(Task_PetWDog,
+		"TASK_PETWDOG",
+		TASK_PETWDOG_STACK_SIZE,
+		(void *)0,				        // Task function args,
+		TASK_PETWDOG_PRIO,
+		PetWDog_Stk,
+		&PetWDog_TCB);
+    xTaskCreateStatic(Task_CheckContactor,
+		"Task_CheckContactor",
+		TASK_CHECK_CONTACTOR_STACK_SIZE,
+		(void *)0,                      // Task function args,
+		TASK_CHECK_CONTACTOR_PRIO,
+		CheckContactor_Stk,
+		&CheckContactor_TCB);
+    xTaskCreateStatic(Task_VoltTempMonitor,
+		"TASK_VOLT_TEMP_MONITOR",
+		TASK_VOLT_TEMP_MONITOR_STACK_SIZE,
+		(void *)0,				            // Task function args,
+		TASK_VOLT_TEMP_MONITOR_PRIO,
+		VoltTempMonitor_Stk,
+		&VoltTempMonitor_TCB);
+    xTaskCreateStatic(Task_AmperesMonitor,
+		"TASK_AMPERES_MONITOR",
+		TASK_AMPERES_MONITOR_STACK_SIZE,
+		(void *)0,				            // Task function args,
+		TASK_AMPERES_MONITOR_PRIO,
+		AmperesMonitor_Stk,
+		&AmperesMonitor_TCB);
     /*
-    RTOS_BPS_TaskCreate(&BatteryBalance_TCB,	// TCB
-            "TASK_BATTERY_BALANCE",	            // Task Name (String)
-            Task_BatteryBalance,				// Task function pointer
-            (void *)0,				            // Task function args
-            TASK_BATTERY_BALANCE_PRIO,			// Priority
-            BatteryBalance_Stk,				    // Stack
-            TASK_BATTERY_BALANCE_STACK_SIZE,	// Stack size
+    xTaskCreateStatic(Task_BatteryBalance,
+		"TASK_BATTERY_BALANCE",
+		TASK_BATTERY_BALANCE_STACK_SIZE,
+		(void *)0,				            // Task function args,
+		TASK_BATTERY_BALANCE_PRIO,
+		BatteryBalance_Stk,
+		&BatteryBalance_TCB,	// Stack size
             );
     */
-    RTOS_BPS_TaskCreate(&LogInfo_TCB,			// TCB
-            "TASK_LOG_INFO",	                // Task Name (String)
-            Task_LogInfo,				        // Task function pointer
-            (void *)0,				            // Task function args
-            TASK_LOG_INFO_PRIO,			        // Priority
-            LogInfo_Stk,				        // Stack
-            TASK_LOG_INFO_STACK_SIZE);
-    RTOS_BPS_TaskCreate(&CANBusConsumer_TCB,	// TCB
-            "TASK_CANBUS_CONSUMER",	            // Task Name (String)
-            Task_CANBusConsumer,				// Task function pointer
-            (void *)BPS_CAN_LOOPBACK,				        // don't use loopback mode
-            TASK_CANBUS_CONSUMER_PRIO,			// Priority
-            CANBusConsumer_Stk,				    // Stack
-            TASK_CANBUS_CONSUMER_STACK_SIZE);
+    xTaskCreateStatic(Task_LogInfo,
+		"TASK_LOG_INFO",
+		TASK_LOG_INFO_STACK_SIZE,
+		(void *)0,				            // Task function args,
+		TASK_LOG_INFO_PRIO,
+		LogInfo_Stk,
+		&LogInfo_TCB);
+    xTaskCreateStatic(Task_CANBusConsumer,
+		"TASK_CANBUS_CONSUMER",
+		TASK_CANBUS_CONSUMER_STACK_SIZE,
+		(void *)BPS_CAN_LOOPBACK,				        // don't use loopback mode,
+		TASK_CANBUS_CONSUMER_PRIO,
+		CANBusConsumer_Stk,
+		&CANBusConsumer_TCB);
     /*
-    RTOS_BPS_TaskCreate(&CLI_TCB,				// TCB
-            "TASK_CLI",	                        // Task Name (String)
-            Task_CLI,				            // Task function pointer
-            (void *)0,				            // Task function args
-            TASK_CLI_PRIO,			            // Priority
-            CLI_Stk,				            // Stack
-            TASK_CLI_STACK_SIZE,		        // Stack size
+    xTaskCreateStatic(Task_CLI,
+		"TASK_CLI",
+		TASK_CLI_STACK_SIZE,
+		(void *)0,				            // Task function args,
+		TASK_CLI_PRIO,
+		CLI_Stk,
+		&CLI_TCB,		        // Stack size
             );
     */
-    RTOS_BPS_TaskCreate(&Idle_TCB,				// TCB
-            "TASK_IDLE",	                    // Task Name (String)
-            Task_Idle,				            // Task function pointer
-            (void *)0,				            // Task function args
-            TASK_IDLE_PRIO,			            // Priority
-            Idle_Stk,				            // Stack
-            TASK_IDLE_STACK_SIZE);
+    xTaskCreateStatic(Task_Idle,
+		"TASK_IDLE",
+		TASK_IDLE_STACK_SIZE,
+		(void *)0,				            // Task function args,
+		TASK_IDLE_PRIO,
+		Idle_Stk,
+		&Idle_TCB);
     
     CAN_Queue_Init();
 

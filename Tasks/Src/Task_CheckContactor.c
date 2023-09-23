@@ -21,7 +21,7 @@ void Task_CheckContactor(void *p_arg) {
     // BLOCKING =====================
     // Wait until voltage, open wire, temperature, and current(Amperes) are all checked and safe
     for (uint8_t i = 0; i < NUM_FAULT_POINTS; i++){
-        RTOS_BPS_SemPend(&SafetyCheck_Sem4,OS_OPT_PEND_BLOCKING);
+        xSemaphoreTake(SafetyCheck_Sem4, (TickType_t)portMAX_DELAY);
     }
 
     // Turn Contactor On
