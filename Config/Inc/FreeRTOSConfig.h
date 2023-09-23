@@ -30,6 +30,12 @@
 #define configMESSAGE_BUFFER_LENGTH_TYPE        size_t
 #define configHEAP_CLEAR_MEMORY_ON_FREE         1
 
+/**
+ * TODO:
+ *  - Fix CMSIS to be the FreeRTOS one
+ *  - Verify delays and all regex replacements
+ */
+
 /* Memory allocation related definitions. */
 #define configSUPPORT_STATIC_ALLOCATION             1
 #define configSUPPORT_DYNAMIC_ALLOCATION            1
