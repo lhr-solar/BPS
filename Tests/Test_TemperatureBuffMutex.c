@@ -15,12 +15,12 @@ OS_TCB Dummy_TCB;
 CPU_STK Dummy_Stk[DEFAULT_STACK_SIZE];
 
 OS_TMR tmr;
-OS_SEM tmr_Sem4;
+SemaphoreHandle_t tmr_Sem4;
 
 cell_asic minions[NUM_MINIONS];
 
 void trigger(void *p_tmr, void *p_arg) {
-    RTOS_BPS_SemPost(&tmr_Sem4, OS_OPT_POST_1); 
+	xSemaphoreGive(tmr_Sem4);
 }
 
 void Task_TestTempMutex1(void *p_args) {
@@ -38,7 +38,7 @@ void Task_TestTempMutex1(void *p_args) {
                 &err);
     assertOSError(err);
 
-    RTOS_BPS_SemCreate(&tmr_Sem4, "Temperature Timer Semaphore", 1);
+	tmr_Sem4 = xSemaphoreCreateBinary();
 
     Temperature_Init(minions);
 
@@ -50,7 +50,7 @@ void Task_TestTempMutex1(void *p_args) {
         //         &err);
         // assert
 
-        RTOS_BPS_SemPend(&tmr_Sem4, OS_OPT_PEND_BLOCKING);
+	xSemaphoreTake(tmr_Sem4, (TickType_t)portMAX_DELAY);
         // assert
 
         Temperature_CheckStatus(1);
@@ -75,7 +75,7 @@ void Task_Dummy(void *p_args) {
 
     while(1) {
         printf("3\r\n");
-        RTOS_BPS_SemPost(&tmr_Sem4, OS_OPT_PEND_BLOCKING);
+	xSemaphoreGive(tmr_Sem4);
         for(volatile int i = 0; i < 1000000; i++);
     }
 }

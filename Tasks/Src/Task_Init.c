@@ -18,11 +18,11 @@ void Task_Init(void *p_arg) {
 
     OS_ERR err;
 
-    RTOS_BPS_SemCreate(&SafetyCheck_Sem4,
+	SafetyCheck_Sem4 = xSemaphoreCreateBinary();
                 "Safety Check Semaphore",
                 0);
 
-    RTOS_BPS_MutexCreate(&WDog_Mutex, "Watchdog Mutex");
+WDog_Mutex = xSemaphoreCreateMutex();
 
     RTOS_BPS_TaskCreate(&PetWDog_TCB,	        // TCB
                 "TASK_PETWDOG",	                // Task Name (String)

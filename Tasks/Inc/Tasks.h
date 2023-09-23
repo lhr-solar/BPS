@@ -112,9 +112,9 @@ extern CPU_STK Init_Stk[TASK_INIT_STACK_SIZE];
 /**
  *  Semaphores, Mutexes, & Bitmaps that are used by multiple threads
  */
-extern OS_SEM SafetyCheck_Sem4;
-extern OS_MUTEX WDog_Mutex;
-extern OS_MUTEX MinionsASIC_Mutex;
+extern SemaphoreHandle_t SafetyCheck_Sem4;
+extern SemaphoreHandle_t WDog_Mutex;
+extern SemaphoreHandle_t MinionsASIC_Mutex;
 extern WDOGBits_e WDog_BitMap;
 extern uint8_t Fault_Flag;
 

@@ -57,7 +57,7 @@ void Balancing_Balance(cell_asic Minions[]){
 static void Balancing_ClearDischargeBit(int Cell, uint8_t total_ic, cell_asic *ic){
 // No simulator support for battery balancing (yet)
 #ifndef SIMULATION
-	RTOS_BPS_MutexPend(&MinionsASIC_Mutex, OS_OPT_PEND_BLOCKING);
+	xSemaphoreTake(MinionsASIC_Mutex, (TickType_t)portMAX_DELAY); 
 	for(int i=0; i<total_ic; i++){
 		if((Cell<9)&& (Cell!=0)){
 			ic[i].config.tx_data[4] = ic[i].config.tx_data[4] & ~(1<<(Cell-1));
@@ -69,7 +69,7 @@ static void Balancing_ClearDischargeBit(int Cell, uint8_t total_ic, cell_asic *i
 			break;
 		}
   	}
-	RTOS_BPS_MutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE);
+	xSemaphoreGive(MinionsASIC_Mutex);
 #endif
 }
 
@@ -100,14 +100,14 @@ static void Balancing_SetDischargeBit(uint8_t module, cell_asic ic[]) {
 	uint8_t ModuleNumber = 0;
 	Balancing_GetICNumber(module, &ICNumber, &ModuleNumber);//Get IC and ModuleInIC number
 	
-	RTOS_BPS_MutexPend(&MinionsASIC_Mutex, OS_OPT_PEND_BLOCKING);
+	xSemaphoreTake(MinionsASIC_Mutex, (TickType_t)portMAX_DELAY); 
 	
 	LTC6811_rdcfg_safe(NUM_MINIONS, ic);
 	LTC6811_set_discharge(ModuleNumber, NUM_MINIONS, &ic[ICNumber]); //Set discharge bit
 	LTC6811_wrcfg(NUM_MINIONS, ic);	
 	LTC6811_rdcfg_safe(NUM_MINIONS, ic);
 	
-	RTOS_BPS_MutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE);
+	xSemaphoreGive(MinionsASIC_Mutex);
 #endif
 
 }

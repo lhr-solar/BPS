@@ -36,7 +36,7 @@ void Task1(void *p_arg) {
 
     while(1) {
         for(int i = 0; i < 4; i++) {
-            RTOS_BPS_SemPend(&SafetyCheck_Sem4, OS_OPT_PEND_BLOCKING);
+	xSemaphoreTake(SafetyCheck_Sem4, (TickType_t)portMAX_DELAY);
         }
 
         RTOS_BPS_DelayTick(1);
@@ -48,7 +48,7 @@ void Task2(void *p_arg) {
     (void)p_arg;
 
     while(1) {
-        RTOS_BPS_SemPost(&SafetyCheck_Sem4, OS_OPT_POST_1);
+	xSemaphoreGive(SafetyCheck_Sem4);
         RTOS_BPS_DelayTick(1);
         printf("2\r\n");
     }
@@ -62,7 +62,7 @@ int main(void) {
     OSInit(&err);
     assertOSError(err);
 
-    RTOS_BPS_SemCreate(&SafetyCheck_Sem4, "Safety Check Semaphore", 0);
+	SafetyCheck_Sem4 = xSemaphoreCreateBinary();
 
     RTOS_BPS_TaskCreate(&Task1_TCB,
                 "Task 1",

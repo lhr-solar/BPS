@@ -3,7 +3,7 @@
 #include "common.h"
 #include "config.h"
 #include "CANbus.h"
-#include "os.h"
+#include "FreeRTOS.h"
 #include "Tasks.h"
 #ifndef SIMULATION
 #include "stm32f4xx.h"
@@ -56,9 +56,9 @@ void Task1(void *p_arg){
     OS_CPU_SysTickInit(SystemCoreClock / (CPU_INT32U) OSCfg_TickRate_Hz);
 #endif
 
-    RTOS_BPS_SemCreate(&SafetyCheck_Sem4, "Safety Check Semaphore", 0);
+	SafetyCheck_Sem4 = xSemaphoreCreateBinary();
 
-    RTOS_BPS_MutexCreate(&WDog_Mutex, "Watchdog Mutex");
+WDog_Mutex = xSemaphoreCreateMutex();
 
     // Spawn tasks needed for Amperes readings to affect contactor
     RTOS_BPS_TaskCreate(&PetWDog_TCB,              // TCB
@@ -97,14 +97,14 @@ void Task1(void *p_arg){
 //Task to prevent watchdog from tripping
 void Task2(void *p_arg){
 
-    RTOS_BPS_SemPost(&SafetyCheck_Sem4, OS_OPT_POST_1); //Set semaphore once since Amperes Task doesn't run
-    RTOS_BPS_SemPost(&SafetyCheck_Sem4, OS_OPT_POST_1); //Set semaphore once since Battery Balancing Task doesn't run
+	xSemaphoreGive(SafetyCheck_Sem4);
+	xSemaphoreGive(SafetyCheck_Sem4);
 
     while(1){
-        RTOS_BPS_MutexPend(&WDog_Mutex, OS_OPT_PEND_BLOCKING);
+	xSemaphoreTake(WDog_Mutex, (TickType_t)portMAX_DELAY); 
         WDog_BitMap |= WD_AMPERES;
         WDog_BitMap |= WD_BALANCING;
-        RTOS_BPS_MutexPost(&WDog_Mutex, OS_OPT_POST_NONE);
+	xSemaphoreGive(WDog_Mutex);
         //delay of 100ms
         RTOS_BPS_DelayTick(1);
     }

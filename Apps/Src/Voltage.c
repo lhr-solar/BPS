@@ -26,7 +26,7 @@ static VoltageFilter_t VoltageFilter;
 
 static cell_asic *Minions;
 
-static OS_MUTEX Voltage_Mutex;
+static SemaphoreHandle_t Voltage_Mutex;
 static uint16_t Voltages[NUM_BATTERY_MODULES]; // Voltage values gathered, in units of 0.1 mV
 static uint32_t openWires[TOTAL_VOLT_WIRES];
 
@@ -45,7 +45,7 @@ void Voltage_Init(cell_asic *boards){
     // Record pointer
     Minions = boards;
     //initialize mutex
-    RTOS_BPS_MutexCreate(&Voltage_Mutex, "Voltage Buffer Mutex");
+Voltage_Mutex = xSemaphoreCreateMutex();
                     
 // simulator bypasses ltc driver
 #ifndef SIMULATION
@@ -53,19 +53,19 @@ void Voltage_Init(cell_asic *boards){
     LTC6811_Init(Minions);
     
     //take control of mutex
-    RTOS_BPS_MutexPend(&MinionsASIC_Mutex, OS_OPT_PEND_BLOCKING);
+	xSemaphoreTake(MinionsASIC_Mutex, (TickType_t)portMAX_DELAY); 
     // Write Configuration Register
     LTC6811_wrcfg(NUM_MINIONS, Minions);
     //release mutex
-    RTOS_BPS_MutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE);
+	xSemaphoreGive(MinionsASIC_Mutex);
 
     wakeup_sleep(NUM_MINIONS);
     // take control of mutex
-    RTOS_BPS_MutexPend(&MinionsASIC_Mutex, OS_OPT_PEND_BLOCKING);
+	xSemaphoreTake(MinionsASIC_Mutex, (TickType_t)portMAX_DELAY); 
     // Read Configuration Register
     LTC6811_rdcfg_safe(NUM_MINIONS, Minions);
     // release mutex
-    RTOS_BPS_MutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE);
+	xSemaphoreGive(MinionsASIC_Mutex);
 #endif
     // Initialize median filter. There should be no modules with less than 0 volts or more than 5 volts
     VoltageFilter_init(&VoltageFilter, 0, 50000);
@@ -86,7 +86,7 @@ void Voltage_UpdateMeasurements(void){
     
     // Read Cell Voltage Registers
     //take control of mutex
-    RTOS_BPS_MutexPend(&MinionsASIC_Mutex, OS_OPT_PEND_BLOCKING);
+	xSemaphoreTake(MinionsASIC_Mutex, (TickType_t)portMAX_DELAY); 
     LTC6811_rdcv_safe(0, NUM_MINIONS, Minions); // Set to read back all cell voltage registers
     //copies values from cells.c_codes to private array
 
@@ -96,7 +96,7 @@ void Voltage_UpdateMeasurements(void){
     }
 
     // release minions asic mutex
-    RTOS_BPS_MutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE);
+	xSemaphoreGive(MinionsASIC_Mutex);
 #else
     // package raw voltage values into single array
     for(uint8_t i = 0; i < NUM_BATTERY_MODULES; i++){
@@ -107,9 +107,9 @@ void Voltage_UpdateMeasurements(void){
     VoltageFilter_put(&VoltageFilter, rawVoltages);
 
     // update public voltage values
-    RTOS_BPS_MutexPend(&Voltage_Mutex, OS_OPT_PEND_BLOCKING);
+	xSemaphoreTake(Voltage_Mutex, (TickType_t)portMAX_DELAY); 
     VoltageFilter_get(&VoltageFilter, Voltages);
-    RTOS_BPS_MutexPost(&Voltage_Mutex, OS_OPT_POST_NONE);
+	xSemaphoreGive(Voltage_Mutex);
 }
 
 /** Voltage_CheckStatus
@@ -144,7 +144,7 @@ void Voltage_GetModulesInDanger(VoltageSafety_t* system){
 #ifndef SIMULATION
     uint32_t wires;
     uint32_t openWireIdx = 0;
-    RTOS_BPS_MutexPend(&MinionsASIC_Mutex, OS_OPT_PEND_BLOCKING);
+	xSemaphoreTake(MinionsASIC_Mutex, (TickType_t)portMAX_DELAY); 
     //put all the bits from each minion's system_open_wire variable into one variable
     for(int k = 0; k < NUM_MINIONS; k++){
         wires = (Minions[k].system_open_wire & 0x1FF);	//there are at most 8 modules per IC, bit 0 is GND
@@ -175,7 +175,7 @@ void Voltage_GetModulesInDanger(VoltageSafety_t* system){
             system->wire_checks[i] = SAFE;
         }
     }
-    RTOS_BPS_MutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE);
+	xSemaphoreGive(MinionsASIC_Mutex);
 }
 
 // no simulator support for open wire checks (yet)
@@ -185,9 +185,9 @@ void Voltage_GetModulesInDanger(VoltageSafety_t* system){
  */
 void Voltage_OpenWireSummary(void){
     wakeup_idle(NUM_MINIONS);
-    RTOS_BPS_MutexPend(&MinionsASIC_Mutex, OS_OPT_PEND_BLOCKING);
+	xSemaphoreTake(MinionsASIC_Mutex, (TickType_t)portMAX_DELAY); 
     LTC6811_run_openwire_multi(NUM_MINIONS, Minions, true);
-    RTOS_BPS_MutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE);
+	xSemaphoreGive(MinionsASIC_Mutex);
 }
 
 /** Voltage_OpenWire
@@ -198,7 +198,7 @@ SafetyStatus Voltage_OpenWire(void){
     SafetyStatus status = SAFE;
     wakeup_idle(NUM_MINIONS);
     
-    RTOS_BPS_MutexPend(&MinionsASIC_Mutex, OS_OPT_PEND_BLOCKING);
+	xSemaphoreTake(MinionsASIC_Mutex, (TickType_t)portMAX_DELAY); 
     
     LTC6811_run_openwire_multi(NUM_MINIONS, Minions, false);
 
@@ -211,7 +211,7 @@ SafetyStatus Voltage_OpenWire(void){
             break;
         }
     }
-    RTOS_BPS_MutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE);
+	xSemaphoreGive(MinionsASIC_Mutex);
 
     return status;
 }
@@ -223,13 +223,13 @@ SafetyStatus Voltage_OpenWire(void){
 uint32_t Voltage_GetOpenWire(void){
     wakeup_idle(NUM_MINIONS);
     if (!Fault_Flag) {
-        RTOS_BPS_MutexPend(&MinionsASIC_Mutex, OS_OPT_PEND_BLOCKING);
+	xSemaphoreTake(MinionsASIC_Mutex, (TickType_t)portMAX_DELAY); 
     }
     
     uint32_t result = LTC6811_run_openwire_multi(NUM_MINIONS, Minions, false);
     
     if (!Fault_Flag) {
-        RTOS_BPS_MutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE);
+	xSemaphoreGive(MinionsASIC_Mutex);
     }
     return result;
 }
@@ -256,13 +256,13 @@ uint16_t Voltage_GetModuleMillivoltage(uint8_t moduleIdx){
     }
 
     if (!Fault_Flag) {
-        RTOS_BPS_MutexPend(&Voltage_Mutex, OS_OPT_PEND_BLOCKING);
+	xSemaphoreTake(Voltage_Mutex, (TickType_t)portMAX_DELAY); 
     }
     
     uint16_t ret = Voltages[moduleIdx] / 10;
     
     if (!Fault_Flag) {
-        RTOS_BPS_MutexPost(&Voltage_Mutex, OS_OPT_POST_NONE);
+	xSemaphoreGive(Voltage_Mutex);
     }
     return ret;
 }

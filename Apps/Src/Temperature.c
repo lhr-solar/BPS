@@ -72,15 +72,15 @@ void Temperature_Init(cell_asic *boards){
     wakeup_sleep(NUM_MINIONS);
     LTC6811_Init(Minions); // Initialize peripherals
 
-    RTOS_BPS_MutexPend(&MinionsASIC_Mutex, OS_OPT_PEND_BLOCKING);
+	xSemaphoreTake(MinionsASIC_Mutex, (TickType_t)portMAX_DELAY); 
     LTC6811_wrcfg(NUM_MINIONS, Minions); // Write Configuration Register
-    RTOS_BPS_MutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE);
+	xSemaphoreGive(MinionsASIC_Mutex);
     
     wakeup_sleep(NUM_MINIONS);
 
-    RTOS_BPS_MutexPend(&MinionsASIC_Mutex, OS_OPT_PEND_BLOCKING);
+	xSemaphoreTake(MinionsASIC_Mutex, (TickType_t)portMAX_DELAY); 
     LTC6811_rdcfg_safe(NUM_MINIONS, Minions); // Read Configuration Register
-    RTOS_BPS_MutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE);
+	xSemaphoreGive(MinionsASIC_Mutex);
     
 #endif
     // set up the median filter with alternating temperatures of 1000 degrees and 0 degrees
@@ -132,7 +132,7 @@ ErrorStatus Temperature_ChannelConfig(uint8_t tempChannel) {
     // Fourth 2 bytes: 4 LSB of data + END_CODE
 
     //take control of mutex
-    RTOS_BPS_MutexPend(&MinionsASIC_Mutex, OS_OPT_PEND_BLOCKING);
+	xSemaphoreTake(MinionsASIC_Mutex, (TickType_t)portMAX_DELAY); 
     
     for (uint8_t board = 0; board < NUM_MINIONS; board++) {
         /* Clear other mux */
@@ -179,7 +179,7 @@ ErrorStatus Temperature_ChannelConfig(uint8_t tempChannel) {
     RTOS_BPS_DelayUs(200);
     LTC6811_stcomm();
     //release mutex
-    RTOS_BPS_MutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE);
+	xSemaphoreGive(MinionsASIC_Mutex);
 
 #endif
 
@@ -220,7 +220,7 @@ ErrorStatus Temperature_UpdateSingleChannel(uint8_t channel){
     Temperature_SampleADC(MD_422HZ_1KHZ);
 
 #ifndef SIMULATION
-    RTOS_BPS_MutexPend(&MinionsASIC_Mutex, OS_OPT_PEND_BLOCKING);
+	xSemaphoreTake(MinionsASIC_Mutex, (TickType_t)portMAX_DELAY); 
 #endif
     // Convert to Celsius
     for(int board = 0; board < NUM_MINIONS; board++) {
@@ -235,7 +235,7 @@ ErrorStatus Temperature_UpdateSingleChannel(uint8_t channel){
 #endif
     }
 #ifndef SIMULATION
-    RTOS_BPS_MutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE);
+	xSemaphoreGive(MinionsASIC_Mutex);
 #endif
     // increment the median filter index
     medianFilterIdx = (medianFilterIdx + 1) % TEMPERATURE_MEDIAN_FILTER_DEPTH;
@@ -389,9 +389,9 @@ ErrorStatus Temperature_SampleADC(uint8_t ADCMode) {
     LTC6811_adax(ADCMode, AUX_CH_GPIO1); // Start ADC conversion on GPIO1
     LTC6811_pollAdc(); //wait till adc is done returns time taken
 
-    RTOS_BPS_MutexPend(&MinionsASIC_Mutex, OS_OPT_PEND_BLOCKING);
+	xSemaphoreTake(MinionsASIC_Mutex, (TickType_t)portMAX_DELAY); 
     int8_t error = LTC6811_rdaux(AUX_CH_GPIO1, NUM_MINIONS, Minions); // Update Minions with fresh values
-    RTOS_BPS_MutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE);\
+	xSemaphoreGive(MinionsASIC_Mutex);
     
     return error != -1 ? SUCCESS : ERROR;
 

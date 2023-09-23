@@ -26,10 +26,10 @@ void LTC6811_Deadlocks(void *p_arg){
     cell_asic boards[NUM_MINIONS];
     printf("initializing...\n");
     bsp_os_t spi_os;
-    OS_SEM semaphore;
-    RTOS_BPS_SemCreate(&semaphore, "SPI Semaphore", 0);
-    spi_os.pend = (void*)RTOS_BPS_SemPend(&semaphore, OS_OPT_PEND_BLOCKING);
-    spi_os.post = (void*)RTOS_BPS_SemPost(&semaphore, OS_OPT_POST_1);
+    SemaphoreHandle_t semaphore;
+	semaphore = xSemaphoreCreateBinary();
+	xSemaphoreTake(semaphore, (TickType_t)portMAX_DELAY);
+	xSemaphoreGive(semaphore);
 
     BSP_SPI_Init(spi_ltc6811, &spi_os, 0);
     printf("SPI initialized\n");
@@ -43,7 +43,7 @@ void LTC6811_Deadlocks(void *p_arg){
     int arg = 0;
     while (1){
         //for(int i = 0; i < 4; i++) {
-        RTOS_BPS_SemPend(&SafetyCheck_Sem4, OS_OPT_PEND_BLOCKING);
+	xSemaphoreTake(SafetyCheck_Sem4, (TickType_t)portMAX_DELAY);
         //}
 
         printf("running %dth loop, thread 1\n", counter);
@@ -102,10 +102,10 @@ void LTC6811_Deadlocks2(void *p_arg){
     cell_asic boards[NUM_MINIONS];
     printf("initializing...\n");
     bsp_os_t spi_os;
-    OS_SEM semaphore;
-    RTOS_BPS_SemCreate(&semaphore, "SPI Semaphore", 0);
-    spi_os.pend = (void*)RTOS_BPS_SemPend(&semaphore, OS_OPT_PEND_BLOCKING);
-    spi_os.post = (void*)RTOS_BPS_SemPost(&semaphore, OS_OPT_POST_1);
+    SemaphoreHandle_t semaphore;
+	semaphore = xSemaphoreCreateBinary();
+	xSemaphoreTake(semaphore, (TickType_t)portMAX_DELAY);
+	xSemaphoreGive(semaphore);
 
     BSP_SPI_Init(spi_ltc6811, &spi_os, 0);
     printf("SPI initialized\n");
@@ -118,7 +118,7 @@ void LTC6811_Deadlocks2(void *p_arg){
     int counter = 0;
     int arg = 0;
     while (1){
-        RTOS_BPS_SemPost(&SafetyCheck_Sem4, OS_OPT_POST_1);
+	xSemaphoreGive(SafetyCheck_Sem4);
 
         printf("running %dth loop, thread 2\n", counter);
         printf("running Voltage_UpdateMeasurements...\n");
@@ -174,7 +174,7 @@ int main() {
     OS_ERR err;
     OSInit(&err);
 
-    RTOS_BPS_SemCreate(&SafetyCheck_Sem4, "Safety Check Semaphore", 0);
+	SafetyCheck_Sem4 = xSemaphoreCreateBinary();
 
     RTOS_BPS_TaskCreate(&LTC6811_Deadlocks_TCB,				// TCB
 				"LTC6811 Deadlocks Test",	// Task Name (String)

@@ -15,17 +15,17 @@
  * The receive sem4 counts the number of messages
  * currently in the receiving queue.
  */
-static OS_MUTEX CANbus_TxMutex;
-static OS_MUTEX CANbus_RxMutex;
-static OS_SEM	CANbus_MailSem4;
-static OS_SEM	CANbus_ReceiveSem4;
+static SemaphoreHandle_t CANbus_TxMutex;
+static SemaphoreHandle_t CANbus_RxMutex;
+static SemaphoreHandle_t	CANbus_MailSem4;
+static SemaphoreHandle_t	CANbus_ReceiveSem4;
 
 /**
  * @brief   Releases hold of the mailbox semaphore.
  * @note	Do not call directly.
  */
 static void CANbus_Release(void) {
-	RTOS_BPS_SemPost(&CANbus_MailSem4, OS_OPT_POST_1);
+	xSemaphoreGive(CANbus_MailSem4);
 }
 
 /**
@@ -33,7 +33,7 @@ static void CANbus_Release(void) {
  * @note	Do not call directly.
  */
 static void CANbus_CountIncoming(void) {
-	RTOS_BPS_SemPost(&CANbus_ReceiveSem4, OS_OPT_POST_1);
+	xSemaphoreGive(CANbus_ReceiveSem4);
 }
 
 /**
@@ -45,10 +45,10 @@ static void CANbus_CountIncoming(void) {
  */
 void CANbus_Init(bool loopback, bool faultState) {
 	if(!faultState){
-		RTOS_BPS_MutexCreate(&CANbus_TxMutex, "CAN TX Lock");
-		RTOS_BPS_MutexCreate(&CANbus_RxMutex, "CAN RX Lock");
-		RTOS_BPS_SemCreate(&CANbus_MailSem4, "CAN Mailbox Semaphore", 3); // # of mailboxes
-		RTOS_BPS_SemCreate(&CANbus_ReceiveSem4, "CAN Queue Counter Semaphore", 0);
+		CANbus_TxMutex = xSemaphoreCreateMutex();
+		CANbus_RxMutex = xSemaphoreCreateMutex();
+		CANbus_MailSem4 = xSemaphoreCreateCounting(255, 3);
+		CANbus_ReceiveSem4 = xSemaphoreCreateBinary();
 		// Initialize and pass interrupt hooks
     	BSP_CAN_Init(CANbus_CountIncoming, CANbus_Release, faultState, loopback);
 	}else{
@@ -108,12 +108,12 @@ static ErrorStatus CANbus_SendMsg(CANId_t id, CANPayload_t payload) {
 	// This is because the software is responsible for
 	// choosing the mailbox to put the message into,
 	// leaving a possible race condition if not protected.
-	RTOS_BPS_MutexPend(&CANbus_TxMutex, OS_OPT_PEND_BLOCKING);
+	xSemaphoreTake(CANbus_TxMutex, (TickType_t)portMAX_DELAY); 
 
 	// Write the data to the bus
 	ErrorStatus retVal = BSP_CAN_Write(id, txdata, data_length);
 
-	RTOS_BPS_MutexPost(&CANbus_TxMutex, OS_OPT_POST_1);
+	xSemaphoreGive(CANbus_TxMutex);
 
 	return retVal;
 }
@@ -188,7 +188,7 @@ ErrorStatus CANbus_BlockAndSend(CANId_t id, CANPayload_t payload) {
  */
 ErrorStatus CANbus_Send(CANId_t id, CANPayload_t payload) {	
 	// Check to see if a mailbox is available
-	RTOS_BPS_SemPend(&CANbus_MailSem4, OS_OPT_PEND_NON_BLOCKING);
+	xSemaphoreTake(CANbus_MailSem4, 0);
 	// Send the message
 	ErrorStatus result = CANbus_SendMsg(id, payload);
 	if (result == ERROR) {
@@ -199,14 +199,14 @@ ErrorStatus CANbus_Send(CANId_t id, CANPayload_t payload) {
 
 static ErrorStatus CANbus_GetMsg(CANId_t *id, uint8_t *buffer) {
 	// The mutex is require to access the CAN receive queue.
-	RTOS_BPS_MutexPend(&CANbus_RxMutex, OS_OPT_PEND_BLOCKING);
+	xSemaphoreTake(CANbus_RxMutex, (TickType_t)portMAX_DELAY); 
 	// Write the data to the bus
 	uint32_t id_int;
 	uint8_t retVal = BSP_CAN_Read(&id_int, buffer);
 
 	*id = id_int;
 
-	RTOS_BPS_MutexPost(&CANbus_RxMutex, OS_OPT_POST_1);
+	xSemaphoreGive(CANbus_RxMutex);
 
 	return retVal;
 }
@@ -219,7 +219,7 @@ static ErrorStatus CANbus_GetMsg(CANId_t *id, uint8_t *buffer) {
  */
 ErrorStatus CANbus_Receive(CANId_t *id, uint8_t *buffer) {
 	// Check to see if a mailbox is available
-	RTOS_BPS_SemPend(&CANbus_ReceiveSem4, OS_OPT_PEND_NON_BLOCKING);
+	xSemaphoreTake(CANbus_ReceiveSem4, 0);
 	// Send the message
 	return CANbus_GetMsg(id, buffer);
 }
@@ -232,6 +232,6 @@ ErrorStatus CANbus_Receive(CANId_t *id, uint8_t *buffer) {
  */
 ErrorStatus CANbus_WaitToReceive(CANId_t *id, uint8_t *buffer) {
 	// Pend for a mailbox (blocking)
-	RTOS_BPS_SemPend(&CANbus_ReceiveSem4, OS_OPT_PEND_BLOCKING);
+	xSemaphoreTake(CANbus_ReceiveSem4, (TickType_t)portMAX_DELAY);
 	return CANbus_GetMsg(id, buffer);
 }

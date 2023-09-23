@@ -329,7 +329,7 @@
 // 		printf("\n\rPEC: %d\n\r", Minions[current_ic].sctrlb.rx_pec_match);
 // 	}
 // 	//release mutex
-//   	RTOS_BPS_MutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE);
+	xSemaphoreGive(MinionsASIC_Mutex);
 // }
 
 // /** CLI_Contactor

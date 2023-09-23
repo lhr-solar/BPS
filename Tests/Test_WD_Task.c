@@ -2,7 +2,7 @@
 
 #include "common.h"
 #include "config.h"
-#include "os.h"
+#include "FreeRTOS.h"
 #include "RTOS_BPS.h"
 #include "Tasks.h"
 #include "stm32f4xx.h"
@@ -22,9 +22,9 @@ void Task2(void *p_arg){
         BSP_Light_Toggle(EXTRA);
         RTOS_BPS_DelayTick(25);
         // Comment out the following lines to test watchdog timeout
-        RTOS_BPS_MutexPend(&WDog_Mutex, OS_OPT_PEND_BLOCKING);
+	xSemaphoreTake(WDog_Mutex, (TickType_t)portMAX_DELAY); 
         WDog_BitMap = 7;
-        RTOS_BPS_MutexPost(&WDog_Mutex, OS_OPT_POST_NONE);
+	xSemaphoreGive(WDog_Mutex);
     }
 
     exit(0);
@@ -35,7 +35,7 @@ void Task1(void *p_arg){
 
     OS_CPU_SysTickInit(SystemCoreClock / (CPU_INT32U) OSCfg_TickRate_Hz);
 
-    RTOS_BPS_MutexCreate(&WDog_Mutex, "Watchdog Mutex");
+WDog_Mutex = xSemaphoreCreateMutex();
     
     RTOS_BPS_TaskCreate(&Task2_TCB,
                 "Task 2",

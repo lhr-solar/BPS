@@ -4,15 +4,15 @@
 #ifndef RTOS_BPS_H
 #define RTOS_BPS_H
 
-#include "os.h" // for RTOS stuff
+#include "FreeRTOS.h" // for RTOS stuff
 #include <stdint.h> 
 
 // Currently using Micrium
-typedef OS_MUTEX    BPS_OS_MUTEX;
-typedef OS_SEM      BPS_OS_SEM;
+typedef SemaphoreHandle_t    BPS_OS_MUTEX;
+typedef SemaphoreHandle_t      BPS_OS_SEM;
 typedef OS_OPT      BPS_OS_OPT;
 typedef OS_ERR      BPS_OS_ERR;
-typedef OS_SEM      BPS_OS_SEM;
+typedef SemaphoreHandle_t      BPS_OS_SEM;
 typedef OS_TCB      BPS_OS_TCB;
 typedef CPU_TS      BPS_CPU_TS;
 typedef OS_SEM_CTR  BPS_OS_SEM_CTR;

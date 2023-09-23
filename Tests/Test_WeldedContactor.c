@@ -2,7 +2,7 @@
 
 #include "common.h"
 #include "config.h"
-#include "os.h"
+#include "FreeRTOS.h"
 #include "Tasks.h"
 #include "CAN_Queue.h"
 #include "BSP_Lights.h"
@@ -24,11 +24,11 @@ void Task_InitWeldedContactor(void *p_arg) {
 #endif
 
     OS_ERR err;
-    RTOS_BPS_SemCreate(&SafetyCheck_Sem4,
+	SafetyCheck_Sem4 = xSemaphoreCreateBinary();
                 "Safety Check Semaphore",
                 0);
 
-    RTOS_BPS_MutexCreate(&WDog_Mutex, "Watchdog Mutex");
+WDog_Mutex = xSemaphoreCreateMutex();
 
     //2
     RTOS_BPS_TaskCreate(&CheckContactor_TCB,    // TCB
@@ -50,10 +50,10 @@ void Task_InitWeldedContactor(void *p_arg) {
     CAN_Queue_Init();
 
     // Simulate volt, amp, temp, and openwire safety checks passing
-    RTOS_BPS_SemPost(&SafetyCheck_Sem4, OS_OPT_POST_1);
-    RTOS_BPS_SemPost(&SafetyCheck_Sem4, OS_OPT_POST_1);
-    RTOS_BPS_SemPost(&SafetyCheck_Sem4, OS_OPT_POST_1);
-    RTOS_BPS_SemPost(&SafetyCheck_Sem4, OS_OPT_POST_1);
+	xSemaphoreGive(SafetyCheck_Sem4);
+	xSemaphoreGive(SafetyCheck_Sem4);
+	xSemaphoreGive(SafetyCheck_Sem4);
+	xSemaphoreGive(SafetyCheck_Sem4);
 
     //delete task
     OSTaskDel(NULL, &err); // Delete task

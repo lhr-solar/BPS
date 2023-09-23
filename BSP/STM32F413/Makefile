@@ -50,8 +50,10 @@ $(wildcard $(TOP_DIR)/Drivers/Src/*.c)	\
 $(wildcard $(TOP_DIR)/BSP/STM32F413/Src/*.c)	\
 $(wildcard $(TOP_DIR)/CMSIS/DSP_Lib/Source/*.c)	\
 $(wildcard $(TOP_DIR)/BSP/STM32F413/STM32F4xx_StdPeriph_Driver/Src/*.c)	\
-$(wildcard $(RTOS_DIR)/*.c)
-$(wildcard $(RTOS_DIR)/portable/RVDS/ARM_CM4F/*.c)
+$(wildcard $(RTOS_DIR)/*.c)		\
+$(wildcard $(RTOS_DIR)/portable/RVDS/ARM_CM4F/*.c)	\
+$(wildcard $(TOP_DIR)/FreeRTOS-Kernel/*.c)	\
+$(wildcard $(TOP_DIR)/Config/Src/*.c)
 
 MESSAGES = $(wildcard $(TOP_DIR)/Config/Src/*.c)
 
@@ -145,7 +147,8 @@ C_INCLUDES =  \
 -I$(TOP_DIR)/CMSIS/Device/ST/STM32F4xx/Include	\
 -I$(TOP_DIR)/CMSIS/Include	\
 -I$(TOP_DIR)/BSP/STM32F413/STM32F4xx_StdPeriph_Driver/Inc	\
--I$(RTOS_DIR)/include	\
+-I$(TOP_DIR)/FreeRTOS-Kernel/include	\
+-I$(RTOS_DIR)/portable/RVDS/ARM_CM4F/	\
 
 
 # compile gcc flags

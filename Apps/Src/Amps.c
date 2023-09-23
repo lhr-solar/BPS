@@ -6,7 +6,7 @@
 
 #include "Amps.h"
 #include "LTC2315.h"
-#include "RTOS_BPS.h"
+#include "FreeRTOS.h"
 #include "Tasks.h"
 #include "BSP_SPI.h"
 #include "CANbus.h"
@@ -15,18 +15,18 @@
 #include "Simulator.h"
 #endif
 
-static OS_MUTEX AmperesData_Mutex;
+static SemaphoreHandle_t AmperesData_Mutex;
 
-static OS_SEM AmperesIO_Sem;
+static SemaphoreHandle_t AmperesIO_Sem;
 static bsp_os_t spi_os;
 
 #ifdef RTOS
 void Amperes_Pend(){
-    RTOS_BPS_SemPend(&AmperesIO_Sem, OS_OPT_PEND_BLOCKING);
+	xSemaphoreTake(AmperesIO_Sem, (TickType_t)portMAX_DELAY);
 }
 
 void Amperes_Post(){
-    RTOS_BPS_SemPost(&AmperesIO_Sem, OS_OPT_POST_1);
+	xSemaphoreGive(AmperesIO_Sem);
 }
 #endif
 
@@ -46,18 +46,18 @@ static int32_t latestMeasureMilliAmps;
  * Initializes hardware to begin current monitoring.
  */
 void Amps_Init(void) {
-    RTOS_BPS_SemCreate(&AmperesIO_Sem, "AmperesIO Semaphore", 0);
+	AmperesIO_Sem = xSemaphoreCreateBinary();
     spi_os.pend = Amperes_Pend;
     spi_os.post = Amperes_Post;
     LTC2315_Init(spi_os);
-    RTOS_BPS_MutexCreate(&AmperesData_Mutex, "Amperes Mutex");
+    AmperesData_Mutex = xSemaphoreCreateMutex();
 }
 
 /** Amps_UpdateMeasurements
  * Stores and updates the new measurements received
  */
 void Amps_UpdateMeasurements(void) {
-    RTOS_BPS_MutexPend(&AmperesData_Mutex, OS_OPT_PEND_BLOCKING);
+	xSemaphoreTake(AmperesData_Mutex, (TickType_t)portMAX_DELAY); 
     #ifdef SIMULATION
         latestMeasureMilliAmps = Simulator_getCurrent();
         char* msg;
@@ -67,7 +67,7 @@ void Amps_UpdateMeasurements(void) {
     #else 
         latestMeasureMilliAmps = LTC2315_GetCurrent();
     #endif
-    RTOS_BPS_MutexPost(&AmperesData_Mutex, OS_OPT_POST_NONE);
+	xSemaphoreGive(AmperesData_Mutex);
 }
 
 /** Amps_CheckStatus
@@ -82,13 +82,13 @@ SafetyStatus Amps_CheckStatus(int32_t maxTemperature) {
     bool dischargingOnly = maxTemperature > MAX_CHARGE_TEMPERATURE_LIMIT;
     int32_t chargingCurrentLimit = dischargingOnly ? 0 : MAX_CHARGING_CURRENT;
 
-    RTOS_BPS_MutexPend(&AmperesData_Mutex, OS_OPT_PEND_BLOCKING);
+	xSemaphoreTake(AmperesData_Mutex, (TickType_t)portMAX_DELAY); 
     if((latestMeasureMilliAmps >= chargingCurrentLimit)&&(latestMeasureMilliAmps < MAX_CURRENT_LIMIT)){
         status = SAFE;
     } else{
         status = DANGER;
     }
-    RTOS_BPS_MutexPost(&AmperesData_Mutex, OS_OPT_POST_NONE);
+	xSemaphoreGive(AmperesData_Mutex);
     return status;
 }
 

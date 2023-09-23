@@ -3,7 +3,7 @@
 #include "LTC2315.h"
 #include "common.h"
 #include "config.h"
-#include "os.h"
+#include "FreeRTOS.h"
 #include "RTOS_BPS.h"
 #include "Tasks.h"
 #include "stm32f4xx.h"

@@ -34,7 +34,7 @@ void Task_AmperesMonitor(void *p_arg) {
             EnterFaultState();
         } else if((amperesStatus == SAFE) && (!amperesHasBeenChecked)) {
             // Signal to turn on contactor but only signal once
-            RTOS_BPS_SemPost(&SafetyCheck_Sem4, OS_OPT_POST_1);
+	xSemaphoreGive(SafetyCheck_Sem4);
             amperesHasBeenChecked = true;
         }
 
@@ -57,11 +57,11 @@ void Task_AmperesMonitor(void *p_arg) {
         CAN_Queue_Post(CanMsg);
 
         //signal watchdog
-        RTOS_BPS_MutexPend(&WDog_Mutex, OS_OPT_PEND_BLOCKING);
+	xSemaphoreTake(WDog_Mutex, (TickType_t)portMAX_DELAY); 
 
         WDog_BitMap |= WD_AMPERES;
 
-        RTOS_BPS_MutexPost(&WDog_Mutex, OS_OPT_POST_NONE);
+	xSemaphoreGive(WDog_Mutex);
         //delay of 10ms
         RTOS_BPS_DelayMs(10);
     }

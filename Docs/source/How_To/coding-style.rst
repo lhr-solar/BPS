@@ -365,7 +365,7 @@ being shared. All global variables should have comments describing their purpose
 .. code-block:: c
     :linenos:
 
-    static OS_MUTEX VoltageMutex;
+    static SemaphoreHandle_t VoltageMutex;
     static uint16_t Voltages[NUM_BATTERY_MODULES]; //Voltage values gathered
     static int32_t Temperatures[NUM_MINIONS][MAX_TEMP_SENSORS_PER_MINION_BOARD];
 

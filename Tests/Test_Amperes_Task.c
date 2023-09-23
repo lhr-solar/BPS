@@ -53,11 +53,11 @@ void Task1(void *p_arg){
 
     OS_ERR err;
 
-    RTOS_BPS_SemCreate(&SafetyCheck_Sem4,
+	SafetyCheck_Sem4 = xSemaphoreCreateBinary();
                 "Safety Check Semaphore",
                 0);
 
-    RTOS_BPS_MutexCreate(&WDog_Mutex, "Watchdog Mutex");
+WDog_Mutex = xSemaphoreCreateMutex();
 
     // Spawn tasks needed for Amperes readings to affect contactor
     //1
@@ -99,15 +99,15 @@ void Task2(void *p_arg){
     int count = 0;
 
     // get contactor to close without temperature, voltage, or open wire readings
-    RTOS_BPS_SemPost(&SafetyCheck_Sem4, OS_OPT_POST_1);
-    RTOS_BPS_SemPost(&SafetyCheck_Sem4, OS_OPT_POST_1);
-    RTOS_BPS_SemPost(&SafetyCheck_Sem4, OS_OPT_POST_1);
+	xSemaphoreGive(SafetyCheck_Sem4);
+	xSemaphoreGive(SafetyCheck_Sem4);
+	xSemaphoreGive(SafetyCheck_Sem4);
 
     while(1){
-        RTOS_BPS_MutexPend(&WDog_Mutex, OS_OPT_PEND_BLOCKING);
+	xSemaphoreTake(WDog_Mutex, (TickType_t)portMAX_DELAY); 
         WDog_BitMap |= WD_VOLT_TEMP;
         WDog_BitMap |= WD_BALANCING;
-        RTOS_BPS_MutexPost(&WDog_Mutex, OS_OPT_POST_NONE);
+	xSemaphoreGive(WDog_Mutex);
         //delay of 100ms
         RTOS_BPS_DelayTick(10);
 

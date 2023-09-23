@@ -4,7 +4,7 @@
 #include "RTOS_BPS.h"
 #include "BSP_UART.h"
 #include "config.h"
-#include "os.h"
+#include "FreeRTOS.h"
 #include "Tasks.h"
 
 OS_TCB UART_Deadlocks_TCB;
@@ -36,7 +36,7 @@ void UART_Deadlocks(void *p_arg){
 
     while (1){
         //for(int i = 0; i < 4; i++) {
-        RTOS_BPS_SemPend(&SafetyCheck_Sem4, OS_OPT_PEND_BLOCKING);
+	xSemaphoreTake(SafetyCheck_Sem4, (TickType_t)portMAX_DELAY);
         //}
         BSP_UART_Write(str1U, 36, UART_USB);
         BSP_UART_ReadLine(str1U, UART_USB);
@@ -82,7 +82,7 @@ void UART_Deadlocks2(void *p_arg){
     int counter = 0;
 
     while (1){
-        RTOS_BPS_SemPost(&SafetyCheck_Sem4, OS_OPT_POST_ALL);
+	xSemaphoreGive(SafetyCheck_Sem4);
         BSP_UART_Write(str1U, 36, UART_USB);
         BSP_UART_ReadLine(str1U, UART_USB);
         printf("%s\n", str1U);

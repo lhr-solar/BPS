@@ -14,16 +14,16 @@
 OS_TCB Task1_TCB, Task2_TCB;
 CPU_STK Task1_Stk[256];
 CPU_STK Task2_Stk[256];
-OS_SEM semaphore;
+SemaphoreHandle_t semaphore;
 bool initFlag = false;
 
 void pend(void) {
-    RTOS_BPS_SemPend(&semaphore, OS_OPT_PEND_BLOCKING);
+	xSemaphoreTake(semaphore, (TickType_t)portMAX_DELAY);
 }
 
 void post(void) {
     //BSP_Light_On(FAULT);
-    RTOS_BPS_SemPost(&semaphore, OS_OPT_PEND_BLOCKING);
+	xSemaphoreGive(semaphore);
     //BSP_Light_Toggle(OVOLT);
     //for (volatile int i = 0; i < 1000000; i++);
 }
@@ -35,7 +35,7 @@ void Task1(void *p_arg){
     OS_CPU_SysTickInit(SystemCoreClock / (CPU_INT32U) OSCfg_TickRate_Hz);
 
     bsp_os_t spi_os;
-    RTOS_BPS_SemCreate(&semaphore, "SPI Semaphore", 0);
+	semaphore = xSemaphoreCreateBinary();
     spi_os.pend = pend;
     spi_os.post = post;
 

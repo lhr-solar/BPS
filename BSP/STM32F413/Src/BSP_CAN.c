@@ -3,7 +3,7 @@
 #include "BSP_CAN.h"
 #include "Interrupt_Priorities.h"
 #include "stm32f4xx.h"
-#include "os.h"
+#include "FreeRTOS.h"
 #include "Tasks.h"
 
 // The message information that we care to receive

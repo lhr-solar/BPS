@@ -78,16 +78,16 @@ Copyright 2017 Linear Technology Corp. (LTC)
 /*** Code that was added by UTSVT. ***/
 /*********************************************************/
 bsp_os_t spi_os;
-OS_SEM MinionsIO_Sem4;
+SemaphoreHandle_t MinionsIO_Sem4;
 
 // RTOS Setup
 #ifdef RTOS
 void LTC6811_Pend(void) {
-    RTOS_BPS_SemPend(&MinionsIO_Sem4, OS_OPT_PEND_BLOCKING);
+	xSemaphoreTake(MinionsIO_Sem4, (TickType_t)portMAX_DELAY);
 }
 
 void LTC6811_Post(void) {
-    RTOS_BPS_SemPost(&MinionsIO_Sem4, OS_OPT_POST_1);
+	xSemaphoreGive(MinionsIO_Sem4);
 }
 #endif
 
@@ -106,8 +106,8 @@ void LTC6811_Init(cell_asic *battMod){
   //only create the mutex the first time this function is called (called by Voltage_Init() and Temperature_Init())
   static bool mutexExists = false;
   if (mutexExists == false){
-    RTOS_BPS_MutexCreate(&MinionsASIC_Mutex, "Minions ASIC Mutex");
-    RTOS_BPS_SemCreate(&MinionsIO_Sem4, "Minions Sem4", 0);
+MinionsASIC_Mutex = xSemaphoreCreateMutex();
+	MinionsIO_Sem4 = xSemaphoreCreateBinary();
     mutexExists = true;
   }
 

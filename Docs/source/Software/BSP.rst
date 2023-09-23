@@ -90,12 +90,12 @@ Usage
 
         // LTC6811.c
         bsp_os_t spi_os;
-        OS_SEM MinionsIO_Sem4;
+        SemaphoreHandle_t MinionsIO_Sem4;
         void LTC6811_Pend(void) {
             RTOS_BPS_SemPend(&MinionsIO_Sem4, 0, OS_OPT_PEND_BLOCKING, &ts, &err);
         }
         void LTC6811_Post(void) {
-            RTOS_BPS_SemPost(&MinionsIO_Sem4, OS_OPT_POST_1, &err);
+	xSemaphoreGive(MinionsIO_Sem4);
         }
         void LTC6811_Init(void) {
             spi_os.pend = LTC6811_Pend;

@@ -4,7 +4,7 @@
 #define BSP_UART_H
 
 #include "common.h"
-#include "os.h"
+#include "FreeRTOS.h"
 
 //enum to describe what UART port you are trying to access
 typedef enum {UART_USB, UART_BLE, NUM_UART} UART_Port;

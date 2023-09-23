@@ -2,7 +2,7 @@
 
 #include "common.h"
 #include "config.h"
-#include "os.h"
+#include "FreeRTOS.h"
 #include "Tasks.h"
 #ifndef SIMULATION
 #include "stm32f4xx.h"
@@ -33,10 +33,10 @@ void Task2(void *p_arg){    //This task is meant to allow contactor to close
 
     RTOS_BPS_DelayTick(250);
 
-    RTOS_BPS_SemPost(&SafetyCheck_Sem4, OS_OPT_POST_1);
-    RTOS_BPS_SemPost(&SafetyCheck_Sem4, OS_OPT_POST_1);
-    RTOS_BPS_SemPost(&SafetyCheck_Sem4, OS_OPT_POST_1);
-    RTOS_BPS_SemPost(&SafetyCheck_Sem4, OS_OPT_POST_1);
+	xSemaphoreGive(SafetyCheck_Sem4);
+	xSemaphoreGive(SafetyCheck_Sem4);
+	xSemaphoreGive(SafetyCheck_Sem4);
+	xSemaphoreGive(SafetyCheck_Sem4);
 
     BSP_Lights_Init();
    
@@ -57,7 +57,7 @@ void Task1(void *p_arg){
     OS_CPU_SysTickInit();
 #endif
 
-    RTOS_BPS_SemCreate(&SafetyCheck_Sem4, "Safety Check Semaphore", 0);
+	SafetyCheck_Sem4 = xSemaphoreCreateBinary();
 
     RTOS_BPS_TaskCreate(&CheckContactor_TCB,    // TCB
 				"Task_CheckContactor",          // Task Name (String)

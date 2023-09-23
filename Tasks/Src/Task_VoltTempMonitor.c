@@ -40,7 +40,7 @@ void Task_VoltTempMonitor(void *p_arg) {
             EnterFaultState(); 
         } else if((voltageStatus == SAFE) && (!voltageHasBeenChecked)) {
             // Signal to turn on contactor but only signal once
-            RTOS_BPS_SemPost(&SafetyCheck_Sem4, OS_OPT_POST_1);
+	xSemaphoreGive(SafetyCheck_Sem4);
             voltageHasBeenChecked = true;
         }
         //Send measurements to CAN queue
@@ -70,7 +70,7 @@ void Task_VoltTempMonitor(void *p_arg) {
             EnterFaultState();
         } else if((wireStatus == SAFE) && (!openWireHasBeenChecked)) {
             // Signal to turn on contactor but only signal once
-            RTOS_BPS_SemPost(&SafetyCheck_Sem4, OS_OPT_POST_1); 
+	xSemaphoreGive(SafetyCheck_Sem4);
             openWireHasBeenChecked = true;
         }
 
@@ -84,7 +84,7 @@ void Task_VoltTempMonitor(void *p_arg) {
             EnterFaultState();
         } else if((temperatureStatus == SAFE) && (!temperatureHasBeenChecked)) {
             // Signal to turn on contactor but only signal once
-            RTOS_BPS_SemPost(&SafetyCheck_Sem4, OS_OPT_POST_1);
+	xSemaphoreGive(SafetyCheck_Sem4);
             temperatureHasBeenChecked = true;
         } 
         //PID loop - sets fan speed based on avg temperature and desired temperature
@@ -138,11 +138,11 @@ void Task_VoltTempMonitor(void *p_arg) {
         Fans_SetAll(TOPSPEED);
 
         //signal watchdog
-        RTOS_BPS_MutexPend(&WDog_Mutex, OS_OPT_PEND_BLOCKING);
+	xSemaphoreTake(WDog_Mutex, (TickType_t)portMAX_DELAY); 
 
         WDog_BitMap |= WD_VOLT_TEMP; //Set watchdog bits for task
 
-        RTOS_BPS_MutexPost(&WDog_Mutex, OS_OPT_POST_NONE); 
+	xSemaphoreGive(WDog_Mutex);
         
         //delay of 50ms
         RTOS_BPS_DelayMs(20);

@@ -15,34 +15,34 @@
 #include "fifo.h"
 
 static CAN_fifo_t canFifo;
-static OS_SEM canFifo_Sem4;
-static OS_MUTEX canFifo_Mutex;
+static SemaphoreHandle_t canFifo_Sem4;
+static SemaphoreHandle_t canFifo_Mutex;
 
 void CAN_Queue_Init(void) {
-    RTOS_BPS_MutexCreate(&canFifo_Mutex, "CAN queue mutex");
-    RTOS_BPS_SemCreate(&canFifo_Sem4, "CAN queue semaphore", 0);
-    RTOS_BPS_MutexPend(&canFifo_Mutex, OS_OPT_PEND_BLOCKING);
+    canFifo_Mutex = xSemaphoreCreateMutex();
+	canFifo_Sem4 = xSemaphoreCreateBinary();
+	xSemaphoreTake(canFifo_Mutex, (TickType_t)portMAX_DELAY); 
     CAN_fifo_renew(&canFifo);
-    RTOS_BPS_MutexPost(&canFifo_Mutex, OS_OPT_POST_NONE);
+	xSemaphoreGive(canFifo_Mutex);
 }
 
 ErrorStatus CAN_Queue_Post(CANMSG_t message) {
-    RTOS_BPS_MutexPend(&canFifo_Mutex, OS_OPT_PEND_BLOCKING);
+	xSemaphoreTake(canFifo_Mutex, (TickType_t)portMAX_DELAY); 
     bool success = CAN_fifo_put(&canFifo, message);
-    RTOS_BPS_MutexPost(&canFifo_Mutex, OS_OPT_POST_NONE);
+	xSemaphoreGive(canFifo_Mutex);
 
     if (success) {
-        RTOS_BPS_SemPost(&canFifo_Sem4, OS_OPT_POST_1);
+	xSemaphoreGive(canFifo_Sem4);
     }
 
     return success ? SUCCESS : ERROR;
 }
 
 ErrorStatus CAN_Queue_Pend(CANMSG_t *message) {
-    RTOS_BPS_SemPend(&canFifo_Sem4, OS_OPT_PEND_BLOCKING);
-    RTOS_BPS_MutexPend(&canFifo_Mutex, OS_OPT_PEND_BLOCKING);
+	xSemaphoreTake(canFifo_Sem4, (TickType_t)portMAX_DELAY);
+	xSemaphoreTake(canFifo_Mutex, (TickType_t)portMAX_DELAY); 
     bool result = CAN_fifo_get(&canFifo, message);
-    RTOS_BPS_MutexPost(&canFifo_Mutex, OS_OPT_POST_NONE);
+	xSemaphoreGive(canFifo_Mutex);
     return result ? SUCCESS : ERROR;
 }
 

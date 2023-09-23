@@ -12,11 +12,11 @@ void Task_BatteryBalance(void *p_arg) {
     while(1){
         Balancing_Balance(Minions);
         //signal watchdog
-        RTOS_BPS_MutexPend(&WDog_Mutex, OS_OPT_PEND_BLOCKING);
+	xSemaphoreTake(WDog_Mutex, (TickType_t)portMAX_DELAY); 
 
         WDog_BitMap |= WD_BALANCING;
 
-        RTOS_BPS_MutexPost(&WDog_Mutex, OS_OPT_POST_NONE);
+	xSemaphoreGive(WDog_Mutex);
         RTOS_BPS_DelayMs(100);
     }
 }

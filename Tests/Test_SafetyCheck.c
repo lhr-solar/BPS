@@ -95,7 +95,7 @@ void CheckContactor(void *p_arg) {
     // BLOCKING =====================
     // Wait until voltage, open wire, temperature, and current(Amperes) are all checked and safe
     for(int32_t check = 0; check < NUM_FAULT_POINTS; check++) {
-        RTOS_BPS_SemPend(&SafetyCheck_Sem4, OS_OPT_PEND_BLOCKING);
+	xSemaphoreTake(SafetyCheck_Sem4, (TickType_t)portMAX_DELAY);
         printf("CS:%lld\r\n", (int64_t)check);
     }
 
@@ -128,7 +128,7 @@ void VoltTempMonitor(void *p_arg) {
             EnterFaultState();        
         } else if((voltage_status == SAFE) && (!isfirst_voltage_check)) {
             // Signal to turn on contactor but only signal once
-            RTOS_BPS_SemPost(&SafetyCheck_Sem4, OS_OPT_POST_1);
+	xSemaphoreGive(SafetyCheck_Sem4);
             isfirst_voltage_check = true;
         }
 
@@ -141,7 +141,7 @@ void VoltTempMonitor(void *p_arg) {
             EnterFaultState();
         } else if((wire_status == SAFE) && (!isfirst_openwire_Check)) {
             // Signal to turn on contactor but only signal once
-            RTOS_BPS_SemPost(&SafetyCheck_Sem4, OS_OPT_POST_1);
+	xSemaphoreGive(SafetyCheck_Sem4);
             // assert
             isfirst_openwire_Check = true;
         }
@@ -156,7 +156,7 @@ void VoltTempMonitor(void *p_arg) {
             EnterFaultState();
         } else if((temperature_status == SAFE) && (!isfirst_temperature_check)) {
             // Signal to turn on contactor but only signal once
-            RTOS_BPS_SemPost(&SafetyCheck_Sem4, OS_OPT_POST_1);
+	xSemaphoreGive(SafetyCheck_Sem4);
             // assert
             isfirst_temperature_check = true;
         }
@@ -183,7 +183,7 @@ void AmperesMonitor(void *p_arg) {
             EnterFaultState();
         } else if((amperes_status == SAFE) && (!isfirst_amperes_check)) {
             // Signal to turn on contactor but only signal once
-            RTOS_BPS_SemPost(&SafetyCheck_Sem4, OS_OPT_POST_1);
+	xSemaphoreGive(SafetyCheck_Sem4);
             // assert
             isfirst_amperes_check = true;
         }

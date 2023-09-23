@@ -5,7 +5,7 @@
 #include "BSP_Timer.h"
 #include "BSP_UART.h"
 
-#include "os.h"
+#include "FreeRTOS.h"
 #include "Tasks.h"
 #include "stm32f4xx.h"
 #include "BSP_PLL.h"

@@ -3,7 +3,7 @@
 #include "BSP_SPI.h"
 #include "Interrupt_Priorities.h"
 #include "stm32f4xx.h"
-#include "os.h"
+#include "FreeRTOS.h"
 #include "BSP_OS.h"
 #include "stm32f4xx_gpio.h"
 #include "stm32f4xx_rcc.h"
