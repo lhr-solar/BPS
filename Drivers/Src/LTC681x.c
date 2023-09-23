@@ -45,7 +45,7 @@ Copyright 2017 Linear Technology Corp. (LTC)
 #include "LTC6811.h"
 #include "BSP_SPI.h"
 #include "BSP_PLL.h"
-#include "RTOS_BPS.h"
+#include "FreeRTOS.h"
 #include "config.h"
 #include "Tasks.h"
 

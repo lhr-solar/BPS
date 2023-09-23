@@ -6,7 +6,7 @@
 #include "LTC681x.h"
 #include "config.h"
 #include "BSP_SPI.h"
-#include "RTOS_BPS.h"
+#include "FreeRTOS.h"
 #include "Tasks.h"
 
 OS_TCB LTC6811_Deadlocks_TCB;

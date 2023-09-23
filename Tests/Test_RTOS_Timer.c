@@ -9,7 +9,7 @@
 #include "BSP_PLL.h"
 #include "BSP_UART.h"
 #include "BSP_Timer.h"
-#include "RTOS_BPS.h"
+#include "FreeRTOS.h"
 
 /**
  * Test Procedure:

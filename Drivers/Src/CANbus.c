@@ -1,7 +1,7 @@
 /* Copyright (c) 2018-2022 UT Longhorn Racing Solar */
 #include "CANbus.h"
 #include "BSP_CAN.h"
-#include "RTOS_BPS.h"
+#include "FreeRTOS.h"
 #include "Tasks.h"
 
 /* Locking mechanism for the CAN bus.

@@ -2,7 +2,7 @@
 /*RTOS_BPS library includes all the wrapper functions for a functioning RTOS - needed for cleaner code and portability
 */
 
-#include "RTOS_BPS.h"
+#include "FreeRTOS.h"
 #include "os_cfg_app.h"
 #include "Tasks.h"      // for OS errors
 #include "BSP_Timer.h"  // for fine-grained RTOS delays

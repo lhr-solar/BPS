@@ -2,7 +2,7 @@
 #ifndef TASKS_H
 #define TASKS_H
 
-#include "RTOS_BPS.h"
+#include "FreeRTOS.h"
 
 #define TASK_INIT_PRIO                      0
 #define TASK_PETWDOG_PRIO                   1
