@@ -66,42 +66,24 @@ void CANbus_DeInit() {
 }
 
 // Static method, call CANbus_Send or CANbus_BlockAndSend instead
-static ErrorStatus CANbus_SendMsg(CANId_t id, CANPayload_t payload) {
+static ErrorStatus CANbus_SendMsg(CANID_t id, CANPayload_t payload) {
 	uint8_t txdata[8];
 	uint8_t data_length = 0;
+	uint8_t idx = 0;
+	uint8_t payload_size = 0;
 
-	// TODO: is it really best to keep the list of
-	//		 valid messages to be sending in the driver?
-	switch (id) {
-		// Handle messages with one byte of data
-		case TRIP:
-		case ALL_CLEAR:
-		case CONTACTOR_STATE:
-		case WDOG_TRIGGERED:
-		case CAN_ERROR:
-		case CHARGE_ENABLE:
-			data_length = 1;
-			memcpy(txdata, &payload.data.b, sizeof(payload.data.b));
-			break;
+	//set parameters for the CAN message being sent: datalength, idx, txData
+	data_length = CanMetadataLUT[id].len;
+	idx = CanMetadataLUT[id].idx_used;
+	void * canData = (data_length > 1) ? (void*) &payload.data.w : (void*) &payload.data.b;
+	payload_size = (data_length > 1) ? sizeof(payload.data.w) : sizeof(payload.data.b);
 
-		// Handle messages with 4 byte data
-		case CURRENT_DATA:
-		case SOC_DATA:
-			data_length = 4;
-			memcpy(txdata, &payload.data.w, sizeof(payload.data.w));
-			break;
-
-		// Handle messages with idx + 4 byte data
-		case VOLT_DATA:
-		case TEMP_DATA:
-			data_length = 5;
-			txdata[0] = payload.idx;
-			memcpy(&txdata[1], &payload.data.w, sizeof(payload.data.w));
-			break;
-
-		// Handle invalid messages
-		default:
-			return ERROR;	// Do nothing if invalid
+	//Copies over payload data into CAN txdata 
+	if (idx) {
+		txdata[0] = payload.idx;
+		memcpy(&txdata[1], canData, payload_size);
+	} else {
+		memcpy(txdata, canData, payload_size);
 	}
 
 	// The mutex is require to access the CAN bus.
@@ -118,42 +100,24 @@ static ErrorStatus CANbus_SendMsg(CANId_t id, CANPayload_t payload) {
 	return retVal;
 }
 
-ErrorStatus CANbus_SendMsg_FaultState(CANId_t id, CANPayload_t payload) {
+ErrorStatus CANbus_SendMsg_FaultState(CANID_t id, CANPayload_t payload) {
 	uint8_t txdata[8];
 	uint8_t data_length = 0;
+	uint8_t idx = 0;
+	uint8_t payload_size;
 
-	// TODO: is it really best to keep the list of
-	//		 valid messages to be sending in the driver?
-	switch (id) {
-		// Handle messages with one byte of data
-		case TRIP:
-		case ALL_CLEAR:
-		case CONTACTOR_STATE:
-		case WDOG_TRIGGERED:
-		case CAN_ERROR:
-		case CHARGE_ENABLE:
-			data_length = 1;
-			memcpy(txdata, &payload.data.b, sizeof(payload.data.b));
-			break;
+	//set parameters for the CAN message being sent: datalength, idx, txData
+	data_length = CanMetadataLUT[id].len;
+	idx = CanMetadataLUT[id].idx_used;
+	void * canData = (data_length > 1) ? (void*) &payload.data.w : (void*) &payload.data.b;
+	payload_size = (data_length > 1) ? sizeof(payload.data.w) : sizeof(payload.data.b);
 
-		// Handle messages with 4 byte data
-		case CURRENT_DATA:
-		case SOC_DATA:
-			data_length = 4;
-			memcpy(txdata, &payload.data.w, sizeof(payload.data.w));
-			break;
-
-		// Handle messages with idx + 4 byte data
-		case VOLT_DATA:
-		case TEMP_DATA:
-			data_length = 5;
-			txdata[0] = payload.idx;
-			memcpy(&txdata[1], &payload.data.w, sizeof(payload.data.w));
-			break;
-
-		// Handle invalid messages
-		default:
-			return ERROR;	// Do nothing if invalid
+	//Copies over payload data into CAN txdata 
+	if (idx) {
+		txdata[0] = payload.idx;
+		memcpy(&txdata[1], canData, payload_size);
+	} else {
+		memcpy(txdata, canData, payload_size);
 	}
 
 	while (BSP_CAN_Write(id, txdata, data_length) == ERROR);
@@ -167,7 +131,7 @@ ErrorStatus CANbus_SendMsg_FaultState(CANId_t id, CANPayload_t payload) {
  * @param   payload : the data that will be sent.
  * @return  ERROR if error, SUCCESS otherwise
  */
-ErrorStatus CANbus_BlockAndSend(CANId_t id, CANPayload_t payload) {
+ErrorStatus CANbus_BlockAndSend(CANID_t id, CANPayload_t payload) {
 	// Pend for a mailbox (blocking)
 	RTOS_BPS_SemPend(&CANbus_MailSem4,OS_OPT_PEND_BLOCKING);
 	ErrorStatus result = CANbus_SendMsg(id, payload);
@@ -186,7 +150,7 @@ ErrorStatus CANbus_BlockAndSend(CANId_t id, CANPayload_t payload) {
  * @param   payload : the data that will be sent.
  * @return  ERROR if data wasn't sent, otherwise it was sent.
  */
-ErrorStatus CANbus_Send(CANId_t id, CANPayload_t payload) {	
+ErrorStatus CANbus_Send(CANID_t id, CANPayload_t payload) {	
 	// Check to see if a mailbox is available
 	RTOS_BPS_SemPend(&CANbus_MailSem4, OS_OPT_PEND_NON_BLOCKING);
 	// Send the message
@@ -197,7 +161,7 @@ ErrorStatus CANbus_Send(CANId_t id, CANPayload_t payload) {
 	return result;
 }
 
-static ErrorStatus CANbus_GetMsg(CANId_t *id, uint8_t *buffer) {
+static ErrorStatus CANbus_GetMsg(CANID_t *id, uint8_t *buffer) {
 	// The mutex is require to access the CAN receive queue.
 	RTOS_BPS_MutexPend(&CANbus_RxMutex, OS_OPT_PEND_BLOCKING);
 	// Write the data to the bus
@@ -217,7 +181,7 @@ static ErrorStatus CANbus_GetMsg(CANId_t *id, uint8_t *buffer) {
  * @param   buffer : pointer to payload buffer
  * @return  ERROR if there was no message, SUCCESS otherwise.
  */
-ErrorStatus CANbus_Receive(CANId_t *id, uint8_t *buffer) {
+ErrorStatus CANbus_Receive(CANID_t *id, uint8_t *buffer) {
 	// Check to see if a mailbox is available
 	RTOS_BPS_SemPend(&CANbus_ReceiveSem4, OS_OPT_PEND_NON_BLOCKING);
 	// Send the message
@@ -230,8 +194,18 @@ ErrorStatus CANbus_Receive(CANId_t *id, uint8_t *buffer) {
  * @param   buffer : pointer to payload buffer
  * @return  ERROR if there was an error, SUCCESS otherwise.
  */
-ErrorStatus CANbus_WaitToReceive(CANId_t *id, uint8_t *buffer) {
+ErrorStatus CANbus_WaitToReceive(CANID_t *id, uint8_t *buffer) {
 	// Pend for a mailbox (blocking)
 	RTOS_BPS_SemPend(&CANbus_ReceiveSem4, OS_OPT_PEND_BLOCKING);
 	return CANbus_GetMsg(id, buffer);
 }
+
+
+
+// /**
+//  * New Updated CANBUS driver functions (based off Sunlight and Controls)
+// */
+
+// ErrorStatus CAN_Receive() {
+
+// }
