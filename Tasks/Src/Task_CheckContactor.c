@@ -30,10 +30,10 @@ void Task_CheckContactor(void *p_arg) {
     Contactor_On(HVLOW_CONTACTOR);
 
     // Push All Clear message to CAN Q
-    CanMsg.id = ALL_CLEAR;
+    CanMsg.id = BPS_ALL_CLEAR;
     CAN_Queue_Post(CanMsg);
     // Push Contactor State message to CAN Q
-    CanMsg.id = CONTACTOR_STATE;
+    CanMsg.id = BPS_CONTACTOR_STATE;
     CAN_Queue_Post(CanMsg);
 
     while(1) {

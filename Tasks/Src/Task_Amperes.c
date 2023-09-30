@@ -52,7 +52,7 @@ void Task_AmperesMonitor(void *p_arg) {
         // Send state of charge to CAN queue
         CanData.w = Charge_GetPercent();
         CanPayload.data = CanData;
-        CanMsg.id = SOC_DATA;
+        CanMsg.id = STATE_OF_CHARGE_DATA;
         CanMsg.payload = CanPayload;
         CAN_Queue_Post(CanMsg);
 
