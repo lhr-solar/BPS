@@ -67,8 +67,3 @@ void Print_Queue_Pend(char *message, unsigned int *len) {
     }
 }
 
-bool New_Line_Check(char *buffer){
-    char topChar;
-    Print_Fifo_peek(&printFifo, &topChar);
-    return (topChar == '\n');
-}
