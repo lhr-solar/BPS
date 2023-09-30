@@ -6,6 +6,7 @@
 #include "RTOS_BPS.h"
 #ifndef SIMULATION
 #include "stm32f4xx.h"
+#include "Print_Queue.h"
 #endif
 
 void Task_Init(void *p_arg) {
@@ -103,6 +104,7 @@ void Task_Init(void *p_arg) {
             TASK_IDLE_STACK_SIZE);
     
     CAN_Queue_Init();
+    Print_Queue_Init();
 
     //delete task
     OSTaskDel(NULL, &err); // Delete task

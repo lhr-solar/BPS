@@ -11,8 +11,6 @@ void Task_Print(void *p_arg) {
 
     char message;
     unsigned int len;
-    
-    Print_Queue_Init();
 
     while(1) {
         // BLOCKING =====================
@@ -20,6 +18,6 @@ void Task_Print(void *p_arg) {
         Print_Queue_Pend(&message, &len);
         
         //Port 2 for now
-        BSP_UART_Write(&message, len, 2);
+        BSP_UART_Write(&message, len, UART_USB);
     }
 }

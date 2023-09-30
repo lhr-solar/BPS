@@ -2,45 +2,74 @@
 #include "Tasks.h"
 #include "stm32f4xx.h"
 #include "BSP_PLL.h"
+#include "BSP_UART.h"
+#include "Print_Queue.h"
 
 // Used by Task1
-OS_TCB Task1_TCB;
-CPU_STK Task1_Stk[DEFAULT_STACK_SIZE];
+OS_TCB Init_Task_TCB;
+CPU_STK Init_Task_Stk[DEFAULT_STACK_SIZE];
+
+OS_TCB Print_Spammer_TCB;
+CPU_STK Print_Spammer_Stk[DEFAULT_STACK_SIZE];
 
 OS_TCB Print_Task_TCB;
 CPU_STK Print_Task_Stk[DEFAULT_STACK_SIZE];
 
-void Task_Print();
+void Print_Spammer(){
+    int n = 1;
+    while(n < 20){
+        printf("Print #%d\r\n", n);
+        n++;
+    }
+}
 
-void Task1(void *p_arg) {
+void Init_Task(void *p_arg) {
     OS_CPU_SysTickInit(SystemCoreClock / (CPU_INT32U) OSCfg_TickRate_Hz);
 
+        //char* test = "PRINTTASK\n";
+        //BSP_UART_Write(test, 11, UART_USB);
+
     // Spawn CANBUS Consumer, PRIO 7
-    RTOS_BPS_TaskCreate(&Print_Task_TCB,				// TCB
-            "TASK_Print",	// Task Name (String)
-            Task_Print,			// Task function pointer
+    RTOS_BPS_TaskCreate(&Print_Spammer_TCB,				// TCB
+            "Print_Spammer",	// Task Name (String)
+            Print_Spammer,			// Task function pointer
             (void *)0,
-            6,			// Priority
-            Print_Task_Stk,	// Watermark limit for debugging
+            9,			// Priority
+            Print_Spammer_Stk,	// Watermark limit for debugging
             DEFAULT_STACK_SIZE);
+    
+    RTOS_BPS_TaskCreate(&Print_Task_TCB,
+            "Print_Task",
+            Task_Print,
+            (void *)0,
+            6,
+            Print_Task_Stk,
+            DEFAULT_STACK_SIZE);
+}
+
+void foo(void){
+    return;
 }
 
 int main(void) {
     OS_ERR err;
     BSP_PLL_Init();
+    BSP_UART_Init(foo, foo, UART_USB);
+    Print_Queue_Init();
 
     OSInit(&err);
     assertOSError(err);
 
-    RTOS_BPS_TaskCreate(&Task1_TCB,
-                "Task 1",
-                Task1,
+    RTOS_BPS_TaskCreate(&Init_Task_TCB,
+                "Init_Task",
+                Init_Task,
                 (void *)0,
                 1,
-                Task1_Stk,
+                Init_Task_Stk,
                 256);
     assertOSError(err);
 
     OSStart(&err);
+    assertOSError(err);
 }
 
