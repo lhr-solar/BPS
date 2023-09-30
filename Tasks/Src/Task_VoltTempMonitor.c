@@ -67,7 +67,7 @@ void Task_VoltTempMonitor(void *p_arg) {
                 CanData.w = (int)(voltage_totals[i] / ODR_VOLTAGE_AVERAGING);
                 CanPayload.data = CanData;
                 CanMsg.payload = CanPayload;
-                CAN_Queue_Post(CanMsg);
+                CAN_TransmitQueue_Post(CanMsg);
 
                 voltage_totals[i] = 0;
             }
@@ -128,7 +128,7 @@ void Task_VoltTempMonitor(void *p_arg) {
             CanData.b = 0;
             CanPayload.data = CanData;
             CanMsg.payload = CanPayload;
-            CAN_Queue_Post(CanMsg);
+            CAN_TransmitQueue_Post(CanMsg);
         }
         else {
             //if the temperature gets low enough, suggest battery can be charged
@@ -137,7 +137,7 @@ void Task_VoltTempMonitor(void *p_arg) {
             CanData.b = 1;
             CanPayload.data = CanData;
             CanMsg.payload = CanPayload;
-            CAN_Queue_Post(CanMsg);
+            CAN_TransmitQueue_Post(CanMsg);
         }
         //Send measurements to CAN queue
         CanMsg.id = TEMPERATURE_DATA_ARRAY;
@@ -148,7 +148,7 @@ void Task_VoltTempMonitor(void *p_arg) {
                     CanData.w = (uint32_t)Temperature_GetSingleTempSensor(i, j);
                     CanPayload.data = CanData;
                     CanMsg.payload = CanPayload;
-                    CAN_Queue_Post(CanMsg);
+                    CAN_TransmitQueue_Post(CanMsg);
                 }
             }
         }
