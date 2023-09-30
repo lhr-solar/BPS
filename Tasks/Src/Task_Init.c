@@ -4,9 +4,9 @@
 #include "CAN_Queue.h"
 #include "Contactor.h"
 #include "RTOS_BPS.h"
+#include "Print_Queue.h"
 #ifndef SIMULATION
 #include "stm32f4xx.h"
-#include "Print_Queue.h"
 #endif
 
 void Task_Init(void *p_arg) {
