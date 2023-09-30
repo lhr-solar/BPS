@@ -47,14 +47,14 @@ void Task_AmperesMonitor(void *p_arg) {
 		CanPayload.data = CanData;
 		CanMsg.id = CURRENT_DATA;
 		CanMsg.payload = CanPayload;
-        CAN_Queue_Post(CanMsg);         // send data to CAN
+        CAN_TransmitQueue_Post(CanMsg);         // send data to CAN
 
         // Send state of charge to CAN queue
         CanData.w = Charge_GetPercent();
         CanPayload.data = CanData;
         CanMsg.id = STATE_OF_CHARGE_DATA;
         CanMsg.payload = CanPayload;
-        CAN_Queue_Post(CanMsg);
+        CAN_TransmitQueue_Post(CanMsg);
 
         //signal watchdog
         RTOS_BPS_MutexPend(&WDog_Mutex, OS_OPT_PEND_BLOCKING);

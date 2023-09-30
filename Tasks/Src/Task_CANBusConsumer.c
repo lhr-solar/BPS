@@ -15,7 +15,7 @@ void Task_CANBusConsumer(void *p_arg) {
     while(1) {
         // BLOCKING =====================
         // Wait for CAN Q to have message
-        CAN_Queue_Pend(&message);
+        CAN_TransmitQueue_Pend(&message);
         CANbus_BlockAndSend(message.id, message.payload);
     }
 }

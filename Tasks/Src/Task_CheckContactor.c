@@ -31,10 +31,10 @@ void Task_CheckContactor(void *p_arg) {
 
     // Push All Clear message to CAN Q
     CanMsg.id = BPS_ALL_CLEAR;
-    CAN_Queue_Post(CanMsg);
+    CAN_TransmitQueue_Post(CanMsg);
     // Push Contactor State message to CAN Q
     CanMsg.id = BPS_CONTACTOR_STATE;
-    CAN_Queue_Post(CanMsg);
+    CAN_TransmitQueue_Post(CanMsg);
 
     while(1) {
         //delay of 250ms

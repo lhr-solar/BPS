@@ -199,13 +199,3 @@ ErrorStatus CANbus_WaitToReceive(CANID_t *id, uint8_t *buffer) {
 	RTOS_BPS_SemPend(&CANbus_ReceiveSem4, OS_OPT_PEND_BLOCKING);
 	return CANbus_GetMsg(id, buffer);
 }
-
-
-
-// /**
-//  * New Updated CANBUS driver functions (based off Sunlight and Controls)
-// */
-
-// ErrorStatus CAN_Receive() {
-
-// }
