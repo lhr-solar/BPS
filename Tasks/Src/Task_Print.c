@@ -9,15 +9,15 @@
 void Task_Print(void *p_arg) {
     (void)p_arg;
 
-    char message;
-    unsigned int len;
+    char message[100] = {0};
+    uint32_t len = 0;
 
     while(1) {
         // BLOCKING =====================
         // Wait for Print Queue to Dump
-        Print_Queue_Pend(&message, &len);
+        Print_Queue_Pend(message, &len);
         
         //Port 2 for now
-        BSP_UART_Write(&message, len, UART_USB);
+        BSP_UART_Write(message, len, UART_USB);
     }
 }

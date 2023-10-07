@@ -7,6 +7,7 @@
 #define PRINT_QUEUE_H
 
 #include <stdbool.h>
+#include <stdint.h> 
 
 /**
  * @brief Initializes the print queue
@@ -18,10 +19,9 @@ void Print_Queue_Init(void);
 /**
  * @brief Initializes the print queue
  * @param buffer String of formatted text to be added to the buffer
- * @param len Length of formatted string
  * @return If the write was successful (there was room in the buffer)
  */
-bool Print_Queue_Append(char *buffer, uint32_t len);
+bool Print_Queue_Append(char *buffer);
 
  /**
  * @brief Blocks until the queue is ready to be dumped
@@ -30,5 +30,8 @@ bool Print_Queue_Append(char *buffer, uint32_t len);
  * @return none
  */
 void Print_Queue_Pend(char *buffer, uint32_t *len);
+
+
+void RTOS_BPS_Printf(const char *format, ...);
 
 #endif

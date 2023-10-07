@@ -9,10 +9,9 @@
 #define STDERR_FILENO 2
 
 int _write(int fd, char *buffer, unsigned int len) {
+    //Add stuff to thread-safe OS level queue instead of BSP callsS
 
-    //Add stuff to thread-safe OS level queue instead of BSP calls
-
-    Print_Queue_Append(buffer, len);
+    Print_Queue_Append(buffer);
 
     return len;
 }
