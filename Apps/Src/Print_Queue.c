@@ -13,6 +13,8 @@
 
 static Print_Fifo_t printFifo;
 static OS_SEM printFifo_Sem;
+static OS_MUTEX printFifo_Mutex;
+
 
 /**
  * @brief Initializes the print queue
@@ -22,6 +24,7 @@ static OS_SEM printFifo_Sem;
 void Print_Queue_Init() {
     Print_Fifo_renew(&printFifo);
     RTOS_BPS_SemCreate(&printFifo_Sem, "printSem", 0);
+    RTOS_BPS_MutexCreate(&printFifo_Mutex, "PRINT queue mutex");
 }
 
 /**
@@ -32,12 +35,13 @@ void Print_Queue_Init() {
  */
 bool Print_Queue_Append(char *buffer, uint32_t len) {
     uint32_t i = 0;
+    RTOS_BPS_MutexPend(&printFifo_Mutex, OS_OPT_PEND_BLOCKING);
     while(i < len){
         Print_Fifo_put(&printFifo, buffer[i]);
-        RTOS_BPS_SemPost(&printFifo_Sem, OS_OPT_POST_1);
         i++;
+        RTOS_BPS_SemPost(&printFifo_Sem, OS_OPT_POST_1);
     }
-
+    RTOS_BPS_MutexPost(&printFifo_Mutex, OS_OPT_POST_NONE);
     return true;
 }
 
@@ -52,12 +56,14 @@ void Print_Queue_Pend(char *message, uint32_t *len) {
     (*len) = 0;
     while(1){
         RTOS_BPS_SemPend(&printFifo_Sem, OS_OPT_PEND_BLOCKING);
+        RTOS_BPS_MutexPend(&printFifo_Mutex, OS_OPT_PEND_BLOCKING);
         Print_Fifo_get(&printFifo, message);
         (*len)++;
         if ((*message == '\r') || (*message == '\n')){
             return;
         }
         message++;
+        RTOS_BPS_MutexPost(&printFifo_Mutex, OS_OPT_POST_NONE);
     }
 }
 
