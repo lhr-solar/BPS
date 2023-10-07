@@ -70,6 +70,7 @@ void Task_Spam(void *p_arg){
             CanPayload.data = CanData;
             CanMsg.payload = CanPayload;
             CAN_TransmitQueue_Post(CanMsg);
+
         }
 
         // Send message if car should be allowed to charge or not
