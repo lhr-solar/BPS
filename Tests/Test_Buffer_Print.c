@@ -17,10 +17,7 @@ CPU_STK Print_Task_Stk[DEFAULT_STACK_SIZE];
 
 void Print_Spammer(){
     int n = 1;
-    while(n < 20){
-        printf("Print #%d\r\n", n);
-        n++;
-    }
+    printf("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
 }
 
 void Init_Task(void *p_arg) {

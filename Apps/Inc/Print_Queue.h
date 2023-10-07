@@ -8,10 +8,27 @@
 
 #include <stdbool.h>
 
+/**
+ * @brief Initializes the print queue
+ * @param none
+ * @return none
+ */
 void Print_Queue_Init(void);
 
-bool Print_Queue_Append(char *buffer, unsigned int len);
+/**
+ * @brief Initializes the print queue
+ * @param buffer String of formatted text to be added to the buffer
+ * @param len Length of formatted string
+ * @return If the write was successful (there was room in the buffer)
+ */
+bool Print_Queue_Append(char *buffer, uint32_t len);
 
-void Print_Queue_Pend(char *buffer, unsigned int *len);
+ /**
+ * @brief Blocks until the queue is ready to be dumped
+ * @param message String to be dumped from the buffer
+ * @param len Length of string to be dumped
+ * @return none
+ */
+void Print_Queue_Pend(char *buffer, uint32_t *len);
 
 #endif

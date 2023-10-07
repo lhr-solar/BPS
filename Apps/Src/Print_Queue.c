@@ -24,22 +24,17 @@ void Print_Queue_Init() {
     RTOS_BPS_SemCreate(&printFifo_Sem, "printSem", 0);
 }
 
-bool New_Line_Check();
-
 /**
  * @brief Initializes the print queue
  * @param buffer String of formatted text to be added to the buffer
  * @param len Length of formatted string
  * @return If the write was successful (there was room in the buffer)
  */
-bool Print_Queue_Append(char *buffer, unsigned int len) {
-    int i = 0;
+bool Print_Queue_Append(char *buffer, uint32_t len) {
+    uint32_t i = 0;
     while(i < len){
         Print_Fifo_put(&printFifo, buffer[i]);
         RTOS_BPS_SemPost(&printFifo_Sem, OS_OPT_POST_1);
-        //if(buffer[i] == '\n' || Print_Fifo_is_full(&printFifo)){
-            
-        //}
         i++;
     }
 
@@ -48,13 +43,12 @@ bool Print_Queue_Append(char *buffer, unsigned int len) {
 
 
  /**
- * @brief Returns if the queue is ready to be dumped
+ * @brief Blocks until the queue is ready to be dumped
  * @param message String to be dumped from the buffer
  * @param len Length of string to be dumped
  * @return none
  */
-
-void Print_Queue_Pend(char *message, unsigned int *len) {
+void Print_Queue_Pend(char *message, uint32_t *len) {
     (*len) = 0;
     while(1){
         RTOS_BPS_SemPend(&printFifo_Sem, OS_OPT_PEND_BLOCKING);
