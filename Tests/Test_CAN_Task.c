@@ -44,6 +44,10 @@ CPU_STK Task1_Stk[DEFAULT_STACK_SIZE];
 OS_TCB TaskSpam_TCB;
 CPU_STK TaskSpam_Stk[DEFAULT_STACK_SIZE];
 
+// Used by Task_Spam second
+OS_TCB TaskSpam1_TCB;
+CPU_STK TaskSpam_Stk1[DEFAULT_STACK_SIZE];
+
 // Used by Task_Read
 OS_TCB TaskRead_TCB;
 CPU_STK TaskRead_Stk[DEFAULT_STACK_SIZE];
@@ -108,6 +112,60 @@ void Task_Spam(void *p_arg){
     }
 }
 
+void Task_Spam1(void * p_arg) {
+    CANData_t CanData;
+    CANPayload_t CanPayload;
+    CANMSG_t CanMsg;
+
+    //BSP_Lights_Init();
+
+    while (1) {
+        // heartbeat
+        //printf("sending a message\n\r");
+        //BSP_Light_Toggle(RUN);
+
+        //Send fake voltage measurements to CAN queue
+        CanMsg.id = VOLTAGE_DATA_ARRAY;
+        uint32_t voltage = 0;
+        for (int i = 0; i < NUM_BATTERY_MODULES; i++){ //send all battery module voltage data
+            CanPayload.idx = i;
+            voltage += 50; // create fake voltages
+            CanData.w = voltage; //send data in millivolts
+            CanPayload.data = CanData;
+            CanMsg.payload = CanPayload;
+            CAN_TransmitQueue_Post(CanMsg);
+        }
+
+        // Send message if car should be allowed to charge or not
+        // suggest that the battery should not be charged
+        CanMsg.id = CHARGING_ENABLED;
+        CanPayload.idx = 0;
+        CanData.b = false;
+        CanPayload.data = CanData;
+        CanMsg.payload = CanPayload;
+        CAN_TransmitQueue_Post(CanMsg);
+
+        //Send fake temperature measurements to CAN queue
+        CanMsg.id = TEMPERATURE_DATA_ARRAY;
+        CanData.w = 40000;
+        for (uint8_t i = 0; i < NUM_MINIONS; i++){ //send all temperature readings
+            for (uint8_t j = 0; j < MAX_TEMP_SENSORS_PER_MINION_BOARD; j++){
+                if (i * MAX_TEMP_SENSORS_PER_MINION_BOARD + j < NUM_TEMPERATURE_SENSORS){
+                    CanPayload.idx = i * MAX_TEMP_SENSORS_PER_MINION_BOARD + j;
+                    CanData.w += 500; // generate fake temperatures
+                    CanPayload.data = CanData;
+                    CanMsg.payload = CanPayload;
+                    CAN_TransmitQueue_Post(CanMsg);
+                }
+            }
+        }
+
+        // delay for 50ms (half the time volttemp delays for because other threads will also take CPU during the race)
+        RTOS_BPS_DelayTick(5);
+    }
+}
+
+
 void Task_Read(void *p_arg) {
   CANMSG_t message = {0};
   while(1) {
@@ -142,7 +200,7 @@ void Task_Read(void *p_arg) {
     // printf("\n");
 
 
-    RTOS_BPS_DelayTick(5);
+    RTOS_BPS_DelayTick(10);
   }
 }
 
@@ -163,6 +221,13 @@ void Task1(void *p_arg){
             (void *)0,				// Task function args
             6,			            // Priority
             TaskSpam_Stk,	// Watermark limit for debugging
+            DEFAULT_STACK_SIZE);					// return err code}
+    RTOS_BPS_TaskCreate(&TaskSpam1_TCB,				// TCB
+            "TASK_SPAM Second",	// Task Name (String)
+            Task_Spam1,				// Task function pointer
+            (void *)0,				// Task function args
+            7,			            // Priority
+            TaskSpam_Stk1,	// Watermark limit for debugging
             DEFAULT_STACK_SIZE);					// return err code}
 
     RTOS_BPS_TaskCreate(&TaskRead_TCB,
