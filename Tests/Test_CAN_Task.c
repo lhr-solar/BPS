@@ -1,5 +1,5 @@
 /* Copyright (c) 2018-2022 UT Longhorn Racing Solar */
- 
+
 #include "common.h"
 #include "config.h"
 #include "CANbus.h"
@@ -8,6 +8,8 @@
 #include "stm32f4xx.h"
 #include "BSP_Lights.h"
 #include "BSP_PLL.h"
+#include "BSP_UART.h"
+
 #include "CAN_Queue.h"
 
 /******************************************************************************
@@ -42,9 +44,13 @@ CPU_STK Task1_Stk[DEFAULT_STACK_SIZE];
 OS_TCB TaskSpam_TCB;
 CPU_STK TaskSpam_Stk[DEFAULT_STACK_SIZE];
 
-// Used by Task_GetSpam
-OS_TCB TaskGetSpam_TCB;
-CPU_STK TaskGetSpam_Stk[DEFAULT_STACK_SIZE];
+// Used by Task_Read
+OS_TCB TaskRead_TCB;
+CPU_STK TaskRead_Stk[DEFAULT_STACK_SIZE];
+
+void foo(void){
+    return;
+}
 
 // Task to spam CAN messages to test CANBUS Consumer
 // heavily influenced by Task_VoltTempMonitor's CAN code
@@ -58,6 +64,7 @@ void Task_Spam(void *p_arg){
 
     while (1) {
         // heartbeat
+        //printf("sending a message\n\r");
         BSP_Light_Toggle(RUN);
 
         //Send fake voltage measurements to CAN queue
@@ -70,7 +77,6 @@ void Task_Spam(void *p_arg){
             CanPayload.data = CanData;
             CanMsg.payload = CanPayload;
             CAN_TransmitQueue_Post(CanMsg);
-
         }
 
         // Send message if car should be allowed to charge or not
@@ -102,17 +108,38 @@ void Task_Spam(void *p_arg){
     }
 }
 
-void Task_GetSpam(void *p_arg) {
+void Task_Read(void *p_arg) {
   CANMSG_t message = {0};
   while(1) {
-    
-    CAN_ReceiveQueue_Pend(&message);
 
-    printf("CAN message: ");
-    for (int i = 0;i < 8;i++) {
-      printf("byte %d: %d", i, message.payload.data.bytes[i]);
+    CAN_ReceiveQueue_Pend(&message);
+    switch (message.id) {
+      case VOLTAGE_DATA_ARRAY:
+        printf("ID: Voltage data\n\r");
+        break;
+      case CHARGING_ENABLED:
+        printf("ID: Charging Enabled\n\r");
+        break;
+      case TEMPERATURE_DATA_ARRAY:
+        printf("ID: Temp data\n\r");
+        break;
+      default:
+        printf("ID: unknown\n\r");
+        break;
     }
-    printf("\n");
+    printf("CAN message: %x %x %x %x %x %x %x %x\n\r",message.payload.data.bytes[0], 
+                                                      message.payload.data.bytes[1],
+                                                      message.payload.data.bytes[2],
+                                                      message.payload.data.bytes[3],
+                                                      message.payload.data.bytes[4],
+                                                      message.payload.data.bytes[5],
+                                                      message.payload.data.bytes[6],
+                                                      message.payload.data.bytes[7]
+    );
+    // for (int i = 0;i < 8;i++) {
+    //   printf("byte %d: %d", i, message.payload.data.bytes[i]);
+    // }
+    // printf("\n");
 
 
     RTOS_BPS_DelayTick(5);
@@ -125,6 +152,7 @@ void Task1(void *p_arg){
 	OS_CPU_SysTickInit(SystemCoreClock / (CPU_INT32U) OSCfg_TickRate_Hz);
 
     OS_ERR err;
+    printf("created tasks\n\r");
 
     // Spawn a thread to spam CAN messages
     // Has a higher priority than CANBUS Consumer because CAN messages will be sent 
@@ -137,15 +165,14 @@ void Task1(void *p_arg){
             TaskSpam_Stk,	// Watermark limit for debugging
             DEFAULT_STACK_SIZE);					// return err code}
 
-    // Spawn a thread to receive CAN messages
-    RTOS_BPS_TaskCreate(&TaskGetSpam_TCB,				// TCB
-        "TASK_GET_SPAM",	// Task Name (String)
-        Task_GetSpam,				// Task function pointer
-        (void *)0,				// Task function args
-        7,			            // Priority
-        TaskGetSpam_Stk,	// Watermark limit for debugging
-        DEFAULT_STACK_SIZE);					// return err code}
-
+    RTOS_BPS_TaskCreate(&TaskRead_TCB,
+            "TASK_READ",
+            Task_Read,
+            (void *)0,
+            5,
+            TaskRead_Stk,
+            DEFAULT_STACK_SIZE
+            );
 
     // Spawn CANBUS Consumer, PRIO 7
     RTOS_BPS_TaskCreate(&CANBusConsumer_TCB,				// TCB
@@ -155,13 +182,14 @@ void Task1(void *p_arg){
             TASK_CANBUS_CONSUMER_PRIO,			// Priority
             CANBusConsumer_Stk,	// Watermark limit for debugging
             TASK_CANBUS_CONSUMER_STACK_SIZE);					// return err code
+
     RTOS_BPS_TaskCreate(&CANBusProducer_TCB,	// TCB
-            "TASK_CANBUS_PRODUCER",	            // Task Name (String)
-            Task_CANBusProducer,				// Task function pointer
-            (void *)true,				        // Use loopback mode
-            TASK_CANBUS_PRODUCER_PRIO,			// Priority
-            CANBusProducer_Stk,				    // Stack
-            TASK_CANBUS_PRODUCER_STACK_SIZE);
+        "TASK_CANBUS_PRODUCER",	            // Task Name (String)
+        Task_CANBusProducer,				// Task function pointer
+        (void *)true,				        // don't use loopback mode
+        TASK_CANBUS_PRODUCER_PRIO,			// Priority
+        CANBusProducer_Stk,				    // Stack
+        TASK_CANBUS_PRODUCER_STACK_SIZE);
         // Initialize CAN queue
         CAN_Queue_Init();
 	//delete task
@@ -172,6 +200,8 @@ void Task1(void *p_arg){
 int main(void) {
     OS_ERR err;
     BSP_PLL_Init();
+
+    BSP_UART_Init(foo, foo, UART_USB);
 
     OSInit(&err);
     assertOSError(err);
