@@ -7,6 +7,7 @@
 #include "RTOS_BPS.h"
 #include "stdio.h"
 #include <stdarg.h>
+#include "BSP_UART.h"
 
 
 #define FIFO_TYPE char
@@ -34,15 +35,7 @@ void Print_Queue_Init() {
  * @param buffer String of formatted text to be added to the buffer
  * @return If the write was successful (there was room in the buffer)
  */
-// bool Print_Queue_Append(char *buffer) {
-//     va_list args;
-//     char buffer[sizeof(buffer)]; // Adjust buffer size as needed
-//     int len = vsnprintf(buffer, sizeof(buffer), args);
 
-//     Print_Queue_Pend(buffer, len);
-
-//     return true;
-// }
 
 bool Print_Queue_Append(char *buffer) {
     Print_Fifo_put(&printFifo, *buffer);
@@ -71,19 +64,17 @@ void Print_Queue_Pend(char *message, uint32_t *len) {
     return;
 }
 
-void RTOS_BPS_Printf(const char *format, ...){
-    RTOS_BPS_MutexPend(&printCall_Mutex, OS_OPT_PEND_BLOCKING);
-    __va_list args;
-    va_start(args, format);
-    vprintf(format, args);   
-    RTOS_BPS_MutexPost(&printCall_Mutex, OS_OPT_POST_NONE);
-}
 
 void RTOS_BPS_snPrintf(char *buffer, size_t size, const char *format, ...){
     RTOS_BPS_MutexPend(&printCall_Mutex, OS_OPT_PEND_BLOCKING);
-    __va_list args;
+    va_list args;
     va_start(args, format);
-    vsnprintf(buffer, size, format, args);
+    int result = vsnprintf(buffer, size, format, args);
+    va_end(args);
+
+    Print_Queue_Append(*buffer);
+    
+
     RTOS_BPS_MutexPost(&printCall_Mutex, OS_OPT_POST_NONE);
 }
 
