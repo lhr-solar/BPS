@@ -13,7 +13,7 @@ OS_TCB Task1_TCB;
 CPU_STK Task1_Stk[256];
 
 void Task1(void *p_arg){
-    CANId_t id = SOC_DATA;
+    CANID_t id = STATE_OF_CHARGE_DATA;
     CANData_t data;
     data.w = 0xBEEF;
     CANPayload_t payload;
