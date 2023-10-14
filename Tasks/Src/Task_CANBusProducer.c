@@ -14,9 +14,13 @@ void Task_CANBusProducer(void *p_arg) {
       //queue so that other tasks can check can messages and do func based on that
       
       CANMSG_t CANMsg = {0};
-      CANbus_Receive(&CANMsg.id, CANMsg.payload.data.bytes);
+      CANbus_WaitToReceive(&CANMsg.id, CANMsg.payload.data.bytes);
       CANMsg.payload.idx = CanMetadataLUT[CANMsg.id].idx_used;
 
       CAN_ReceiveQueue_Post(CANMsg);
+
+      // printf("receive task \n\r");
+      // RTOS_BPS_DelayMs(10);
+
     }
 }

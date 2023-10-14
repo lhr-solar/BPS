@@ -44,14 +44,16 @@ static void CANbus_CountIncoming(void) {
  * @return  None
  */
 void CANbus_Init(bool loopback, bool faultState) {
-	if(!faultState){
+  static bool initalized = false;
+	if(!faultState && !initalized){
+    initalized = true;
 		RTOS_BPS_MutexCreate(&CANbus_TxMutex, "CAN TX Lock");
 		RTOS_BPS_MutexCreate(&CANbus_RxMutex, "CAN RX Lock");
 		RTOS_BPS_SemCreate(&CANbus_MailSem4, "CAN Mailbox Semaphore", 3); // # of mailboxes
 		RTOS_BPS_SemCreate(&CANbus_ReceiveSem4, "CAN Queue Counter Semaphore", 0);
 		// Initialize and pass interrupt hooks
     	BSP_CAN_Init(CANbus_CountIncoming, CANbus_Release, faultState, loopback);
-	}else{
+	}else if (faultState){
 		BSP_CAN_Init(NULL, NULL, faultState, loopback);
 	}
 
