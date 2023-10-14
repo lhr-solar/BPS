@@ -8,6 +8,8 @@
 
 #include <stdbool.h>
 #include <stdint.h> 
+#include "stddef.h"
+
 
 /**
  * @brief Initializes the print queue
@@ -33,5 +35,7 @@ void Print_Queue_Pend(char *buffer, uint32_t *len);
 
 
 void RTOS_BPS_Printf(const char *format, ...);
+
+void RTOS_BPS_snPrintf(char *buffer, size_t size, const char *format, ...);
 
 #endif

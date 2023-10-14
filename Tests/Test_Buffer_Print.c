@@ -12,11 +12,20 @@ CPU_STK Init_Task_Stk[DEFAULT_STACK_SIZE];
 OS_TCB Print_Spammer_TCB;
 CPU_STK Print_Spammer_Stk[DEFAULT_STACK_SIZE];
 
+OS_TCB Print_Print1_TCB;
+CPU_STK Print_Print1_Stk[DEFAULT_STACK_SIZE];
+
 OS_TCB Print_Task_TCB;
 CPU_STK Print_Task_Stk[DEFAULT_STACK_SIZE];
 
 void Print_Spammer(){
     while(1){RTOS_BPS_Printf("fuck kartik\n\r");}
+}
+
+void Print1(){
+    char* str = "nope\n\r";
+    char output[10];
+    RTOS_BPS_snPrintf(output, sizeof(str), str);
 }
 
 void Init_Task(void *p_arg) {
@@ -34,6 +43,14 @@ void Init_Task(void *p_arg) {
             Print_Spammer_Stk,	// Watermark limit for debugging
             DEFAULT_STACK_SIZE);
     
+    RTOS_BPS_TaskCreate(&Print_Print1_TCB,
+            "Print1",
+            Print1,
+            (void *)0,
+            9,
+            Print_Print1_Stk,
+            DEFAULT_STACK_SIZE);
+
     RTOS_BPS_TaskCreate(&Print_Task_TCB,
             "Print_Task",
             Task_Print,
