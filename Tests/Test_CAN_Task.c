@@ -118,7 +118,7 @@ void Task_Spam(void *p_arg){
         CAN_TransmitQueue_Post(CanMsg);
 
         // delay for 50ms (half the time volttemp delays for because other threads will also take CPU during the race)
-        RTOS_BPS_DelayTick(5);
+        RTOS_BPS_DelayTick(50);
     }
 }
 
@@ -180,7 +180,9 @@ void Task_Read(void *p_arg) {
   CANMSG_t message = {0};
   while(1) {
 
-    CAN_ReceiveQueue_Pend(&message);
+    if(CAN_ReceiveQueue_Pend(&message) == ERROR) {
+      printf("Receive FIFO empty!!! \n\r");
+    }
     switch (message.id) {
       case VOLTAGE_DATA_ARRAY:
         printf("ID: Voltage data\n\r");

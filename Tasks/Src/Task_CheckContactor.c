@@ -8,6 +8,8 @@
 
 void Task_CheckContactor(void *p_arg) {
     (void)p_arg;
+    CANData_t CanData;
+    CANPayload_t CanPayload;
     
     CANMSG_t CanMsg = {.payload = {.idx = 0, .data.b = 1}};
     
@@ -34,7 +36,7 @@ void Task_CheckContactor(void *p_arg) {
     CAN_TransmitQueue_Post(CanMsg);
     // Push Contactor State message to CAN Q
     CanMsg.id = BPS_CONTACTOR_STATE;
-    CAN_TransmitQueue_Post(CanMsg);
+    CAN_TransmitQueue_Post(CanMsg);//TODO this thingie does nothing delete???
 
     while(1) {
         //delay of 250ms
@@ -55,6 +57,18 @@ void Task_CheckContactor(void *p_arg) {
             Contactor_Off(ARRAY_CONTACTOR);
           }
         }
+
+        //Send BPS contactor state
+      static uint8_t contactor_state = 0;
+      CanMsg.id = BPS_CONTACTOR_STATE;
+      CanPayload.idx = 0;
+
+      contactor_state = Contactor_GetState(HVHIGH_CONTACTOR)*4 + Contactor_GetState(HVLOW_CONTACTOR)*2+Contactor_GetState(ARRAY_CONTACTOR);
+      CanData.b = contactor_state;
+      CanPayload.data = CanData;
+      CanMsg.payload = CanPayload;
+      CAN_TransmitQueue_Post(CanMsg);
+        
         
     }
 }
