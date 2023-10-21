@@ -12,12 +12,12 @@
 
 // fifo
 #define FIFO_TYPE CANMSG_t
-#define FIFO_SIZE 256
+#define FIFO_SIZE 512
 #define FIFO_NAME CAN_fifo_TRANSMIT
 #include "fifo.h"
 
 #define FIFO_TYPE CANMSG_t
-#define FIFO_SIZE 256
+#define FIFO_SIZE 512
 #define FIFO_NAME CAN_fifo_RECEIVE
 #include "fifo.h"
 
@@ -102,12 +102,13 @@ ErrorStatus CAN_ReceiveQueue_Post(CANMSG_t message) {
 }
 
 /**
- * @brief: (Blocking) grabs a CANMSG from the receive queue
+ * @brief: (NON Blocking) grabs a CANMSG from the receive queue
  * @param: pointer to CANMSG
  * @return: error status
+ * @note: SemPend (Micrium) will have err = OS_ERR_PEND_WOULD_BLOCK, which is okay
 */
 ErrorStatus CAN_ReceiveQueue_Pend(CANMSG_t *message) {
-    RTOS_BPS_SemPend(&canFifo_Receive_Sem4, OS_OPT_PEND_BLOCKING);
+    RTOS_BPS_SemPend(&canFifo_Receive_Sem4, OS_OPT_PEND_NON_BLOCKING);
     RTOS_BPS_MutexPend(&canFifo_Receive_Mutex, OS_OPT_PEND_BLOCKING);
     bool result = CAN_fifo_RECEIVE_get(&canFifo_RECEIVE, message);
     RTOS_BPS_MutexPost(&canFifo_Receive_Mutex, OS_OPT_POST_NONE);

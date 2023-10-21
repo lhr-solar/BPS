@@ -1,6 +1,7 @@
 /* Copyright (c) 2018-2022 UT Longhorn Racing Solar */
 
 #include "BSP_CAN.h"
+#include "CANMetaData.h"
 #include "Interrupt_Priorities.h"
 #include "stm32f4xx.h"
 #include "os.h"
@@ -95,10 +96,10 @@ void BSP_CAN_Init(callback_t rxEvent, callback_t txEnd, bool faultState, bool lo
     CAN_FilterInitStructure.CAN_FilterNumber = 0;
     CAN_FilterInitStructure.CAN_FilterMode = CAN_FilterMode_IdMask;
     CAN_FilterInitStructure.CAN_FilterScale = CAN_FilterScale_32bit;
-    CAN_FilterInitStructure.CAN_FilterIdHigh = 0x0000;
-    CAN_FilterInitStructure.CAN_FilterIdLow = 0x0000;
-    CAN_FilterInitStructure.CAN_FilterMaskIdHigh = 0x0000;
-    CAN_FilterInitStructure.CAN_FilterMaskIdLow = 0x0000;
+    CAN_FilterInitStructure.CAN_FilterIdHigh = ARRAY_CONTACTOR_STATE_CHANGE << 5;
+    CAN_FilterInitStructure.CAN_FilterIdLow = 0;
+    CAN_FilterInitStructure.CAN_FilterMaskIdHigh = 0xFFFF;
+    CAN_FilterInitStructure.CAN_FilterMaskIdLow = 0xFFFF;
     CAN_FilterInitStructure.CAN_FilterFIFOAssignment = 0;
     CAN_FilterInitStructure.CAN_FilterActivation = ENABLE;
     CAN_FilterInit(CAN1, &CAN_FilterInitStructure);
