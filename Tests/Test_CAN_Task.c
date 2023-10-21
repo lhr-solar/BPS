@@ -107,6 +107,16 @@ void Task_Spam(void *p_arg){
             }
         }
 
+        //send a state change 
+        static uint8_t arrayChange = 0;
+        arrayChange ^= 1;
+        CanMsg.id = ARRAY_CONTACTOR_STATE_CHANGE;
+        CanPayload.idx = 0;
+        CanData.b = arrayChange;
+        CanPayload.data = CanData;
+        CanMsg.payload = CanPayload;
+        CAN_TransmitQueue_Post(CanMsg);
+
         // delay for 50ms (half the time volttemp delays for because other threads will also take CPU during the race)
         RTOS_BPS_DelayTick(5);
     }
@@ -181,6 +191,14 @@ void Task_Read(void *p_arg) {
       case TEMPERATURE_DATA_ARRAY:
         printf("ID: Temp data\n\r");
         break;
+      case ARRAY_CONTACTOR_STATE_CHANGE:
+        printf("ID: Array state changed!!!\n\r");
+        if (message.payload.data.b) {
+          printf("Array Contactor is on!\n\r");
+        } else {
+          printf("Array Contactor is off!!\n\r");
+        }
+        break;
       default:
         printf("ID: unknown\n\r");
         break;
@@ -222,13 +240,13 @@ void Task1(void *p_arg){
             6,			            // Priority
             TaskSpam_Stk,	// Watermark limit for debugging
             DEFAULT_STACK_SIZE);					// return err code}
-    RTOS_BPS_TaskCreate(&TaskSpam1_TCB,				// TCB
-            "TASK_SPAM Second",	// Task Name (String)
-            Task_Spam1,				// Task function pointer
-            (void *)0,				// Task function args
-            7,			            // Priority
-            TaskSpam_Stk1,	// Watermark limit for debugging
-            DEFAULT_STACK_SIZE);					// return err code}
+    // RTOS_BPS_TaskCreate(&TaskSpam1_TCB,				// TCB
+    //         "TASK_SPAM Second",	// Task Name (String)
+    //         Task_Spam1,				// Task function pointer
+    //         (void *)0,				// Task function args
+    //         7,			            // Priority
+    //         TaskSpam_Stk1,	// Watermark limit for debugging
+    //         DEFAULT_STACK_SIZE);					// return err code}
 
     RTOS_BPS_TaskCreate(&TaskRead_TCB,
             "TASK_READ",

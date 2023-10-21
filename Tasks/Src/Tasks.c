@@ -64,9 +64,10 @@ uint8_t Fault_Flag    = 0; //This is a flag that replaces the semaphore in case 
 /**
  * Used to assert if there has been an error in one of the OS functions
  * Kills the car if there is an OS error
+ * Note: we also allow err = OS_ERR_PEND_WOULD_BLOCK to not kill system (for our nonblocking pend)
  **/
 void assertOSError(BPS_OS_ERR err){
-    if(err != OS_ERR_NONE) {
+    if(err != OS_ERR_NONE && err != OS_ERR_PEND_WOULD_BLOCK) {
         Fault_BitMap |= Fault_OS;
         EnterFaultState();
         // We should not get to this point if the call above worked.

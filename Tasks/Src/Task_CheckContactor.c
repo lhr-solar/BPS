@@ -45,6 +45,17 @@ void Task_CheckContactor(void *p_arg) {
             Fault_BitMap |= Fault_ESTOP;
             EnterFaultState();
         }
+
+        // Turn on/off array contactor based on what we receive from controls
+        CAN_ReceiveQueue_Pend(&CanMsg);
+        if (CanMsg.id == ARRAY_CONTACTOR_STATE_CHANGE) {
+          if (CanMsg.payload.data.b) {
+            Contactor_On(ARRAY_CONTACTOR);
+          } else {
+            Contactor_Off(ARRAY_CONTACTOR);
+          }
+        }
+        
     }
 }
 
