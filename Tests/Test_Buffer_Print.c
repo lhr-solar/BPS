@@ -23,22 +23,19 @@ CPU_STK Print_Task_Stk[DEFAULT_STACK_SIZE];
 
 void Basic_Functionality(){
     char* str = "nope\n\r";
-    char output[10];
-    RTOS_BPS_snPrintf(output, sizeof(output), str);
+    RTOS_BPS_snPrintf(str);
 }
 
 void Concurrent_Writes(){
     char* str1 = "nope\n\r";
     char* str2 = "yeppers\n\r";
-    char output[10];
-    RTOS_BPS_snPrintf(output, sizeof(output), str1);
-    RTOS_BPS_snPrintf(output, sizeof(output), str2);
+    RTOS_BPS_snPrintf(str1);
+    RTOS_BPS_snPrintf(str2);
 }
 
 void Overflow_Buffer(){
-    char* str1 = "23165441651516513\n\r";
-    char output[10];
-    RTOS_BPS_snPrintf(output, sizeof(output), str1);
+    char* str1 = "0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678922222222222222222222222222222222222222222222222222222222";
+    RTOS_BPS_snPrintf(str1);
 }
 
 void Init_Task(void *p_arg) {
@@ -77,7 +74,7 @@ void Init_Task(void *p_arg) {
             "Print_Task",
             Task_Print,
             (void *)0,
-            6,
+            1,
             Print_Task_Stk,
             DEFAULT_STACK_SIZE);
 }

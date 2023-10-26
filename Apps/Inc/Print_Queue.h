@@ -36,6 +36,6 @@ void Print_Queue_Pend(char *buffer, uint32_t *len);
 
 void RTOS_BPS_Printf(const char *format, ...);
 
-void RTOS_BPS_snPrintf(char *buffer, size_t size, const char *format, ...);
+void RTOS_BPS_snPrintf(const char *format, ...);
 
 #endif
