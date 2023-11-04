@@ -11,7 +11,7 @@
 
 
 #define FIFO_TYPE char
-#define FIFO_SIZE (128)
+#define FIFO_SIZE (257)
 #define FIFO_NAME Print_Fifo
 #include "fifo.h"
 
@@ -67,7 +67,11 @@ void Print_Queue_Pend(char *message, uint32_t *len) {
     return;
 }
 
-
+/**
+ * @brief Performs a "non-blocking" printf by dumping into a buffer for Task_Print.c
+ * @param string String of formatted text to be added to the buffer
+ * @return none
+ */
 void RTOS_BPS_snPrintf(const char *format, ...){
     RTOS_BPS_MutexPend(&printCall_Mutex, OS_OPT_PEND_BLOCKING);
     va_list args;
@@ -75,10 +79,6 @@ void RTOS_BPS_snPrintf(const char *format, ...){
 
     int result = vsnprintf(NULL, 0, format, args);
     char buffer[256];
-    volatile int x = 1;
-    while(x < 100){
-        x = x + 1;
-    }
     if(result<255){
         vsnprintf(buffer, result+1, format, args);
     }else{

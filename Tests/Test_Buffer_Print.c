@@ -9,8 +9,8 @@
 OS_TCB Init_Task_TCB;
 CPU_STK Init_Task_Stk[DEFAULT_STACK_SIZE];
 
-OS_TCB Print_Basic_Functionality_TCB;
-CPU_STK Print_Basic_Functionality_Stk[DEFAULT_STACK_SIZE];
+OS_TCB Print_Basic_Functionality_Test_TCB;
+CPU_STK Print_Basic_Functionality_Test_Stk[DEFAULT_STACK_SIZE];
 
 OS_TCB Print_Concurrent_Writes_TCB;
 CPU_STK Print_Concurrent_Writes_Stk[DEFAULT_STACK_SIZE];
@@ -18,25 +18,58 @@ CPU_STK Print_Concurrent_Writes_Stk[DEFAULT_STACK_SIZE];
 OS_TCB Print_Overflow_Buffer_TCB;
 CPU_STK Print_Overflow_Buffer_Stk[DEFAULT_STACK_SIZE];
 
+OS_TCB Print_Edge_Case_Buffer_Limit_Test_TCB;
+CPU_STK Print_Edge_Case_Buffer_Limit_Test_Stk[DEFAULT_STACK_SIZE];
+
+OS_TCB Print_Empty_String_Test_TCB;
+CPU_STK Print_Empty_String_Test_Stk[DEFAULT_STACK_SIZE];
+
+OS_TCB Print_Special_Characters_Test_TCB;
+CPU_STK Print_Special_Characters_Test_Stk[DEFAULT_STACK_SIZE];
+
+OS_TCB Print_Format_String_Test_TCB;
+CPU_STK Print_Format_String_Test_Stk[DEFAULT_STACK_SIZE];
+
 OS_TCB Print_Task_TCB;
 CPU_STK Print_Task_Stk[DEFAULT_STACK_SIZE];
 
-void Basic_Functionality(){
-    char* str = "nope\n\r";
+// void Basic_Functionality_Test(){
+//     char* str = "Hello, world!\n\r";
+//     RTOS_BPS_snPrintf(str);
+// }
+
+// void Concurrent_Writes(){
+//     char* str1 = "First\n\r";
+//     char* str2 = "Second\n\r";
+//     RTOS_BPS_snPrintf(str1);
+//     RTOS_BPS_snPrintf(str2);
+// }
+
+void Overflow_Buffer(){
+    char* str = "THIS STRING IS 260 CHARACTERS xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\n\r";
     RTOS_BPS_snPrintf(str);
 }
 
-void Concurrent_Writes(){
-    char* str1 = "nope\n\r";
-    char* str2 = "yeppers\n\r";
-    RTOS_BPS_snPrintf(str1);
-    RTOS_BPS_snPrintf(str2);
-}
+// void Edge_Case_Buffer_Limit_Test(){
+//     char* str1 = "01234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789222222222222222222222222222222222222222222222222222222az";
+//     RTOS_BPS_snPrintf(str1);
+// }
 
-void Overflow_Buffer(){
-    char* str1 = "0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678922222222222222222222222222222222222222222222222222222222";
-    RTOS_BPS_snPrintf(str1);
-}
+// void Empty_String_Test(){
+//     char* str = "";
+//     RTOS_BPS_snPrintf(str);
+// }
+
+// void Special_Characters_Test(){
+//     char* str = "Special chars: \t \n \r %% & * \0";
+//     RTOS_BPS_snPrintf(str);
+// }
+
+// void Format_String_Test(){
+//     char* formatStr = "Formatted number: %d\n\r";
+//     int num = 42;
+//     RTOS_BPS_snPrintf(formatStr, num);
+// }
 
 void Init_Task(void *p_arg) {
     OS_CPU_SysTickInit(SystemCoreClock / (CPU_INT32U) OSCfg_TickRate_Hz);
@@ -46,29 +79,61 @@ void Init_Task(void *p_arg) {
 
     // Spawn CANBUS Consumer, PRIO 7
 
-    RTOS_BPS_TaskCreate(&Print_Basic_Functionality_TCB,     // TCB
-            "Basic_Functionality",                          // Task Name (String)
-            Basic_Functionality,                            // Task Function Pointer
-            (void *)0,                                      
-            2,                                              // Priority (lower is more important)
-            Print_Basic_Functionality_Stk,                  // Watermark Limit for Debugging
-            DEFAULT_STACK_SIZE);
+    // RTOS_BPS_TaskCreate(&Print_Basic_Functionality_Test_TCB,     // TCB
+    //         "Basic_Functionality_Test",                          // Task Name (String)
+    //         Basic_Functionality_Test,                            // Task Function Pointer
+    //         (void *)0,                                      
+    //         2,                                              // Priority (lower is more important)
+    //         Print_Basic_Functionality_Test_Stk,                  // Watermark Limit for Debugging
+    //         DEFAULT_STACK_SIZE);
     
-    RTOS_BPS_TaskCreate(&Print_Concurrent_Writes_TCB,
-            "Concurrent_Writes",
-            Concurrent_Writes,
-            (void *)0,
-            3,
-            Print_Concurrent_Writes_Stk,
-            DEFAULT_STACK_SIZE);
+    // RTOS_BPS_TaskCreate(&Print_Concurrent_Writes_TCB,
+    //         "Concurrent_Writes",
+    //         Concurrent_Writes,
+    //         (void *)0,
+    //         3,
+    //         Print_Concurrent_Writes_Stk,
+    //         DEFAULT_STACK_SIZE);
     
     RTOS_BPS_TaskCreate(&Print_Overflow_Buffer_TCB,
             "Overflow_Buffer",
             Overflow_Buffer,
             (void *)0,
-            3,
+            4,
             Print_Overflow_Buffer_Stk,
             DEFAULT_STACK_SIZE);
+    
+    // RTOS_BPS_TaskCreate(&Print_Edge_Case_Buffer_Limit_Test_TCB,
+    //         "Edge_Case_Buffer_Limit_Test",
+    //         Edge_Case_Buffer_Limit_Test,
+    //         (void *)0,
+    //         5,
+    //         Print_Edge_Case_Buffer_Limit_Test_Stk,
+    //         DEFAULT_STACK_SIZE);
+
+    // RTOS_BPS_TaskCreate(&Print_Empty_String_Test_TCB,
+    //         "Empty_String_Test",
+    //         Empty_String_Test,
+    //         (void *)0,
+    //         6,
+    //         Print_Empty_String_Test_Stk,
+    //         DEFAULT_STACK_SIZE);
+    
+    // RTOS_BPS_TaskCreate(&Print_Special_Characters_Test_TCB,
+    //         "Special_Characters_Test",
+    //         Special_Characters_Test,
+    //         (void *)0,
+    //         7,
+    //         Print_Special_Characters_Test_Stk,
+    //         DEFAULT_STACK_SIZE);
+    
+    // RTOS_BPS_TaskCreate(&Print_Format_String_Test_TCB,
+    //         "Format_String_Test",
+    //         Format_String_Test,
+    //         (void *)0,
+    //         8,
+    //         Print_Format_String_Test_Stk,
+    //         DEFAULT_STACK_SIZE);
 
     RTOS_BPS_TaskCreate(&Print_Task_TCB,
             "Print_Task",

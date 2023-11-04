@@ -33,9 +33,11 @@ bool Print_Queue_Append(char *buffer);
  */
 void Print_Queue_Pend(char *buffer, uint32_t *len);
 
-
-void RTOS_BPS_Printf(const char *format, ...);
-
+/**
+ * @brief Performs a "non-blocking" printf by dumping into a buffer for Task_Print.c
+ * @param string String of formatted text to be added to the buffer
+ * @return none
+ */
 void RTOS_BPS_snPrintf(const char *format, ...);
 
 #endif
