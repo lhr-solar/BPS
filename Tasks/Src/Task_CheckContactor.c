@@ -8,11 +8,10 @@
 
 void Task_CheckContactor(void *p_arg) {
     (void)p_arg;
-    CANData_t CanData;
-    CANPayload_t CanPayload;
     
-    CANMSG_t CanMsg = {.payload = {.idx = 0, .data.b = 1}};
-    
+    CANMSG_t SendCanMsg = {.payload = {.idx = 0, .data.b = 1}};
+    CANMSG_t ReceiveCanMsg = {.payload = {.idx = 0, .data.b = 0}, .id = ARRAY_CONTACTOR_STATE_CHANGE};
+
     BSP_PLL_DelayMs(30); // delay is needed for pull up resistor to stabilize before we check for contactor state
     // If a contactor is on before we turn it on in this task, it may have failed and welded closed
     if (Contactor_GetState(HVHIGH_CONTACTOR) || Contactor_GetState(HVLOW_CONTACTOR)) {
@@ -32,11 +31,11 @@ void Task_CheckContactor(void *p_arg) {
     Contactor_On(HVLOW_CONTACTOR);
 
     // Push All Clear message to CAN Q
-    CanMsg.id = BPS_ALL_CLEAR;
-    CAN_TransmitQueue_Post(CanMsg);
-    // Push Contactor State message to CAN Q
-    CanMsg.id = BPS_CONTACTOR_STATE;
-    CAN_TransmitQueue_Post(CanMsg);//TODO this thingie does nothing delete???
+    SendCanMsg.id = BPS_ALL_CLEAR;
+    CAN_TransmitQueue_Post(SendCanMsg);
+
+    //Set send can ID to BPS_CONTACTOR_STATE now
+    SendCanMsg.id = BPS_CONTACTOR_STATE;
 
     while(1) {
         //delay of 250ms
@@ -49,25 +48,20 @@ void Task_CheckContactor(void *p_arg) {
         }
 
         // Turn on/off array contactor based on what we receive from controls
-        CAN_ReceiveQueue_Pend(&CanMsg);
-        if (CanMsg.id == ARRAY_CONTACTOR_STATE_CHANGE) {
-          if (CanMsg.payload.data.b) {
+        CAN_ReceiveQueue_Pend(&ReceiveCanMsg);
+        if (ReceiveCanMsg.id == ARRAY_CONTACTOR_STATE_CHANGE) {
+          if (ReceiveCanMsg.payload.data.b) {
             Contactor_On(ARRAY_CONTACTOR);
           } else {
             Contactor_Off(ARRAY_CONTACTOR);
           }
         }
 
-        //Send BPS contactor state
-      static uint8_t contactor_state = 0;
-      CanMsg.id = BPS_CONTACTOR_STATE;
-      CanPayload.idx = 0;
-
-      contactor_state = Contactor_GetState(HVHIGH_CONTACTOR)*4 + Contactor_GetState(HVLOW_CONTACTOR)*2+Contactor_GetState(ARRAY_CONTACTOR);
-      CanData.b = contactor_state;
-      CanPayload.data = CanData;
-      CanMsg.payload = CanPayload;
-      CAN_TransmitQueue_Post(CanMsg);
+        //Send BPS contactor state via CAN
+        SendCanMsg.payload.data.b = (Contactor_GetState(HVHIGH_CONTACTOR) << 2) + 
+                                    (Contactor_GetState(HVLOW_CONTACTOR) << 1) +
+                                    Contactor_GetState(ARRAY_CONTACTOR);
+        CAN_TransmitQueue_Post(SendCanMsg);
         
         
     }

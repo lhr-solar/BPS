@@ -44,9 +44,9 @@ static void CANbus_CountIncoming(void) {
  * @return  None
  */
 void CANbus_Init(bool loopback, bool faultState) {
-  static bool initalized = false;
-	if(!faultState && !initalized){
-    initalized = true;
+  static bool initialized = false;
+	if(!faultState && !initialized){
+    initialized = true;
 		RTOS_BPS_MutexCreate(&CANbus_TxMutex, "CAN TX Lock");
 		RTOS_BPS_MutexCreate(&CANbus_RxMutex, "CAN RX Lock");
 		RTOS_BPS_SemCreate(&CANbus_MailSem4, "CAN Mailbox Semaphore", 3); // # of mailboxes
@@ -69,19 +69,15 @@ void CANbus_DeInit() {
 
 // Static method, call CANbus_Send or CANbus_BlockAndSend instead
 static ErrorStatus CANbus_SendMsg(CANID_t id, CANPayload_t payload) {
+	//set parameters for the CAN message being sent: datalength, idx_used
 	uint8_t txdata[8];
-	uint8_t data_length = 0;
-	uint8_t idx = 0;
-	uint8_t payload_size = 0;
-
-	//set parameters for the CAN message being sent: datalength, idx, txData
-	data_length = CanMetadataLUT[id].len;
-	idx = CanMetadataLUT[id].idx_used;
-	void * canData = (data_length > 1) ? (void*) &payload.data.w : (void*) &payload.data.b;
-	payload_size = (data_length > 1) ? sizeof(payload.data.w) : sizeof(payload.data.b);
+	bool idx_used = CanMetadataLUT[id].idx_used;
+	uint8_t payload_size = CanMetadataLUT[id].len;
+	uint8_t data_length = payload_size + (idx_used ? 1 : 0);
+	void* canData = (void*) &payload.data;
 
 	//Copies over payload data into CAN txdata 
-	if (idx) {
+	if (idx_used) {
 		txdata[0] = payload.idx;
 		memcpy(&txdata[1], canData, payload_size);
 	} else {
@@ -103,19 +99,15 @@ static ErrorStatus CANbus_SendMsg(CANID_t id, CANPayload_t payload) {
 }
 
 ErrorStatus CANbus_SendMsg_FaultState(CANID_t id, CANPayload_t payload) {
+	//set parameters for the CAN message being sent: datalength, idx_used
 	uint8_t txdata[8];
-	uint8_t data_length = 0;
-	uint8_t idx = 0;
-	uint8_t payload_size;
-
-	//set parameters for the CAN message being sent: datalength, idx, txData
-	data_length = CanMetadataLUT[id].len;
-	idx = CanMetadataLUT[id].idx_used;
-	void * canData = (data_length > 1) ? (void*) &payload.data.w : (void*) &payload.data.b;
-	payload_size = (data_length > 1) ? sizeof(payload.data.w) : sizeof(payload.data.b);
-
+	bool idx_used = CanMetadataLUT[id].idx_used;
+	uint8_t payload_size = CanMetadataLUT[id].len;
+	uint8_t data_length = payload_size + (idx_used ? 1 : 0);
+	void* canData = (void*) &payload.data;
+	
 	//Copies over payload data into CAN txdata 
-	if (idx) {
+	if (idx_used) {
 		txdata[0] = payload.idx;
 		memcpy(&txdata[1], canData, payload_size);
 	} else {
