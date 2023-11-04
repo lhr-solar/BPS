@@ -9,7 +9,7 @@
 void Task_Print(void *p_arg) {
     (void)p_arg;
 
-    char message[100] = {0};
+    char message[257] = {0};
     uint32_t len = 0;
 
     while(1) {
