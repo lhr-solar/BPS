@@ -13,6 +13,7 @@
 #include "BSP_Lights.h"
 #include "BSP_PLL.h"
 #include "CAN_Queue.h"
+#include "BSP_UART.h"
 
 OS_TCB Task1_TCB;
 CPU_STK Task1_Stk[256];
@@ -25,6 +26,9 @@ CPU_STK Task2_Stk[256];
 
 OS_TCB SetContactorState_TCB;
 CPU_STK SetContactorState_Stk[256];
+
+
+
 
 OS_TCB Task_Read_TCB;
 CPU_STK TaskRead_Stk[256];
@@ -39,45 +43,41 @@ CPU_STK TaskRead_Stk[256];
  * 4. Make sure the contactor goes from open to closed. Use an ohmmeter to check the resistance across the contactor's terminals to determine the state of the contactor (this resistance should be close to 0 Ohms).
  * 5. Unpower the contactor, while keeping the BPS powered on. Make sure the BPS goes into a fault state
 ****************************************************************************/
-
-void Task2(void *p_arg){    //This task is meant to allow contactor to close
-
-    RTOS_BPS_DelayTick(250);
-
-    RTOS_BPS_SemPost(&SafetyCheck_Sem4, OS_OPT_POST_1);
-    RTOS_BPS_SemPost(&SafetyCheck_Sem4, OS_OPT_POST_1);
-    RTOS_BPS_SemPost(&SafetyCheck_Sem4, OS_OPT_POST_1);
-    RTOS_BPS_SemPost(&SafetyCheck_Sem4, OS_OPT_POST_1);
-
-    BSP_Lights_Init();
-   
-    while(1) {
-        BSP_Light_Toggle(RUN);
-        RTOS_BPS_DelayTick(25);
-    }
-
-    exit(0);
+void foo(void){
+    return;
 }
 
 void SetContactorState(void *p_arg){
 
-
     BSP_PLL_DelayMs(30);
+    CANMSG_t CanMsg;
     while(1){
-        Contactor_On(ARRAY_CONTACTOR);
-        Contactor_Off(HVHIGH_CONTACTOR);
-        Contactor_On(HVLOW_CONTACTOR);
+        BSP_Light_Toggle(RUN);
+        Contactor_On(HVHIGH_CONTACTOR);
 
-        RTOS_BPS_DelayMs(50);
+        //send can message turning array contactor on and off
+        static uint8_t osciallation = 0;
+        CanMsg.id = ARRAY_CONTACTOR_STATE_CHANGE;
+        CanMsg.payload.data.b = (osciallation) ? 0 : 1;
+        CAN_TransmitQueue_Post(CanMsg);
+
+        RTOS_BPS_DelayMs(100);
     }
 }
 
 void Task_Read(void *p_arg) {
   CANMSG_t message = {0};
+
+
+  RTOS_BPS_SemPost(&SafetyCheck_Sem4, OS_OPT_POST_1);
+  RTOS_BPS_SemPost(&SafetyCheck_Sem4, OS_OPT_POST_1);
+  RTOS_BPS_SemPost(&SafetyCheck_Sem4, OS_OPT_POST_1);
+  RTOS_BPS_SemPost(&SafetyCheck_Sem4, OS_OPT_POST_1);
+
   while(1) {
 
     if(CAN_ReceiveQueue_Pend(&message) == ERROR) {
-      printf("Receive FIFO empty!!! \n\r");
+      //printf("Receive FIFO empty!!! \n\r");
     }
     switch (message.id) {
       case VOLTAGE_DATA_ARRAY:
@@ -89,7 +89,7 @@ void Task_Read(void *p_arg) {
       case TEMPERATURE_DATA_ARRAY:
         printf("ID: Temp data\n\r");
         break;
-      case ARRAY_CONTACTOR_STATE_CHANGE:
+      case ARRAY_CONTACTOR_STATE_CHANGE:  
         printf("ID: Array state changed!!!\n\r");
         if (message.payload.data.b) {
           printf("Array Contactor is on!\n\r");
@@ -146,10 +146,10 @@ void Task1(void *p_arg){
                 );
 
     RTOS_BPS_TaskCreate(&SetContactorState_TCB,    // TCB
-				"Task_CheckContactor",          // Task Name (String)
-				Task_CheckContactor,            // Task function pointer
+				"Task_SetContactor",          // Task Name (String)
+				SetContactorState,            // Task function pointer
 				(void *)true,                      // Task function args
-				TASK_CHECK_CONTACTOR_PRIO,      // Priority
+				6,      // Priority
 				SetContactorState_Stk,             // Stack
 				TASK_CHECK_CONTACTOR_STACK_SIZE
                 );
@@ -163,14 +163,6 @@ void Task1(void *p_arg){
             TASK_CHECK_CONTACTOR_STACK_SIZE
             );
 
-    RTOS_BPS_TaskCreate(&Task2_TCB,
-        "Task 2",
-        Task2,
-        (void *)0,
-        4,
-        Task2_Stk,
-        256);
-
     RTOS_BPS_TaskCreate(&CANBusConsumer_TCB,				// TCB
 		"TASK_CANBUS_CONSUMER_PRIO",	// Task Name (String)
 		Task_CANBusConsumer,				// Task function pointer
@@ -178,6 +170,14 @@ void Task1(void *p_arg){
 		TASK_CANBUS_CONSUMER_PRIO,			// Priority
 		CANBusConsumer_Stk,	// Watermark limit for debugging
 		TASK_CANBUS_CONSUMER_STACK_SIZE);
+
+    RTOS_BPS_TaskCreate(&CANBusProducer_TCB,	// TCB
+        "TASK_CANBUS_PRODUCER",	            // Task Name (String)
+        Task_CANBusProducer,				// Task function pointer
+        (void *)true,				        // don't use loopback mode
+        TASK_CANBUS_PRODUCER_PRIO,			// Priority
+        CANBusProducer_Stk,				    // Stack
+        TASK_CANBUS_PRODUCER_STACK_SIZE);
 
     CAN_Queue_Init();
 
@@ -197,6 +197,7 @@ int main() {
 
     OS_ERR err;
     BSP_PLL_Init();
+    BSP_UART_Init(foo, foo, UART_USB);
     BSP_Lights_Init();
     Contactor_Init();
 

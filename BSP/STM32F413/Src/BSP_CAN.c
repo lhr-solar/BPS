@@ -96,10 +96,10 @@ void BSP_CAN_Init(callback_t rxEvent, callback_t txEnd, bool faultState, bool lo
     CAN_FilterInitStructure.CAN_FilterNumber = 0;
     CAN_FilterInitStructure.CAN_FilterMode = CAN_FilterMode_IdMask;
     CAN_FilterInitStructure.CAN_FilterScale = CAN_FilterScale_32bit;
-    CAN_FilterInitStructure.CAN_FilterIdHigh = ARRAY_CONTACTOR_STATE_CHANGE << 5;
+    CAN_FilterInitStructure.CAN_FilterIdHigh = 0;//ARRAY_CONTACTOR_STATE_CHANGE << 5;
     CAN_FilterInitStructure.CAN_FilterIdLow = 0;
-    CAN_FilterInitStructure.CAN_FilterMaskIdHigh = 0xFFFF;
-    CAN_FilterInitStructure.CAN_FilterMaskIdLow = 0xFFFF;
+    CAN_FilterInitStructure.CAN_FilterMaskIdHigh = 0;//0xFFFF;
+    CAN_FilterInitStructure.CAN_FilterMaskIdLow = 0;//0xFFFF;
     CAN_FilterInitStructure.CAN_FilterFIFOAssignment = 0;
     CAN_FilterInitStructure.CAN_FilterActivation = ENABLE;
     CAN_FilterInit(CAN1, &CAN_FilterInitStructure);

@@ -10,7 +10,7 @@ void Task_CheckContactor(void *p_arg) {
     (void)p_arg;
     
     CANMSG_t SendCanMsg = {.payload = {.idx = 0, .data.b = 1}};
-    CANMSG_t ReceiveCanMsg = {.payload = {.idx = 0, .data.b = 0}, .id = ARRAY_CONTACTOR_STATE_CHANGE};
+    CANMSG_t ReceiveCanMsg = {.payload = {.idx = 0, .data.b = 0}};
 
     BSP_PLL_DelayMs(30); // delay is needed for pull up resistor to stabilize before we check for contactor state
     // If a contactor is on before we turn it on in this task, it may have failed and welded closed
