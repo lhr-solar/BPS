@@ -43,14 +43,8 @@ void CAN_Queue_Init(void) {
     RTOS_BPS_MutexCreate(&canFifo_Receive_Mutex, "CAN receive queue mutex");
     RTOS_BPS_SemCreate(&canFifo_Receive_Sem4, "CAN receive queue semaphore", 0);
     
-    //TODO: i dont think these mutexes are necessary honestly, maybe remove??
-    RTOS_BPS_MutexPend(&canFifo_Transmit_Mutex, OS_OPT_PEND_BLOCKING);
     CAN_fifo_TRANSMIT_renew(&canFifo_TRANSMIT);
-    RTOS_BPS_MutexPost(&canFifo_Transmit_Mutex, OS_OPT_POST_NONE);
-
-    RTOS_BPS_MutexPend(&canFifo_Receive_Mutex, OS_OPT_PEND_BLOCKING);
     CAN_fifo_RECEIVE_renew(&canFifo_RECEIVE);
-    RTOS_BPS_MutexPost(&canFifo_Receive_Mutex, OS_OPT_POST_NONE);
 
 }
 
