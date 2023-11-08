@@ -50,10 +50,11 @@ void foo(void){
 void SetContactorState(void *p_arg){
 
     BSP_PLL_DelayMs(30);
+    Contactor_On(HVHIGH_CONTACTOR);
     CANMSG_t CanMsg;
     while(1){
         BSP_Light_Toggle(RUN);
-        Contactor_On(HVHIGH_CONTACTOR);
+        
 
         //send can message turning array contactor on and off
         static uint8_t osciallation = 0;
