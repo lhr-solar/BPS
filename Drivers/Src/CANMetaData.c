@@ -32,7 +32,7 @@ const struct CANLUTEntry CanMetadataLUT[LARGEST_CAN_ID] = {
     [SUPPLEMENTAL_VOLTAGE]                                 {.idx_used = 0, .len = 2},
     [CHARGING_ENABLED]                                     {.idx_used = 0, .len = 1},
     [CAR_STATE]                                            {.idx_used = 0, .len = 1},
-    [CAR_DATA]                                             {.idx_used = 0, .len = 8},
+    [IO_STATE]                                             {.idx_used = 0, .len = 8},
     [MOTOR_CONTROLLER_BUS]                                 {.idx_used = 0, .len = 8},
     [VELOCITY]                                             {.idx_used = 0, .len = 8},
     [MOTOR_CONTROLLER_PHASE_CURRENT]                       {.idx_used = 0, .len = 8},

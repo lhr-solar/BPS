@@ -37,7 +37,7 @@ typedef enum {
     SUPPLEMENTAL_VOLTAGE                                 = 0x10B,
     CHARGING_ENABLED                                     = 0x10C,
     CAR_STATE                                            = 0x580,
-    CAR_DATA                                             = 0x581,
+    IO_STATE                                             = 0x581,
     MOTOR_CONTROLLER_BUS                                 = 0x242,
     VELOCITY                                             = 0x243,
     MOTOR_CONTROLLER_PHASE_CURRENT                       = 0x244,

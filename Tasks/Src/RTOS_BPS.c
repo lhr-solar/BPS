@@ -157,10 +157,12 @@ void RTOS_BPS_DelayMs(uint16_t delay_ms){
  */
 void RTOS_BPS_DelayUs(uint32_t delay_us) {
     BPS_OS_ERR err;
+    // only errors possible are OS_ERR_NONE and OS_ERR_LOCK_NESTING_OVF
+    // OS_ERR_LOCK_NESTING_OVF occurs when scheduler is already locked
+    // we can ignore this error (OSSchedLock then does nothing)
     
     // lock the scheduler
     OSSchedLock(&err);
-    assertOSError(err);
 
     // delay
     BSP_Timer_Start_OneShot(delay_us, DelayUsCallback);
@@ -168,8 +170,9 @@ void RTOS_BPS_DelayUs(uint32_t delay_us) {
     DelayUsContinue = 0;
 
     // unlock the scheduler
-    OSSchedUnlock(&err);
-    assertOSError(err);
+    if (err == OS_ERR_NONE) {
+        OSSchedUnlock(&err);
+    }
 }
 
 /**
