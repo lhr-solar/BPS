@@ -33,10 +33,20 @@ CPU_STK Print_Format_String_Test_Stk[DEFAULT_STACK_SIZE];
 OS_TCB Print_Task_TCB;
 CPU_STK Print_Task_Stk[DEFAULT_STACK_SIZE];
 
+/**
+ * @brief Tests the basic functionality of the code
+ * 
+ */
+
 // void Basic_Functionality_Test(){
 //     char* str = "Hello, world!\n\r";
 //     RTOS_BPS_snPrintf(str);
 // }
+
+/**
+ * @brief Tests how the program behaves if several calls to the print does not cause errors
+ * 
+ */
 
 // void Concurrent_Writes(){
 //     char* str1 = "First\n\r";
@@ -45,20 +55,40 @@ CPU_STK Print_Task_Stk[DEFAULT_STACK_SIZE];
 //     RTOS_BPS_snPrintf(str2);
 // }
 
-void Overflow_Buffer(){
-    char* str = "THIS STRING IS 260 CHARACTERS xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\n\r";
-    RTOS_BPS_snPrintf(str);
-}
+/**
+ * @brief Tests how the program responds to an overflow of characters sent from the call
+ * 
+ */
+
+// void Overflow_Buffer(){
+//     char* str = "THIS STRING IS 260 CHARACTERS xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\n\r";
+//     RTOS_BPS_snPrintf(str);
+// }
+
+/**
+ * @brief Tests the behavior of an overflow of the printFifo
+ * 
+ */
 
 // void Edge_Case_Buffer_Limit_Test(){
 //     char* str1 = "01234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789222222222222222222222222222222222222222222222222222222az";
 //     RTOS_BPS_snPrintf(str1);
 // }
 
+/**
+ * @brief Tests the behavior of an empty string
+ * 
+ */
+
 // void Empty_String_Test(){
 //     char* str = "";
 //     RTOS_BPS_snPrintf(str);
 // }
+
+/**
+ * @brief Tests the behavior of special charaters and symbols
+ * 
+ */
 
 // void Special_Characters_Test(){
 //     char* str = "Special chars: \t \n \r %% & * \0";
