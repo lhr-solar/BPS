@@ -42,7 +42,7 @@ void Print_Queue_Init() {
  */
 
 
-void Print_Queue_Append(char *buffer, int length) {
+void Print_Queue_Append(char *buffer) {
     int a = 0;
     while(*buffer != 0 && a != 128) {
         if(Print_Fifo_is_full(&printFifo)){
@@ -50,8 +50,6 @@ void Print_Queue_Append(char *buffer, int length) {
             // If we can remove stuff, lets remove from the length (a)
             // Flush printFifo
             // Continue
-            // Print_Queue_Append again
-            // return
             while(a > 0){
                 Print_Fifo_popback(&printFifo, NULL);
                 buffer--;
@@ -107,13 +105,13 @@ void RTOS_BPS_snPrintf(const char *format, ...){
     int a = strlen(format);                             // Per every group of 128 characters, it appends
     while(a > 128){
         vsnprintf(buffer, 128, format, args);
-        Print_Queue_Append(buffer, 128);
+        Print_Queue_Append(buffer);
         format = format + 128;
         a = a - 128;
     }
 
     vsnprintf(buffer, a, format, args);
-    Print_Queue_Append(buffer, a);
+    Print_Queue_Append(buffer);
     va_end(args);
     
 

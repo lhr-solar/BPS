@@ -23,7 +23,7 @@ void Print_Queue_Init(void);
  * @param buffer String of formatted text to be added to the buffer
  * @return none
  */
-void Print_Queue_Append(char *buffer, int length);
+void Print_Queue_Append(char *buffer);
 
  /**
  * @brief Blocks until the queue is ready to be dumped
