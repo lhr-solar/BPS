@@ -103,8 +103,8 @@ void RTOS_BPS_snPrintf(const char *format, ...){
     va_list args;
     va_start(args, format);
     char buffer[128];
-
-    int a = strlen(format);
+    
+    int a = strlen(format);                             // Per every group of 128 characters, it appends
     while(a > 128){
         vsnprintf(buffer, 128, format, args);
         Print_Queue_Append(buffer, 128);
