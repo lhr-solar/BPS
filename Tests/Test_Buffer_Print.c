@@ -27,8 +27,8 @@ CPU_STK Print_Empty_String_Test_Stk[DEFAULT_STACK_SIZE];
 OS_TCB Print_Special_Characters_Test_TCB;
 CPU_STK Print_Special_Characters_Test_Stk[DEFAULT_STACK_SIZE];
 
-OS_TCB Print_Format_String_Test_TCB;
-CPU_STK Print_Format_String_Test_Stk[DEFAULT_STACK_SIZE];
+OS_TCB Print_Performance_Test_TCB;
+CPU_STK Print_Performance_Test_Stk[DEFAULT_STACK_SIZE];
 
 OS_TCB Print_Task_TCB;
 CPU_STK Print_Task_Stk[DEFAULT_STACK_SIZE];
@@ -95,7 +95,12 @@ CPU_STK Print_Task_Stk[DEFAULT_STACK_SIZE];
 //     RTOS_BPS_snPrintf(str);
 // }
 
-// void Format_String_Test(){
+/**
+ * @brief Tests the performance of the code
+ * 
+ */
+
+// void Performance_Test(){
 //     char* formatStr = "Formatted number: %d\n\r";
 //     int num = 42;
 //     RTOS_BPS_snPrintf(formatStr, num);
@@ -125,13 +130,13 @@ void Init_Task(void *p_arg) {
     //         Print_Concurrent_Writes_Stk,
     //         DEFAULT_STACK_SIZE);
     
-    RTOS_BPS_TaskCreate(&Print_Overflow_Buffer_TCB,
-            "Overflow_Buffer",
-            Overflow_Buffer,
-            (void *)0,
-            4,
-            Print_Overflow_Buffer_Stk,
-            DEFAULT_STACK_SIZE);
+    // RTOS_BPS_TaskCreate(&Print_Overflow_Buffer_TCB,
+    //         "Overflow_Buffer",
+    //         Overflow_Buffer,
+    //         (void *)0,
+    //         4,
+    //         Print_Overflow_Buffer_Stk,
+    //         DEFAULT_STACK_SIZE);
     
     // RTOS_BPS_TaskCreate(&Print_Edge_Case_Buffer_Limit_Test_TCB,
     //         "Edge_Case_Buffer_Limit_Test",
@@ -157,12 +162,12 @@ void Init_Task(void *p_arg) {
     //         Print_Special_Characters_Test_Stk,
     //         DEFAULT_STACK_SIZE);
     
-    // RTOS_BPS_TaskCreate(&Print_Format_String_Test_TCB,
-    //         "Format_String_Test",
-    //         Format_String_Test,
+    // RTOS_BPS_TaskCreate(&Print_Performance_Test_TCB,
+    //         "Performance_Test",
+    //         Performance_Test,
     //         (void *)0,
     //         8,
-    //         Print_Format_String_Test_Stk,
+    //         Print_Performance_Test_Stk,
     //         DEFAULT_STACK_SIZE);
 
     RTOS_BPS_TaskCreate(&Print_Task_TCB,

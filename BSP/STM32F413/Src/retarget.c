@@ -11,7 +11,7 @@
 int _write(int fd, char *buffer, unsigned int len) {
     //Add stuff to thread-safe OS level queue instead of BSP callsS
 
-    Print_Queue_Append(buffer);
+    Print_Queue_Append(buffer, len);
 
     return len;
 }
