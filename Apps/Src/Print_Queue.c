@@ -11,7 +11,7 @@
 
 
 #define FIFO_TYPE char
-#define FIFO_SIZE (257)
+#define FIFO_SIZE (128)
 #define FIFO_NAME Print_Fifo
 #include "fifo.h"
 
@@ -39,7 +39,7 @@ void Print_Queue_Init() {
 
 bool Print_Queue_Append(char *buffer) {
     int a = 0;
-    while(*buffer != 0 && a != 256) {
+    while(*buffer != 0 && a != 128) {
         Print_Fifo_put(&printFifo, *buffer);
         buffer++;
         a++;
