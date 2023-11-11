@@ -963,8 +963,9 @@ int8_t LTC681x_rdstat(uint8_t reg, //Determines which Stat  register is read bac
       if (received_pec != data_pec)
       {
         pec_error = -1;                             //The pec_error variable is simply set negative if any PEC errors
-        if(reg<3){    //keep compiler happy and stop index outta bound errors
-          ic[c_ic].stat.pec_match[reg-1]=1;
+        if (reg < 3) {
+          //keep compiler happy and stop index outta bound errors
+          ic[c_ic].stat.pec_match[reg-1] = 1;
         }
       }
 
