@@ -16,8 +16,12 @@
 #include "fifo.h"
 
 static Print_Fifo_t printFifo;
-static OS_SEM printFifo_ready;
+static OS_MUTEX printFifo_ready;
 static OS_MUTEX printCall_Mutex;
+static OS_MUTEX printIsFull_Mutex;
+
+bool waitingToClear = false;
+
 
 /**
  * @brief Initializes the print queue
@@ -26,26 +30,44 @@ static OS_MUTEX printCall_Mutex;
  */
 void Print_Queue_Init() {
     Print_Fifo_renew(&printFifo);
-    RTOS_BPS_SemCreate(&printFifo_ready, "readyPrint", 0);
+    RTOS_BPS_MutexCreate(&printFifo_ready, "readyPrint");
     RTOS_BPS_MutexCreate(&printCall_Mutex, "printCall mutex");
+    RTOS_BPS_MutexCreate(&printIsFull_Mutex, "printIsFull mutex");
 }
 
 /**
  * @brief Initializes the print queue
  * @param buffer String of formatted text to be added to the buffer
- * @return If the write was successful (there was room in the buffer)
+ * @return none
  */
 
 
-bool Print_Queue_Append(char *buffer) {
+void Print_Queue_Append(char *buffer, int length) {
     int a = 0;
     while(*buffer != 0 && a != 128) {
+        if(Print_Fifo_is_full(&printFifo)){
+            // If we are full, we need to wait
+            // If we can remove stuff, lets remove from the length (a)
+            // Flush printFifo
+            // Continue
+            // Print_Queue_Append again
+            // return
+            while(a > 0){
+                Print_Fifo_popback(&printFifo, NULL);
+                buffer--;
+                a--;
+            }
+            RTOS_BPS_MutexPost(&printFifo_ready, OS_OPT_POST_1);
+            waitingToClear = true;
+            RTOS_BPS_MutexPend(&printIsFull_Mutex, OS_OPT_PEND_BLOCKING);
+        }
         Print_Fifo_put(&printFifo, *buffer);
         buffer++;
         a++;
+        if((*buffer == '\r') || (*buffer == '\n')){
+            RTOS_BPS_MutexPost(&printFifo_ready, OS_OPT_POST_1);
+        }
     }
-    RTOS_BPS_SemPost(&printFifo_ready, OS_OPT_POST_NONE);
-    return true;
 }
 
 
@@ -58,13 +80,16 @@ bool Print_Queue_Append(char *buffer) {
 void Print_Queue_Pend(char *message, uint32_t *len) {
     char *curr = message;
     (*len) = 0;
-    RTOS_BPS_SemPend(&printFifo_ready, OS_OPT_PEND_BLOCKING);
+    RTOS_BPS_MutexPend(&printFifo_ready, OS_OPT_PEND_BLOCKING);
     while(!Print_Fifo_is_empty(&printFifo)){
         Print_Fifo_get(&printFifo, curr);
         (*len)++;
         curr++;
     }
-    return;
+    if(waitingToClear){
+        waitingToClear = false;
+        RTOS_BPS_MutexPost(&printIsFull_Mutex, OS_OPT_POST_1);
+    }
 }
 
 /**
@@ -73,20 +98,24 @@ void Print_Queue_Pend(char *message, uint32_t *len) {
  * @return none
  */
 void RTOS_BPS_snPrintf(const char *format, ...){
+    
     RTOS_BPS_MutexPend(&printCall_Mutex, OS_OPT_PEND_BLOCKING);
     va_list args;
     va_start(args, format);
+    char buffer[128];
 
-    int result = vsnprintf(NULL, 0, format, args);
-    char buffer[256];
-    if(result<255){
-        vsnprintf(buffer, result+1, format, args);
-    }else{
-        vsnprintf(buffer, 256, format, args);
+    int a = strlen(format);
+    while(a > 128){
+        vsnprintf(buffer, 128, format, args);
+        Print_Queue_Append(buffer, 128);
+        format = format + 128;
+        a = a - 128;
     }
+
+    vsnprintf(buffer, a, format, args);
+    Print_Queue_Append(buffer, a);
     va_end(args);
+    
 
-    Print_Queue_Append(buffer);
-
-    RTOS_BPS_MutexPost(&printCall_Mutex, OS_OPT_POST_NONE);
+    RTOS_BPS_MutexPost(&printCall_Mutex, OS_OPT_POST_1);
 }

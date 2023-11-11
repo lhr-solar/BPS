@@ -21,9 +21,9 @@ void Print_Queue_Init(void);
 /**
  * @brief Initializes the print queue
  * @param buffer String of formatted text to be added to the buffer
- * @return If the write was successful (there was room in the buffer)
+ * @return none
  */
-bool Print_Queue_Append(char *buffer);
+void Print_Queue_Append(char *buffer, int length);
 
  /**
  * @brief Blocks until the queue is ready to be dumped
