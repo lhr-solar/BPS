@@ -1,4 +1,4 @@
-/* Copyright (c) 2018-2022 UT Longhorn Racing Solar */
+/* Copyright (c) 2018-2023 UT Longhorn Racing Solar */
 #include "Tasks.h"
 #include "Print_Queue.h"
 #include "BSP_UART.h"

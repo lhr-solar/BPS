@@ -1,3 +1,5 @@
+/* Copyright (c) 2018-2023 UT Longhorn Racing Solar */
+
 #include "os.h"
 #include "Tasks.h"
 #include "stm32f4xx.h"
