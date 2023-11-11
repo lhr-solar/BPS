@@ -60,20 +60,30 @@ CPU_STK Print_Task_Stk[DEFAULT_STACK_SIZE];
  * 
  */
 
-// void Overflow_Buffer(){
-//     char* str = "THIS STRING IS 260 CHARACTERS xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\n\r";
-//     RTOS_BPS_snPrintf(str);
-// }
+void Overflow_Buffer(){
+    // 260
+    char* str = "THIS STRING IS 260 CHARACTERS xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\n\r";
+    // 129
+    char* str2 = "abcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabczyx";
+    // 128
+    char* str3 = "abcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabczy";
+    // 127
+    char* str4 = "abcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcz";
+    RTOS_BPS_snPrintf(str);
+
+}
 
 /**
  * @brief Tests the behavior of an overflow of the printFifo
  * 
  */
 
-// void Edge_Case_Buffer_Limit_Test(){
-//     char* str1 = "01234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789222222222222222222222222222222222222222222222222222222az";
-//     RTOS_BPS_snPrintf(str1);
-// }
+void Edge_Case_Buffer_Limit_Test(){
+    char* str1 = "abcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabc";
+    char* str2 = "abc";
+    RTOS_BPS_snPrintf(str1);
+    RTOS_BPS_snPrintf(str2);    
+}
 
 /**
  * @brief Tests the behavior of an empty string
@@ -86,12 +96,12 @@ CPU_STK Print_Task_Stk[DEFAULT_STACK_SIZE];
 // }
 
 /**
- * @brief Tests the behavior of special charaters and symbols
+ * @brief Tests the behavior of special charaters and symbols, especially a \0
  * 
  */
 
 // void Special_Characters_Test(){
-//     char* str = "Special chars: \t \n \r %% & * \0";
+//     char* str = "Special chars: \t \n \r \0 %% & *";
 //     RTOS_BPS_snPrintf(str);
 // }
 
@@ -113,12 +123,12 @@ void Init_Task(void *p_arg) {
         //BSP_UART_Write(test, 11, UART_USB);
 
     // Spawn CANBUS Consumer, PRIO 7
-
+    
     // RTOS_BPS_TaskCreate(&Print_Basic_Functionality_Test_TCB,     // TCB
     //         "Basic_Functionality_Test",                          // Task Name (String)
     //         Basic_Functionality_Test,                            // Task Function Pointer
     //         (void *)0,                                      
-    //         2,                                              // Priority (lower is more important)
+    //         2,                                                   // Priority (lower is more important)
     //         Print_Basic_Functionality_Test_Stk,                  // Watermark Limit for Debugging
     //         DEFAULT_STACK_SIZE);
     
@@ -138,13 +148,13 @@ void Init_Task(void *p_arg) {
     //         Print_Overflow_Buffer_Stk,
     //         DEFAULT_STACK_SIZE);
     
-    // RTOS_BPS_TaskCreate(&Print_Edge_Case_Buffer_Limit_Test_TCB,
-    //         "Edge_Case_Buffer_Limit_Test",
-    //         Edge_Case_Buffer_Limit_Test,
-    //         (void *)0,
-    //         5,
-    //         Print_Edge_Case_Buffer_Limit_Test_Stk,
-    //         DEFAULT_STACK_SIZE);
+    RTOS_BPS_TaskCreate(&Print_Edge_Case_Buffer_Limit_Test_TCB,
+            "Edge_Case_Buffer_Limit_Test",
+            Edge_Case_Buffer_Limit_Test,
+            (void *)0,
+            5,
+            Print_Edge_Case_Buffer_Limit_Test_Stk,
+            DEFAULT_STACK_SIZE);
 
     // RTOS_BPS_TaskCreate(&Print_Empty_String_Test_TCB,
     //         "Empty_String_Test",
