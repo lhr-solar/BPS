@@ -13,6 +13,7 @@
 #define FIFO_TYPE char
 #define FIFO_SIZE (128)
 #define FIFO_NAME Print_Fifo
+#define BUFFER_SIZE (128)
 #include "fifo.h"
 
 static Print_Fifo_t printFifo;
@@ -62,7 +63,7 @@ void Print_Queue_Append(char *buffer) {
         Print_Fifo_put(&printFifo, *buffer);
         buffer++;
         a++;
-        if((*buffer == '\r') || (*buffer == '\n')){
+        if(*buffer == '\n'){
             RTOS_BPS_MutexPost(&printFifo_ready, OS_OPT_POST_1);
         }
     }
@@ -76,13 +77,12 @@ void Print_Queue_Append(char *buffer) {
  * @return none
  */
 void Print_Queue_Pend(char *message, uint32_t *len) {
-    char *curr = message;
     (*len) = 0;
     RTOS_BPS_MutexPend(&printFifo_ready, OS_OPT_PEND_BLOCKING);
     while(!Print_Fifo_is_empty(&printFifo)){
-        Print_Fifo_get(&printFifo, curr);
+        Print_Fifo_get(&printFifo, message);
         (*len)++;
-        curr++;
+        message++;
     }
     if(waitingToClear){
         waitingToClear = false;
@@ -100,14 +100,14 @@ void RTOS_BPS_snPrintf(const char *format, ...){
     RTOS_BPS_MutexPend(&printCall_Mutex, OS_OPT_PEND_BLOCKING);
     va_list args;
     va_start(args, format);
-    char buffer[128];
+    char buffer[BUFFER_SIZE];
     
     int a = strlen(format);                             // Per every group of 128 characters, it appends
-    while(a > 128){
-        vsnprintf(buffer, 128, format, args);
+    while(a > BUFFER_SIZE){
+        vsnprintf(buffer, BUFFER_SIZE, format, args);
         Print_Queue_Append(buffer);
-        format = format + 128;
-        a = a - 128;
+        format += BUFFER_SIZE;
+        a -= BUFFER_SIZE;
     }
 
     vsnprintf(buffer, a, format, args);
