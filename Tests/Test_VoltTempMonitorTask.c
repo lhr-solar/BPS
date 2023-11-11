@@ -13,6 +13,7 @@
 #include "BSP_Lights.h"
 #include "CAN_Queue.h"
 #include "BSP_PLL.h"
+#include "BSP_Timer.h"
 #include "BSP_WDTimer.h"
 #include "Contactor.h"
 #include "RTOS_BPS.h"
@@ -44,10 +45,6 @@ OS_TCB Task2_TCB;
 CPU_STK Task2_Stk[DEFAULT_STACK_SIZE];
 
 OS_ERR p_err;
-
-void foo(void){
-    return;
-}
 
 // Initialization task for this test
 void Task1(void *p_arg){
@@ -106,7 +103,7 @@ void Task2(void *p_arg){
         WDog_BitMap |= WD_BALANCING;
         RTOS_BPS_MutexPost(&WDog_Mutex, OS_OPT_POST_NONE);
         //delay of 100ms
-        RTOS_BPS_DelayTick(1);
+        RTOS_BPS_DelayMs(100);
     }
 }
 
@@ -117,12 +114,6 @@ int main(int argc, char **argv) {
 int main() {
 #endif
     OS_ERR err;
-    
-    //Resetting the contactor
-    Contactor_Init();
-    Contactor_Off(HVLOW_CONTACTOR);
-    Contactor_Off(HVHIGH_CONTACTOR);
-    Contactor_Off(ARRAY_CONTACTOR);
 
     if (BSP_WDTimer_DidSystemReset()) {
         Fault_BitMap = Fault_WDOG;
@@ -130,8 +121,16 @@ int main() {
     }
 
     BSP_PLL_Init();
-    BSP_UART_Init(foo, foo, UART_USB);
+    BSP_UART_Init(NULL, NULL, UART_USB);
+
+    //Resetting the contactor
+    Contactor_Init();
+    Contactor_On(HVLOW_CONTACTOR);
+    Contactor_On(HVHIGH_CONTACTOR);
+    Contactor_On(ARRAY_CONTACTOR);
+
     BSP_Lights_Init();
+    BSP_Timer_Init();
     OSInit(&err);
     assertOSError(err);
 

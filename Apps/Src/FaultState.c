@@ -74,9 +74,9 @@ void EnterFaultState() {
 
     EEPROM_Init();
 
-    if (BSP_WDTimer_DidSystemReset()) {
-        Fault_BitMap = Fault_WDOG;
-    }
+    // if (BSP_WDTimer_DidSystemReset()) {
+    //     Fault_BitMap = Fault_WDOG;
+    // }
 
     // TODO: fix this so it works if there are multiple faults
     #ifdef SIMULATION

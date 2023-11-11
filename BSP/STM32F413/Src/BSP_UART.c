@@ -141,16 +141,18 @@ static void USART_USB_Init() {
  * @brief   Initializes the UART peripheral
  */
 void BSP_UART_Init(callback_t rxCallback, callback_t txCallback, UART_Port usart) {
+    rxCallback = (rxCallback == NULL) ? foo : rxCallback;
+    txCallback = (txCallback == NULL) ? foo : txCallback;
     switch(usart){
     case UART_USB:
+        usbRxCallback = rxCallback;
+        usbTxCallback = txCallback;
         USART_USB_Init();
-        usbRxCallback = (rxCallback == NULL) ? foo : rxCallback;
-        usbTxCallback = (txCallback == NULL) ? foo : txCallback;
         break;
     case UART_BLE:
+        bleRxCallback = rxCallback;
+        bleTxCallback = txCallback;
         USART_BLE_Init();
-        bleRxCallback = (rxCallback == NULL) ? foo : rxCallback;
-        bleTxCallback = (txCallback == NULL) ? foo : txCallback;
         break;
     default:
         // Error
