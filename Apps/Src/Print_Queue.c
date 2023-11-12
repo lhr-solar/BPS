@@ -63,7 +63,7 @@ void Print_Queue_Append(char *buffer) {
         Print_Fifo_put(&printFifo, *buffer);
         buffer++;
         a++;
-        if(*buffer == '\n'){
+        if(*buffer == '\r'){
             RTOS_BPS_MutexPost(&printFifo_ready, OS_OPT_POST_1);
         }
     }
