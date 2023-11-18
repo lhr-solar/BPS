@@ -77,9 +77,10 @@ void Print_Queue_Append(char *buffer) {
  * @return none
  */
 void Print_Queue_Pend(char *message, uint32_t *len) {
+    uint32_t max_Size = *len;
     (*len) = 0;
     RTOS_BPS_MutexPend(&printFifo_ready, OS_OPT_PEND_BLOCKING);
-    while(!Print_Fifo_is_empty(&printFifo)){
+    while((!Print_Fifo_is_empty(&printFifo)) && (*len < max_Size)){
         Print_Fifo_get(&printFifo, message);
         (*len)++;
         message++;
