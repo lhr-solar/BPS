@@ -40,7 +40,7 @@ void Print_Queue_Init() {
  */
 bool Print_Queue_Append(char *buffer) {
     //Check if theres room
-    if(strlen(buffer) > Print_Fifo_Space(&printFifo)){
+    if(strlen(buffer) > Print_Fifo_space(&printFifo)){
         RTOS_BPS_MutexPost(&printFifo_ready, OS_OPT_POST_1);
         return false;
     }

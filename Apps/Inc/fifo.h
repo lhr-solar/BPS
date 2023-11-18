@@ -76,7 +76,7 @@ typedef struct FIFO_STRUCT_NAME {
 #define PEEK     CONCAT(FIFO_NAME, _peek)
 #define POPBACK  CONCAT(FIFO_NAME, _popback)
 #define RENEW    CONCAT(FIFO_NAME, _renew)
-#define SPACE CONCAT(FIFO_NAME, _has_room)
+#define SPACE    CONCAT(FIFO_NAME, _space)
 
 /**
  * @brief Initialize a new fifo
@@ -236,7 +236,7 @@ SPACE (FIFO_TYPE_NAME *fifo) {
         return FIFO_SIZE - (fifo->put % FIFO_SIZE);
     }
 
-    return FIFO_SIZE;
+    return FIFO_SIZE;    
 }
 
 #undef IS_EMPTY
