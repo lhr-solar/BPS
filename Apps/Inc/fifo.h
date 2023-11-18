@@ -225,10 +225,14 @@ POPBACK (FIFO_TYPE_NAME *fifo, FIFO_TYPE *elem) {
 
 /**
  * @brief Returns how much room is left in the Fifo.
+ * 
+ * If the type of the fifo is myfifo_t, then this function
+ * will be called myfifo_space().
+ * 
  * @param fifo A pointer to the fifo
  * @return uin32_t of empty spaces
  */
-static uint32_t __attribute__((unused))
+static int __attribute__((unused))
 SPACE (FIFO_TYPE_NAME *fifo) {
     if(!IS_EMPTY(fifo)) {
         return FIFO_SIZE - (fifo->put % FIFO_SIZE);
