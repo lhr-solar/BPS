@@ -34,7 +34,6 @@
 #define __FIFO_H
 #include <stdbool.h>
 #include <string.h>
-#include "stdint.h"
 #endif
 
 // The type of the fifo
@@ -76,7 +75,6 @@ typedef struct FIFO_STRUCT_NAME {
 #define PEEK     CONCAT(FIFO_NAME, _peek)
 #define POPBACK  CONCAT(FIFO_NAME, _popback)
 #define RENEW    CONCAT(FIFO_NAME, _renew)
-#define SPACE    CONCAT(FIFO_NAME, _space)
 
 /**
  * @brief Initialize a new fifo
@@ -224,21 +222,6 @@ POPBACK (FIFO_TYPE_NAME *fifo, FIFO_TYPE *elem) {
     return false;
 }
 
-/**
- * @brief Returns how much room is left in the Fifo.
- * 
- * @param fifo A pointer to the fifo
- * @return uin32_t of empty spaces
- */
-static uint32_t __attribute__((unused))
-SPACE (FIFO_TYPE_NAME *fifo) {
-    if(!IS_EMPTY(fifo)) {
-        return FIFO_SIZE - (fifo->put % FIFO_SIZE);
-    }
-
-    return FIFO_SIZE;    
-}
-
 #undef IS_EMPTY
 #undef IS_FULL
 #undef FIFO_SIZE
@@ -251,6 +234,5 @@ SPACE (FIFO_TYPE_NAME *fifo) {
 #undef NEW
 #undef PEEK
 #undef POPBACK
-#undef SPACE
 #undef CONCAT
 #undef _CONCAT

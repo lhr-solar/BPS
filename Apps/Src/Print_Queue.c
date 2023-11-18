@@ -40,7 +40,7 @@ void Print_Queue_Init() {
  */
 bool Print_Queue_Append(char *buffer) {
     //Check if theres room
-    if(strlen(buffer) > Print_Fifo_space(&printFifo)){
+    if(strlen(buffer) > fifo_space()){
         RTOS_BPS_MutexPost(&printFifo_ready, OS_OPT_POST_1);
         return false;
     }
@@ -127,4 +127,9 @@ void RTOS_BPS_Blocking_Printf(const char *format, ...){
 
     va_end(args);
     RTOS_BPS_MutexPost(&printCall_Mutex, OS_OPT_POST_1);
+}
+
+//Function will get removed when merged with my FIFO PR
+uint32_t fifo_space(){
+    return FIFO_SIZE - (printFifo.put % FIFO_SIZE);
 }
