@@ -50,17 +50,17 @@ ErrorStatus CANbus_SendMsg_FaultState(CANID_t id, CANPayload_t payload);
 /**
  * @brief   Receives data from the CAN bus. This is a non-blocking operation.
  * @param   id : pointer to id variable
- * @param   buffer : pointer to payload buffer
+ * @param   payload : pointer to payload buffer
  * @return  ERROR if there was no message, SUCCESS otherwise.
  */
-ErrorStatus CANbus_Receive(CANID_t *id, uint8_t *buffer);
+ErrorStatus CANbus_Receive(CANID_t *id, CANPayload_t *payload);
 
 /**
  * @brief   Waits for data to arrive.
  * @param   id : pointer to id variable
- * @param   buffer : pointer to payload buffer
+ * @param   payload : pointer to payload buffer
  * @return  ERROR if there was an error, SUCCESS otherwise.
  */
-ErrorStatus CANbus_WaitToReceive(CANID_t *id, uint8_t *buffer);
+ErrorStatus CANbus_WaitToReceive(CANID_t *id, CANPayload_t *payload);
 
 #endif

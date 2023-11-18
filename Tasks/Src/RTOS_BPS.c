@@ -59,13 +59,18 @@ void RTOS_BPS_SemCreate(BPS_OS_SEM* sem, char* name, uint32_t count) {
  * @brief Pends a BPS_OS_Semaphore.
  * @param sem - pointer to a sempaphore to pend
  * @param opt - pend option
- * @return the semaphore count, or 0 if not available
+ * @return the semaphore count, or -1 if not available (will be 0xFFFFFFFF as it is unsigned)
  */
 BPS_OS_SEM_CTR RTOS_BPS_SemPend(BPS_OS_SEM* sem, BPS_OS_OPT opt) {
     BPS_OS_ERR err;
     BPS_OS_SEM_CTR count = OSSemPend(sem, 0, opt, 0, &err); // we don't need timestamp
-    assertOSError(err);
-    return count;
+    if (err == OS_ERR_PEND_WOULD_BLOCK) {
+        return BPS_OS_SEM_WOULD_BLOCK;
+    }
+    else {
+        assertOSError(err);
+        return count;
+    }
 }
 
 /**

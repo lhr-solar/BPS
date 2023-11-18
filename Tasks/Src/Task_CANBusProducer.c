@@ -12,15 +12,10 @@ void Task_CANBusProducer(void *p_arg) {
     (void)p_arg;
 
     CANbus_Init((bool) p_arg, false);
+    CANMSG_t CANMsg;
     
     while(1) {
-      
-      
-      CANMSG_t CANMsg = {0};
-      CANbus_WaitToReceive(&CANMsg.id, CANMsg.payload.data.bytes);
-      CANMsg.payload.idx = CanMetadataLUT[CANMsg.id].idx_used;
-
+      CANbus_WaitToReceive(&CANMsg.id, &CANMsg.payload);
       CAN_ReceiveQueue_Post(CANMsg);
-
     }
 }
