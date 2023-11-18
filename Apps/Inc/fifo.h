@@ -33,7 +33,6 @@
 #ifndef __FIFO_H
 #define __FIFO_H
 #include <stdbool.h>
-#include "stdint.h"
 #endif
 
 // The type of the fifo
