@@ -19,6 +19,7 @@ static OS_MUTEX CANbus_TxMutex;
 static OS_MUTEX CANbus_RxMutex;
 static OS_SEM	CANbus_MailSem4;
 static OS_SEM	CANbus_ReceiveSem4;
+static bool initialized = false;	// used to check for double initialization
 
 /**
  * @brief   Releases hold of the mailbox semaphore.
@@ -44,9 +45,8 @@ static void CANbus_CountIncoming(void) {
  * @return  None
  */
 void CANbus_Init(bool loopback, bool faultState) {
-  static bool initialized = false;
 	if(!faultState && !initialized){
-    initialized = true;
+    	initialized = true;
 		RTOS_BPS_MutexCreate(&CANbus_TxMutex, "CAN TX Lock");
 		RTOS_BPS_MutexCreate(&CANbus_RxMutex, "CAN RX Lock");
 		RTOS_BPS_SemCreate(&CANbus_MailSem4, "CAN Mailbox Semaphore", 3); // # of mailboxes
@@ -155,41 +155,52 @@ ErrorStatus CANbus_Send(CANID_t id, CANPayload_t payload) {
 	return result;
 }
 
-static ErrorStatus CANbus_GetMsg(CANID_t *id, uint8_t *buffer) {
-	// The mutex is require to access the CAN receive queue.
-	RTOS_BPS_MutexPend(&CANbus_RxMutex, OS_OPT_PEND_BLOCKING);
-	// Write the data to the bus
+static ErrorStatus CANbus_GetMsg(CANID_t *id, CANPayload_t *payload) {
 	uint32_t id_int;
-	uint8_t retVal = BSP_CAN_Read(&id_int, buffer);
 
-	*id = id_int;
-
+	// Mutex is required for BSP access
+	RTOS_BPS_MutexPend(&CANbus_RxMutex, OS_OPT_PEND_BLOCKING);
+	uint8_t retVal = BSP_CAN_Read(&id_int, payload->data.bytes);
 	RTOS_BPS_MutexPost(&CANbus_RxMutex, OS_OPT_POST_1);
 
+	// fill out payload according to CAN ID
+	*id = id_int;
+
+	bool idx_used = CanMetadataLUT[id_int].idx_used;
+    uint8_t payload_size = CanMetadataLUT[id_int].len;
+    if (idx_used) {
+        payload->idx = payload->data.bytes[0];
+        memcpy(&payload->data.bytes[1], &payload->data.bytes[0], payload_size);
+    }
+
+	// note: data received is not valid if retVal is ERROR
 	return retVal;
 }
 
 /**
  * @brief   Receives data from the CAN bus. This is a non-blocking operation.
  * @param   id : pointer to id variable
- * @param   buffer : pointer to payload buffer
+ * @param   payload : pointer to payload buffer
  * @return  ERROR if there was no message, SUCCESS otherwise.
  */
-ErrorStatus CANbus_Receive(CANID_t *id, uint8_t *buffer) {
+ErrorStatus CANbus_Receive(CANID_t *id, CANPayload_t *payload) {
 	// Check to see if a mailbox is available
-	RTOS_BPS_SemPend(&CANbus_ReceiveSem4, OS_OPT_PEND_NON_BLOCKING);
+	BPS_OS_SEM_CTR cnt = RTOS_BPS_SemPend(&CANbus_ReceiveSem4, OS_OPT_PEND_NON_BLOCKING);
+	if (cnt == BPS_OS_SEM_WOULD_BLOCK) {
+		return ERROR;
+	}
 	// Send the message
-	return CANbus_GetMsg(id, buffer);
+	return CANbus_GetMsg(id, payload);
 }
 
 /**
  * @brief   Waits for data to arrive.
  * @param   id : pointer to id variable
- * @param   buffer : pointer to payload buffer
+ * @param   payload : pointer to payload buffer
  * @return  ERROR if there was an error, SUCCESS otherwise.
  */
-ErrorStatus CANbus_WaitToReceive(CANID_t *id, uint8_t *buffer) {
+ErrorStatus CANbus_WaitToReceive(CANID_t *id, CANPayload_t *payload) {
 	// Pend for a mailbox (blocking)
 	RTOS_BPS_SemPend(&CANbus_ReceiveSem4, OS_OPT_PEND_BLOCKING);
-	return CANbus_GetMsg(id, buffer);
+	return CANbus_GetMsg(id, payload);
 }
