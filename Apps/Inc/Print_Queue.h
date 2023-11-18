@@ -38,6 +38,13 @@ void Print_Queue_Pend(char *buffer, uint32_t *len);
  * @param string String of formatted text to be added to the buffer
  * @return none
  */
-void RTOS_BPS_snPrintf(const char *format, ...);
+void RTOS_BPS_NonBlocking_Printf(const char *format, ...);
+
+/**
+ * @brief Performs a "blocking" printf by attempting to dump into the buffer until success
+ * @param string String of formatted text to be added to the buffer
+ * @return none
+ */
+void RTOS_BPS_Blocking_Printf(const char *format, ...);
 
 #endif
