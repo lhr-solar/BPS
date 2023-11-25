@@ -19,6 +19,9 @@ typedef struct _msg {
 #define FIFO_NAME msg_queue
 #include "fifo.h"
 
+#define BSP_CAN_IDS_PER_FILTER  4
+#define BSP_CAN_NUM_FILTERS     28
+
 static msg_queue_t gRxQueue;
 
 // Required for receiving CAN messages
@@ -31,13 +34,20 @@ static void (*gTxEnd)(void);
 
 /**
  * @brief   Initializes the CAN module that communicates with the rest of the electrical system.
- * @param   rxEvent     : the function to execute when recieving a message. NULL for no action.
- * @param   txEnd       : the function to execute after transmitting a message. NULL for no action.
- * @param   faultState  : if we should initialize CAN interrupts
- * @param   loopback    : if we should use loopback mode (for testing)
+ * @param   rxEvent       : the function to execute when recieving a message. NULL for no action.
+ * @param   txEnd         : the function to execute after transmitting a message. NULL for no action.
+ * @param   faultState    : if we should initialize CAN interrupts
+ * @param   loopback      : if we should use loopback mode (for testing)
+ * @param   txIDFilter    : array of IDs to accept messages from. Pass NULL for no filtering.
+ * @param   txIDFilterLen : length of txIDFilter array. Max 28 * 4 (28 filter banks * 4 IDs per bank)
  * @return  None
  */
-void BSP_CAN_Init(callback_t rxEvent, callback_t txEnd, bool faultState, bool loopback) {
+void BSP_CAN_Init(callback_t rxEvent, 
+                  callback_t txEnd, 
+                  bool faultState, 
+                  bool loopback,
+                  uint16_t *txIDFilter,
+                  uint8_t txIDFilterLen) {
     GPIO_InitTypeDef GPIO_InitStructure;
     CAN_InitTypeDef CAN_InitStructure;
     NVIC_InitTypeDef NVIC_InitStructure;
@@ -92,17 +102,49 @@ void BSP_CAN_Init(callback_t rxEvent, callback_t txEnd, bool faultState, bool lo
     CAN_InitStructure.CAN_Prescaler = 20;
     CAN_Init(CAN1, &CAN_InitStructure);
 
-    /* CAN filter init */
-    CAN_FilterInitStructure.CAN_FilterNumber = 0;
-    CAN_FilterInitStructure.CAN_FilterMode = CAN_FilterMode_IdMask;
-    CAN_FilterInitStructure.CAN_FilterScale = CAN_FilterScale_32bit;
-    CAN_FilterInitStructure.CAN_FilterIdHigh = 0;//ARRAY_CONTACTOR_STATE_CHANGE << 5;
-    CAN_FilterInitStructure.CAN_FilterIdLow = 0;
-    CAN_FilterInitStructure.CAN_FilterMaskIdHigh = 0;//0xFFFF;
-    CAN_FilterInitStructure.CAN_FilterMaskIdLow = 0;//0xFFFF;
-    CAN_FilterInitStructure.CAN_FilterFIFOAssignment = 0;
-    CAN_FilterInitStructure.CAN_FilterActivation = ENABLE;
-    CAN_FilterInit(CAN1, &CAN_FilterInitStructure);
+    /* CAN filter init
+    *  Do nothing if we want to filter too many IDs
+    */
+    if (txIDFilter && (txIDFilterLen <= BSP_CAN_IDS_PER_FILTER * BSP_CAN_NUM_FILTERS)) {
+        CAN_FilterInitStructure.CAN_FilterNumber = 0;
+        CAN_FilterInitStructure.CAN_FilterMode = CAN_FilterMode_IdList;
+        CAN_FilterInitStructure.CAN_FilterScale = CAN_FilterScale_16bit;
+        CAN_FilterInitStructure.CAN_FilterFIFOAssignment = 0;
+        CAN_FilterInitStructure.CAN_FilterActivation = ENABLE;
+
+        uint16_t *filter_fields[BSP_CAN_IDS_PER_FILTER] = {
+            &CAN_FilterInitStructure.CAN_FilterIdHigh,
+            &CAN_FilterInitStructure.CAN_FilterIdLow,
+            &CAN_FilterInitStructure.CAN_FilterMaskIdHigh,
+            &CAN_FilterInitStructure.CAN_FilterMaskIdLow
+        };
+
+        uint8_t num_ids_rounded = ((txIDFilterLen + BSP_CAN_IDS_PER_FILTER - 1)
+                                      / BSP_CAN_IDS_PER_FILTER)
+                                  * BSP_CAN_IDS_PER_FILTER; // round up
+        for (uint8_t i = 0; i < num_ids_rounded; i++) {
+            // loop through a rounded-up number of IDs, that way we can fill in the empty 
+            // filter banks with 0s.
+            *filter_fields[i / BSP_CAN_IDS_PER_FILTER] = (i < txIDFilterLen) ? (txIDFilter[i] << 5) : 0x0000;
+            if (i % BSP_CAN_IDS_PER_FILTER == 3) {
+                CAN_FilterInit(CAN1, &CAN_FilterInitStructure);
+                CAN_FilterInitStructure.CAN_FilterNumber++;
+            }
+        }
+    }
+    else {
+        // no filter
+        CAN_FilterInitStructure.CAN_FilterNumber = 0;
+        CAN_FilterInitStructure.CAN_FilterMode = CAN_FilterMode_IdMask;
+        CAN_FilterInitStructure.CAN_FilterScale = CAN_FilterScale_32bit;
+        CAN_FilterInitStructure.CAN_FilterIdHigh = 0x0000;
+        CAN_FilterInitStructure.CAN_FilterIdLow = 0x0000;
+        CAN_FilterInitStructure.CAN_FilterMaskIdHigh = 0x0000;
+        CAN_FilterInitStructure.CAN_FilterMaskIdLow = 0x0000;
+        CAN_FilterInitStructure.CAN_FilterFIFOAssignment = 0;
+        CAN_FilterInitStructure.CAN_FilterActivation = ENABLE;
+        CAN_FilterInit(CAN1, &CAN_FilterInitStructure);
+    }
 
     /* Transmit Structure preparation */
     gTxMessage.ExtId = 0x1;

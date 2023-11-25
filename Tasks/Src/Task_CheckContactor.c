@@ -39,8 +39,11 @@ void Task_CheckContactor(void *p_arg) {
     SendCanMsg.id = BPS_CONTACTOR_STATE;
 
     while(1) {
-        //delay of 250ms
-        RTOS_BPS_DelayMs(250);
+        // delay of 200ms
+        // controls IO_STATE message every ~250ms, so we need to check for the 
+        // message more frequently to ensure our CAN queue doesn't fill. 
+        // 200ms is chosen because it's a neat number and should be fast enough. 
+        RTOS_BPS_DelayMs(200);
 
         // fault if the contactor is open
         if (Contactor_GetState(HVHIGH_CONTACTOR) != true) {
@@ -49,8 +52,9 @@ void Task_CheckContactor(void *p_arg) {
         }
 
         // Turn on/off array contactor based on what we receive from controls
-        CAN_ReceiveQueue_Pend(&ReceiveCanMsg);
-        if (ReceiveCanMsg.id == IO_STATE) {
+        // if we get to this point and there's no message we try again ~200ms later
+        ErrorStatus status = CAN_ReceiveQueue_Pend(&ReceiveCanMsg);
+        if (status == SUCCESS && ReceiveCanMsg.id == IO_STATE) {
             uint8_t ign_1_state = ReceiveCanMsg.payload.data.bytes[3] & 0x1;
             // uint8_t ign_2_state = ReceiveCanMsg.payload.data.bytes[3] & 0x2; // Motor state -- unused for now
             if (ign_1_state) {

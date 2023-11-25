@@ -11,10 +11,14 @@
 void Task_CANBusProducer(void *p_arg) {
     (void)p_arg;
 
-    CANbus_Init((bool) p_arg, false);
     CANMSG_t CANMsg;
+
+    uint16_t filter_ids[] = {IO_STATE};
+    CANbus_Init((bool) p_arg, false, filter_ids, sizeof(filter_ids) / sizeof(*filter_ids));
     
     while(1) {
+      // BLOCKING =====================
+      // Wait for CAN Bus to have message
       CANbus_WaitToReceive(&CANMsg.id, &CANMsg.payload);
       CAN_ReceiveQueue_Post(CANMsg);
     }
