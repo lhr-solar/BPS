@@ -30,7 +30,7 @@ ifneq ($(TEST), none)
 else
 	@echo -e "Making STM32 build with ${RED}NO${NC}test."
 endif
-	$(MAKE) -C BSP -C STM32F413 -j
+	$(MAKE) -C BSP -C STM32F413 -j || sl
 
 .PHONY: simulator
 simulator:

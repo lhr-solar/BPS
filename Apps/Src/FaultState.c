@@ -74,9 +74,9 @@ void EnterFaultState() {
 
     EEPROM_Init();
 
-    // if (BSP_WDTimer_DidSystemReset()) {
-    //     Fault_BitMap = Fault_WDOG;
-    // }
+    if (BSP_WDTimer_DidSystemReset()) {
+        Fault_BitMap = Fault_WDOG;
+    }
 
     // TODO: fix this so it works if there are multiple faults
     #ifdef SIMULATION
@@ -94,14 +94,10 @@ void EnterFaultState() {
 
     EEPROM_LogError(Fault_BitMap);
 
-    // TODO: create an interrupt-independent CAN interface, so we can use CAN from within a fault state
-    // avoid infinite recursive faults, since our CAN Driver relies on the OS to work
-    // also don't call CAN if the watchdog tripped, since CAN won't be initialized
-
     //Deinitialize CAN registers
     CANbus_DeInit();
     //Reinit CAN in fault state
-    CANbus_Init(BPS_CAN_LOOPBACK, true);
+    CANbus_Init(BPS_CAN_LOOPBACK, true, NULL, 0);
 
 #ifdef DEBUGMODE
     char command[COMMAND_SIZE];

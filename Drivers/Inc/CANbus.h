@@ -11,9 +11,16 @@
  * @brief   Initializes the CAN system
  * @param   loopback	: if we should use loopback mode (for testing)	
  * @param   faultState  : fault state being true disables Tx and Rx interrupts 
+ * @param   txIDFilter    : array of IDs to accept messages from. Pass NULL for no filtering.
+ * @param   txIDFilterLen : length of txIDFilter array. Max 28 * 4 (28 filter banks * 4 IDs per bank)
  * @return  None
  */
-void CANbus_Init(bool loopback, bool faultState);
+void CANbus_Init(bool loopback, bool faultState, uint16_t *txIDFilter, uint8_t txIDFilterLen);
+
+/**
+ * @brief  name says it all
+ */
+bool CANbus_IsInitialized();
 
 /**
  * @brief   Deitializes the CAN system 
