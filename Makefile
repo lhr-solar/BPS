@@ -23,6 +23,9 @@ endif
 OS = RTOS
 export OS
 
+BUILD_HELPER_SRC := BSP/STM32F413/BuildHelper/error_verbose.c
+BUILD_HELPER := gcc -O -o error_verbose.log $(BUILD_HELPER_SRC) -lncurses
+
 .PHONY: stm32f413
 stm32f413:
 ifneq ($(TEST), none)
@@ -30,11 +33,13 @@ ifneq ($(TEST), none)
 else
 	@echo -e "Making STM32 build with ${RED}NO${NC}test."
 endif
-	$(MAKE) -C BSP -C STM32F413 -j || sl
+	@$(BUILD_HELPER)
+	$(MAKE) -C BSP -C STM32F413 -j || ./error_verbose.log
 
 .PHONY: simulator
 simulator:
-	$(MAKE) -C BSP -C Simulator -j
+	@$(BUILD_HELPER)
+	$(MAKE) -C BSP -C Simulator -j || ./error_verbose.log
 
 flash:
 	$(MAKE) -C BSP -C STM32F413 flash
