@@ -9,16 +9,18 @@
 #include <stdarg.h>
 #include "BSP_UART.h"
 
+uint32_t size = 1024;
 
 #define FIFO_TYPE char
-#define FIFO_SIZE (1024)
+#define FIFO_SIZE 1024
 #define FIFO_NAME Print_Fifo
-#define BUFFER_SIZE (1024)
 #include "fifo.h"
 
 static Print_Fifo_t printFifo;
 static OS_MUTEX printFifo_ready;
 static OS_MUTEX printCall_Mutex;
+
+uint32_t fifo_space();
 
 
 /**
@@ -99,7 +101,7 @@ void RTOS_BPS_NonBlocking_Printf(const char *format, ...){
     RTOS_BPS_MutexPend(&printCall_Mutex, OS_OPT_PEND_BLOCKING);
     va_list args;
     va_start(args, format);
-    char buffer[BUFFER_SIZE];
+    char buffer[size];
     
     int printLen = strlen(format); 
     vsnprintf(buffer, printLen, format, args);
@@ -119,7 +121,7 @@ void RTOS_BPS_Blocking_Printf(const char *format, ...){
     RTOS_BPS_MutexPend(&printCall_Mutex, OS_OPT_PEND_BLOCKING);
     va_list args;
     va_start(args, format);
-    char buffer[BUFFER_SIZE];
+    char buffer[size];
     
     int printLen = strlen(format); 
     vsnprintf(buffer, printLen, format, args);
@@ -131,5 +133,5 @@ void RTOS_BPS_Blocking_Printf(const char *format, ...){
 
 //Function will get removed when merged with my FIFO PR
 uint32_t fifo_space(){
-    return FIFO_SIZE - (printFifo.put % FIFO_SIZE);
+    return size - (printFifo.put % size);
 }
