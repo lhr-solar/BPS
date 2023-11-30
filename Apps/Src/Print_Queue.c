@@ -110,7 +110,7 @@ void RTOS_BPS_NonBlocking_Printf(const char *format, ...){
 }
 
 /**
- * @brief Performs a "non-blocking" printf by dumping into a buffer for Task_Print.c
+ * @brief Performs a "blocking" printf by dumping into a buffer for Task_Print.c until success
  * @param string String of formatted text to be added to the buffer
  * @return none
  */
