@@ -234,7 +234,11 @@ POPBACK (FIFO_TYPE_NAME *fifo, FIFO_TYPE *elem) {
 static int __attribute__((unused))
 SPACE (FIFO_TYPE_NAME *fifo) {
     if(!IS_EMPTY(fifo)) {
-        return FIFO_SIZE - (fifo->put % FIFO_SIZE);
+        if(fifo->put > fifo->get){
+            return FIFO_SIZE - (fifo->put - fifo->get);
+        }else{
+            return fifo->get - fifo->put;
+        }
     }
 
     return FIFO_SIZE;    
