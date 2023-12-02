@@ -133,5 +133,9 @@ void RTOS_BPS_Blocking_Printf(const char *format, ...){
 
 //Function will get removed when merged with my FIFO PR
 uint32_t fifo_space(){
-    return size - (printFifo.put % size);
+    if(!Print_Fifo_is_empty(&printFifo)){
+        return ((printFifo.get - printFifo.put) + size) % size;
+    }
+
+    return size; 
 }
