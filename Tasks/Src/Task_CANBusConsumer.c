@@ -10,7 +10,7 @@ void Task_CANBusConsumer(void *p_arg) {
 
     CANMSG_t message;
 
-    while (!CANbus_IsInitialized())
+    while (!CANbus_IsInitialized());
     
     while(1) {
         // BLOCKING =====================
