@@ -48,24 +48,22 @@ bool Print_Queue_Append(char *buffer) {
     }
 
     while(*buffer != '\0') {
-        //Add characters to the fifo one by one
-        Print_Fifo_put(&printFifo, *buffer);
 
-        //Endline check
-        if((*buffer == '\r')){
-            RTOS_BPS_MutexPost(&printFifo_ready, OS_OPT_POST_1);
-        }else if(*buffer == '\n'){
+        //Add characters to the fifo one by one
+        if(!(*buffer == '\r' || *buffer == '\n')){
+            Print_Fifo_put(&printFifo, *buffer);
             buffer++;
-            if(*buffer == '\r'){
+        }else{
+            //Endline check
+            while((*buffer == '\r' || *buffer == '\n')){
                 Print_Fifo_put(&printFifo, *buffer);
-                RTOS_BPS_MutexPost(&printFifo_ready, OS_OPT_POST_1);
-            }else{
-                RTOS_BPS_MutexPost(&printFifo_ready, OS_OPT_POST_1);
-                Print_Fifo_put(&printFifo, *buffer);
+                buffer++;
             }
+
+            RTOS_BPS_MutexPost(&printFifo_ready, OS_OPT_POST_1);
         }
+
         
-        buffer++;
     }
     return true;
 }
