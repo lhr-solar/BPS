@@ -55,8 +55,8 @@ void Task_CheckContactor(void *p_arg) {
         // if we get to this point and there's no message we try again ~200ms later
         ErrorStatus status = CAN_ReceiveQueue_Pend(&ReceiveCanMsg);
         if (status == SUCCESS && ReceiveCanMsg.id == IO_STATE) {
-            uint8_t ign_1_state = ReceiveCanMsg.payload.data.bytes[3] & 0x1;
-            // uint8_t ign_2_state = ReceiveCanMsg.payload.data.bytes[3] & 0x2; // Motor state -- unused for now
+            uint8_t ign_1_state = ReceiveCanMsg.payload.data.bytes[2] & 0x1;
+            // uint8_t ign_2_state = ReceiveCanMsg.payload.data.bytes[2] & 0x2; // Motor state -- unused for now
             if (ign_1_state) {
                 Contactor_On(ARRAY_CONTACTOR);
             } else {
