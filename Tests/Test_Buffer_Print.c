@@ -42,7 +42,7 @@ CPU_STK Print_Task_Stk[DEFAULT_STACK_SIZE];
 
 // void Basic_Functionality_Test(){
 //     char* str = "Hello, world!\n\r";
-//     RTOS_BPS_snPrintf(str);
+//     RTOS_BPS_NonBlocking_Printf(str);
 // }
 
 /**
@@ -53,8 +53,8 @@ CPU_STK Print_Task_Stk[DEFAULT_STACK_SIZE];
 // void Concurrent_Writes(){
 //     char* str1 = "First\n\r";
 //     char* str2 = "Second\n\r";
-//     RTOS_BPS_snPrintf(str1);
-//     RTOS_BPS_snPrintf(str2);
+//     RTOS_BPS_NonBlocking_Printf(str1);
+//     RTOS_BPS_NonBlocking_Printf(str2);
 // }
 
 /**
@@ -71,7 +71,7 @@ void Overflow_Buffer(){
     // char* str3 = "abcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabczy";
     // // 127
     // char* str4 = "abcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcz";
-    RTOS_BPS_snPrintf(str);
+    RTOS_BPS_NonBlocking_Printf(str);
 
 }
 
@@ -83,8 +83,8 @@ void Overflow_Buffer(){
 void Edge_Case_Buffer_Limit_Test(){
     char* str1 = "abcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabc";
     char* str2 = "abc";
-    RTOS_BPS_snPrintf(str1);
-    RTOS_BPS_snPrintf(str2);    
+    RTOS_BPS_NonBlocking_Printf(str1);
+    RTOS_BPS_NonBlocking_Printf(str2);    
 }
 
 /**
@@ -94,7 +94,7 @@ void Edge_Case_Buffer_Limit_Test(){
 
 // void Empty_String_Test(){
 //     char* str = "";
-//     RTOS_BPS_snPrintf(str);
+//     RTOS_BPS_NonBlocking_Printf(str);
 // }
 
 /**
@@ -104,7 +104,7 @@ void Edge_Case_Buffer_Limit_Test(){
 
 // void Special_Characters_Test(){
 //     char* str = "Special chars: \t \n \r \0 %% & *";
-//     RTOS_BPS_snPrintf(str);
+//     RTOS_BPS_NonBlocking_Printf(str);
 // }
 
 /**
@@ -115,7 +115,7 @@ void Edge_Case_Buffer_Limit_Test(){
 // void Performance_Test(){
 //     char* formatStr = "Formatted number: %d\n\r";
 //     int num = 42;
-//     RTOS_BPS_snPrintf(formatStr, num);
+//     RTOS_BPS_NonBlocking_Printf(formatStr, num);
 // }
 
 void Init_Task(void *p_arg) {
