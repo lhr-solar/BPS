@@ -16,7 +16,6 @@
 
 import sphinx_rtd_theme # ReadTheDocs theme. More information available at: https://sphinx-rtd-theme.readthedocs.io/en/latest/installing.html 
 
-
 # -- Project information -----------------------------------------------------
 
 project = 'BeVolt BPS'
@@ -27,7 +26,6 @@ author = 'Sugam Arora'
 
 # The full version, including alpha/beta/rc tags
 release = '0.0'
-
 
 # -- General configuration ---------------------------------------------------
 
