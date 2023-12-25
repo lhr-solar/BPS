@@ -65,6 +65,14 @@ will build the bare metal version, and
     ```
 will build the RTOS version. The RTOS version is selected by default.
 
+The BPS configuration settings can be modified from the command line from Make. In the top-level of the repo,
+you can specify ```DEFINES=``` alongside the ```make``` command to override values from the configuration
+header file with the values you specify. For example
+    ```
+    make test=Voltage DEFINES=NUM_MINIONS=2
+    ```
+Would update the BPS build to use 2 minion boards in the code and calculations as opposed to 3.
+
 For testing, please read the Testing section.
 
 ### How to build a test
