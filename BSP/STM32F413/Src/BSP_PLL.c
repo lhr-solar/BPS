@@ -14,50 +14,62 @@
 // USB OTG FS, SDIO and RNG Clock = PLL_VCO / PLLQ 
 #define PLL_Q 5
 
+// Number of times to retry enabling the PLL
+// Will fault the BPS after this number of failures
+#define PLL_ATTEMPTS_MAX 10
+
 /**
  * @brief   Initialize the PLL so the system core frequency runs at your preferred frequency.
  * @param   None
  * @return  None
  */
-void BSP_PLL_Init(void) {
+ErrorStatus BSP_PLL_Init(void) {
     RCC_HSEConfig(RCC_HSE_ON);
     
     ErrorStatus status = RCC_WaitForHSEStartUp();
+    uint8_t pllAttempts = 0;
 
-    if(status == SUCCESS){
-        // Flash 3 wait state, prefetch buffer and cache ON
-        FLASH_SetLatency(FLASH_Latency_3);
-        FLASH_PrefetchBufferCmd(ENABLE);
-        FLASH_InstructionCacheCmd(ENABLE);
-        FLASH_DataCacheCmd(ENABLE);
-        
-        // HCLK = SYSCLK
-        RCC_HCLKConfig(RCC_SYSCLK_Div1);
-        
-        // PCLK2 = HCLK/2
-        RCC_PCLK2Config(RCC_HCLK_Div2);
-        
-        // PCLK1 = HCLK/4
-        RCC_PCLK1Config(RCC_HCLK_Div4);
-        
-        // Configure the main PLL clock to 80 MHz
-        RCC_PLLConfig(RCC_PLLSource_HSE, PLL_M, PLL_N, PLL_P, PLL_Q, 2);    // 2 is arbitrary number
-        
-        // Enable the main PLL
-        RCC_PLLCmd(ENABLE);
-        
-        // Wait till the main PLL is ready
-        while (RCC_GetFlagStatus(RCC_FLAG_PLLRDY) == RESET);
-        
-        // Select the main PLL as system clock source
-        RCC_SYSCLKConfig(RCC_SYSCLKSource_PLLCLK);
-        
-        // Update the system clock variable
-        SystemCoreClockUpdate();
+    // If PLL fails to engage in time retry PLL_ATTEMPTS_MAX amount of times
+    // If still fail then we will fault
+    while (status == ERROR) {
+        if (pllAttempts >= PLL_ATTEMPTS_MAX) {
+            //return an error for waiting too long
+            return ERROR;
+        }
+        status = RCC_WaitForHSEStartUp();
+        pllAttempts++;
     }
-    else {
-        while(1);    // Spin for error
-    }
+
+    // Flash 3 wait state, prefetch buffer and cache ON
+    FLASH_SetLatency(FLASH_Latency_3);
+    FLASH_PrefetchBufferCmd(ENABLE);
+    FLASH_InstructionCacheCmd(ENABLE);
+    FLASH_DataCacheCmd(ENABLE);
+        
+    // HCLK = SYSCLK
+    RCC_HCLKConfig(RCC_SYSCLK_Div1);
+    
+    // PCLK2 = HCLK/2
+    RCC_PCLK2Config(RCC_HCLK_Div2);
+        
+    // PCLK1 = HCLK/4
+    RCC_PCLK1Config(RCC_HCLK_Div4);
+        
+    // Configure the main PLL clock to 80 MHz
+    RCC_PLLConfig(RCC_PLLSource_HSE, PLL_M, PLL_N, PLL_P, PLL_Q, 2);	// 2 is arbitrary number
+        
+    // Enable the main PLL
+    RCC_PLLCmd(ENABLE);
+        
+    // Wait till the main PLL is ready
+    while (RCC_GetFlagStatus(RCC_FLAG_PLLRDY) == RESET);
+        
+    // Select the main PLL as system clock source
+    RCC_SYSCLKConfig(RCC_SYSCLKSource_PLLCLK);
+        
+    // Update the system clock variable
+    SystemCoreClockUpdate();
+    return SUCCESS;
 }
 
 /**
@@ -87,10 +99,11 @@ void BSP_PLL_DelayUs(uint32_t micro) {
  * @param   # of milliseconds to delay
  * @return  None
 */
-void BSP_PLL_DelayMs(uint32_t milli) {
+void BSP_PLL_DelayMs(uint32_t milli)
+{
     uint32_t delay = BSP_PLL_GetSystemClock() / 1000;
-    delay /= 10;        // inner loop takes about 10 cycles @ GCC -O3
-    for (volatile uint32_t i = 0; i < milli; i++) {
-        for (volatile uint32_t j = 0; j < delay; j++);
+    for(volatile uint32_t i = 0; i < milli; i++)
+    {
+        for(volatile uint32_t j = 0; j < delay; j++);
     }
 }

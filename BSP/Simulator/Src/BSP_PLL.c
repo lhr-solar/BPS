@@ -15,10 +15,11 @@ static bool initialized = false;
  * @param   None
  * @return  None
  */
-void BSP_PLL_Init(void) {
+ErrorStatus BSP_PLL_Init(void) {
     SystemCoreClock = 80000000;
     initialized = true;
     Simulator_Log(LOG_INFO, "Initialized PLL\n");
+    return SUCCESS;
 }
 
 /**
