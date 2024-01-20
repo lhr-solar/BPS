@@ -125,7 +125,7 @@ void BSP_CAN_Init(callback_t rxEvent,
         for (uint8_t i = 0; i < num_ids_rounded; i++) {
             // loop through a rounded-up number of IDs, that way we can fill in the empty 
             // filter banks with 0s.
-            *filter_fields[i / BSP_CAN_IDS_PER_FILTER] = (i < txIDFilterLen) ? (txIDFilter[i] << 5) : 0x0000;
+            *filter_fields[i % BSP_CAN_IDS_PER_FILTER] = (i < txIDFilterLen) ? (txIDFilter[i] << 5) : 0x0000;
             if (i % BSP_CAN_IDS_PER_FILTER == 3) {
                 CAN_FilterInit(CAN1, &CAN_FilterInitStructure);
                 CAN_FilterInitStructure.CAN_FilterNumber++;
