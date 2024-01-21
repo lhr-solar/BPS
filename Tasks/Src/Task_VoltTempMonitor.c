@@ -11,6 +11,10 @@
 //declared in Tasks.c
 extern cell_asic Minions[NUM_MINIONS];
 
+static uint32_t voltage_averages[NUM_BATTERY_MODULES] = {0};
+
+static uint32_t task_cycle_counter = 0;
+
 void Task_VoltTempMonitor(void *p_arg) {
     (void)p_arg; 
 
@@ -28,6 +32,8 @@ void Task_VoltTempMonitor(void *p_arg) {
     CANPayload_t CanPayload;
     CANMSG_t CanMsg;
     while(1) {
+        task_cycle_counter++;       // used for temperature sampling decimation
+
         // BLOCKING =====================
         // Update Voltage Measurements
         Voltage_UpdateMeasurements();
@@ -47,14 +53,23 @@ void Task_VoltTempMonitor(void *p_arg) {
         bool charge_enable = true;
         CanMsg.id = VOLT_DATA;
         for (int i = 0; i < NUM_BATTERY_MODULES; i++){ //send all battery module voltage data
-            CanPayload.idx = i;
-            int voltage = Voltage_GetModuleMillivoltage(i);
-            CanData.w = voltage;
-            CanPayload.data = CanData;
-            CanMsg.payload = CanPayload;
-            CAN_Queue_Post(CanMsg);
+            
+            uint16_t voltage = Voltage_GetModuleMillivoltage(i);
+            voltage_averages[i] += voltage;
+
             if (voltage > CHARGE_DISABLE_VOLTAGE){
                 charge_enable = false;
+            }
+
+            // Send voltages over CAN every ODR_VOLTAGE_AVERAGING iterations
+            if (task_cycle_counter % ODR_VOLTAGE_AVERAGING == 0) {
+                CanPayload.idx = i;
+                CanData.w = (int)(voltage_averages[i] / ODR_VOLTAGE_AVERAGING);
+                CanPayload.data = CanData;
+                CanMsg.payload = CanPayload;
+                CAN_Queue_Post(CanMsg);
+
+                voltage_averages[i] = 0;
             }
         }
         
@@ -75,8 +90,11 @@ void Task_VoltTempMonitor(void *p_arg) {
         }
 
         // BLOCKING =====================
-        // Update Temperature Measurements
-        Temperature_UpdateAllMeasurements();
+        // Update Temperature Measurements (every ODR_TEMPERATURE_DECIMATION iterations)
+        if (task_cycle_counter % ODR_TEMPERATURE_DECIMATION == 0) {
+            Temperature_UpdateAllMeasurements();
+        }
+
         // Check if temperature is NOT safe: for all modules
         SafetyStatus temperatureStatus = Temperature_CheckStatus(Amps_IsCharging());
         if(temperatureStatus != SAFE) {
