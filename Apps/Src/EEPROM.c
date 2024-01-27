@@ -9,9 +9,8 @@
 
 // addresses for EEPROM data segments
 #define EEPROM_CHARGE_INIT_ADDR 0x400
-#define EEPROM_ERRORS_INIT_ADDR 0x0
+#define EEPROM_ERRORS_INIT_ADDR 0x4
 static uint16_t charge_dynamic_addr = EEPROM_CHARGE_INIT_ADDR;
-static uint16_t errors_dynamic_addr = EEPROM_ERRORS_INIT_ADDR;
 
 static const uint16_t MAX_FAULTS = 100;
 
@@ -45,14 +44,14 @@ void EEPROM_Init(void) {
 
     // find the end of the fault array
     uint32_t data = 0;
-    faultArrayEndAddress = errors_dynamic_addr - sizeof(EEPROM_TERMINATOR);
+    faultArrayEndAddress = EEPROM_ERRORS_INIT_ADDR - sizeof(EEPROM_TERMINATOR);
     while (data != EEPROM_TERMINATOR) {
         if (EEPROM_errorLoggingDisabled) {
             return;
         }
-        if (faultArrayEndAddress > errors_dynamic_addr + sizeof(EEPROM_TERMINATOR) * MAX_FAULTS) {
+        if (faultArrayEndAddress > EEPROM_ERRORS_INIT_ADDR + sizeof(EEPROM_TERMINATOR) * MAX_FAULTS) {
             EEPROM_Reset();
-            faultArrayEndAddress = errors_dynamic_addr;
+            faultArrayEndAddress = EEPROM_ERRORS_INIT_ADDR;
             break;
         }
         faultArrayEndAddress += sizeof(EEPROM_TERMINATOR);
@@ -69,9 +68,9 @@ void EEPROM_Reset(void) {
     // initialize the EEPROM
     M24128_Init();
     // initialize the fault array
-    EEPROM_RETRY(M24128_Write(errors_dynamic_addr, sizeof(EEPROM_TERMINATOR), (uint8_t *) &EEPROM_TERMINATOR)); // retry if unsuccessful
+    EEPROM_RETRY(M24128_Write(EEPROM_ERRORS_INIT_ADDR, sizeof(EEPROM_TERMINATOR), (uint8_t *) &EEPROM_TERMINATOR)); // retry if unsuccessful
 
-    faultArrayEndAddress = errors_dynamic_addr;
+    faultArrayEndAddress = EEPROM_ERRORS_INIT_ADDR;
 }
 
 /**
@@ -97,7 +96,13 @@ void EEPROM_SetCharge(uint32_t charge) {
         EEPROM_driverErrorCount++; // log that we had an error
     } else {
         // increment the location we write to every time if we succeed
-        charge_dynamic_addr += sizeof(charge);
+
+        if (charge_dynamic_addr + sizeof(charge) < charge_dynamic_addr) {
+            // overflow happened so reset back to our initial starting addr for charge
+            charge_dynamic_addr = EEPROM_CHARGE_INIT_ADDR;
+        } else {
+            charge_dynamic_addr += sizeof(charge);
+        }
     }
 }
 
