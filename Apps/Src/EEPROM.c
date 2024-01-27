@@ -8,8 +8,11 @@
 #include "M24128.h"
 
 // addresses for EEPROM data segments
-#define EEPROM_CHARGE_ADDR  0x0
-static const uint16_t EEPROM_FAULT_ADDR  = (EEPROM_CHARGE_ADDR + sizeof(uint32_t));
+#define EEPROM_CHARGE_INIT_ADDR 0x400
+#define EEPROM_ERRORS_INIT_ADDR 0x0
+static uint16_t charge_dynamic_addr = EEPROM_CHARGE_INIT_ADDR;
+static uint16_t errors_dynamic_addr = EEPROM_ERRORS_INIT_ADDR;
+
 static const uint16_t MAX_FAULTS = 100;
 
 // terminating character for fault array
@@ -43,14 +46,14 @@ void EEPROM_Init(void) {
 
     // find the end of the fault array
     uint32_t data = 0;
-    faultArrayEndAddress = EEPROM_FAULT_ADDR - sizeof(EEPROM_TERMINATOR);
+    faultArrayEndAddress = errors_dynamic_addr - sizeof(EEPROM_TERMINATOR);
     while (data != EEPROM_TERMINATOR) {
         if (EEPROM_errorLoggingDisabled) {
             return;
         }
-        if (faultArrayEndAddress > EEPROM_FAULT_ADDR + sizeof(EEPROM_TERMINATOR) * MAX_FAULTS) {
+        if (faultArrayEndAddress > errors_dynamic_addr + sizeof(EEPROM_TERMINATOR) * MAX_FAULTS) {
             EEPROM_Reset();
-            faultArrayEndAddress = EEPROM_FAULT_ADDR;
+            faultArrayEndAddress = errors_dynamic_addr;
             break;
         }
         faultArrayEndAddress += sizeof(EEPROM_TERMINATOR);
@@ -70,9 +73,9 @@ void EEPROM_Reset(void) {
     M24128_Init();
 
     // initialize the fault array
-    EEPROM_RETRY(M24128_Write(EEPROM_FAULT_ADDR, sizeof(EEPROM_TERMINATOR), (uint8_t *) &EEPROM_TERMINATOR)); // retry if unsuccessful
+    EEPROM_RETRY(M24128_Write(errors_dynamic_addr, sizeof(EEPROM_TERMINATOR), (uint8_t *) &EEPROM_TERMINATOR)); // retry if unsuccessful
 
-    faultArrayEndAddress = EEPROM_FAULT_ADDR;
+    faultArrayEndAddress = errors_dynamic_addr;
 }
 
 /**
@@ -84,7 +87,7 @@ uint32_t EEPROM_GetCharge(void) {
     return 45000;
     //TODO: THIS IS UNTIL WE FIX THESE DRIVERS. ISSUE TICKET ON GITHUB
     uint32_t charge;
-    EEPROM_RETRY(M24128_Read(EEPROM_CHARGE_ADDR, sizeof(charge), (uint8_t *) &charge)); // retry if unsuccessful
+    EEPROM_RETRY(M24128_Read(charge_dynamic_addr, sizeof(charge), (uint8_t *) &charge)); // retry if unsuccessful
     return charge;
 }
 
@@ -97,9 +100,15 @@ void EEPROM_SetCharge(uint32_t charge) {
     return;
     //TODO: THIS IS UNTIL WE FIX THESE DRIVERS. ISSUE TICKET ON GITHUB
     // this gets called a lot during normal operation, and I think it is ok if it fails sometimes, so I won't make it retry
-    ErrorStatus result = M24128_Write(EEPROM_CHARGE_ADDR, sizeof(charge), (uint8_t *) &charge);
+    ErrorStatus result = M24128_Write(charge_dynamic_addr, sizeof(charge), (uint8_t *) &charge);
     if (result == ERROR) {
         EEPROM_driverErrorCount++; // log that we had an error
+    } else {
+        // increment the location we write to every time if we succeed
+        charge_dynamic_addr += 4;
+        if (charge_dynamic_addr == faultArrayEndAddress) {
+            charge_dynamic_addr += 4;
+        }
     }
 }
 
@@ -131,7 +140,7 @@ uint16_t EEPROM_GetErrors(uint32_t *errors, uint16_t maxErrors) {
     if (EEPROM_errorLoggingDisabled) return 0;
 
     uint16_t numErrors = 0;
-    uint16_t addr = EEPROM_FAULT_ADDR;
+    uint16_t addr = EEPROM_ERRORS_INIT_ADDR;
     for (; (addr < faultArrayEndAddress) && (numErrors < maxErrors); ++numErrors) {
         EEPROM_RETRY(M24128_Read(addr, sizeof(*errors), (uint8_t *) (errors + numErrors))); // retry if unsuccessful
         addr += sizeof(*errors);
