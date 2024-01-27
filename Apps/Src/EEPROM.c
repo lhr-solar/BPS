@@ -40,7 +40,6 @@ static uint32_t EEPROM_driverErrorCount = 0;
  * Initializes EEPROM application
  */
 void EEPROM_Init(void) {
-    return; //TODO: THIS IS UNTIL WE FIX THESE DRIVERS. ISSUE TICKET ON GITHUB
     // initialize the EEPROM
     M24128_Init();
 
@@ -67,11 +66,8 @@ void EEPROM_Init(void) {
  * set-up programs and the CLI.
  */
 void EEPROM_Reset(void) {
-    //TODO: THIS IS UNTIL WE FIX THESE DRIVERS. ISSUE TICKET ON GITHUB
-    return;
     // initialize the EEPROM
     M24128_Init();
-
     // initialize the fault array
     EEPROM_RETRY(M24128_Write(errors_dynamic_addr, sizeof(EEPROM_TERMINATOR), (uint8_t *) &EEPROM_TERMINATOR)); // retry if unsuccessful
 
@@ -84,8 +80,6 @@ void EEPROM_Reset(void) {
  * @return uint32_t stored charge value
  */
 uint32_t EEPROM_GetCharge(void) {
-    return 45000;
-    //TODO: THIS IS UNTIL WE FIX THESE DRIVERS. ISSUE TICKET ON GITHUB
     uint32_t charge;
     EEPROM_RETRY(M24128_Read(charge_dynamic_addr, sizeof(charge), (uint8_t *) &charge)); // retry if unsuccessful
     return charge;
@@ -97,18 +91,13 @@ uint32_t EEPROM_GetCharge(void) {
  * @param charge The value to set the EEPROM's stored state of charge to
  */
 void EEPROM_SetCharge(uint32_t charge) {
-    return;
-    //TODO: THIS IS UNTIL WE FIX THESE DRIVERS. ISSUE TICKET ON GITHUB
     // this gets called a lot during normal operation, and I think it is ok if it fails sometimes, so I won't make it retry
     ErrorStatus result = M24128_Write(charge_dynamic_addr, sizeof(charge), (uint8_t *) &charge);
     if (result == ERROR) {
         EEPROM_driverErrorCount++; // log that we had an error
     } else {
         // increment the location we write to every time if we succeed
-        charge_dynamic_addr += 4;
-        if (charge_dynamic_addr == faultArrayEndAddress) {
-            charge_dynamic_addr += 4;
-        }
+        charge_dynamic_addr += sizeof(charge);
     }
 }
 
@@ -118,7 +107,6 @@ void EEPROM_SetCharge(uint32_t charge) {
  * @param error The error to log
  */
 void EEPROM_LogError(uint32_t error) {
-    return;
     //TODO: THIS IS UNTIL WE FIX THESE DRIVERS. ISSUE TICKET ON GITHUB
     if (EEPROM_errorLoggingDisabled) return;
     // assumes sizeof(EEPROM_TERMINATOR) == sizeof(error)
