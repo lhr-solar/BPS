@@ -103,8 +103,12 @@ void EnterFaultState() {
     char command[COMMAND_SIZE];
 #endif
     BSP_WDTimer_Init(true); //re-initialize for fault state
-    BSP_WDTimer_Start(); 
+    BSP_WDTimer_Start();
+    uint32_t i = 0;
     while(1) {
+        //toggle run led when in fault state -- divide by 10 makes the blink speed ok
+        if (i % 10 == 0) BSP_Light_Toggle(RUN);
+        i++;
         //Send Trip Readings
         CANPayload_t payload;
         payload.data.w = 1;
@@ -132,9 +136,6 @@ void EnterFaultState() {
             CANbus_SendMsg_FaultState(TEMPERATURE_DATA_ARRAY, payload);
         }
 
-#ifdef DEBUGMODE
-        if (BSP_UART_ReadLine(command)) CLI_Handler(command); // CLI
-#endif
         BSP_WDTimer_Reset(); // WDOG Reset
 #ifdef SIMULATION
         Simulator_Log(LOG_INFO, "Completed fault state\n");
