@@ -10,7 +10,10 @@
 // addresses for EEPROM data segments
 #define EEPROM_CHARGE_INIT_ADDR 0x400
 #define EEPROM_ERRORS_INIT_ADDR 0x4
+#define EEPROM_MAX_ADDR 0x3FFC
+
 static uint16_t charge_dynamic_addr = EEPROM_CHARGE_INIT_ADDR;
+static uint8_t performedWrites = 0;
 
 static const uint16_t MAX_FAULTS = 100;
 
@@ -41,7 +44,7 @@ static uint32_t EEPROM_driverErrorCount = 0;
 void EEPROM_Init(void) {
     // initialize the EEPROM
     M24128_Init();
-
+    performedWrites = 0;
     // find the end of the fault array
     uint32_t data = 0;
     faultArrayEndAddress = EEPROM_ERRORS_INIT_ADDR - sizeof(EEPROM_TERMINATOR);
@@ -78,11 +81,39 @@ void EEPROM_Reset(void) {
  * 
  * @return uint32_t stored charge value
  */
-uint32_t EEPROM_GetCharge(void) {
+uint32_t EEPROM_GetLastCharge(void) {
     uint32_t charge;
+    uint16_t read_addr;
+    // if havent performed any writes dont read out of bounds
+    if (performedWrites == 0) {
+        read_addr = charge_dynamic_addr;
+    } else {
+        read_addr = charge_dynamic_addr - 4;
+    }
     EEPROM_RETRY(M24128_Read(charge_dynamic_addr, sizeof(charge), (uint8_t *) &charge)); // retry if unsuccessful
     return charge;
 }
+
+/**
+ * @brief Get a specific state of charge entry from the EEPROM
+ * 
+ * @param numEntry Which state of charge entry to read (i.e. entry 0, entry 1)
+ * @return uint32_t 
+ */
+uint32_t EEPROM_GetChargeEntry(uint16_t entry_num) {
+    uint32_t charge = -1;
+    // EEPROM memory arranged as 16 K * 8 bit chunks
+    // SOC vals are 4 bytes each so shift "entry num" left 2 to * 4
+    // [0x3ffc (max addr we can use) - 0x400] >> 2
+    uint16_t offset = (entry_num << 2) % 0xEFF;
+    uint16_t readAddress = EEPROM_CHARGE_INIT_ADDR + offset;
+    EEPROM_RETRY(M24128_Read(readAddress, sizeof(charge), (uint8_t *) &charge));
+    return readAddress;
+}
+/*
+EEPROM_GetLastCharge()
+EEPROM_GetChargeEntry(uint16_t entry_num);
+*/
 
 /**
  * @brief Set the stored state of charge value in the EEPROM
@@ -96,8 +127,7 @@ void EEPROM_SetCharge(uint32_t charge) {
         EEPROM_driverErrorCount++; // log that we had an error
     } else {
         // increment the location we write to every time if we succeed
-
-        if (charge_dynamic_addr + sizeof(charge) < charge_dynamic_addr) {
+        if (charge_dynamic_addr + sizeof(charge) > EEPROM_MAX_ADDR) {
             // overflow happened so reset back to our initial starting addr for charge
             charge_dynamic_addr = EEPROM_CHARGE_INIT_ADDR;
         } else {
