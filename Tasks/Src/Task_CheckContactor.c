@@ -55,11 +55,6 @@ void Task_CheckContactor(void *p_arg) {
         // if we get to this point and there's no message we try again ~200ms later
         ErrorStatus status = CAN_ReceiveQueue_Pend(&ReceiveCanMsg);
         if (status == SUCCESS && ReceiveCanMsg.id == IO_STATE) {
-            printf("recv:");
-            for (int i = 0; i < 8; i++) {
-                printf(" %02x", ReceiveCanMsg.payload.data.bytes[i]);
-            }
-            printf("\n");
             uint8_t array_state = (ReceiveCanMsg.payload.data.bytes[3] >> 2) & 0x1;
             if (array_state) {
                 Contactor_On(ARRAY_CONTACTOR);
