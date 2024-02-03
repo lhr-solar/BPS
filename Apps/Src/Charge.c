@@ -19,7 +19,7 @@ void Charge_Init(void){
 	return; //TODO: THIS IS UNTIL WE FIX THE EEPROM DRIVERS. ISSUE TICKET ON GITHUB
 	
 	// Grab from EEPROM what is the current Charge
-	charge = EEPROM_GetCharge();
+	charge = EEPROM_GetLastCharge();
 
     BSP_Timer_Start_TickCounter();
 }

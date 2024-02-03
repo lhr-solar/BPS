@@ -11,9 +11,10 @@
 #define EEPROM_CHARGE_INIT_ADDR 0x400
 #define EEPROM_ERRORS_INIT_ADDR 0x4
 #define EEPROM_MAX_ADDR 0x3FFC
+#define EEPROM_MAX_CHARGE_ENTRIES 0xEFF
 
 static uint16_t charge_dynamic_addr = EEPROM_CHARGE_INIT_ADDR;
-static uint8_t performedWrites = 0;
+static uint16_t performedWrites = 0;
 
 static const uint16_t MAX_FAULTS = 100;
 
@@ -82,13 +83,16 @@ void EEPROM_Reset(void) {
  * @return uint32_t stored charge value
  */
 uint32_t EEPROM_GetLastCharge(void) {
-    uint32_t charge;
+    uint32_t charge = -1;
     uint16_t read_addr;
-    // if havent performed any writes dont read out of bounds
+    // dont read out of bounds on edge cases
     if (performedWrites == 0) {
         read_addr = charge_dynamic_addr;
     } else {
-        read_addr = charge_dynamic_addr - 4;
+        charge_dynamic_addr += (0x3BFC - EEPROM_CHARGE_INIT_ADDR);
+        charge_dynamic_addr %= 0x3C00;
+        charge_dynamic_addr += EEPROM_CHARGE_INIT_ADDR;
+        // (charge_dynamic_addr - 400) + 3BFC) % 3C00 ) + 400 
     }
     EEPROM_RETRY(M24128_Read(charge_dynamic_addr, sizeof(charge), (uint8_t *) &charge)); // retry if unsuccessful
     return charge;
@@ -104,16 +108,12 @@ uint32_t EEPROM_GetChargeEntry(uint16_t entry_num) {
     uint32_t charge = -1;
     // EEPROM memory arranged as 16 K * 8 bit chunks
     // SOC vals are 4 bytes each so shift "entry num" left 2 to * 4
-    // [0x3ffc (max addr we can use) - 0x400] >> 2
+    // [0x3ffc (max addr we can use) - 0x400] >> 2 = 0xEFF # of entries in the SOC write region
     uint16_t offset = (entry_num << 2) % 0xEFF;
     uint16_t readAddress = EEPROM_CHARGE_INIT_ADDR + offset;
     EEPROM_RETRY(M24128_Read(readAddress, sizeof(charge), (uint8_t *) &charge));
-    return readAddress;
+    return charge;
 }
-/*
-EEPROM_GetLastCharge()
-EEPROM_GetChargeEntry(uint16_t entry_num);
-*/
 
 /**
  * @brief Set the stored state of charge value in the EEPROM
@@ -127,12 +127,17 @@ void EEPROM_SetCharge(uint32_t charge) {
         EEPROM_driverErrorCount++; // log that we had an error
     } else {
         // increment the location we write to every time if we succeed
-        if (charge_dynamic_addr + sizeof(charge) > EEPROM_MAX_ADDR) {
-            // overflow happened so reset back to our initial starting addr for charge
-            charge_dynamic_addr = EEPROM_CHARGE_INIT_ADDR;
-        } else {
-            charge_dynamic_addr += sizeof(charge);
-        }
+        /*
+            To cyclically update the write address from 0x400 -> 0x3FFC, we apply the following:
+            1) Subtract 0x3FC (-0x400, + 0x4)
+            2) Modulo 0x3C00 (0x4000 total bytes we can write - 0x400 [starting addr for SOC writes])
+            3) Add 0x400
+            4) This is next write address.
+        */
+        charge_dynamic_addr -= 0x3FC;
+        charge_dynamic_addr %= 0x3C00;
+        charge_dynamic_addr += 0x400;
+        performedWrites++;
     }
 }
 
