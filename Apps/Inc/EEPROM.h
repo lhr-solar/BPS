@@ -59,4 +59,11 @@ void EEPROM_LogError(uint32_t error);
  */
 uint16_t EEPROM_GetErrors(uint32_t *errors, uint16_t maxErrors);
 
+/**
+ * @brief Saves the last written address the EEPROM wrote to on failure or shutdown for
+ * next power cycle
+ * 
+ */
+void EEPROM_SaveAddress(void);
+
 #endif

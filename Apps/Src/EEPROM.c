@@ -13,6 +13,7 @@
 #define EEPROM_MAX_ADDR 0x3FFC
 #define EEPROM_MAX_CHARGE_ENTRIES 0xEFF
 
+
 static uint16_t charge_dynamic_addr = EEPROM_CHARGE_INIT_ADDR;
 static uint16_t performedWrites = 0;
 
@@ -61,6 +62,8 @@ void EEPROM_Init(void) {
         faultArrayEndAddress += sizeof(EEPROM_TERMINATOR);
         EEPROM_RETRY(M24128_Read(faultArrayEndAddress, sizeof(data), (uint8_t *) &data)); // retry if unsuccessful
     }
+    // On initialization, set our starting charge address to the one we saved on shutdowns.
+    EEPROM_RETRY(M24128_Read(EEPROM_CHARGE_INIT_ADDR - 0x4, sizeof(uint16_t), (uint8_t*) &charge_dynamic_addr));
 }
 
 /** EEPROM_Reset
@@ -89,12 +92,10 @@ uint32_t EEPROM_GetLastCharge(void) {
     if (performedWrites == 0) {
         read_addr = charge_dynamic_addr;
     } else {
-        charge_dynamic_addr += (0x3BFC - EEPROM_CHARGE_INIT_ADDR);
-        charge_dynamic_addr %= 0x3C00;
-        charge_dynamic_addr += EEPROM_CHARGE_INIT_ADDR;
+        read_addr = ((charge_dynamic_addr + (0x3BFC - EEPROM_CHARGE_INIT_ADDR)) % 0x3C00) + EEPROM_CHARGE_INIT_ADDR;
         // (charge_dynamic_addr - 400) + 3BFC) % 3C00 ) + 400 
     }
-    EEPROM_RETRY(M24128_Read(charge_dynamic_addr, sizeof(charge), (uint8_t *) &charge)); // retry if unsuccessful
+    EEPROM_RETRY(M24128_Read(read_addr, sizeof(charge), (uint8_t *) &charge)); // retry if unsuccessful
     return charge;
 }
 
@@ -109,7 +110,7 @@ uint32_t EEPROM_GetChargeEntry(uint16_t entry_num) {
     // EEPROM memory arranged as 16 K * 8 bit chunks
     // SOC vals are 4 bytes each so shift "entry num" left 2 to * 4
     // [0x3ffc (max addr we can use) - 0x400] >> 2 = 0xEFF # of entries in the SOC write region
-    uint16_t offset = (entry_num << 2) % 0xEFF;
+    uint16_t offset = (entry_num << 2) % EEPROM_MAX_CHARGE_ENTRIES;
     uint16_t readAddress = EEPROM_CHARGE_INIT_ADDR + offset;
     EEPROM_RETRY(M24128_Read(readAddress, sizeof(charge), (uint8_t *) &charge));
     return charge;
@@ -147,8 +148,6 @@ void EEPROM_SetCharge(uint32_t charge) {
  * @param error The error to log
  */
 void EEPROM_LogError(uint32_t error) {
-    //TODO: THIS IS UNTIL WE FIX THESE DRIVERS. ISSUE TICKET ON GITHUB
-    if (EEPROM_errorLoggingDisabled) return;
     // assumes sizeof(EEPROM_TERMINATOR) == sizeof(error)
     // retry writes if unsuccessful
     EEPROM_RETRY(M24128_Write(faultArrayEndAddress + sizeof(EEPROM_TERMINATOR), sizeof(EEPROM_TERMINATOR), (uint8_t *) &EEPROM_TERMINATOR));
@@ -164,8 +163,6 @@ void EEPROM_LogError(uint32_t error) {
  * @return              the number of errors read
  */
 uint16_t EEPROM_GetErrors(uint32_t *errors, uint16_t maxErrors) {
-    //TODO: THIS IS UNTIL WE FIX THESE DRIVERS. ISSUE TICKET ON GITHUB
-    if (EEPROM_errorLoggingDisabled) return 0;
 
     uint16_t numErrors = 0;
     uint16_t addr = EEPROM_ERRORS_INIT_ADDR;
@@ -174,4 +171,16 @@ uint16_t EEPROM_GetErrors(uint32_t *errors, uint16_t maxErrors) {
         addr += sizeof(*errors);
     }
     return numErrors;
+}
+
+/**
+ * @brief Save the last written charge address to a fixed location.
+ * Only called on shutdown/faults.
+ * 
+ */
+void EEPROM_SaveAddress() {
+    // same as GetLastCharge()
+    uint16_t last_addr = ((charge_dynamic_addr + (0x3BFC - EEPROM_CHARGE_INIT_ADDR)) % 0x3C00) + EEPROM_CHARGE_INIT_ADDR;
+    M24128_Write(EEPROM_CHARGE_INIT_ADDR - 0x4, sizeof(last_addr), (uint8_t*) &last_addr);
+    // we aren't going to retry here. if it fails it fails.
 }

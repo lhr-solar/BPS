@@ -93,6 +93,7 @@ void EnterFaultState() {
     }
 
     EEPROM_LogError(Fault_BitMap);
+    EEPROM_SaveAddress();
 
     // TODO: create an interrupt-independent CAN interface, so we can use CAN from within a fault state
     // avoid infinite recursive faults, since our CAN Driver relies on the OS to work
