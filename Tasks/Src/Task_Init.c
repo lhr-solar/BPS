@@ -52,16 +52,16 @@ void Task_Init(void *p_arg) {
             TASK_AMPERES_MONITOR_PRIO,			// Priority
             AmperesMonitor_Stk,				    // Stack
             TASK_AMPERES_MONITOR_STACK_SIZE);
-    /*
+    
     RTOS_BPS_TaskCreate(&BatteryBalance_TCB,	// TCB
             "TASK_BATTERY_BALANCE",	            // Task Name (String)
             Task_BatteryBalance,				// Task function pointer
             (void *)0,				            // Task function args
             TASK_BATTERY_BALANCE_PRIO,			// Priority
             BatteryBalance_Stk,				    // Stack
-            TASK_BATTERY_BALANCE_STACK_SIZE,	// Stack size
-            );
-    */
+            TASK_BATTERY_BALANCE_STACK_SIZE);	// Stack size
+            
+    
     RTOS_BPS_TaskCreate(&LogInfo_TCB,			// TCB
             "TASK_LOG_INFO",	                // Task Name (String)
             Task_LogInfo,				        // Task function pointer
