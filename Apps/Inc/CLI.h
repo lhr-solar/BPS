@@ -106,7 +106,7 @@ void CLI_Help(void);
  * Checks and displays the desired voltage parameter(s)
  * @param hashTokens is the array of hashed tokens
  */
-void CLI_Voltage(int* hashTokens);
+void CLI_Voltage();
 
 /** CLI_Current
  * Checks and displays the desired current parameter(s)
@@ -116,9 +116,18 @@ void CLI_Current(int* hashTokens);
 
 /** CLI_Temperature
  * Checks and displays the desired temperature parameter(s)
- * @param hashTokens is the array of hashed tokens
  */
-void CLI_Temperature(int* hashTokens);
+void CLI_Temperature();
+
+/** CLI_FAULT
+ * Prints the current fault state out
+ */
+void CLI_FAULT();
+
+/** CLI_FANS
+ * Prints the fan speed out
+ */
+void CLI_Fans();
 
 /** CLI_LTC6811
  * Prints register information. All registers are of the same type

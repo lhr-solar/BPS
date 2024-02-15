@@ -1,27 +1,137 @@
-/* Copyright (c) 2018-2022 UT Longhorn Racing Solar */
+/* Copyright (c) 2018-2023 UT Longhorn Racing Solar */
 
-// /* CLI.c
-//  * Command Line Interface wrapper to 
-//  * define and route commands
+/* CLI.c
+* Command Line Interface wrapper to 
+ * define and route commands
+*/
+
+#include "CLI.h"
+#include "Voltage.h"
+#include "Amps.h"
+#include "Temperature.h"
+#include "Contactor.h"
+#include "BSP_WDTimer.h"
+#include "BSP_Lights.h"
+#include "config.h"
+#include "Charge.h"
+#include "CANbus.h"
+#include "BSP_CAN.h"
+#include "BSP_UART.h"
+#include "Images.h"
+#include "BSP_ADC.h"
+#include "EEPROM.h"
+#include "Tasks.h"
+#include <string.h>
+#include "Fans.h"
+
+
+// to do, fix header file
+
+
+/** CLI_Init
+* Initializes the CLI with the values it needs
+* @param boards is a cell_asic struct pointer to the minion boards
+*/
+void CLI_Init(cell_asic* minions){
+
+}
+
+void CLI_DUMP(){
+    char* StartString = "-----------Start of Dump-----------\n";
+    char* EndString   = "-------------End of Dump-----------\n";
+    printf(StartString);
+    CLI_Voltage();
+    CLI_Temperature();
+    CLI_Fans();
+    CLI_FAULT();
+    printf(EndString);
+
+}
+
+void CLI_Voltage(){
+    // Todo: figure out units
+    // Prints total voltage of the Battery pack in [units tbd]
+ 	//printf("Total voltage: %u\n\r", Voltage_GetTotalPackVoltage());
+
+    // Prints the voltages
+    for(int i = 0; i < NUM_BATTERY_MODULES; i++){
+        //printf("Module %d:  %umV\n\r", i+1, Voltage_GetModuleMillivoltage(i));
+    }
+
+
+}
+
+void CLI_Temperature(){
+
+}
+
+void CLI_Fans(){
+    printf("Fan Speeds: On a scale of 0 - 8\n");
+    for(int i = 0; i < 3; i++)
+    {
+        printf("Fan %d is at %d\n", i+1, Fans_GetSpeed(i));
+    }
+}
+
+void CLI_FAULT(){
+
+}
+
+
+
+// /** CLI_Voltage
+//  * Checks and displays the desired
+//  * voltage parameter(s)
+//  * @param hashTokens is the array of hashed tokens
 //  */
-
-// #include "CLI.h"
-// #include "Voltage.h"
-// #include "Amps.h"
-// #include "Temperature.h"
-// #include "Contactor.h"
-// #include "BSP_WDTimer.h"
-// #include "BSP_Lights.h"
-// #include "config.h"
-// #include "Charge.h"
-// #include "CANbus.h"
-// #include "BSP_CAN.h"
-// #include "BSP_UART.h"
-// #include "Images.h"
-// #include "BSP_ADC.h"
-// #include "EEPROM.h"
-// #include "Tasks.h"
-// #include <string.h>
+// void CLI_Voltage(int* hashTokens) {
+// 	if(hashTokens[1] == 0) {
+// 		for(int i = 0; i < NUM_BATTERY_MODULES; i++){
+// 			printf("Module number %d: %.3fV\n\r", i+1, Voltage_GetModuleMillivoltage(i)/MILLI_UNIT_CONVERSION);
+// 		}
+// 		return;
+// 	}
+// 	SafetyStatus voltage = Voltage_CheckStatus();
+// 	switch(hashTokens[1]){		
+// 		// Specific module
+// 		case CLI_MODULE_HASH:
+// 			if (hashTokens[2] == 0 || hashTokens[2] > NUM_BATTERY_MODULES || hashTokens[2] < 1){
+// 				printf("Invalid module number");
+// 			}
+// 			else {
+// 				printf("Module number %d: %.3fV\n\r", hashTokens[2], Voltage_GetModuleMillivoltage(hashTokens[2]-1)/MILLI_UNIT_CONVERSION);
+// 			}
+// 			break;
+// 		// Total
+// 		case CLI_TOTAL_HASH:
+// 			printf("Total voltage: %.3fV\n\r", Voltage_GetTotalPackVoltage()/MILLI_UNIT_CONVERSION);
+// 			break;
+// 		// Safety Status
+// 		case CLI_SAFE_HASH:
+// 		case CLI_SAFETY_HASH:	
+// 			printf("Safety Status: ");
+// 				switch(voltage) {
+// 					case SAFE: 
+// 						printf("SAFE\n\r");
+// 						break;
+// 					case DANGER: 
+// 						printf("DANGER\n\r");
+// 						break;
+// 					case OVERVOLTAGE:
+// 						printf("OVERVOLTAGE\n\r");
+// 						break;
+// 					case UNDERVOLTAGE: 
+// 						printf("UNDERVOLTAGE\n\r");
+// 						break;
+// 					default:
+// 						break;
+// 				}		
+// 				break;
+// 		default:
+// 			printf("Invalid voltage command\n\r");
+// 			break;
+// 	}
+// }
 
 // #define MAX_TOKEN_SIZE 4
 
@@ -116,60 +226,6 @@
 // 	printf("Critical/Abort\t\topenwire\t\tAll\n\r");
 // 	printf("Keep in mind: all values are 1-indexed\n\r");
 // 	printf("-----------------------------------------------------------\n\r");
-// }
-
-// /** CLI_Voltage
-//  * Checks and displays the desired
-//  * voltage parameter(s)
-//  * @param hashTokens is the array of hashed tokens
-//  */
-// void CLI_Voltage(int* hashTokens) {
-// 	if(hashTokens[1] == 0) {
-// 		for(int i = 0; i < NUM_BATTERY_MODULES; i++){
-// 			printf("Module number %d: %.3fV\n\r", i+1, Voltage_GetModuleMillivoltage(i)/MILLI_UNIT_CONVERSION);
-// 		}
-// 		return;
-// 	}
-// 	SafetyStatus voltage = Voltage_CheckStatus();
-// 	switch(hashTokens[1]){		
-// 		// Specific module
-// 		case CLI_MODULE_HASH:
-// 			if (hashTokens[2] == 0 || hashTokens[2] > NUM_BATTERY_MODULES || hashTokens[2] < 1){
-// 				printf("Invalid module number");
-// 			}
-// 			else {
-// 				printf("Module number %d: %.3fV\n\r", hashTokens[2], Voltage_GetModuleMillivoltage(hashTokens[2]-1)/MILLI_UNIT_CONVERSION);
-// 			}
-// 			break;
-// 		// Total
-// 		case CLI_TOTAL_HASH:
-// 			printf("Total voltage: %.3fV\n\r", Voltage_GetTotalPackVoltage()/MILLI_UNIT_CONVERSION);
-// 			break;
-// 		// Safety Status
-// 		case CLI_SAFE_HASH:
-// 		case CLI_SAFETY_HASH:	
-// 			printf("Safety Status: ");
-// 				switch(voltage) {
-// 					case SAFE: 
-// 						printf("SAFE\n\r");
-// 						break;
-// 					case DANGER: 
-// 						printf("DANGER\n\r");
-// 						break;
-// 					case OVERVOLTAGE:
-// 						printf("OVERVOLTAGE\n\r");
-// 						break;
-// 					case UNDERVOLTAGE: 
-// 						printf("UNDERVOLTAGE\n\r");
-// 						break;
-// 					default:
-// 						break;
-// 				}		
-// 				break;
-// 		default:
-// 			printf("Invalid voltage command\n\r");
-// 			break;
-// 	}
 // }
 
 // /** CLI_Current
