@@ -17,12 +17,12 @@
 */
 void ADT740_Init(void) {
     BSP_I2C_Init();
-    uint8_t monitoringData = (CFG_1 | 0x01);
-    BSP_I2C_Write(ADT740_ADDRESS, CFG_1, &monitoringData, AddressLength); //set the ADT740 to monitoring mode
+    uint8_t monitingMessage = (CFG_1 | 0x01);
+    BSP_I2C_Write(ADT740_ADDRESS, CFG_1, &monitingMessage, AddressLength); //set the ADT740 to monitoring mode
 }
 
 // to do: read the register first then OR it with bit 0
 void enterShutdown(){
-    uint8_t shutDownData = CFG_2 | 0x01;
+    uint8_t shutDownMessage = CFG_2 | 0x01;
     BSP_I2C_Write(ADT740_ADDRESS, CFG_2, &shutDownData, AddressLength);
 }
