@@ -37,6 +37,9 @@ void Task_CheckContactor(void *p_arg) {
     CAN_Queue_Post(CanMsg);
 
     while(1) {
+        // Gets the start time of the task
+        BPS_OS_ERR err;
+        CPU_TS time = OSTimeGet(&err);
         //delay of 250ms
         RTOS_BPS_DelayMs(250);
 
@@ -45,6 +48,8 @@ void Task_CheckContactor(void *p_arg) {
             Fault_BitMap |= Fault_ESTOP;
             EnterFaultState();
         }
+        // Gets the time it takes to run as task
+        time-=OSTimeGet(&err);
     }
 }
 

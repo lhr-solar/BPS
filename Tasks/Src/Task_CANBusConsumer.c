@@ -14,8 +14,13 @@ void Task_CANBusConsumer(void *p_arg) {
     
     while(1) {
         // BLOCKING =====================
+        // Gets the start time of the task
+        BPS_OS_ERR err;
+        CPU_TS time = OSTimeGet(&err);
         // Wait for CAN Q to have message
         CAN_Queue_Pend(&message);
         CANbus_BlockAndSend(message.id, message.payload);
+        // Gets the time it takes to run as task
+        time-=OSTimeGet(&err);
     }
 }

@@ -25,6 +25,9 @@ void Task_AmperesMonitor(void *p_arg) {
 
     while(1) {
         // BLOCKING =====================
+        // Gets the start time of the task
+        BPS_OS_ERR err;
+        CPU_TS time = OSTimeGet(&err);
         // Update Amperes Measurements
 		Amps_UpdateMeasurements();
         // Check if amperes is NOT safe:
@@ -62,6 +65,10 @@ void Task_AmperesMonitor(void *p_arg) {
         WDog_BitMap |= WD_AMPERES;
 
         RTOS_BPS_MutexPost(&WDog_Mutex, OS_OPT_POST_NONE);
+        
+        // Gets the time it takes to run as task
+        time-=OSTimeGet(&err);
+        
         //delay of 10ms
         RTOS_BPS_DelayMs(10);
     }

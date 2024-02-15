@@ -28,6 +28,9 @@ void Task_VoltTempMonitor(void *p_arg) {
     CANPayload_t CanPayload;
     CANMSG_t CanMsg;
     while(1) {
+        // Gets the start time of the task
+        BPS_OS_ERR err;
+        CPU_TS time = OSTimeGet(&err);
         // BLOCKING =====================
         // Update Voltage Measurements
         Voltage_UpdateMeasurements();
@@ -144,6 +147,8 @@ void Task_VoltTempMonitor(void *p_arg) {
 
         RTOS_BPS_MutexPost(&WDog_Mutex, OS_OPT_POST_NONE); 
         
+        // Gets the time it takes to run as task
+        time-=OSTimeGet(&err);
         //delay of 50ms
         RTOS_BPS_DelayMs(20);
     }

@@ -10,6 +10,9 @@ void Task_PetWDog(void *p_arg) {
     BSP_WDTimer_Start();    
 
     while (1){
+        // Gets the start time of the task
+        BPS_OS_ERR err;
+        CPU_TS time = OSTimeGet(&err);
         //take WDog Mutex
         RTOS_BPS_MutexPend(&WDog_Mutex, OS_OPT_PEND_BLOCKING);
 
@@ -25,5 +28,8 @@ void Task_PetWDog(void *p_arg) {
         //release WDog Mutex
         RTOS_BPS_MutexPost(&WDog_Mutex, OS_OPT_POST_NONE);
         RTOS_BPS_DelayMs(500);
+        
+        // Gets the time it takes to run as task
+        time-=OSTimeGet(&err);
     }
 }
