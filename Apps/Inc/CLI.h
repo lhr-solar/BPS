@@ -76,7 +76,7 @@
  * Initializes the CLI with the values it needs
  * @param minions is a cell_asic struct describing the LTC6811
  */
-void CLI_Init(cell_asic* minions);
+void CLI_Init();
 
 /** CLI_InputParse
  * Parses the input string and stores in hashTokens[]
@@ -137,9 +137,8 @@ void CLI_LTC6811(void);
 
 /** CLI_Contactor
  * Interacts with contactor status by printing the status of the contactor
- * @param hashTokens is the array of hashed tokens
  */
-void CLI_Contactor(int* hashTokens);
+void CLI_Contactor();
 
 /** CLI_Charge
  * Checks and displays the desired state of charge parameter(s)

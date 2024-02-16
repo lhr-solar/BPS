@@ -76,16 +76,16 @@ void Task_Init(void *p_arg) {
             TASK_CANBUS_CONSUMER_PRIO,			// Priority
             CANBusConsumer_Stk,				    // Stack
             TASK_CANBUS_CONSUMER_STACK_SIZE);
-    /*
+    
     RTOS_BPS_TaskCreate(&CLI_TCB,				// TCB
             "TASK_CLI",	                        // Task Name (String)
             Task_CLI,				            // Task function pointer
             (void *)0,				            // Task function args
             TASK_CLI_PRIO,			            // Priority
             CLI_Stk,				            // Stack
-            TASK_CLI_STACK_SIZE,		        // Stack size
+            TASK_CLI_STACK_SIZE		                    // Stack size
             );
-    */
+    
     RTOS_BPS_TaskCreate(&Idle_TCB,				// TCB
             "TASK_IDLE",	                    // Task Name (String)
             Task_Idle,				            // Task function pointer

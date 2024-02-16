@@ -32,7 +32,7 @@
 * Initializes the CLI with the values it needs
 * @param boards is a cell_asic struct pointer to the minion boards
 */
-void CLI_Init(cell_asic* minions){
+void CLI_Init(){
 
 }
 
@@ -42,6 +42,7 @@ void CLI_DUMP(){
     printf(StartString);
     CLI_Voltage();
     CLI_Temperature();
+    CLI_Contactor();
     CLI_Fans();
     CLI_FAULT();
     printf(EndString);
@@ -54,8 +55,8 @@ void CLI_Voltage(){
  	//printf("Total voltage: %u\n\r", Voltage_GetTotalPackVoltage());
 
     // Prints the voltages
-    for(int i = 0; i < NUM_BATTERY_MODULES; i++){
-        //printf("Module %d:  %umV\n\r", i+1, Voltage_GetModuleMillivoltage(i));
+    for(uint8_t i = 0; i < NUM_BATTERY_MODULES; i++){
+        printf("|Module %d:  %umV|\n\r", i+1, Voltage_GetModuleMillivoltage(i));
     }
 
 
@@ -74,7 +75,15 @@ void CLI_Fans(){
 }
 
 void CLI_FAULT(){
+    // Maybe also print out which modules are in danger?
+    // What Fault State we're in
+    
+}
 
+void CLI_Contactor(){
+    printf("Contactor Status\n");
+    printf("HV+ Contactor Status: %s\n", Contactor_GetState(HVHIGH_CONTACTOR) ? "On" : "Off");
+    printf("HV- Contactor Status: %s\n", Contactor_GetState(HVLOW_CONTACTOR) ? "On" : "Off");
 }
 
 
