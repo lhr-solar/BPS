@@ -13,13 +13,13 @@ void Task_CLI(void *p_arg) {
         char* StartString = "-----------Start-----------\n";
         char* EndString   = "-------------End-----------\n";
         while(1){
-            printf(StartString);
+            printf("%s\n", StartString);
             CLI_Voltage();
             CLI_Temperature();
             CLI_Contactor();
             CLI_Fans();
             CLI_FAULT();
-            printf(EndString);
+            printf("%s\n", EndString);
         }
     // To do: fix this
     RTOS_BPS_DelayMs(100);

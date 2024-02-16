@@ -36,18 +36,6 @@ void CLI_Init(){
 
 }
 
-void CLI_DUMP(){
-    char* StartString = "-----------Start of Dump-----------\n";
-    char* EndString   = "-------------End of Dump-----------\n";
-    printf(StartString);
-    CLI_Voltage();
-    CLI_Temperature();
-    CLI_Contactor();
-    CLI_Fans();
-    CLI_FAULT();
-    printf(EndString);
-
-}
 
 void CLI_Voltage(){
     // Todo: figure out units
