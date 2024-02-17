@@ -44,21 +44,25 @@ void CLI_Voltage(){
 
     // Prints the voltages
     for(uint8_t i = 0; i < NUM_BATTERY_MODULES; i++){
-        printf("|Module %d:  %umV| \n\r", i+1, Voltage_GetModuleMillivoltage(i));
+        printf("|Module %d Voltage: %umV| \n\r", i+1, Voltage_GetModuleMillivoltage(i));
     }
 
 
 }
 
 void CLI_Temperature(){
-
+    
+    for(uint8_t i = 0; ; i++)
+    {
+        //printf("|Module %d Temp: %d |\n\r", i+1, Temperature_GetModuleTemperature(i));
+    }
 }
 
 void CLI_Fans(){
     printf("Fan Speeds: On a scale of 0 - 8\n");
     for(int i = 0; i < 3; i++)
     {
-        printf("Fan %d is at %d\n", i+1, Fans_GetSpeed(i));
+        printf("Fan %d is at %d\n\r", i+1, Fans_GetSpeed(i));
     }
 }
 
@@ -70,8 +74,8 @@ void CLI_FAULT(){
 
 void CLI_Contactor(){
     printf("Contactor Status\n");
-    printf("HV+ Contactor Status: %s\n", Contactor_GetState(HVHIGH_CONTACTOR) ? "On" : "Off");
-    printf("HV- Contactor Status: %s\n", Contactor_GetState(HVLOW_CONTACTOR) ? "On" : "Off");
+    printf("HV+ Contactor Status: %s\n\r", Contactor_GetState(HVHIGH_CONTACTOR) ? "On" : "Off");
+    printf("HV- Contactor Status: %s\n\r", Contactor_GetState(HVLOW_CONTACTOR) ? "On" : "Off");
 }
 
 
