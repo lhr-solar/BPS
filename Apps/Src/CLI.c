@@ -44,7 +44,7 @@ void CLI_Voltage(){
 
     // Prints the voltages
     for(uint8_t i = 0; i < NUM_BATTERY_MODULES; i++){
-        printf("|Module %d:  %umV|\n\r", i+1, Voltage_GetModuleMillivoltage(i));
+        printf("|Module %d:  %umV| \n\r", i+1, Voltage_GetModuleMillivoltage(i));
     }
 
 
