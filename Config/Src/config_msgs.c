@@ -50,4 +50,6 @@
 
 #pragma message ("BPS_CAN_LOOPBACK set to " XSTR(BPS_CAN_LOOPBACK))
 
+#pragma message ("BPS_CAN_MIRROR_OUTPUT_USB set to " XSTR(BPS_CAN_MIRROR_OUTPUT_USB))
+
 // I don't think the other #defines in config.h should be editable
