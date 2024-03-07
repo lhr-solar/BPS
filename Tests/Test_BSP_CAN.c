@@ -10,7 +10,7 @@ int main(void){
    uint32_t id[1];
   
    uint8_t length = 8;
-   BSP_CAN_Init(NULL, NULL, false, false);
+   BSP_CAN_Init(NULL, NULL, false, false, NULL, 0);
    
    while(1) {
       BSP_CAN_Write(0x10A, message, length);

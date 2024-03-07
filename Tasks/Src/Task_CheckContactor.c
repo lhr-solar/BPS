@@ -9,8 +9,10 @@
 void Task_CheckContactor(void *p_arg) {
     (void)p_arg;
     
-    CANMSG_t CanMsg = {.payload = {.idx = 0, .data.b = 1}};
-    
+    CANMSG_t SendCanMsg;
+    memset(&SendCanMsg, 0, sizeof(SendCanMsg));
+    CANMSG_t ReceiveCanMsg;
+
     BSP_PLL_DelayMs(30); // delay is needed for pull up resistor to stabilize before we check for contactor state
     // If a contactor is on before we turn it on in this task, it may have failed and welded closed
     if (Contactor_GetState(HVHIGH_CONTACTOR) || Contactor_GetState(HVLOW_CONTACTOR)) {
@@ -26,25 +28,46 @@ void Task_CheckContactor(void *p_arg) {
 
     // Turn Contactor On
     Contactor_On(HVHIGH_CONTACTOR);
-    Contactor_On(ARRAY_CONTACTOR);
     Contactor_On(HVLOW_CONTACTOR);
 
     // Push All Clear message to CAN Q
-    CanMsg.id = ALL_CLEAR;
-    CAN_Queue_Post(CanMsg);
-    // Push Contactor State message to CAN Q
-    CanMsg.id = CONTACTOR_STATE;
-    CAN_Queue_Post(CanMsg);
+    SendCanMsg.payload.data.b = 1;
+    SendCanMsg.id = BPS_ALL_CLEAR;
+    CAN_TransmitQueue_Post(SendCanMsg);
+
+    // We only send contactor state after this
+    SendCanMsg.id = BPS_CONTACTOR_STATE;
 
     while(1) {
-        //delay of 250ms
-        RTOS_BPS_DelayMs(250);
+        // delay of 200ms
+        // controls IO_STATE message every ~250ms, so we need to check for the 
+        // message more frequently to ensure our CAN queue doesn't fill. 
+        // 200ms is chosen because it's a neat number and should be fast enough. 
+        RTOS_BPS_DelayMs(200);
 
         // fault if the contactor is open
         if (Contactor_GetState(HVHIGH_CONTACTOR) != true) {
             Fault_BitMap |= Fault_ESTOP;
             EnterFaultState();
         }
+
+        // Turn on/off array contactor based on what we receive from controls
+        // if we get to this point and there's no message we try again ~200ms later
+        ErrorStatus status = CAN_ReceiveQueue_Pend(&ReceiveCanMsg);
+        if (status == SUCCESS && ReceiveCanMsg.id == IO_STATE) {
+            uint8_t array_state = (ReceiveCanMsg.payload.data.bytes[3] >> 2) & 0x1;
+            if (array_state) {
+                Contactor_On(ARRAY_CONTACTOR);
+            } else {
+                Contactor_Off(ARRAY_CONTACTOR);
+            }
+        }
+
+        //Send BPS contactor state via CAN
+        SendCanMsg.payload.data.b = (Contactor_GetState(HVHIGH_CONTACTOR) << 2) |
+                                    (Contactor_GetState(HVLOW_CONTACTOR) << 1) |
+                                     Contactor_GetState(ARRAY_CONTACTOR);
+        CAN_TransmitQueue_Post(SendCanMsg);
     }
 }
 

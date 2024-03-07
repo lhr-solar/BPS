@@ -17,6 +17,7 @@ typedef OS_TCB      BPS_OS_TCB;
 typedef CPU_TS      BPS_CPU_TS;
 typedef OS_SEM_CTR  BPS_OS_SEM_CTR;
 typedef OS_TICK     BPS_OS_TICK;
+#define BPS_OS_SEM_WOULD_BLOCK ((BPS_OS_SEM_CTR)(-1))
 
 //Custom typedefs for BPS_TaskCreate function currently using micirium
 typedef OS_TCB       BPS_OS_TCB;

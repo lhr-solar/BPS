@@ -45,14 +45,14 @@ void Task_VoltTempMonitor(void *p_arg) {
         }
         //Send measurements to CAN queue
         bool charge_enable = true;
-        CanMsg.id = VOLT_DATA;
+        CanMsg.id = VOLTAGE_DATA_ARRAY;
         for (int i = 0; i < NUM_BATTERY_MODULES; i++){ //send all battery module voltage data
             CanPayload.idx = i;
             int voltage = Voltage_GetModuleMillivoltage(i);
             CanData.w = voltage;
             CanPayload.data = CanData;
             CanMsg.payload = CanPayload;
-            CAN_Queue_Post(CanMsg);
+            CAN_TransmitQueue_Post(CanMsg);
             if (voltage > CHARGE_DISABLE_VOLTAGE){
                 charge_enable = false;
             }
@@ -105,24 +105,24 @@ void Task_VoltTempMonitor(void *p_arg) {
             }
         }
         if (!charge_enable){
-            CanMsg.id = CHARGE_ENABLE;
+            CanMsg.id = CHARGING_ENABLED;
             CanPayload.idx = 0;
             CanData.b = 0;
             CanPayload.data = CanData;
             CanMsg.payload = CanPayload;
-            CAN_Queue_Post(CanMsg);
+            CAN_TransmitQueue_Post(CanMsg);
         }
         else {
             //if the temperature gets low enough, suggest battery can be charged
-            CanMsg.id = CHARGE_ENABLE;
+            CanMsg.id = CHARGING_ENABLED;
             CanPayload.idx = 0;
             CanData.b = 1;
             CanPayload.data = CanData;
             CanMsg.payload = CanPayload;
-            CAN_Queue_Post(CanMsg);
+            CAN_TransmitQueue_Post(CanMsg);
         }
         //Send measurements to CAN queue
-        CanMsg.id = TEMP_DATA;
+        CanMsg.id = TEMPERATURE_DATA_ARRAY;
         for (uint8_t i = 0; i < NUM_MINIONS; i++){ //send all temperature readings
             for (uint8_t j = 0; j < MAX_TEMP_SENSORS_PER_MINION_BOARD; j++){
                 if (i * MAX_TEMP_SENSORS_PER_MINION_BOARD + j < NUM_TEMPERATURE_SENSORS){
@@ -130,7 +130,7 @@ void Task_VoltTempMonitor(void *p_arg) {
                     CanData.w = (uint32_t)Temperature_GetSingleTempSensor(i, j);
                     CanPayload.data = CanData;
                     CanMsg.payload = CanPayload;
-                    CAN_Queue_Post(CanMsg);
+                    CAN_TransmitQueue_Post(CanMsg);
                 }
             }
         }

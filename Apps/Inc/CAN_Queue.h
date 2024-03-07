@@ -10,8 +10,11 @@
 
 void CAN_Queue_Init(void);
 
-ErrorStatus CAN_Queue_Post(CANMSG_t message);
+ErrorStatus CAN_TransmitQueue_Post(CANMSG_t message);
 
-ErrorStatus CAN_Queue_Pend(CANMSG_t *message);
+ErrorStatus CAN_TransmitQueue_Pend(CANMSG_t *message);
 
+ErrorStatus CAN_ReceiveQueue_Post(CANMSG_t message);
+
+ErrorStatus CAN_ReceiveQueue_Pend(CANMSG_t *message);
 #endif

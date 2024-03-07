@@ -34,7 +34,7 @@ int main() {
     OS_ERR err;
 
     BSP_PLL_Init();
-    BSP_UART_Init(NULL, NULL, UART_USB);	
+    BSP_UART_Init(NULL, NULL, UART_USB);
 
     //Resetting the contactor
     Contactor_Init();

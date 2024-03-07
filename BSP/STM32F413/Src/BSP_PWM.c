@@ -170,13 +170,21 @@ int BSP_PWM_Get(uint8_t pin){
 /**
  * @brief   Gets the state of the Contactor switch from one of its AUX pins.
  * @note	THIS IS ALSO CODE THAT HAS NO HOME. You cannot get the state of ALL_CONTACTORS. As such, if that param is passed, it will return the state of the array contactor.
- * @param   Contactor to get state of
+ * @param   Contactor to get state of, contactorChoice should be only 3 or 4
  * @return  0 if contactor is off/open, 1 if on/closed
  */
 bool BSP_Contactor_Get(uint8_t contactorChoice) {
-	bool contactorReturnValue = ((GPIOB->IDR & GPIO_Pin_1) >> 1) ? 0 : 1; //read the one and only input pin
 
-	/* this is future support for multiple contactors, but we only have one pin right now
+  bool contactorReturnValue = false;
+
+  if(contactorChoice == 4) {
+	  contactorReturnValue = ((GPIOB->IDR & GPIO_Pin_1) >> 1) ? 0 : 1; //read the one and only input pin
+  }
+  else if(contactorChoice == 3) {
+    contactorReturnValue = (TIM_GetCapture2(TIM12)) ? 1 : 0;
+  }
+
+  /* this is future support for multiple contactors, but we only have one pin right now
 	bool contactorReturnValue = false;
 	if (contactorChoice == ARRAY_CONTACTOR) {
 		contactorReturnValue = ((C1_PORT->IDR & GPIO_Pin_1) >> 1) ? 0 : 1;

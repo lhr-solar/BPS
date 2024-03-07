@@ -11,6 +11,7 @@
 #endif
 #include "BSP_Lights.h"
 #include "BSP_PLL.h"
+#include "BSP_Timer.h"
 #include "CAN_Queue.h"
 #include "BSP_WDTimer.h"
 #include "Contactor.h"
@@ -42,6 +43,11 @@ CPU_STK Task1_Stk[DEFAULT_STACK_SIZE];
 
 OS_TCB Task2_TCB;
 CPU_STK Task2_Stk[DEFAULT_STACK_SIZE];
+
+// Dummy callback
+void foo() {
+    return;
+}
 
 // Initialization task for this test
 void Task1(void *p_arg){
@@ -112,7 +118,7 @@ void Task2(void *p_arg){
         RTOS_BPS_DelayTick(10);
 
         if (count == 0) {
-            printf("Amps: %lld\n\r", (int64_t)Amps_GetReading());
+            printf("Amps: %ld\n\r", Amps_GetReading());
         }
         count = (count + 1) % 10;
 
@@ -135,7 +141,9 @@ int main() {
     OS_ERR err;
 
     BSP_PLL_Init();
-    BSP_UART_Init(NULL, NULL, UART_USB);
+    BSP_UART_Init(foo, foo, UART_USB);
+    BSP_Timer_Init();
+    BSP_Lights_Init();
     //Resetting the contactor
     Contactor_Init();
     Contactor_Off(HVLOW_CONTACTOR);
