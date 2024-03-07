@@ -11,7 +11,7 @@
 //declared in Tasks.c
 extern cell_asic Minions[NUM_MINIONS];
 
-static uint32_t voltage_averages[NUM_BATTERY_MODULES] = {0};
+static uint32_t voltage_totals[NUM_BATTERY_MODULES] = {0};
 
 static uint32_t task_cycle_counter = 0;
 
@@ -32,7 +32,7 @@ void Task_VoltTempMonitor(void *p_arg) {
     CANPayload_t CanPayload;
     CANMSG_t CanMsg;
     while(1) {
-        task_cycle_counter++;       // used for temperature sampling decimation
+        task_cycle_counter++;       // used for output and sampling decimation / averaging
 
         // BLOCKING =====================
         // Update Voltage Measurements
@@ -55,7 +55,7 @@ void Task_VoltTempMonitor(void *p_arg) {
         for (int i = 0; i < NUM_BATTERY_MODULES; i++){ //send all battery module voltage data
             
             uint16_t voltage = Voltage_GetModuleMillivoltage(i);
-            voltage_averages[i] += voltage;
+            voltage_totals[i] += voltage;
 
             if (voltage > CHARGE_DISABLE_VOLTAGE){
                 charge_enable = false;
@@ -64,12 +64,12 @@ void Task_VoltTempMonitor(void *p_arg) {
             // Send voltages over CAN every ODR_VOLTAGE_AVERAGING iterations
             if (task_cycle_counter % ODR_VOLTAGE_AVERAGING == 0) {
                 CanPayload.idx = i;
-                CanData.w = (int)(voltage_averages[i] / ODR_VOLTAGE_AVERAGING);
+                CanData.w = (int)(voltage_totals[i] / ODR_VOLTAGE_AVERAGING);
                 CanPayload.data = CanData;
                 CanMsg.payload = CanPayload;
                 CAN_Queue_Post(CanMsg);
 
-                voltage_averages[i] = 0;
+                voltage_totals[i] = 0;
             }
         }
         
@@ -162,7 +162,7 @@ void Task_VoltTempMonitor(void *p_arg) {
 
         RTOS_BPS_MutexPost(&WDog_Mutex, OS_OPT_POST_NONE); 
         
-        //delay of 50ms
+        //delay of 20ms
         RTOS_BPS_DelayMs(20);
     }
 }

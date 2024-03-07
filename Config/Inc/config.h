@@ -113,7 +113,7 @@ typedef enum SafetyStatus_e {SAFE = 0, DANGER = 1, OVERVOLTAGE = 2, UNDERVOLTAGE
 // Reduce sampling rate for Temperature and CANBus sending rate for Voltage to 
 // reduce CANBus traffic. Set these to powers of 2 to avoid slight overflow errors.
 #define ODR_VOLTAGE_AVERAGING               4   // Number of samples to average for voltage
-#define ODR_TEMPERATURE_DECIMATION          8   // Number of voltage samples per temperature sample
+#define ODR_TEMPERATURE_DECIMATION          4   // Number of voltage samples per temperature sample
                                                 // Temperature takes a long time to sample and changes fairly slowly -- 
                                                 // decimation is preferred over averaging.
 
