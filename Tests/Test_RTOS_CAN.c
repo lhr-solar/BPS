@@ -23,7 +23,7 @@ void Task1(void *p_arg){
     OS_CPU_SysTickInit(SystemCoreClock / (CPU_INT32U) OSCfg_TickRate_Hz);
     
     BSP_Lights_Init();
-    CANbus_Init(true, false);
+    CANbus_Init(true, false, NULL, 0);
    
     while(1) {
         CANbus_BlockAndSend(id, payload);
