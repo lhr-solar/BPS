@@ -109,6 +109,15 @@ typedef enum SafetyStatus_e {SAFE = 0, DANGER = 1, OVERVOLTAGE = 2, UNDERVOLTAGE
 #define MAX_TEMP_SENSORS_PER_MINION_BOARD	16
 
 //--------------------------------------------------------------------------------
+// Voltage and Temperature Output Rate Configurations
+// Reduce sampling rate for Temperature and CANBus sending rate for Voltage to 
+// reduce CANBus traffic. Set these to powers of 2 to avoid slight overflow errors.
+#define ODR_VOLTAGE_AVERAGING               4   // Number of samples to average for voltage
+#define ODR_TEMPERATURE_DECIMATION          4   // Number of voltage samples per temperature sample
+                                                // Temperature takes a long time to sample and changes fairly slowly -- 
+                                                // decimation is preferred over averaging.
+
+//--------------------------------------------------------------------------------
 // HeartBeat Delay Ticks
 // Define heartbeatDelay as # of desired while(1) loops per toggle
 #define HEARTBEAT_DELAY 0x10
