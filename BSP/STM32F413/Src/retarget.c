@@ -1,17 +1,18 @@
-/* Copyright (c) 2018-2022 UT Longhorn Racing Solar */
+/* Copyright (c) 2018-2023 UT Longhorn Racing Solar */
 
 #include "common.h"
 #include "sys/stat.h"
-#include "BSP_UART.h"
+#include "Print_Queue.h"
 
 #define STDIN_FILENO  0
 #define STDOUT_FILENO 1
 #define STDERR_FILENO 2
 
 int _write(int fd, char *buffer, unsigned int len) {
-    if(buffer != NULL) {
-        BSP_UART_Write(buffer, len, UART_USB);
-    }
+    //Add stuff to thread-safe OS level queue instead of BSP callsS
+
+    Print_Queue_Append(buffer);
+
     return len;
 }
 
