@@ -81,7 +81,8 @@ void Voltage_UpdateMeasurements(void){
 #ifndef SIMULATION
     // Start Cell ADC Measurements
     wakeup_sleep(NUM_MINIONS);
-    LTC6811_adcv(ADC_CONVERSION_MODE,ADC_DCP,CELL_CH_TO_CONVERT);
+
+    LTC6811_adcv(ADC_CONVERSION_MODE,ADC_DCP,1);
     LTC6811_pollAdc();	// In case you want to time the length of the conversion time
     
     // Read Cell Voltage Registers
@@ -91,8 +92,16 @@ void Voltage_UpdateMeasurements(void){
     //copies values from cells.c_codes to private array
 
     // package raw voltage values into single array
+    uint8_t offset = 0;
     for(uint8_t i = 0; i < NUM_BATTERY_MODULES; i++){
-        rawVoltages[i] = Minions[i / MAX_VOLT_SENSORS_PER_MINION_BOARD].cells.c_codes[i % MAX_VOLT_SENSORS_PER_MINION_BOARD];
+        uint8_t minionIdx = i / MAX_VOLT_SENSORS_PER_MINION_BOARD;
+        uint8_t sensorIdx = i % MAX_VOLT_SENSORS_PER_MINION_BOARD;
+
+        // Segment 1 and Segment 3 have 11 modules and Segment 2 has 10 modules.
+        // Offset increases when we want to skip modules
+        if((minionIdx == 0 && sensorIdx == 11) || (minionIdx == 1 && sensorIdx >= 10)) offset++;
+
+        rawVoltages[i - offset] = Minions[minionIdx].cells.c_codes[sensorIdx];
     }
 
     // release minions asic mutex
