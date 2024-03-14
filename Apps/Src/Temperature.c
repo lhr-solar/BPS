@@ -200,7 +200,7 @@ int32_t milliVoltToCelsius(uint32_t milliVolt){
         return 0; //safe value
     }
     else {
-        return TEMP_ERR_OUT_BOUNDS;
+        return 0; // TODO: ignore for now
     }
 }
 

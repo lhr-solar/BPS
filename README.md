@@ -117,8 +117,6 @@ to either debug, or just run a specific test.
 You can check the log file by doing `cat bps-sim-<logged time>.log`.
 
 ## Rules
-Make sure to have fun!
-
 Commit frequently into your own branches. Create a Pull Request whenever you are ready to add you working code to the master branch. Make sure that your code compiles without any errors or warnings before you open a pull request. At least one approver must approve your pull request before it can be merged. The reviewers will make sure everything is up to par with the coding standards.
 
 ### Code Reviews
@@ -131,8 +129,3 @@ You can either approve, comment, or request changes at the end of your pull requ
 - **Approve:** You are signing off that this pull request is ready to merge. You and the pull request author "own" this part of the code now.
 - **Request Changes:** You have found problems with the code that must be addressed before it can be merged. Note that this will block the pull request from merging until you re-review the code.
 - **Comment:** Do this if you do not want to explicitly approve or request changes.
-
-Approvers:
-1. Manthan Upadhyaya
-2. Clark Poon
-3. Tianda Huang

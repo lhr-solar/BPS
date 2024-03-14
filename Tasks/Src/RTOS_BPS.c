@@ -59,13 +59,18 @@ void RTOS_BPS_SemCreate(BPS_OS_SEM* sem, char* name, uint32_t count) {
  * @brief Pends a BPS_OS_Semaphore.
  * @param sem - pointer to a sempaphore to pend
  * @param opt - pend option
- * @return the semaphore count, or 0 if not available
+ * @return the semaphore count, or -1 if not available (will be 0xFFFFFFFF as it is unsigned)
  */
 BPS_OS_SEM_CTR RTOS_BPS_SemPend(BPS_OS_SEM* sem, BPS_OS_OPT opt) {
     BPS_OS_ERR err;
     BPS_OS_SEM_CTR count = OSSemPend(sem, 0, opt, 0, &err); // we don't need timestamp
-    assertOSError(err);
-    return count;
+    if (err == OS_ERR_PEND_WOULD_BLOCK) {
+        return BPS_OS_SEM_WOULD_BLOCK;
+    }
+    else {
+        assertOSError(err);
+        return count;
+    }
 }
 
 /**
@@ -157,10 +162,12 @@ void RTOS_BPS_DelayMs(uint16_t delay_ms){
  */
 void RTOS_BPS_DelayUs(uint32_t delay_us) {
     BPS_OS_ERR err;
+    // only errors possible are OS_ERR_NONE and OS_ERR_LOCK_NESTING_OVF
+    // OS_ERR_LOCK_NESTING_OVF occurs when scheduler is already locked
+    // we can ignore this error (OSSchedLock then does nothing)
     
     // lock the scheduler
     OSSchedLock(&err);
-    assertOSError(err);
 
     // delay
     BSP_Timer_Start_OneShot(delay_us, DelayUsCallback);
@@ -168,6 +175,9 @@ void RTOS_BPS_DelayUs(uint32_t delay_us) {
     DelayUsContinue = 0;
 
     // unlock the scheduler
+    if (err == OS_ERR_NONE) {
+        OSSchedUnlock(&err);
+    }
     OSSchedUnlock(&err);
     if(err != OS_ERR_SCHED_LOCKED) assertOSError(err);
 }

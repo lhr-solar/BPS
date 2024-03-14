@@ -76,6 +76,14 @@ void Task_Init(void *p_arg) {
             TASK_CANBUS_CONSUMER_PRIO,			// Priority
             CANBusConsumer_Stk,				    // Stack
             TASK_CANBUS_CONSUMER_STACK_SIZE);
+
+    RTOS_BPS_TaskCreate(&CANBusProducer_TCB,	// TCB
+            "TASK_CANBUS_PRODUCER",	            // Task Name (String)
+            Task_CANBusProducer,				// Task function pointer
+            (void *)BPS_CAN_LOOPBACK,				        // don't use loopback mode
+            TASK_CANBUS_PRODUCER_PRIO,			// Priority
+            CANBusProducer_Stk,				    // Stack
+            TASK_CANBUS_PRODUCER_STACK_SIZE);
     /*
     RTOS_BPS_TaskCreate(&CLI_TCB,				// TCB
             "TASK_CLI",	                        // Task Name (String)
