@@ -3,7 +3,7 @@
 ######################################
 TARGET = bps-leader
 
-DEBUG = 0
+DEBUG = 1
 READABLE = true
 
 ######################################
@@ -12,7 +12,7 @@ READABLE = true
 # optimization
 # change to -Og if you want the compiler to generate assembly that is very close
 # to your source code. Change to -O3 for best performance
-OPT = -O3
+OPT = -Og
 
 # COLORS
 RED=\033[0;31m

@@ -178,8 +178,6 @@ void RTOS_BPS_DelayUs(uint32_t delay_us) {
     if (err == OS_ERR_NONE) {
         OSSchedUnlock(&err);
     }
-    OSSchedUnlock(&err);
-    if(err != OS_ERR_SCHED_LOCKED) assertOSError(err);
 }
 
 /**
