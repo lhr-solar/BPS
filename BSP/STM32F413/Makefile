@@ -3,7 +3,9 @@
 ######################################
 TARGET = bps-leader
 
-DEBUG = 0
+# sets debugging mode on or off based on BPS makefile
+DEBUG = $(debug)
+
 READABLE = true
 
 ######################################
@@ -12,7 +14,11 @@ READABLE = true
 # optimization
 # change to -Og if you want the compiler to generate assembly that is very close
 # to your source code. Change to -O3 for best performance
+ifeq ($(debug), 0)
+OPT = -Og
+else
 OPT = -O3
+endif
 
 # COLORS
 RED=\033[0;31m

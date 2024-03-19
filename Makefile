@@ -13,6 +13,9 @@ NC=\033[0m # No Color
 DEFINES = none
 export DEFINES
 
+debug = 0
+export debug
+
 TEST = none
 export TEST
 
