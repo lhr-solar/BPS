@@ -44,6 +44,7 @@ static uint32_t openWires[TOTAL_VOLT_WIRES];
 void Voltage_Init(cell_asic *boards){
     // Record pointer
     Minions = boards;
+
     //initialize mutex
     RTOS_BPS_MutexCreate(&Voltage_Mutex, "Voltage Buffer Mutex");
                     
@@ -91,21 +92,20 @@ void Voltage_UpdateMeasurements(void){
     //copies values from cells.c_codes to private array
 
      // which minion we are currently sampling from
-    uint8_t minionID = 0;
+    uint8_t moduleIdx = 0;
 
     // the number of modules remaining to sample in the current minion
-    uint8_t minionModulesRemaining = VOLT_TAP_DIST[minionID];
+    uint8_t minionModulesRemaining = VOLT_TAP_DIST[moduleIdx];
 
     // package raw voltage values into single array
     for(uint8_t i = 0; i < NUM_BATTERY_MODULES; i++){
-        // to do: change this to work with the VOLT_TAP_DIST array
 
         // if we are out of modules in this minion to sample, move to the next minion
         if(minionModulesRemaining <= 0) {
-            minionID ++;
-            minionModulesRemaining = VOLT_TAP_DIST[minionID];
+            moduleIdx ++;
+            minionModulesRemaining = VOLT_TAP_DIST[moduleIdx];
         }
-        rawVoltages[i] = Minions[minionID].cells.c_codes[VOLT_TAP_DIST[minionID] - minionModulesRemaining];
+        rawVoltages[i] = Minions[moduleIdx].cells.c_codes[VOLT_TAP_DIST[moduleIdx] - minionModulesRemaining];
         minionModulesRemaining --;
     }
 
@@ -219,10 +219,14 @@ SafetyStatus Voltage_OpenWire(void){
 
     for(int32_t i = 0; i < NUM_MINIONS; i++) {
         if(Minions[i].system_open_wire != 0){
-            if ((i == NUM_MINIONS -1) && ((Minions[i].system_open_wire & 0xEF) != 0)) { 
-                //The last Voltage board is only connected to 7 modules ("nuh-uh" - Lakshay 2024)
-                break; //Open Wire test runs using MAX_VOLT_SENSORS_PER_MINION_BOARD so value of last module should be cleared
-            }
+            
+            int 
+            // check the current minion open wire, and see if the expected ones are closed (closed  = 0)
+
+            // if ((i == NUM_MINIONS -1) && ((Minions[i].system_open_wire & 0xEF) != 0)) { 
+            //     //The last Voltage board is only connected to 7 modules ("nuh-uh" - Lakshay 2024)
+            //     break; //Open Wire test runs using MAX_VOLT_SENSORS_PER_MINION_BOARD so value of last module should be cleared
+            // }
             status = DANGER;
             break;
         }
@@ -251,6 +255,7 @@ uint32_t Voltage_GetOpenWire(void){
 }
 #endif
 
+// to do: change to work with VOLT_TAP_DIST
 /** Voltage_GetModuleVoltage
  * Gets the voltage of a certain battery module in the battery pack
  * @precondition moduleIdx < NUM_BATTERY_SENSORS
@@ -262,12 +267,14 @@ uint16_t Voltage_GetModuleMillivoltage(uint8_t moduleIdx){
     if(moduleIdx >= NUM_BATTERY_MODULES) {
         return 0xFFFF;
     }
-    // Each board will measure the same number of modules except for the last board in the daisy chain.
-    // To find which minion board the battery module (moduleIdx) is assigned to, we need to
-    // divide the moduleIdx by how many battery modules are assigned to each minion board
-    // (indicated by MAX_VOLT_SENSORS_PER_MINION_BOARD). If the minion idx exceeds how many minion
-    // boards are currently present, then return an error voltage.
-    if((moduleIdx / MAX_VOLT_SENSORS_PER_MINION_BOARD) >= NUM_MINIONS) {
+
+    /*
+       To find which minion board the battery module (moduleIdx) is assigned to, we need to
+       divide the moduleIdx by how many battery modules are assigned to each minion board
+       (indicated by MAX_VOLT_SENSORS_PER_MINION_BOARD). If the minion idx exceeds how many minion
+       boards are currently present, then return an error voltage.
+    */
+    if((moduleIdx / MAX_VOLT_SENSORS_PER_MINION_BOARD) >= NUM_MINIONS) { // why doesn't equal to work?
         return 0xFFFF;
     }
 

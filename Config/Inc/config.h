@@ -103,8 +103,7 @@ typedef enum SafetyStatus_e {SAFE = 0, DANGER = 1, OVERVOLTAGE = 2, UNDERVOLTAGE
 #endif
 
 // to do: 
-//change to a better name :p 
-// add error checking to see if the size of the array is equal to num
+// add error checking to see if the size of the array is equal to NUM_MINIONS
 // add guards?
 static const uint8_t VOLT_TAP_DIST[NUM_MINIONS] = {11, 10, 11}; 
 
