@@ -31,6 +31,7 @@ typedef enum SafetyStatus_e {SAFE = 0, DANGER = 1, OVERVOLTAGE = 2, UNDERVOLTAGE
 #define NUM_BATTERY_MODULES				(((MAX_VOLT_SENSORS_PER_MINION_BOARD * NUM_MINIONS) > 32) ? 32 : (MAX_VOLT_SENSORS_PER_MINION_BOARD * NUM_MINIONS))	// Number of battery modules
 #endif
 
+
 #ifndef NUM_TEMP_SENSORS_PER_MOD
 #define NUM_TEMP_SENSORS_PER_MOD		1		// Number of temperature sensors per battery module
 #endif
@@ -101,7 +102,14 @@ typedef enum SafetyStatus_e {SAFE = 0, DANGER = 1, OVERVOLTAGE = 2, UNDERVOLTAGE
 #define MAX_VOLT_SENSORS_PER_MINION_BOARD	12	// User defined. The LTC6811 can actually measure 12 modules.
 #endif
 
+// to do: 
+//change to a better name :p 
+// add error checking to see if the size of the array is equal to num
+// add guards?
+static const uint8_t VOLT_TAP_DIST[NUM_MINIONS] = {11, 10, 11}; 
+
 #define TOTAL_VOLT_WIRES					(MAX_VOLT_SENSORS_PER_MINION_BOARD * NUM_MINIONS)
+
 
 //--------------------------------------------------------------------------------
 // Temperature Sensor Configurations

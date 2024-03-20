@@ -90,9 +90,23 @@ void Voltage_UpdateMeasurements(void){
     LTC6811_rdcv_safe(0, NUM_MINIONS, Minions); // Set to read back all cell voltage registers
     //copies values from cells.c_codes to private array
 
+     // which minion we are currently sampling from
+    uint8_t minionID = 0;
+
+    // the number of modules remaining to sample in the current minion
+    uint8_t minionModulesRemaining = VOLT_TAP_DIST[minionID];
+
     // package raw voltage values into single array
     for(uint8_t i = 0; i < NUM_BATTERY_MODULES; i++){
-        rawVoltages[i] = Minions[i / MAX_VOLT_SENSORS_PER_MINION_BOARD].cells.c_codes[i % MAX_VOLT_SENSORS_PER_MINION_BOARD];
+        // to do: change this to work with the VOLT_TAP_DIST array
+
+        // if we are out of modules in this minion to sample, move to the next minion
+        if(minionModulesRemaining <= 0) {
+            minionID ++;
+            minionModulesRemaining = VOLT_TAP_DIST[minionID];
+        }
+        rawVoltages[i] = Minions[minionID].cells.c_codes[VOLT_TAP_DIST[minionID] - minionModulesRemaining];
+        minionModulesRemaining --;
     }
 
     // release minions asic mutex
@@ -147,6 +161,7 @@ void Voltage_GetModulesInDanger(VoltageSafety_t* system){
     RTOS_BPS_MutexPend(&MinionsASIC_Mutex, OS_OPT_PEND_BLOCKING);
     //put all the bits from each minion's system_open_wire variable into one variable
     for(int k = 0; k < NUM_MINIONS; k++){
+        // to do: change this for volt_dist array
         wires = (Minions[k].system_open_wire & 0x1FF);	//there are at most 8 modules per IC, bit 0 is GND
         for(int s = 0; s <= MAX_VOLT_SENSORS_PER_MINION_BOARD; s++){
             if((k == NUM_MINIONS - 1) && (s == MAX_VOLT_SENSORS_PER_MINION_BOARD)){
@@ -204,7 +219,8 @@ SafetyStatus Voltage_OpenWire(void){
 
     for(int32_t i = 0; i < NUM_MINIONS; i++) {
         if(Minions[i].system_open_wire != 0){
-            if ((i == NUM_MINIONS -1) && ((Minions[i].system_open_wire & 0xEF) != 0)) { //The last Voltage board is only connected to 7 modules
+            if ((i == NUM_MINIONS -1) && ((Minions[i].system_open_wire & 0xEF) != 0)) { 
+                //The last Voltage board is only connected to 7 modules ("nuh-uh" - Lakshay 2024)
                 break; //Open Wire test runs using MAX_VOLT_SENSORS_PER_MINION_BOARD so value of last module should be cleared
             }
             status = DANGER;
