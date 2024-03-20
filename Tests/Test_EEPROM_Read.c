@@ -19,7 +19,7 @@ int main(void) {
     printf("EEPROM Initialized\n\r");
 
     // read state of charge
-    charge = EEPROM_GetCharge();
+    charge = EEPROM_GetLastCharge();
 
     // read errors
     numErrors = EEPROM_GetErrors(errors, 10);
