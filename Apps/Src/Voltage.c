@@ -160,7 +160,12 @@ void Voltage_GetModulesInDanger(VoltageSafety_t* system){
     RTOS_BPS_MutexPend(&MinionsASIC_Mutex, OS_OPT_PEND_BLOCKING);
     //put all the bits from each minion's system_open_wire variable into one variable
     for(int k = 0; k < NUM_MINIONS; k++){
-        // to do: change this for volt_dist array
+        // TO DO: change this to be based on VOLT_TAP_DIST array
+
+        /*
+        This section of code assumes a specific distribution of modules that we don't have anymore
+        (don't use)
+        */
         wires = (Minions[k].system_open_wire & 0x1FF);	//there are at most 8 modules per IC, bit 0 is GND
         for(int s = 0; s <= MAX_VOLT_SENSORS_PER_MINION_BOARD; s++){
             if((k == NUM_MINIONS - 1) && (s == MAX_VOLT_SENSORS_PER_MINION_BOARD)){
@@ -217,27 +222,22 @@ SafetyStatus Voltage_OpenWire(void){
     //int32_t openModules = LTC6811_run_openwire_multi(NUM_MINIONS, Minions, false);
     LTC6811_run_openwire_multi(NUM_MINIONS, Minions, false);
 
-    
+    /*
+    To do: fix this to work with VOLT_TAP_DIST array
+    This assumes a specific distribution of modules to minions, which we do not have anymore
+    (don't use)
+    In the future, check the bitmap returned by LTC6811_run_openwire_multi, and see if the expected modules are closed (closed = 0) based on VOLT_TAP_DIST
+    */
     for(int32_t i = 0; i < NUM_MINIONS; i++) {
-        // check the current minion open wire, and see if the expected ones are closed (closed  = 0)
-        if(Minions[i].system_open_wire == VOLT_TAP_DIST[i])
-        {
+
+        if(Minions[i].system_open_wire != 0){
+            if ((i == NUM_MINIONS -1) && ((Minions[i].system_open_wire & 0xEF) != 0)) { 
+                break; //Open Wire test runs using MAX_VOLT_SENSORS_PER_MINION_BOARD so value of last module should be cleared
+            }
             status = DANGER;
             break;
         }
     }
-        // if(Minions[i].system_open_wire != 0){
-            
-        //     // check the current minion open wire, and see if the expected ones are closed (closed  = 0)
-
-            
-
-        //     // if ((i == NUM_MINIONS -1) && ((Minions[i].system_open_wire & 0xEF) != 0)) { 
-        //     //     break; //Open Wire test runs using MAX_VOLT_SENSORS_PER_MINION_BOARD so value of last module should be cleared
-        //     // }
-        //     status = DANGER;
-        //     break;
-        // }
     
     RTOS_BPS_MutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE);
 
@@ -263,7 +263,7 @@ uint32_t Voltage_GetOpenWire(void){
 }
 #endif
 
-// to do: change to work with VOLT_TAP_DIST
+// TO DO: change to work with VOLT_TAP_DIST
 /** Voltage_GetModuleMillivoltage
  * Gets the voltage of a certain battery module in the battery pack
  * @precondition moduleIdx < NUM_BATTERY_SENSORS
@@ -273,17 +273,6 @@ uint32_t Voltage_GetOpenWire(void){
 uint16_t Voltage_GetModuleMillivoltage(uint8_t moduleIdx){
     // These if statements prevents a hardfault.
     if(moduleIdx >= NUM_BATTERY_MODULES) {
-        return 0xFFFF;
-    }
-
-    /*
-       To find which minion board the battery module (moduleIdx) is assigned to, we need to
-       divide the moduleIdx by how many battery modules are assigned to each minion board
-       (indicated by MAX_VOLT_SENSORS_PER_MINION_BOARD). If the minion idx exceeds how many minion
-       boards are currently present, then return an error voltage.
-    */
-   // i don't really understand the point of this, why does the previous if statement not cover this?
-    if((moduleIdx / MAX_VOLT_SENSORS_PER_MINION_BOARD) >= NUM_MINIONS) { // why doesn't equal to work?
         return 0xFFFF;
     }
 
