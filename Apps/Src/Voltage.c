@@ -91,22 +91,18 @@ void Voltage_UpdateMeasurements(void){
     LTC6811_rdcv_safe(0, NUM_MINIONS, Minions); // Set to read back all cell voltage registers
     //copies values from cells.c_codes to private array
 
-     // which minion we are currently sampling from
+     // which module we're reading
     uint8_t moduleIdx = 0;
-    // the number of modules remaining to sample in the current minion
-    uint8_t minionModulesRemaining = VOLT_TAP_DIST[moduleIdx];
 
     // package raw voltage values into single array
-    for(uint8_t i = 0; i < NUM_BATTERY_MODULES; i++){
-
-        // if we are out of modules in this minion to sample, move to the next minion
-        if(minionModulesRemaining <= 0) {
-            moduleIdx ++;
-            minionModulesRemaining = VOLT_TAP_DIST[moduleIdx];
+    for(uint8_t minionIdx = 0; minionIdx < NUM_MINIONS; minionIdx++){
+        for(int voltTapIdx = 0; voltTapIdx < VOLT_TAP_DIST[minionIdx]; voltTapIdx++)
+        {
+            rawVoltages[moduleIdx] = Minions[minionIdx].cells.c_codes[voltTapIdx];
+            moduleIdx++;
         }
-        rawVoltages[i] = Minions[moduleIdx].cells.c_codes[VOLT_TAP_DIST[moduleIdx] - minionModulesRemaining];
-        minionModulesRemaining --;
     }
+
 
     // release minions asic mutex
     RTOS_BPS_MutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE);
@@ -223,7 +219,7 @@ SafetyStatus Voltage_OpenWire(void){
     LTC6811_run_openwire_multi(NUM_MINIONS, Minions, false);
 
     /*
-    To do: fix this to work with VOLT_TAP_DIST array
+    TO DO: fix this to work with VOLT_TAP_DIST array
     This assumes a specific distribution of modules to minions, which we do not have anymore
     (don't use)
     In the future, check the bitmap returned by LTC6811_run_openwire_multi, and see if the expected modules are closed (closed = 0) based on VOLT_TAP_DIST
@@ -263,7 +259,6 @@ uint32_t Voltage_GetOpenWire(void){
 }
 #endif
 
-// TO DO: change to work with VOLT_TAP_DIST
 /** Voltage_GetModuleMillivoltage
  * Gets the voltage of a certain battery module in the battery pack
  * @precondition moduleIdx < NUM_BATTERY_SENSORS
