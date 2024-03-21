@@ -13,8 +13,8 @@ NC=\033[0m # No Color
 DEFINES = none
 export DEFINES
 
-debug = 0
-export debug
+DEBUG = 0
+export DEBUG
 
 TEST = none
 export TEST
@@ -64,7 +64,14 @@ help:
 	@echo -e "When building for the board, you can specify custom define values for config.h."
 	@echo -e "See Config/Inc/config.h for all values."
 	@echo -e "Specify with the following ${PURPLE}format${NC}(quotes ARE needed):"
-	@echo -e "		${ORANGE}make ${BLUE}DEFINES=${GREEN}\"VARIABLE=VALUE VARIABLE=VALUE\"\n"
+	@echo -e "		${ORANGE}make ${BLUE}DEFINES=${GREEN}\"VARIABLE=VALUE VARIABLE=VALUE\"${NC}"
+	@echo -e ""
+	@echo -e "When debugging with GDB, you can set debugging and optimization"
+	@echo -e "Debugging is off by default:"
+	@echo -e "	${BLUE}DEBUG=${GREEN}0 ${NC}turns highest optimization on and sets debugging off"
+	@echo -e "	${BLUE}DEBUG=${GREEN}1 ${NC}turns optimizations off and sets debugging on"
+	@echo -e "Specify with the following ${PURPLE}format${NC}:"
+	@echo -e "		${ORANGE}make ${BLUE}DEBUG=${GREEN}1\n"
 
 .PHONY: clean
 clean:

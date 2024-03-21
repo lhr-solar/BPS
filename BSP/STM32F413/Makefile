@@ -3,8 +3,7 @@
 ######################################
 TARGET = bps-leader
 
-# sets debugging mode on or off based on BPS makefile
-DEBUG = $(debug)
+# Debugging mode is set on or off based on BPS makefile (by default it is off)
 
 READABLE = true
 
@@ -14,8 +13,8 @@ READABLE = true
 # optimization
 # change to -Og if you want the compiler to generate assembly that is very close
 # to your source code. Change to -O3 for best performance
-ifneq ($(debug), 0)
-OPT = -Og
+ifeq ($(debug), 1)
+OPT = -Og # no optimizations, for most accurate debugging
 else
 OPT = -O3
 endif
