@@ -24,6 +24,8 @@
 
 #pragma message ("NUM_BATTERY_MODULES set to " XSTR(NUM_BATTERY_MODULES))
 
+
+
 #pragma message ("NUM_TEMPERATURE_SENSORS set to " XSTR(NUM_TEMPERATURE_SENSORS))
 
 #pragma message ("NUM_TEMP_SENSORS_PER_MOD set to " XSTR(NUM_TEMP_SENSORS_PER_MOD))

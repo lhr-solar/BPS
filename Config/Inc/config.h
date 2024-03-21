@@ -102,10 +102,8 @@ typedef enum SafetyStatus_e {SAFE = 0, DANGER = 1, OVERVOLTAGE = 2, UNDERVOLTAGE
 #define MAX_VOLT_SENSORS_PER_MINION_BOARD	12	// User defined. The LTC6811 can actually measure 12 modules.
 #endif
 
-// to do: 
-// add error checking to see if the size of the array is equal to NUM_MINIONS
-// add guards?
-static const uint8_t VOLT_TAP_DIST[NUM_MINIONS] = {11, 10, 11}; 
+static const uint8_t VOLT_TAP_DIST[NUM_MINIONS] = {11, 10, 11}; // the distribution of modules each minion is monitoring
+
 
 #define TOTAL_VOLT_WIRES					(MAX_VOLT_SENSORS_PER_MINION_BOARD * NUM_MINIONS)
 
