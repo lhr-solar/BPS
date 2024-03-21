@@ -214,10 +214,10 @@ SafetyStatus Voltage_OpenWire(void){
     
     RTOS_BPS_MutexPend(&MinionsASIC_Mutex, OS_OPT_PEND_BLOCKING);
     
-    // why don't we just use Voltage_GetOpenWire() ? ;
+    //int32_t openModules = LTC6811_run_openwire_multi(NUM_MINIONS, Minions, false);
     LTC6811_run_openwire_multi(NUM_MINIONS, Minions, false);
-    //LTC6811_run_openwire_multi(NUM_MINIONS, Minions, false);
 
+    
     for(int32_t i = 0; i < NUM_MINIONS; i++) {
         // check the current minion open wire, and see if the expected ones are closed (closed  = 0)
         if(Minions[i].system_open_wire == VOLT_TAP_DIST[i])
@@ -225,7 +225,6 @@ SafetyStatus Voltage_OpenWire(void){
             status = DANGER;
             break;
         }
-        
     }
         // if(Minions[i].system_open_wire != 0){
             
@@ -234,7 +233,6 @@ SafetyStatus Voltage_OpenWire(void){
             
 
         //     // if ((i == NUM_MINIONS -1) && ((Minions[i].system_open_wire & 0xEF) != 0)) { 
-        //     //     //The last Voltage board is only connected to 7 modules ("nuh-uh" - Lakshay 2024)
         //     //     break; //Open Wire test runs using MAX_VOLT_SENSORS_PER_MINION_BOARD so value of last module should be cleared
         //     // }
         //     status = DANGER;
