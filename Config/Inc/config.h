@@ -108,6 +108,8 @@ typedef enum SafetyStatus_e {SAFE = 0, DANGER = 1, OVERVOLTAGE = 2, UNDERVOLTAGE
 // Define how many temperature sensors are connected to each board
 #define MAX_TEMP_SENSORS_PER_MINION_BOARD	16
 
+static const uint8_t TEMP_SENSOR_DIST [NUM_MINIONS] = {16, 0, 16}; // the distribution of temperature sensors monitored by each minion
+
 //--------------------------------------------------------------------------------
 // HeartBeat Delay Ticks
 // Define heartbeatDelay as # of desired while(1) loops per toggle

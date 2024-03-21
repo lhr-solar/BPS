@@ -83,10 +83,11 @@ void Temperature_Init(cell_asic *boards){
     RTOS_BPS_MutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE);
     
 #endif
+    // to do: change this to iterate through the array properly (done!)
     // set up the median filter with alternating temperatures of 1000 degrees and 0 degrees
     for (uint8_t filterIdx = 0; filterIdx < TEMPERATURE_MEDIAN_FILTER_DEPTH - 1; ++filterIdx) {
         for (uint8_t minion = 0; minion < NUM_MINIONS; ++minion) {
-            for (uint8_t sensor = 0; sensor < MAX_TEMP_SENSORS_PER_MINION_BOARD; ++sensor) {
+            for (uint8_t sensor = 0; sensor < TEMP_SENSOR_DIST[minion]; ++sensor) {
                 rawTemperatures[minion][sensor][filterIdx] = (filterIdx & 0x1) ? 1000000 : 0;
             }
         }
@@ -104,6 +105,7 @@ void Temperature_Init(cell_asic *boards){
  * @return SUCCESS or ERROR
  * @note we clear the otherMux every time a channel is switched even on the same mux; Maybe change depending on speed/optimization
  */
+// to do: change this?
 ErrorStatus Temperature_ChannelConfig(uint8_t tempChannel) {
 #ifdef SIMULATION
     currentChannel = tempChannel;
@@ -240,8 +242,9 @@ ErrorStatus Temperature_UpdateSingleChannel(uint8_t channel){
     // increment the median filter index
     medianFilterIdx = (medianFilterIdx + 1) % TEMPERATURE_MEDIAN_FILTER_DEPTH;
 
+    // to do: change how we loop through this array
     // update the filtered values
-    // you need to change this if you change 
+    // you need to change this if you change  <- fantastic comment :)
     for (uint8_t minion = 0; minion < NUM_MINIONS; ++minion) {
         for (uint8_t sensor = 0; sensor < MAX_TEMP_SENSORS_PER_MINION_BOARD; ++sensor) {
             temperatures[minion][sensor] = median(rawTemperatures[minion][sensor][0],
