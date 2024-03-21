@@ -242,11 +242,10 @@ ErrorStatus Temperature_UpdateSingleChannel(uint8_t channel){
     // increment the median filter index
     medianFilterIdx = (medianFilterIdx + 1) % TEMPERATURE_MEDIAN_FILTER_DEPTH;
 
-    // to do: change how we loop through this array
+    // to do: change how we loop through this array (done!)
     // update the filtered values
-    // you need to change this if you change  <- fantastic comment :)
     for (uint8_t minion = 0; minion < NUM_MINIONS; ++minion) {
-        for (uint8_t sensor = 0; sensor < MAX_TEMP_SENSORS_PER_MINION_BOARD; ++sensor) {
+        for (uint8_t sensor = 0; sensor < TEMP_SENSOR_DIST[minion]; ++sensor) {
             temperatures[minion][sensor] = median(rawTemperatures[minion][sensor][0],
                                                   rawTemperatures[minion][sensor][1],
                                                   rawTemperatures[minion][sensor][2]);
