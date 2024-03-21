@@ -83,7 +83,6 @@ void Temperature_Init(cell_asic *boards){
     RTOS_BPS_MutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE);
     
 #endif
-    // to do: change this to iterate through the array properly (done!)
     // set up the median filter with alternating temperatures of 1000 degrees and 0 degrees
     for (uint8_t filterIdx = 0; filterIdx < TEMPERATURE_MEDIAN_FILTER_DEPTH - 1; ++filterIdx) {
         for (uint8_t minion = 0; minion < NUM_MINIONS; ++minion) {
@@ -242,8 +241,8 @@ ErrorStatus Temperature_UpdateSingleChannel(uint8_t channel){
     // increment the median filter index
     medianFilterIdx = (medianFilterIdx + 1) % TEMPERATURE_MEDIAN_FILTER_DEPTH;
 
-    // to do: change how we loop through this array (done!)
     // update the filtered values
+    // assumes TEMPERATURE_MEDIAN_FILTER_DEPTH = 3
     for (uint8_t minion = 0; minion < NUM_MINIONS; ++minion) {
         for (uint8_t sensor = 0; sensor < TEMP_SENSOR_DIST[minion]; ++sensor) {
             temperatures[minion][sensor] = median(rawTemperatures[minion][sensor][0],
@@ -261,6 +260,7 @@ ErrorStatus Temperature_UpdateSingleChannel(uint8_t channel){
  */
 ErrorStatus Temperature_UpdateAllMeasurements(){
     // update all measurements
+    // to do: fix this cuz it's gonna iterate through the most possible temp sensors
     for (uint8_t sensorCh = 0; sensorCh < MAX_TEMP_SENSORS_PER_MINION_BOARD; sensorCh++) {
         // A hack to solve a timing issue related to enabling one of the muxes
         if(sensorCh % 8 == 0) {
@@ -274,11 +274,7 @@ ErrorStatus Temperature_UpdateAllMeasurements(){
     // update max temperature
     uint32_t newMaxTemperature = temperatures[0][0];
     for (uint8_t minion = 0; minion < NUM_MINIONS; ++minion) {
-        for (uint8_t sensor = 0; sensor < MAX_TEMP_SENSORS_PER_MINION_BOARD; ++sensor) {
-            // ignore parts of the array that are out of bounds
-            if (minion * MAX_TEMP_SENSORS_PER_MINION_BOARD + sensor >= NUM_TEMPERATURE_SENSORS) {
-                break;
-            }
+        for (uint8_t sensor = 0; sensor < TEMP_SENSOR_DIST[minion]; ++sensor) {
             if (temperatures[minion][sensor] > newMaxTemperature) {
                 newMaxTemperature = temperatures[minion][sensor];
             }
