@@ -343,8 +343,9 @@ uint8_t *Temperature_GetModulesInDanger(void){
  */
 // To Do: change this
 int32_t Temperature_GetSingleTempSensor(uint8_t board, uint8_t sensorIdx) {
-    // add error checking to see if it's an invalid module
-    return temperatures[board][sensorIdx];
+
+    // Returns -1 if there are sensor index is out of range for that minion, otherwise returns temperature
+    return (TEMP_SENSOR_DIST[board] - sensorIdx < 0) ? -1: temperatures[board][sensorIdx];
 }
 
 /** Temperature_GetModuleTemperature
