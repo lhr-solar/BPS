@@ -125,17 +125,18 @@ void Task_VoltTempMonitor(void *p_arg) {
             CanMsg.payload = CanPayload;
             CAN_TransmitQueue_Post(CanMsg);
         }
-        //Send measurements to CAN queue
+
+        //Send temperature measurements to CAN queue
         CanMsg.id = TEMPERATURE_DATA_ARRAY;
-        for (uint8_t i = 0; i < NUM_MINIONS; i++){ //send all temperature readings
-            for (uint8_t j = 0; j < MAX_TEMP_SENSORS_PER_MINION_BOARD; j++){
-                if (i * MAX_TEMP_SENSORS_PER_MINION_BOARD + j < NUM_TEMPERATURE_SENSORS){
-                    CanPayload.idx = i * MAX_TEMP_SENSORS_PER_MINION_BOARD + j;
-                    CanData.w = (uint32_t)Temperature_GetSingleTempSensor(i, j);
-                    CanPayload.data = CanData;
-                    CanMsg.payload = CanPayload;
-                    CAN_TransmitQueue_Post(CanMsg);
-                }
+        for(uint8_t i = 0; i < NUM_MINIONS; i++)
+        {
+            for(uint8_t j = 0; j < TEMP_SENSOR_DIST[i]; j++)
+            {
+                CanPayload.idx = i * MAX_TEMP_SENSORS_PER_MINION_BOARD + j; // To Do: figure out what this does :/ 
+                CanData.w = (uint32_t)Temperature_GetSingleTempSensor(i, j); // puts specific module temperature into queue
+                CanPayload.data = CanData;
+                CanMsg.payload = CanPayload;
+                CAN_TransmitQueue_Post(CanMsg);
             }
         }
 

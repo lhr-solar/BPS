@@ -84,9 +84,11 @@ void Temperature_Init(cell_asic *boards){
     
 #endif
     // set up the median filter with alternating temperatures of 1000 degrees and 0 degrees
+    // To do: this is bing chilling
     for (uint8_t filterIdx = 0; filterIdx < TEMPERATURE_MEDIAN_FILTER_DEPTH - 1; ++filterIdx) {
         for (uint8_t minionIdx = 0; minionIdx < NUM_MINIONS; ++minionIdx) {
             for (uint8_t sensorIdx = 0; sensorIdx < TEMP_SENSOR_DIST[minionIdx]; ++sensorIdx) {
+                // puts raw temperatures into array indexed based on minion
                 rawTemperatures[minionIdx][sensorIdx][filterIdx] = (filterIdx & 0x1) ? 1000000 : 0;
             }
         }
@@ -224,11 +226,12 @@ ErrorStatus Temperature_UpdateSingleChannel(uint8_t channel){
     RTOS_BPS_MutexPend(&MinionsASIC_Mutex, OS_OPT_PEND_BLOCKING);
 #endif
     // Convert to Celsius
+    // to do: fix this?
     for(int board = 0; board < NUM_MINIONS; board++) {
         // update adc value from GPIO1 stored in a_codes[0]; 
         // a_codes[0] is fixed point with .001 resolution in volts -> multiply by .001 * 1000 to get mV in double form
 #ifndef SIMULATION
-        rawTemperatures[board][channel][medianFilterIdx] = milliVoltToCelsius(Minions[board].aux.a_codes[0] / 10);
+        rawTemperatures[board][channel][medianFilterIdx] = milliVoltToCelsius(Minions[board].aux.a_codes[0] / 10); // to do: huh?
 #else
         if (board * MAX_TEMP_SENSORS_PER_MINION_BOARD + channel < NUM_TEMPERATURE_SENSORS) {
             rawTemperatures[board][channel][medianFilterIdx] = Simulator_getTemperature(board * MAX_TEMP_SENSORS_PER_MINION_BOARD + channel);
@@ -319,21 +322,26 @@ void Temperature_SetChargeState(uint8_t isCharging){
  * This function is called when you can't use the current module to see if it is charging.
  * @return pointer to index of modules that are in danger
  */
-// To do: change this (it's never even called tho)
 uint8_t *Temperature_GetModulesInDanger(void){
     static uint8_t ModuleTempStatus[NUM_TEMPERATURE_SENSORS];
-    int32_t temperatureLimit = ChargingState == 1 ? MAX_CHARGE_TEMPERATURE_LIMIT : MAX_DISCHARGE_TEMPERATURE_LIMIT;
-
-    for (uint8_t i = 0; i < NUM_MINIONS-1; i++) {
-        for (uint8_t j = 0; j < MAX_TEMP_SENSORS_PER_MINION_BOARD; j++) {
-            if (i * MAX_TEMP_SENSORS_PER_MINION_BOARD + j >= NUM_TEMPERATURE_SENSORS) break;
-            if (temperatures[i][j] > temperatureLimit) {
-                ModuleTempStatus[(i * MAX_TEMP_SENSORS_PER_MINION_BOARD + j) / NUM_TEMP_SENSORS_PER_MOD] = 1;
+    int32_t temperatureLimit = (ChargingState == 1) ? MAX_CHARGE_TEMPERATURE_LIMIT : MAX_DISCHARGE_TEMPERATURE_LIMIT;
+    uint8_t moduleIdx = 0;
+    for (uint8_t minionIdx = 0; minionIdx < NUM_MINIONS-1; minionIdx++) {
+        for (uint8_t sensorIdx = 0; sensorIdx < TEMP_SENSOR_DIST[minionIdx]; sensorIdx++) {
+            // checks whether or not a module is over temperature limit
+            if(temperatures[minionIdx][sensorIdx] > temperatureLimit){
+                ModuleTempStatus[moduleIdx] = 1; 
             }
+            else{
+                ModuleTempStatus[moduleIdx] = 0; 
+            }
+            moduleIdx++;
         }
     }
     return ModuleTempStatus;
 }
+
+// to do: this might be completely wrong :/
 /** Temperature_GetSingleTempSensor
  * Gets the single sensor from a particular board
  * @precondition: board must be < NUM_MINIONS, sensorIdx < MAX_TEMP_SENSORS_PER_MINION_BOARD
@@ -354,18 +362,10 @@ int32_t Temperature_GetSingleTempSensor(uint8_t board, uint8_t sensorIdx) {
  * @return temperature of the battery module at specified index
  */
 int32_t Temperature_GetModuleTemperature(uint8_t moduleIdx){
-
-    // checks to see if module has an associated temperature sensor
-    if(Temperature_GetModuleHasSensor(moduleIdx) == 0) 
-    {
-        // To do: figure out what to do here
-        // maybe return a really like xFFFF
-    }
-
     int32_t total = 0;
     for(int i = 0; i < MAX_TEMP_SENSORS_PER_MINION_BOARD; i++) // check if MAX_TEMP_PER_MINION is the number we should do?
     {
-
+        
     }
 
     uint8_t board = (moduleIdx * 2) / MAX_TEMP_SENSORS_PER_MINION_BOARD;
@@ -379,7 +379,9 @@ int32_t Temperature_GetModuleTemperature(uint8_t moduleIdx){
 }
 
 
-
+/**
+ * To Do: Remove this, it is stupid, i was NOT cooking last night
+*/
 /** Temperature_GetModuleHasSensor
  * Checks if the module has a temperature sensor associated with it.
  * @param moduleIdx the index of the module (0-indexed based)
