@@ -89,7 +89,6 @@ void Voltage_UpdateMeasurements(void){
     //take control of mutex
     RTOS_BPS_MutexPend(&MinionsASIC_Mutex, OS_OPT_PEND_BLOCKING);
     LTC6811_rdcv_safe(0, NUM_MINIONS, Minions); // Set to read back all cell voltage registers
-    //copies values from cells.c_codes to private array
 
      // which module we're reading
     uint8_t moduleIdx = 0;

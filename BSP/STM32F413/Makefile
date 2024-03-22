@@ -13,7 +13,7 @@ READABLE = true
 # optimization
 # change to -Og if you want the compiler to generate assembly that is very close
 # to your source code. Change to -O3 for best performance
-ifeq ($(debug), 1)
+ifeq ($(DEBUG), 1)
 OPT = -Og # no optimizations, for most accurate debugging
 else
 OPT = -O3
