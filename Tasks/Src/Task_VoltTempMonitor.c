@@ -76,7 +76,7 @@ void Task_VoltTempMonitor(void *p_arg) {
 
         // BLOCKING =====================
         // Update Temperature Measurements
-        Temperature_UpdateAllMeasurements();
+        Temperature_UpdateAllMeasurements(); // not done yet :/
         // Check if temperature is NOT safe: for all modules
         SafetyStatus temperatureStatus = Temperature_CheckStatus(Amps_IsCharging());
         if(temperatureStatus != SAFE) {
@@ -93,17 +93,21 @@ void Task_VoltTempMonitor(void *p_arg) {
             Fans_SetAll(Temperature_PID_Output(Temperature_GetTotalPackAvgTemperature(), PID_DESIRED_TEMPERATURE));
         }
 
+        /* 
+        not finished
+        */
         //Check if car should be allowed to charge or not
-        for (uint8_t board = 0; board < NUM_MINIONS; board++) {
-            for (int sensor = 0; sensor < MAX_TEMP_SENSORS_PER_MINION_BOARD; sensor++) {
-                if (board * MAX_TEMP_SENSORS_PER_MINION_BOARD + sensor >= NUM_TEMPERATURE_SENSORS) break;
-                uint32_t temp = Temperature_GetSingleTempSensor(board, sensor);
+        for(uint8_t board = 0; board < NUM_MINIONS; board++){
+            for (uint8_t sensor = 0; sensor < TEMP_SENSOR_DIST[board]; sensor++){
+                int32_t temp = Temperature_GetSingleTempSensor(board, sensor);
+                if(temp == -1) break; // read from an invalid module
                 if(temp > MAX_CHARGE_TEMPERATURE_LIMIT && temp < MAX_DISCHARGE_TEMPERATURE_LIMIT){
                     //suggest that the battery should not be charged
                     charge_enable = false;
                 }
             }
         }
+
         if (!charge_enable){
             CanMsg.id = CHARGING_ENABLED;
             CanPayload.idx = 0;

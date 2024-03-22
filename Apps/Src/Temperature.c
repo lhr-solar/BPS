@@ -293,7 +293,7 @@ SafetyStatus Temperature_CheckStatus(uint8_t isCharging){
     int32_t temperatureLimit = isCharging == 1 ? MAX_CHARGE_TEMPERATURE_LIMIT : MAX_DISCHARGE_TEMPERATURE_LIMIT;
 
     for (uint8_t i = 0; i < NUM_MINIONS; i++) {
-        for (uint8_t j = 0; j < TEMP_SENSOR_DIST[NUM_MINIONS]; j++) {
+        for (uint8_t j = 0; j < TEMP_SENSOR_DIST[i]; j++) {
             if ((temperatures[i][j] > temperatureLimit) || (temperatures[i][j] == TEMP_ERR_OUT_BOUNDS)) {
                 return DANGER;
             }
@@ -319,6 +319,7 @@ void Temperature_SetChargeState(uint8_t isCharging){
  * This function is called when you can't use the current module to see if it is charging.
  * @return pointer to index of modules that are in danger
  */
+// To do: change this (it's never even called tho)
 uint8_t *Temperature_GetModulesInDanger(void){
     static uint8_t ModuleTempStatus[NUM_TEMPERATURE_SENSORS];
     int32_t temperatureLimit = ChargingState == 1 ? MAX_CHARGE_TEMPERATURE_LIMIT : MAX_DISCHARGE_TEMPERATURE_LIMIT;
@@ -340,7 +341,9 @@ uint8_t *Temperature_GetModulesInDanger(void){
  * @param index of sensor (0-indexed based)
  * @return temperature of the battery module at specified index
  */
+// To Do: change this
 int32_t Temperature_GetSingleTempSensor(uint8_t board, uint8_t sensorIdx) {
+    // add error checking to see if it's an invalid module
     return temperatures[board][sensorIdx];
 }
 
