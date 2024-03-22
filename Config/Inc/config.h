@@ -108,7 +108,9 @@ typedef enum SafetyStatus_e {SAFE = 0, DANGER = 1, OVERVOLTAGE = 2, UNDERVOLTAGE
 // Define how many temperature sensors are connected to each board
 #define MAX_TEMP_SENSORS_PER_MINION_BOARD	16
 
-static const uint8_t TEMP_SENSOR_DIST [NUM_MINIONS] = {16, 0, 16}; // the distribution of temperature sensors monitored by each minion
+__attribute__ ((weak)) const uint8_t TEMP_SENSOR_DIST[] = {16, 0, 16}; // the distribution of temperature sensors monitored by each minion
+
+_Static_assert(sizeof(TEMP_SENSOR_DIST)/sizeof(TEMP_SENSOR_DIST[0]) == NUM_MINIONS, "The number of minions specified and the number used for TEMP_SENSOR_DIST are different!");
 
 //--------------------------------------------------------------------------------
 // HeartBeat Delay Ticks
