@@ -85,9 +85,9 @@ void Temperature_Init(cell_asic *boards){
 #endif
     // set up the median filter with alternating temperatures of 1000 degrees and 0 degrees
     for (uint8_t filterIdx = 0; filterIdx < TEMPERATURE_MEDIAN_FILTER_DEPTH - 1; ++filterIdx) {
-        for (uint8_t minion = 0; minion < NUM_MINIONS; ++minion) {
-            for (uint8_t sensor = 0; sensor < TEMP_SENSOR_DIST[minion]; ++sensor) {
-                rawTemperatures[minion][sensor][filterIdx] = (filterIdx & 0x1) ? 1000000 : 0;
+        for (uint8_t minionIdx = 0; minionIdx < NUM_MINIONS; ++minionIdx) {
+            for (uint8_t sensorIdx = 0; sensorIdx < TEMP_SENSOR_DIST[minionIdx]; ++sensorIdx) {
+                rawTemperatures[minionIdx][sensorIdx][filterIdx] = (filterIdx & 0x1) ? 1000000 : 0;
             }
         }
     }
@@ -293,14 +293,13 @@ SafetyStatus Temperature_CheckStatus(uint8_t isCharging){
     int32_t temperatureLimit = isCharging == 1 ? MAX_CHARGE_TEMPERATURE_LIMIT : MAX_DISCHARGE_TEMPERATURE_LIMIT;
 
     for (uint8_t i = 0; i < NUM_MINIONS; i++) {
-        for (uint8_t j = 0; j < MAX_TEMP_SENSORS_PER_MINION_BOARD; j++) {
-            if (i * MAX_TEMP_SENSORS_PER_MINION_BOARD + j >= NUM_TEMPERATURE_SENSORS) break;
+        for (uint8_t j = 0; j < TEMP_SENSOR_DIST[NUM_MINIONS]; j++) {
             if ((temperatures[i][j] > temperatureLimit) || (temperatures[i][j] == TEMP_ERR_OUT_BOUNDS)) {
                 return DANGER;
             }
         }
     }
-
+    
     return SAFE;
 }
 
@@ -362,6 +361,25 @@ int32_t Temperature_GetModuleTemperature(uint8_t moduleIdx){
     total += temperatures[board][sensor + MAX_TEMP_SENSORS_PER_MINION_BOARD / 2];
     total /= 2;
     return total;
+}
+
+/** Temperature_GetModuleHasSensor
+ * Checks if the module has a temperature sensor associated with it.
+ * @param moduleIdx the index of the module (0-indexed based)
+ * @return returns 1 if the module has a temperature sensor associated with it, 0 otherwise 
+*/
+uint8_t Temperature_GetModuleHasSensor(uint8_t moduleIdx){
+    
+    // Module out of bounds
+    if(moduleIdx >= NUM_BATTERY_MODULES)
+        return 0;
+
+    for(int minionIdx = 0; minionIdx < NUM_MINIONS; minionIdx++)
+    {
+       
+    }
+    return 0;
+
 }
 
 /** Temperature_GetTotalPackAvgTemperature

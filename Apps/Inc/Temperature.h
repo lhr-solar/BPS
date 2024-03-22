@@ -105,6 +105,13 @@ uint8_t *Temperature_GetModulesInDanger(void);
  */
 int32_t Temperature_GetSingleTempSensor(uint8_t board, uint8_t sensorIdx);
 
+/** Temperature_GetModuleHasSensor
+ * Checks if the module has a temperature sensor associated with it.
+ * @param moduleIdx the index of the module (0-indexed based)
+ * @return returns 1 if the module has a temperature sensor associated with it, 0 otherwise 
+*/
+uint8_t Temperature_GetModuleHasSensor(uint8_t moduleIdx);
+
 /** Temperature_GetModuleTemperature
  * Gets the avg temperature of a certain battery module in the battery pack. 
  * Since there are 2 sensors per module, the return value is the average
