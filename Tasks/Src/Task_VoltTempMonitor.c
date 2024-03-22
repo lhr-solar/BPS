@@ -100,7 +100,7 @@ void Task_VoltTempMonitor(void *p_arg) {
         for (uint8_t board = 0; board < NUM_MINIONS; board++){
             for (uint8_t sensor = 0; sensor < TEMP_SENSOR_DIST[board]; sensor++){
                 int32_t temp = Temperature_GetSingleTempSensor(board, sensor);
-                if(temp == -1) break; // read from an invalid sensor
+                if(temp == -1) break; // read from a module without a sensor
                 if(temp > MAX_CHARGE_TEMPERATURE_LIMIT && temp < MAX_DISCHARGE_TEMPERATURE_LIMIT){
                     //suggest that the battery should not be charged
                     charge_enable = false;

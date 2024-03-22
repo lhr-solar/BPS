@@ -339,11 +339,9 @@ uint8_t *Temperature_GetModulesInDanger(void){
  * @precondition: board must be < NUM_MINIONS, sensorIdx < MAX_TEMP_SENSORS_PER_MINION_BOARD
  * @param index of board (0-indexed based)
  * @param index of sensor (0-indexed based)
- * @return temperature of the battery module at specified index
+ * @return temperature of the battery module at specified index and -1 if reading from an invalid module
  */
-// To Do: change this
 int32_t Temperature_GetSingleTempSensor(uint8_t board, uint8_t sensorIdx) {
-
     // Returns -1 if there are sensor index is out of range for that minion, otherwise returns temperature
     return (TEMP_SENSOR_DIST[board] - sensorIdx < 0) ? -1: temperatures[board][sensorIdx];
 }
@@ -356,7 +354,20 @@ int32_t Temperature_GetSingleTempSensor(uint8_t board, uint8_t sensorIdx) {
  * @return temperature of the battery module at specified index
  */
 int32_t Temperature_GetModuleTemperature(uint8_t moduleIdx){
+
+    // checks to see if module has an associated temperature sensor
+    if(Temperature_GetModuleHasSensor(moduleIdx) == 0) 
+    {
+        // To do: figure out what to do here
+        // maybe return a really like xFFFF
+    }
+
     int32_t total = 0;
+    for(int i = 0; i < MAX_TEMP_SENSORS_PER_MINION_BOARD; i++) // check if MAX_TEMP_PER_MINION is the number we should do?
+    {
+
+    }
+
     uint8_t board = (moduleIdx * 2) / MAX_TEMP_SENSORS_PER_MINION_BOARD;
     uint8_t sensor = moduleIdx % (MAX_TEMP_SENSORS_PER_MINION_BOARD / 2);
 
@@ -366,6 +377,8 @@ int32_t Temperature_GetModuleTemperature(uint8_t moduleIdx){
     total /= 2;
     return total;
 }
+
+
 
 /** Temperature_GetModuleHasSensor
  * Checks if the module has a temperature sensor associated with it.
