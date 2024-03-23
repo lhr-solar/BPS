@@ -28,7 +28,7 @@ static cell_asic *Minions;
 
 static OS_MUTEX Voltage_Mutex;
 static uint16_t Voltages[NUM_BATTERY_MODULES]; // Voltage values gathered, in units of 0.1 mV
-static uint32_t openWires[TOTAL_VOLT_WIRES];
+static uint32_t openWires[MAX_TEMP_SENSORS];
 
 /** LTC ADC measures with resolution of 4 decimal places, 
  * But we standardized to have 3 decimal places to work with
@@ -90,18 +90,12 @@ void Voltage_UpdateMeasurements(void){
     RTOS_BPS_MutexPend(&MinionsASIC_Mutex, OS_OPT_PEND_BLOCKING);
     LTC6811_rdcv_safe(0, NUM_MINIONS, Minions); // Set to read back all cell voltage registers
 
-     // which module we're reading
-    uint8_t moduleIdx = 0;
-
     // package raw voltage values into single array
-    for(uint8_t minionIdx = 0; minionIdx < NUM_MINIONS; minionIdx++){
-        for(int voltTapIdx = 0; voltTapIdx < VOLT_TAP_DIST[minionIdx]; voltTapIdx++)
-        {
-            rawVoltages[moduleIdx] = Minions[minionIdx].cells.c_codes[voltTapIdx];
-            moduleIdx++;
+    for (uint8_t minion = 0, module = 0; minion < NUM_MINIONS; minion++){
+        for (uint8_t tap = 0; tap < VoltageSensorsCfg[minion]; tap++) {
+            rawVoltages[module++] = Minions[minion].cells.c_codes[tap];
         }
     }
-
 
     // release minions asic mutex
     RTOS_BPS_MutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE);
@@ -172,7 +166,7 @@ void Voltage_GetModulesInDanger(VoltageSafety_t* system){
     }
 #endif
     
-    for (int i = 0; i < TOTAL_VOLT_WIRES; i++) {	
+    for (int i = 0; i < MAX_VOLT_WIRES; i++) {	
         if(i < NUM_BATTERY_MODULES){
             // Check if battery is in range of voltage limit
             if(Voltage_GetModuleMillivoltage(i) > MAX_VOLTAGE_LIMIT) {

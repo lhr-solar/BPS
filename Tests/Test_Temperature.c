@@ -78,7 +78,7 @@ void test(void) {
             printf("\tTemperature:\r\n");
 
             for(int j = 0; j < MAX_TEMP_SENSORS_PER_MINION_BOARD; j++) {
-                printf("\t%d: %ldmC\r\n", j, Temperature_GetSingleTempSensor(i, j));
+                printf("\t%d: %ldmC\r\n", j, Temperature_GetSingleTempSensor(i * MAX_TEMP_SENSORS_PER_MINION_BOARD + j));
             }
         }
         /*uint8_t rxbuf[8];

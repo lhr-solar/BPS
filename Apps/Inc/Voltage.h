@@ -13,7 +13,7 @@
 #include "common.h"
 
 typedef struct voltage_safety{
-    SafetyStatus wire_checks[TOTAL_VOLT_WIRES];
+    SafetyStatus wire_checks[MAX_VOLT_WIRES];
     SafetyStatus module_checks[NUM_BATTERY_MODULES];
 } VoltageSafety_t;
 
