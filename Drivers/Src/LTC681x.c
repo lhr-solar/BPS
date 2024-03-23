@@ -67,7 +67,9 @@ static ErrorStatus spi_write_multi8(uint8_t *txBuf, uint32_t txSize){
 }
 
 static ErrorStatus spi_write_read_multi8(uint8_t *txBuf, uint32_t txSize, uint8_t *rxBuf, uint32_t rxSize){
-  if ((BSP_SPI_Write(spi_ltc6811, txBuf, txSize) && BSP_SPI_Read(spi_ltc6811, rxBuf, rxSize)) == ERROR){
+  //BSP_SPI_Read(spi_ltc6811, rxBuf, rxSize);
+  if ((BSP_SPI_Write(spi_ltc6811, txBuf, txSize) && BSP_SPI_Read(spi_ltc6811, rxBuf, rxSize)) == ERROR)
+  {
     Fault_BitMap |= Fault_CRC;
     EnterFaultState();
   }
@@ -526,7 +528,7 @@ void LTC681x_rdcv_reg(uint8_t reg, //Determines which cell voltage register is r
   cmd[3] = (uint8_t)(cmd_pec & 0x00FF);
 
   cs_set(0);
-  spi_write_read_multi8(cmd, 4, data, (REG_LEN*total_ic));
+  spi_write_read_multi8(cmd, 4, data, (REG_LEN*total_ic)); // Data contains raw voltages from SPI read
   cs_set(1);
 }
 
@@ -544,8 +546,6 @@ int8_t parse_cells(uint8_t current_ic, uint8_t cell_reg, uint8_t cell_data[], ui
 
   for (uint8_t current_cell = 0; current_cell<CELL_IN_REG; current_cell++)  // This loop parses the read back data into cell voltages, it
   {
-    // loops once for each of the 3 cell voltage codes in the register
-
     parsed_cell = cell_data[data_counter] + (cell_data[data_counter + 1] << 8);//Each cell code is received as two bytes and is combined to
     // create the parsed cell voltage code
     cell_codes[current_cell  + ((cell_reg - 1) * CELL_IN_REG)] = parsed_cell;
@@ -727,9 +727,10 @@ uint8_t LTC681x_rdcv(uint8_t reg, // Controls which cell voltage register is rea
 
   if (reg == 0)
   {
-    for (uint8_t cell_reg = 1; cell_reg<ic[0].ic_reg.num_cv_reg+1; cell_reg++)                   //executes once for each of the LTC6811 cell voltage registers
-    {
-      LTC681x_rdcv_reg(cell_reg, total_ic,cell_data );
+    for (uint8_t cell_reg = 1; cell_reg<ic[0].ic_reg.num_cv_reg+1; cell_reg++)  //executes once for each of the LTC6811 cell voltage registers
+    { 
+      LTC681x_rdcv_reg(cell_reg, total_ic,cell_data);
+            
       for (int current_ic = 0; current_ic<total_ic; current_ic++)
       {
         if (ic->isospi_reverse == false)
