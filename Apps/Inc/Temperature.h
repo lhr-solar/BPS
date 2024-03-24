@@ -98,16 +98,14 @@ uint8_t *Temperature_GetModulesInDanger(void);
 
 /** Temperature_GetSingleTempSensor
  * Gets the single sensor from a particular board
- * @precondition: board must be < NUM_MINIONS, sensorIdx < MAX_TEMP_SENSORS_PER_MINION_BOARD
- * @param index of board (0-indexed based)
  * @param index of sensor (0-indexed based)
  * @return temperature of the battery module at specified index
  */
-int32_t Temperature_GetSingleTempSensor(uint8_t board, uint8_t sensorIdx);
+int32_t Temperature_GetSingleTempSensor(uint8_t sensorIdx);
 
 /** Temperature_GetModuleTemperature
  * Gets the avg temperature of a certain battery module in the battery pack. 
- * Since there are 2 sensors per module, the return value is the average
+ * There is currently (2023-2024) one temperature per module, so this function does nothing.
  * @precondition: moduleIdx must be < NUM_BATTERY_MODULE
  * @param index of module (0-indexed based)
  * @return temperature of the battery module at specified index
