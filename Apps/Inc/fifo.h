@@ -74,6 +74,7 @@ typedef struct FIFO_STRUCT_NAME {
 #define PEEK     CONCAT(FIFO_NAME, _peek)
 #define POPBACK  CONCAT(FIFO_NAME, _popback)
 #define RENEW    CONCAT(FIFO_NAME, _renew)
+#define SPACE    CONCAT(FIFO_NAME, _space)
 
 /**
  * @brief Initialize a new fifo
@@ -221,6 +222,24 @@ POPBACK (FIFO_TYPE_NAME *fifo, FIFO_TYPE *elem) {
     return false;
 }
 
+/**
+ * @brief Returns how much room is left in the Fifo.
+ * 
+ * If the type of the fifo is myfifo_t, then this function
+ * will be called myfifo_space().
+ * 
+ * @param fifo A pointer to the fifo
+ * @return uin32_t of empty spaces
+ */
+static int __attribute__((unused))
+SPACE (FIFO_TYPE_NAME *fifo) {
+    if(!IS_EMPTY(fifo)) {
+        return ((fifo->get - fifo->put) + FIFO_SIZE) % FIFO_SIZE;
+    }
+
+    return FIFO_SIZE;    
+}
+
 #undef IS_EMPTY
 #undef IS_FULL
 #undef FIFO_SIZE
@@ -232,6 +251,7 @@ POPBACK (FIFO_TYPE_NAME *fifo, FIFO_TYPE *elem) {
 #undef PUT
 #undef NEW
 #undef PEEK
+#undef SPACE
 #undef POPBACK
 #undef CONCAT
 #undef _CONCAT
