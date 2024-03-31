@@ -11,12 +11,6 @@
 //declared in Tasks.c
 extern cell_asic Minions[NUM_MINIONS];
 
-int piss = 0;
-#define PISS(...) \
-    if (piss % 32 == 0) { \
-        printf(__VA_ARGS__); \
-    }
-
 void Task_VoltTempMonitor(void *p_arg) {
     (void)p_arg; 
 
@@ -34,7 +28,6 @@ void Task_VoltTempMonitor(void *p_arg) {
     CANPayload_t CanPayload;
     CANMSG_t CanMsg;
     while(1) {
-        piss++;
         // BLOCKING =====================
         // Update Voltage Measurements
         Voltage_UpdateMeasurements();
@@ -50,16 +43,10 @@ void Task_VoltTempMonitor(void *p_arg) {
             RTOS_BPS_SemPost(&SafetyCheck_Sem4, OS_OPT_POST_1);
             voltageHasBeenChecked = true;
         }
-        // if (!voltageHasBeenChecked) {
-        //     // Signal to turn on contactor but only signal once
-        //     RTOS_BPS_SemPost(&SafetyCheck_Sem4, OS_OPT_POST_1);
-        //     voltageHasBeenChecked = true;
-        // }
-
+        
         //Send measurements to CAN queue
         bool charge_enable = true;
         CanMsg.id = VOLTAGE_DATA_ARRAY;
-        PISS("voltage:\n\r");
         for (int i = 0; i < NUM_BATTERY_MODULES; i++){ //send all battery module voltage data
             CanPayload.idx = i;
             int voltage = Voltage_GetModuleMillivoltage(i);
@@ -67,12 +54,10 @@ void Task_VoltTempMonitor(void *p_arg) {
             CanPayload.data = CanData;
             CanMsg.payload = CanPayload;
             CAN_TransmitQueue_Post(CanMsg);
-            PISS("%d:%d ", i, (int)CanData.w);
             if (voltage > CHARGE_DISABLE_VOLTAGE){
                 charge_enable = false;
             }
         }
-        PISS("\n\r");
         
         // BLOCKING =====================
         // Check if open wire is NOT safe:
@@ -136,16 +121,13 @@ void Task_VoltTempMonitor(void *p_arg) {
         }
         //Send measurements to CAN queue
         CanMsg.id = TEMPERATURE_DATA_ARRAY;
-        PISS("temperature:\n\r");
         for (uint8_t sensor = 0; sensor < NUM_TEMPERATURE_SENSORS; sensor++) {
             CanPayload.idx = sensor;
             CanData.w = Temperature_GetSingleTempSensor(sensor);
             CanPayload.data = CanData;
             CanMsg.payload = CanPayload;
             CAN_TransmitQueue_Post(CanMsg);
-            PISS("%d:%d ", sensor, (int)CanData.w);
         }
-        PISS("\n\r");
 
         Fans_SetAll(TOPSPEED);
 

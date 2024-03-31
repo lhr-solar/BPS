@@ -9,7 +9,6 @@
 #if BPS_CAN_MIRROR_OUTPUT_USB
 #include "BSP_UART.h"
 
-char can_msg_str_buf[128];
 #endif
 
 void Task_CANBusConsumer(void *p_arg) {
@@ -31,20 +30,7 @@ void Task_CANBusConsumer(void *p_arg) {
 
         #if BPS_CAN_MIRROR_OUTPUT_USB // Send CAN message to USB
 
-        uint32_t len = snprintf(
-                can_msg_str_buf, sizeof(can_msg_str_buf), 
-                "(CAN) id:0x%03" PRIx16 ", idx:%" PRIu16 ", msg:[ ",
-                message.id, 
-                message.payload.idx);
-        for (uint32_t i = 0; i < 8; i++) {
-            len += snprintf(
-                    can_msg_str_buf + len, sizeof(can_msg_str_buf) - len, 
-                    "0x%02" PRIx8 " ", 
-                    message.payload.data.bytes[i]);
-        }
-        len += snprintf(can_msg_str_buf + len, sizeof(can_msg_str_buf) - len, "]\n\r");
-
-        BSP_UART_Write(can_msg_str_buf, len, UART_USB);
+        // TODO: perform bit-wise output to CAN, merge with nonblocking printf PR.
 
         #endif
     }
