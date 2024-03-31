@@ -212,7 +212,17 @@ ErrorStatus Temperature_UpdateSingleChannel(uint8_t channel){
 #ifndef SIMULATION
             rawTemperatures[sensor_idx] = milliVoltToCelsius(Minions[board].aux.a_codes[0] / 10);
 #else
-            rawTemperatures[sensor_idx] = Simulator_getTemperature(sensor_idx);
+            // simulator expects the actual number of physical sensors (and not just mux channels on the PCB)
+            // therefore, we have to do some index crunching -- this is very inefficient but it's just for 
+            // simulator so it's ok.
+            uint8_t empty_sensors_so_far = 0;
+            for (uint8_t i = 0; i < board; i++) {
+                empty_sensors_so_far += MAX_TEMP_SENSORS_PER_MINION_BOARD - TemperatureSensorsCfg[i];
+            }
+            uint8_t simulator_idx = sensor_idx - empty_sensors_so_far;
+            
+            // populate nonvalid sensors with 0
+            rawTemperatures[sensor_idx] = (channel < TemperatureSensorsCfg[board]) ? Simulator_getTemperature(simulator_idx) : 0;
 #endif
         }
     }
