@@ -28,7 +28,7 @@ static cell_asic *Minions;
 
 static OS_MUTEX Voltage_Mutex;
 static uint16_t Voltages[NUM_BATTERY_MODULES]; // Voltage values gathered, in units of 0.1 mV
-static uint32_t openWires[TOTAL_VOLT_WIRES];
+static uint32_t openWires[MAX_TEMP_SENSORS];
 
 /** LTC ADC measures with resolution of 4 decimal places, 
  * But we standardized to have 3 decimal places to work with
@@ -44,6 +44,7 @@ static uint32_t openWires[TOTAL_VOLT_WIRES];
 void Voltage_Init(cell_asic *boards){
     // Record pointer
     Minions = boards;
+
     //initialize mutex
     RTOS_BPS_MutexCreate(&Voltage_Mutex, "Voltage Buffer Mutex");
                     
@@ -88,11 +89,12 @@ void Voltage_UpdateMeasurements(void){
     //take control of mutex
     RTOS_BPS_MutexPend(&MinionsASIC_Mutex, OS_OPT_PEND_BLOCKING);
     LTC6811_rdcv_safe(0, NUM_MINIONS, Minions); // Set to read back all cell voltage registers
-    //copies values from cells.c_codes to private array
 
     // package raw voltage values into single array
-    for(uint8_t i = 0; i < NUM_BATTERY_MODULES; i++){
-        rawVoltages[i] = Minions[i / MAX_VOLT_SENSORS_PER_MINION_BOARD].cells.c_codes[i % MAX_VOLT_SENSORS_PER_MINION_BOARD];
+    for (uint8_t minion = 0, module = 0; minion < NUM_MINIONS; minion++){
+        for (uint8_t tap = 0; tap < VoltageSensorsCfg[minion]; tap++) {
+            rawVoltages[module++] = Minions[minion].cells.c_codes[tap];
+        }
     }
 
     // release minions asic mutex
@@ -147,6 +149,12 @@ void Voltage_GetModulesInDanger(VoltageSafety_t* system){
     RTOS_BPS_MutexPend(&MinionsASIC_Mutex, OS_OPT_PEND_BLOCKING);
     //put all the bits from each minion's system_open_wire variable into one variable
     for(int k = 0; k < NUM_MINIONS; k++){
+        // TO DO: change this to be based on VOLT_TAP_DIST array
+
+        /*
+        This section of code assumes a specific distribution of modules that we don't have anymore
+        (don't use)
+        */
         wires = (Minions[k].system_open_wire & 0x1FF);	//there are at most 8 modules per IC, bit 0 is GND
         for(int s = 0; s <= MAX_VOLT_SENSORS_PER_MINION_BOARD; s++){
             if((k == NUM_MINIONS - 1) && (s == MAX_VOLT_SENSORS_PER_MINION_BOARD)){
@@ -158,7 +166,7 @@ void Voltage_GetModulesInDanger(VoltageSafety_t* system){
     }
 #endif
     
-    for (int i = 0; i < TOTAL_VOLT_WIRES; i++) {	
+    for (int i = 0; i < MAX_VOLT_WIRES; i++) {	
         if(i < NUM_BATTERY_MODULES){
             // Check if battery is in range of voltage limit
             if(Voltage_GetModuleMillivoltage(i) > MAX_VOLTAGE_LIMIT) {
@@ -200,17 +208,26 @@ SafetyStatus Voltage_OpenWire(void){
     
     RTOS_BPS_MutexPend(&MinionsASIC_Mutex, OS_OPT_PEND_BLOCKING);
     
+    //int32_t openModules = LTC6811_run_openwire_multi(NUM_MINIONS, Minions, false);
     LTC6811_run_openwire_multi(NUM_MINIONS, Minions, false);
 
+    /*
+    TO DO: fix this to work with VOLT_TAP_DIST array
+    This assumes a specific distribution of modules to minions, which we do not have anymore
+    (don't use)
+    In the future, check the bitmap returned by LTC6811_run_openwire_multi, and see if the expected modules are closed (closed = 0) based on VOLT_TAP_DIST
+    */
     for(int32_t i = 0; i < NUM_MINIONS; i++) {
+
         if(Minions[i].system_open_wire != 0){
-            if ((i == NUM_MINIONS -1) && ((Minions[i].system_open_wire & 0xEF) != 0)) { //The last Voltage board is only connected to 7 modules
+            if ((i == NUM_MINIONS -1) && ((Minions[i].system_open_wire & 0xEF) != 0)) { 
                 break; //Open Wire test runs using MAX_VOLT_SENSORS_PER_MINION_BOARD so value of last module should be cleared
             }
             status = DANGER;
             break;
         }
     }
+    
     RTOS_BPS_MutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE);
 
     return status;
@@ -235,7 +252,7 @@ uint32_t Voltage_GetOpenWire(void){
 }
 #endif
 
-/** Voltage_GetModuleVoltage
+/** Voltage_GetModuleMillivoltage
  * Gets the voltage of a certain battery module in the battery pack
  * @precondition moduleIdx < NUM_BATTERY_SENSORS
  * @param index of battery (0-indexed)
@@ -244,14 +261,6 @@ uint32_t Voltage_GetOpenWire(void){
 uint16_t Voltage_GetModuleMillivoltage(uint8_t moduleIdx){
     // These if statements prevents a hardfault.
     if(moduleIdx >= NUM_BATTERY_MODULES) {
-        return 0xFFFF;
-    }
-    // Each board will measure the same number of modules except for the last board in the daisy chain.
-    // To find which minion board the battery module (moduleIdx) is assigned to, we need to
-    // divide the moduleIdx by how many battery modules are assigned to each minion board
-    // (indicated by MAX_VOLT_SENSORS_PER_MINION_BOARD). If the minion idx exceeds how many minion
-    // boards are currently present, then return an error voltage.
-    if((moduleIdx / MAX_VOLT_SENSORS_PER_MINION_BOARD) >= NUM_MINIONS) {
         return 0xFFFF;
     }
 
