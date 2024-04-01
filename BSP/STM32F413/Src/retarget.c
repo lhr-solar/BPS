@@ -44,11 +44,3 @@ int _fstat(int fd, struct stat *statbuf) {
 }
 */
 
-
-/**
- * TODO: for print queue
- * 
- * Dynamic memory allocation of blocks: OSMemCreate(), OSMemGet(), OSMemPut()
- * 
- */
-

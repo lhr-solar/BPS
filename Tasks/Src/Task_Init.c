@@ -112,7 +112,7 @@ void Task_Init(void *p_arg) {
             TASK_IDLE_STACK_SIZE);
     
     CAN_Queue_Init();
-    Print_Queue_Init();
+    PQ_Init();
 
     //delete task
     OSTaskDel(NULL, &err); // Delete task

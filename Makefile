@@ -36,11 +36,13 @@ ifneq ($(TEST), none)
 else
 	@echo -e "Making STM32 build with ${RED}NO${NC}test."
 endif
+	rm -f Objects/config_msgs.*
 	@$(BUILD_HELPER)
 	$(MAKE) -C BSP -C STM32F413 -j || ./error_verbose.log
 
 .PHONY: simulator
 simulator:
+	rm -f Objects/config_msgs.*
 	@$(BUILD_HELPER)
 	$(MAKE) -C BSP -C Simulator -j || ./error_verbose.log
 

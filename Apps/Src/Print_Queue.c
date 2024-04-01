@@ -8,132 +8,85 @@
 #include "stdio.h"
 #include <stdarg.h>
 #include "BSP_UART.h"
+#include "Tasks.h"  // for assertOSError()
 
-uint32_t size = 1024;
+#define FFIFO_TYPE char
+#define FFIFO_SIZE PQ_PRINT_FIFO_SIZE
+#define FFIFO_NAME PQFifo
+#include "fastfifo.h"
+static PQFifo_t PQFifo;
 
-#define FIFO_TYPE char
-#define FIFO_SIZE 1024
-#define FIFO_NAME Print_Fifo
-#include "fifo.h"
+static OS_MEM  PQPrintfPool;
+static char    PQPrintfBuffers[PQ_PRINTF_BUFFER_COUNT][PQ_PRINTF_BUFFER_SIZE];
 
-static Print_Fifo_t printFifo;
-static OS_MUTEX printFifo_ready;
-static OS_MUTEX printCall_Mutex;
+static BPS_OS_SEM PQ_SignalFlush;
+static BPS_OS_MUTEX PQ_Mutex;
 
-uint32_t fifo_space();
+void PQ_Init() {
+    // setup fifo
+    PQFifo = PQFifo_new();
 
+    // setup memory pool
+    BPS_OS_ERR err;
+    OSMemCreate(&PQPrintfPool,
+                "Print Queue Printf Pool",
+                PQPrintfBuffers,
+                PQ_PRINTF_BUFFER_COUNT,
+                PQ_PRINTF_BUFFER_SIZE,
+                &err);
+    assertOSError(err);
 
-/**
- * @brief Initializes the print queue
- * @param none
- * @return none
- */
-void Print_Queue_Init() {
-    Print_Fifo_renew(&printFifo);
-    RTOS_BPS_MutexCreate(&printFifo_ready, "readyPrint");
-    RTOS_BPS_MutexCreate(&printCall_Mutex, "printCall mutex");
+    RTOS_BPS_SemCreate(&PQ_SignalFlush, "PQ_SignalFlush", 0);
+    RTOS_BPS_MutexCreate(&PQ_Mutex, "PQ_Mutex");
 }
 
-/**
- * @brief Initializes the print queue
- * @return Returns if the string was added into the buffer
- * @param buffer String of formatted text to be added to the buffer
- * @return none
- */
-bool Print_Queue_Append(char *buffer) {
-    //Check if theres room
-    if(strlen(buffer) > fifo_space()){
-        RTOS_BPS_MutexPost(&printFifo_ready, OS_OPT_POST_1);
-        return false;
-    }
+bool PQ_Write(char *data, uint32_t len) {
+    RTOS_BPS_MutexPend(&PQ_Mutex, OS_OPT_PEND_BLOCKING);
+    bool status = PQFifo_put(&PQFifo, data, (int)len);
+    RTOS_BPS_MutexPost(&PQ_Mutex, OS_OPT_POST_NONE);
+    return status;
+}
 
-    while(*buffer != '\0') {
+bool PQ_Read(char *data, uint32_t len) {
+    RTOS_BPS_MutexPend(&PQ_Mutex, OS_OPT_PEND_BLOCKING);
+    bool status = PQFifo_get(&PQFifo, data, (int)len);
+    RTOS_BPS_MutexPost(&PQ_Mutex, OS_OPT_POST_NONE);
+    return status;
+}
 
-        //Add characters to the fifo one by one
-        if(!(*buffer == '\r' || *buffer == '\n')){
-            Print_Fifo_put(&printFifo, *buffer);
-            buffer++;
-        }else{
-            //Endline check
-            while((*buffer == '\r' || *buffer == '\n')){
-                Print_Fifo_put(&printFifo, *buffer);
-                buffer++;
-            }
-
-            RTOS_BPS_MutexPost(&printFifo_ready, OS_OPT_POST_1);
-        }
-
-        
-    }
-    return true;
+void PQ_Flush(void) {
+    RTOS_BPS_SemPost(&PQ_SignalFlush, OS_OPT_POST_ALL);
 }
 
 
- /**
- * @brief Blocks until the queue is ready to be dumped
- * @param message String to be dumped from the buffer
- * @param len Length of string to be dumped
- * @return none
- */
-void Print_Queue_Pend(char *message, uint32_t *len) {
-    uint32_t max_Size = 1024;
-    (*len) = 0;
-    RTOS_BPS_MutexPend(&printFifo_ready, OS_OPT_PEND_BLOCKING);
-    while(!Print_Fifo_is_empty(&printFifo)){
-        Print_Fifo_get(&printFifo, message);
-        (*len)++;
-        message++;
-        if(*len >= max_Size){
-            return;
-        }
-    }
-}
+int _printf_internal(const char *format, ...) {
+    // TODO: make this work from ISR
+    BPS_OS_ERR err;
 
-/**
- * @brief Performs a "non-blocking" printf by dumping into a buffer for Task_Print.c
- * @param string String of formatted text to be added to the buffer
- * @return none
- */
-void RTOS_BPS_NonBlocking_Printf(const char *format, ...){
-    
-    RTOS_BPS_MutexPend(&printCall_Mutex, OS_OPT_PEND_BLOCKING);
     va_list args;
     va_start(args, format);
-    char buffer[size];
-    
-    int printLen = strlen(format); 
-    vsnprintf(buffer, printLen, format, args);
-    Print_Queue_Append(buffer);
 
-    va_end(args);
-    RTOS_BPS_MutexPost(&printCall_Mutex, OS_OPT_POST_1);
-}
+    // get a buffer from the pool
+    char *buffer = (char *)OSMemGet(&PQPrintfPool, &err);
+    assertOSError(err);
 
-/**
- * @brief Performs a "blocking" printf by dumping into a buffer for Task_Print.c until success
- * @param string String of formatted text to be added to the buffer
- * @return none
- */
-void RTOS_BPS_Blocking_Printf(const char *format, ...){
-    
-    RTOS_BPS_MutexPend(&printCall_Mutex, OS_OPT_PEND_BLOCKING);
-    va_list args;
-    va_start(args, format);
-    char buffer[size];
-    
-    int printLen = strlen(format); 
-    vsnprintf(buffer, printLen, format, args);
-    while(!Print_Queue_Append(buffer));
+    // write to buffer
+    int len = vsnprintf(buffer, PQ_PRINTF_BUFFER_SIZE, format, args);
 
-    va_end(args);
-    RTOS_BPS_MutexPost(&printCall_Mutex, OS_OPT_POST_1);
-}
+    // copy from buffer to fifo
+    bool status = PQ_Write(buffer, len);
 
-//Function will get removed when merged with my FIFO PR
-uint32_t fifo_space(){
-    if(!Print_Fifo_is_empty(&printFifo)){
-        return ((printFifo.get - printFifo.put) + size) % size;
+    // release buffer
+    OSMemPut(&PQPrintfPool, buffer, &err);
+    assertOSError(err);
+
+    // signal flush
+    if (memchr(buffer, '\n', len)) {
+        PQ_Flush();
     }
 
-    return size; 
+    va_end(args);
+    return status ? len : 0;
 }
+
+
