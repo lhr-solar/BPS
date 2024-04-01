@@ -13,21 +13,13 @@
 #include "Simulator.h"
 #endif
 
-// if you change this, you also need to change the calls to median()
-#define TEMPERATURE_MEDIAN_FILTER_DEPTH 3
-
-// median filter for temperature values
-static int32_t medianFilterIdx = TEMPERATURE_MEDIAN_FILTER_DEPTH - 1;
-static int32_t rawTemperatures[NUM_MINIONS][MAX_TEMP_SENSORS_PER_MINION_BOARD][TEMPERATURE_MEDIAN_FILTER_DEPTH];
-
-// Holds the temperatures in Celsius (Fixed Point with .001 resolution) for each sensor on each board
-static int32_t temperatures[NUM_MINIONS][MAX_TEMP_SENSORS_PER_MINION_BOARD];
-
-// Holds the maximum measured temperature in the most recent batch of temperature measurements
-static int32_t maxTemperature;
-
-// 0 if discharging 1 if charging
-static uint8_t ChargingState;
+// median filter
+#define MEDIAN_FILTER_TYPE int32_t
+#define MEDIAN_FILTER_DEPTH 3
+#define MEDIAN_FILTER_CHANNELS MAX_TEMP_SENSORS
+#define MEDIAN_FILTER_NAME TemperatureFilter
+#include "MedianFilter.h"
+static TemperatureFilter_t TemperatureFilter;
 
 // simulator bypasses ltc driver
 #ifndef SIMULATION
@@ -35,6 +27,18 @@ static uint8_t ChargingState;
 // Temperature.c uses auxiliary registers to view ADC data and COM register for I2C with LTC1380 MUX
 static cell_asic *Minions;
 #endif
+
+// Holds the temperatures in Celsius (Fixed Point with .001 resolution) for each sensor on each board
+static int32_t Temperatures[NUM_TEMPERATURE_SENSORS];
+
+// Raw temperature values from the ADC -- this is a sparse array and will be packed down later.
+static int32_t rawTemperatures[MAX_TEMP_SENSORS];
+
+// Holds the maximum measured temperature in the most recent batch of temperature measurements
+static int32_t maxTemperature;
+
+// 0 if discharging 1 if charging
+static uint8_t ChargingState;
 
 #ifdef SIMULATION
 // keep track of which temperature channel we are using
@@ -44,21 +48,6 @@ static uint8_t currentChannel = 0;
 // Variables to help with PID calculation
 static int32_t ErrorSum = 0;
 static int32_t Error;
-
-
-/**
- * @brief find the median of three values
- * 
- * @param a first value
- * @param b second value
- * @param c third value
- * @return the median
- */
-static inline int32_t median(int32_t a, int32_t b, int32_t c) {
-    if ((a <= b && b < c) || (a >= b && b > c)) return b;
-    if ((a < b && a > c) || (b < a && a < c)) return a;
-    return c;
-}
 
 /** Temperature_Init
  * Initializes device drivers including SPI inside LTC6811_init and LTC6811 for Temperature Monitoring
@@ -84,16 +73,7 @@ void Temperature_Init(cell_asic *boards){
     
 #endif
     // set up the median filter with alternating temperatures of 1000 degrees and 0 degrees
-    for (uint8_t filterIdx = 0; filterIdx < TEMPERATURE_MEDIAN_FILTER_DEPTH - 1; ++filterIdx) {
-        for (uint8_t minion = 0; minion < NUM_MINIONS; ++minion) {
-            for (uint8_t sensor = 0; sensor < MAX_TEMP_SENSORS_PER_MINION_BOARD; ++sensor) {
-                rawTemperatures[minion][sensor][filterIdx] = (filterIdx & 0x1) ? 1000000 : 0;
-            }
-        }
-    }
-    // median filter should start pointing to the last set of temperature readings
-    medianFilterIdx = TEMPERATURE_MEDIAN_FILTER_DEPTH - 1;
-
+    TemperatureFilter_init(&TemperatureFilter, 0, 1000000);
 }
 
 /** Temperature_ChannelConfig
@@ -222,33 +202,36 @@ ErrorStatus Temperature_UpdateSingleChannel(uint8_t channel){
 #ifndef SIMULATION
     RTOS_BPS_MutexPend(&MinionsASIC_Mutex, OS_OPT_PEND_BLOCKING);
 #endif
+
     // Convert to Celsius
-    for(int board = 0; board < NUM_MINIONS; board++) {
+    for (uint8_t board = 0; board < NUM_MINIONS; board++) {
         // update adc value from GPIO1 stored in a_codes[0]; 
         // a_codes[0] is fixed point with .001 resolution in volts -> multiply by .001 * 1000 to get mV in double form
+        uint8_t sensor_idx = (board * MAX_TEMP_SENSORS_PER_MINION_BOARD) + channel;
+        if (channel < TemperatureSensorsCfg[board]) {   // don't touch unused sensors
 #ifndef SIMULATION
-        rawTemperatures[board][channel][medianFilterIdx] = milliVoltToCelsius(Minions[board].aux.a_codes[0] / 10);
+            rawTemperatures[sensor_idx] = milliVoltToCelsius(Minions[board].aux.a_codes[0] / 10);
 #else
-        if (board * MAX_TEMP_SENSORS_PER_MINION_BOARD + channel < NUM_TEMPERATURE_SENSORS) {
-            rawTemperatures[board][channel][medianFilterIdx] = Simulator_getTemperature(board * MAX_TEMP_SENSORS_PER_MINION_BOARD + channel);
-        }
+            // simulator expects the actual number of physical sensors (and not just mux channels on the PCB)
+            // therefore, we have to do some index crunching -- this is very inefficient but it's just for 
+            // simulator so it's ok.
+            uint8_t empty_sensors_so_far = 0;
+            for (uint8_t i = 0; i < board; i++) {
+                empty_sensors_so_far += MAX_TEMP_SENSORS_PER_MINION_BOARD - TemperatureSensorsCfg[i];
+            }
+            uint8_t simulator_idx = sensor_idx - empty_sensors_so_far;
+            
+            // populate nonvalid sensors with 0
+            rawTemperatures[sensor_idx] = (channel < TemperatureSensorsCfg[board]) ? Simulator_getTemperature(simulator_idx) : 0;
 #endif
+        }
     }
 #ifndef SIMULATION
     RTOS_BPS_MutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE);
 #endif
-    // increment the median filter index
-    medianFilterIdx = (medianFilterIdx + 1) % TEMPERATURE_MEDIAN_FILTER_DEPTH;
-
-    // update the filtered values
-    // you need to change this if you change 
-    for (uint8_t minion = 0; minion < NUM_MINIONS; ++minion) {
-        for (uint8_t sensor = 0; sensor < MAX_TEMP_SENSORS_PER_MINION_BOARD; ++sensor) {
-            temperatures[minion][sensor] = median(rawTemperatures[minion][sensor][0],
-                                                  rawTemperatures[minion][sensor][1],
-                                                  rawTemperatures[minion][sensor][2]);
-        }
-    }
+    
+    // run median filter
+    TemperatureFilter_put(&TemperatureFilter, rawTemperatures);
 
     return SUCCESS;
 }
@@ -261,7 +244,7 @@ ErrorStatus Temperature_UpdateAllMeasurements(){
     // update all measurements
     for (uint8_t sensorCh = 0; sensorCh < MAX_TEMP_SENSORS_PER_MINION_BOARD; sensorCh++) {
         // A hack to solve a timing issue related to enabling one of the muxes
-        if(sensorCh % 8 == 0) {
+        if (sensorCh % 8 == 0) {
             Temperature_ChannelConfig(sensorCh);
             Temperature_ChannelConfig(sensorCh);
         }
@@ -269,19 +252,26 @@ ErrorStatus Temperature_UpdateAllMeasurements(){
         Temperature_UpdateSingleChannel(sensorCh);
     }
 
-    // update max temperature
-    uint32_t newMaxTemperature = temperatures[0][0];
-    for (uint8_t minion = 0; minion < NUM_MINIONS; ++minion) {
-        for (uint8_t sensor = 0; sensor < MAX_TEMP_SENSORS_PER_MINION_BOARD; ++sensor) {
-            // ignore parts of the array that are out of bounds
-            if (minion * MAX_TEMP_SENSORS_PER_MINION_BOARD + sensor >= NUM_TEMPERATURE_SENSORS) {
-                break;
-            }
-            if (temperatures[minion][sensor] > newMaxTemperature) {
-                newMaxTemperature = temperatures[minion][sensor];
-            }
+    // update public temperatures with output of median filter
+    int32_t filteredTemperatures[MAX_TEMP_SENSORS];
+    TemperatureFilter_get(&TemperatureFilter, filteredTemperatures);
+
+    // package raw voltage values into single array
+    for (uint8_t minion = 0, sensor = 0; minion < NUM_MINIONS; minion++){
+        for (uint8_t channel = 0; channel < TemperatureSensorsCfg[minion]; channel++) {
+            uint8_t sensor_idx = (minion * MAX_TEMP_SENSORS_PER_MINION_BOARD) + channel;
+            Temperatures[sensor++] = filteredTemperatures[sensor_idx];
         }
     }
+
+    // update max temperature
+    int32_t newMaxTemperature = 0;
+    for (uint8_t i = 0; i < NUM_TEMPERATURE_SENSORS; i++) {
+        if (Temperatures[i] > newMaxTemperature) {
+            newMaxTemperature = Temperatures[i];
+        }
+    }
+
     maxTemperature = newMaxTemperature;
     return SUCCESS;
 }
@@ -294,12 +284,9 @@ ErrorStatus Temperature_UpdateAllMeasurements(){
 SafetyStatus Temperature_CheckStatus(uint8_t isCharging){
     int32_t temperatureLimit = isCharging == 1 ? MAX_CHARGE_TEMPERATURE_LIMIT : MAX_DISCHARGE_TEMPERATURE_LIMIT;
 
-    for (uint8_t i = 0; i < NUM_MINIONS; i++) {
-        for (uint8_t j = 0; j < MAX_TEMP_SENSORS_PER_MINION_BOARD; j++) {
-            if (i * MAX_TEMP_SENSORS_PER_MINION_BOARD + j >= NUM_TEMPERATURE_SENSORS) break;
-            if ((temperatures[i][j] > temperatureLimit) || (temperatures[i][j] == TEMP_ERR_OUT_BOUNDS)) {
-                return DANGER;
-            }
+    for (uint8_t i = 0; i < NUM_TEMPERATURE_SENSORS; i++) {
+        if ((Temperatures[i] > temperatureLimit) || (Temperatures[i] == TEMP_ERR_OUT_BOUNDS)) {
+            return DANGER;
         }
     }
 
@@ -326,44 +313,35 @@ uint8_t *Temperature_GetModulesInDanger(void){
     static uint8_t ModuleTempStatus[NUM_TEMPERATURE_SENSORS];
     int32_t temperatureLimit = ChargingState == 1 ? MAX_CHARGE_TEMPERATURE_LIMIT : MAX_DISCHARGE_TEMPERATURE_LIMIT;
 
-    for (uint8_t i = 0; i < NUM_MINIONS-1; i++) {
-        for (uint8_t j = 0; j < MAX_TEMP_SENSORS_PER_MINION_BOARD; j++) {
-            if (i * MAX_TEMP_SENSORS_PER_MINION_BOARD + j >= NUM_TEMPERATURE_SENSORS) break;
-            if (temperatures[i][j] > temperatureLimit) {
-                ModuleTempStatus[(i * MAX_TEMP_SENSORS_PER_MINION_BOARD + j) / NUM_TEMP_SENSORS_PER_MOD] = 1;
-            }
+    for (uint8_t i = 0; i < NUM_TEMPERATURE_SENSORS; i++) {
+        if (Temperatures[i] > temperatureLimit) {
+            ModuleTempStatus[i] = 1;
         }
     }
+
     return ModuleTempStatus;
 }
 /** Temperature_GetSingleTempSensor
  * Gets the single sensor from a particular board
- * @precondition: board must be < NUM_MINIONS, sensorIdx < MAX_TEMP_SENSORS_PER_MINION_BOARD
- * @param index of board (0-indexed based)
  * @param index of sensor (0-indexed based)
  * @return temperature of the battery module at specified index
  */
-int32_t Temperature_GetSingleTempSensor(uint8_t board, uint8_t sensorIdx) {
-    return temperatures[board][sensorIdx];
+int32_t Temperature_GetSingleTempSensor(uint8_t sensorIdx) {
+    return Temperatures[sensorIdx];
 }
 
 /** Temperature_GetModuleTemperature
- * Gets the avg temperature of a certain battery module in the battery pack. Since there
- * are 2 sensors per module, the return value is the average
+ * Gets the avg temperature of a certain battery module in the battery pack. 
+ * There is currently (2023-2024) one temperature per module, so this function does nothing.
  * @precondition: moduleIdx must be < NUM_BATTERY_MODULE
  * @param index of module (0-indexed based)
  * @return temperature of the battery module at specified index
  */
-int32_t Temperature_GetModuleTemperature(uint8_t moduleIdx){
-    int32_t total = 0;
-    uint8_t board = (moduleIdx * 2) / MAX_TEMP_SENSORS_PER_MINION_BOARD;
-    uint8_t sensor = moduleIdx % (MAX_TEMP_SENSORS_PER_MINION_BOARD / 2);
-
-    total += temperatures[board][sensor];
-    // Get temperature from other sensor on other side
-    total += temperatures[board][sensor + MAX_TEMP_SENSORS_PER_MINION_BOARD / 2];
-    total /= 2;
-    return total;
+int32_t Temperature_GetModuleTemperature(uint8_t moduleIdx) {
+    if (moduleIdx >= NUM_BATTERY_MODULES) {
+        return INT32_MAX;
+    }
+    return Temperature_GetSingleTempSensor(moduleIdx);
 }
 
 /** Temperature_GetTotalPackAvgTemperature

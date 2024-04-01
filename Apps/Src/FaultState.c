@@ -94,29 +94,29 @@ void EnterFaultState() {
 
     EEPROM_LogError(Fault_BitMap);
 
-    // TODO: create an interrupt-independent CAN interface, so we can use CAN from within a fault state
-    // avoid infinite recursive faults, since our CAN Driver relies on the OS to work
-    // also don't call CAN if the watchdog tripped, since CAN won't be initialized
-
     //Deinitialize CAN registers
     CANbus_DeInit();
     //Reinit CAN in fault state
-    CANbus_Init(BPS_CAN_LOOPBACK, true);
+    CANbus_Init(BPS_CAN_LOOPBACK, true, NULL, 0);
 
 #ifdef DEBUGMODE
     char command[COMMAND_SIZE];
 #endif
     BSP_WDTimer_Init(true); //re-initialize for fault state
-    BSP_WDTimer_Start(); 
+    BSP_WDTimer_Start();
+    uint32_t i = 0;
     while(1) {
+        //toggle run led when in fault state -- divide by 10 makes the blink speed ok
+        if (i % 10 == 0) BSP_Light_Toggle(RUN);
+        i++;
         //Send Trip Readings
         CANPayload_t payload;
         payload.data.w = 1;
-        CANbus_SendMsg_FaultState(TRIP, payload);
+        CANbus_SendMsg_FaultState(BPS_TRIP, payload);
 
         //Send Contactor Readings
         payload.data.b = 0;
-        CANbus_SendMsg_FaultState(CONTACTOR_STATE, payload);
+        CANbus_SendMsg_FaultState(BPS_CONTACTOR_STATE, payload);
         
         //Send Current Readings
         payload.data.w = Amps_GetReading();
@@ -126,19 +126,16 @@ void EnterFaultState() {
         for (uint8_t i = 0; i < NUM_BATTERY_MODULES; i++){ //send all battery module voltage data
             payload.idx = i;
             payload.data.w = Voltage_GetModuleMillivoltage(i);
-            CANbus_SendMsg_FaultState(VOLT_DATA, payload);
+            CANbus_SendMsg_FaultState(VOLTAGE_DATA_ARRAY, payload);
         }
 
         //Send Temperature Readings
         for (uint8_t i = 0; i < NUM_BATTERY_MODULES; i++){ //send all battery module temperature data
             payload.idx = i;
             payload.data.w = Temperature_GetModuleTemperature(i);
-            CANbus_SendMsg_FaultState(TEMP_DATA, payload);
+            CANbus_SendMsg_FaultState(TEMPERATURE_DATA_ARRAY, payload);
         }
 
-#ifdef DEBUGMODE
-        if (BSP_UART_ReadLine(command)) CLI_Handler(command); // CLI
-#endif
         BSP_WDTimer_Reset(); // WDOG Reset
 #ifdef SIMULATION
         Simulator_Log(LOG_INFO, "Completed fault state\n");
