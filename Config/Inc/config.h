@@ -43,7 +43,7 @@ typedef enum SafetyStatus_e {SAFE = 0, DANGER = 1, OVERVOLTAGE = 2, UNDERVOLTAGE
 // Voltage Sensor Configurations
 // Defines how many voltage sensors are connected to each board
 #ifndef MAX_VOLT_SENSORS_PER_MINION_BOARD
-#define MAX_VOLT_SENSORS_PER_MINION_BOARD    12    // User defined. The LTC6811 can actually measure 12 modules.
+#define MAX_VOLT_SENSORS_PER_MINION_BOARD    12     // Note: use this value for reference, we don't actually check against it
 #endif
 
 #ifndef PER_MINION_BOARD_VOLT_SENSORS
@@ -56,7 +56,7 @@ typedef enum SafetyStatus_e {SAFE = 0, DANGER = 1, OVERVOLTAGE = 2, UNDERVOLTAGE
 // Temperature Sensor Configurations
 // Define how many temperature sensors are connected to each board
 #ifndef MAX_TEMP_SENSORS_PER_MINION_BOARD
-#define MAX_TEMP_SENSORS_PER_MINION_BOARD    16
+#define MAX_TEMP_SENSORS_PER_MINION_BOARD    16     // Note: use this value for reference, we don't actually check against it
 #endif
 
 #ifndef PER_MINION_BOARD_TEMP_SENSORS
@@ -74,14 +74,14 @@ VoltageSensorsCfg[] = PER_MINION_BOARD_VOLT_SENSORS;
 
 // check if VOLT_TAP_DIST array size is equal to the number of minions
 _Static_assert((sizeof(VoltageSensorsCfg)/sizeof(*VoltageSensorsCfg)) == NUM_MINIONS, 
-               "Error: the number of minions specified and the number used for VOLT_TAP_DIST are different.");
+               "Error: the number of minions specified and the number used for PER_MINION_BOARD_VOLT_SENSORS are different.");
 
 __attribute__ ((weak)) const int
 TemperatureSensorsCfg[] = PER_MINION_BOARD_TEMP_SENSORS;
 
 // check if VOLT_TAP_DIST array size is equal to the number of minions
 _Static_assert((sizeof(TemperatureSensorsCfg)/sizeof(*TemperatureSensorsCfg)) == NUM_MINIONS, 
-               "Error: the number of minions specified and the number used for VOLT_TAP_DIST are different.");
+               "Error: the number of minions specified and the number used for PER_MINION_BOARD_TEMP_SENSORS are different.");
 
 
 
@@ -137,7 +137,7 @@ _Static_assert((sizeof(TemperatureSensorsCfg)/sizeof(*TemperatureSensorsCfg)) ==
 #endif
 //--------------------------------------------------------------------------------
 // Helpers
-#define STARTUP_WAIT_TIME               100000  // Number of iterations to wait for battery charging instructions on startup
+#define STARTUP_WAIT_TIME               100000  // Number of iterations to wait for battery charging instructions on startup (Deprecated)
 
 #define PWM_PERIOD                      4000    // Number of clock cycles per PWM period
 
