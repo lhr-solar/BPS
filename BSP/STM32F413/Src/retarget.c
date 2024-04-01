@@ -2,16 +2,16 @@
 
 #include "common.h"
 #include "sys/stat.h"
-#include "Print_Queue.h"
+#include "BSP_UART.h"
 
 #define STDIN_FILENO  0
 #define STDOUT_FILENO 1
 #define STDERR_FILENO 2
 
 int _write(int fd, char *buffer, unsigned int len) {
-    //Add stuff to thread-safe OS level queue instead of BSP callsS
-
-    Print_Queue_Append(buffer);
+    if(buffer != NULL) {
+        BSP_UART_Write(buffer, len, UART_USB);
+    }
 
     return len;
 }
@@ -43,3 +43,12 @@ int _fstat(int fd, struct stat *statbuf) {
     return -1;
 }
 */
+
+
+/**
+ * TODO: for print queue
+ * 
+ * Dynamic memory allocation of blocks: OSMemCreate(), OSMemGet(), OSMemPut()
+ * 
+ */
+
