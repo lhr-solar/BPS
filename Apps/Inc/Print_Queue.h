@@ -27,6 +27,8 @@ void PQ_Init(void);
 bool PQ_Write(char *data, uint32_t len);
 bool PQ_Read(char *data, uint32_t len);
 void PQ_Flush(void);
+void PQ_WaitForFlush(void);
+uint32_t PQ_GetNumWaiting(void);
 
 /**
  * @brief threadsafe wrapper for printf(). DO NOT USE DIRECTLY -- just use printf
@@ -56,3 +58,10 @@ void RTOS_BPS_Blocking_Printf(const char *format, ...);
 #endif  // BPS_ENABLE_PRINT_OUTPUT
 
 #endif
+
+/**
+ * TODO:
+ * Error handling on fifo full
+ * Test everything
+ * Add back in CAN print mirroring
+ */
