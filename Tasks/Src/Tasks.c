@@ -18,6 +18,7 @@ BPS_OS_TCB VoltTempMonitor_TCB;
 BPS_OS_TCB AmperesMonitor_TCB;
 BPS_OS_TCB LogInfo_TCB;
 BPS_OS_TCB CANBusConsumer_TCB;
+BPS_OS_TCB CANBusProducer_TCB;
 BPS_OS_TCB BatteryBalance_TCB;
 BPS_OS_TCB CheckContactor_TCB;
 BPS_OS_TCB CLI_TCB;
@@ -33,6 +34,7 @@ BPS_CPU_STK VoltTempMonitor_Stk[TASK_VOLT_TEMP_MONITOR_STACK_SIZE];
 BPS_CPU_STK AmperesMonitor_Stk[TASK_AMPERES_MONITOR_STACK_SIZE];
 BPS_CPU_STK LogInfo_Stk[TASK_LOG_INFO_STACK_SIZE];
 BPS_CPU_STK CANBusConsumer_Stk[TASK_CANBUS_CONSUMER_STACK_SIZE];
+BPS_CPU_STK CANBusProducer_Stk[TASK_CANBUS_PRODUCER_STACK_SIZE];
 BPS_CPU_STK BatteryBalance_Stk[TASK_BATTERY_BALANCE_STACK_SIZE];
 BPS_CPU_STK CheckContactor_Stk[TASK_CHECK_CONTACTOR_STACK_SIZE];
 BPS_CPU_STK CLI_Stk[TASK_CLI_STACK_SIZE];
@@ -62,9 +64,10 @@ uint8_t Fault_Flag    = 0; //This is a flag that replaces the semaphore in case 
 /**
  * Used to assert if there has been an error in one of the OS functions
  * Kills the car if there is an OS error
+ * Note: we also allow err = OS_ERR_PEND_WOULD_BLOCK to not kill system (for our nonblocking pend)
  **/
 void assertOSError(BPS_OS_ERR err){
-    if(err != OS_ERR_NONE) {
+    if(err != OS_ERR_NONE && err != OS_ERR_PEND_WOULD_BLOCK) {
         Fault_BitMap |= Fault_OS;
         EnterFaultState();
         // We should not get to this point if the call above worked.

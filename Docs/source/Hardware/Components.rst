@@ -2,8 +2,8 @@
 Components
 *************
 
-Fault Indicator/Strobe Light
-=============================
+`Fault Indicator/Strobe Light <https://www.ledequipped.com/a-1377/>`__
+======================================================================
 Description
     The strobelight contains 4, 3 watt LED's and is powered by a 12V line. It has 4 wires for setup
     although we only need to use 3. Outside of power and ground, the other 2 wires are for sync and

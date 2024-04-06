@@ -11,6 +11,10 @@
 //declared in Tasks.c
 extern cell_asic Minions[NUM_MINIONS];
 
+static uint32_t voltage_totals[NUM_BATTERY_MODULES] = {0};
+
+static uint32_t task_cycle_counter = 0;
+
 void Task_VoltTempMonitor(void *p_arg) {
     (void)p_arg; 
 
@@ -28,6 +32,8 @@ void Task_VoltTempMonitor(void *p_arg) {
     CANPayload_t CanPayload;
     CANMSG_t CanMsg;
     while(1) {
+        task_cycle_counter++;       // used for output and sampling decimation / averaging
+
         // BLOCKING =====================
         // Update Voltage Measurements
         Voltage_UpdateMeasurements();
@@ -43,18 +49,28 @@ void Task_VoltTempMonitor(void *p_arg) {
             RTOS_BPS_SemPost(&SafetyCheck_Sem4, OS_OPT_POST_1);
             voltageHasBeenChecked = true;
         }
+        
         //Send measurements to CAN queue
         bool charge_enable = true;
-        CanMsg.id = VOLT_DATA;
+        CanMsg.id = VOLTAGE_DATA_ARRAY;
         for (int i = 0; i < NUM_BATTERY_MODULES; i++){ //send all battery module voltage data
-            CanPayload.idx = i;
-            int voltage = Voltage_GetModuleMillivoltage(i);
-            CanData.w = voltage;
-            CanPayload.data = CanData;
-            CanMsg.payload = CanPayload;
-            CAN_Queue_Post(CanMsg);
+            
+            uint16_t voltage = Voltage_GetModuleMillivoltage(i);
+            voltage_totals[i] += voltage;
+
             if (voltage > CHARGE_DISABLE_VOLTAGE){
                 charge_enable = false;
+            }
+
+            // Send voltages over CAN every ODR_VOLTAGE_AVERAGING iterations
+            if (task_cycle_counter % ODR_VOLTAGE_AVERAGING == 0) {
+                CanPayload.idx = i;
+                CanData.w = (int)(voltage_totals[i] / ODR_VOLTAGE_AVERAGING);
+                CanPayload.data = CanData;
+                CanMsg.payload = CanPayload;
+                CAN_TransmitQueue_Post(CanMsg);
+
+                voltage_totals[i] = 0;
             }
         }
         
@@ -75,8 +91,11 @@ void Task_VoltTempMonitor(void *p_arg) {
         }
 
         // BLOCKING =====================
-        // Update Temperature Measurements
-        Temperature_UpdateAllMeasurements();
+        // Update Temperature Measurements (every ODR_TEMPERATURE_DECIMATION iterations)
+        if (task_cycle_counter % ODR_TEMPERATURE_DECIMATION == 0) {
+            Temperature_UpdateAllMeasurements();
+        }
+
         // Check if temperature is NOT safe: for all modules
         SafetyStatus temperatureStatus = Temperature_CheckStatus(Amps_IsCharging());
         if(temperatureStatus != SAFE) {
@@ -94,45 +113,38 @@ void Task_VoltTempMonitor(void *p_arg) {
         }
 
         //Check if car should be allowed to charge or not
-        for (uint8_t board = 0; board < NUM_MINIONS; board++) {
-            for (int sensor = 0; sensor < MAX_TEMP_SENSORS_PER_MINION_BOARD; sensor++) {
-                if (board * MAX_TEMP_SENSORS_PER_MINION_BOARD + sensor >= NUM_TEMPERATURE_SENSORS) break;
-                uint32_t temp = Temperature_GetSingleTempSensor(board, sensor);
-                if(temp > MAX_CHARGE_TEMPERATURE_LIMIT && temp < MAX_DISCHARGE_TEMPERATURE_LIMIT){
-                    //suggest that the battery should not be charged
-                    charge_enable = false;
-                }
+        for (uint8_t sensor = 0; sensor < NUM_TEMPERATURE_SENSORS; sensor++) {
+            uint32_t temp = Temperature_GetSingleTempSensor(sensor);
+            if (temp > MAX_CHARGE_TEMPERATURE_LIMIT && temp < MAX_DISCHARGE_TEMPERATURE_LIMIT){
+                //suggest that the battery should not be charged
+                charge_enable = false;
             }
         }
         if (!charge_enable){
-            CanMsg.id = CHARGE_ENABLE;
+            CanMsg.id = CHARGING_ENABLED;
             CanPayload.idx = 0;
             CanData.b = 0;
             CanPayload.data = CanData;
             CanMsg.payload = CanPayload;
-            CAN_Queue_Post(CanMsg);
+            CAN_TransmitQueue_Post(CanMsg);
         }
         else {
             //if the temperature gets low enough, suggest battery can be charged
-            CanMsg.id = CHARGE_ENABLE;
+            CanMsg.id = CHARGING_ENABLED;
             CanPayload.idx = 0;
             CanData.b = 1;
             CanPayload.data = CanData;
             CanMsg.payload = CanPayload;
-            CAN_Queue_Post(CanMsg);
+            CAN_TransmitQueue_Post(CanMsg);
         }
         //Send measurements to CAN queue
-        CanMsg.id = TEMP_DATA;
-        for (uint8_t i = 0; i < NUM_MINIONS; i++){ //send all temperature readings
-            for (uint8_t j = 0; j < MAX_TEMP_SENSORS_PER_MINION_BOARD; j++){
-                if (i * MAX_TEMP_SENSORS_PER_MINION_BOARD + j < NUM_TEMPERATURE_SENSORS){
-                    CanPayload.idx = i * MAX_TEMP_SENSORS_PER_MINION_BOARD + j;
-                    CanData.w = (uint32_t)Temperature_GetSingleTempSensor(i, j);
-                    CanPayload.data = CanData;
-                    CanMsg.payload = CanPayload;
-                    CAN_Queue_Post(CanMsg);
-                }
-            }
+        CanMsg.id = TEMPERATURE_DATA_ARRAY;
+        for (uint8_t sensor = 0; sensor < NUM_TEMPERATURE_SENSORS; sensor++) {
+            CanPayload.idx = sensor;
+            CanData.w = Temperature_GetSingleTempSensor(sensor);
+            CanPayload.data = CanData;
+            CanMsg.payload = CanPayload;
+            CAN_TransmitQueue_Post(CanMsg);
         }
 
         Fans_SetAll(TOPSPEED);
@@ -144,7 +156,7 @@ void Task_VoltTempMonitor(void *p_arg) {
 
         RTOS_BPS_MutexPost(&WDog_Mutex, OS_OPT_POST_NONE); 
         
-        //delay of 50ms
+        //delay of 20ms
         RTOS_BPS_DelayMs(20);
     }
 }

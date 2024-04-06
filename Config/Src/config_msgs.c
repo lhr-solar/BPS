@@ -24,7 +24,11 @@
 
 #pragma message ("NUM_BATTERY_MODULES set to " XSTR(NUM_BATTERY_MODULES))
 
+#pragma message ("PER_MINION_BOARD_VOLT_SENSORS set to " STR(PER_MINION_BOARD_VOLT_SENSORS))
+
 #pragma message ("NUM_TEMPERATURE_SENSORS set to " XSTR(NUM_TEMPERATURE_SENSORS))
+
+#pragma message ("PER_MINION_BOARD_TEMP_SENSORS set to " STR(PER_MINION_BOARD_TEMP_SENSORS))
 
 #pragma message ("NUM_TEMP_SENSORS_PER_MOD set to " XSTR(NUM_TEMP_SENSORS_PER_MOD))
 
@@ -49,5 +53,7 @@
 #pragma message ("BALANCING_TOLERANCE_STOP stop set to " XSTR(BALANCING_TOLERANCE_STOP))
 
 #pragma message ("BPS_CAN_LOOPBACK set to " XSTR(BPS_CAN_LOOPBACK))
+
+#pragma message ("BPS_CAN_MIRROR_OUTPUT_USB set to " XSTR(BPS_CAN_MIRROR_OUTPUT_USB))
 
 // I don't think the other #defines in config.h should be editable

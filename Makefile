@@ -13,6 +13,9 @@ NC=\033[0m # No Color
 DEFINES = none
 export DEFINES
 
+DEBUG = 0
+export DEBUG
+
 TEST = none
 export TEST
 
@@ -23,6 +26,9 @@ endif
 OS = RTOS
 export OS
 
+BUILD_HELPER_SRC := BSP/STM32F413/BuildHelper/error_verbose.c
+BUILD_HELPER := gcc -O -o error_verbose.log $(BUILD_HELPER_SRC) -lncurses
+
 .PHONY: stm32f413
 stm32f413:
 ifneq ($(TEST), none)
@@ -30,11 +36,13 @@ ifneq ($(TEST), none)
 else
 	@echo -e "Making STM32 build with ${RED}NO${NC}test."
 endif
-	$(MAKE) -C BSP -C STM32F413 -j
+	@$(BUILD_HELPER)
+	$(MAKE) -C BSP -C STM32F413 -j || ./error_verbose.log
 
 .PHONY: simulator
 simulator:
-	$(MAKE) -C BSP -C Simulator -j
+	@$(BUILD_HELPER)
+	$(MAKE) -C BSP -C Simulator -j || ./error_verbose.log
 
 flash:
 	$(MAKE) -C BSP -C STM32F413 flash
@@ -56,7 +64,14 @@ help:
 	@echo -e "When building for the board, you can specify custom define values for config.h."
 	@echo -e "See Config/Inc/config.h for all values."
 	@echo -e "Specify with the following ${PURPLE}format${NC}(quotes ARE needed):"
-	@echo -e "		${ORANGE}make ${BLUE}DEFINES=${GREEN}\"VARIABLE=VALUE VARIABLE=VALUE\"\n"
+	@echo -e "		${ORANGE}make ${BLUE}DEFINES=${GREEN}\"VARIABLE=VALUE VARIABLE=VALUE\"${NC}"
+	@echo -e ""
+	@echo -e "When debugging with GDB, you can set debugging and optimization"
+	@echo -e "Debugging is off by default:"
+	@echo -e "	${BLUE}DEBUG=${GREEN}0 ${NC}turns highest optimization on and sets debugging off"
+	@echo -e "	${BLUE}DEBUG=${GREEN}1 ${NC}turns optimizations off and sets debugging on"
+	@echo -e "Specify with the following ${PURPLE}format${NC}:"
+	@echo -e "		${ORANGE}make ${BLUE}DEBUG=${GREEN}1\n"
 
 .PHONY: clean
 clean:

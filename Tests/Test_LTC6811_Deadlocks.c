@@ -78,7 +78,7 @@ void LTC6811_Deadlocks(void *p_arg){
         printf("running Temperature_GetModulesInDanger...\n");
         Temperature_GetModulesInDanger();
         printf("running Temperature_GetSingleTempSensor...\n");
-        Temperature_GetSingleTempSensor(arg, arg);
+        Temperature_GetSingleTempSensor(arg);
         printf("running Temperature_GetModuleTemperature...\n");
         Temperature_GetModuleTemperature(arg);
         printf("running Temperature_GetTotalPackAvgTemperature...\n");
@@ -152,7 +152,7 @@ void LTC6811_Deadlocks2(void *p_arg){
         printf("running Temperature_GetModulesInDanger...\n");
         Temperature_GetModulesInDanger();
         printf("running Temperature_GetSingleTempSensor...\n");
-        Temperature_GetSingleTempSensor(arg, arg);
+        Temperature_GetSingleTempSensor(arg);
         printf("running Temperature_GetModuleTemperature...\n");
         Temperature_GetModuleTemperature(arg);
         printf("running Temperature_GetTotalPackAvgTemperature...\n");

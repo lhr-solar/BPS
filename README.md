@@ -46,41 +46,43 @@ The BPS is designed be built and deployed from a Linux terminal, allowing you to
     The tabbing MUST MATCH the other dashes at the bottom of the file, otherwise this will not work!
 
 ## Building
+Run `make help` for more information on usage. 
 When calling any of the following commands, make sure you are in the top level of the repo.
 
-Call ```make bsp_type``` to compile the release version of the code. ```bsp_type``` is the system you want to compile for. It can either be
-```stm32f4132``` or ```simulator```. The stm32f413 version is selected by default.
+Call `make bsp_type` to compile the release version of the code. `bsp_type` is the system you want to compile for. It can either be
+`stm32f4132` or `simulator`. The stm32f413 version is selected by default.
 
-Call ```make help``` for more information on how to build the project.
+Call `make help` for more information on how to build the project.
 
-Call ```make clean``` if the build fails for any reason other than syntax related.
+Call `make clean` if the build fails for any reason other than syntax related.
 
 The BPS has an RTOS version and a bare metal version for its BSP files. To select which one to build, pass either `RTOS` or `BAREMETAL` to the `OS` argument. For example
-    ```
-    make simulator OS=BAREMETAL
-    ```
+```
+make simulator OS=BAREMETAL
+```
 will build the bare metal version, and  
-    ```
-    make simulator OS=RTOS
-    ```
+```
+make simulator OS=RTOS
+```
 will build the RTOS version. The RTOS version is selected by default.
 
 The BPS configuration settings can be modified from the command line from Make. In the top-level of the repo,
-you can specify ```DEFINES=``` alongside the ```make``` command to override values from the configuration
+you can specify `DEFINES=` alongside the `make` command to override values from the configuration
 header file with the values you specify. For example
-    ```
-    make test=Voltage DEFINES=NUM_MINIONS=2
-    ```
+```
+make test=Voltage DEFINES=NUM_MINIONS=2
+```
 Would update the BPS build to use 2 minion boards in the code and calculations as opposed to 3.
+Run `make help` for more information on usage.
 
 For testing, please read the Testing section.
 
 ### How to build a test
 To build a new test, you need to use the following command:
-```make bsp_type TEST=x```
+`make bsp_type TEST=x`
 
-- ```x``` specifies which test you want to compile. TEST= is optional and only required if a test is to be compiled. Set TEST equal to the suffix of the Test_ Src files i.e. if the test you want to run is in Test_x.c, set TEST=x.
-    E.g. Call ```make stm32f413 TEST=Voltage``` if you want to test Voltage.c with the Test_Voltage.c src file
+- `x` specifies which test you want to compile. TEST= is optional and only required if a test is to be compiled. Set TEST equal to the suffix of the Test_ Src files i.e. if the test you want to run is in Test_x.c, set TEST=x.
+    E.g. Call `make stm32f413 TEST=Voltage` if you want to test Voltage.c with the Test_Voltage.c src file
 
 ## Flashing
 When calling any of the following commands, make sure you are in the top most level of the directory.
@@ -102,11 +104,11 @@ The following testing information is specifically for terminal development.
 ### Using GDB with OPENOCD
 OpenOCD is a debugger program that is open source and compatible with the STM32F413. 
 GDB is a debugger program that can be used to step through a program as it is being run on the board. To use, you need two terminals open, as well as a USB connection to the ST-Link programmer (as if you were going to flash the program to the board). 
-1. Run ```./openocd-debug.sh``` in one terminal.
-2. In the other terminal, start gdb with the command ```gdb-multiarch ./Objects/bps-leader.elf``` (assuming that you are doing this in the root of the project directory.
-3. This will launch GDB and read in all of the symbols from the program that you are running on the board. In order to actually connect gdb to the board, execute the command ```target extended-remote localhost:4242```, which will connect to the st-util command from earlier.
+1. Run `./openocd-debug.sh` in one terminal.
+2. In the other terminal, start gdb with the command `gdb-multiarch ./Objects/bps-leader.elf` (assuming that you are doing this in the root of the project directory.
+3. This will launch GDB and read in all of the symbols from the program that you are running on the board. In order to actually connect gdb to the board, execute the command `target extended-remote localhost:4242`, which will connect to the st-util command from earlier.
 
-**Note:** If you get an error message for Permission denied, try giving openocd read/write permissions using chmod: ```chmod 764 openocd```
+**Note:** If you get an error message for Permission denied, try giving openocd read/write permissions using chmod: `chmod 764 openocd`
 
 https://linuxcommand.org/lc3_lts0090.php
 
@@ -125,8 +127,6 @@ to either debug, or just run a specific test.
 You can check the log file by doing `cat bps-sim-<logged time>.log`.
 
 ## Rules
-Make sure to have fun!
-
 Commit frequently into your own branches. Create a Pull Request whenever you are ready to add you working code to the master branch. Make sure that your code compiles without any errors or warnings before you open a pull request. At least one approver must approve your pull request before it can be merged. The reviewers will make sure everything is up to par with the coding standards.
 
 ### Code Reviews
@@ -139,8 +139,3 @@ You can either approve, comment, or request changes at the end of your pull requ
 - **Approve:** You are signing off that this pull request is ready to merge. You and the pull request author "own" this part of the code now.
 - **Request Changes:** You have found problems with the code that must be addressed before it can be merged. Note that this will block the pull request from merging until you re-review the code.
 - **Comment:** Do this if you do not want to explicitly approve or request changes.
-
-Approvers:
-1. Manthan Upadhyaya
-2. Clark Poon
-3. Tianda Huang

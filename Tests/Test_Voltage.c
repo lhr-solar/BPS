@@ -94,7 +94,7 @@ void test(void) {
     for (int i = 0; i < NUM_BATTERY_MODULES; i++) {
         printf("Module %d voltage status: %s\n\r", i, statuses[v.module_checks[i]]);
     }
-    for (int i = 0; i < TOTAL_VOLT_WIRES; i++) {
+    for (int i = 0; i < MAX_VOLT_WIRES; i++) {
         printf("Wire %d status: %s\n\r", i, statuses[v.wire_checks[i]]);
     }
 

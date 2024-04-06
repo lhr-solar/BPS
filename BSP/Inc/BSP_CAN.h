@@ -8,14 +8,20 @@
 
 /**
  * @brief   Initializes the CAN module that communicates with the rest of the electrical system.
- * @param   rxEvent     : the function to execute when recieving a message. NULL for no action.
- * @param   txEnd       : the function to execute after transmitting a message. NULL for no action.
- * @param   faultState  : if we should initialize CAN interrupts
- * @param   loopback    : if we should use loopback mode (for testing)
+ * @param   rxEvent       : the function to execute when recieving a message. NULL for no action.
+ * @param   txEnd         : the function to execute after transmitting a message. NULL for no action.
+ * @param   faultState    : if we should initialize CAN interrupts
+ * @param   loopback      : if we should use loopback mode (for testing)
+ * @param   txIDFilter    : array of IDs to accept messages from. Pass NULL for no filtering.
+ * @param   txIDFilterLen : length of txIDFilter array. Max 28 * 4 (28 filter banks * 4 IDs per bank)
  * @return  None
  */
-void BSP_CAN_Init(callback_t rxEvent, callback_t txEnd, bool faultState, bool loopback);
-
+void BSP_CAN_Init(callback_t rxEvent, 
+                  callback_t txEnd, 
+                  bool faultState, 
+                  bool loopback,
+                  uint16_t *txIDFilter,
+                  uint8_t txIDFilterLen);
 
 /**
  * @brief   Calls stm-level CAN_DeInit
