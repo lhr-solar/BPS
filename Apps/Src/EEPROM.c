@@ -8,14 +8,13 @@
 #include "M24128.h"
 
 // addresses for EEPROM data segments
-#define EEPROM_CHARGE_INIT_ADDR 0x400
+#define EEPROM_DYNAMIC_INIT_ADDR 0x400
 #define EEPROM_ERRORS_INIT_ADDR 0x4
-#define EEPROM_MAX_ADDR 0x3FFC
-#define EEPROM_MAX_CHARGE_ENTRIES 0xEFF
+#define EEPROM_MAX_ADDR 0x4000
+#define EEPROM_PAGE_SIZE_BYTES 64
+#define EEPROM_LINKED_LIST_SENTINEL 0x0000
 
-
-static uint16_t charge_dynamic_addr = EEPROM_CHARGE_INIT_ADDR;
-static uint16_t performedWrites = 0;
+static uint16_t dynamic_addr = EEPROM_DYNAMIC_INIT_ADDR;
 
 static const uint16_t MAX_FAULTS = 100;
 
@@ -40,13 +39,25 @@ static uint32_t EEPROM_driverErrorCount = 0;
     } \
     EEPROM_consecutiveFaults = 0;
 
+void EEPROM_Retrieve_Last_Addr(void) {
+    for (int i = 0; i < (EEPROM_MAX_ADDR - EEPROM_DYNAMIC_INIT_ADDR) / EEPROM_PAGE_SIZE_BYTES; i++) {
+        uint16_t data[EEPROM_PAGE_SIZE_BYTES/2];
+        EEPROM_RETRY(M24128_Read(EEPROM_DYNAMIC_INIT_ADDR + EEPROM_PAGE_SIZE_BYTES * i, EEPROM_PAGE_SIZE_BYTES, (uint8_t*) data));
+
+        if (data[EEPROM_PAGE_SIZE_BYTES / 2 - 1] == EEPROM_LINKED_LIST_SENTINEL) {
+            dynamic_addr = EEPROM_DYNAMIC_INIT_ADDR + EEPROM_PAGE_SIZE_BYTES * i;
+            return;
+        }
+    }
+}
+
 /** EEPROM_Init
  * Initializes EEPROM application
  */
 void EEPROM_Init(void) {
     // initialize the EEPROM
     M24128_Init();
-    performedWrites = 0;
+
     // find the end of the fault array
     uint32_t data = 0;
     faultArrayEndAddress = EEPROM_ERRORS_INIT_ADDR - sizeof(EEPROM_TERMINATOR);
@@ -63,7 +74,7 @@ void EEPROM_Init(void) {
         EEPROM_RETRY(M24128_Read(faultArrayEndAddress, sizeof(data), (uint8_t *) &data)); // retry if unsuccessful
     }
     // On initialization, set our starting charge address to the one we saved on shutdowns.
-    EEPROM_RETRY(M24128_Read(EEPROM_CHARGE_INIT_ADDR - 0x4, sizeof(uint16_t), (uint8_t*) &charge_dynamic_addr));
+    EEPROM_Retrieve_Last_Addr();
 }
 
 /** EEPROM_Reset
@@ -83,49 +94,61 @@ void EEPROM_Reset(void) {
 /**
  * @brief Gets the stored state of charge from the EEPROM
  * 
- * @return uint32_t stored charge value
+ * @param data    Address of uint32_t* that stores the 64 bytes; set to NULL if no available previous charge; else data returned in void* of size EEPROM_PAGE_SIZE_BYTES - 2 with last byte containing the length of array
  */
-uint32_t EEPROM_GetLastCharge(void) {
-    uint32_t charge = -1;
-    uint16_t read_addr;
-    // dont read out of bounds on edge cases
-    if (performedWrites == 0) {
-        read_addr = charge_dynamic_addr;
-    } else {
-        read_addr = ((charge_dynamic_addr + (0x3BFC - EEPROM_CHARGE_INIT_ADDR)) % 0x3C00) + EEPROM_CHARGE_INIT_ADDR;
-        // (charge_dynamic_addr - 400) + 3BFC) % 3C00 ) + 400 
+
+void EEPROM_GetLastData(void* data) {
+    uint16_t prev_data[EEPROM_PAGE_SIZE_BYTES / 2];
+    uint16_t read_addr = (dynamic_addr - EEPROM_DYNAMIC_INIT_ADDR + (EEPROM_MAX_ADDR - EEPROM_DYNAMIC_INIT_ADDR - EEPROM_PAGE_SIZE_BYTES)) % (EEPROM_MAX_ADDR - EEPROM_PAGE_SIZE_BYTES) + EEPROM_DYNAMIC_INIT_ADDR;;
+
+    EEPROM_RETRY(M24128_Read(read_addr, EEPROM_PAGE_SIZE_BYTES, (uint8_t *) &prev_data)); // retry if unsuccessful
+
+    uint16_t last_addr = prev_data[EEPROM_PAGE_SIZE_BYTES / 2 - 1];
+    if (last_addr != dynamic_addr) {
+        return NULL;
     }
-    EEPROM_RETRY(M24128_Read(read_addr, sizeof(charge), (uint8_t *) &charge)); // retry if unsuccessful
-    return charge;
+    
+    memcpy(data, prev_data, EEPROM_PAGE_SIZE_BYTES - 2);
+    
+    return data;
 }
 
 /**
- * @brief Get a specific state of charge entry from the EEPROM
+ * @brief Write new data to next page of EEPROM
  * 
- * @param numEntry Which state of charge entry to read (i.e. entry 0, entry 1)
- * @return uint32_t 
+ * @param data  pointer to array of integers
+ * @param len   defines length of data array; range is up to (EEPROM_PAGE_SIZE_BYTES - EEPROM_ADDRESS_BITS / 8) / 4
+ * 
+ * @return      error code; -1 indicates an error in the EEPROM write; -2 indicates an out of range len input; 0 indicates successful write
  */
-uint32_t EEPROM_GetChargeEntry(uint16_t entry_num) {
-    uint32_t charge = -1;
-    // EEPROM memory arranged as 16 K * 8 bit chunks
-    // SOC vals are 4 bytes each so shift "entry num" left 2 to * 4
-    // [0x3ffc (max addr we can use) - 0x400] >> 2 = 0xEFF # of entries in the SOC write region
-    uint16_t offset = (entry_num << 2) % EEPROM_MAX_CHARGE_ENTRIES;
-    uint16_t readAddress = EEPROM_CHARGE_INIT_ADDR + offset;
-    EEPROM_RETRY(M24128_Read(readAddress, sizeof(charge), (uint8_t *) &charge));
-    return charge;
-}
 
-/**
- * @brief Set the stored state of charge value in the EEPROM
- * 
- * @param charge The value to set the EEPROM's stored state of charge to
- */
-void EEPROM_SetCharge(uint32_t charge) {
+int8_t EEPROM_Write(void* data, uint8_t len) {
     // this gets called a lot during normal operation, and I think it is ok if it fails sometimes, so I won't make it retry
-    ErrorStatus result = M24128_Write(charge_dynamic_addr, sizeof(charge), (uint8_t *) &charge);
+
+    // Sets available space for data with the total page size - the space for the length of the data - the space for the next address
+    uint32_t data_space = EEPROM_PAGE_SIZE_BYTES - 3;
+
+    // Checks len to see if in range
+    if (len > data_space) {
+        return -2;
+    }
+
+    // Move dynamic_addr to next page
+    dynamic_addr = (dynamic_addr + EEPROM_PAGE_SIZE_BYTES - EEPROM_DYNAMIC_INIT_ADDR) % (EEPROM_MAX_ADDR - EEPROM_DYNAMIC_INIT_ADDR) + EEPROM_DYNAMIC_INIT_ADDR;
+
+    // Add sentinel and length to end of data
+    uint8_t* end_len = (uint8_t *) data;
+    end_len += data_space;
+    *end_len = len;
+    uint16_t* end_addr = (uint16_t *) end_len + 1;
+    *end_addr = EEPROM_LINKED_LIST_SENTINEL;
+
+    // Write data
+    ErrorStatus result = M24128_Write(dynamic_addr, EEPROM_PAGE_SIZE_BYTES, (uint8_t *) data);
+
     if (result == ERROR) {
         EEPROM_driverErrorCount++; // log that we had an error
+        return -1;
     } else {
         // increment the location we write to every time if we succeed
         /*
@@ -133,13 +156,20 @@ void EEPROM_SetCharge(uint32_t charge) {
             1) Subtract 0x3FC (-0x400, + 0x4)
             2) Modulo 0x3C00 (0x4000 total bytes we can write - 0x400 [starting addr for SOC writes])
             3) Add 0x400
-            4) This is next write address.
+            4) This is next write address
+            
+            1) Subtract 0x400
+            2) Add 0x3BC0
+            3) Modulo 3C00
+            4) Add 0x400.
         */
-        charge_dynamic_addr -= 0x3FC;
-        charge_dynamic_addr %= 0x3C00;
-        charge_dynamic_addr += 0x400;
-        performedWrites++;
+
+        uint16_t last_address_ptr = (dynamic_addr - EEPROM_DYNAMIC_INIT_ADDR + (EEPROM_MAX_ADDR - EEPROM_DYNAMIC_INIT_ADDR - EEPROM_PAGE_SIZE_BYTES)) % (EEPROM_MAX_ADDR - EEPROM_PAGE_SIZE_BYTES) + EEPROM_DYNAMIC_INIT_ADDR;
+        result = M24128_Write(last_address_ptr, sizeof(dynamic_addr), (uint8_t *) &dynamic_addr);
+        if (result == ERROR) EEPROM_driverErrorCount++; // log that we had an error
+        else return 0;
     }
+    return -1;
 }
 
 /**
@@ -163,7 +193,6 @@ void EEPROM_LogError(uint32_t error) {
  * @return              the number of errors read
  */
 uint16_t EEPROM_GetErrors(uint32_t *errors, uint16_t maxErrors) {
-
     uint16_t numErrors = 0;
     uint16_t addr = EEPROM_ERRORS_INIT_ADDR;
     for (; (addr < faultArrayEndAddress) && (numErrors < maxErrors); ++numErrors) {
@@ -171,16 +200,4 @@ uint16_t EEPROM_GetErrors(uint32_t *errors, uint16_t maxErrors) {
         addr += sizeof(*errors);
     }
     return numErrors;
-}
-
-/**
- * @brief Save the last written charge address to a fixed location.
- * Only called on shutdown/faults.
- * 
- */
-void EEPROM_SaveAddress() {
-    // same as GetLastCharge()
-    uint16_t last_addr = ((charge_dynamic_addr + (0x3BFC - EEPROM_CHARGE_INIT_ADDR)) % 0x3C00) + EEPROM_CHARGE_INIT_ADDR;
-    M24128_Write(EEPROM_CHARGE_INIT_ADDR - 0x4, sizeof(last_addr), (uint8_t*) &last_addr);
-    // we aren't going to retry here. if it fails it fails.
 }
