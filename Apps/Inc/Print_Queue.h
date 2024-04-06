@@ -23,6 +23,7 @@
  * @brief Initializes print queue internal structures
  */
 void PQ_Init(void);
+void PQ_InitMemPool(void);
 
 bool PQ_Write(char *data, uint32_t len);
 bool PQ_Read(char *data, uint32_t len);
@@ -53,7 +54,7 @@ void RTOS_BPS_Blocking_Printf(const char *format, ...);
 
 #else   // BPS_ENABLE_PRINT_OUTPUT disabled
 
-#define printf(...)
+// #define printf(...)
 
 #endif  // BPS_ENABLE_PRINT_OUTPUT
 

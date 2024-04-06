@@ -14,8 +14,8 @@
 #define TASK_BATTERY_BALANCE_PRIO           7
 #define TASK_LOG_INFO_PRIO                  8 
 #define TASK_CLI_PRIO                       9  
-#define TASK_PRINT_PRIO                     10
-#define TASK_IDLE_PRIO                      11
+#define TASK_PRINT_PRIO                     9
+#define TASK_IDLE_PRIO                      10
 
 #define DEFAULT_STACK_SIZE                  256
 #define WATERMARK_STACK_LIMIT               DEFAULT_STACK_SIZE/2

@@ -8,6 +8,12 @@
 #include "Amps.h"
 #include "CAN_Queue.h"
 
+#define PISS(...) \
+do { \
+    if (task_cycle_counter % ODR_VOLTAGE_AVERAGING == 0) printf(__VA_ARGS__); \
+} while(0) \
+
+
 //declared in Tasks.c
 extern cell_asic Minions[NUM_MINIONS];
 
@@ -53,6 +59,7 @@ void Task_VoltTempMonitor(void *p_arg) {
         //Send measurements to CAN queue
         bool charge_enable = true;
         CanMsg.id = VOLTAGE_DATA_ARRAY;
+        PISS("voltage\n\r");
         for (int i = 0; i < NUM_BATTERY_MODULES; i++){ //send all battery module voltage data
             
             uint16_t voltage = Voltage_GetModuleMillivoltage(i);
@@ -69,10 +76,12 @@ void Task_VoltTempMonitor(void *p_arg) {
                 CanPayload.data = CanData;
                 CanMsg.payload = CanPayload;
                 CAN_TransmitQueue_Post(CanMsg);
+                printf("%d:%d ", i, CanData.w);
 
                 voltage_totals[i] = 0;
             }
         }
+        PISS("\n\r");
         
         // BLOCKING =====================
         // Check if open wire is NOT safe:
@@ -108,9 +117,9 @@ void Task_VoltTempMonitor(void *p_arg) {
         } 
         //PID loop - sets fan speed based on avg temperature and desired temperature
         //overrides PID loop if above PID_MAX_TEMPERATURE or if it's FAULT
-        if (temperatureStatus == SAFE) {
-            Fans_SetAll(Temperature_PID_Output(Temperature_GetTotalPackAvgTemperature(), PID_DESIRED_TEMPERATURE));
-        }
+        // if (temperatureStatus == SAFE) {
+        //     Fans_SetAll(Temperature_PID_Output(Temperature_GetTotalPackAvgTemperature(), PID_DESIRED_TEMPERATURE));
+        // }
 
         //Check if car should be allowed to charge or not
         for (uint8_t sensor = 0; sensor < NUM_TEMPERATURE_SENSORS; sensor++) {
@@ -138,15 +147,17 @@ void Task_VoltTempMonitor(void *p_arg) {
             CAN_TransmitQueue_Post(CanMsg);
         }
         //Send measurements to CAN queue
-        CanMsg.id = TEMPERATURE_DATA_ARRAY;
-        for (uint8_t sensor = 0; sensor < NUM_TEMPERATURE_SENSORS; sensor++) {
-            CanPayload.idx = sensor;
-            CanData.w = Temperature_GetSingleTempSensor(sensor);
-            CanPayload.data = CanData;
-            CanMsg.payload = CanPayload;
-            CAN_TransmitQueue_Post(CanMsg);
+        if (task_cycle_counter % ODR_TEMPERATURE_DECIMATION == 0) {
+            CanMsg.id = TEMPERATURE_DATA_ARRAY;
+            for (uint8_t sensor = 0; sensor < NUM_TEMPERATURE_SENSORS; sensor++) {
+                CanPayload.idx = sensor;
+                CanData.w = Temperature_GetSingleTempSensor(sensor);
+                CanPayload.data = CanData;
+                CanMsg.payload = CanPayload;
+                CAN_TransmitQueue_Post(CanMsg);
+            }
         }
-
+        
         Fans_SetAll(TOPSPEED);
 
         //signal watchdog
@@ -156,7 +167,7 @@ void Task_VoltTempMonitor(void *p_arg) {
 
         RTOS_BPS_MutexPost(&WDog_Mutex, OS_OPT_POST_NONE); 
         
-        //delay of 20ms
-        RTOS_BPS_DelayMs(20);
+        //delay of 50ms
+        RTOS_BPS_DelayMs(50);
     }
 }

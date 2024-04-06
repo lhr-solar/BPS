@@ -58,6 +58,9 @@ int main() {
     OSInit(&err);
     assertOSError(err);
 
+    // Initialize the Print Queue
+    PQ_InitMemPool();
+
     RTOS_BPS_TaskCreate(&Init_TCB,		// TCB
         "TASK_INIT",	                // Task Name (String)
         Task_Init,				        // Task function pointer

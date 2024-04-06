@@ -98,7 +98,7 @@ void Task_Init(void *p_arg) {
     RTOS_BPS_TaskCreate(&Print_TCB,
             "TASK_PRINT_QUEUE_OUT",
             Task_Print,
-            (void *) 0,
+            (void *)0,
             TASK_PRINT_PRIO,
             Print_Stk,
             TASK_PRINT_STACK_SIZE);

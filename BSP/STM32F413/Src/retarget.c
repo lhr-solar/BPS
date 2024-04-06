@@ -1,4 +1,4 @@
-/* Copyright (c) 2018-2023 UT Longhorn Racing Solar */
+/* Copyright (c) 2018-2022 UT Longhorn Racing Solar */
 
 #include "common.h"
 #include "sys/stat.h"
@@ -12,7 +12,6 @@ int _write(int fd, char *buffer, unsigned int len) {
     if(buffer != NULL) {
         BSP_UART_Write(buffer, len, UART_USB);
     }
-
     return len;
 }
 
@@ -43,4 +42,3 @@ int _fstat(int fd, struct stat *statbuf) {
     return -1;
 }
 */
-

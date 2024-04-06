@@ -22,41 +22,46 @@ static char    PQPrintfBuffers[PQ_PRINTF_BUFFER_COUNT][PQ_PRINTF_BUFFER_SIZE];
 static BPS_OS_SEM PQ_SignalFlush_Sem4;
 static BPS_OS_MUTEX PQ_Mutex;
 
-void PQ_Init(void) {
-    // setup fifo
-    PQFifo = PQFifo_new();
-
-    // setup memory pool
+// must be called before OSStart()
+void PQ_InitMemPool(void) {
     BPS_OS_ERR err;
     OSMemCreate(&PQPrintfPool,
                 "Print Queue Printf Pool",
-                PQPrintfBuffers,
+                &PQPrintfBuffers[0][0],
                 PQ_PRINTF_BUFFER_COUNT,
                 PQ_PRINTF_BUFFER_SIZE,
                 &err);
     assertOSError(err);
+}
+
+void PQ_Init(void) {
+
+    // setup fifo
+    PQFifo_renew(&PQFifo);
 
     RTOS_BPS_SemCreate(&PQ_SignalFlush_Sem4, "PQ_SignalFlush", 0);
     RTOS_BPS_MutexCreate(&PQ_Mutex, "PQ_Mutex");
 }
 
 bool PQ_Write(char *data, uint32_t len) {
-    if (OSIntNestingCtr == 0) { // not in ISR -- ok to pend
+    bool in_isr = OSIntNestingCtr > 0;
+    if (!in_isr) { // not in ISR -- ok to pend
         RTOS_BPS_MutexPend(&PQ_Mutex, OS_OPT_PEND_BLOCKING);
     }
     bool status = PQFifo_put(&PQFifo, data, (int)len);
-    if (OSIntNestingCtr == 0) {
+    if (!in_isr) {
         RTOS_BPS_MutexPost(&PQ_Mutex, OS_OPT_POST_NONE);
     }
     return status;
 }
 
 bool PQ_Read(char *data, uint32_t len) {
-    if (OSIntNestingCtr == 0) { // not in ISR -- ok to pend
+    bool in_isr = OSIntNestingCtr > 0;
+    if (!in_isr) { // not in ISR -- ok to pend
         RTOS_BPS_MutexPend(&PQ_Mutex, OS_OPT_PEND_BLOCKING);
     }
     bool status = PQFifo_get(&PQFifo, data, (int)len);
-    if (OSIntNestingCtr == 0) {
+    if (!in_isr) {
         RTOS_BPS_MutexPost(&PQ_Mutex, OS_OPT_POST_NONE);
     }
     return status;

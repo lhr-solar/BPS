@@ -283,12 +283,10 @@ void USART2_IRQHandler(void) {
 }
 
 void USART3_IRQHandler(void) {
-#ifdef RTOS
     CPU_SR_ALLOC();
     CPU_CRITICAL_ENTER();
     OSIntEnter();
     CPU_CRITICAL_EXIT();
-#endif
 
     if(USART_GetITStatus(USART3, USART_IT_RXNE) != RESET) {
         uint8_t data = USART3->DR;
@@ -324,7 +322,6 @@ void USART3_IRQHandler(void) {
     }
     if(USART_GetITStatus(USART3, USART_IT_ORE) != RESET);
 
-#ifdef RTOS
     OSIntExit();
-#endif
+
 }
