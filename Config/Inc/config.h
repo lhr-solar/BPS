@@ -175,4 +175,10 @@ _Static_assert((sizeof(TemperatureSensorsCfg)/sizeof(*TemperatureSensorsCfg)) ==
 #define BPS_CAN_MIRROR_OUTPUT_USB false
 #endif
 
+// enable print outputs over USB UART.
+// DO NOT CHANGE VALUE HERE -- pass in when calling 'make'
+#ifndef BPS_ENABLE_PRINT_OUTPUT
+#define BPS_ENABLE_PRINT_OUTPUT true
+#endif
+
 #endif

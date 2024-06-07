@@ -6,21 +6,19 @@
 #include "stm32f4xx_usart.h"
 #include "stm32f4xx_rcc.h"
 #include "Interrupt_Priorities.h"
-
-#define TX_SIZE     2048
-#define RX_SIZE     64
+#include <stdio.h>
 
 // Initialize the FIFOs
 
-#define FIFO_TYPE char
-#define FIFO_SIZE TX_SIZE
-#define FIFO_NAME txfifo
-#include "fifo.h"
+#define FFIFO_TYPE char
+#define FFIFO_SIZE BSP_UART_TX_SIZE
+#define FFIFO_NAME txfifo
+#include "fastfifo.h"
 static txfifo_t usbTxFifo;
 static txfifo_t bleTxFifo;
 
 #define FIFO_TYPE char
-#define FIFO_SIZE RX_SIZE
+#define FIFO_SIZE BSP_UART_RX_SIZE
 #define FIFO_NAME rxfifo
 #include "fifo.h"
 static rxfifo_t usbRxFifo;
@@ -45,7 +43,7 @@ static void foo() {
 }
 
 static void USART_BLE_Init() {
-    bleTxFifo = txfifo_new();
+    txfifo_renew(&bleTxFifo);
     bleRxFifo = rxfifo_new();
 
     GPIO_InitTypeDef GPIO_InitStruct = {0};
@@ -80,14 +78,14 @@ static void USART_BLE_Init() {
     // Enable NVIC
     NVIC_InitTypeDef NVIC_InitStructure;
     NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = USART2_PREEMPT_PRIO;
-    NVIC_InitStructure.NVIC_IRQChannelSubPriority = USART2_USB_PRIO;
+    NVIC_InitStructure.NVIC_IRQChannelSubPriority = USART2_SUB_PRIO;
     NVIC_InitStructure.NVIC_IRQChannel = USART2_IRQn;
     NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
     NVIC_Init(&NVIC_InitStructure);
 }
 
 static void USART_USB_Init() {
-    usbTxFifo = txfifo_new();
+    txfifo_renew(&usbTxFifo);
     usbRxFifo = rxfifo_new();
 
     GPIO_InitTypeDef GPIO_InitStruct = {0};
@@ -122,7 +120,7 @@ static void USART_USB_Init() {
 
     // Enable interrupts
     USART_ITConfig(USART3, USART_IT_RXNE, ENABLE);
-    USART_ITConfig(USART3, USART_IT_TC, ENABLE);
+    USART_ITConfig(USART3, USART_IT_TXE, ENABLE);
 
     USART_Cmd(USART3, ENABLE);
 
@@ -212,35 +210,31 @@ uint32_t BSP_UART_Write(char *str, uint32_t len, UART_Port usart) {
 
     USART_TypeDef *usart_handle = handles[usart];
 
-    USART_ITConfig(usart_handle, USART_IT_TC, RESET);
-
     txfifo_t *fifo = tx_fifos[usart];
+    
+    // wait for enough space to send
+    volatile uint32_t space;    // volatile as ISR pulls from fifo
+    do {
+        // nasty hack to make sure fifo len is up to date
+        space = BSP_UART_TX_SIZE - *((volatile int *)&(fifo->len));
+    } while (len > space);
 
-    while(sent < len) {
-        if(!txfifo_put(fifo, str[sent])) {
-            // Allow the interrupt to fire
-            USART_ITConfig(usart_handle, USART_IT_TC, SET);
-            // Wait for space to open up
-            while(txfifo_is_full(fifo));
-            // Disable the interrupt again
-            USART_ITConfig(usart_handle, USART_IT_TC, RESET);
-        } else {
-            sent++;  
-        }
+    // add to fifo and enable interrupt -- disable first to prevent race
+    USART_ITConfig(usart_handle, USART_IT_TXE, RESET);
+    if (USART_GetITStatus(usart_handle, USART_IT_TXE) != RESET) {
+        while (1);
     }
-
-    USART_ITConfig(usart_handle, USART_IT_TC, SET);
+    txfifo_put(fifo, str, len);
+    USART_ITConfig(usart_handle, USART_IT_TXE, SET);
 
     return sent;
 }
 
 void USART2_IRQHandler(void) {
-#ifdef RTOS //TODO: Replace with RTOS independent code (i.e replae with wrappers)
     CPU_SR_ALLOC();
     CPU_CRITICAL_ENTER();
     OSIntEnter();
     CPU_CRITICAL_EXIT();
-#endif
 
     if(USART_GetITStatus(USART2, USART_IT_RXNE) != RESET) {
         uint8_t data = USART2->DR;
@@ -256,7 +250,7 @@ void USART2_IRQHandler(void) {
         if(data != '\b' && data != '\177') rxfifo_put(&bleRxFifo, data);
         // Sweet, just a "regular" key. Put it into the fifo
         // Doesn't matter if it fails. If it fails, then the data gets thrown away
-        // and the easiest solution for this is to increase RX_SIZE
+        // and the easiest solution for this is to increase BSP_UART_RX_SIZE
         else {
             char junk;
             // Delete the last entry!
@@ -266,28 +260,25 @@ void USART2_IRQHandler(void) {
             USART2->DR = data;
         }
     }
-    if(USART_GetITStatus(USART2, USART_IT_TC) != RESET) {
+    if(USART_GetITStatus(USART2, USART_IT_TXE) != RESET) {
         // If getting data from fifo fails i.e. the tx fifo is empty, then turn off the TX interrupt
-        if(!txfifo_get(&usbTxFifo, (char*)&(USART2->DR))) {
-            USART_ITConfig(USART2, USART_IT_TC, RESET); // Turn off the interrupt
+        if(!txfifo_get(&usbTxFifo, (char*)&(USART2->DR), 1)) {
+            USART_ITConfig(USART2, USART_IT_TXE, RESET); // Turn off the interrupt
             if(bleTxCallback != NULL)
                 bleTxCallback();    // Callback
         }
     }
     if(USART_GetITStatus(USART2, USART_IT_ORE) != RESET);
 
-#ifdef RTOS
     OSIntExit();
-#endif
+
 }
 
 void USART3_IRQHandler(void) {
-#ifdef RTOS
     CPU_SR_ALLOC();
     CPU_CRITICAL_ENTER();
     OSIntEnter();
     CPU_CRITICAL_EXIT();
-#endif
 
     if(USART_GetITStatus(USART3, USART_IT_RXNE) != RESET) {
         uint8_t data = USART3->DR;
@@ -303,7 +294,7 @@ void USART3_IRQHandler(void) {
         if(data != '\b' && data != '\177') rxfifo_put(&usbRxFifo, data);
         // Sweet, just a "regular" key. Put it into the fifo
         // Doesn't matter if it fails. If it fails, then the data gets thrown away
-        // and the easiest solution for this is to increase RX_SIZE
+        // and the easiest solution for this is to increase BSP_UART_RX_SIZE
         else {
             char junk;
             // Delete the last entry!
@@ -313,17 +304,16 @@ void USART3_IRQHandler(void) {
             USART3->DR = data;
         }
     }
-    if(USART_GetITStatus(USART3, USART_IT_TC) != RESET) {
+    if(USART_GetITStatus(USART3, USART_IT_TXE) != RESET) {
         // If getting data from fifo fails i.e. the tx fifo is empty, then turn off the TX interrupt
-        if(!txfifo_get(&usbTxFifo, (char*)&(USART3->DR))) {
-            USART_ITConfig(USART3, USART_IT_TC, RESET);
+        if(!txfifo_get(&usbTxFifo, (char*)&(USART3->DR), 1)) {
+            USART_ITConfig(USART3, USART_IT_TXE, RESET);
             if(usbTxCallback != NULL)
                 usbTxCallback();
         }
     }
     if(USART_GetITStatus(USART3, USART_IT_ORE) != RESET);
 
-#ifdef RTOS
     OSIntExit();
-#endif
+
 }

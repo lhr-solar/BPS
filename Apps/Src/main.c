@@ -58,6 +58,11 @@ int main() {
     OSInit(&err);
     assertOSError(err);
 
+    #if BPS_ENABLE_PRINT_OUTPUT
+    // Initialize the Print Queue -- must be done before OSStart
+    PQ_InitMemPool();
+    #endif
+
     RTOS_BPS_TaskCreate(&Init_TCB,		// TCB
         "TASK_INIT",	                // Task Name (String)
         Task_Init,				        // Task function pointer

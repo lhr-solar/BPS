@@ -1,4 +1,4 @@
-/* Copyright (c) 2018-2022 UT Longhorn Racing Solar */
+/* Copyright (c) 2018-2023 UT Longhorn Racing Solar */
 #ifndef TASKS_H
 #define TASKS_H
 
@@ -14,6 +14,7 @@
 #define TASK_BATTERY_BALANCE_PRIO           7
 #define TASK_LOG_INFO_PRIO                  8 
 #define TASK_CLI_PRIO                       9  
+#define TASK_PRINT_PRIO                     9
 #define TASK_IDLE_PRIO                      10
 
 #define DEFAULT_STACK_SIZE                  256
@@ -29,6 +30,7 @@
 #define TASK_BATTERY_BALANCE_STACK_SIZE     512
 #define TASK_CLI_STACK_SIZE                 DEFAULT_STACK_SIZE
 #define TASK_BLE_STACK_SIZE                 DEFAULT_STACK_SIZE
+#define TASK_PRINT_STACK_SIZE               DEFAULT_STACK_SIZE
 #define TASK_IDLE_STACK_SIZE                DEFAULT_STACK_SIZE
 #define TASK_INIT_STACK_SIZE                DEFAULT_STACK_SIZE
 
@@ -64,6 +66,8 @@ void Task_CLI(void *p_arg);
 
 void Task_BLE(void *p_arg);
 
+void Task_Print(void *p_arg);
+
 void Task_Idle(void *p_arg);
 
 void Task_Init(void *p_arg);
@@ -97,6 +101,7 @@ extern OS_TCB CheckContactor_TCB;
 extern OS_TCB BatteryBalance_TCB;
 extern OS_TCB CLI_TCB;
 extern OS_TCB BLE_TCB;
+extern OS_TCB Print_TCB;
 extern OS_TCB Idle_TCB;
 extern OS_TCB Init_TCB;
 /**
@@ -112,6 +117,7 @@ extern CPU_STK CheckContactor_Stk[TASK_CHECK_CONTACTOR_STACK_SIZE];
 extern CPU_STK BatteryBalance_Stk[TASK_BATTERY_BALANCE_STACK_SIZE];
 extern CPU_STK CLI_Stk[TASK_CLI_STACK_SIZE];
 extern CPU_STK BLE_Stk[TASK_BLE_STACK_SIZE];
+extern CPU_STK Print_Stk[TASK_PRINT_STACK_SIZE];
 extern CPU_STK Idle_Stk[TASK_IDLE_STACK_SIZE];
 extern CPU_STK Init_Stk[TASK_INIT_STACK_SIZE];
 

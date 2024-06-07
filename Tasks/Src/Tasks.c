@@ -1,4 +1,4 @@
-/* Copyright (c) 2018-2022 UT Longhorn Racing Solar */
+/* Copyright (c) 2018-2023 UT Longhorn Racing Solar */
 #include "common.h"
 #include "config.h"
 #include "Tasks.h"
@@ -23,6 +23,7 @@ BPS_OS_TCB BatteryBalance_TCB;
 BPS_OS_TCB CheckContactor_TCB;
 BPS_OS_TCB CLI_TCB;
 BPS_OS_TCB BLE_TCB;
+BPS_OS_TCB Print_TCB;
 BPS_OS_TCB Idle_TCB;
 BPS_OS_TCB Init_TCB;
 
@@ -39,6 +40,7 @@ BPS_CPU_STK BatteryBalance_Stk[TASK_BATTERY_BALANCE_STACK_SIZE];
 BPS_CPU_STK CheckContactor_Stk[TASK_CHECK_CONTACTOR_STACK_SIZE];
 BPS_CPU_STK CLI_Stk[TASK_CLI_STACK_SIZE];
 BPS_CPU_STK BLE_Stk[TASK_BLE_STACK_SIZE];
+BPS_CPU_STK Print_Stk[TASK_PRINT_STACK_SIZE];
 BPS_CPU_STK Idle_Stk[TASK_IDLE_STACK_SIZE];
 BPS_CPU_STK Init_Stk[TASK_INIT_STACK_SIZE];
 
