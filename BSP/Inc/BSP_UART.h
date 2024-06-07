@@ -9,7 +9,7 @@
 //enum to describe what UART port you are trying to access
 typedef enum {UART_USB, UART_BLE, NUM_UART} UART_Port;
 
-#define BSP_UART_TX_SIZE     256
+#define BSP_UART_TX_SIZE     512
 #define BSP_UART_RX_SIZE     64
 
 /**

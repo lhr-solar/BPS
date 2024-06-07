@@ -9,11 +9,6 @@
 #include "CAN_Queue.h"
 #include "Print_Queue.h"
 
-#define PISS(...) \
-do { \
-    if (task_cycle_counter % ODR_VOLTAGE_AVERAGING == 0) printf(__VA_ARGS__); \
-} while(0) \
-
 
 //declared in Tasks.c
 extern cell_asic Minions[NUM_MINIONS];
@@ -60,7 +55,7 @@ void Task_VoltTempMonitor(void *p_arg) {
         //Send measurements to CAN queue
         bool charge_enable = true;
         CanMsg.id = VOLTAGE_DATA_ARRAY;
-        PISS("voltage\n\r");
+
         for (int i = 0; i < NUM_BATTERY_MODULES; i++){ //send all battery module voltage data
             
             uint16_t voltage = Voltage_GetModuleMillivoltage(i);
@@ -77,12 +72,10 @@ void Task_VoltTempMonitor(void *p_arg) {
                 CanPayload.data = CanData;
                 CanMsg.payload = CanPayload;
                 CAN_TransmitQueue_Post(CanMsg);
-                printf("%d:%d ", i, (int)CanData.w);
 
                 voltage_totals[i] = 0;
             }
         }
-        PISS("\n\r");
         
         // BLOCKING =====================
         // Check if open wire is NOT safe:

@@ -1,6 +1,7 @@
 /* Copyright (c) 2018-2022 UT Longhorn Racing Solar */
 /*
- * This file implements a circular fifo supporting blocked puts and gets.
+ * This file implements a circular fifo supporting blocked puts and gets via memcpy.
+ * Note that this only really improves performance for smaller datatypes (e.g. char, short)
  * 
  * In order to use it in another file, you must import it in 
  * a particular way.
@@ -31,7 +32,7 @@
 #define __FAST_FIFO_H
 #include <stdbool.h>
 #include <string.h>
-#include "common.h"
+#include "common.h" // for MIN
 #endif
 
 #ifndef FFIFO_TYPE

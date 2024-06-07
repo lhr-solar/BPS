@@ -19,52 +19,72 @@
 #define PQ_PRINTF_BUFFER_SIZE       256 // in bytes
 #define PQ_PRINTF_BUFFER_COUNT      8
 
+
+/**
+ * @brief Initializes memory pool for print queue
+ * @note  must be called before OSStart()
+ */
+void PQ_InitMemPool(void);
+
 /**
  * @brief Initializes print queue internal structures
  */
 void PQ_Init(void);
-void PQ_InitMemPool(void);
 
+/**
+ * @brief Write to the global print queue. This is threadsafe.
+ * 
+ * @param data  pointer to data
+ * @param len   length of data in bytes
+ * @return true on success, false on fail (queue full)
+ */
 bool PQ_Write(char *data, uint32_t len);
+
+/**
+ * @brief Read from the global print queue. This is threadsafe.
+ * 
+ * @param data  pointer to read buffer
+ * @param len   requested read length
+ * @return true on success, false on fail (data in queue less than requested)
+ */
 bool PQ_Read(char *data, uint32_t len);
-void PQ_Flush(void);
-void PQ_WaitForFlush(void);
+
+/**
+ * @brief Essentially queue->length() function.
+ * 
+ * @return number of elements in print queue
+ */
 uint32_t PQ_GetNumWaiting(void);
 
 /**
+ * @brief Signal Print Task (or someone waiting on PQ_WaitForFlush())
+ */
+void PQ_Flush(void);
+
+/**
+ * @brief As the name says. This is a blocking call. Pairs with PQ_Flush().
+ */
+void PQ_WaitForFlush(void);
+
+/**
  * @brief threadsafe wrapper for printf(). DO NOT USE DIRECTLY -- just use printf
+ * 
+ * @param printf format string
  * @note to enable, BPS_ENABLE_PRINT_OUTPUT must be set to true
  */
 int _printf_internal(const char *format, ...);
 
-/**
- * @brief Performs a "blocking" printf by attempting to dump into the buffer until success
- * @param string String of formatted text to be added to the buffer
- * @return none
- */
-void RTOS_BPS_Blocking_Printf(const char *format, ...);
 
-#define BPS_ENABLE_PRINT_OUTPUT true
-
-#if BPS_ENABLE_PRINT_OUTPUT
 
 #ifndef SIMULATION
+
+#if BPS_ENABLE_PRINT_OUTPUT
 #define printf(...) _printf_internal(__VA_ARGS__)
-#else // running in SIMULATION mode
-#define printf(...) printf(__VA_ARGS__)
-#endif
-
 #else   // BPS_ENABLE_PRINT_OUTPUT disabled
-
-// #define printf(...)
-
+#define printf(...)
 #endif  // BPS_ENABLE_PRINT_OUTPUT
 
-#endif
+#endif // SIMULATION
 
-/**
- * TODO:
- * Error handling on fifo full
- * Test everything
- * Add back in CAN print mirroring
- */
+#endif  // PRINT_QUEUE_H
+
