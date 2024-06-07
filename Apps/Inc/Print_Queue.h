@@ -19,6 +19,7 @@
 #define PQ_PRINTF_BUFFER_SIZE       256 // in bytes
 #define PQ_PRINTF_BUFFER_COUNT      8
 
+#define PQ_FLUSH_TIMEOUT_OS_TICKS   10  // forces a flush after this many ticks
 
 /**
  * @brief Initializes memory pool for print queue
