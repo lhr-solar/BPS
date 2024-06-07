@@ -10,7 +10,7 @@
 #define INTERRUPT_PRIORITIES_H
 
 #define USART2_PREEMPT_PRIO    2
-#define USART2_USB_PRIO        1
+#define USART2_SUB_PRIO        1
 #define USART3_PREEMPT_PRIO    2
 #define USART3_SUB_PRIO        0
 

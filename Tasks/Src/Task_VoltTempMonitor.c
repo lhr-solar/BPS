@@ -7,6 +7,7 @@
 #include "CANbus.h"
 #include "Amps.h"
 #include "CAN_Queue.h"
+#include "Print_Queue.h"
 
 #define PISS(...) \
 do { \
@@ -76,7 +77,7 @@ void Task_VoltTempMonitor(void *p_arg) {
                 CanPayload.data = CanData;
                 CanMsg.payload = CanPayload;
                 CAN_TransmitQueue_Post(CanMsg);
-                printf("%d:%d ", i, CanData.w);
+                printf("%d:%d ", i, (int)CanData.w);
 
                 voltage_totals[i] = 0;
             }
@@ -167,7 +168,7 @@ void Task_VoltTempMonitor(void *p_arg) {
 
         RTOS_BPS_MutexPost(&WDog_Mutex, OS_OPT_POST_NONE); 
         
-        //delay of 50ms
-        RTOS_BPS_DelayMs(50);
+        //delay of 20ms
+        RTOS_BPS_DelayMs(20);
     }
 }

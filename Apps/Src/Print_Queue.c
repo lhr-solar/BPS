@@ -1,6 +1,6 @@
 /* Copyright (c) 2018-2023 UT Longhorn Racing Solar */
 /** Print_Queue.c
- * Queue that holds all characters to be printed that Task_Print needs to send to UART.
+ * Asynchronous printf output via UART
  */
 
 #include "Print_Queue.h"
@@ -72,7 +72,7 @@ uint32_t PQ_GetNumWaiting(void) {
 }
 
 void PQ_Flush(void) {
-    RTOS_BPS_SemPost(&PQ_SignalFlush_Sem4, OS_OPT_POST_ALL | OS_OPT_POST_NO_SCHED);
+    RTOS_BPS_SemPost(&PQ_SignalFlush_Sem4, OS_OPT_POST_ALL);
 }
 
 void PQ_WaitForFlush(void) {
@@ -80,32 +80,34 @@ void PQ_WaitForFlush(void) {
 }
 
 int _printf_internal(const char *format, ...) {
-    BPS_OS_ERR err;
-
     va_list args;
     va_start(args, format);
 
+    BPS_OS_ERR err;
+
     // get a buffer from the pool
     char *buffer = (char *)OSMemGet(&PQPrintfPool, &err);
-    assertOSError(err);
+    if (err != OS_ERR_NONE) return 0;
 
     // write to buffer
     int len = vsnprintf(buffer, PQ_PRINTF_BUFFER_SIZE, format, args);
+    len = MIN(len, PQ_PRINTF_BUFFER_SIZE);
 
     // copy from buffer to fifo
     bool status = PQ_Write(buffer, len);
 
     // release buffer
     OSMemPut(&PQPrintfPool, buffer, &err);
-    assertOSError(err);
 
     // signal flush
-    if (memchr(buffer, '\n', len)) {
+    if ((PQ_GetNumWaiting() > (PQ_PRINT_FIFO_SIZE - PQ_PRINTF_BUFFER_SIZE))
+        || memchr(buffer, '\n', len)) {
+
         PQ_Flush();
     }
 
     va_end(args);
-    return status ? len : 0;
+    return status ? len : EOF;
 }
 
 

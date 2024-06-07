@@ -1,10 +1,6 @@
 /* Copyright (c) 2018-2022 UT Longhorn Racing Solar */
 /*
  * This file implements a circular fifo supporting blocked puts and gets.
- * In a traditional circular fifo, an accessed block could be wrapped around the 
- * end of the buffer. In this implementation, by allocating actual memory twice 
- * the size of the fifo, we can utilize memcpy() -- which is faster than an 
- * element-by-element copy, especially for smaller data types.
  * 
  * In order to use it in another file, you must import it in 
  * a particular way.
@@ -35,6 +31,7 @@
 #define __FAST_FIFO_H
 #include <stdbool.h>
 #include <string.h>
+#include "common.h"
 #endif
 
 #ifndef FFIFO_TYPE
@@ -57,7 +54,7 @@
 
 // The actual structure
 typedef struct FFIFO_STRUCT_NAME {
-    FFIFO_TYPE buffer[FFIFO_SIZE * 2];
+    FFIFO_TYPE buffer[FFIFO_SIZE];
     int head;
     int tail;
     int len;
@@ -75,6 +72,8 @@ typedef struct FFIFO_STRUCT_NAME {
  * 
  * If the type of the fifo is myfifo_t, then this function
  * will be called myfifo_new().
+ * @note PLEASE DON'T USE THIS -- returns on stack and will probably overflow
+ * @deprecated
  * 
  * @return an empty fifo
  */
@@ -130,17 +129,18 @@ LEN (FFIFO_TYPE_NAME *fifo) {
  */
 static bool __attribute__((unused))
 GET (FFIFO_TYPE_NAME *fifo, FFIFO_TYPE *data, int size) {
-    if (fifo->len < size) {
+    if (size > fifo->len) {
         return false;
     }
 
-    memcpy(data, &fifo->buffer[fifo->head], size * sizeof(FFIFO_TYPE));
-    fifo->head += size;
-    fifo->len += size;
-    if (fifo->head > FFIFO_SIZE) {
-       fifo->head -= FFIFO_SIZE;
-       fifo->tail -= FFIFO_SIZE;
-    }
+    int hi = MIN(size, FFIFO_SIZE - fifo->head);
+    int lo = size - hi;
+
+    memcpy(data, &fifo->buffer[fifo->head], hi * sizeof(FFIFO_TYPE));
+    memcpy(&data[hi], &fifo->buffer[0], lo * sizeof(FFIFO_TYPE));
+
+    fifo->head = (fifo->head + size) % FFIFO_SIZE;
+    fifo->len -= size;
     return true;
 }
 
@@ -159,12 +159,18 @@ GET (FFIFO_TYPE_NAME *fifo, FFIFO_TYPE *data, int size) {
  */
 static bool __attribute__((unused))
 PUT (FFIFO_TYPE_NAME *fifo, FFIFO_TYPE *data, int size) {
-    if ((FFIFO_SIZE - fifo->len) < size){
+    if (size > (FFIFO_SIZE - fifo->len)){
         return false;
     }
-    memcpy(&fifo->buffer[fifo->tail], data, size * sizeof(FFIFO_TYPE));
-    fifo->tail += size;
-    fifo->len  += size;
+
+    int hi = MIN(size, FFIFO_SIZE - fifo->tail);
+    int lo = size - hi;
+
+    memcpy(&fifo->buffer[fifo->tail], data, hi * sizeof(FFIFO_TYPE));
+    memcpy(&fifo->buffer[0], &data[hi], lo * sizeof(FFIFO_TYPE));
+
+    fifo->tail = (fifo->tail + size) % FFIFO_SIZE;
+    fifo->len += size;
     return true;
 }
 

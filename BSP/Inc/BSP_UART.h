@@ -9,6 +9,9 @@
 //enum to describe what UART port you are trying to access
 typedef enum {UART_USB, UART_BLE, NUM_UART} UART_Port;
 
+#define BSP_UART_TX_SIZE     256
+#define BSP_UART_RX_SIZE     64
+
 /**
  * @brief   Initializes the UART peripheral
  * @param   rxCallback The callback for when data come in to the system

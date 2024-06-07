@@ -1,6 +1,6 @@
 /* Copyright (c) 2018-2023 UT Longhorn Racing Solar */
 /** Print_Queue.c
- * Queue that holds all characters to be printed that Task_Print needs to send to UART.
+ * Asynchronous printf output via UART
  */
 
 #ifndef PRINT_QUEUE_H
@@ -9,9 +9,9 @@
 #include <stdbool.h>
 #include <stdint.h> 
 #include "stddef.h"
+#include "config.h"
 
 // fifo size used by print queue task
-// note: double this size is actually used as we use a contiguous block circular buffer
 #define PQ_PRINT_FIFO_SIZE          1024
 
 // buffers are dynamically allocated from this pool whenever printf() is called.
@@ -44,7 +44,9 @@ int _printf_internal(const char *format, ...);
  */
 void RTOS_BPS_Blocking_Printf(const char *format, ...);
 
-#ifdef BPS_ENABLE_PRINT_OUTPUT
+#define BPS_ENABLE_PRINT_OUTPUT true
+
+#if BPS_ENABLE_PRINT_OUTPUT
 
 #ifndef SIMULATION
 #define printf(...) _printf_internal(__VA_ARGS__)
