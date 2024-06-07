@@ -28,9 +28,9 @@
 
 // Compiler messages go here so they don't get spammed when building
 #if BPS_ENABLE_PRINT_OUTPUT
-#pragma message("Printf output is enabled.")
+#pragma message("Printf output is enabled (default). To disable, set BPS_ENABLE_PRINT_OUTPUT to 'false' when building: 'make DEFINES=\"BPS_ENABLE_PRINT_OUTPUT=false\"'")
 #else   // BPS_ENABLE_PRINT_OUTPUT disabled
-#pragma message("Printf output is disabled (default). To enable, set BPS_ENABLE_PRINT_OUTPUT to 'true' when building: 'make DEFINES=\"BPS_ENABLE_PRINT_OUTPUT=true\"'")
+#pragma message("Printf output is disabled. To enable, set BPS_ENABLE_PRINT_OUTPUT to 'true' when building: 'make DEFINES=\"BPS_ENABLE_PRINT_OUTPUT=true\"'")
 #endif  // BPS_ENABLE_PRINT_OUTPUT
 
 #endif  // SIMULATION
