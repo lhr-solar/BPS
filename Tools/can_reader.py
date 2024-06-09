@@ -7,10 +7,12 @@ import serial
 import serial.tools.list_ports
 from collections import namedtuple
 import binascii
+import crc
 
 class CarCANMsg():
 
     CANMeta = namedtuple('CANMeta', ['idx', 'len'])
+    CRCCalculator = crc.Calculator(crc.Crc8.SAEJ1850, optimized=True)
 
     def __init__(self, id, idx, data) -> None:
         self.id = id
@@ -18,10 +20,39 @@ class CarCANMsg():
         self.data = data
 
     @classmethod
-    def from_human_readable_bytes(cls, b):
+    def from_human_readable_bytes(cls, b, usecrc=False):
+        """
+        expects b in the following format
+        <ID:3> <IDX:2> <DATA:*> [<CRC:2>]
+        note the spaces between each field and lack of newline at the end
+        """
+        if usecrc:
+            crc_recv = int.from_bytes(binascii.unhexlify(b[-2:]), byteorder='big', signed=False)
+            crc_calc = cls.CRCCalculator.checksum(b[:-3])
+            if crc_recv != crc_calc:
+                raise ValueError(f'CRC mismatch: {crc_recv} != {crc_calc}')
+
         id = int.from_bytes(binascii.unhexlify(b'0'+b[0:3]), byteorder='big', signed=False)
         idx = int.from_bytes(binascii.unhexlify(b[4:6]), byteorder='big', signed=False) if cls.CANMetaLUT[id].idx else None
-        data = binascii.unhexlify(b[7:])
+        data = binascii.unhexlify(b[7:-3] if usecrc else b[7:])
+        return cls(id, idx, data)
+    
+    @classmethod
+    def from_bytes(cls, b, usecrc=False):
+        """
+        expects b in the following format
+        <ID:2><IDX:1><DATA:*>[<CRC:1>]
+        note the stripped message framing bytes (0xBE 0xEF)
+        """
+        if usecrc:
+            crc_recv = b[-1]
+            crc_calc = cls.CRCCalculator.checksum(b[:-1])
+            if crc_recv != crc_calc:
+                raise ValueError(f'CRC mismatch: {crc_recv} != {crc_calc}')
+        
+        id = int.from_bytes(b[0:2], byteorder='little', signed=False)
+        idx = b[2] if cls.CANMetaLUT[id].idx else None
+        data = b[3:-1] if usecrc else b[3:]
         return cls(id, idx, data)
     
     def __str__(self) -> str:
@@ -127,6 +158,15 @@ class CarCANMsg():
     }
 
 
+voltages = [0 for _ in range(32)]
+temperatures = [0 for _ in range(32)]
+
+def open_port_safe(port, baudrate):
+    ser = serial.Serial(port, baudrate)
+    for _ in range(2):
+        _ = ser.readline()
+    return ser
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__, 
                                      epilog='\n\r'.join([str(s) for s in serial.tools.list_ports.comports()]))
@@ -138,10 +178,44 @@ def main():
                         help='log file to write to. default is None')
     args = parser.parse_args()
 
+    # ser = open_port_safe(args.port, args.baudrate)
     ser = serial.Serial(args.port, args.baudrate)
+    readbuf = bytearray([0 for _ in range(100)])
+    idx = 0
+    prev = None
+
     while True:
-        incoming = ser.readline().strip()
-        print(CarCANMsg.from_human_readable_bytes(incoming))
+        incoming = ser.read()
+        readbuf[idx] = incoming[0]
+        idx += 1
+        
+        if prev == b'\xBE' and incoming == b'\xEF': # start of message
+            if idx > 2: # valid message
+                try:
+                    msg = CarCANMsg.from_bytes(readbuf[:idx-2], usecrc=True)
+
+                    if msg.id == CarCANMsg.CarCANID.VOLTAGE_DATA_ARRAY:
+                        voltages[msg.idx] = int.from_bytes(msg.data[0:4], byteorder='little', signed=False)
+                    elif msg.id == CarCANMsg.CarCANID.TEMPERATURE_DATA_ARRAY:
+                        temperatures[msg.idx] = int.from_bytes(msg.data[0:4], byteorder='little', signed=True)
+                    
+                    if msg.idx == 31 and msg.id == CarCANMsg.CarCANID.TEMPERATURE_DATA_ARRAY:
+                        print('voltages')
+                        print(' '.join([f'{v:5d}' for v in voltages]))
+                        print('temperatures')
+                        print(' '.join([f'{t:5d}' for t in temperatures]))
+                        print(f'total voltage: {sum(voltages)/1000:.1f}, avg temperature: {sum(temperatures)/32000:.2f}')
+                        print('')
+
+                except Exception as e:
+                    print(e)
+                    print(f'failed to parse: {" ".join([f"{b:02x}" for b in readbuf[:idx-2]])}')
+                    raise e
+            idx = 0
+
+        prev = incoming
+
+        
 
 if __name__ == '__main__':
     main()

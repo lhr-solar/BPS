@@ -4,7 +4,6 @@
 #include "CANbus.h"
 #include "CAN_Queue.h"
 #include "config.h"
-#include "inttypes.h"
 
 #if !BPS_CAN_MIRROR_OUTPUT_USB
 
@@ -15,38 +14,20 @@
 #pragma message("CAN mirroring over UART is enabled. To disable, set BPS_CAN_MIRROR_OUTPUT_USB to 'false' when building: 'make DEFINES=\"BPS_CAN_MIRROR_OUTPUT_USB=false\"'")
 
 #include "Print_Queue.h"
+#include "PrintCANHelper.h"
 
-// CAN mirroring -- globals
+// Define some options here
+#define CAN_MIRROR_HUMAN_READABLE   false   // prints newline-terminated human-readable hex strings: [ID] [IDX] [DATA] ([CRC])
+#define CAN_MIRROR_ONLY_VALID_DATA  true    // truncates can payload to actual length. results in variable length messages.
+#define CAN_MIRROR_CRC              true    // appends crc8 to end of message.
+
+#if CAN_MIRROR_HUMAN_READABLE
+#define can_to_string(msg, buf) CAN_ToHexString_HumanReadable(msg, buf, CAN_MIRROR_ONLY_VALID_DATA, CAN_MIRROR_CRC)
+#else
+#define can_to_string(msg, buf) CAN_ToBytes(msg, buf, CAN_MIRROR_ONLY_VALID_DATA, CAN_MIRROR_CRC)
+#endif
+
 static char can_str_buf[40];
-static const char hex_lut[] = "0123456789ABCDEF";
-
-// CAN mirroring -- helper functions
-
-static inline void byte_to_hex(uint8_t byte, char *buf) {
-    buf[0] = hex_lut[(byte >> 4) & 0x0F];
-    buf[1] = hex_lut[byte & 0x0F];
-}
-
-static void can_to_string(CANMSG_t *msg, char *buf) {
-    // ID
-    buf[0] = hex_lut[(msg->id >> 8) & 0x0F];
-    buf[1] = hex_lut[(msg->id >> 4) & 0x0F];
-    buf[2] = hex_lut[msg->id & 0x0F];
-    buf[3] = ' ';
-
-    // idx
-    byte_to_hex(msg->payload.idx, &buf[4]);
-    buf[6] = ' ';
-
-    // data
-    for (int i = 0; i < 8; i++) {
-        byte_to_hex(msg->payload.data.bytes[i], &buf[7 + i * 2]);
-    }
-    
-    // term
-    buf[23] = '\n';
-    buf[24] = '\0';
-}
 
 #endif  // BPS_CAN_MIRROR_OUTPUT_USB
 
@@ -69,8 +50,8 @@ void Task_CANBusConsumer(void *p_arg) {
 
         #if BPS_CAN_MIRROR_OUTPUT_USB // Send CAN message to USB
 
-        can_to_string(&message, can_str_buf);
-        PQ_Write(can_str_buf, 24);
+        int len = can_to_string(&message, can_str_buf);
+        PQ_Write(can_str_buf, len);
 
         #endif
     }
