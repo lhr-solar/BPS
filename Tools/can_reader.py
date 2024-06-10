@@ -1,5 +1,12 @@
 """
-python script to read from a serial port and print the output to the console
+Python script to read CAN messages from serial port and print the output to the console
+
+Example for how to use the BPS_CAN_MIRROR_OUTPUT_USB feature. 
+To enable, build with BPS_CAN_MIRROR_OUTPUT_USB enabled:
+    make DEFINES="BPS_CAN_MIRROR_OUTPUT_USB=true"
+
+Requires the 'crc' package: 
+    pip install crc
 """
 
 import argparse
@@ -158,15 +165,6 @@ class CarCANMsg():
     }
 
 
-voltages = [0 for _ in range(32)]
-temperatures = [0 for _ in range(32)]
-
-def open_port_safe(port, baudrate):
-    ser = serial.Serial(port, baudrate)
-    for _ in range(2):
-        _ = ser.readline()
-    return ser
-
 def main():
     parser = argparse.ArgumentParser(description=__doc__, 
                                      epilog='\n\r'.join([str(s) for s in serial.tools.list_ports.comports()]))
@@ -174,13 +172,10 @@ def main():
                         help='serial port. if unspecified, will automatically search for one')
     parser.add_argument('-b', '--baudrate', type=int, default=115200,
                         help='serial port baudrate. default is 115200')
-    parser.add_argument('-l', '--log', type=str, default=None,
-                        help='log file to write to. default is None')
     args = parser.parse_args()
 
-    # ser = open_port_safe(args.port, args.baudrate)
     ser = serial.Serial(args.port, args.baudrate)
-    readbuf = bytearray([0 for _ in range(100)])
+    readbuf = bytearray([0 for _ in range(256)])
     idx = 0
     prev = None
 
@@ -193,19 +188,7 @@ def main():
             if idx > 2: # valid message
                 try:
                     msg = CarCANMsg.from_bytes(readbuf[:idx-2], usecrc=True)
-
-                    if msg.id == CarCANMsg.CarCANID.VOLTAGE_DATA_ARRAY:
-                        voltages[msg.idx] = int.from_bytes(msg.data[0:4], byteorder='little', signed=False)
-                    elif msg.id == CarCANMsg.CarCANID.TEMPERATURE_DATA_ARRAY:
-                        temperatures[msg.idx] = int.from_bytes(msg.data[0:4], byteorder='little', signed=True)
-                    
-                    if msg.idx == 31 and msg.id == CarCANMsg.CarCANID.TEMPERATURE_DATA_ARRAY:
-                        print('voltages')
-                        print(' '.join([f'{v:5d}' for v in voltages]))
-                        print('temperatures')
-                        print(' '.join([f'{t:5d}' for t in temperatures]))
-                        print(f'total voltage: {sum(voltages)/1000:.1f}, avg temperature: {sum(temperatures)/32000:.2f}')
-                        print('')
+                    print(msg)
 
                 except Exception as e:
                     print(e)
