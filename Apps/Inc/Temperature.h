@@ -113,12 +113,6 @@ int32_t Temperature_GetSingleTempSensor(uint8_t sensorIdx);
  */
 int32_t Temperature_GetModuleTemperature(uint8_t moduleIdx);
 
-/** Temperature_GetTotalPackAvgTemperature
- * Gets the average temperature of the whole battery pack
- * @return average temperature of battery pack
- */
-int32_t Temperature_GetTotalPackAvgTemperature(void);
-
 /** Temperature_SampleADC
  * Starts ADC conversion on GPIO1 on LTC6811's auxiliary registers on all boards
  * @param ADCMode sets the sampling rate
@@ -132,11 +126,16 @@ ErrorStatus Temperature_SampleADC(uint8_t ADCMode);
  */
 int32_t Temperature_GetMaxTemperature(void);
 
-/**
- * @brief Gives fan speed based on Average temperature of pack and past error values
- * @param InputTemp - current temperature
- * @param DesiredTemp - desired temperature
- * @return FanSpeed: 0-8
+/** Temperature_GetMinTemperature
+ * Gets the minimum measured temperature in the most recent batch of temperature measurements
+ * @return the minimum measured temperature in the most recent batch of temperature measurements
  */
-uint8_t Temperature_PID_Output(uint32_t InputTemp, uint32_t DesiredTemp);
+int32_t Temperature_GetMinTemperature(void);
+
+/** Temperature_GetTotalPackAvgTemperature
+ * Gets the average temperature of the whole battery pack
+ * @return average temperature of battery pack
+ */
+int32_t Temperature_GetTotalPackAvgTemperature(void);
+
 #endif

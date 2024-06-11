@@ -33,7 +33,7 @@ extern cell_asic Minions[NUM_MINIONS];
 // for averaging voltage and temperature data
 static uint32_t voltage_data_count = 0;
 static uint32_t voltage_totals[NUM_BATTERY_MODULES] = {0};
-static uint32_t temperature_data_count = 0;
+static int32_t temperature_data_count = 0;  // must be signed to perform arithmetic with other signed values
 static int32_t temperature_totals[NUM_BATTERY_MODULES] = {0};
 
 static uint32_t task_cycle_counter = 0;
@@ -52,14 +52,6 @@ void Task_VoltTempMonitor(void *p_arg) {
     (void)p_arg; 
     OS_ERR err;
 
-    Fans_Init();
-    Voltage_Init(Minions);
-    Temperature_Init(Minions);
-
-    // two charge enables for an edge detector
-    // charge enable is sent every ODR_CHARGING_ENABLED_PERIOD_MS but if it changes we 
-    // want to send it immediately 
-    bool charge_enable_prev = true;
     bool charge_enable = true;
 
     // buffers for CAN messages
@@ -72,6 +64,10 @@ void Task_VoltTempMonitor(void *p_arg) {
     uint32_t volt_prev_tick = 0, temp_prev_tick = 0, chg_en_prev_tick = 0, 
              volt_data_send_prev_tick = 0, temp_data_send_prev_tick = 0;
     uint32_t volt_elapsed = 0, temp_elapsed = 0;
+
+    Fans_Init();
+    Voltage_Init(Minions);
+    Temperature_Init(Minions);
 
     while (1) {
         task_cycle_counter++;       // used for output and sampling decimation / averaging
@@ -88,7 +84,7 @@ void Task_VoltTempMonitor(void *p_arg) {
         }
         
         // BLOCKING =====================
-        // Check if open wire is NOT safe:
+        // Check if open wire is NOT safe: This currently does nothing
         CheckOpenWire();
         
         // BLOCKING =====================
@@ -111,28 +107,27 @@ void Task_VoltTempMonitor(void *p_arg) {
         // NONBLOCKING ==================
         // Send more frequent CAN messages -- every loop iteration
 
-        *(volt_summary_t *)&msg_voltage_summary.payload.data.bytes = (volt_summary_t){
+        *(volt_summary_t *)msg_voltage_summary.payload.data.bytes = (volt_summary_t){
             .pack_voltage_mv = Voltage_GetTotalPackVoltage(),
             .voltage_range_mv = 0,
-            .elapsed_ms = volt_elapsed
+            .elapsed_ms = OS_TICKS_TO_MS(volt_elapsed)
         };
 
-        *(temp_summary_t *)&msg_temperature_summary.payload.data.bytes = (temp_summary_t){
+        *(temp_summary_t *)msg_temperature_summary.payload.data.bytes = (temp_summary_t){
             .avg_temperature_mc = Temperature_GetTotalPackAvgTemperature(),
             .temperature_range_mc = 0,
-            .elapsed_ms = temp_elapsed
+            .elapsed_ms = OS_TICKS_TO_MS(temp_elapsed)
         };
 
         // NONBLOCKING ==================
         // Send less frequent CAN messages -- change frequency in config.h
 
-        if ((charge_enable != charge_enable_prev)
-         || (((uint32_t)OSTimeGet(&err)) - chg_en_prev_tick > MS_TO_OS_TICKS(ODR_CHARGING_ENABLED_PERIOD_MS))) {
+        if (!charge_enable || 
+            (((uint32_t)OSTimeGet(&err)) - chg_en_prev_tick > MS_TO_OS_TICKS(ODR_CHARGING_ENABLED_PERIOD_MS))) {
             msg_charge_enable.payload.data.b = charge_enable;
             CAN_TransmitQueue_Post(msg_charge_enable);
             chg_en_prev_tick = (uint32_t)OSTimeGet(&err);
         }
-        charge_enable_prev = charge_enable;
 
         if (((uint32_t)OSTimeGet(&err)) - volt_data_send_prev_tick > MS_TO_OS_TICKS(ODR_VOLTAGE_DATA_ARRAY_PERIOD_MS)) {
             SendVoltageArray();

@@ -37,6 +37,12 @@ static int32_t rawTemperatures[MAX_TEMP_SENSORS];
 // Holds the maximum measured temperature in the most recent batch of temperature measurements
 static int32_t maxTemperature;
 
+// Holds the minimum measured temperature in the most recent batch of temperature measurements
+static int32_t minTemperature;
+
+// Holds the average pack temperature in the most recent batch of temperature measurements
+static int32_t avgTemperature;
+
 // 0 if discharging 1 if charging
 static uint8_t ChargingState;
 
@@ -44,10 +50,6 @@ static uint8_t ChargingState;
 // keep track of which temperature channel we are using
 static uint8_t currentChannel = 0;
 #endif
-
-// Variables to help with PID calculation
-static int32_t ErrorSum = 0;
-static int32_t Error;
 
 /** Temperature_Init
  * Initializes device drivers including SPI inside LTC6811_init and LTC6811 for Temperature Monitoring
@@ -264,15 +266,18 @@ ErrorStatus Temperature_UpdateAllMeasurements(){
         }
     }
 
-    // update max temperature
-    int32_t newMaxTemperature = 0;
+    // update min/max/avg temperature
+    int32_t running_max = 0, running_min = INT32_MAX, running_total = 0;
     for (uint8_t i = 0; i < NUM_TEMPERATURE_SENSORS; i++) {
-        if (Temperatures[i] > newMaxTemperature) {
-            newMaxTemperature = Temperatures[i];
-        }
+        running_max = MAX(running_max, Temperatures[i]);
+        running_min = MIN(running_min, Temperatures[i]);
+        running_total += Temperatures[i];
     }
 
-    maxTemperature = newMaxTemperature;
+    maxTemperature = running_max;
+    minTemperature = running_min;
+    avgTemperature = running_total / NUM_TEMPERATURE_SENSORS;
+
     return SUCCESS;
 }
 
@@ -352,18 +357,6 @@ int32_t Temperature_GetModuleTemperature(uint8_t moduleIdx) {
     return Temperature_GetSingleTempSensor(moduleIdx);
 }
 
-/** Temperature_GetTotalPackAvgTemperature
- * Gets the average temperature of the whole battery pack
- * @return average temperature of battery pack
- */
-int32_t Temperature_GetTotalPackAvgTemperature(void){
-    int32_t total = 0;
-    for (uint8_t i = 0; i < NUM_BATTERY_MODULES; i++) {
-        total += Temperature_GetModuleTemperature(i);
-    }
-    return total /= NUM_BATTERY_MODULES;
-}
-
 /** Temperature_SampleADC
  * Starts ADC conversion on GPIO1 on LTC6811's auxiliary registers on all boards
  * NOTE: May need to call wakeup_sleep before this function.
@@ -394,37 +387,18 @@ int32_t Temperature_GetMaxTemperature(void) {
     return maxTemperature;
 }
 
-/**
- * @brief Gives fan speed based on Average temperature of pack and past error values
- * @param InputTemp - current temperature. Should not exceed 293 or -294 Celcius given that expected temp is 38 celcius.
- * If the temperature exceeds these bounds, the fans will be set to max speed. 
- * @param DesiredTemp - desired temperature
- * @return FanSpeed: 0-8
+/** Temperature_GetMinTemperature
+ * Gets the minimum measured temperature in the most recent batch of temperature measurements
+ * @return the minimum measured temperature in the most recent batch of temperature measurements
  */
-uint8_t Temperature_PID_Output(uint32_t InputTemp, uint32_t DesiredTemp) {
-    if(InputTemp > TEMPERATURE_PID_MAX_INPUT){
-        return TOPSPEED;
-    }
+int32_t Temperature_GetMinTemperature(void) {
+    return minTemperature;
+}
 
-    Error = DesiredTemp - InputTemp;
-	
-    //Only read error sum in range
-    ErrorSum += abs(Error) < TEMPERATURE_PID_I_ZONE ? Error : 0;
-
-    //Cap error sum at 500 read degrees
-    ErrorSum = (abs(ErrorSum) < TEMPERATURE_PID_I_MAX_ACCUM) ? ErrorSum :
-        (ErrorSum > 0 ? TEMPERATURE_PID_I_MAX_ACCUM : -TEMPERATURE_PID_I_MAX_ACCUM);
-
-    int32_t p_Output = (int32_t)((-Error)/(TEMPERATURE_PID_PROPORTIONAL));
-    //realistic range of -15,000 to 15,0000
-
-    //I output could totally fudge things up (and probably will on the first test), so disable it and make sure p is good first
-    int32_t i_Output = (int32_t)((-ErrorSum)/(TEMPERATURE_PID_INTEGRAL));
-    //max ranges of -2000, 2000
-    
-    int32_t output = ((p_Output + i_Output) / TEMPERATURE_PID_MILLICELCIUS_CONVERT) + TEMPERATURE_HOLD_FAN_SPEED;
-    //realistic range of -10 to 20
-
-    //Don't use D output
-    return (uint8_t) output > TOPSPEED ? TOPSPEED : output;
+/** Temperature_GetTotalPackAvgTemperature
+ * Gets the average temperature of the whole battery pack
+ * @return average temperature of battery pack
+ */
+int32_t Temperature_GetTotalPackAvgTemperature(void){
+    return avgTemperature;
 }

@@ -49,9 +49,15 @@
 
 #pragma message(PRE("🥶") "COLD_CHARGE_TEMPERATURE set to            " XSTR(COLD_CHARGE_TEMPERATURE))
 
+#pragma message(PRE("🥶") "COLD_DISCHARGE_TEMPERATURE set to         " XSTR(COLD_DISCHARGE_TEMPERATURE))
+
 #pragma message(PRE("📉") "MAX_CURRENT_LIMIT set to                  " XSTR(MAX_CURRENT_LIMIT))
 
+#pragma message(PRE("📉") "MAX_COLD_CURRENT_LIMIT set to             " XSTR(MAX_COLD_CURRENT_LIMIT))
+
 #pragma message(PRE("📈") "MAX_CHARGING_CURRENT set to               " XSTR(MAX_CHARGING_CURRENT))
+
+#pragma message(PRE("📈") "MAX_COLD_CHARGING_CURRENT set to          " XSTR(MAX_CHARGING_CURRENT))
 
 #pragma message(PRE("🔧") "BALANCING_TOLERANCE_START start set to    " XSTR(BALANCING_TOLERANCE_START))
 

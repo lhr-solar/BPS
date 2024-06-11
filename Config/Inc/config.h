@@ -133,19 +133,27 @@ _Static_assert((sizeof(TemperatureSensorsCfg)/sizeof(*TemperatureSensorsCfg)) ==
 #endif
 
 #ifndef COLD_CHARGE_TEMPERATURE
-#define COLD_CHARGE_TEMPERATURE         25000   // Temperature to reduce charging current at
+#define COLD_CHARGE_TEMPERATURE         25000   // Temperature for reduced charging rate
 #endif
 
-#ifndef PID_DESIRED_TEMPERATURE
-#define PID_DESIRED_TEMPERATURE         38000   // Desired temperature   (milliCelcius) 
+#ifndef COLD_DISCHARGE_TEMPERATURE
+#define COLD_DISCHARGE_TEMPERATURE      10000   // Temperature for reduced discharging rate
 #endif
 
 #ifndef MAX_CURRENT_LIMIT
-#define MAX_CURRENT_LIMIT               75000   // Max current limit (Milliamperes)        (Max continuous discharge is 15A per cell)
+#define MAX_CURRENT_LIMIT               60000   // Max current limit (Milliamperes)        (Max continuous discharge is 7A per cell)
+#endif
+
+#ifndef MAX_COLD_CURRENT_LIMIT
+#define MAX_COLD_CURRENT_LIMIT          16000   // Max current limit (Milliamperes)        (Max continuous discharge is 2A per cell)
 #endif
 
 #ifndef MAX_CHARGING_CURRENT
-#define MAX_CHARGING_CURRENT            -20000  // Max current per cell is 1.5 Amps (Standard charge)
+#define MAX_CHARGING_CURRENT            -25000  // Max current per cell is 3.3 Amps (Standard charge)
+#endif
+
+#ifndef MAX_COLD_CHARGING_CURRENT
+#define MAX_COLD_CHARGING_CURRENT       -10000  // Max current per cell is 1.4 Amps (Cold charge)
 #endif
 
 #ifndef BALANCING_TOLERANCE_START
@@ -157,7 +165,6 @@ _Static_assert((sizeof(TemperatureSensorsCfg)/sizeof(*TemperatureSensorsCfg)) ==
 #endif
 //--------------------------------------------------------------------------------
 // Helpers
-#define STARTUP_WAIT_TIME               100000  // Number of iterations to wait for battery charging instructions on startup (Deprecated)
 
 #define PWM_PERIOD                      4000    // Number of clock cycles per PWM period
 

@@ -24,7 +24,8 @@ typedef OS_TICK     BPS_OS_TICK;
 typedef OS_TCB       BPS_OS_TCB;
 typedef CPU_STK      BPS_CPU_STK;
 
-#define MS_TO_OS_TICKS(ms)  ((OS_CFG_TICK_RATE_HZ * (ms)) / 1000)
+#define MS_TO_OS_TICKS(ms)      ((OS_CFG_TICK_RATE_HZ * (ms)) / 1000)
+#define OS_TICKS_TO_MS(ticks)   ((ticks) * 1000 / OS_CFG_TICK_RATE_HZ)
 
 /**
  * @brief Pends a BPS_OS_Semaphore.
