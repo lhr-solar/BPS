@@ -6,15 +6,30 @@
 
 #include "PrintCANHelper.h"
 
+// lookup table for byte-to-string conversion
 static const char hex_lut[] = "0123456789ABCDEF";
 
+/**
+ * @brief convert a single byte to a 2-character hex string. not null terminated.
+ * 
+ * @param byte byte to convert
+ * @param buf  buffer to store the hex string. must be at least 2 bytes long.
+ */
 static inline void byte_to_hexstr(uint8_t byte, char *buf) {
     buf[0] = hex_lut[(byte >> 4) & 0x0F];   // high nibble
     buf[1] = hex_lut[byte & 0x0F];          // low nibble
 }
 
+// lookup table of precalculated crc values for each possible byte
 static const uint8_t crc8_SAE_J1850[256];
 
+/**
+ * @brief calculate 8-bit crc of data using SAE J1850 polynomial (0x1d).
+ * 
+ * @param data pointer to buffer
+ * @param len  length of data in buffer (in bytes)
+ * @return uint8_t crc result
+ */
 static uint8_t crc8(void *data, uint32_t len) {
     char *data_p = (char *)data;
     uint8_t crc = 0xFF;
@@ -24,6 +39,15 @@ static uint8_t crc8(void *data, uint32_t len) {
     return ~crc;
 }
 
+/**
+ * @brief Convert CANBus message into a human-readable space-separated string with a newline at the end
+ * 
+ * @param msg CANBus message to convert
+ * @param buf buffer to store result in. Must be at least 28 bytes long.
+ * @param validonly only print valid data in the CAN payload (otherwise print all 8 bytes)
+ * @param crc print out crc at the end of the message
+ * @return int length of message
+ */
 int CAN_ToHexString_HumanReadable(CANMSG_t *msg, void *buf, 
                                   bool validonly, bool crc) {
     char *buf_p = (char *)buf;
@@ -61,7 +85,15 @@ int CAN_ToHexString_HumanReadable(CANMSG_t *msg, void *buf,
     return end + 1; // excludes null term
 }
 
-
+/**
+ * @brief Convert CANBus message into a raw byte array. Array will start with 0xBE 0xEF as framing bytes.
+ * 
+ * @param msg CANBus message to convert
+ * @param buf buffer to store result in. Must be at least 14 bytes long.
+ * @param validonly only convert valid data in the CAN payload (otherwise convert all 8 bytes)
+ * @param crc append 8-bit crc as last byte of message
+ * @return int length of message
+ */
 int CAN_ToBytes(CANMSG_t *msg, void *buf, 
                 bool validonly, bool crc) {
     char *buf_p = (char *)buf;

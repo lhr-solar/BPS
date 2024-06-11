@@ -63,8 +63,6 @@ void Task_AmperesMonitor(void *p_arg) {
             soc_data_send_prev_tick = (uint32_t)OSTimeGet(&err);
         }
 
-        // TODO: add averaging for AMPS and reduce rate for SoC
-
         //signal watchdog
         RTOS_BPS_MutexPend(&WDog_Mutex, OS_OPT_PEND_BLOCKING);
 
