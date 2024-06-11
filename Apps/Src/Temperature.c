@@ -279,17 +279,25 @@ ErrorStatus Temperature_UpdateAllMeasurements(){
 /** Temperature_CheckStatus
  * Checks if all modules are safe
  * @param 1 if pack is charging, 0 if discharging
- * @return SAFE or DANGER
+ * @return SAFE, opt = CHARGE_DISABLE / OPT_SAFE
+ * @return DANGER, opt = UNDERVOLTAGE / OVERVOLTAGE
  */
-SafetyStatus Temperature_CheckStatus(uint8_t isCharging){
-    int32_t temperatureLimit = isCharging == 1 ? MAX_CHARGE_TEMPERATURE_LIMIT : MAX_DISCHARGE_TEMPERATURE_LIMIT;
+SafetyStatus Temperature_CheckStatus(uint8_t isCharging, SafetyStatusOpt *opt){
+    SafetyStatusOpt tmp;
+    if (opt == NULL) opt = &tmp;
+    int32_t temperatureLimit = isCharging ? MAX_CHARGE_TEMPERATURE_LIMIT : MAX_DISCHARGE_TEMPERATURE_LIMIT;
 
+    bool charge_enable = true;
     for (uint8_t i = 0; i < NUM_TEMPERATURE_SENSORS; i++) {
         if ((Temperatures[i] > temperatureLimit) || (Temperatures[i] == TEMP_ERR_OUT_BOUNDS)) {
+            *opt = OPT_NONE;
             return DANGER;
+        } else if (Temperatures[i] > CHARGE_DISABLE_TEMPERATURE) {
+            charge_enable = false;
         }
     }
 
+    *opt = charge_enable ? OPT_SAFE : CHARGE_DISABLE;
     return SAFE;
 }
 

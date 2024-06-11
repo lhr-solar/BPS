@@ -12,7 +12,14 @@
 
 typedef enum State_e {OFF = 0, ON} State;
 typedef enum ErrorStatus_e {ERROR = 0, SUCCESS = !ERROR} ErrorStatus;
-typedef enum SafetyStatus_e {SAFE = 0, DANGER = 1, OVERVOLTAGE = 2, UNDERVOLTAGE = 3} SafetyStatus;
+typedef enum SafetyStatus_e {SAFE = 0, DANGER = 1} SafetyStatus;
+typedef enum SafetyStatusOpt_e {
+    OPT_SAFE = SAFE,
+    UNDERVOLTAGE = 1,
+    OVERVOLTAGE,
+    CHARGE_DISABLE,
+    OPT_NONE
+} SafetyStatusOpt;
 
 //--------------------------------------------------------------------------------
 // Basic Parameters of BPS layout
@@ -116,6 +123,19 @@ _Static_assert((sizeof(TemperatureSensorsCfg)/sizeof(*TemperatureSensorsCfg)) ==
 #define MAX_CHARGE_TEMPERATURE_LIMIT    45000   // Max temperature limit (milliCelcius)     (recommended release: 45.00C)
 #endif
 
+#ifndef CHARGE_DISABLE_TEMPERATURE
+#define CHARGE_DISABLE_TEMPERATURE      43000   // Temperature to stop charging at
+#endif
+
+// make sure we don't enable charging if we're too close to the temperature limit
+#if MAX_CHARGE_TEMPERATURE_LIMIT - 1000 < CHARGE_DISABLE_TEMPERATURE
+#error "Charging maximum temperature is too close to temperature trip limit!"
+#endif
+
+#ifndef COLD_CHARGE_TEMPERATURE
+#define COLD_CHARGE_TEMPERATURE         25000   // Temperature to reduce charging current at
+#endif
+
 #ifndef PID_DESIRED_TEMPERATURE
 #define PID_DESIRED_TEMPERATURE         38000   // Desired temperature   (milliCelcius) 
 #endif
@@ -142,13 +162,18 @@ _Static_assert((sizeof(TemperatureSensorsCfg)/sizeof(*TemperatureSensorsCfg)) ==
 #define PWM_PERIOD                      4000    // Number of clock cycles per PWM period
 
 //--------------------------------------------------------------------------------
-// Voltage and Temperature Output Rate Configurations
-// Reduce sampling rate for Temperature and CANBus sending rate for Voltage to 
-// reduce CANBus traffic. Set these to powers of 2 to avoid slight overflow errors.
-#define ODR_VOLTAGE_AVERAGING               4   // Number of samples to average for voltage
-#define ODR_TEMPERATURE_DECIMATION          4   // Number of voltage samples per temperature sample
-                                                // Temperature takes a long time to sample and changes fairly slowly -- 
-                                                // decimation is preferred over averaging.
+// Output Data Rates for various sensor measurement CAN IDs
+// Helps reduce CANBus traffic by sending data at a slower rate
+// at 125kbps (and assuming max-length messages), this equates ~900 messages per second
+#define ODR_VOLTAGE_DATA_ARRAY_PERIOD_MS        500     // Period in milliseconds to send voltage data
+#define ODR_TEMPERATURE_DATA_ARRAY_PERIOD_MS    500     // Period in milliseconds to send temperature data
+#define ODR_CURRENT_DATA_PERIOD_MS              200     // Period in milliseconds to send current data
+#define ODR_STATE_OF_CHARGE_DATA_PERIOD_MS      2000    // Period in milliseconds to send state of charge data
+#define ODR_CHARGING_ENABLED_PERIOD_MS          200     // Period in milliseconds to send charging enabled data
+
+#define ODR_TEMPERATURE_DECIMATION              2       // Number of voltage samples per temperature sample
+                                                        // Temperature takes a long time to sample and changes fairly slowly -- 
+                                                        // decimation is preferred over averaging. Don't set to >4.
 
 //--------------------------------------------------------------------------------
 // HeartBeat Delay Ticks

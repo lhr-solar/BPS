@@ -69,7 +69,7 @@ void test(void) {
         int status = Temperature_UpdateAllMeasurements();
         printf("%s\r\n", status ? "status :^)" : "status :^(");
 
-        if(Temperature_CheckStatus(isCharging) != SAFE) {
+        if(Temperature_CheckStatus(isCharging, NULL) != SAFE) {
             printf("DANGER!! Temperature levels in danger :(\r\n");
         }
         printf("Printing temperature values.\r\n");

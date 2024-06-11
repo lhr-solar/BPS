@@ -13,9 +13,6 @@
 
 #include <stdint.h>
 
-/**
- * CAN Message structure copied from BPS
- */
 
 // Enum for ID's of all messages that can be sent across CAN bus
 // IDs must be listed in strictly increasing order!
@@ -36,6 +33,8 @@ typedef enum {
     BPS_COMMAND_MSG                                      = 0x109,
     SUPPLEMENTAL_VOLTAGE                                 = 0x10B,
     CHARGING_ENABLED                                     = 0x10C,
+    VOLTAGE_SUMMARY                                      = 0x10D,
+    TEMPERATURE_SUMMARY                                  = 0x10E,
     CAR_STATE                                            = 0x580,
     IO_STATE                                             = 0x581,
     MOTOR_CONTROLLER_BUS                                 = 0x242,

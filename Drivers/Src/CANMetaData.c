@@ -31,6 +31,8 @@ const struct CANLUTEntry CanMetadataLUT[LARGEST_CAN_ID] = {
     [BPS_COMMAND_MSG]                                      {.idx_used = 0, .len = 8},
     [SUPPLEMENTAL_VOLTAGE]                                 {.idx_used = 0, .len = 2},
     [CHARGING_ENABLED]                                     {.idx_used = 0, .len = 1},
+    [VOLTAGE_SUMMARY]                                      {.idx_used = 0, .len = 8},
+    [TEMPERATURE_SUMMARY]                                  {.idx_used = 0, .len = 8},
     [CAR_STATE]                                            {.idx_used = 0, .len = 1},
     [IO_STATE]                                             {.idx_used = 0, .len = 8},
     [MOTOR_CONTROLLER_BUS]                                 {.idx_used = 0, .len = 8},

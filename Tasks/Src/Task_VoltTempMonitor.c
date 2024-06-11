@@ -8,160 +8,250 @@
 #include "Amps.h"
 #include "CAN_Queue.h"
 #include "Print_Queue.h"
+#include "RTOS_BPS.h"
+#include "os.h"
 
+typedef struct voltage_summary_s {
+    uint64_t pack_voltage_mv:       24;
+    uint64_t voltage_range_mv:      24;
+    uint64_t elapsed_ms:            16;
+} volt_summary_t;
+_Static_assert(sizeof(volt_summary_t) == 8, 
+              "volt_summary_t must fit within a CAN message!");
 
-//declared in Tasks.c
+typedef struct temperature_summary_s {
+    int64_t avg_temperature_mc:     24;
+    int64_t temperature_range_mc:   24;
+    uint64_t elapsed_ms:            16;
+} temp_summary_t;
+_Static_assert(sizeof(temp_summary_t) == 8, 
+              "temp_summary_t must fit within a CAN message!");
+
+// declared in Tasks.c
 extern cell_asic Minions[NUM_MINIONS];
 
+// for averaging voltage and temperature data
+static uint32_t voltage_data_count = 0;
 static uint32_t voltage_totals[NUM_BATTERY_MODULES] = {0};
+static uint32_t temperature_data_count = 0;
+static int32_t temperature_totals[NUM_BATTERY_MODULES] = {0};
 
 static uint32_t task_cycle_counter = 0;
 
+
+// volttempmonitor functions -- split off for readability
+static bool CheckVoltage(void);
+static void CheckOpenWire(void);
+static bool CheckTemperature(void);
+static void SendVoltageArray(void);
+static void SendTemperatureArray(void);
+
+
+
 void Task_VoltTempMonitor(void *p_arg) {
     (void)p_arg; 
+    OS_ERR err;
 
     Fans_Init();
     Voltage_Init(Minions);
     Temperature_Init(Minions);
 
-    // SafetyCheck_Sem4 must only be signaled once per parameter at system boot up.
-    // These flags indicate was signaled for that parameter
-    bool voltageHasBeenChecked = false;
-    bool openWireHasBeenChecked = false;
-    bool temperatureHasBeenChecked = false;
+    // two charge enables for an edge detector
+    // charge enable is sent every ODR_CHARGING_ENABLED_PERIOD_MS but if it changes we 
+    // want to send it immediately 
+    bool charge_enable_prev = true;
+    bool charge_enable = true;
 
-    CANData_t CanData;
-    CANPayload_t CanPayload;
-    CANMSG_t CanMsg;
-    while(1) {
+    // buffers for CAN messages
+    // static to avoid stack allocation
+    static CANMSG_t msg_charge_enable =         {.id = CHARGING_ENABLED};
+    static CANMSG_t msg_voltage_summary =       {.id = VOLTAGE_SUMMARY};
+    static CANMSG_t msg_temperature_summary =   {.id = TEMPERATURE_SUMMARY};
+
+    // timing variables
+    uint32_t volt_prev_tick = 0, temp_prev_tick = 0, chg_en_prev_tick = 0, 
+             volt_data_send_prev_tick = 0, temp_data_send_prev_tick = 0;
+    uint32_t volt_elapsed = 0, temp_elapsed = 0;
+
+    while (1) {
         task_cycle_counter++;       // used for output and sampling decimation / averaging
 
         // BLOCKING =====================
         // Update Voltage Measurements
         Voltage_UpdateMeasurements();
-        
-        // Check if voltage is NOT safe:
-        SafetyStatus voltageStatus = Voltage_CheckStatus();
-        if(voltageStatus != SAFE) {
-            if (voltageStatus == UNDERVOLTAGE) Fault_BitMap = Fault_UVOLT;
-            if (voltageStatus == OVERVOLTAGE) Fault_BitMap = Fault_OVOLT;
-            EnterFaultState(); 
-        } else if((voltageStatus == SAFE) && (!voltageHasBeenChecked)) {
-            // Signal to turn on contactor but only signal once
-            RTOS_BPS_SemPost(&SafetyCheck_Sem4, OS_OPT_POST_1);
-            voltageHasBeenChecked = true;
-        }
-        
-        //Send measurements to CAN queue
-        bool charge_enable = true;
-        CanMsg.id = VOLTAGE_DATA_ARRAY;
-
-        for (int i = 0; i < NUM_BATTERY_MODULES; i++){ //send all battery module voltage data
-            
-            uint16_t voltage = Voltage_GetModuleMillivoltage(i);
-            voltage_totals[i] += voltage;
-
-            if (voltage > CHARGE_DISABLE_VOLTAGE){
-                charge_enable = false;
-            }
-
-            // Send voltages over CAN every ODR_VOLTAGE_AVERAGING iterations
-            if (task_cycle_counter % ODR_VOLTAGE_AVERAGING == 0) {
-                CanPayload.idx = i;
-                CanData.w = (int)(voltage_totals[i] / ODR_VOLTAGE_AVERAGING);
-                CanPayload.data = CanData;
-                CanMsg.payload = CanPayload;
-                CAN_TransmitQueue_Post(CanMsg);
-
-                voltage_totals[i] = 0;
-            }
+        charge_enable = CheckVoltage();
+        volt_elapsed = ((uint32_t)OSTimeGet(&err)) - volt_prev_tick;
+        volt_prev_tick = (uint32_t)OSTimeGet(&err);
+        voltage_data_count++;
+        for (int i = 0; i < NUM_BATTERY_MODULES; i++) {
+            voltage_totals[i] += Voltage_GetModuleMillivoltage(i);
         }
         
         // BLOCKING =====================
         // Check if open wire is NOT safe:
-    
-        // TODO: get OpenWire to not take forever and actually run this
-        // SafetyStatus wireStatus = Voltage_OpenWire();
-        SafetyStatus wireStatus = SAFE;
+        CheckOpenWire();
         
-        if(wireStatus != SAFE) {
-            Fault_BitMap = Fault_OW;
-            EnterFaultState();
-        } else if((wireStatus == SAFE) && (!openWireHasBeenChecked)) {
-            // Signal to turn on contactor but only signal once
-            RTOS_BPS_SemPost(&SafetyCheck_Sem4, OS_OPT_POST_1); 
-            openWireHasBeenChecked = true;
-        }
-
         // BLOCKING =====================
         // Update Temperature Measurements (every ODR_TEMPERATURE_DECIMATION iterations)
         if (task_cycle_counter % ODR_TEMPERATURE_DECIMATION == 0) {
             Temperature_UpdateAllMeasurements();
-        }
-
-        // Check if temperature is NOT safe: for all modules
-        SafetyStatus temperatureStatus = Temperature_CheckStatus(Amps_IsCharging());
-        if(temperatureStatus != SAFE) {
-            Fault_BitMap = Fault_OTEMP;
-            EnterFaultState();
-        } else if((temperatureStatus == SAFE) && (!temperatureHasBeenChecked)) {
-            // Signal to turn on contactor but only signal once
-            RTOS_BPS_SemPost(&SafetyCheck_Sem4, OS_OPT_POST_1);
-            temperatureHasBeenChecked = true;
-        } 
-        //PID loop - sets fan speed based on avg temperature and desired temperature
-        //overrides PID loop if above PID_MAX_TEMPERATURE or if it's FAULT
-        // if (temperatureStatus == SAFE) {
-        //     Fans_SetAll(Temperature_PID_Output(Temperature_GetTotalPackAvgTemperature(), PID_DESIRED_TEMPERATURE));
-        // }
-
-        //Check if car should be allowed to charge or not
-        for (uint8_t sensor = 0; sensor < NUM_TEMPERATURE_SENSORS; sensor++) {
-            uint32_t temp = Temperature_GetSingleTempSensor(sensor);
-            if (temp > MAX_CHARGE_TEMPERATURE_LIMIT && temp < MAX_DISCHARGE_TEMPERATURE_LIMIT){
-                //suggest that the battery should not be charged
-                charge_enable = false;
-            }
-        }
-        if (!charge_enable){
-            CanMsg.id = CHARGING_ENABLED;
-            CanPayload.idx = 0;
-            CanData.b = 0;
-            CanPayload.data = CanData;
-            CanMsg.payload = CanPayload;
-            CAN_TransmitQueue_Post(CanMsg);
-        }
-        else {
-            //if the temperature gets low enough, suggest battery can be charged
-            CanMsg.id = CHARGING_ENABLED;
-            CanPayload.idx = 0;
-            CanData.b = 1;
-            CanPayload.data = CanData;
-            CanMsg.payload = CanPayload;
-            CAN_TransmitQueue_Post(CanMsg);
-        }
-        //Send measurements to CAN queue
-        if (task_cycle_counter % ODR_TEMPERATURE_DECIMATION == 0) {
-            CanMsg.id = TEMPERATURE_DATA_ARRAY;
-            for (uint8_t sensor = 0; sensor < NUM_TEMPERATURE_SENSORS; sensor++) {
-                CanPayload.idx = sensor;
-                CanData.w = Temperature_GetSingleTempSensor(sensor);
-                CanPayload.data = CanData;
-                CanMsg.payload = CanPayload;
-                CAN_TransmitQueue_Post(CanMsg);
+            charge_enable &= CheckTemperature();
+            temp_elapsed = ((uint32_t)OSTimeGet(&err)) - temp_prev_tick;
+            temp_prev_tick = (uint32_t)OSTimeGet(&err);
+            temperature_data_count++;
+            for (int i = 0; i < NUM_TEMPERATURE_SENSORS; i++) {
+                temperature_totals[i] += Temperature_GetSingleTempSensor(i);
             }
         }
         
+        // NONBLOCKING ==================
+        // Update Fan Speeds based on average temperature
         Fans_SetAll(TOPSPEED);
 
-        //signal watchdog
+        // NONBLOCKING ==================
+        // Send more frequent CAN messages -- every loop iteration
+
+        *(volt_summary_t *)&msg_voltage_summary.payload.data.bytes = (volt_summary_t){
+            .pack_voltage_mv = Voltage_GetTotalPackVoltage(),
+            .voltage_range_mv = 0,
+            .elapsed_ms = volt_elapsed
+        };
+
+        *(temp_summary_t *)&msg_temperature_summary.payload.data.bytes = (temp_summary_t){
+            .avg_temperature_mc = Temperature_GetTotalPackAvgTemperature(),
+            .temperature_range_mc = 0,
+            .elapsed_ms = temp_elapsed
+        };
+
+        // NONBLOCKING ==================
+        // Send less frequent CAN messages -- change frequency in config.h
+
+        if ((charge_enable != charge_enable_prev)
+         || (((uint32_t)OSTimeGet(&err)) - chg_en_prev_tick > MS_TO_OS_TICKS(ODR_CHARGING_ENABLED_PERIOD_MS))) {
+            msg_charge_enable.payload.data.b = charge_enable;
+            CAN_TransmitQueue_Post(msg_charge_enable);
+            chg_en_prev_tick = (uint32_t)OSTimeGet(&err);
+        }
+        charge_enable_prev = charge_enable;
+
+        if (((uint32_t)OSTimeGet(&err)) - volt_data_send_prev_tick > MS_TO_OS_TICKS(ODR_VOLTAGE_DATA_ARRAY_PERIOD_MS)) {
+            SendVoltageArray();
+            volt_data_send_prev_tick = (uint32_t)OSTimeGet(&err);
+            voltage_data_count = 0;
+            memset(voltage_totals, 0, sizeof(voltage_totals));
+        }
+
+        if (((uint32_t)OSTimeGet(&err)) - temp_data_send_prev_tick > MS_TO_OS_TICKS(ODR_TEMPERATURE_DATA_ARRAY_PERIOD_MS)) {
+            SendTemperatureArray();
+            temp_data_send_prev_tick = (uint32_t)OSTimeGet(&err);
+            temperature_data_count = 0;
+            memset(temperature_totals, 0, sizeof(temperature_totals));
+        }
+
+        // signal watchdog
         RTOS_BPS_MutexPend(&WDog_Mutex, OS_OPT_PEND_BLOCKING);
 
         WDog_BitMap |= WD_VOLT_TEMP; //Set watchdog bits for task
 
         RTOS_BPS_MutexPost(&WDog_Mutex, OS_OPT_POST_NONE); 
         
-        //delay of 20ms
+        // delay of 20ms
         RTOS_BPS_DelayMs(20);
+    }
+}
+
+/**
+ * @brief check voltage status. If voltage is not safe, enter fault state
+ *        Voltage_UpdateMeasurements() must be called beforehand.
+ * 
+ * @return true if charging should be enabled, false otherwise -- if not SAFE, 
+ *         this will not return
+ */
+static bool CheckVoltage(void) {
+    SafetyStatusOpt status_opt;
+    SafetyStatus status = Voltage_CheckStatus(&status_opt);
+    static bool voltageHasBeenChecked = false;
+
+    if (status != SAFE) {
+        if      (status_opt == UNDERVOLTAGE) Fault_BitMap |= Fault_UVOLT;
+        else if (status_opt == OVERVOLTAGE)  Fault_BitMap |= Fault_OVOLT;
+        EnterFaultState();  // doesn't return
+    }
+    if (!voltageHasBeenChecked) { // Signal to turn on contactor but only signal once
+        RTOS_BPS_SemPost(&SafetyCheck_Sem4, OS_OPT_POST_1);
+        voltageHasBeenChecked = true;
+    }
+
+    return (status_opt != CHARGE_DISABLE);
+}
+
+/**
+ * @brief check open wire status. If open wire is not safe, enter fault state
+ */
+static void CheckOpenWire(void) {
+    static bool openWireHasBeenChecked = false;
+    // TODO: get OpenWire to not take forever and actually run this
+    // SafetyStatus status = Voltage_OpenWire();
+    SafetyStatus status = SAFE;
+    
+    if (status != SAFE) {
+        Fault_BitMap |= Fault_OW;
+        EnterFaultState();
+    }
+    if (!openWireHasBeenChecked) {
+        // Signal to turn on contactor but only signal once
+        RTOS_BPS_SemPost(&SafetyCheck_Sem4, OS_OPT_POST_1);
+        openWireHasBeenChecked = true;
+    }
+}
+
+/**
+ * @brief check temperature status. If temperature is not safe, enter fault state
+ *        Temperature_UpdateAllMeasurements() must be called beforehand.
+ * 
+ * @return true if charging should be enabled, false otherwise -- if not SAFE,
+ *         this will not return
+ */
+static bool CheckTemperature(void) {
+    SafetyStatusOpt status_opt;
+    SafetyStatus status = Temperature_CheckStatus(Amps_IsCharging(), &status_opt);
+    static bool temperatureHasBeenChecked = false;
+
+    if (status != SAFE) {
+        Fault_BitMap = Fault_OTEMP;
+        EnterFaultState();
+    } 
+    if (!temperatureHasBeenChecked) {
+        // Signal to turn on contactor but only signal once
+        RTOS_BPS_SemPost(&SafetyCheck_Sem4, OS_OPT_POST_1);
+        temperatureHasBeenChecked = true;
+    }
+
+    return (status_opt != CHARGE_DISABLE);
+}
+
+/**
+ * @brief send all voltages over CAN. This will be an average of voltages since last send
+ */
+static void SendVoltageArray(void) {
+    static CANMSG_t msg = {.id = VOLTAGE_DATA_ARRAY};
+
+    for (int i = 0; i < NUM_BATTERY_MODULES; i++) {
+        msg.payload.idx = i;
+        msg.payload.data.w = (int)(voltage_totals[i] / voltage_data_count);
+        CAN_TransmitQueue_Post(msg);
+    }
+}
+
+/**
+ * @brief send all temperatures over CAN. This will be an average of temperatures since last send
+ */
+static void SendTemperatureArray(void) {
+    static CANMSG_t msg = {.id = TEMPERATURE_DATA_ARRAY};
+
+    for (int i = 0; i < NUM_BATTERY_MODULES; i++) {
+        msg.payload.idx = i;
+        msg.payload.data.w = (int)(temperature_totals[i] / temperature_data_count);
+        CAN_TransmitQueue_Post(msg);
     }
 }

@@ -32,9 +32,9 @@ void Voltage_UpdateMeasurements(void);
 
 /** Voltage_CheckStatus
  * Checks if all modules are safe
- * @return SAFE or danger: UNDERVOLTAGE or OVERVOLTAGE
+ * @return SAFE or DANGER + UNDERVOLTAGE/OVERVOLTAGE/CHARGE_DISABLE if DANGER
  */
-SafetyStatus Voltage_CheckStatus(void);
+SafetyStatus Voltage_CheckStatus(SafetyStatusOpt *opt);
 
 /** Voltage_GetModulesInDanger
  * Finds all battery modules in danger and stores them into a list.

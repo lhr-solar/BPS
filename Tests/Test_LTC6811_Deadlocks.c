@@ -72,7 +72,7 @@ void LTC6811_Deadlocks(void *p_arg){
         printf("running Temperature_UpdateAllMeasurements...\n");
         Temperature_UpdateAllMeasurements();
         printf("running Temperature_CheckStatus...\n");
-        Temperature_CheckStatus(arg);
+        Temperature_CheckStatus(arg, NULL);
         printf("running Temperature_SetChargeState...\n");
         Temperature_SetChargeState(arg);
         printf("running Temperature_GetModulesInDanger...\n");

@@ -53,7 +53,7 @@ void Task_TestTempMutex1(void *p_args) {
         RTOS_BPS_SemPend(&tmr_Sem4, OS_OPT_PEND_BLOCKING);
         // assert
 
-        Temperature_CheckStatus(1);
+        Temperature_CheckStatus(1, NULL);
     }
 }
 
@@ -62,7 +62,7 @@ void Task_TestTempMutex2(void *p_args) {
 
     while(1) {
         printf("2\r\n");
-        Temperature_CheckStatus(1);
+        Temperature_CheckStatus(1, NULL);
         for(int i = 0; i < 16; i++) {
             printf("%ld\r\n", Temperature_GetModuleTemperature(i));
         }

@@ -116,23 +116,30 @@ void Voltage_UpdateMeasurements(void){
 
 /** Voltage_CheckStatus
  * Checks if all battery modules are safe
- * @return SAFE or danger: UNDERVOLTAGE or OVERVOLTAGE
+ * @return SAFE, opt = CHARGE_DISABLE / OPT_SAFE
+ * @return DANGER, opt = UNDERVOLTAGE / OVERVOLTAGE
  */
-SafetyStatus Voltage_CheckStatus(void){
+SafetyStatus Voltage_CheckStatus(SafetyStatusOpt* opt){
+    SafetyStatusOpt tmp;
+    if (opt == NULL) opt = &tmp;
+    
+    bool charge_enable = true;
     for(int i = 0; i < NUM_BATTERY_MODULES; i++){
         uint16_t voltage = Voltage_GetModuleMillivoltage(i);
-        // VOLTAGE_LIMITS are in floating point. The LTC6811 sends the voltage data
+        // VOLTAGE_LIMITS in integer millivolts. The LTC6811 sends the voltage data
         // as unsigned 16-bit fixed point integers with a resolution of 0.00001
-        if(voltage > MAX_VOLTAGE_LIMIT) {
-            return OVERVOLTAGE;
-        }
-        if (Amps_IsCharging()){
-            if(voltage < MIN_VOLTAGE_CHARGING_LIMIT) return UNDERVOLTAGE;
-        }
-        else if(voltage < MIN_VOLTAGE_LIMIT) {
-            return UNDERVOLTAGE;
+        if (voltage > MAX_VOLTAGE_LIMIT) {
+            *opt = OVERVOLTAGE;
+            return DANGER;
+        } else if (voltage > CHARGE_DISABLE_VOLTAGE) {
+            charge_enable = false;
+        } else if ((voltage < MIN_VOLTAGE_LIMIT)
+                || (Amps_IsCharging() && voltage < MIN_VOLTAGE_CHARGING_LIMIT)) {
+            *opt = UNDERVOLTAGE;
+            return DANGER;
         }
     }
+    *opt = charge_enable ? OPT_SAFE : CHARGE_DISABLE;
     return SAFE;
 }
 
@@ -170,10 +177,10 @@ void Voltage_GetModulesInDanger(VoltageSafety_t* system){
         if(i < NUM_BATTERY_MODULES){
             // Check if battery is in range of voltage limit
             if(Voltage_GetModuleMillivoltage(i) > MAX_VOLTAGE_LIMIT) {
-                system->module_checks[i] = OVERVOLTAGE;
+                system->module_checks[i] = DANGER;
             }
             else if(Voltage_GetModuleMillivoltage(i) < MIN_VOLTAGE_LIMIT){
-                system->module_checks[i] = UNDERVOLTAGE;
+                system->module_checks[i] = DANGER;
             }
             else system->module_checks[i] = SAFE;
         }

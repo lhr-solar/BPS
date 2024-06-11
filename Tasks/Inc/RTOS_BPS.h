@@ -5,6 +5,7 @@
 #define RTOS_BPS_H
 
 #include "os.h" // for RTOS stuff
+#include "os_cfg_app.h"
 #include <stdint.h> 
 
 // Currently using Micrium
@@ -22,6 +23,8 @@ typedef OS_TICK     BPS_OS_TICK;
 //Custom typedefs for BPS_TaskCreate function currently using micirium
 typedef OS_TCB       BPS_OS_TCB;
 typedef CPU_STK      BPS_CPU_STK;
+
+#define MS_TO_OS_TICKS(ms)  ((OS_CFG_TICK_RATE_HZ * (ms)) / 1000)
 
 /**
  * @brief Pends a BPS_OS_Semaphore.
