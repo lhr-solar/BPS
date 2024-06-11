@@ -30,6 +30,10 @@ static OS_MUTEX Voltage_Mutex;
 static uint16_t Voltages[NUM_BATTERY_MODULES]; // Voltage values gathered, in units of 0.1 mV
 static uint32_t openWires[MAX_TEMP_SENSORS];
 
+static uint32_t minVoltage_mv = UINT32_MAX;
+static uint32_t maxVoltage_mv = 0;
+static uint32_t packVoltage_mv = 0;
+
 /** LTC ADC measures with resolution of 4 decimal places, 
  * But we standardized to have 3 decimal places to work with
  * millivolts
@@ -110,8 +114,24 @@ void Voltage_UpdateMeasurements(void){
 
     // update public voltage values
     RTOS_BPS_MutexPend(&Voltage_Mutex, OS_OPT_PEND_BLOCKING);
+
     VoltageFilter_get(&VoltageFilter, Voltages);
+
+    // calculate min, max, and pack voltage
+    uint32_t maxv = 0, minv = UINT32_MAX, totalv = 0;
+    for (int i = 0; i < NUM_BATTERY_MODULES; i++) {
+        uint32_t voltage = Voltages[i];
+        totalv += voltage;
+        if (voltage > maxv) maxv = voltage;
+        if (voltage < minv) minv = voltage;
+    }
+
     RTOS_BPS_MutexPost(&Voltage_Mutex, OS_OPT_POST_NONE);
+
+    // update global variables
+    minVoltage_mv = minv / 10;  // convert to millivolts
+    maxVoltage_mv = maxv / 10;
+    packVoltage_mv = totalv / 10;
 }
 
 /** Voltage_CheckStatus
@@ -288,12 +308,24 @@ uint16_t Voltage_GetModuleMillivoltage(uint8_t moduleIdx){
  * @return voltage of whole battery pack
  */
 uint32_t Voltage_GetTotalPackVoltage(void){
-    int sum = 0;
-    for (int i = 0; i < NUM_BATTERY_MODULES; i++) {
-        sum += Voltage_GetModuleMillivoltage(i);
-    }
-    return sum;
+    return packVoltage_mv;
 }
 
+
+/** Voltage_GetMaxVoltage
+ * Gets the maximum cell voltage within the battery pack
+ * @return maximum voltage of battery pack
+ */
+uint32_t Voltage_GetMaxVoltage(void){
+    return maxVoltage_mv;
+}
+
+/** Voltage_GetMinVoltage
+ * Gets the minimum cell voltage within the battery pack
+ * @return minimum voltage of battery pack
+ */
+uint32_t Voltage_GetMinVoltage(void){
+    return minVoltage_mv;
+}
 
 

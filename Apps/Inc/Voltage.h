@@ -76,4 +76,17 @@ uint16_t Voltage_GetModuleMillivoltage(uint8_t moduleIdx);
  */
 uint32_t Voltage_GetTotalPackVoltage(void);
 
+/** Voltage_GetMaxVoltage
+ * Gets the maximum cell voltage within the battery pack
+ * @return maximum voltage of battery pack
+ */
+uint32_t Voltage_GetMaxVoltage(void);
+
+/** Voltage_GetMinVoltage
+ * Gets the minimum cell voltage within the battery pack
+ * @return minimum voltage of battery pack
+ */
+uint32_t Voltage_GetMinVoltage(void);
+
+
 #endif

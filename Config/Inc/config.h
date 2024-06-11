@@ -178,10 +178,6 @@ _Static_assert((sizeof(TemperatureSensorsCfg)/sizeof(*TemperatureSensorsCfg)) ==
 #define ODR_STATE_OF_CHARGE_DATA_PERIOD_MS      2000    // Period in milliseconds to send state of charge data
 #define ODR_CHARGING_ENABLED_PERIOD_MS          200     // Period in milliseconds to send charging enabled data
 
-#define ODR_TEMPERATURE_DECIMATION              2       // Number of voltage samples per temperature sample
-                                                        // Temperature takes a long time to sample and changes fairly slowly -- 
-                                                        // decimation is preferred over averaging. Don't set to >4.
-
 //--------------------------------------------------------------------------------
 // HeartBeat Delay Ticks
 // Define heartbeatDelay as # of desired while(1) loops per toggle

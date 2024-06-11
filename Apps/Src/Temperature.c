@@ -35,13 +35,13 @@ static int32_t Temperatures[NUM_TEMPERATURE_SENSORS];
 static int32_t rawTemperatures[MAX_TEMP_SENSORS];
 
 // Holds the maximum measured temperature in the most recent batch of temperature measurements
-static int32_t maxTemperature;
+static int32_t maxTemperature = 0;
 
 // Holds the minimum measured temperature in the most recent batch of temperature measurements
-static int32_t minTemperature;
+static int32_t minTemperature = UINT32_MAX;
 
 // Holds the average pack temperature in the most recent batch of temperature measurements
-static int32_t avgTemperature;
+static int32_t avgTemperature = 0;
 
 // 0 if discharging 1 if charging
 static uint8_t ChargingState;

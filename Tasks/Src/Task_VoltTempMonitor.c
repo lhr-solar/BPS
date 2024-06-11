@@ -36,9 +36,6 @@ static uint32_t voltage_totals[NUM_BATTERY_MODULES] = {0};
 static int32_t temperature_data_count = 0;  // must be signed to perform arithmetic with other signed values
 static int32_t temperature_totals[NUM_BATTERY_MODULES] = {0};
 
-static uint32_t task_cycle_counter = 0;
-
-
 // volttempmonitor functions -- split off for readability
 static bool CheckVoltage(void);
 static void CheckOpenWire(void);
@@ -70,7 +67,6 @@ void Task_VoltTempMonitor(void *p_arg) {
     Temperature_Init(Minions);
 
     while (1) {
-        task_cycle_counter++;       // used for output and sampling decimation / averaging
 
         // BLOCKING =====================
         // Update Voltage Measurements
@@ -88,16 +84,14 @@ void Task_VoltTempMonitor(void *p_arg) {
         CheckOpenWire();
         
         // BLOCKING =====================
-        // Update Temperature Measurements (every ODR_TEMPERATURE_DECIMATION iterations)
-        if (task_cycle_counter % ODR_TEMPERATURE_DECIMATION == 0) {
-            Temperature_UpdateAllMeasurements();
-            charge_enable &= CheckTemperature();
-            temp_elapsed = ((uint32_t)OSTimeGet(&err)) - temp_prev_tick;
-            temp_prev_tick = (uint32_t)OSTimeGet(&err);
-            temperature_data_count++;
-            for (int i = 0; i < NUM_TEMPERATURE_SENSORS; i++) {
-                temperature_totals[i] += Temperature_GetSingleTempSensor(i);
-            }
+        // Update Temperature Measurements
+        Temperature_UpdateAllMeasurements();
+        charge_enable &= CheckTemperature();
+        temp_elapsed = ((uint32_t)OSTimeGet(&err)) - temp_prev_tick;
+        temp_prev_tick = (uint32_t)OSTimeGet(&err);
+        temperature_data_count++;
+        for (int i = 0; i < NUM_TEMPERATURE_SENSORS; i++) {
+            temperature_totals[i] += Temperature_GetSingleTempSensor(i);
         }
         
         // NONBLOCKING ==================
@@ -109,13 +103,13 @@ void Task_VoltTempMonitor(void *p_arg) {
 
         *(volt_summary_t *)msg_voltage_summary.payload.data.bytes = (volt_summary_t){
             .pack_voltage_mv = Voltage_GetTotalPackVoltage(),
-            .voltage_range_mv = 0,
+            .voltage_range_mv = Voltage_GetMaxVoltage() - Voltage_GetMinVoltage(),
             .elapsed_ms = OS_TICKS_TO_MS(volt_elapsed)
         };
 
         *(temp_summary_t *)msg_temperature_summary.payload.data.bytes = (temp_summary_t){
             .avg_temperature_mc = Temperature_GetTotalPackAvgTemperature(),
-            .temperature_range_mc = 0,
+            .temperature_range_mc = Temperature_GetMaxTemperature() - Temperature_GetMinTemperature(),
             .elapsed_ms = OS_TICKS_TO_MS(temp_elapsed)
         };
 
