@@ -154,7 +154,7 @@ SafetyStatus Voltage_CheckStatus(SafetyStatusOpt* opt){
         } else if (voltage > CHARGE_DISABLE_VOLTAGE) {
             charge_enable = false;
         } else if ((voltage < MIN_VOLTAGE_LIMIT)
-                || (Amps_IsCharging() && voltage < MIN_VOLTAGE_CHARGING_LIMIT)) {
+                || (Amps_IsCharging() && (voltage < MIN_VOLTAGE_CHARGING_LIMIT))) {
             *opt = UNDERVOLTAGE;
             return DANGER;
         }

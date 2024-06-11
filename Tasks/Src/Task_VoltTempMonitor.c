@@ -207,7 +207,7 @@ static bool CheckTemperature(void) {
     static bool temperatureHasBeenChecked = false;
 
     if (status != SAFE) {
-        Fault_BitMap = Fault_OTEMP;
+        Fault_BitMap |= Fault_OTEMP;
         EnterFaultState();
     } 
     if (!temperatureHasBeenChecked) {
