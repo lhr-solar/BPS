@@ -106,17 +106,19 @@ void Task_VoltTempMonitor(void *p_arg) {
             .voltage_range_mv = Voltage_GetMaxVoltage() - Voltage_GetMinVoltage(),
             .elapsed_ms = OS_TICKS_TO_MS(volt_elapsed)
         };
+        CAN_TransmitQueue_Post(msg_voltage_summary);
 
         *(temp_summary_t *)msg_temperature_summary.payload.data.bytes = (temp_summary_t){
             .avg_temperature_mc = Temperature_GetTotalPackAvgTemperature(),
             .temperature_range_mc = Temperature_GetMaxTemperature() - Temperature_GetMinTemperature(),
             .elapsed_ms = OS_TICKS_TO_MS(temp_elapsed)
         };
+        CAN_TransmitQueue_Post(msg_temperature_summary);
 
         // NONBLOCKING ==================
         // Send less frequent CAN messages -- change frequency in config.h
 
-        if (!charge_enable || 
+        if (!charge_enable || // always send message if charging is disabled
             (((uint32_t)OSTimeGet(&err)) - chg_en_prev_tick > MS_TO_OS_TICKS(ODR_CHARGING_ENABLED_PERIOD_MS))) {
             msg_charge_enable.payload.data.b = charge_enable;
             CAN_TransmitQueue_Post(msg_charge_enable);

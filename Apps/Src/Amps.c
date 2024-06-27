@@ -61,12 +61,11 @@ void Amps_UpdateMeasurements(void) {
  * @return SAFE or DANGER
  */
 SafetyStatus Amps_CheckStatus(int32_t minTemperature, int32_t maxTemperature) {
-    // determine if we should allow charging or not
-    int32_t lo_limit = (maxTemperature > CHARGE_DISABLE_TEMPERATURE) ? 0 : 
-                      ((minTemperature < COLD_CHARGE_TEMPERATURE)    ? MAX_COLD_CHARGING_CURRENT : 
-                                                                       MAX_CHARGING_CURRENT);
-    int32_t hi_limit = (minTemperature < COLD_DISCHARGE_TEMPERATURE) ? MAX_COLD_CURRENT_LIMIT : 
-                                                                       MAX_CURRENT_LIMIT;
+    int32_t lo_limit = (maxTemperature > MAX_CHARGE_TEMPERATURE_LIMIT)  ? -AMPS_NOISE_LIMIT : 
+                      ((minTemperature < COLD_CHARGE_TEMPERATURE)       ? MAX_COLD_CHARGING_CURRENT : 
+                                                                          MAX_CHARGING_CURRENT);
+    int32_t hi_limit = (minTemperature < COLD_DISCHARGE_TEMPERATURE)    ? MAX_COLD_CURRENT_LIMIT : 
+                                                                          MAX_CURRENT_LIMIT;
 
     int32_t current = latestMeasureMilliAmps;
     return (current > lo_limit && current < hi_limit) ? SAFE : DANGER;
