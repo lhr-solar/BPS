@@ -86,7 +86,7 @@ void test(void) {
 
     printf("\r\nTesting Voltage_CheckStatus...\r\n");
     printf("Is charging: %s\r\n", (Amps_IsCharging() ? "true" : "false"));
-    printf("Status: %s\r\n", statuses[Voltage_CheckStatus()]);
+    printf("Status: %s\r\n", statuses[Voltage_CheckStatus(NULL)]);
 
     VoltageSafety_t v;
     printf("\r\nTesting Voltage_GetModulesInDanger...\r\n");

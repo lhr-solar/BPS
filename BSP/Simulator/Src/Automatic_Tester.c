@@ -245,10 +245,10 @@ void initializeVariables(bool charging){
         }
 
         for(int j=0; j<NUM_TEMPERATURE_SENSORS; j++){
-            states[i].temperatures[j] = randomRange(0, MAX_CHARGE_TEMPERATURE_LIMIT);
+            states[i].temperatures[j] = randomRange(0, CHARGE_DISABLE_TEMPERATURE);
         }
 
-        states[i].current = charging ? randomRange(MAX_CHARGING_CURRENT, 0) : randomRange(0, MAX_CURRENT_LIMIT);
+        states[i].current = charging ? randomRange(MAX_COLD_CHARGING_CURRENT, 0) : randomRange(0, MAX_COLD_CURRENT_LIMIT);
 
         states[i].charge = 50000000;
     }

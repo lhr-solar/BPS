@@ -15,12 +15,9 @@
 #include "Simulator.h"
 #endif
 
-static OS_MUTEX AmperesData_Mutex;
-
 static OS_SEM AmperesIO_Sem;
 static bsp_os_t spi_os;
 
-#ifdef RTOS
 void Amperes_Pend(){
     RTOS_BPS_SemPend(&AmperesIO_Sem, OS_OPT_PEND_BLOCKING);
 }
@@ -28,17 +25,6 @@ void Amperes_Pend(){
 void Amperes_Post(){
     RTOS_BPS_SemPost(&AmperesIO_Sem, OS_OPT_POST_1);
 }
-#endif
-
-#ifdef BAREMETAL //TODO: Remove all baremetal code since we do not have support for it anymore
-void Amperes_Pend(void) {
-    return;
-}
-
-void Amperes_Post(void) {
-    return;
-}
-#endif
 
 static int32_t latestMeasureMilliAmps;
 
@@ -50,46 +36,39 @@ void Amps_Init(void) {
     spi_os.pend = Amperes_Pend;
     spi_os.post = Amperes_Post;
     LTC2315_Init(spi_os);
-    RTOS_BPS_MutexCreate(&AmperesData_Mutex, "Amperes Mutex");
 }
 
 /** Amps_UpdateMeasurements
  * Stores and updates the new measurements received
  */
 void Amps_UpdateMeasurements(void) {
-    RTOS_BPS_MutexPend(&AmperesData_Mutex, OS_OPT_PEND_BLOCKING);
     #ifdef SIMULATION
+        int32_t current = Simulator_getCurrent();
         latestMeasureMilliAmps = Simulator_getCurrent();
         char* msg;
-        asprintf(&msg, "Milliamp measurement is %d\n", latestMeasureMilliAmps);
+        asprintf(&msg, "Milliamp measurement is %d\n", current);
         Simulator_Log(LOG_INFO, msg);
         free(msg);
     #else 
         latestMeasureMilliAmps = LTC2315_GetCurrent();
     #endif
-    RTOS_BPS_MutexPost(&AmperesData_Mutex, OS_OPT_POST_NONE);
 }
 
 /** Amps_CheckStatus
  * Checks if pack does not have a short circuit
+ * @param minTemperature the minimum temperature measured in the most recent batch of temperature readings
  * @param maxTemperature the maximum temperature measured in the most recent batch of temperature readings
  * @return SAFE or DANGER
  */
-SafetyStatus Amps_CheckStatus(int32_t maxTemperature) {
-    SafetyStatus status;
+SafetyStatus Amps_CheckStatus(int32_t minTemperature, int32_t maxTemperature) {
+    int32_t lo_limit = (maxTemperature > MAX_CHARGE_TEMPERATURE_LIMIT)  ? -AMPS_NOISE_LIMIT : 
+                      ((minTemperature < COLD_CHARGE_TEMPERATURE)       ? MAX_COLD_CHARGING_CURRENT : 
+                                                                          MAX_CHARGING_CURRENT);
+    int32_t hi_limit = (minTemperature < COLD_DISCHARGE_TEMPERATURE)    ? MAX_COLD_CURRENT_LIMIT : 
+                                                                          MAX_CURRENT_LIMIT;
 
-    // determine if we should allow charging or not
-    bool dischargingOnly = maxTemperature > MAX_CHARGE_TEMPERATURE_LIMIT;
-    int32_t chargingCurrentLimit = dischargingOnly ? 0 : MAX_CHARGING_CURRENT;
-
-    RTOS_BPS_MutexPend(&AmperesData_Mutex, OS_OPT_PEND_BLOCKING);
-    if((latestMeasureMilliAmps >= chargingCurrentLimit)&&(latestMeasureMilliAmps < MAX_CURRENT_LIMIT)){
-        status = SAFE;
-    } else{
-        status = DANGER;
-    }
-    RTOS_BPS_MutexPost(&AmperesData_Mutex, OS_OPT_POST_NONE);
-    return status;
+    int32_t current = latestMeasureMilliAmps;
+    return (current > lo_limit && current < hi_limit) ? SAFE : DANGER;
 }
 
 /** Amps_IsCharging

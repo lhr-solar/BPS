@@ -12,7 +12,14 @@
 
 typedef enum State_e {OFF = 0, ON} State;
 typedef enum ErrorStatus_e {ERROR = 0, SUCCESS = !ERROR} ErrorStatus;
-typedef enum SafetyStatus_e {SAFE = 0, DANGER = 1, OVERVOLTAGE = 2, UNDERVOLTAGE = 3} SafetyStatus;
+typedef enum SafetyStatus_e {SAFE = 0, DANGER = 1} SafetyStatus;
+typedef enum SafetyStatusOpt_e {
+    OPT_SAFE = SAFE,
+    UNDERVOLTAGE = 1,
+    OVERVOLTAGE,
+    CHARGE_DISABLE,
+    OPT_NONE
+} SafetyStatusOpt;
 
 //--------------------------------------------------------------------------------
 // Basic Parameters of BPS layout
@@ -116,16 +123,37 @@ _Static_assert((sizeof(TemperatureSensorsCfg)/sizeof(*TemperatureSensorsCfg)) ==
 #define MAX_CHARGE_TEMPERATURE_LIMIT    45000   // Max temperature limit (milliCelcius)     (recommended release: 45.00C)
 #endif
 
-#ifndef PID_DESIRED_TEMPERATURE
-#define PID_DESIRED_TEMPERATURE         38000   // Desired temperature   (milliCelcius) 
+#ifndef CHARGE_DISABLE_TEMPERATURE
+#define CHARGE_DISABLE_TEMPERATURE      43000   // Temperature to stop charging at
+#endif
+
+// make sure we don't enable charging if we're too close to the temperature limit
+#if MAX_CHARGE_TEMPERATURE_LIMIT - 1000 < CHARGE_DISABLE_TEMPERATURE
+#error "Charging maximum temperature is too close to temperature trip limit!"
+#endif
+
+#ifndef COLD_CHARGE_TEMPERATURE
+#define COLD_CHARGE_TEMPERATURE         25000   // Temperature for reduced charging rate
+#endif
+
+#ifndef COLD_DISCHARGE_TEMPERATURE
+#define COLD_DISCHARGE_TEMPERATURE      10000   // Temperature for reduced discharging rate
 #endif
 
 #ifndef MAX_CURRENT_LIMIT
-#define MAX_CURRENT_LIMIT               75000   // Max current limit (Milliamperes)        (Max continuous discharge is 15A per cell)
+#define MAX_CURRENT_LIMIT               60000   // Max current limit (Milliamperes)        (Max continuous discharge is 7A per cell)
+#endif
+
+#ifndef MAX_COLD_CURRENT_LIMIT
+#define MAX_COLD_CURRENT_LIMIT          16000   // Max current limit (Milliamperes)        (Max continuous discharge is 2A per cell)
 #endif
 
 #ifndef MAX_CHARGING_CURRENT
-#define MAX_CHARGING_CURRENT            -20000  // Max current per cell is 1.5 Amps (Standard charge)
+#define MAX_CHARGING_CURRENT            -25000  // Max current per cell is 3.3 Amps (Standard charge)
+#endif
+
+#ifndef MAX_COLD_CHARGING_CURRENT
+#define MAX_COLD_CHARGING_CURRENT       -10000  // Max current per cell is 1.4 Amps (Cold charge)
 #endif
 
 #ifndef BALANCING_TOLERANCE_START
@@ -137,18 +165,18 @@ _Static_assert((sizeof(TemperatureSensorsCfg)/sizeof(*TemperatureSensorsCfg)) ==
 #endif
 //--------------------------------------------------------------------------------
 // Helpers
-#define STARTUP_WAIT_TIME               100000  // Number of iterations to wait for battery charging instructions on startup (Deprecated)
 
 #define PWM_PERIOD                      4000    // Number of clock cycles per PWM period
 
 //--------------------------------------------------------------------------------
-// Voltage and Temperature Output Rate Configurations
-// Reduce sampling rate for Temperature and CANBus sending rate for Voltage to 
-// reduce CANBus traffic. Set these to powers of 2 to avoid slight overflow errors.
-#define ODR_VOLTAGE_AVERAGING               4   // Number of samples to average for voltage
-#define ODR_TEMPERATURE_DECIMATION          4   // Number of voltage samples per temperature sample
-                                                // Temperature takes a long time to sample and changes fairly slowly -- 
-                                                // decimation is preferred over averaging.
+// Output Data Rates for various sensor measurement CAN IDs
+// Helps reduce CANBus traffic by sending data at a slower rate
+// at 125kbps (and assuming max-length messages), this equates ~900 messages per second
+#define ODR_VOLTAGE_DATA_ARRAY_PERIOD_MS        500     // Period in milliseconds to send voltage data
+#define ODR_TEMPERATURE_DATA_ARRAY_PERIOD_MS    500     // Period in milliseconds to send temperature data
+#define ODR_CURRENT_DATA_PERIOD_MS              200     // Period in milliseconds to send current data
+#define ODR_STATE_OF_CHARGE_DATA_PERIOD_MS      2000    // Period in milliseconds to send state of charge data
+#define ODR_CHARGING_ENABLED_PERIOD_MS          200     // Period in milliseconds to send charging enabled data
 
 //--------------------------------------------------------------------------------
 // HeartBeat Delay Ticks

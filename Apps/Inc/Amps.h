@@ -21,10 +21,11 @@ void Amps_UpdateMeasurements(void);
 
 /** Amps_CheckStatus
  * Checks if pack does not have a short circuit
+ * @param minTemperature the minimum temperature measured in the most recent batch of temperature readings
  * @param maxTemperature the maximum temperature measured in the most recent batch of temperature readings
  * @return SAFE or DANGER
  */
-SafetyStatus Amps_CheckStatus(int32_t maxTemperature);
+SafetyStatus Amps_CheckStatus(int32_t minTemperature, int32_t maxTemperature);
 
 /** Amps_IsCharging
  * Determines if the the battery pack is being charged or discharged depending on

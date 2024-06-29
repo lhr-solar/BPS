@@ -54,7 +54,7 @@ void Task1(void *p_arg){
 
         bool check = Amps_IsCharging();
         printf("Is charging: %s\n\r", (check ? "true" : "false"));
-        printf("Status: %s\n\r", statuses[Amps_CheckStatus(check)]);
+        printf("Status: %s\n\r", statuses[Amps_CheckStatus(0, 100000)]);
 
         BSP_Light_Toggle(EXTRA);
         

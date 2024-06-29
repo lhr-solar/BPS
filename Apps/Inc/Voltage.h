@@ -32,9 +32,9 @@ void Voltage_UpdateMeasurements(void);
 
 /** Voltage_CheckStatus
  * Checks if all modules are safe
- * @return SAFE or danger: UNDERVOLTAGE or OVERVOLTAGE
+ * @return SAFE or DANGER + UNDERVOLTAGE/OVERVOLTAGE/CHARGE_DISABLE if DANGER
  */
-SafetyStatus Voltage_CheckStatus(void);
+SafetyStatus Voltage_CheckStatus(SafetyStatusOpt *opt);
 
 /** Voltage_GetModulesInDanger
  * Finds all battery modules in danger and stores them into a list.
@@ -75,5 +75,18 @@ uint16_t Voltage_GetModuleMillivoltage(uint8_t moduleIdx);
  * @return voltage of whole battery pack (fixed point of 0.00001
  */
 uint32_t Voltage_GetTotalPackVoltage(void);
+
+/** Voltage_GetMaxVoltage
+ * Gets the maximum cell voltage within the battery pack
+ * @return maximum voltage of battery pack
+ */
+uint32_t Voltage_GetMaxVoltage(void);
+
+/** Voltage_GetMinVoltage
+ * Gets the minimum cell voltage within the battery pack
+ * @return minimum voltage of battery pack
+ */
+uint32_t Voltage_GetMinVoltage(void);
+
 
 #endif

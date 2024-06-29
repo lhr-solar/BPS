@@ -104,7 +104,7 @@ int32_t LTC2315_GetCurrent() {
      */
    
     int32_t reading = 0;
-    const int32_t averaging = 10;
+    const int32_t averaging = 8;
     for (int i = 0; i < averaging; ++i) {
         reading += (int32_t)LTC2315_Read();
     }
@@ -122,7 +122,7 @@ int32_t LTC2315_GetCurrent() {
  */
 void LTC2315_Calibrate() {
     int32_t reading = 0;
-    const int32_t averaging = 10;
+    const int32_t averaging = 8;
     for (int i = 0; i < averaging; ++i) {
         reading += (int32_t)LTC2315_Read();
     }

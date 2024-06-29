@@ -50,7 +50,7 @@ void LTC6811_Deadlocks(void *p_arg){
         printf("running Voltage_UpdateMeasurements...\n");
         Voltage_UpdateMeasurements();
         printf("running Voltage_CheckStatus...\n");
-        Voltage_CheckStatus();
+        Voltage_CheckStatus(NULL);
         printf("running Voltage_GetModulesInDanger...\n");
         Voltage_GetModulesInDanger(&system);
         printf("running Voltage_OpenWireSummary...\n");
@@ -72,7 +72,7 @@ void LTC6811_Deadlocks(void *p_arg){
         printf("running Temperature_UpdateAllMeasurements...\n");
         Temperature_UpdateAllMeasurements();
         printf("running Temperature_CheckStatus...\n");
-        Temperature_CheckStatus(arg);
+        Temperature_CheckStatus(arg, NULL);
         printf("running Temperature_SetChargeState...\n");
         Temperature_SetChargeState(arg);
         printf("running Temperature_GetModulesInDanger...\n");
@@ -124,7 +124,7 @@ void LTC6811_Deadlocks2(void *p_arg){
         printf("running Voltage_UpdateMeasurements...\n");
         Voltage_UpdateMeasurements();
         printf("running Voltage_CheckStatus...\n");
-        Voltage_CheckStatus();
+        Voltage_CheckStatus(NULL);
         printf("running Voltage_GetModulesInDanger...\n");
         Voltage_GetModulesInDanger(&system);
         printf("running Voltage_OpenWireSummary...\n");
@@ -146,7 +146,7 @@ void LTC6811_Deadlocks2(void *p_arg){
         printf("running Temperature_UpdateAllMeasurements...\n");
         Temperature_UpdateAllMeasurements();
         printf("running Temperature_CheckStatus...\n");
-        Temperature_CheckStatus(arg);
+        Temperature_CheckStatus(arg, NULL);
         printf("running Temperature_SetChargeState...\n");
         Temperature_SetChargeState(arg);
         printf("running Temperature_GetModulesInDanger...\n");
