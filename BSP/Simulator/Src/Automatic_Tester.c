@@ -248,7 +248,7 @@ void initializeVariables(bool charging){
             states[i].temperatures[j] = randomRange(0, CHARGE_DISABLE_TEMPERATURE);
         }
 
-        states[i].current = charging ? randomRange(MAX_COLD_CHARGING_CURRENT, 0) : randomRange(0, MAX_COLD_CURRENT_LIMIT);
+        states[i].current = charging ? randomRange(MAX_COLD_CHARGING_CURRENT, -AMPS_NOISE_LIMIT-1) : randomRange(0, MAX_COLD_CURRENT_LIMIT);
 
         states[i].charge = 50000000;
     }
