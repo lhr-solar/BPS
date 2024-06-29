@@ -19,8 +19,6 @@
 #define STR(x)  #x
 #define XSTR(x) STR(x)
 
-#include "config.h"
-
 #pragma message(PRE("👪") "NUM_MINIONS set to                        " XSTR(NUM_MINIONS))
 
 #pragma message(PRE("⚡") "NUM_BATTERY_MODULES set to                " XSTR(NUM_BATTERY_MODULES))
