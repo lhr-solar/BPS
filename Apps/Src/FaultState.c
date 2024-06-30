@@ -93,6 +93,7 @@ void EnterFaultState() {
     }
 
     EEPROM_LogError(Fault_BitMap);
+    EEPROM_SaveAddress();
 
     //Deinitialize CAN registers
     CANbus_DeInit();

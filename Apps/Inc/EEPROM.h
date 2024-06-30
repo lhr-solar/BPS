@@ -22,11 +22,19 @@ void EEPROM_Init(void);
 void EEPROM_Reset(void);
 
 /**
- * @brief Gets the stored state of charge from the EEPROM
+ * @brief Gets the last-written state of charge from the EEPROM
  * 
  * @return uint32_t stored charge value
  */
-uint32_t EEPROM_GetCharge(void);
+uint32_t EEPROM_GetLastCharge(void);
+
+/**
+ * @brief Get a specific state of charge entry from the EEPROM
+ * 
+ * @param numEntry Which state of charge entry to read (i.e. entry 0, entry 1)
+ * @return uint32_t 
+ */
+uint32_t EEPROM_GetChargeEntry(uint16_t numEntry);
 
 /**
  * @brief Set the stored state of charge value in the EEPROM
@@ -50,5 +58,12 @@ void EEPROM_LogError(uint32_t error);
  * @return              the number of errors read
  */
 uint16_t EEPROM_GetErrors(uint32_t *errors, uint16_t maxErrors);
+
+/**
+ * @brief Saves the last written address the EEPROM wrote to on failure or shutdown for
+ * next power cycle
+ * 
+ */
+void EEPROM_SaveAddress(void);
 
 #endif
