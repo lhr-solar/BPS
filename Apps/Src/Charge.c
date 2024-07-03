@@ -5,6 +5,7 @@
  */
 #include "Charge.h"
 #include "BSP_Timer.h"
+#include "VoltageToSoC.h"
 
 #define CHARGE_RESOLUTION_SCALE 1000000     // What we need to multiply 100% by before storing. Ensure it is >= 10,000 to avoid depleted charge calculation issues
 #define MAX_CHARGE_MILLI_AMP_HRS 41300    // In miliamp-hours (mAh), calculated from 12950(mah)*14 bats in parallel
@@ -61,7 +62,7 @@ void Charge_Calibrate(int8_t faultType){
  * @return fixed point percentage. Resolution = 0.000001% (45,550,000 = 45.55%)
  */
 uint32_t Charge_GetPercent(void){
-	return charge;
+	return lg21700m50t_ocv_soc_lut_uAh[0];
 }
 
 /** Charge_SetAccum 
