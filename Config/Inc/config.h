@@ -38,6 +38,10 @@ typedef enum SafetyStatusOpt_e {
 #define NUM_BATTERY_MODULES             32      // Number of battery modules
 #endif
 
+#ifndef MODULE_CELLS_IN_PARALLEL
+#define MODULE_CELLS_IN_PARALLEL        9
+#endif
+
 #ifndef NUM_TEMP_SENSORS_PER_MOD
 #define NUM_TEMP_SENSORS_PER_MOD        1       // Number of temperature sensors per battery module
 #endif

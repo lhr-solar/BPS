@@ -6,7 +6,7 @@
 #include "Fans.h"
 #include "Temperature.h"
 #include "Amps.h"
-#include "EEPROM.h"
+// #include "EEPROM.h"
 #include "BSP_WDTimer.h"
 #include "CLI.h"
 #include "CANbus.h"
@@ -67,12 +67,10 @@ void EnterFaultState() {
     Fans_Init();
     Fans_SetAll(TOPSPEED);
     // Turn Strobe Light On
-    // Turn LEDs On and logs Error into EEPROM
+    // Turn LEDs On
     BSP_Lights_Init();
     BSP_Light_Off(RUN); //turn off run light
     BSP_Light_On(FAULT);
-
-    EEPROM_Init();
 
     if (BSP_WDTimer_DidSystemReset()) {
         Fault_BitMap = Fault_WDOG;
@@ -91,8 +89,6 @@ void EnterFaultState() {
             BSP_Light_On(FaultDict[i].light); //allow multiple lights to be turned on
         }
     }
-
-    EEPROM_LogError(Fault_BitMap);
 
     //Deinitialize CAN registers
     CANbus_DeInit();

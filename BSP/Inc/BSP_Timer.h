@@ -39,17 +39,10 @@ void BSP_Timer_Start_TickCounter(void);
 uint32_t BSP_Timer_GetTicksElapsed(void);
 
 /**
- * @brief   Gets the running frequency of the timer (time per tick)
- * @param   None
- * @return  frequency in Hz
+ * @brief   Convert ticks to micros. Call in conjunction with BSP_Timer_GetTicksElapsed().
+ * @param   ticks Timer tick value
+ * @return  Microseconds 
  */
-uint32_t BSP_Timer_GetRunFreq(void);
-
-/**
- * @brief   Calculates the microseconds passed since last calling BSP_TimerGetTicksElapsed()
- * @param   None
- * @return  Microseconds
- */
-uint32_t BSP_Timer_GetMicrosElapsed(void);
+uint32_t BSP_Timer_TicksToMicros(uint32_t ticks);
 
 #endif
