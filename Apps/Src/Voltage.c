@@ -20,9 +20,18 @@
 #define MEDIAN_FILTER_TYPE uint16_t
 #define MEDIAN_FILTER_DEPTH 3
 #define MEDIAN_FILTER_CHANNELS NUM_BATTERY_MODULES
-#define MEDIAN_FILTER_NAME VoltageFilter
+#define MEDIAN_FILTER_NAME VoltageFilter1
 #include "MedianFilter.h"
-static VoltageFilter_t VoltageFilter;
+static VoltageFilter1_t VoltageFilter1;
+
+// ema filter
+#define EMA_FILTER_TYPE uint16_t
+#define EMA_FILTER_ALPHA_NUMERATOR 1
+#define EMA_FILTER_ALPHA_DEMONINATOR 4
+#define EMA_FILTER_CHANNELS NUM_BATTERY_MODULES
+#define EMA_FILTER_NAME VoltageFilter2
+#include "EMAFilter.h"
+static VoltageFilter2_t VoltageFilter2;
 
 static cell_asic *Minions;
 
@@ -72,8 +81,9 @@ void Voltage_Init(cell_asic *boards){
     // release mutex
     RTOS_BPS_MutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE);
 #endif
-    // Initialize median filter. There should be no modules with less than 0 volts or more than 5 volts
-    VoltageFilter_init(&VoltageFilter, 0, 50000);
+    // Initialize median + EMA filter with safe values. There should be no modules with less than 0 volts or more than 5 volts
+    VoltageFilter1_init(&VoltageFilter1, 0, 50000);
+    VoltageFilter2_init(&VoltageFilter2, 37000);
 }
 
 
@@ -82,7 +92,8 @@ void Voltage_Init(cell_asic *boards){
  * @param pointer to new voltage measurements
  */
 void Voltage_UpdateMeasurements(void){
-    uint16_t rawVoltages[NUM_BATTERY_MODULES];
+    uint16_t volt_med_filt_in[NUM_BATTERY_MODULES];
+    uint16_t volt_ema_filt_in[NUM_BATTERY_MODULES];
 #ifndef SIMULATION
     // Start Cell ADC Measurements
     wakeup_sleep(NUM_MINIONS);
@@ -97,7 +108,7 @@ void Voltage_UpdateMeasurements(void){
     // package raw voltage values into single array
     for (uint8_t minion = 0, module = 0; minion < NUM_MINIONS; minion++){
         for (uint8_t tap = 0; tap < VoltageSensorsCfg[minion]; tap++) {
-            rawVoltages[module++] = Minions[minion].cells.c_codes[tap];
+            volt_med_filt_in[module++] = Minions[minion].cells.c_codes[tap];
         }
     }
 
@@ -106,16 +117,20 @@ void Voltage_UpdateMeasurements(void){
 #else
     // package raw voltage values into single array
     for(uint8_t i = 0; i < NUM_BATTERY_MODULES; i++){
-        rawVoltages[i] = Simulator_getVoltage(i);
+        volt_med_filt[i] = Simulator_getVoltage(i);
     }
 #endif
     // run median filter
-    VoltageFilter_put(&VoltageFilter, rawVoltages);
+    VoltageFilter1_put(&VoltageFilter1, volt_med_filt_in);
+    VoltageFilter1_get(&VoltageFilter1, volt_ema_filt_in);
+
+    // run ema filter
+    VoltageFilter2_put(&VoltageFilter2, volt_ema_filt_in);
 
     // update public voltage values
     RTOS_BPS_MutexPend(&Voltage_Mutex, OS_OPT_PEND_BLOCKING);
 
-    VoltageFilter_get(&VoltageFilter, Voltages);
+    VoltageFilter2_get(&VoltageFilter2, Voltages);
 
     // calculate min, max, and pack voltage
     uint32_t maxv = 0, minv = UINT32_MAX, totalv = 0;

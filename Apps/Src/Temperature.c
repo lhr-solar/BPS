@@ -17,9 +17,18 @@
 #define MEDIAN_FILTER_TYPE int32_t
 #define MEDIAN_FILTER_DEPTH 3
 #define MEDIAN_FILTER_CHANNELS MAX_TEMP_SENSORS
-#define MEDIAN_FILTER_NAME TemperatureFilter
+#define MEDIAN_FILTER_NAME TemperatureFilter1
 #include "MedianFilter.h"
-static TemperatureFilter_t TemperatureFilter;
+static TemperatureFilter1_t TemperatureFilter1;
+
+// ema filter
+#define EMA_FILTER_TYPE int32_t
+#define EMA_FILTER_ALPHA_NUMERATOR 1
+#define EMA_FILTER_ALPHA_DEMONINATOR 4
+#define EMA_FILTER_CHANNELS MAX_TEMP_SENSORS
+#define EMA_FILTER_NAME TemperatureFilter2
+#include "EMAFilter.h"
+static TemperatureFilter2_t TemperatureFilter2;
 
 // simulator bypasses ltc driver
 #ifndef SIMULATION
@@ -31,8 +40,9 @@ static cell_asic *Minions;
 // Holds the temperatures in Celsius (Fixed Point with .001 resolution) for each sensor on each board
 static int32_t Temperatures[NUM_TEMPERATURE_SENSORS];
 
-// Raw temperature values from the ADC -- this is a sparse array and will be packed down later.
-static int32_t rawTemperatures[MAX_TEMP_SENSORS];
+// Intermediate temperature values for filtering -- this is a sparse array and will be packed down later.
+static int32_t TemperaturesMedFiltIn[MAX_TEMP_SENSORS];
+static int32_t TemperaturesEMAFiltIn[MAX_TEMP_SENSORS];
 
 // Holds the maximum measured temperature in the most recent batch of temperature measurements
 static int32_t maxTemperature = 0;
@@ -75,7 +85,9 @@ void Temperature_Init(cell_asic *boards){
     
 #endif
     // set up the median filter with alternating temperatures of 1000 degrees and 0 degrees
-    TemperatureFilter_init(&TemperatureFilter, 0, 1000000);
+    TemperatureFilter1_init(&TemperatureFilter1, 0, 1000000);
+    // set up the ema filter with an initial safe value (35000)
+    TemperatureFilter2_init(&TemperatureFilter2, 25000);
 }
 
 /** Temperature_ChannelConfig
@@ -212,7 +224,7 @@ ErrorStatus Temperature_UpdateSingleChannel(uint8_t channel){
         uint8_t sensor_idx = (board * MAX_TEMP_SENSORS_PER_MINION_BOARD) + channel;
         if (channel < TemperatureSensorsCfg[board]) {   // don't touch unused sensors
 #ifndef SIMULATION
-            rawTemperatures[sensor_idx] = milliVoltToCelsius(Minions[board].aux.a_codes[0] / 10);
+            TemperaturesMedFiltIn[sensor_idx] = milliVoltToCelsius(Minions[board].aux.a_codes[0] / 10);
 #else
             // simulator expects the actual number of physical sensors (and not just mux channels on the PCB)
             // therefore, we have to do some index crunching -- this is very inefficient but it's just for 
@@ -224,7 +236,7 @@ ErrorStatus Temperature_UpdateSingleChannel(uint8_t channel){
             uint8_t simulator_idx = sensor_idx - empty_sensors_so_far;
             
             // populate nonvalid sensors with 0
-            rawTemperatures[sensor_idx] = (channel < TemperatureSensorsCfg[board]) ? Simulator_getTemperature(simulator_idx) : 0;
+            TemperaturesMedFiltIn[sensor_idx] = (channel < TemperatureSensorsCfg[board]) ? Simulator_getTemperature(simulator_idx) : 0;
 #endif
         }
     }
@@ -233,7 +245,10 @@ ErrorStatus Temperature_UpdateSingleChannel(uint8_t channel){
 #endif
     
     // run median filter
-    TemperatureFilter_put(&TemperatureFilter, rawTemperatures);
+    TemperatureFilter1_put(&TemperatureFilter1, TemperaturesMedFiltIn);
+    TemperatureFilter1_get(&TemperatureFilter1, TemperaturesEMAFiltIn);
+    // run ema filter -- values will be retrieved in Temperature_UpdateAllMeasurements()
+    TemperatureFilter2_put(&TemperatureFilter2, TemperaturesEMAFiltIn);
 
     return SUCCESS;
 }
@@ -256,7 +271,7 @@ ErrorStatus Temperature_UpdateAllMeasurements(){
 
     // update public temperatures with output of median filter
     int32_t filteredTemperatures[MAX_TEMP_SENSORS];
-    TemperatureFilter_get(&TemperatureFilter, filteredTemperatures);
+    TemperatureFilter2_get(&TemperatureFilter2, filteredTemperatures);
 
     // package raw voltage values into single array
     for (uint8_t minion = 0, sensor = 0; minion < NUM_MINIONS; minion++){
