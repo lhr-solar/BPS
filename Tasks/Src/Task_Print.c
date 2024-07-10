@@ -23,12 +23,14 @@ void Task_Print(void *p_arg) {
 
         // copy over block-by-block
         for (uint32_t i = 0; i < pending / PRINT_BUFFER_SIZE; i++) {
-            PQ_Read(print_buffer, PRINT_BUFFER_SIZE);
-            BSP_UART_Write(print_buffer, PRINT_BUFFER_SIZE, UART_USB);
+            if (PQ_Read(print_buffer, PRINT_BUFFER_SIZE)) { // really shouldn't fail
+                BSP_UART_Write(print_buffer, PRINT_BUFFER_SIZE, UART_USB);
+            }
         }
 
         // copy remainder
-        PQ_Read(print_buffer, pending % PRINT_BUFFER_SIZE);
-        BSP_UART_Write(print_buffer, pending % PRINT_BUFFER_SIZE, UART_USB);
+        if (PQ_Read(print_buffer, pending % PRINT_BUFFER_SIZE)) {   // really shouldn't fail
+            BSP_UART_Write(print_buffer, pending % PRINT_BUFFER_SIZE, UART_USB);
+        }
     }
 }
