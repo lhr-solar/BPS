@@ -288,6 +288,10 @@ ErrorStatus Temperature_UpdateAllMeasurements(){
     for (uint8_t minion = 0, sensor = 0; minion < NUM_MINIONS; minion++){
         for (uint8_t channel = 0; channel < TemperatureSensorsCfg[minion]; channel++) {
             uint8_t sensor_idx = (minion * MAX_TEMP_SENSORS_PER_MINION_BOARD) + channel;
+            // hack to deal with skip wiring assignment in harness. TODO: remove this
+            // wires are assigned 11, 10, 11 to correspond to original battery pack
+            // updated pack is 11, 9, 11 -- we have to add a skip after the 20th module (sensor >= 20)
+            if (sensor >= 20) sensor_idx += 1;
             Temperatures[sensor++] = filteredTemperatures[sensor_idx];
         }
     }
