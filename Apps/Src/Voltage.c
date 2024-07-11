@@ -117,7 +117,7 @@ void Voltage_UpdateMeasurements(void){
 #else
     // package raw voltage values into single array
     for(uint8_t i = 0; i < NUM_BATTERY_MODULES; i++){
-        volt_med_filt[i] = Simulator_getVoltage(i);
+        volt_med_filt_in[i] = Simulator_getVoltage(i);
     }
 #endif
     // run median filter

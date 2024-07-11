@@ -115,7 +115,7 @@ void EnterFaultState() {
         CANbus_SendMsg_FaultState(BPS_CONTACTOR_STATE, payload);
         
         //Send Current Readings
-        payload.data.w = Amps_GetReading();
+        payload.data.w = Amps_GetReading(false);
         CANbus_SendMsg_FaultState(CURRENT_DATA, payload);
         
         //Send Voltage Readings

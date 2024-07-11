@@ -58,7 +58,7 @@ void Task_AmperesMonitor(void *p_arg) {
         }
 
         if (((uint32_t)OSTimeGet(&err)) - soc_data_send_prev_tick > MS_TO_OS_TICKS(ODR_STATE_OF_CHARGE_DATA_PERIOD_MS)) {
-            msg_current.payload.data.w = Charge_GetPercent();
+            msg_state_of_charge.payload.data.w = Charge_GetPercent();
             CAN_TransmitQueue_Post(msg_state_of_charge);
             soc_data_send_prev_tick = (uint32_t)OSTimeGet(&err);
         }
