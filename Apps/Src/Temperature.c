@@ -30,6 +30,15 @@ static TemperatureFilter1_t TemperatureFilter1;
 #include "EMAFilter.h"
 static TemperatureFilter2_t TemperatureFilter2;
 
+// hacky remapping for temperature hat error in pin assignment. TODO: fix this in HW
+/**
+ * [1->1,  2->5,  3->9,   4->13 ],
+ * [5->2,  6->6,  7->10,  8->14 ],
+ * [9->3,  10->7, 11->11, 12->15],
+ * [13->4, 14->8, 15->12, 16->16]
+ */
+static const uint8_t temp_reindex[16] = {0, 4, 8, 12, 1, 5, 9, 13, 2, 6, 10, 14, 3, 7, 11, 15};
+
 // simulator bypasses ltc driver
 #ifndef SIMULATION
 // Interface to communicate with LTC6811 (Register values)
@@ -102,6 +111,8 @@ ErrorStatus Temperature_ChannelConfig(uint8_t tempChannel) {
 #ifdef SIMULATION
     currentChannel = tempChannel;
 #else
+    // define actual temp channel in HW based on error in PCB. TODO: fix this in HW
+    tempChannel = temp_reindex[tempChannel];
 
     uint8_t muxAddress;
     uint8_t otherMux;

@@ -41,10 +41,10 @@ void Task_AmperesMonitor(void *p_arg) {
         Amps_UpdateMeasurements();
         CheckCurrent();
         amps_data_count++;
-        amps_totals += Amps_GetReading();
+        amps_totals += Amps_GetReading(false);  // use filtered value here
 
         // update state of charge
-        Charge_Calculate(Amps_GetReading());
+        Charge_Calculate(Amps_GetReading(true));    // use raw value here
 
         // NONBLOCKING ==================
         // Send CAN messages
