@@ -39,6 +39,8 @@ void Task_CheckContactor(void *p_arg) {
     // Push All Clear message to CAN Queue
     CAN_TransmitQueue_Post(all_clear);
 
+    uint32_t controls_no_msg = 0;
+
     while (1) {
         // delay of 200ms
         // controls IO_STATE message every ~250ms, so we need to check for the 
@@ -56,12 +58,18 @@ void Task_CheckContactor(void *p_arg) {
         // if we get to this point and there's no message we try again ~200ms later
         ErrorStatus status = CAN_ReceiveQueue_Pend(&recv);
         if (status == SUCCESS && recv.id == IO_STATE) {
+            controls_no_msg = 0;
             uint8_t array_state = (recv.payload.data.bytes[3] >> 2) & 0x1;
             if (array_state) {
                 Contactor_On(ARRAY_CONTACTOR);
             } else {
                 Contactor_Off(ARRAY_CONTACTOR);
             }
+        } else if (status != SUCCESS && controls_no_msg >= 25) {
+            Contactor_On(ARRAY_CONTACTOR);
+        } 
+        else if (status != SUCCESS) {
+            controls_no_msg += 1;
         }
 
         //Send BPS contactor state via CAN

@@ -10,6 +10,7 @@
 #include "Print_Queue.h"
 #include "RTOS_BPS.h"
 #include "os.h"
+#include "Contactor.h"
 
 typedef struct voltage_summary_s {
     uint64_t pack_voltage_mv:       24;
@@ -97,6 +98,10 @@ void Task_VoltTempMonitor(void *p_arg) {
         // NONBLOCKING ==================
         // Update Fan Speeds based on average temperature
         Fans_SetAll(TOPSPEED);
+
+        // NONBLOCKING ==================
+        // Disable array contactor if unsafe
+        Contactor_SetArrayEnable(charge_enable);
 
         // NONBLOCKING ==================
         // Send more frequent CAN messages -- every loop iteration

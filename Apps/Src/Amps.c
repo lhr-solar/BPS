@@ -46,6 +46,7 @@ void Amps_Init(void) {
     spi_os.pend = Amperes_Pend;
     spi_os.post = Amperes_Post;
     LTC2315_Init(spi_os);
+    AmpsFilter_init(&AmpsFilter, 0);
 }
 
 /** Amps_UpdateMeasurements
@@ -122,7 +123,7 @@ void Amps_Calibrate(void) {
     RTOS_BPS_DelayTick(1); //TODO: Change this to DelayMs if resolution of ticks is <10ms
     Amps_UpdateMeasurements();
     #ifndef SIMULATION
-    while (Amps_GetReading(true) != 0) {
+    while (Amps_GetReading(true) < -10 || Amps_GetReading(true) > 10) {
         LTC2315_Calibrate();
         RTOS_BPS_DelayTick(1);
         Amps_UpdateMeasurements();

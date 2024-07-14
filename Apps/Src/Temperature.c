@@ -111,8 +111,6 @@ ErrorStatus Temperature_ChannelConfig(uint8_t tempChannel) {
 #ifdef SIMULATION
     currentChannel = tempChannel;
 #else
-    // define actual temp channel in HW based on error in PCB. TODO: fix this in HW
-    tempChannel = temp_reindex[tempChannel];
 
     uint8_t muxAddress;
     uint8_t otherMux;
@@ -227,6 +225,9 @@ ErrorStatus Temperature_UpdateSingleChannel(uint8_t channel){
 #ifndef SIMULATION
     RTOS_BPS_MutexPend(&MinionsASIC_Mutex, OS_OPT_PEND_BLOCKING);
 #endif
+
+    // define actual temp channel in HW based on error in PCB. TODO: fix this in HW
+    channel = temp_reindex[channel];
 
     // Convert to Celsius
     for (uint8_t board = 0; board < NUM_MINIONS; board++) {
