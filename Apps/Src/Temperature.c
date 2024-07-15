@@ -200,7 +200,7 @@ int32_t milliVoltToCelsius(uint32_t milliVolt){
         return voltToTemp[milliVolt];
     }
     else if (milliVolt < 5200 && milliVolt > 4800) { //temperature sensor is disconnected for scrutineering
-        return 0; //safe value
+        return TEMP_DISCONNECTED;
     }
     else {
         return TEMP_ERR_OUT_BOUNDS;
@@ -212,11 +212,11 @@ int32_t milliVoltToCelsius(uint32_t milliVolt){
  * @param channel < MAX_TEMP_SENSORS_PER_MINION_BOARD, 0-indexed
  * @return SUCCESS or ERROR
  */
-ErrorStatus Temperature_UpdateSingleChannel(uint8_t channel){
+int32_t Temperature_UpdateSingleChannel(uint8_t channel){
     
     // Configure correct channel
     if (ERROR == Temperature_ChannelConfig(channel)) {
-        return ERROR;
+        return -1;
     }
     
     // Sample ADC channel
@@ -229,6 +229,8 @@ ErrorStatus Temperature_UpdateSingleChannel(uint8_t channel){
     // define actual temp channel in HW based on error in PCB. TODO: fix this in HW
     channel = temp_reindex[channel];
 
+    uint8_t temp_connected_count = 0;
+
     // Convert to Celsius
     for (uint8_t board = 0; board < NUM_MINIONS; board++) {
         // update adc value from GPIO1 stored in a_codes[0]; 
@@ -237,6 +239,15 @@ ErrorStatus Temperature_UpdateSingleChannel(uint8_t channel){
         if (channel < TemperatureSensorsCfg[board]) {   // don't touch unused sensors
 #ifndef SIMULATION
             TemperaturesMedFiltIn[sensor_idx] = milliVoltToCelsius(Minions[board].aux.a_codes[0] / 10);
+            // if we detect a disconnected temp tap, we set to a safe temperature assuming we are 
+            // currently scrutineering (all but one connected). then, at the last temperature sensor, 
+            // if only one temp tap is detected as connected, we can verify that we are indeed 
+            // scrutineering. else, we set the last sensor to a large number to trigger otemp fault.
+            if (TemperaturesMedFiltIn[sensor_idx] == TEMP_DISCONNECTED) {
+                TemperaturesMedFiltIn[sensor_idx] = 0;  // go ahead and set to a safe temperature.
+            } else {
+                temp_connected_count++;
+            }
 #else
             // simulator expects the actual number of physical sensors (and not just mux channels on the PCB)
             // therefore, we have to do some index crunching -- this is very inefficient but it's just for 
@@ -262,7 +273,7 @@ ErrorStatus Temperature_UpdateSingleChannel(uint8_t channel){
     // run ema filter -- values will be retrieved in Temperature_UpdateAllMeasurements()
     TemperatureFilter2_put(&TemperatureFilter2, TemperaturesEMAFiltIn);
 
-    return SUCCESS;
+    return temp_connected_count;
 }
 
 /** Temperature_UpdateAllMeasurements
@@ -271,6 +282,7 @@ ErrorStatus Temperature_UpdateSingleChannel(uint8_t channel){
  */
 ErrorStatus Temperature_UpdateAllMeasurements(){
     // update all measurements
+    int32_t total_connected_sensors = 0;
     for (uint8_t sensorCh = 0; sensorCh < MAX_TEMP_SENSORS_PER_MINION_BOARD; sensorCh++) {
         // A hack to solve a timing issue related to enabling one of the muxes
         if (sensorCh % 8 == 0) {
@@ -278,7 +290,7 @@ ErrorStatus Temperature_UpdateAllMeasurements(){
             Temperature_ChannelConfig(sensorCh);
         }
         // Update the measurement for this channel
-        Temperature_UpdateSingleChannel(sensorCh);
+        total_connected_sensors += Temperature_UpdateSingleChannel(sensorCh);
     }
 
     // update public temperatures with output of median filter
@@ -295,6 +307,11 @@ ErrorStatus Temperature_UpdateAllMeasurements(){
             if (sensor >= 20) sensor_idx += 1;
             Temperatures[sensor++] = filteredTemperatures[sensor_idx];
         }
+    }
+
+    if (total_connected_sensors > 1 && total_connected_sensors < NUM_TEMPERATURE_SENSORS) {
+        // sensor disconnected somewhere (and we are not scrutineering)
+        Temperatures[NUM_TEMPERATURE_SENSORS - 1] = TEMP_DISCONNECTED;
     }
 
     // update min/max/avg temperature
@@ -325,7 +342,7 @@ SafetyStatus Temperature_CheckStatus(uint8_t isCharging, SafetyStatusOpt *opt){
 
     bool charge_enable = true;
     for (uint8_t i = 0; i < NUM_TEMPERATURE_SENSORS; i++) {
-        if ((Temperatures[i] > temperatureLimit) || (Temperatures[i] == TEMP_ERR_OUT_BOUNDS)) {
+        if ((Temperatures[i] > temperatureLimit) || (Temperatures[i] == TEMP_ERR_OUT_BOUNDS) || (Temperatures[i] == TEMP_DISCONNECTED)) {
             *opt = OPT_NONE;
             return DANGER;
         } else if (Temperatures[i] > CHARGE_DISABLE_TEMPERATURE) {
