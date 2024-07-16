@@ -33,7 +33,7 @@ void Task_AmperesMonitor(void *p_arg) {
     uint32_t curr_data_send_prev_tick = 0, soc_data_send_prev_tick = 0;
 
     Amps_Init();
-    Amps_Calibrate();
+    // Amps_Calibrate();
 
     while (1) {
         // BLOCKING =====================

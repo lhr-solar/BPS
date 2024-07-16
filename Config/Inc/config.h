@@ -145,7 +145,7 @@ _Static_assert((sizeof(TemperatureSensorsCfg)/sizeof(*TemperatureSensorsCfg)) ==
 #endif
 
 #ifndef MAX_CURRENT_LIMIT
-#define MAX_CURRENT_LIMIT               59000   // Max current limit (Milliamperes)        (Max continuous discharge is 7A per cell)
+#define MAX_CURRENT_LIMIT               58000   // Max current limit (Milliamperes)        (Max continuous discharge is 7A per cell)
 #endif
 
 #ifndef MAX_COLD_CURRENT_LIMIT
@@ -153,7 +153,7 @@ _Static_assert((sizeof(TemperatureSensorsCfg)/sizeof(*TemperatureSensorsCfg)) ==
 #endif
 
 #ifndef MAX_CHARGING_CURRENT
-#define MAX_CHARGING_CURRENT            -25000  // Max current per cell is 3.3 Amps (Standard charge)
+#define MAX_CHARGING_CURRENT            -24000  // Max current per cell is 3.3 Amps (Standard charge)
 #endif
 
 #ifndef MAX_COLD_CHARGING_CURRENT
@@ -193,7 +193,7 @@ _Static_assert((sizeof(TemperatureSensorsCfg)/sizeof(*TemperatureSensorsCfg)) ==
 #define MAX_PEC_ERRORS 5
 
 // used to determine if we are charging
-#define AMPS_NOISE_LIMIT 250 // milliamps
+#define AMPS_NOISE_LIMIT 500 // milliamps
 
 // set CAN loopback mode. default is false.
 // DO NOT CHANGE VALUE HERE -- pass in when calling 'make'

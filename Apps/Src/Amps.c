@@ -18,7 +18,7 @@
 // ema filter
 #define EMA_FILTER_TYPE int32_t
 #define EMA_FILTER_ALPHA_NUMERATOR 1
-#define EMA_FILTER_ALPHA_DEMONINATOR 4
+#define EMA_FILTER_ALPHA_DEMONINATOR 8
 #define EMA_FILTER_CHANNELS 1
 #define EMA_FILTER_NAME AmpsFilter
 #include "EMAFilter.h"
@@ -76,12 +76,13 @@ void Amps_UpdateMeasurements(void) {
  * @return SAFE or DANGER
  */
 SafetyStatus Amps_CheckStatus(int32_t minTemperature, int32_t maxTemperature) {
-    int32_t lo_limit = (maxTemperature > MAX_CHARGE_TEMPERATURE_LIMIT)  ? -AMPS_NOISE_LIMIT : 
-                      ((minTemperature < COLD_CHARGE_TEMPERATURE)       ? MAX_COLD_CHARGING_CURRENT : 
-                                                                          MAX_CHARGING_CURRENT);
-    int32_t hi_limit = (minTemperature < COLD_DISCHARGE_TEMPERATURE)    ? MAX_COLD_CURRENT_LIMIT : 
-                                                                          MAX_CURRENT_LIMIT;
-
+    // int32_t lo_limit = (maxTemperature > MAX_CHARGE_TEMPERATURE_LIMIT)  ? -AMPS_NOISE_LIMIT : 
+    //                   ((minTemperature < COLD_CHARGE_TEMPERATURE)       ? MAX_COLD_CHARGING_CURRENT : 
+    //                                                                       MAX_CHARGING_CURRENT);
+    // int32_t hi_limit = (minTemperature < COLD_DISCHARGE_TEMPERATURE)    ? MAX_COLD_CURRENT_LIMIT : 
+    //                                                                       MAX_CURRENT_LIMIT;
+    int32_t lo_limit = MAX_CHARGING_CURRENT;
+    int32_t hi_limit = MAX_CURRENT_LIMIT;
     int32_t current = latest_milliamps_filtered;
     return (current > lo_limit && current < hi_limit) ? SAFE : DANGER;
 }
