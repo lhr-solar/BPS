@@ -309,7 +309,8 @@ ErrorStatus Temperature_UpdateAllMeasurements(){
         }
     }
 
-    if (total_connected_sensors > 1 && total_connected_sensors < NUM_TEMPERATURE_SENSORS) {
+    if (total_connected_sensors > 1 && total_connected_sensors < NUM_TEMPERATURE_SENSORS - 1) {
+    // if (total_connected_sensors == 0) {
         // sensor disconnected somewhere (and we are not scrutineering)
         Temperatures[NUM_TEMPERATURE_SENSORS - 1] = TEMP_DISCONNECTED;
     }
