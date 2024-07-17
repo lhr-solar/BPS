@@ -54,4 +54,6 @@ void Contactor_Off(uint8_t contactorChoice);
  */
 bool Contactor_GetState(uint8_t contactorChoice);
 
+void Contactor_SetArrayEnable(bool en);
+
 #endif

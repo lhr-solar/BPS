@@ -17,9 +17,27 @@
 #define MEDIAN_FILTER_TYPE int32_t
 #define MEDIAN_FILTER_DEPTH 3
 #define MEDIAN_FILTER_CHANNELS MAX_TEMP_SENSORS
-#define MEDIAN_FILTER_NAME TemperatureFilter
+#define MEDIAN_FILTER_NAME TemperatureFilter1
 #include "MedianFilter.h"
-static TemperatureFilter_t TemperatureFilter;
+static TemperatureFilter1_t TemperatureFilter1;
+
+// ema filter
+#define EMA_FILTER_TYPE int32_t
+#define EMA_FILTER_ALPHA_NUMERATOR 1
+#define EMA_FILTER_ALPHA_DEMONINATOR 4
+#define EMA_FILTER_CHANNELS MAX_TEMP_SENSORS
+#define EMA_FILTER_NAME TemperatureFilter2
+#include "EMAFilter.h"
+static TemperatureFilter2_t TemperatureFilter2;
+
+// hacky remapping for temperature hat error in pin assignment. TODO: fix this in HW
+/**
+ * [1->1,  2->5,  3->9,   4->13 ],
+ * [5->2,  6->6,  7->10,  8->14 ],
+ * [9->3,  10->7, 11->11, 12->15],
+ * [13->4, 14->8, 15->12, 16->16]
+ */
+static const uint8_t temp_reindex[16] = {0, 4, 8, 12, 1, 5, 9, 13, 2, 6, 10, 14, 3, 7, 11, 15};
 
 // simulator bypasses ltc driver
 #ifndef SIMULATION
@@ -31,8 +49,9 @@ static cell_asic *Minions;
 // Holds the temperatures in Celsius (Fixed Point with .001 resolution) for each sensor on each board
 static int32_t Temperatures[NUM_TEMPERATURE_SENSORS];
 
-// Raw temperature values from the ADC -- this is a sparse array and will be packed down later.
-static int32_t rawTemperatures[MAX_TEMP_SENSORS];
+// Intermediate temperature values for filtering -- this is a sparse array and will be packed down later.
+static int32_t TemperaturesMedFiltIn[MAX_TEMP_SENSORS];
+static int32_t TemperaturesEMAFiltIn[MAX_TEMP_SENSORS];
 
 // Holds the maximum measured temperature in the most recent batch of temperature measurements
 static int32_t maxTemperature = 0;
@@ -75,7 +94,9 @@ void Temperature_Init(cell_asic *boards){
     
 #endif
     // set up the median filter with alternating temperatures of 1000 degrees and 0 degrees
-    TemperatureFilter_init(&TemperatureFilter, 0, 1000000);
+    TemperatureFilter1_init(&TemperatureFilter1, 0, 1000000);
+    // set up the ema filter with an initial safe value (35000)
+    TemperatureFilter2_init(&TemperatureFilter2, 25000);
 }
 
 /** Temperature_ChannelConfig
@@ -179,7 +200,7 @@ int32_t milliVoltToCelsius(uint32_t milliVolt){
         return voltToTemp[milliVolt];
     }
     else if (milliVolt < 5200 && milliVolt > 4800) { //temperature sensor is disconnected for scrutineering
-        return 0; //safe value
+        return TEMP_DISCONNECTED;
     }
     else {
         return TEMP_ERR_OUT_BOUNDS;
@@ -191,11 +212,11 @@ int32_t milliVoltToCelsius(uint32_t milliVolt){
  * @param channel < MAX_TEMP_SENSORS_PER_MINION_BOARD, 0-indexed
  * @return SUCCESS or ERROR
  */
-ErrorStatus Temperature_UpdateSingleChannel(uint8_t channel){
+int32_t Temperature_UpdateSingleChannel(uint8_t channel){
     
     // Configure correct channel
     if (ERROR == Temperature_ChannelConfig(channel)) {
-        return ERROR;
+        return -1;
     }
     
     // Sample ADC channel
@@ -205,6 +226,11 @@ ErrorStatus Temperature_UpdateSingleChannel(uint8_t channel){
     RTOS_BPS_MutexPend(&MinionsASIC_Mutex, OS_OPT_PEND_BLOCKING);
 #endif
 
+    // define actual temp channel in HW based on error in PCB. TODO: fix this in HW
+    channel = temp_reindex[channel];
+
+    uint8_t temp_connected_count = 0;
+
     // Convert to Celsius
     for (uint8_t board = 0; board < NUM_MINIONS; board++) {
         // update adc value from GPIO1 stored in a_codes[0]; 
@@ -212,7 +238,16 @@ ErrorStatus Temperature_UpdateSingleChannel(uint8_t channel){
         uint8_t sensor_idx = (board * MAX_TEMP_SENSORS_PER_MINION_BOARD) + channel;
         if (channel < TemperatureSensorsCfg[board]) {   // don't touch unused sensors
 #ifndef SIMULATION
-            rawTemperatures[sensor_idx] = milliVoltToCelsius(Minions[board].aux.a_codes[0] / 10);
+            TemperaturesMedFiltIn[sensor_idx] = milliVoltToCelsius(Minions[board].aux.a_codes[0] / 10);
+            // if we detect a disconnected temp tap, we set to a safe temperature assuming we are 
+            // currently scrutineering (all but one connected). then, at the last temperature sensor, 
+            // if only one temp tap is detected as connected, we can verify that we are indeed 
+            // scrutineering. else, we set the last sensor to a large number to trigger otemp fault.
+            if (TemperaturesMedFiltIn[sensor_idx] == TEMP_DISCONNECTED) {
+                TemperaturesMedFiltIn[sensor_idx] = 0;  // go ahead and set to a safe temperature.
+            } else {
+                temp_connected_count++;
+            }
 #else
             // simulator expects the actual number of physical sensors (and not just mux channels on the PCB)
             // therefore, we have to do some index crunching -- this is very inefficient but it's just for 
@@ -224,7 +259,7 @@ ErrorStatus Temperature_UpdateSingleChannel(uint8_t channel){
             uint8_t simulator_idx = sensor_idx - empty_sensors_so_far;
             
             // populate nonvalid sensors with 0
-            rawTemperatures[sensor_idx] = (channel < TemperatureSensorsCfg[board]) ? Simulator_getTemperature(simulator_idx) : 0;
+            TemperaturesMedFiltIn[sensor_idx] = (channel < TemperatureSensorsCfg[board]) ? Simulator_getTemperature(simulator_idx) : 0;
 #endif
         }
     }
@@ -233,9 +268,12 @@ ErrorStatus Temperature_UpdateSingleChannel(uint8_t channel){
 #endif
     
     // run median filter
-    TemperatureFilter_put(&TemperatureFilter, rawTemperatures);
+    TemperatureFilter1_put(&TemperatureFilter1, TemperaturesMedFiltIn);
+    TemperatureFilter1_get(&TemperatureFilter1, TemperaturesEMAFiltIn);
+    // run ema filter -- values will be retrieved in Temperature_UpdateAllMeasurements()
+    TemperatureFilter2_put(&TemperatureFilter2, TemperaturesEMAFiltIn);
 
-    return SUCCESS;
+    return temp_connected_count;
 }
 
 /** Temperature_UpdateAllMeasurements
@@ -244,6 +282,7 @@ ErrorStatus Temperature_UpdateSingleChannel(uint8_t channel){
  */
 ErrorStatus Temperature_UpdateAllMeasurements(){
     // update all measurements
+    int32_t total_connected_sensors = 0;
     for (uint8_t sensorCh = 0; sensorCh < MAX_TEMP_SENSORS_PER_MINION_BOARD; sensorCh++) {
         // A hack to solve a timing issue related to enabling one of the muxes
         if (sensorCh % 8 == 0) {
@@ -251,19 +290,29 @@ ErrorStatus Temperature_UpdateAllMeasurements(){
             Temperature_ChannelConfig(sensorCh);
         }
         // Update the measurement for this channel
-        Temperature_UpdateSingleChannel(sensorCh);
+        total_connected_sensors += Temperature_UpdateSingleChannel(sensorCh);
     }
 
     // update public temperatures with output of median filter
     int32_t filteredTemperatures[MAX_TEMP_SENSORS];
-    TemperatureFilter_get(&TemperatureFilter, filteredTemperatures);
+    TemperatureFilter2_get(&TemperatureFilter2, filteredTemperatures);
 
     // package raw voltage values into single array
     for (uint8_t minion = 0, sensor = 0; minion < NUM_MINIONS; minion++){
         for (uint8_t channel = 0; channel < TemperatureSensorsCfg[minion]; channel++) {
             uint8_t sensor_idx = (minion * MAX_TEMP_SENSORS_PER_MINION_BOARD) + channel;
+            // hack to deal with skip wiring assignment in harness. TODO: remove this
+            // wires are assigned 11, 10, 11 to correspond to original battery pack
+            // updated pack is 11, 9, 11 -- we have to add a skip after the 20th module (sensor >= 20)
+            if (sensor >= 20) sensor_idx += 1;
             Temperatures[sensor++] = filteredTemperatures[sensor_idx];
         }
+    }
+
+    if (total_connected_sensors > 1 && total_connected_sensors < NUM_TEMPERATURE_SENSORS - 1) {
+    // if (total_connected_sensors == 0) {
+        // sensor disconnected somewhere (and we are not scrutineering)
+        Temperatures[NUM_TEMPERATURE_SENSORS - 1] = TEMP_DISCONNECTED;
     }
 
     // update min/max/avg temperature
@@ -294,7 +343,7 @@ SafetyStatus Temperature_CheckStatus(uint8_t isCharging, SafetyStatusOpt *opt){
 
     bool charge_enable = true;
     for (uint8_t i = 0; i < NUM_TEMPERATURE_SENSORS; i++) {
-        if ((Temperatures[i] > temperatureLimit) || (Temperatures[i] == TEMP_ERR_OUT_BOUNDS)) {
+        if ((Temperatures[i] > temperatureLimit) || (Temperatures[i] == TEMP_ERR_OUT_BOUNDS) || (Temperatures[i] == TEMP_DISCONNECTED)) {
             *opt = OPT_NONE;
             return DANGER;
         } else if (Temperatures[i] > CHARGE_DISABLE_TEMPERATURE) {

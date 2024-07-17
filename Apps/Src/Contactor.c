@@ -2,6 +2,8 @@
 
 #include "Contactor.h"
 
+static bool array_contactor_enable = true;
+
 /**
  * @brief Initializes all Contactor pins used by the BPS
  * @param none
@@ -22,6 +24,9 @@ void Contactor_Init(void) {
  * @return  None
  */
 void Contactor_On(uint8_t contactorChoice) {
+    if (contactorChoice == ARRAY_CONTACTOR && !array_contactor_enable) {
+        return; // don't allow array to be turned on.
+    }
     // set output pins to start outputing with a duty cycle set by PWM_ON_TIME in the header file
     BSP_PWM_Set(contactorChoice, PWM_ON_TIME);
 }
@@ -44,4 +49,11 @@ void Contactor_Off(uint8_t contactorChoice) {
  */
 bool Contactor_GetState(uint8_t contactorChoice) {
     return BSP_Contactor_Get(contactorChoice);
+}
+
+void Contactor_SetArrayEnable(bool en) {
+    array_contactor_enable = en;
+    if (!en) {
+        Contactor_Off(ARRAY_CONTACTOR);
+    }
 }

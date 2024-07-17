@@ -118,7 +118,7 @@ void Task2(void *p_arg){
         RTOS_BPS_DelayTick(10);
 
         if (count == 0) {
-            printf("Amps: %ld\n\r", Amps_GetReading());
+            printf("Amps: %ld\n\r", Amps_GetReading(true));
         }
         count = (count + 1) % 10;
 

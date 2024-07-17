@@ -63,6 +63,7 @@ void Task_Init(void *p_arg) {
             TASK_BATTERY_BALANCE_STACK_SIZE,        // Stack size
             );
     */
+    /*
     RTOS_BPS_TaskCreate(&LogInfo_TCB,               // TCB
             "TASK_LOG_INFO",                        // Task Name (String)
             Task_LogInfo,                           // Task function pointer
@@ -70,6 +71,7 @@ void Task_Init(void *p_arg) {
             TASK_LOG_INFO_PRIO,                     // Priority
             LogInfo_Stk,                            // Stack
             TASK_LOG_INFO_STACK_SIZE);
+    */
     RTOS_BPS_TaskCreate(&CANBusConsumer_TCB,        // TCB
             "TASK_CANBUS_CONSUMER",                 // Task Name (String)
             Task_CANBusConsumer,                    // Task function pointer

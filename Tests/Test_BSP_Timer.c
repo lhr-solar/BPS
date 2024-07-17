@@ -19,8 +19,6 @@ int main(void){
     BSP_Timer_Init();
     BSP_UART_Init(NULL, NULL, UART_USB);
     BSP_Timer_Start_TickCounter();
-    uint32_t freq = BSP_Timer_GetRunFreq();
-    printf("Timer frequency: %ld\n\r", freq);
     
     while(1){
         test = BSP_Timer_GetTicksElapsed();

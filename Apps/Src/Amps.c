@@ -15,6 +15,15 @@
 #include "Simulator.h"
 #endif
 
+// ema filter
+#define EMA_FILTER_TYPE int32_t
+#define EMA_FILTER_ALPHA_NUMERATOR 1
+#define EMA_FILTER_ALPHA_DEMONINATOR 8
+#define EMA_FILTER_CHANNELS 1
+#define EMA_FILTER_NAME AmpsFilter
+#include "EMAFilter.h"
+static AmpsFilter_t AmpsFilter;
+
 static OS_SEM AmperesIO_Sem;
 static bsp_os_t spi_os;
 
@@ -26,7 +35,8 @@ void Amperes_Post(){
     RTOS_BPS_SemPost(&AmperesIO_Sem, OS_OPT_POST_1);
 }
 
-static int32_t latestMeasureMilliAmps;
+static int32_t latest_milliamps_raw;
+static int32_t latest_milliamps_filtered;
 
 /** Amps_Init
  * Initializes hardware to begin current monitoring.
@@ -36,6 +46,7 @@ void Amps_Init(void) {
     spi_os.pend = Amperes_Pend;
     spi_os.post = Amperes_Post;
     LTC2315_Init(spi_os);
+    AmpsFilter_init(&AmpsFilter, 0);
 }
 
 /** Amps_UpdateMeasurements
@@ -44,14 +55,18 @@ void Amps_Init(void) {
 void Amps_UpdateMeasurements(void) {
     #ifdef SIMULATION
         int32_t current = Simulator_getCurrent();
-        latestMeasureMilliAmps = Simulator_getCurrent();
+        latest_milliamps_raw = Simulator_getCurrent();
         char* msg;
         asprintf(&msg, "Milliamp measurement is %d\n", current);
         Simulator_Log(LOG_INFO, msg);
         free(msg);
     #else 
-        latestMeasureMilliAmps = LTC2315_GetCurrent();
+        latest_milliamps_raw = LTC2315_GetCurrent();
     #endif
+
+    // update filtered mA reading with EMA filter
+    AmpsFilter_put(&AmpsFilter, &latest_milliamps_raw);
+    AmpsFilter_get(&AmpsFilter, &latest_milliamps_filtered);
 }
 
 /** Amps_CheckStatus
@@ -61,13 +76,14 @@ void Amps_UpdateMeasurements(void) {
  * @return SAFE or DANGER
  */
 SafetyStatus Amps_CheckStatus(int32_t minTemperature, int32_t maxTemperature) {
-    int32_t lo_limit = (maxTemperature > MAX_CHARGE_TEMPERATURE_LIMIT)  ? -AMPS_NOISE_LIMIT : 
-                      ((minTemperature < COLD_CHARGE_TEMPERATURE)       ? MAX_COLD_CHARGING_CURRENT : 
-                                                                          MAX_CHARGING_CURRENT);
-    int32_t hi_limit = (minTemperature < COLD_DISCHARGE_TEMPERATURE)    ? MAX_COLD_CURRENT_LIMIT : 
-                                                                          MAX_CURRENT_LIMIT;
-
-    int32_t current = latestMeasureMilliAmps;
+    // int32_t lo_limit = (maxTemperature > MAX_CHARGE_TEMPERATURE_LIMIT)  ? -AMPS_NOISE_LIMIT : 
+    //                   ((minTemperature < COLD_CHARGE_TEMPERATURE)       ? MAX_COLD_CHARGING_CURRENT : 
+    //                                                                       MAX_CHARGING_CURRENT);
+    // int32_t hi_limit = (minTemperature < COLD_DISCHARGE_TEMPERATURE)    ? MAX_COLD_CURRENT_LIMIT : 
+    //                                                                       MAX_CURRENT_LIMIT;
+    int32_t lo_limit = MAX_CHARGING_CURRENT;
+    int32_t hi_limit = MAX_CURRENT_LIMIT;
+    int32_t current = latest_milliamps_filtered;
     return (current > lo_limit && current < hi_limit) ? SAFE : DANGER;
 }
 
@@ -77,15 +93,17 @@ SafetyStatus Amps_CheckStatus(int32_t minTemperature, int32_t maxTemperature) {
  * @return true if charge, false if discharge
  */
 bool Amps_IsCharging(void) {
-    return latestMeasureMilliAmps + AMPS_NOISE_LIMIT < 0;
+    return latest_milliamps_filtered + AMPS_NOISE_LIMIT < 0;
 }
 
 /** Amps_GetReading
  * Measures the electrical current from the Ampere minion board
+ * @param raw if true, return raw value. If false, return filtered value
+ *            use raw value for coulomb counting and filtered for any direct current comparisons
  * @return milliamperes value
  */
-int32_t Amps_GetReading(void) {
-    return latestMeasureMilliAmps;
+int32_t Amps_GetReading(bool raw) {
+    return raw ? latest_milliamps_raw : latest_milliamps_filtered;
 }
 
 /**
@@ -106,7 +124,7 @@ void Amps_Calibrate(void) {
     RTOS_BPS_DelayTick(1); //TODO: Change this to DelayMs if resolution of ticks is <10ms
     Amps_UpdateMeasurements();
     #ifndef SIMULATION
-    while (Amps_GetReading() != 0) {
+    while (Amps_GetReading(true) < -10 || Amps_GetReading(true) > 10) {
         LTC2315_Calibrate();
         RTOS_BPS_DelayTick(1);
         Amps_UpdateMeasurements();
