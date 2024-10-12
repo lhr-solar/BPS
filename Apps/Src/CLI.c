@@ -1,9 +1,9 @@
 /* Copyright (c) 2018-2022 UT Longhorn Racing Solar */
 
-// /* CLI.c
-//  * Command Line Interface wrapper to 
-//  * define and route commands
-//  */
+/* CLI.c
+ * Command Line Interface wrapper to 
+ * define and route commands
+ */
 
 // #include "CLI.h"
 // #include "Voltage.h"
@@ -804,4 +804,3 @@
 // 		}
 //     }
 // }
-
