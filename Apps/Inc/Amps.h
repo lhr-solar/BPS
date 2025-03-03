@@ -36,9 +36,11 @@ bool Amps_IsCharging(void);
 
 /** Amps_GetReading
  * Measures the electrical current from the Ampere minion board
+ * @param raw if true, return raw value. If false, return filtered value
+ *            use raw value for coulomb counting and filtered for any direct current comparisons
  * @return milliamperes value
  */
-int32_t Amps_GetReading(void);
+int32_t Amps_GetReading(bool raw);
 
 /**
  * @brief calibrate the amperes module. Must be called when the contactors are open

@@ -23,6 +23,7 @@
 #define AUX_I2C_NO_TRANSMIT 0x7
 
 #define TEMP_ERR_OUT_BOUNDS 42424242
+#define TEMP_DISCONNECTED   69696969
 
 //TODO: tune PID with actual pack and fans, and then change values below to appropiate value
 #define TEMPERATURE_PID_PROPORTIONAL 4
@@ -64,7 +65,7 @@ int32_t milliVoltToCelsius(uint32_t milliVolt);
  * @param channel < MAX_TEMP_SENSORS_PER_MINION_BOARD, 0-indexed
  * @return SUCCESS or ERROR
  */
-ErrorStatus Temperature_UpdateSingleChannel(uint8_t channel);
+int32_t Temperature_UpdateSingleChannel(uint8_t channel);
 
 /** Temperature_UpdateAllMeasurements
  * Stores and updates the new measurements received on all temperature sensors

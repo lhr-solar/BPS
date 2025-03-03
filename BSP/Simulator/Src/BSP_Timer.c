@@ -87,14 +87,11 @@ uint32_t BSP_Timer_GetRunFreq(void) {
  * @param   None
  * @return  Microseconds 
  */
-uint32_t BSP_Timer_GetMicrosElapsed(void) {
+uint32_t BSP_Timer_TicksToMicros(uint32_t ticks) {
     if(!initialized) {
         Simulator_Log_Location(LOG_ERROR, "Used Timer (GetMicrosElapsed) without initialization!\n");
         exit(-1);
     }
-    uint32_t MicrosElasped = ((uint64_t) BSP_Timer_GetTicksElapsed() * MICROS_IN_SEC) / CLOCKS_PER_SEC;
-    char MicrosMessage[100] = {0};
-    sprintf(MicrosMessage, "Microseconds elasped: %d us\n", MicrosElasped);
-    Simulator_Log(LOG_INFO, MicrosMessage);
-    return (uint32_t) MicrosElasped;
+    uint32_t MicrosElapsed = ((uint64_t)ticks * MICROS_IN_SEC) / CLOCKS_PER_SEC;
+    return (uint32_t) MicrosElapsed;
 }

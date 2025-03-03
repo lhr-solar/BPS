@@ -35,7 +35,11 @@ typedef enum SafetyStatusOpt_e {
 //--------------------------------------------------------------------------------
 // Battery Pack layout
 #ifndef NUM_BATTERY_MODULES
-#define NUM_BATTERY_MODULES             32      // Number of battery modules
+#define NUM_BATTERY_MODULES             31      // Number of battery modules
+#endif
+
+#ifndef MODULE_CELLS_IN_PARALLEL
+#define MODULE_CELLS_IN_PARALLEL        9
 #endif
 
 #ifndef NUM_TEMP_SENSORS_PER_MOD
@@ -43,7 +47,7 @@ typedef enum SafetyStatusOpt_e {
 #endif
 
 #ifndef NUM_TEMPERATURE_SENSORS
-#define NUM_TEMPERATURE_SENSORS         32      // Number of temperature sensors
+#define NUM_TEMPERATURE_SENSORS         31      // Number of temperature sensors
 #endif
 
 //--------------------------------------------------------------------------------
@@ -54,7 +58,7 @@ typedef enum SafetyStatusOpt_e {
 #endif
 
 #ifndef PER_MINION_BOARD_VOLT_SENSORS
-#define PER_MINION_BOARD_VOLT_SENSORS   {11, 10, 11}    // Number of voltage sensors per minion board. Should be an array with same length as NUM_MINIONS
+#define PER_MINION_BOARD_VOLT_SENSORS   {11, 9, 11}    // Number of voltage sensors per minion board. Should be an array with same length as NUM_MINIONS
 #endif
 
 #define MAX_VOLT_WIRES                    (MAX_VOLT_SENSORS_PER_MINION_BOARD * NUM_MINIONS)
@@ -67,7 +71,7 @@ typedef enum SafetyStatusOpt_e {
 #endif
 
 #ifndef PER_MINION_BOARD_TEMP_SENSORS
-#define PER_MINION_BOARD_TEMP_SENSORS   {16, 0, 16}     // Number of voltage sensors per minion board. Should be an array with same length as NUM_MINIONS
+#define PER_MINION_BOARD_TEMP_SENSORS   {16, 0, 15}     // Number of voltage sensors per minion board. Should be an array with same length as NUM_MINIONS
 #endif
 
 #define MAX_TEMP_SENSORS                (MAX_TEMP_SENSORS_PER_MINION_BOARD * NUM_MINIONS)
@@ -103,11 +107,11 @@ _Static_assert((sizeof(TemperatureSensorsCfg)/sizeof(*TemperatureSensorsCfg)) ==
 #endif
 
 #ifndef MAX_VOLTAGE_LIMIT
-#define MAX_VOLTAGE_LIMIT               4100    // Over voltage limit (milliVolts)      (actual max: 4.2V)
+#define MAX_VOLTAGE_LIMIT               4200    // Over voltage limit (milliVolts)      (actual max: 4.2V)
 #endif
 
 #ifndef CHARGE_DISABLE_VOLTAGE
-#define CHARGE_DISABLE_VOLTAGE          4000    // Voltage to stop charging at
+#define CHARGE_DISABLE_VOLTAGE          4100    // Voltage to stop charging at
 #endif
 
 // make sure we don't enable charging if we're too close to the voltage limit
@@ -124,11 +128,11 @@ _Static_assert((sizeof(TemperatureSensorsCfg)/sizeof(*TemperatureSensorsCfg)) ==
 #endif
 
 #ifndef CHARGE_DISABLE_TEMPERATURE
-#define CHARGE_DISABLE_TEMPERATURE      43000   // Temperature to stop charging at
+#define CHARGE_DISABLE_TEMPERATURE      44500   // Temperature to stop charging at
 #endif
 
 // make sure we don't enable charging if we're too close to the temperature limit
-#if MAX_CHARGE_TEMPERATURE_LIMIT - 1000 < CHARGE_DISABLE_TEMPERATURE
+#if MAX_CHARGE_TEMPERATURE_LIMIT - 100 < CHARGE_DISABLE_TEMPERATURE
 #error "Charging maximum temperature is too close to temperature trip limit!"
 #endif
 
@@ -141,7 +145,7 @@ _Static_assert((sizeof(TemperatureSensorsCfg)/sizeof(*TemperatureSensorsCfg)) ==
 #endif
 
 #ifndef MAX_CURRENT_LIMIT
-#define MAX_CURRENT_LIMIT               60000   // Max current limit (Milliamperes)        (Max continuous discharge is 7A per cell)
+#define MAX_CURRENT_LIMIT               58000   // Max current limit (Milliamperes)        (Max continuous discharge is 7A per cell)
 #endif
 
 #ifndef MAX_COLD_CURRENT_LIMIT
@@ -149,7 +153,7 @@ _Static_assert((sizeof(TemperatureSensorsCfg)/sizeof(*TemperatureSensorsCfg)) ==
 #endif
 
 #ifndef MAX_CHARGING_CURRENT
-#define MAX_CHARGING_CURRENT            -25000  // Max current per cell is 3.3 Amps (Standard charge)
+#define MAX_CHARGING_CURRENT            -24000  // Max current per cell is 3.3 Amps (Standard charge)
 #endif
 
 #ifndef MAX_COLD_CHARGING_CURRENT
@@ -189,7 +193,7 @@ _Static_assert((sizeof(TemperatureSensorsCfg)/sizeof(*TemperatureSensorsCfg)) ==
 #define MAX_PEC_ERRORS 5
 
 // used to determine if we are charging
-#define AMPS_NOISE_LIMIT 250 // milliamps
+#define AMPS_NOISE_LIMIT 500 // milliamps
 
 // set CAN loopback mode. default is false.
 // DO NOT CHANGE VALUE HERE -- pass in when calling 'make'

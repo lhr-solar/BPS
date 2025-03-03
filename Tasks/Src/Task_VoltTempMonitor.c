@@ -10,6 +10,7 @@
 #include "Print_Queue.h"
 #include "RTOS_BPS.h"
 #include "os.h"
+#include "Contactor.h"
 
 typedef struct voltage_summary_s {
     uint64_t pack_voltage_mv:       24;
@@ -34,7 +35,7 @@ extern cell_asic Minions[NUM_MINIONS];
 static uint32_t voltage_data_count = 0;
 static uint32_t voltage_totals[NUM_BATTERY_MODULES] = {0};
 static int32_t temperature_data_count = 0;  // must be signed to perform arithmetic with other signed values
-static int32_t temperature_totals[NUM_BATTERY_MODULES] = {0};
+static int32_t temperature_totals[NUM_TEMPERATURE_SENSORS] = {0};
 
 // volttempmonitor functions -- split off for readability
 static bool CheckVoltage(void);
@@ -97,6 +98,10 @@ void Task_VoltTempMonitor(void *p_arg) {
         // NONBLOCKING ==================
         // Update Fan Speeds based on average temperature
         Fans_SetAll(TOPSPEED);
+
+        // NONBLOCKING ==================
+        // Disable array contactor if unsafe
+        Contactor_SetArrayEnable(charge_enable);
 
         // NONBLOCKING ==================
         // Send more frequent CAN messages -- every loop iteration
@@ -240,7 +245,7 @@ static void SendVoltageArray(void) {
 static void SendTemperatureArray(void) {
     static CANMSG_t msg = {.id = TEMPERATURE_DATA_ARRAY};
 
-    for (int i = 0; i < NUM_BATTERY_MODULES; i++) {
+    for (int i = 0; i < NUM_TEMPERATURE_SENSORS; i++) {
         msg.payload.idx = i;
         msg.payload.data.w = (int)(temperature_totals[i] / temperature_data_count);
         CAN_TransmitQueue_Post(msg);

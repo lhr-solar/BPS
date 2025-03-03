@@ -11,12 +11,10 @@ int main(int argc, char **argv) {
     Simulator_Init(argv[1]);
     int delay = SIM_TIME_TEST_DELAY;
     BSP_Timer_Init();
-    //BSP_Timer_GetTicksElasped();
-    BSP_Timer_GetMicrosElapsed();
+    BSP_Timer_TicksToMicros(BSP_Timer_GetTicksElapsed());
     while (delay > 0) {
         delay--;
     }
-    //BSP_Timer_GetTicksElapsed();
-    BSP_Timer_GetMicrosElapsed();
+    BSP_Timer_TicksToMicros(BSP_Timer_GetTicksElapsed());
     return 0;
 }

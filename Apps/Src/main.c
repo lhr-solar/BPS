@@ -51,9 +51,8 @@ int main() {
         EnterFaultState();
     }
 
-    // set up EEPROM and state of charge
-    EEPROM_Init();
-    Charge_Init();
+    // set up EEPROM
+    // EEPROM_Init();
 
     OSInit(&err);
     assertOSError(err);

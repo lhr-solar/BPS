@@ -33,7 +33,7 @@ void Task_AmperesMonitor(void *p_arg) {
     uint32_t curr_data_send_prev_tick = 0, soc_data_send_prev_tick = 0;
 
     Amps_Init();
-    Amps_Calibrate();
+    // Amps_Calibrate();
 
     while (1) {
         // BLOCKING =====================
@@ -41,10 +41,10 @@ void Task_AmperesMonitor(void *p_arg) {
         Amps_UpdateMeasurements();
         CheckCurrent();
         amps_data_count++;
-        amps_totals += Amps_GetReading();
+        amps_totals += Amps_GetReading(false);  // use filtered value here
 
         // update state of charge
-        Charge_Calculate(Amps_GetReading());
+        Charge_Calculate(Amps_GetReading(true));    // use raw value here
 
         // NONBLOCKING ==================
         // Send CAN messages
@@ -58,7 +58,7 @@ void Task_AmperesMonitor(void *p_arg) {
         }
 
         if (((uint32_t)OSTimeGet(&err)) - soc_data_send_prev_tick > MS_TO_OS_TICKS(ODR_STATE_OF_CHARGE_DATA_PERIOD_MS)) {
-            msg_current.payload.data.w = Charge_GetPercent();
+            msg_state_of_charge.payload.data.w = Charge_GetPercent();
             CAN_TransmitQueue_Post(msg_state_of_charge);
             soc_data_send_prev_tick = (uint32_t)OSTimeGet(&err);
         }

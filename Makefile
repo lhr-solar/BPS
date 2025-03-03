@@ -13,7 +13,7 @@ NC=\033[0m # No Color
 DEFINES = none
 export DEFINES
 
-DEBUG = 0
+DEBUG ?= 1
 export DEBUG
 
 TEST = none
@@ -38,13 +38,13 @@ else
 endif
 	rm -f Objects/config_msgs.*
 	@$(BUILD_HELPER)
-	$(MAKE) -C BSP -C STM32F413 -j || ./error_verbose.log
+	$(MAKE) -C BSP -C STM32F413 -j
 
 .PHONY: simulator
 simulator:
 	rm -f Objects/config_msgs.*
 	@$(BUILD_HELPER)
-	$(MAKE) -C BSP -C Simulator -j || ./error_verbose.log
+	$(MAKE) -C BSP -C Simulator -j
 
 flash:
 	$(MAKE) -C BSP -C STM32F413 flash

@@ -50,7 +50,7 @@ void Task1(void *p_arg){
 
     while(1) {
         Amps_UpdateMeasurements();
-        printf("Current (milliAmps): %ld\n\r", Amps_GetReading());
+        printf("Current (milliAmps): %ld\n\r", Amps_GetReading(true));
 
         bool check = Amps_IsCharging();
         printf("Is charging: %s\n\r", (check ? "true" : "false"));

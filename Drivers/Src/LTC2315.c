@@ -8,7 +8,7 @@
 
 // offset for current reading
 // experimentally determined at startup through calibration
-static int32_t offset;
+static int32_t offset = 0x800;
 
 // Helper functions copied from LTC681x.c
 

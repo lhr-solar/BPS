@@ -140,24 +140,14 @@ uint32_t BSP_Timer_GetTicksElapsed(void) {
 }
 
 /**
- * @brief   Gets the running frequency of the timer (time per tick)
- * @param   None
- * @return  frequency in Hz
- */
-uint32_t BSP_Timer_GetRunFreq(void) {
-    return TimerFrequency;
-}
-
-/**
- * @brief   Gives a standard unit for time elapsed in microseconds since calling BSP_Timer_GetTicksElapsed()
- * @param   None
+ * @brief   Convert ticks to micros. Call in conjunction with BSP_Timer_GetTicksElapsed().
+ * @param   ticks Timer tick value
  * @return  Microseconds 
  */
-uint32_t BSP_Timer_GetMicrosElapsed(void) {
-    uint32_t ticks = BSP_Timer_GetTicksElapsed();
-    uint32_t freq = BSP_Timer_GetRunFreq();
-    uint32_t micros_elap = ticks / (freq / MICROSECONDS_PER_SECOND); // Math to ensure that we do not overflow (16Mhz or 80Mhz)
-    return micros_elap;
+uint32_t BSP_Timer_TicksToMicros(uint32_t ticks) {
+    uint32_t freq = TimerFrequency;
+    uint32_t us = ticks / (freq / MICROSECONDS_PER_SECOND); // Math to ensure that we do not overflow (16Mhz or 80Mhz)
+    return us;
 } 
 
 extern void BSP_TIMER_IRQ(BSP_TIMER_ONESHOT)() {

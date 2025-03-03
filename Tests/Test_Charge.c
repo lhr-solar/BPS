@@ -17,7 +17,6 @@ uint32_t charge_reading;
 void Task1(void *p_arg){
     BSP_UART_Init(NULL, NULL, UART_USB);
     Charge_Init();
-    Charge_SetAccum(50000);
     OS_CPU_SysTickInit(SystemCoreClock / (CPU_INT32U) OSCfg_TickRate_Hz);
    
     while(1) {
