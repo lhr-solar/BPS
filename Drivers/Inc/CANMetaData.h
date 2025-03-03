@@ -37,6 +37,7 @@ typedef enum {
     TEMPERATURE_SUMMARY                                  = 0x10E,
     CAR_STATE                                            = 0x580,
     IO_STATE                                             = 0x581,
+    BOOST_ENABLE                                         = 0x209,   
     MOTOR_CONTROLLER_BUS                                 = 0x242,
     VELOCITY                                             = 0x243,
     MOTOR_CONTROLLER_PHASE_CURRENT                       = 0x244,
