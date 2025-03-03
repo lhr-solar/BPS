@@ -7,6 +7,10 @@
 #include "BSP_PLL.h"
 #include "Charge.h"
 
+#define CHECK_CONTACTOR_DELAY 200
+
+#define MPPT_HEATBEAT_COUNT (1000/CHECK_CONTACTOR_DELAY) * 5
+
 void Task_CheckContactor(void *p_arg) {
     (void)p_arg;
     
@@ -42,12 +46,16 @@ void Task_CheckContactor(void *p_arg) {
 
     uint32_t controls_no_msg = 0;
 
+    // number of times we've failed to recieve MPPT safe message
+    uint32_t mppt_no_msg = 0;
+    uint8_t mppt_status = 0;
+
     while (1) {
         // delay of 200ms
         // controls IO_STATE message every ~250ms, so we need to check for the 
         // message more frequently to ensure our CAN queue doesn't fill. 
         // 200ms is chosen because it's a neat number and should be fast enough. 
-        RTOS_BPS_DelayMs(200);
+        RTOS_BPS_DelayMs(CHECK_CONTACTOR_DELAY);
 
         // fault if the contactor is open -- this should only happen if ESTOP is hit
         if (Contactor_GetState(HVHIGH_CONTACTOR) != true) {
@@ -66,7 +74,9 @@ void Task_CheckContactor(void *p_arg) {
             } else {
                 Contactor_Off(ARRAY_CONTACTOR);
             }
-        } else if (status != SUCCESS && controls_no_msg >= 25) {
+            
+        } 
+        else if (status != SUCCESS && controls_no_msg >= 25) { // hack for when Controls is not connected, turns array on after 5 seconds
             Contactor_On(ARRAY_CONTACTOR);
         } 
         else if (status != SUCCESS) {
@@ -79,13 +89,22 @@ void Task_CheckContactor(void *p_arg) {
                                           Contactor_GetState(ARRAY_CONTACTOR);
         CAN_TransmitQueue_Post(contactor_state);
 
-        // Tell the MPPT it's safe to boost
-        if(Contactor_GetState(ARRAY_CONTACTOR)){
-            boost_enable.payload.b = 1;
+        // TOOD: need to fix CAN filter for MPPT recieve messages
+        ErrorStatus mppt_msg_status = CAN_ReceiveQueue_Pend(&recv);
+        if (mppt_msg_status == SUCCESS && recv.id == BOOST_ENABLE){
+            // TODO: need to get status of MPPT
+            mppt_status = 0;
+            mppt_no_msg = 0; // reset MPPT status heartbeat
+        } 
+        else if(mppt_msg_status != SUCCESS){ // no MPPT status message recieved
+            mppt_no_msg ++;
+        } 
+        else if(mppt_msg_status != SUCCESS && mppt_no_msg >= MPPT_HEATBEAT_COUNT){ // MPPT has not send a status message for 5 seconds
+            mppt_status = 0;
         }
-        else{
-            boost_enable.payload.b = 0;
-        }
+
+        // Tell the MPPT if it's safe to boost or not
+        boost_enable.payload.data.b = (Contactor_GetState(ARRAY_CONTACTOR) & mppt_status) ? 1 : 0;
         CAN_TransmitQueue_Post(boost_enable);
     }
 }

@@ -35,6 +35,7 @@ const struct CANLUTEntry CanMetadataLUT[LARGEST_CAN_ID] = {
     [TEMPERATURE_SUMMARY]                                  {.idx_used = 0, .len = 8},
     [CAR_STATE]                                            {.idx_used = 0, .len = 1},
     [IO_STATE]                                             {.idx_used = 0, .len = 8},
+    [BOOST_ENABLE]                                         {.idx_used = 0, .len = 1},
     [MOTOR_CONTROLLER_BUS]                                 {.idx_used = 0, .len = 8},
     [VELOCITY]                                             {.idx_used = 0, .len = 8},
     [MOTOR_CONTROLLER_PHASE_CURRENT]                       {.idx_used = 0, .len = 8},

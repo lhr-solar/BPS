@@ -110,6 +110,10 @@ void EnterFaultState() {
         payload.data.w = 1;
         CANbus_SendMsg_FaultState(BPS_TRIP, payload);
 
+        //Send MPPT to disable boosting
+        payload.data.b = 0;;
+        CANbus_SendMsg_FaultState(BOOST_ENABLE, payload);
+
         //Send Contactor Readings
         payload.data.b = 0;
         CANbus_SendMsg_FaultState(BPS_CONTACTOR_STATE, payload);
