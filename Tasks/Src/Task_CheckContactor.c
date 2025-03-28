@@ -18,7 +18,9 @@ void Task_CheckContactor(void *p_arg) {
     // static to avoid stack allocation
     static CANMSG_t all_clear =         {.id = BPS_ALL_CLEAR, .payload.data.b = 1};
     static CANMSG_t contactor_state =   {.id = BPS_CONTACTOR_STATE};
-    static CANMSG_t boost_enable =      {.id = MPPT_A_BOOST_ENABLE};
+    static CANMSG_t mppt_boost_enable_a =   {.id = MPPT_A_BOOST_ENABLE};
+    static CANMSG_t mppt_boost_enable_b =   {.id = MPPT_B_BOOST_ENABLE};
+
     static CANMSG_t recv;
 
     BSP_PLL_DelayMs(30); // delay is needed for pull up resistor to stabilize before we check for contactor state
@@ -100,8 +102,11 @@ void Task_CheckContactor(void *p_arg) {
 
         if(mppt_status == 0){}
         // Tell the MPPT if it's safe to boost or not
-        boost_enable.payload.data.b = (Contactor_GetState(ARRAY_CONTACTOR)) ? 1 : 0;
-        CAN_TransmitQueue_Post(boost_enable);
+        mppt_boost_enable_a.payload.data.b = (Contactor_GetState(ARRAY_CONTACTOR)) ? 1 : 0;
+        CAN_TransmitQueue_Post(mppt_boost_enable_a);
+
+        mppt_boost_enable_b.payload.data.b = (Contactor_GetState(ARRAY_CONTACTOR)) ? 1 : 0;
+        CAN_TransmitQueue_Post(mppt_boost_enable_b);
     }
 }
 
