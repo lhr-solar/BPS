@@ -16,8 +16,8 @@ void Task_CheckContactor(void *p_arg) {
     
     // buffers for CAN messages
     // static to avoid stack allocation
-    static CANMSG_t all_clear =         {.id = BPS_ALL_CLEAR, .payload.data.b = 1};
-    static CANMSG_t contactor_state =   {.id = BPS_CONTACTOR_STATE};
+    static CANMSG_t all_clear =             {.id = BPS_ALL_CLEAR, .payload.data.b = 1};
+    static CANMSG_t contactor_state =       {.id = BPS_CONTACTOR_STATE};
     static CANMSG_t mppt_boost_enable_a =   {.id = MPPT_A_BOOST_ENABLE};
     static CANMSG_t mppt_boost_enable_b =   {.id = MPPT_B_BOOST_ENABLE};
 
@@ -43,9 +43,6 @@ void Task_CheckContactor(void *p_arg) {
     Contactor_On(HVHIGH_CONTACTOR);
     Contactor_On(HVLOW_CONTACTOR);
 
-    // Push All Clear message to CAN Queue
-    CAN_TransmitQueue_Post(all_clear);
-
     // number of times we've failed to recieve Controls IO_State message
     uint32_t controls_no_msg = 0;
 
@@ -61,6 +58,11 @@ void Task_CheckContactor(void *p_arg) {
         // message more frequently to ensure our CAN queue doesn't fill. 
         // 200ms is chosen because it's a neat number and should be fast enough. 
         RTOS_BPS_DelayMs(CHECK_CONTACTOR_DELAY);
+
+        // Transmit that BPS is safe
+        // Assumes that BPS is safe at this point
+        // this task will stop sending BPS all clear if we enter a fault state
+        CAN_TransmitQueue_Post(all_clear);
 
         // fault if the contactor is open -- this should only happen if ESTOP is hit
         if (Contactor_GetState(HVHIGH_CONTACTOR) != true) {
