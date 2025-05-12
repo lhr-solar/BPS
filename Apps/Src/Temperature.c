@@ -37,7 +37,7 @@ static TemperatureFilter2_t TemperatureFilter2;
  * [9->3,  10->7, 11->11, 12->15],
  * [13->4, 14->8, 15->12, 16->16]
  */
-static const uint8_t temp_reindex[16] = {0, 4, 8, 12, 1, 5, 9, 13, 2, 6, 10, 14, 3, 7, 11, 15};
+// static const uint8_t temp_reindex[16] = {0, 4, 8, 12, 1, 5, 9, 13, 2, 6, 10, 14, 3, 7, 11, 15};
 
 // simulator bypasses ltc driver
 #ifndef SIMULATION
@@ -203,9 +203,12 @@ int32_t milliVoltToCelsius(uint32_t milliVolt){
         return TEMP_DISCONNECTED;
     }
     else {
-        return TEMP_ERR_OUT_BOUNDS;
+        return TEMP_ERR_OUT_BOUNDS; 
     }
 }
+
+uint16_t Milivolts[32] = {0};
+uint32_t i = 0;
 
 /** Temperature_UpdateSingleChannel
  * Stores and updates the new measurements received on one particular temperature sensor
@@ -227,7 +230,7 @@ int32_t Temperature_UpdateSingleChannel(uint8_t channel){
 #endif
 
     // define actual temp channel in HW based on error in PCB. TODO: fix this in HW
-    channel = temp_reindex[channel];
+    // channel = temp_reindex[channel];
 
     uint8_t temp_connected_count = 0;
 
@@ -239,6 +242,7 @@ int32_t Temperature_UpdateSingleChannel(uint8_t channel){
         if (channel < TemperatureSensorsCfg[board]) {   // don't touch unused sensors
 #ifndef SIMULATION
             TemperaturesMedFiltIn[sensor_idx] = milliVoltToCelsius(Minions[board].aux.a_codes[0] / 10);
+            Milivolts[i++ % 32] = Minions[board].aux.a_codes[0] / 10;
             // if we detect a disconnected temp tap, we set to a safe temperature assuming we are 
             // currently scrutineering (all but one connected). then, at the last temperature sensor, 
             // if only one temp tap is detected as connected, we can verify that we are indeed 
@@ -304,7 +308,7 @@ ErrorStatus Temperature_UpdateAllMeasurements(){
             // hack to deal with skip wiring assignment in harness. TODO: remove this
             // wires are assigned 11, 10, 11 to correspond to original battery pack
             // updated pack is 11, 9, 11 -- we have to add a skip after the 20th module (sensor >= 20)
-            if (sensor >= 20) sensor_idx += 1;
+            // if (sensor >= 20) sensor_idx += 1;
             Temperatures[sensor++] = filteredTemperatures[sensor_idx];
         }
     }
