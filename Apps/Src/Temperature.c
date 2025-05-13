@@ -243,6 +243,10 @@ int32_t Temperature_UpdateSingleChannel(uint8_t channel){
 #ifndef SIMULATION
             TemperaturesMedFiltIn[sensor_idx] = milliVoltToCelsius(Minions[board].aux.a_codes[0] / 10);
             Milivolts[i++ % 32] = Minions[board].aux.a_codes[0] / 10;
+            // print out the mV value for debugging with board + channel
+            printf("minion %d sensor %d mV: %d\r\n", board + 1, channel + 1, Milivolts[i-1]);
+
+
             // if we detect a disconnected temp tap, we set to a safe temperature assuming we are 
             // currently scrutineering (all but one connected). then, at the last temperature sensor, 
             // if only one temp tap is detected as connected, we can verify that we are indeed 
@@ -311,6 +315,10 @@ ErrorStatus Temperature_UpdateAllMeasurements(){
             // if (sensor >= 20) sensor_idx += 1;
             Temperatures[sensor++] = filteredTemperatures[sensor_idx];
         }
+    }
+
+    for (uint8_t i = 0; i < NUM_TEMPERATURE_SENSORS; i++) {
+        printf("sensor %d: %d°C\r\n", i + 1, Temperatures[i] / 1000);
     }
 
 

@@ -35,6 +35,7 @@ int main() {
 
     BSP_PLL_Init();
     BSP_UART_Init(NULL, NULL, UART_USB);
+    printf("laksee gupta\r\n");
 
     //Resetting the contactor
     Contactor_Init();
