@@ -46,12 +46,6 @@ void Task_CheckContactor(void *p_arg) {
     // number of times we've failed to recieve Controls IO_State message
     uint32_t controls_no_msg = 0;
 
-    // number of times we've failed to recieve MPPT safe message
-    uint32_t mppt_no_msg = 0;
-
-    // Status of the MPPT based on periodic fault message
-    uint8_t mppt_status = 0;
-
     while (1) {
         // delay of 200ms
         // controls IO_STATE message every ~250ms, so we need to check for the 
@@ -76,24 +70,21 @@ void Task_CheckContactor(void *p_arg) {
         if(status == SUCCESS){
             if(recv.id == IO_STATE){
                 controls_no_msg = 0;
-                uint8_t array_state = (recv.payload.data.bytes[3] >> 2) & 0x1;
+                // bit 1 of the payload is the array contactor state
+                uint8_t array_state = (recv.payload.data.bytes[2]) & 0x1;
                 if (array_state) {
                     Contactor_On(ARRAY_CONTACTOR);
                 } else {
                     Contactor_Off(ARRAY_CONTACTOR);
                 }
             }
-            // TODO: write MPPT status code
         }
         else {
             controls_no_msg++;
-            mppt_no_msg++;
         }
 
         if(controls_no_msg >= 25){ // hack for when Controls is not connected, turns array on after 5 seconds
-
-            // TODO: set this to be opposite where after 5 seconds turn off array contactor
-            Contactor_On(ARRAY_CONTACTOR);
+            Contactor_Off(ARRAY_CONTACTOR);
         }
 
         //Send BPS contactor state via CAN
@@ -102,7 +93,6 @@ void Task_CheckContactor(void *p_arg) {
                                           Contactor_GetState(ARRAY_CONTACTOR);
         CAN_TransmitQueue_Post(contactor_state);
 
-        if(mppt_status == 0){}
         // Tell the MPPT if it's safe to boost or not
         mppt_boost_enable_a.payload.data.b = (Contactor_GetState(ARRAY_CONTACTOR)) ? 1 : 0;
         CAN_TransmitQueue_Post(mppt_boost_enable_a);
