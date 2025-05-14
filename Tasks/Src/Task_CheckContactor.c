@@ -83,7 +83,7 @@ void Task_CheckContactor(void *p_arg) {
             controls_no_msg++;
         }
 
-        if(controls_no_msg >= 25){ // hack for when Controls is not connected, turns array on after 5 seconds
+        if(controls_no_msg >= 25){ // controls doesn't send a message for 5 seconds
             Contactor_Off(ARRAY_CONTACTOR);
         }
 
