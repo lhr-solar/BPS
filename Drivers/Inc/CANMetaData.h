@@ -60,6 +60,7 @@
      CONTROL_MODE                     = 0x580,
      IO_STATE                         = 0x581,
      MOTOR_PRECHARGE_ENABLE           = 0x582,
+     BPS_FAULT_STATE                  = 0x583,
      LARGEST_CAN_ID
  } CANID_t;
  

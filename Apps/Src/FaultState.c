@@ -36,6 +36,20 @@ static const struct FaultToOut_t FaultDict[FAULT_MAX] = {
     [Fault_ESTOP]       = {.light = WIRE, .string = "ESTOP"}
 };
 
+typedef enum {
+    CAN_FAULT_NONE = 0,
+    CAN_Fault_UVOLT = 1,
+    CAN_Fault_OVOLT = 2,
+    CAN_Fault_OTEMP = 3,
+    CAN_Fault_OCURR = 4,
+    CAN_Fault_OW = 5,
+    CAN_Fault_HANDLER = 6,
+    CAN_Fault_OS = 7,
+    CAN_Fault_WDOG = 8,
+    CAN_Fault_CRC = 9,
+    CAN_Fault_ESTOP = 10
+}Fault_CAN_message_t;
+
 /*
  * Note: do not call this directly if it can be helped.
  * Instead, call an RTOS function to unblock the mutex
@@ -138,6 +152,45 @@ void EnterFaultState() {
             payload.data.w = Temperature_GetModuleTemperature(i);
             CANbus_SendMsg_FaultState(TEMPERATURE_DATA_ARRAY, payload);
         }
+
+        // Send FAULT ID
+        switch(Fault_BitMap){
+            case Fault_UVOLT:
+                payload.data.b = CAN_Fault_UVOLT;
+                break;
+            case Fault_OVOLT:
+                payload.data.b = CAN_Fault_OVOLT;
+                break;
+            case Fault_OTEMP:
+                payload.data.b = CAN_Fault_OTEMP;
+                break;
+            case Fault_OCURR:
+                payload.data.b = CAN_Fault_OCURR;
+                break;
+            case Fault_OW:
+                payload.data.b = CAN_Fault_OW;
+                break;
+            case Fault_ESTOP:
+                payload.data.b = CAN_Fault_ESTOP;
+                break;
+            case Fault_CRC:
+                payload.data.b = CAN_Fault_CRC;
+                break;
+            case Fault_WDOG:
+                payload.data.b = CAN_Fault_WDOG;
+                break;
+            case Fault_OS:
+                payload.data.b = CAN_Fault_OS;
+                break;
+            case Fault_HANDLER:
+                payload.data.b = CAN_Fault_HANDLER;
+                break;
+            default:
+                payload.data.b = CAN_FAULT_NONE;
+                break;
+        }
+        CANbus_SendMsg_FaultState(BPS_FAULT_STATE, payload);
+
 
         BSP_WDTimer_Reset(); // WDOG Reset
 #ifdef SIMULATION

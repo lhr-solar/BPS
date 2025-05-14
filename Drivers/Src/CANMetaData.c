@@ -55,6 +55,7 @@
      [PRECHARGE_TIMEOUT_]               {.idx_used = 0, .len = 1},
      [CONTROL_MODE]                     {.idx_used = 0, .len = 1},
      [IO_STATE]                         {.idx_used = 0, .len = 3},
-     [MOTOR_PRECHARGE_ENABLE]           {.idx_used = 0, .len = 1}
+     [MOTOR_PRECHARGE_ENABLE]           {.idx_used = 0, .len = 1},
+     [BPS_FAULT_STATE]                  {.idx_used = 0, .len = 1},
  };
  
