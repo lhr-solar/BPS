@@ -78,6 +78,8 @@ void Task_VoltTempMonitor(void *p_arg) {
         voltage_data_count++;
         for (int i = 0; i < NUM_BATTERY_MODULES; i++) {
             voltage_totals[i] += Voltage_GetModuleMillivoltage(i);
+            // print out the mV value for debugging with board + channel
+            printf("module %d mV: %d\r\n", i + 1, Voltage_GetModuleMillivoltage(i));
         }
         
         // BLOCKING =====================
@@ -86,15 +88,12 @@ void Task_VoltTempMonitor(void *p_arg) {
         
         // BLOCKING =====================
         // Update Temperature Measurements
-        printf("\r\nupdating temperatures\r\n");
         Temperature_UpdateAllMeasurements();
-        RTOS_BPS_DelaySecs(1);
         charge_enable &= CheckTemperature();
         temp_elapsed = ((uint32_t)OSTimeGet(&err)) - temp_prev_tick;
         temp_prev_tick = (uint32_t)OSTimeGet(&err);
         temperature_data_count++;
         for (int i = 0; i < NUM_TEMPERATURE_SENSORS; i++) {
-            printf("getting temperature %d\r\n", i);
             temperature_totals[i] += Temperature_GetSingleTempSensor(i);
         }
         

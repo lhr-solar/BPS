@@ -241,10 +241,16 @@ int32_t Temperature_UpdateSingleChannel(uint8_t channel){
         uint8_t sensor_idx = (board * MAX_TEMP_SENSORS_PER_MINION_BOARD) + channel;
         if (channel < TemperatureSensorsCfg[board]) {   // don't touch unused sensors
 #ifndef SIMULATION
-            TemperaturesMedFiltIn[sensor_idx] = milliVoltToCelsius(Minions[board].aux.a_codes[0] / 10);
-            Milivolts[i++ % 32] = Minions[board].aux.a_codes[0] / 10;
+            if (board == 2 && (channel == 0 || channel == 11)) {
+                TemperaturesMedFiltIn[sensor_idx] = milliVoltToCelsius(2500);
+            } else {
+                TemperaturesMedFiltIn[sensor_idx] = milliVoltToCelsius(Minions[board].aux.a_codes[0] / 10);
+            }
+            
+            Milivolts[i] = Minions[board].aux.a_codes[0] / 10;
+            i = (i + 1) % 32;
             // print out the mV value for debugging with board + channel
-            printf("minion %d sensor %d mV: %d\r\n", board + 1, channel + 1, Milivolts[i-1]);
+            //printf("minion %d sensor %d mV: %d\r\n", board + 1, channel + 1, Milivolts[i-1]);
 
 
             // if we detect a disconnected temp tap, we set to a safe temperature assuming we are 
@@ -317,9 +323,9 @@ ErrorStatus Temperature_UpdateAllMeasurements(){
         }
     }
 
-    for (uint8_t i = 0; i < NUM_TEMPERATURE_SENSORS; i++) {
-        printf("sensor %d: %d°C\r\n", i + 1, Temperatures[i] / 1000);
-    }
+    // for (uint8_t i = 0; i < NUM_TEMPERATURE_SENSORS; i++) {
+    //     printf("sensor %d: %d°C\r\n", i + 1, Temperatures[i] / 1000);
+    // }
 
 
     int empty_sensors = 2; // number of sensors we allow to be disconnected
