@@ -105,30 +105,32 @@ void Task_CheckContactor(void *p_arg) {
             EnterFaultState();
         }
 
-        // Turn on/off array contactor based on what we receive from controls or the MPPT
+        // Turn on/off array contactor based on what we recieve from CAN
         // if we get to this point and there's no message we try again ~200ms later
         ErrorStatus status = CAN_ReceiveQueue_Pend(&recv); // non-blocking
+        if(status == SUCCESS && recv.id == CONTACTOR_SENSE){
+            // if the array precharge contactor sense is on and there's no array precharge contactor fault
+            array_precharge_complete = ((recv.payload.data.bytes[0] >> 6) & 0x1 ) && !((recv.payload.data.bytes[1] >> 1) & 0x1);
+        }
 
         // update the MPPT boost status
         if(status == SUCCESS && (recv.id == MPPT_A_STATUS || recv.id == MPPT_B_STATUS)){
             MPPT_t mppt = (recv.id == MPPT_A_STATUS) ? MPPT_A : MPPT_B;
             mppt_boost_status[mppt] = recv.payload.data.bytes[2] & 0x1 ? ENABLED : DISABLED;
         }
-        if(status == SUCCESS){
-            if(recv.id == IO_STATE){
-                controls_no_msg = 0;
-                // bit 1 of the payload is the array contactor state
-                uint8_t array_ign_state = (recv.payload.data.bytes[2]) & 0x1;
-                if(!array_ign_state){
-                    // now need to wait for MPPT to send that boosting is disabled
-                    updateArrayContactorState(false);
-                }
-                // if the array contactor is not already on and the MPPT is disabled, enable array based on controls
-                else if(array_ign_state && !ARRAY_CONTACTOR_ON && mppt_boost_status[MPPT_B] == DISABLED){
-                    updateArrayContactorState(true);
-                }
-                // otherwise leave the array contactor state as is
+        if(status == SUCCESS && recv.id == IO_STATE){
+            controls_no_msg = 0;
+            // bit 1 of the payload is the array contactor state
+            uint8_t array_ign_state = (recv.payload.data.bytes[2]) & 0x1;
+            if(!array_ign_state){
+                // now need to wait for MPPT to send that boosting is disabled
+                updateArrayContactorState(false);
             }
+            // if the array contactor is not already on and the MPPT is disabled, enable array based on controls
+            else if(array_ign_state && !ARRAY_CONTACTOR_ON && mppt_boost_status[MPPT_B] == DISABLED){
+                updateArrayContactorState(true);
+            }
+            // otherwise leave the array contactor state as is
         }
         else {
             controls_no_msg++;
