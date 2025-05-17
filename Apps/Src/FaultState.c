@@ -47,7 +47,9 @@ typedef enum {
     CAN_Fault_OS = 7,
     CAN_Fault_WDOG = 8,
     CAN_Fault_CRC = 9,
-    CAN_Fault_ESTOP = 10
+    CAN_Fault_ESTOP = 10,
+    CAN_Fault_CONTACTOR_FAULT = 11,
+    CAN_Fault_MPPT_FAULT = 12
 }Fault_CAN_message_t;
 
 /*
@@ -90,7 +92,6 @@ void EnterFaultState() {
         Fault_BitMap = Fault_WDOG;
     }
 
-    // TODO: fix this so it works if there are multiple faults
     #ifdef SIMULATION
     char err[100] = {0};
     #endif
@@ -134,6 +135,10 @@ void EnterFaultState() {
         //Send Contactor Readings
         payload.data.b = 0;
         CANbus_SendMsg_FaultState(BPS_CONTACTOR_STATE, payload);
+
+        //Send All Clear False
+        payload.data.b = 0;
+        CANbus_SendMsg_FaultState(BPS_ALL_CLEAR, payload);
         
         //Send Current Readings
         payload.data.w = Amps_GetReading(false);
@@ -170,20 +175,20 @@ void EnterFaultState() {
             case Fault_OW:
                 payload.data.b = CAN_Fault_OW;
                 break;
-            case Fault_ESTOP:
-                payload.data.b = CAN_Fault_ESTOP;
-                break;
-            case Fault_CRC:
-                payload.data.b = CAN_Fault_CRC;
-                break;
-            case Fault_WDOG:
-                payload.data.b = CAN_Fault_WDOG;
+            case Fault_HANDLER:
+                payload.data.b = CAN_Fault_HANDLER;
                 break;
             case Fault_OS:
                 payload.data.b = CAN_Fault_OS;
                 break;
-            case Fault_HANDLER:
-                payload.data.b = CAN_Fault_HANDLER;
+            case Fault_WDOG:
+                payload.data.b = CAN_Fault_WDOG;
+                break;
+            case Fault_CRC:
+                payload.data.b = CAN_Fault_CRC;
+                break;
+            case Fault_ESTOP:
+                payload.data.b = CAN_Fault_ESTOP;
                 break;
             default:
                 payload.data.b = CAN_FAULT_NONE;
