@@ -137,10 +137,12 @@ void Task_CheckContactor(void *p_arg) {
         }
         // controls doesn't send a message for 5 seconds
         // TOOD: make this turn the contactor off instead of on, this is just for testing without Controls
-        if(controls_no_msg >= CONTROLS_HEARTBEAT_COUNT && !ARRAY_CONTACTOR_ON && mppt_boost_status[MPPT_B] == DISABLED){
-            updateArrayContactorState(true);
-        }
-
+        // if(controls_no_msg >= CONTROLS_HEARTBEAT_COUNT && !ARRAY_CONTACTOR_ON && mppt_boost_status[MPPT_B] == DISABLED){
+        //     updateArrayContactorState(true);
+        // }
+    if(controls_no_msg >= CONTROLS_HEARTBEAT_COUNT){
+        updateArrayContactorState(false);
+    }
         bool array_contactor_state = Contactor_GetState(ARRAY_CONTACTOR);
 
         //Send BPS contactor state via CAN
