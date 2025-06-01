@@ -52,6 +52,25 @@ typedef enum {
     CAN_Fault_MPPT_FAULT = 12
 }Fault_CAN_message_t;
 
+/**
+ * @brief Assembly to create ms delay 
+ */
+static inline void delay_ms(uint32_t ms) {
+    // Adjusted loop count per ms based on empirical timing
+    // Originally: 20,000 per ms (80,000 cycles / 4 cycles/iter)
+    // Observed: ~3.77× slower → need ~5300 iterations per ms
+    uint32_t count = ms * 5300;
+
+    __asm__ volatile (
+        "1: \n"
+        "subs %[cnt], %[cnt], #1 \n"
+        "bne 1b \n"
+        : [cnt] "+r" (count)
+        :
+        : "cc"
+    );
+}
+
 /*
  * Note: do not call this directly if it can be helped.
  * Instead, call an RTOS function to unblock the mutex
@@ -202,6 +221,8 @@ void EnterFaultState() {
         Simulator_Log(LOG_INFO, "Completed fault state\n");
         Simulator_Shutdown(0);
 #endif
+        // Wait for 1000ms
+        delay_ms(100);
     }
 }
 

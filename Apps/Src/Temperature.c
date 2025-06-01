@@ -241,11 +241,13 @@ int32_t Temperature_UpdateSingleChannel(uint8_t channel){
         uint8_t sensor_idx = (board * MAX_TEMP_SENSORS_PER_MINION_BOARD) + channel;
         if (channel < TemperatureSensorsCfg[board]) {   // don't touch unused sensors
 #ifndef SIMULATION
-            if (board == 2 && (channel == 0 || channel == 11)) {
-                TemperaturesMedFiltIn[sensor_idx] = milliVoltToCelsius(2500);
-            } else {
-                TemperaturesMedFiltIn[sensor_idx] = milliVoltToCelsius(Minions[board].aux.a_codes[0] / 10);
-            }
+            // if (board == 2 && (channel == 0 || channel == 11)) {
+            //     TemperaturesMedFiltIn[sensor_idx] = milliVoltToCelsius(2500);
+            // } else {
+            //     TemperaturesMedFiltIn[sensor_idx] = milliVoltToCelsius(Minions[board].aux.a_codes[0] / 10);
+            // }
+            TemperaturesMedFiltIn[sensor_idx] = milliVoltToCelsius(Minions[board].aux.a_codes[0] / 10);
+
             
             Milivolts[i] = Minions[board].aux.a_codes[0] / 10;
             i = (i + 1) % 32;
@@ -302,6 +304,8 @@ ErrorStatus Temperature_UpdateAllMeasurements(){
         if (sensorCh % 8 == 0) {
             Temperature_ChannelConfig(sensorCh);
             Temperature_ChannelConfig(sensorCh);
+            Temperature_ChannelConfig(sensorCh);
+
         }
         // Update the measurement for this channel
         total_connected_sensors += Temperature_UpdateSingleChannel(sensorCh);

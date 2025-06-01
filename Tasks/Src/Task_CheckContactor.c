@@ -7,10 +7,10 @@
 #include "BSP_PLL.h"
 #include "Charge.h"
 
-#define CHECK_CONTACTOR_DELAY 200
+#define CHECK_CONTACTOR_DELAY 100
 
-// ~ 5 second timer
-#define CONTROLS_HEARTBEAT_COUNT (1000/CHECK_CONTACTOR_DELAY) * 5
+// Number of seconds before auto turning off the array contactor due to no Controls message
+#define CONTROLS_HEARTBEAT_COUNT (1000/CHECK_CONTACTOR_DELAY) * 100
 
 // ~ 5 second timer for waiting to turn on the array Contactor
 #define ARRAY_PRECHARGE_DELAY (1000/CHECK_CONTACTOR_DELAY) * 5
@@ -127,9 +127,12 @@ void Task_CheckContactor(void *p_arg) {
                 updateArrayContactorState(false);
             }
             // if the array contactor is not already on and the MPPT is disabled, enable array based on controls
-            else if(array_ign_state && !ARRAY_CONTACTOR_ON && mppt_boost_status[MPPT_B] == DISABLED){
+            else if(array_ign_state && !ARRAY_CONTACTOR_ON){
                 updateArrayContactorState(true);
             }
+            // else if(array_ign_state && !ARRAY_CONTACTOR_ON && mppt_boost_status[MPPT_B] == DISABLED){
+            //     updateArrayContactorState(true);
+            // }
             // otherwise leave the array contactor state as is
         }
         else {
