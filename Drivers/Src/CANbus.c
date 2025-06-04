@@ -21,6 +21,7 @@ static OS_SEM	CANbus_MailSem4;
 static OS_SEM	CANbus_ReceiveSem4;
 static volatile bool initialized = false;	// used to check for double initialization -- volatile so we don't accidentally optimize it out
 
+uint16_t can_filter_ids[] = {IO_STATE, MPPT_A_STATUS, MPPT_B_STATUS, CONTACTOR_SENSE};
 /**
  * @brief   Releases hold of the mailbox semaphore.
  * @note	Do not call directly.
@@ -42,11 +43,9 @@ static void CANbus_CountIncoming(void) {
  * deinitialize first.
  * @param   loopback	: if we should use loopback mode (for testing)	
  * @param 	faultState  : determines whether to implement Rx and Tx interrupts
- * @param   txIDFilter    : array of IDs to accept messages from. Pass NULL for no filtering.
- * @param   txIDFilterLen : length of txIDFilter array. Max 28 * 4 (28 filter banks * 4 IDs per bank)
  * @return  None
  */
-void CANbus_Init(bool loopback, bool faultState, uint16_t *txIDFilter, uint8_t txIDFilterLen) {
+void CANbus_Init(bool loopback, bool faultState) {
     if(!faultState && !initialized){
         initialized = true;
         RTOS_BPS_MutexCreate(&CANbus_TxMutex, "CAN TX Lock");
@@ -54,7 +53,7 @@ void CANbus_Init(bool loopback, bool faultState, uint16_t *txIDFilter, uint8_t t
         RTOS_BPS_SemCreate(&CANbus_MailSem4, "CAN Mailbox Semaphore", 3); // # of mailboxes
         RTOS_BPS_SemCreate(&CANbus_ReceiveSem4, "CAN Queue Counter Semaphore", 0);
         // Initialize and pass interrupt hooks
-        BSP_CAN_Init(CANbus_CountIncoming, CANbus_Release, faultState, loopback, txIDFilter, txIDFilterLen);
+        BSP_CAN_Init(CANbus_CountIncoming, CANbus_Release, faultState, loopback, can_filter_ids, CAN_FILTER_IDS_LEN);
     }else if (faultState){
         BSP_CAN_Init(NULL, NULL, faultState, loopback, NULL, 0);
     }

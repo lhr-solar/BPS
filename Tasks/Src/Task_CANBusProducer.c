@@ -13,12 +13,7 @@ void Task_CANBusProducer(void *p_arg) {
 
     CANMSG_t CANMsg;
 
-    uint16_t filter_ids[] = {IO_STATE, MPPT_A_STATUS, MPPT_B_STATUS, CONTACTOR_SENSE};
-    CANbus_Init(
-        (bool) p_arg, 
-        false, 
-        filter_ids, 
-        sizeof(filter_ids) / sizeof(*filter_ids));
+    CANbus_Init((bool) p_arg, false);
     
     while(1) {
       // BLOCKING =====================

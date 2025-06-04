@@ -127,7 +127,7 @@ void EnterFaultState() {
     //Deinitialize CAN registers
     CANbus_DeInit();
     //Reinit CAN in fault state
-    CANbus_Init(BPS_CAN_LOOPBACK, true, NULL, 0);
+    CANbus_Init(BPS_CAN_LOOPBACK, true);
 
 #ifdef DEBUGMODE
     char command[COMMAND_SIZE];

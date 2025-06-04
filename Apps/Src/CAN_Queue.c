@@ -30,6 +30,13 @@ static OS_MUTEX canFifo_Transmit_Mutex;
 static OS_SEM canFifo_Receive_Sem4;
 static OS_MUTEX canFifo_Receive_Mutex;
 
+typedef struct {
+    CANID_t id;
+    OS_SEM can_recv_Sem4;
+    CANMSG_t message;
+} can_recv_entry_t;
+
+static can_recv_entry_t can_recv_entries[CAN_FILTER_IDS_LEN];
 
 /**
  * @brief: initializes both Receive and Transmit fifo + sema4s and mutexes
@@ -46,6 +53,10 @@ void CAN_Queue_Init(void) {
     CAN_fifo_TRANSMIT_renew(&canFifo_TRANSMIT);
     CAN_fifo_RECEIVE_renew(&canFifo_RECEIVE);
 
+    for(uint8_t i = 0; i < CAN_FILTER_IDS_LEN; i++) {
+        can_recv_entries[i].id = can_filter_ids[i];
+        RTOS_BPS_SemCreate(&can_recv_entries[i].can_recv_Sem4, "CAN receive entry semaphore", 0);
+    }
 }
 
 /**
