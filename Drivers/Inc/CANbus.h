@@ -7,6 +7,8 @@
 #include "config.h"
 #include "CANMetaData.h"
 
+
+// Declae the CAN IDs that BPS will recieve from, array declared in c file
 #define CAN_FILTER_IDS {IO_STATE, MPPT_A_STATUS, MPPT_B_STATUS, CONTACTOR_SENSE}
 #define CAN_FILTER_IDS_LEN (sizeof((uint16_t[])CAN_FILTER_IDS) / sizeof(uint16_t))
 
