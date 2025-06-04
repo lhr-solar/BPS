@@ -122,19 +122,7 @@ ErrorStatus CAN_ReceiveQueue_Post(CANMSG_t message) {
  * @return: error status
  * @note: SemPend (Micrium) will have err = OS_ERR_PEND_WOULD_BLOCK, which is okay
 */
-ErrorStatus CAN_ReceiveQueue_Pend(CANMSG_t *message) {
-    BPS_OS_SEM_CTR cnt = RTOS_BPS_SemPend(&canFifo_Receive_Sem4, OS_OPT_PEND_NON_BLOCKING);
-    if (cnt == BPS_OS_SEM_WOULD_BLOCK) {
-		return ERROR;
-	}
-
-    RTOS_BPS_MutexPend(&canFifo_Receive_Mutex, OS_OPT_PEND_BLOCKING);
-    bool result = CAN_fifo_RECEIVE_get(&canFifo_RECEIVE, message);
-    RTOS_BPS_MutexPost(&canFifo_Receive_Mutex, OS_OPT_POST_NONE);
-    return result ? SUCCESS : ERROR;
-}
-
-ErrorStatus CAN_ReceiveQueue_Pend_Id(CANMSG_t *message, CANID_t id) {
+ErrorStatus CAN_ReceiveQueue_Pend(CANMSG_t *message, CANID_t id) {
     uint8_t idx = -1;
     for(uint8_t i = 0; i < CAN_FILTER_IDS_LEN; i++) {
         if (can_recv_entries[i].id == id) {

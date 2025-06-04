@@ -16,7 +16,5 @@ ErrorStatus CAN_TransmitQueue_Pend(CANMSG_t *message);
 
 ErrorStatus CAN_ReceiveQueue_Post(CANMSG_t message);
 
-ErrorStatus CAN_ReceiveQueue_Pend(CANMSG_t *message);
-
-ErrorStatus CAN_ReceiveQueue_Pend_Id(CANMSG_t *message, CANID_t id);
+ErrorStatus CAN_ReceiveQueue_Pend(CANMSG_t *message, CANID_t id);
 #endif

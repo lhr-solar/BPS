@@ -105,21 +105,21 @@ void Task_CheckContactor(void *p_arg) {
             EnterFaultState();
         }
 
-        ErrorStatus status = CAN_ReceiveQueue_Pend_Id(&recv, CONTACTOR_SENSE); // non-blocking
+        ErrorStatus status = CAN_ReceiveQueue_Pend(&recv, CONTACTOR_SENSE); // non-blocking
         if(status == SUCCESS){
             // if the array precharge contactor sense is on and there's no array precharge contactor fault
             array_precharge_complete = ((recv.payload.data.bytes[0] >> 6) & 0x1 ) && !((recv.payload.data.bytes[1] >> 1) & 0x1);
         }
-        status = CAN_ReceiveQueue_Pend_Id(&recv, MPPT_A_STATUS); // non-blocking
+        status = CAN_ReceiveQueue_Pend(&recv, MPPT_A_STATUS); // non-blocking
         if(status == SUCCESS){
             mppt_boost_status[MPPT_A] = recv.payload.data.bytes[2] & 0x1 ? ENABLED : DISABLED;
         }
-        status = CAN_ReceiveQueue_Pend_Id(&recv, MPPT_B_STATUS); // non-blocking
+        status = CAN_ReceiveQueue_Pend(&recv, MPPT_B_STATUS); // non-blocking
         if(status == SUCCESS){
             mppt_boost_status[MPPT_B] = recv.payload.data.bytes[2] & 0x1 ? ENABLED : DISABLED;
         }
 
-        status = CAN_ReceiveQueue_Pend_Id(&recv, IO_STATE); // non-blocking
+        status = CAN_ReceiveQueue_Pend(&recv, IO_STATE); // non-blocking
         if(status == SUCCESS){
             controls_no_msg = 0;
             uint8_t array_ign_state = (recv.payload.data.bytes[2]) & 0x1;
