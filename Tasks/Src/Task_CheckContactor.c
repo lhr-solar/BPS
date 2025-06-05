@@ -105,6 +105,56 @@ void Task_CheckContactor(void *p_arg) {
             EnterFaultState();
         }
 
+        ErrorStatus status = CAN_ReceiveQueue_Pend(&recv, CONTACTOR_SENSE); // non-blocking
+        if(status == SUCCESS){
+            // if the array precharge contactor sense is on and there's no array precharge contactor fault
+            array_precharge_complete = ((recv.payload.data.bytes[0] >> 6) & 0x1 ) && !((recv.payload.data.bytes[1] >> 1) & 0x1);
+        }
+        status = CAN_ReceiveQueue_Pend(&recv, MPPT_A_STATUS); // non-blocking
+        if(status == SUCCESS){
+            mppt_boost_status[MPPT_A] = recv.payload.data.bytes[2] & 0x1 ? ENABLED : DISABLED;
+        }
+        status = CAN_ReceiveQueue_Pend(&recv, MPPT_B_STATUS); // non-blocking
+        if(status == SUCCESS){
+            mppt_boost_status[MPPT_B] = recv.payload.data.bytes[2] & 0x1 ? ENABLED : DISABLED;
+        }
+
+        status = CAN_ReceiveQueue_Pend(&recv, IO_STATE); // non-blocking
+        if(status == SUCCESS){
+            controls_no_msg = 0;
+            uint8_t array_ign_state = (recv.payload.data.bytes[2]) & 0x1;
+            if(!array_ign_state){
+                // now need to wait for MPPT to send that boosting is disabled
+                updateArrayContactorState(false);
+            }
+            // if the array contactor is not already on and the MPPT is disabled, enable array based on controls
+            else if(array_ign_state && !ARRAY_CONTACTOR_ON){
+                updateArrayContactorState(true);
+            }
+        }
+        else{
+            controls_no_msg++;
+        }
+
+        if(controls_no_msg >= CONTROLS_HEARTBEAT_COUNT){
+            // if controls doesn't send a message for long enough, turn off the array contactor
+            updateArrayContactorState(false);
+        }
+
+        bool array_contactor_state = Contactor_GetState(ARRAY_CONTACTOR);
+        //Send BPS contactor state via CAN
+        contactor_state.payload.data.b = (Contactor_GetState(HVHIGH_CONTACTOR) << 2) |
+                                         (Contactor_GetState(HVLOW_CONTACTOR) << 1) |
+                                          array_contactor_state;
+        CAN_TransmitQueue_Post(contactor_state);
+
+        // Allow the MPPTs to boost if both the array and array precharge contactors are on
+        // Else disable boosting
+        sendBoostEnable(MPPT_A, array_contactor_state && array_precharge_complete);
+        sendBoostEnable(MPPT_B, array_contactor_state && array_precharge_complete);
+
+        /*
+
         // Turn on/off array contactor based on what we recieve from CAN
         // if we get to this point and there's no message we try again ~200ms later
         ErrorStatus status = CAN_ReceiveQueue_Pend(&recv); // non-blocking
@@ -165,5 +215,6 @@ void Task_CheckContactor(void *p_arg) {
 
         sendBoostEnable(MPPT_A, array_contactor_state && array_precharge_complete);
         sendBoostEnable(MPPT_B, array_contactor_state && array_precharge_complete);
+        */
     }
 }

@@ -13,17 +13,15 @@ void Task_CANBusProducer(void *p_arg) {
 
     CANMSG_t CANMsg;
 
-    uint16_t filter_ids[] = {IO_STATE, MPPT_A_STATUS, MPPT_B_STATUS, CONTACTOR_SENSE};
-    CANbus_Init(
-        (bool) p_arg, 
-        false, 
-        filter_ids, 
-        sizeof(filter_ids) / sizeof(*filter_ids));
+    CANbus_Init((bool) p_arg, false);
     
     while(1) {
       // BLOCKING =====================
-      // Wait for CAN Bus to have message
+      // Wait for CAN Bus to have any message
+      // CANmsg will be filled with the id and payload when a new message is received
       CANbus_WaitToReceive(&CANMsg.id, &CANMsg.payload);
+
+      // Place this into the CAN queue, where the recieve entries array will be updated
       CAN_ReceiveQueue_Post(CANMsg);
     }
 }
