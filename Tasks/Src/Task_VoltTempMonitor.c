@@ -171,8 +171,8 @@ static bool CheckVoltage(void) {
     static bool voltageHasBeenChecked = false;
 
     if (status != SAFE) {
-        if      (status_opt == UNDERVOLTAGE) Fault_BitMap |= Fault_UVOLT;
-        else if (status_opt == OVERVOLTAGE)  Fault_BitMap |= Fault_OVOLT;
+        if (status_opt == UNDERVOLTAGE) Fault_BitMap |= Fault_UVOLT;
+        if (status_opt == OVERVOLTAGE)  Fault_BitMap |= Fault_OVOLT;
         EnterFaultState();  // doesn't return
     }
     if (!voltageHasBeenChecked) { // Signal to turn on contactor but only signal once
@@ -214,22 +214,12 @@ static bool CheckTemperature(void) {
     SafetyStatusOpt status_opt;
     SafetyStatus status = Temperature_CheckStatus(Amps_IsCharging(), &status_opt);
 
-    // hack for when one temperature spikes very high
-    static volatile uint8_t num_temp_faults = 0;
     static bool temperatureHasBeenChecked = false;
 
     if (status != SAFE) {
-        if(num_temp_faults < 3){
-            num_temp_faults++;
-        }
-        else{
-            Fault_BitMap |= Fault_OTEMP;
-            EnterFaultState();
-        }
+        Fault_BitMap |= Fault_OTEMP;
+        EnterFaultState();
     }
-    else{
-        num_temp_faults = 0; // reset the number of faults if we are safe
-    } 
     if (!temperatureHasBeenChecked) {
         // Signal to turn on contactor but only signal once
         RTOS_BPS_SemPost(&SafetyCheck_Sem4, OS_OPT_POST_1);
