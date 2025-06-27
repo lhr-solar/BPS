@@ -213,12 +213,21 @@ static void CheckOpenWire(void) {
 static bool CheckTemperature(void) {
     SafetyStatusOpt status_opt;
     SafetyStatus status = Temperature_CheckStatus(Amps_IsCharging(), &status_opt);
+    static uint8_t temperature_fault_count = 0;
 
     static bool temperatureHasBeenChecked = false;
 
     if (status != SAFE) {
-        Fault_BitMap |= Fault_OTEMP;
-        EnterFaultState();
+        // For spikes where we overtemperature for one iteration
+        temperature_fault_count++;
+        if(temperature_fault_count >= 3){
+            Fault_BitMap |= Fault_OTEMP;
+            EnterFaultState();
+        }
+    }
+    else{
+        // reset the overtemperature count
+        temperature_fault_count = 0;
     }
     if (!temperatureHasBeenChecked) {
         // Signal to turn on contactor but only signal once
