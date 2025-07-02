@@ -120,15 +120,15 @@ _Static_assert((sizeof(TemperatureSensorsCfg)/sizeof(*TemperatureSensorsCfg)) ==
 #endif
 
 #ifndef MAX_DISCHARGE_TEMPERATURE_LIMIT
-#define MAX_DISCHARGE_TEMPERATURE_LIMIT 55000   // Max temperature limit (milliCelcius)     (recommended release: 55.00C)
+#define MAX_DISCHARGE_TEMPERATURE_LIMIT 52000   // Max temperature limit (milliCelcius)     (recommended release: 55.00C)
 #endif
 
 #ifndef MAX_CHARGE_TEMPERATURE_LIMIT
-#define MAX_CHARGE_TEMPERATURE_LIMIT    45000   // Max temperature limit (milliCelcius)     (recommended release: 45.00C)
+#define MAX_CHARGE_TEMPERATURE_LIMIT    43000   // Max temperature limit (milliCelcius)     (recommended release: 45.00C)
 #endif
 
 #ifndef CHARGE_DISABLE_TEMPERATURE
-#define CHARGE_DISABLE_TEMPERATURE      44500   // Temperature to stop charging at
+#define CHARGE_DISABLE_TEMPERATURE      42500   // Temperature to stop charging at
 #endif
 
 // make sure we don't enable charging if we're too close to the temperature limit
@@ -145,7 +145,7 @@ _Static_assert((sizeof(TemperatureSensorsCfg)/sizeof(*TemperatureSensorsCfg)) ==
 #endif
 
 #ifndef MAX_CURRENT_LIMIT
-#define MAX_CURRENT_LIMIT               60000   // Max current limit (Milliamperes)        (Max continuous discharge is 7A per cell)
+#define MAX_CURRENT_LIMIT               58000   // Max current limit (Milliamperes)        (Max continuous discharge is 7A per cell)
 #endif
 
 #ifndef MAX_COLD_CURRENT_LIMIT
