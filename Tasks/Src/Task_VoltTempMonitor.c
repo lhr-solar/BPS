@@ -232,7 +232,7 @@ static bool CheckTemperature(void) {
     if (status != SAFE) {
         // For spikes where we overtemperature for one iteration
         temperature_fault_count++;
-        if(temperature_fault_count >= 3){
+        if(temperature_fault_count >= 8){
             Fault_BitMap |= Fault_OTEMP;
             EnterFaultState();
         }
