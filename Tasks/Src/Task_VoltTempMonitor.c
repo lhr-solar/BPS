@@ -173,7 +173,7 @@ static bool CheckVoltage(void) {
     static volatile uint8_t voltage_fault_counter = 0;
 
     if (status != SAFE) {
-        if(voltage_fault_counter >= 3){
+        if(voltage_fault_counter >= 8){
             if (status_opt == UNDERVOLTAGE){
                 Fault_BitMap |= Fault_UVOLT;
             }
@@ -184,7 +184,7 @@ static bool CheckVoltage(void) {
         }
         voltage_fault_counter++;
     }
-    else{
+    else {
         voltage_fault_counter = 0;
     }
     if (!voltageHasBeenChecked) { // Signal to turn on contactor but only signal once
