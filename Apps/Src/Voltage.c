@@ -159,16 +159,21 @@ SafetyStatus Voltage_CheckStatus(SafetyStatusOpt* opt){
     if (opt == NULL) opt = &tmp;
     
     bool charge_enable = true;
+    // adjusted undervoltage limit based on current draw -> min voltage - (fos * internal resistance * current). only if current is greater than 1 amp
+    int32_t current = Amps_GetSafe();
+    int32_t adj_min_voltage_limit = MIN_VOLTAGE_LIMIT - ((current > 500) ? (int32_t)(0.75 * (current / 9.0) * 25 / 1000.0) : 0);
+
     for(int i = 0; i < NUM_BATTERY_MODULES; i++){
         uint16_t voltage = Voltage_GetModuleMillivoltage(i);
         // VOLTAGE_LIMITS in integer millivolts. The LTC6811 sends the voltage data
         // as unsigned 16-bit fixed point integers with a resolution of 0.00001
+
         if (voltage > MAX_VOLTAGE_LIMIT) {
             *opt = OVERVOLTAGE;
             return DANGER;
         } else if (voltage > CHARGE_DISABLE_VOLTAGE) {
             charge_enable = false;
-        } else if ((voltage < MIN_VOLTAGE_LIMIT)
+        } else if ((voltage < adj_min_voltage_limit)
                 || (Amps_IsCharging() && (voltage < MIN_VOLTAGE_CHARGING_LIMIT))) {
             *opt = UNDERVOLTAGE;
             return DANGER;

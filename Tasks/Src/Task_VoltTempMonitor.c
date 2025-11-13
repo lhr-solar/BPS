@@ -71,7 +71,7 @@ void Task_VoltTempMonitor(void *p_arg) {
 
         // BLOCKING =====================
         // Update Voltage Measurements
-        Voltage_UpdateMeasurements();\
+        Voltage_UpdateMeasurements();
         charge_enable = CheckVoltage();
         volt_elapsed = ((uint32_t)OSTimeGet(&err)) - volt_prev_tick;
         volt_prev_tick = (uint32_t)OSTimeGet(&err);
@@ -84,7 +84,7 @@ void Task_VoltTempMonitor(void *p_arg) {
         
         // BLOCKING =====================
         // Check if open wire is NOT safe: This currently does nothing
-        CheckOpenWire();
+        // CheckOpenWire();
         
         // BLOCKING =====================
         // Update Temperature Measurements

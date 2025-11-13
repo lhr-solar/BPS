@@ -27,6 +27,8 @@ static AmpsFilter_t AmpsFilter;
 static OS_SEM AmperesIO_Sem;
 static bsp_os_t spi_os;
 
+static OS_MUTEX Amperes_Mutex;
+
 void Amperes_Pend(){
     RTOS_BPS_SemPend(&AmperesIO_Sem, OS_OPT_PEND_BLOCKING);
 }
@@ -47,6 +49,7 @@ void Amps_Init(void) {
     spi_os.post = Amperes_Post;
     LTC2315_Init(spi_os);
     AmpsFilter_init(&AmpsFilter, 0);
+    RTOS_BPS_MutexCreate(&Amperes_Mutex, "Amperes Mutex");
 }
 
 /** Amps_UpdateMeasurements
@@ -130,4 +133,11 @@ void Amps_Calibrate(void) {
         Amps_UpdateMeasurements();
     }
     #endif
+}
+
+int32_t Amps_GetSafe() {
+    RTOS_BPS_MutexPend(&Amperes_Mutex, OS_OPT_PEND_BLOCKING);
+    int32_t current = latest_milliamps_filtered;
+    RTOS_BPS_MutexPost(&Amperes_Mutex, OS_OPT_POST_NONE);
+    return current;
 }
