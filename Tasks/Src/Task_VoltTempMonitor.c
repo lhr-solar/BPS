@@ -171,22 +171,30 @@ static bool CheckVoltage(void) {
     static bool voltageHasBeenChecked = false;
 
     static volatile uint8_t voltage_fault_counter = 0;
+    static volatile bool initially_faulted = false;
 
     if (status != SAFE) {
-        if(voltage_fault_counter >= 8){
+        uint8_t fault_threshold = initially_faulted ? 30 : 8;
+
+        if (!voltageHasBeenChecked) {
+            initially_faulted = true;
+        }
+        
+        if(voltage_fault_counter >= fault_threshold){
             if (status_opt == UNDERVOLTAGE){
                 Fault_BitMap |= Fault_UVOLT;
             }
             if (status_opt == OVERVOLTAGE){
                 Fault_BitMap |= Fault_OVOLT;
             }
-            EnterFaultState();  // doesn't return
+            EnterFaultState();
         }
         voltage_fault_counter++;
-    }
-    else {
+    } else {
         voltage_fault_counter = 0;
+        initially_faulted = false;
     }
+
     if (!voltageHasBeenChecked) { // Signal to turn on contactor but only signal once
         RTOS_BPS_SemPost(&SafetyCheck_Sem4, OS_OPT_POST_1);
         voltageHasBeenChecked = true;
