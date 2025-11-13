@@ -107,15 +107,15 @@ _Static_assert((sizeof(TemperatureSensorsCfg)/sizeof(*TemperatureSensorsCfg)) ==
 #endif
 
 #ifndef MAX_VOLTAGE_LIMIT
-#define MAX_VOLTAGE_LIMIT               4100    // Over voltage limit (milliVolts)      (actual max: 4.2V)
+#define MAX_VOLTAGE_LIMIT               4200    // Over voltage limit (milliVolts)      (actual max: 4.2V)
 #endif
 
 #ifndef CHARGE_DISABLE_VOLTAGE
-#define CHARGE_DISABLE_VOLTAGE          4000    // Voltage to stop charging at
+#define CHARGE_DISABLE_VOLTAGE          4100    // Voltage to stop charging at
 #endif
 
 // make sure we don't enable charging if we're too close to the voltage limit
-#if MAX_VOLTAGE_LIMIT - 100 < CHARGE_DISABLE_VOLTAGE
+#if MAX_VOLTAGE_LIMIT - 10 < CHARGE_DISABLE_VOLTAGE
 #error "Charging maximum voltage is too close to voltage trip limit!"
 #endif
 
