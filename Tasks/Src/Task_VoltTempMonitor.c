@@ -174,7 +174,7 @@ static bool CheckVoltage(void) {
     static volatile bool initially_faulted = false;
 
     if (status != SAFE) {
-        uint8_t fault_threshold = initially_faulted ? 30 : 8;
+        uint8_t fault_threshold = initially_faulted ? 30 : 12;
 
         if (!voltageHasBeenChecked) {
             initially_faulted = true;
