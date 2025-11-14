@@ -78,6 +78,8 @@ void Task_VoltTempMonitor(void *p_arg) {
         voltage_data_count++;
         for (int i = 0; i < NUM_BATTERY_MODULES; i++) {
             voltage_totals[i] += Voltage_GetModuleMillivoltage(i);
+            // print out the mV value for debugging with board + channel
+            printf("module %d mV: %d\r\n", i + 1, Voltage_GetModuleMillivoltage(i));
         }
         
         // BLOCKING =====================
@@ -168,11 +170,31 @@ static bool CheckVoltage(void) {
     SafetyStatus status = Voltage_CheckStatus(&status_opt);
     static bool voltageHasBeenChecked = false;
 
+    static volatile uint8_t voltage_fault_counter = 0;
+    static volatile bool initially_faulted = false;
+
     if (status != SAFE) {
-        if      (status_opt == UNDERVOLTAGE) Fault_BitMap |= Fault_UVOLT;
-        else if (status_opt == OVERVOLTAGE)  Fault_BitMap |= Fault_OVOLT;
-        EnterFaultState();  // doesn't return
+        uint8_t fault_threshold = initially_faulted ? 30 : 12;
+
+        if (!voltageHasBeenChecked) {
+            initially_faulted = true;
+        }
+        
+        if(voltage_fault_counter >= fault_threshold){
+            if (status_opt == UNDERVOLTAGE){
+                Fault_BitMap |= Fault_UVOLT;
+            }
+            if (status_opt == OVERVOLTAGE){
+                Fault_BitMap |= Fault_OVOLT;
+            }
+            EnterFaultState();
+        }
+        voltage_fault_counter++;
+    } else {
+        voltage_fault_counter = 0;
+        initially_faulted = false;
     }
+
     if (!voltageHasBeenChecked) { // Signal to turn on contactor but only signal once
         RTOS_BPS_SemPost(&SafetyCheck_Sem4, OS_OPT_POST_1);
         voltageHasBeenChecked = true;
@@ -180,6 +202,7 @@ static bool CheckVoltage(void) {
 
     return (status_opt != CHARGE_DISABLE);
 }
+
 
 /**
  * @brief check open wire status. If open wire is not safe, enter fault state
@@ -211,12 +234,22 @@ static void CheckOpenWire(void) {
 static bool CheckTemperature(void) {
     SafetyStatusOpt status_opt;
     SafetyStatus status = Temperature_CheckStatus(Amps_IsCharging(), &status_opt);
+    static uint8_t temperature_fault_count = 0;
+
     static bool temperatureHasBeenChecked = false;
 
     if (status != SAFE) {
-        Fault_BitMap |= Fault_OTEMP;
-        EnterFaultState();
-    } 
+        // For spikes where we overtemperature for one iteration
+        temperature_fault_count++;
+        if(temperature_fault_count >= 8){
+            Fault_BitMap |= Fault_OTEMP;
+            EnterFaultState();
+        }
+    }
+    else{
+        // reset the overtemperature count
+        temperature_fault_count = 0;
+    }
     if (!temperatureHasBeenChecked) {
         // Signal to turn on contactor but only signal once
         RTOS_BPS_SemPost(&SafetyCheck_Sem4, OS_OPT_POST_1);

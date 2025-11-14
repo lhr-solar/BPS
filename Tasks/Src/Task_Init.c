@@ -25,6 +25,21 @@ void Task_Init(void *p_arg) {
 
     RTOS_BPS_MutexCreate(&WDog_Mutex, "Watchdog Mutex");
 
+    #if BPS_ENABLE_PRINT_OUTPUT
+    RTOS_BPS_TaskCreate(&Print_TCB,                 // TCB
+            "TASK_PRINT_QUEUE_OUT",                 // Task Name (String)
+            Task_Print,                             // Task function pointer
+            (void *)0,                              // Task function args
+            TASK_PRINT_PRIO,                        // Priority
+            Print_Stk,                              // Stack
+            TASK_PRINT_STACK_SIZE);                 // Stack size
+    #endif
+
+    #if BPS_ENABLE_PRINT_OUTPUT
+    PQ_Init();
+    #endif
+
+
     RTOS_BPS_TaskCreate(&PetWDog_TCB,               // TCB
                 "TASK_PETWDOG",                     // Task Name (String)
                 Task_PetWDog,                       // Task function pointer
@@ -98,15 +113,7 @@ void Task_Init(void *p_arg) {
             );
     */
 
-    #if BPS_ENABLE_PRINT_OUTPUT
-    RTOS_BPS_TaskCreate(&Print_TCB,                 // TCB
-            "TASK_PRINT_QUEUE_OUT",                 // Task Name (String)
-            Task_Print,                             // Task function pointer
-            (void *)0,                              // Task function args
-            TASK_PRINT_PRIO,                        // Priority
-            Print_Stk,                              // Stack
-            TASK_PRINT_STACK_SIZE);                 // Stack size
-    #endif
+    
 
     RTOS_BPS_TaskCreate(&Idle_TCB,                  // TCB
             "TASK_IDLE",                            // Task Name (String)
@@ -117,10 +124,6 @@ void Task_Init(void *p_arg) {
             TASK_IDLE_STACK_SIZE);                  // Stack size
     
     CAN_Queue_Init();
-
-    #if BPS_ENABLE_PRINT_OUTPUT
-    PQ_Init();
-    #endif
 
     //delete task
     OSTaskDel(NULL, &err); // Delete task

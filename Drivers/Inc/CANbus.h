@@ -7,6 +7,14 @@
 #include "config.h"
 #include "CANMetaData.h"
 
+
+// Declae the CAN IDs that BPS will recieve from, array declared in c file
+#define CAN_FILTER_IDS {IO_STATE, MPPT_A_STATUS, MPPT_B_STATUS, CONTACTOR_SENSE}
+#define CAN_FILTER_IDS_LEN (sizeof((uint16_t[])CAN_FILTER_IDS) / sizeof(uint16_t))
+
+extern uint16_t can_filter_ids[];
+
+
 /**
  * @brief   Initializes the CAN system
  * @param   loopback	: if we should use loopback mode (for testing)	
@@ -15,7 +23,7 @@
  * @param   txIDFilterLen : length of txIDFilter array. Max 28 * 4 (28 filter banks * 4 IDs per bank)
  * @return  None
  */
-void CANbus_Init(bool loopback, bool faultState, uint16_t *txIDFilter, uint8_t txIDFilterLen);
+void CANbus_Init(bool loopback, bool faultState);
 
 /**
  * @brief  name says it all

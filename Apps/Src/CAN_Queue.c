@@ -30,6 +30,13 @@ static OS_MUTEX canFifo_Transmit_Mutex;
 static OS_SEM canFifo_Receive_Sem4;
 static OS_MUTEX canFifo_Receive_Mutex;
 
+typedef struct {
+    CANID_t id;
+    OS_SEM can_recv_Sem4;
+    CANMSG_t message;
+} can_recv_entry_t;
+
+static can_recv_entry_t can_recv_entries[CAN_FILTER_IDS_LEN];
 
 /**
  * @brief: initializes both Receive and Transmit fifo + sema4s and mutexes
@@ -46,6 +53,10 @@ void CAN_Queue_Init(void) {
     CAN_fifo_TRANSMIT_renew(&canFifo_TRANSMIT);
     CAN_fifo_RECEIVE_renew(&canFifo_RECEIVE);
 
+    for(uint8_t i = 0; i < CAN_FILTER_IDS_LEN; i++) {
+        can_recv_entries[i].id = can_filter_ids[i];
+        RTOS_BPS_SemCreate(&can_recv_entries[i].can_recv_Sem4, "CAN receive entry semaphore", 0);
+    }
 }
 
 /**
@@ -85,14 +96,24 @@ ErrorStatus CAN_TransmitQueue_Pend(CANMSG_t *message) {
 */
 ErrorStatus CAN_ReceiveQueue_Post(CANMSG_t message) {
     RTOS_BPS_MutexPend(&canFifo_Receive_Mutex, OS_OPT_PEND_BLOCKING);
-    bool success = CAN_fifo_RECEIVE_put(&canFifo_RECEIVE, message);
+    uint8_t idx = -1;
+    for(uint8_t i = 0; i < CAN_FILTER_IDS_LEN; i++) {
+        // if the message recieved is an entry, copy the message contents over to recieve entry
+        if (can_recv_entries[i].id == message.id) {
+            idx = i;
+            memcpy(&can_recv_entries[i].message, &message, sizeof(CANMSG_t));
+            break;
+        }
+    }
     RTOS_BPS_MutexPost(&canFifo_Receive_Mutex, OS_OPT_POST_NONE);
 
-    if (success) {
-        RTOS_BPS_SemPost(&canFifo_Receive_Sem4, OS_OPT_POST_1);
+    if(idx != -1){
+        // post to the semaphore for the specific can recvieve entry
+        RTOS_BPS_SemPost(&can_recv_entries[idx].can_recv_Sem4, OS_OPT_POST_1);
+        return SUCCESS;
     }
 
-    return success ? SUCCESS : ERROR;
+    return ERROR;
 }
 
 /**
@@ -101,15 +122,28 @@ ErrorStatus CAN_ReceiveQueue_Post(CANMSG_t message) {
  * @return: error status
  * @note: SemPend (Micrium) will have err = OS_ERR_PEND_WOULD_BLOCK, which is okay
 */
-ErrorStatus CAN_ReceiveQueue_Pend(CANMSG_t *message) {
-    BPS_OS_SEM_CTR cnt = RTOS_BPS_SemPend(&canFifo_Receive_Sem4, OS_OPT_PEND_NON_BLOCKING);
+ErrorStatus CAN_ReceiveQueue_Pend(CANMSG_t *message, CANID_t id) {
+    uint8_t idx = -1;
+    for(uint8_t i = 0; i < CAN_FILTER_IDS_LEN; i++) {
+        if (can_recv_entries[i].id == id) {
+            idx = i;
+        }
+    }
+    // CAN ID was not found in the receive entries
+    if(idx == -1){
+        return ERROR;
+    }
+
+    BPS_OS_SEM_CTR cnt = RTOS_BPS_SemPend(&can_recv_entries[idx].can_recv_Sem4, OS_OPT_PEND_NON_BLOCKING);
+
+    // There are no new contents for this CAN ID, scheduler would've blocked if we didn't pass in non-block option
     if (cnt == BPS_OS_SEM_WOULD_BLOCK) {
 		return ERROR;
 	}
 
     RTOS_BPS_MutexPend(&canFifo_Receive_Mutex, OS_OPT_PEND_BLOCKING);
-    bool result = CAN_fifo_RECEIVE_get(&canFifo_RECEIVE, message);
+    memcpy(message, &can_recv_entries[idx].message, sizeof(CANMSG_t));  // copy the recieve entry contents to the user message
+    message->id = can_recv_entries[idx].id; // somewhat redundant, but good for consistency
     RTOS_BPS_MutexPost(&canFifo_Receive_Mutex, OS_OPT_POST_NONE);
-    return result ? SUCCESS : ERROR;
+    return SUCCESS;
 }
-

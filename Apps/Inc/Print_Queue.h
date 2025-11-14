@@ -79,10 +79,11 @@ int _printf_internal(const char *format, ...);
 
 #ifndef SIMULATION
 
+#define BPS_ENABLE_PRINT_OUTPUT true
 #if BPS_ENABLE_PRINT_OUTPUT
 #define printf(...) _printf_internal(__VA_ARGS__)
 #else   // BPS_ENABLE_PRINT_OUTPUT disabled
-#define printf(...)
+#define printf(...) 
 #endif  // BPS_ENABLE_PRINT_OUTPUT
 
 #endif // SIMULATION

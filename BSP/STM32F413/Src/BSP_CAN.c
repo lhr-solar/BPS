@@ -85,9 +85,9 @@ void BSP_CAN_Init(callback_t rxEvent,
 
     /* CAN cell init */
     CAN_InitStructure.CAN_TTCM = DISABLE;
-    CAN_InitStructure.CAN_ABOM = DISABLE;
+    CAN_InitStructure.CAN_ABOM = ENABLE;
     CAN_InitStructure.CAN_AWUM = DISABLE;
-    CAN_InitStructure.CAN_NART = DISABLE;
+    CAN_InitStructure.CAN_NART = ENABLE;
     CAN_InitStructure.CAN_RFLM = DISABLE;
     CAN_InitStructure.CAN_TXFP = ENABLE;    // I don't think we picked BPS CAN IDs in order of importance anyway, so I'll just make this a FIFO
     CAN_InitStructure.CAN_Mode = (loopback ? CAN_Mode_LoopBack: CAN_Mode_Normal);

@@ -36,6 +36,41 @@ static const struct FaultToOut_t FaultDict[FAULT_MAX] = {
     [Fault_ESTOP]       = {.light = WIRE, .string = "ESTOP"}
 };
 
+typedef enum {
+    CAN_FAULT_NONE = 0,
+    CAN_Fault_UVOLT = 1,
+    CAN_Fault_OVOLT = 2,
+    CAN_Fault_OTEMP = 3,
+    CAN_Fault_OCURR = 4,
+    CAN_Fault_OW = 5,
+    CAN_Fault_HANDLER = 6,
+    CAN_Fault_OS = 7,
+    CAN_Fault_WDOG = 8,
+    CAN_Fault_CRC = 9,
+    CAN_Fault_ESTOP = 10,
+    CAN_Fault_CONTACTOR_FAULT = 11,
+    CAN_Fault_MPPT_FAULT = 12
+}Fault_CAN_message_t;
+
+/**
+ * @brief Assembly to create ms delay 
+ */
+static inline void delay_ms(uint32_t ms) {
+    // Adjusted loop count per ms based on empirical timing
+    // Originally: 20,000 per ms (80,000 cycles / 4 cycles/iter)
+    // Observed: ~3.77× slower → need ~5300 iterations per ms
+    uint32_t count = ms * 5300;
+
+    __asm__ volatile (
+        "1: \n"
+        "subs %[cnt], %[cnt], #1 \n"
+        "bne 1b \n"
+        : [cnt] "+r" (count)
+        :
+        : "cc"
+    );
+}
+
 /*
  * Note: do not call this directly if it can be helped.
  * Instead, call an RTOS function to unblock the mutex
@@ -76,7 +111,6 @@ void EnterFaultState() {
         Fault_BitMap = Fault_WDOG;
     }
 
-    // TODO: fix this so it works if there are multiple faults
     #ifdef SIMULATION
     char err[100] = {0};
     #endif
@@ -93,7 +127,7 @@ void EnterFaultState() {
     //Deinitialize CAN registers
     CANbus_DeInit();
     //Reinit CAN in fault state
-    CANbus_Init(BPS_CAN_LOOPBACK, true, NULL, 0);
+    CANbus_Init(BPS_CAN_LOOPBACK, true);
 
 #ifdef DEBUGMODE
     char command[COMMAND_SIZE];
@@ -110,9 +144,20 @@ void EnterFaultState() {
         payload.data.w = 1;
         CANbus_SendMsg_FaultState(BPS_TRIP, payload);
 
+        //Send MPPT to disable boosting
+        payload.data.b = 0;
+        CANbus_SendMsg_FaultState(MPPT_A_BOOST_ENABLE, payload);
+
+        payload.data.b = 0;
+        CANbus_SendMsg_FaultState(MPPT_B_BOOST_ENABLE, payload);
+
         //Send Contactor Readings
         payload.data.b = 0;
         CANbus_SendMsg_FaultState(BPS_CONTACTOR_STATE, payload);
+
+        //Send All Clear False
+        payload.data.b = 0;
+        CANbus_SendMsg_FaultState(BPS_ALL_CLEAR, payload);
         
         //Send Current Readings
         payload.data.w = Amps_GetReading(false);
@@ -132,11 +177,52 @@ void EnterFaultState() {
             CANbus_SendMsg_FaultState(TEMPERATURE_DATA_ARRAY, payload);
         }
 
+        // Send FAULT ID
+        switch(Fault_BitMap){
+            case Fault_UVOLT:
+                payload.data.b = CAN_Fault_UVOLT;
+                break;
+            case Fault_OVOLT:
+                payload.data.b = CAN_Fault_OVOLT;
+                break;
+            case Fault_OTEMP:
+                payload.data.b = CAN_Fault_OTEMP;
+                break;
+            case Fault_OCURR:
+                payload.data.b = CAN_Fault_OCURR;
+                break;
+            case Fault_OW:
+                payload.data.b = CAN_Fault_OW;
+                break;
+            case Fault_HANDLER:
+                payload.data.b = CAN_Fault_HANDLER;
+                break;
+            case Fault_OS:
+                payload.data.b = CAN_Fault_OS;
+                break;
+            case Fault_WDOG:
+                payload.data.b = CAN_Fault_WDOG;
+                break;
+            case Fault_CRC:
+                payload.data.b = CAN_Fault_CRC;
+                break;
+            case Fault_ESTOP:
+                payload.data.b = CAN_Fault_ESTOP;
+                break;
+            default:
+                payload.data.b = CAN_FAULT_NONE;
+                break;
+        }
+        CANbus_SendMsg_FaultState(BPS_FAULT_STATE, payload);
+
+
         BSP_WDTimer_Reset(); // WDOG Reset
 #ifdef SIMULATION
         Simulator_Log(LOG_INFO, "Completed fault state\n");
         Simulator_Shutdown(0);
 #endif
+        // Wait for 1000ms
+        delay_ms(100);
     }
 }
 

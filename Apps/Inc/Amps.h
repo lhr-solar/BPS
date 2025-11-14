@@ -42,6 +42,8 @@ bool Amps_IsCharging(void);
  */
 int32_t Amps_GetReading(bool raw);
 
+int32_t Amps_GetSafe(void);
+
 /**
  * @brief calibrate the amperes module. Must be called when the contactors are open
  * 

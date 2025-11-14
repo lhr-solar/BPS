@@ -35,7 +35,7 @@ typedef enum SafetyStatusOpt_e {
 //--------------------------------------------------------------------------------
 // Battery Pack layout
 #ifndef NUM_BATTERY_MODULES
-#define NUM_BATTERY_MODULES             31      // Number of battery modules
+#define NUM_BATTERY_MODULES             32      // Number of battery modules
 #endif
 
 #ifndef MODULE_CELLS_IN_PARALLEL
@@ -47,7 +47,7 @@ typedef enum SafetyStatusOpt_e {
 #endif
 
 #ifndef NUM_TEMPERATURE_SENSORS
-#define NUM_TEMPERATURE_SENSORS         31      // Number of temperature sensors
+#define NUM_TEMPERATURE_SENSORS         32      // Number of temperature sensors
 #endif
 
 //--------------------------------------------------------------------------------
@@ -58,7 +58,7 @@ typedef enum SafetyStatusOpt_e {
 #endif
 
 #ifndef PER_MINION_BOARD_VOLT_SENSORS
-#define PER_MINION_BOARD_VOLT_SENSORS   {11, 9, 11}    // Number of voltage sensors per minion board. Should be an array with same length as NUM_MINIONS
+#define PER_MINION_BOARD_VOLT_SENSORS   {11, 10, 11}    // Number of voltage sensors per minion board. Should be an array with same length as NUM_MINIONS
 #endif
 
 #define MAX_VOLT_WIRES                    (MAX_VOLT_SENSORS_PER_MINION_BOARD * NUM_MINIONS)
@@ -71,7 +71,7 @@ typedef enum SafetyStatusOpt_e {
 #endif
 
 #ifndef PER_MINION_BOARD_TEMP_SENSORS
-#define PER_MINION_BOARD_TEMP_SENSORS   {16, 0, 15}     // Number of voltage sensors per minion board. Should be an array with same length as NUM_MINIONS
+#define PER_MINION_BOARD_TEMP_SENSORS   {0, 16, 16}     // Number of temperature sensors per minion board. Should be an array with same length as NUM_MINIONS
 #endif
 
 #define MAX_TEMP_SENSORS                (MAX_TEMP_SENSORS_PER_MINION_BOARD * NUM_MINIONS)
@@ -103,7 +103,7 @@ _Static_assert((sizeof(TemperatureSensorsCfg)/sizeof(*TemperatureSensorsCfg)) ==
 #endif
 
 #ifndef MIN_VOLTAGE_LIMIT
-#define MIN_VOLTAGE_LIMIT               2700    // Under voltage limit (milliVolts)     (actual min: 2.5V)
+#define MIN_VOLTAGE_LIMIT               2600    // Under voltage limit (milliVolts)     (actual min: 2.5V)
 #endif
 
 #ifndef MAX_VOLTAGE_LIMIT
@@ -115,20 +115,20 @@ _Static_assert((sizeof(TemperatureSensorsCfg)/sizeof(*TemperatureSensorsCfg)) ==
 #endif
 
 // make sure we don't enable charging if we're too close to the voltage limit
-#if MAX_VOLTAGE_LIMIT - 100 < CHARGE_DISABLE_VOLTAGE
+#if MAX_VOLTAGE_LIMIT - 10 < CHARGE_DISABLE_VOLTAGE
 #error "Charging maximum voltage is too close to voltage trip limit!"
 #endif
 
 #ifndef MAX_DISCHARGE_TEMPERATURE_LIMIT
-#define MAX_DISCHARGE_TEMPERATURE_LIMIT 60000   // Max temperature limit (milliCelcius)     (recommended release: 60.00C)
+#define MAX_DISCHARGE_TEMPERATURE_LIMIT 52000   // Max temperature limit (milliCelcius)     (recommended release: 55.00C)
 #endif
 
 #ifndef MAX_CHARGE_TEMPERATURE_LIMIT
-#define MAX_CHARGE_TEMPERATURE_LIMIT    45000   // Max temperature limit (milliCelcius)     (recommended release: 45.00C)
+#define MAX_CHARGE_TEMPERATURE_LIMIT    43000   // Max temperature limit (milliCelcius)     (recommended release: 45.00C)
 #endif
 
 #ifndef CHARGE_DISABLE_TEMPERATURE
-#define CHARGE_DISABLE_TEMPERATURE      44500   // Temperature to stop charging at
+#define CHARGE_DISABLE_TEMPERATURE      42500   // Temperature to stop charging at
 #endif
 
 // make sure we don't enable charging if we're too close to the temperature limit

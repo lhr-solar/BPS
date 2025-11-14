@@ -30,15 +30,6 @@ static TemperatureFilter1_t TemperatureFilter1;
 #include "EMAFilter.h"
 static TemperatureFilter2_t TemperatureFilter2;
 
-// hacky remapping for temperature hat error in pin assignment. TODO: fix this in HW
-/**
- * [1->1,  2->5,  3->9,   4->13 ],
- * [5->2,  6->6,  7->10,  8->14 ],
- * [9->3,  10->7, 11->11, 12->15],
- * [13->4, 14->8, 15->12, 16->16]
- */
-static const uint8_t temp_reindex[16] = {0, 4, 8, 12, 1, 5, 9, 13, 2, 6, 10, 14, 3, 7, 11, 15};
-
 // simulator bypasses ltc driver
 #ifndef SIMULATION
 // Interface to communicate with LTC6811 (Register values)
@@ -203,9 +194,12 @@ int32_t milliVoltToCelsius(uint32_t milliVolt){
         return TEMP_DISCONNECTED;
     }
     else {
-        return TEMP_ERR_OUT_BOUNDS;
+        return TEMP_ERR_OUT_BOUNDS; 
     }
 }
+
+uint16_t Milivolts[32] = {0};
+uint32_t i = 0;
 
 /** Temperature_UpdateSingleChannel
  * Stores and updates the new measurements received on one particular temperature sensor
@@ -226,9 +220,6 @@ int32_t Temperature_UpdateSingleChannel(uint8_t channel){
     RTOS_BPS_MutexPend(&MinionsASIC_Mutex, OS_OPT_PEND_BLOCKING);
 #endif
 
-    // define actual temp channel in HW based on error in PCB. TODO: fix this in HW
-    channel = temp_reindex[channel];
-
     uint8_t temp_connected_count = 0;
 
     // Convert to Celsius
@@ -239,6 +230,13 @@ int32_t Temperature_UpdateSingleChannel(uint8_t channel){
         if (channel < TemperatureSensorsCfg[board]) {   // don't touch unused sensors
 #ifndef SIMULATION
             TemperaturesMedFiltIn[sensor_idx] = milliVoltToCelsius(Minions[board].aux.a_codes[0] / 10);
+            
+            // Milivolts[i] = Minions[board].aux.a_codes[0] / 10;
+            // i = (i + 1) % 32;
+            // // print out the mV value for debugging with board + channel
+            // printf("minion %d sensor %d mV: %d\r\n", board + 1, channel + 1, Milivolts[i-1]);
+
+
             // if we detect a disconnected temp tap, we set to a safe temperature assuming we are 
             // currently scrutineering (all but one connected). then, at the last temperature sensor, 
             // if only one temp tap is detected as connected, we can verify that we are indeed 
@@ -246,8 +244,9 @@ int32_t Temperature_UpdateSingleChannel(uint8_t channel){
             if (TemperaturesMedFiltIn[sensor_idx] == TEMP_DISCONNECTED) {
                 TemperaturesMedFiltIn[sensor_idx] = 0;  // go ahead and set to a safe temperature.
             } else {
-                temp_connected_count++;
+                // temp_connected_count++;
             }
+            temp_connected_count++;
 #else
             // simulator expects the actual number of physical sensors (and not just mux channels on the PCB)
             // therefore, we have to do some index crunching -- this is very inefficient but it's just for 
@@ -285,10 +284,12 @@ ErrorStatus Temperature_UpdateAllMeasurements(){
     int32_t total_connected_sensors = 0;
     for (uint8_t sensorCh = 0; sensorCh < MAX_TEMP_SENSORS_PER_MINION_BOARD; sensorCh++) {
         // A hack to solve a timing issue related to enabling one of the muxes
-        if (sensorCh % 8 == 0) {
-            Temperature_ChannelConfig(sensorCh);
-            Temperature_ChannelConfig(sensorCh);
-        }
+        // if (sensorCh % 8 == 0) {
+        //     Temperature_ChannelConfig(sensorCh);
+        //     Temperature_ChannelConfig(sensorCh);
+        // }
+        Temperature_ChannelConfig(sensorCh);
+        Temperature_ChannelConfig(sensorCh);
         // Update the measurement for this channel
         total_connected_sensors += Temperature_UpdateSingleChannel(sensorCh);
     }
@@ -301,13 +302,13 @@ ErrorStatus Temperature_UpdateAllMeasurements(){
     for (uint8_t minion = 0, sensor = 0; minion < NUM_MINIONS; minion++){
         for (uint8_t channel = 0; channel < TemperatureSensorsCfg[minion]; channel++) {
             uint8_t sensor_idx = (minion * MAX_TEMP_SENSORS_PER_MINION_BOARD) + channel;
-            // hack to deal with skip wiring assignment in harness. TODO: remove this
-            // wires are assigned 11, 10, 11 to correspond to original battery pack
-            // updated pack is 11, 9, 11 -- we have to add a skip after the 20th module (sensor >= 20)
-            if (sensor >= 20) sensor_idx += 1;
             Temperatures[sensor++] = filteredTemperatures[sensor_idx];
         }
     }
+
+    // for (uint8_t i = 0; i < NUM_TEMPERATURE_SENSORS; i++) {
+    //     printf("sensor %d: %d°C\r\n", i + 1, Temperatures[i] / 1000);
+    // }
 
 
     int empty_sensors = 2; // number of sensors we allow to be disconnected
@@ -420,7 +421,6 @@ ErrorStatus Temperature_SampleADC(uint8_t ADCMode) {
     RTOS_BPS_MutexPend(&MinionsASIC_Mutex, OS_OPT_PEND_BLOCKING);
     int8_t error = LTC6811_rdaux(AUX_CH_GPIO1, NUM_MINIONS, Minions); // Update Minions with fresh values
     RTOS_BPS_MutexPost(&MinionsASIC_Mutex, OS_OPT_POST_NONE);\
-    
     return error != -1 ? SUCCESS : ERROR;
 
 #else
