@@ -84,7 +84,7 @@ void Task_VoltTempMonitor(void *p_arg) {
         
         // BLOCKING =====================
         // Check if open wire is NOT safe: This currently does nothing
-        // CheckOpenWire();
+        CheckOpenWire();
         
         // BLOCKING =====================
         // Update Temperature Measurements
@@ -202,6 +202,7 @@ static bool CheckVoltage(void) {
 
     return (status_opt != CHARGE_DISABLE);
 }
+
 
 /**
  * @brief check open wire status. If open wire is not safe, enter fault state

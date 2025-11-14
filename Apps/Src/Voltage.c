@@ -167,8 +167,9 @@ SafetyStatus Voltage_CheckStatus(SafetyStatusOpt* opt){
         uint16_t voltage = Voltage_GetModuleMillivoltage(i);
         // VOLTAGE_LIMITS in integer millivolts. The LTC6811 sends the voltage data
         // as unsigned 16-bit fixed point integers with a resolution of 0.00001
-
-        if (voltage > MAX_VOLTAGE_LIMIT) {
+        
+        //only overvolt if charging
+        if (voltage > MAX_VOLTAGE_LIMIT && Amps_IsCharging()) {
             *opt = OVERVOLTAGE;
             return DANGER;
         } else if (voltage > CHARGE_DISABLE_VOLTAGE) {
